@@ -66,7 +66,8 @@ class SearchStore {
 
     set rangeType(newRangeType: string) {
         this._rangeType = newRangeType;
-        this.rangeParams = Immutable.Map<string, any>();
+        this.rangeParams = (this.originalSearch.get('rangeType') === newRangeType) ? this.originalSearch.get('rangeParams') : Immutable.Map<string, any>();
+
         if (this.onParamsChanged !== undefined) {
             this.onParamsChanged(this.getParams());
         }
@@ -109,8 +110,8 @@ class SearchStore {
                 break;
             case 'absolute':
                 rangeParams = Immutable.Map<string, any>({
-                    from: parsedSearch.get('from', ''),
-                    to: parsedSearch.get('to', '')
+                    from: parsedSearch.get('from', null),
+                    to: parsedSearch.get('to', null)
                 });
                 break;
             case 'keyword':
@@ -162,6 +163,7 @@ class SearchStore {
         };
     }
 
+    // Get initial search params, with names used in AJAX requests
     getOriginalSearchParams(): Immutable.Map<string,any> {
         var orignalParams = Immutable.Map<string, any>();
         orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
@@ -172,7 +174,8 @@ class SearchStore {
         return orignalParams;
     }
 
-    getSearchURLParams(): Immutable.Map<string, any> {
+    // Get initial search params, with the names used in a search URL request
+    getOriginalSearchURLParams(): Immutable.Map<string, any> {
         var simplifiedParams = Immutable.Map<string, any>();
         simplifiedParams = simplifiedParams.set('rangetype', this.originalSearch.get('rangeType'));
         simplifiedParams = simplifiedParams.merge(this.originalSearch.get('rangeParams'));
@@ -184,7 +187,7 @@ class SearchStore {
     }
 
     _reloadSearchWithNewParam(param: string, value: any) {
-        var searchURLParams = this.getSearchURLParams();
+        var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
         URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
     }
