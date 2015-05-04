@@ -35,6 +35,18 @@ var StreamsStore = {
             url: url
         }).done(callback).fail(failCallback);
     },
+    pause(streamId: string, callback: (() => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Pausing Stream failed with status: " + errorThrown,
+                "Could not resume Stream!");
+        };
+
+        var url = jsRoutes.controllers.api.StreamsApiController.pause(streamId).url;
+        $.ajax({
+            type: "POST",
+            url: url
+        }).done(callback).fail(failCallback);
+    },
     resume(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Resuming Stream failed with status: " + errorThrown,
