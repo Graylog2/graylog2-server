@@ -24,15 +24,17 @@
     }
 }
 
-<label for="@(idPrefix + "-" + field.getTitle)">
-    @field.getHumanName
+<div class="form-group">
+    <label for="@(idPrefix + "-" + field.getTitle)">
+        @field.getHumanName
 
-    @if(field.isOptional) {
-        <span class="configuration-field-optional">(optional)</span>
-    }
-</label>
-<input id="@(idPrefix + "-" + field.getTitle)" type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
-    @htmlAttributes(field)
-    @fieldValue(value, field.getDefaultValue)
+        @if(field.isOptional) {
+            <span class="configuration-field-optional">(optional)</span>
+        }
+    </label>
+    <input id="@(idPrefix + "-" + field.getTitle)" type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
+        @htmlAttributes(field)
+        @fieldValue(value, field.getDefaultValue)
     class="input-xlarge validatable form-control">
-<p class="help-block">@field.getDescription</p>
+    <p class="help-block">@field.getDescription</p>
+</div>

@@ -16,6 +16,10 @@ System
     / Outputs
 }
 
+@if(request.path().startsWith("/system/agents")) {
+    / Agents
+}
+
 @if(request.path().startsWith("/system/indices")) {
     / Indices
 }
