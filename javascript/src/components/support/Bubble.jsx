@@ -6,7 +6,7 @@ var Bubble = React.createClass({
     render() {
         return (
             <a href={"https://www.graylog.org/documentation/" + this.props.link} target="_blank">
-                <i class="fa fa-lightbulb"></i>
+                <i className="fa fa-lightbulb"></i>
             </a>
         );
     }
