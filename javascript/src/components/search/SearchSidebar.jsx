@@ -32,7 +32,9 @@ var MessageField = React.createClass({
                        onClick={this._toggleShowActions}></i>
                 </div>
                 <div style={{marginLeft: 25}}>
-                    <Input type="checkbox" label={this.props.field.name}
+                    <Input type="checkbox"
+                           label={this.props.field.name}
+                           checked={this.props.selected}
                            onChange={() => this.props.onToggled(this.props.field.name)}/>
 
                     {this.state.showActions &&
