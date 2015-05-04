@@ -3,13 +3,15 @@
 var React = require('react/addons');
 var Stream = require('./Stream');
 var Alert = require('react-bootstrap').Alert;
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var StreamList = React.createClass({
+    mixins: [PermissionsMixin],
     getInitialState() {
         return {};
     },
     _formatStream(stream) {
-        return <Stream key={"stream-" + stream.id} stream={stream}
+        return <Stream key={"stream-" + stream.id} stream={stream} permissions={this.props.permissions}
                        onDelete={this.props.onDelete} onResume={this.props.onResume} onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>;
     },
     _sortByTitle(stream1, stream2) {
@@ -26,7 +28,7 @@ var StreamList = React.createClass({
             );
         } else {
             // @if(isPermitted(STREAMS_CREATE))
-            var createLink = <a onClick={this.props.createStream}>Create one now</a>;
+            var createLink = (this.isPermitted(this.props.permissions, ['streams:create']) ? <a onClick={this.props.onCreate}>Create one now</a> : "");
             return (
                 <Alert bsStyle='warning'>
                     <i className="fa fa-info-circle"></i>&nbsp;

@@ -2,8 +2,10 @@
 
 var React = require('react/addons');
 var StreamRuleForm = require('./StreamRuleForm');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var StreamRule = React.createClass({
+    mixins: [PermissionsMixin],
     _onDelete(evt) {},
     _onEdit(evt) {
         this.refs.streamRuleForm.open();
@@ -24,9 +26,10 @@ var StreamRule = React.createClass({
     },
     render() {
         var streamRule = this.props.streamRule;
+        var actionItems = (this.isPermitted(this.props.permissions, ['streams:edit:'+this.props.stream.id]) ? this._formatActionItems() : "");
         return (
             <li>
-                {this._formatActionItems()}{streamRule.field}
+                {actionItems}{streamRule.field}
                 <StreamRuleForm ref='streamRuleForm' streamRule={this.streamRule} title="Edit Stream Rule"/>
             </li>
         );

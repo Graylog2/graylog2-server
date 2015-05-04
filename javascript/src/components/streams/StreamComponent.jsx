@@ -5,8 +5,10 @@ var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamList = require('./StreamList');
 var CreateStreamButton = require('./CreateStreamButton');
 var SupportLink = require('../support/SupportLink');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var StreamComponent = React.createClass({
+    mixins: [PermissionsMixin],
     getInitialState() {
         return {
             streams: []
@@ -51,8 +53,7 @@ var StreamComponent = React.createClass({
         this.refs.createStreamButton.onClick();
     },
     render() {
-        // @if(isPermitted(STREAMS_CREATE)) {
-        var createStreamButton = <CreateStreamButton ref='createStreamButton' onSave={this._onSave} />;
+        var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ? <CreateStreamButton ref='createStreamButton' onSave={this._onSave} /> : "");
         return (
             <div>
                 <div className="row content content-head">
@@ -80,7 +81,8 @@ var StreamComponent = React.createClass({
 
                 <div className="row content">
                     <div className="col-md-12">
-                        <StreamList streams={this.state.streams} createStream={this._onCreateStream}
+                        <StreamList streams={this.state.streams} permissions={this.props.permissions}
+                                    onCreate={this._onCreateStream}
                                     onDelete={this._onDeleteStream} onResume={this._onResumeStream}
                                     onUpdate={this._onUpdateStream} onClone={this._onCloneStream}/>
                     </div>

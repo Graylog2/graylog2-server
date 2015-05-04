@@ -1,9 +1,8 @@
 @(currentUser: org.graylog2.restclient.models.User)
 
-@import lib.security.RestPermissions._
-@import views.helpers.Permissions
+@import play.libs.Json
 
 @main("Streams", null, "", currentUser, false) {
-    <div class="react-stream-component" data-permissions='@Permissions.asJson(STREAMS_READ, STREAMS_EDIT)'>
+    <div class="react-stream-component" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
 }

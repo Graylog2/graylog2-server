@@ -1,3 +1,5 @@
+/* global jsRoutes */
+
 'use strict';
 
 var React = require('react/addons');
@@ -5,8 +7,10 @@ var StreamThroughput = require('./StreamThroughput');
 var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');
 var CollapsableStreamList = require('./CollapsableStreamList');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var Stream = React.createClass({
+    mixins: [PermissionsMixin],
     _formatNumberOfStreamRules(stream) {
         return (stream.stream_rules.length > 0 ? stream.stream_rules.length + " configured stream rule(s)." : "no configured rules.");
     },
@@ -15,15 +19,23 @@ var Stream = React.createClass({
     },
     render() {
         var stream = this.props.stream;
+        var permissions = this.props.permissions;
         // @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        var editRulesLink = <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a>;
+        var editRulesLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : "");
         // @if(isPermitted(STREAMS_EDIT, stream.getId) && isPermitted(STREAM_OUTPUTS_READ)) {
-        var manageOutputsLink = <a href={jsRoutes.controllers.StreamOutputsController.index(stream.id).url} className="btn btn-info">Manage outputs</a>;
-        var manageAlertsLink = <a href={jsRoutes.controllers.AlertsController.index(stream.id).url} className="btn btn-info">Manage alerts</a>;
+        if (this.isPermitted(permissions, ['streams:edit:'+stream.id, 'stream_outputs:read'])) {
+            var manageOutputsLink = <a href={jsRoutes.controllers.StreamOutputsController.index(stream.id).url}
+                                       className="btn btn-info">Manage outputs</a>;
+            var manageAlertsLink = <a href={jsRoutes.controllers.AlertsController.index(stream.id).url}
+                                      className="btn btn-info">Manage alerts</a>;
+        } else {
+            var manageOutputsLink = "";
+            var manageAlertsLink = "";
+        }
         // @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        var deleteStreamLink = <a className="btn btn-danger" onClick={this._handleDelete}>
+        var deleteStreamLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a className="btn btn-danger" onClick={this._handleDelete}>
             <i className="fa fa-trash"></i>
-        </a>;
+        </a> : "");
 
         var createdFromContentPack = (stream.content_pack ? <i className="fa fa-cube" title="Created from content pack"></i> : "");
 
@@ -41,7 +53,7 @@ var Stream = React.createClass({
                         {manageAlertsLink}
                         {deleteStreamLink}
 
-                        <StreamControls stream={stream}
+                        <StreamControls stream={stream} permissions={this.props.permissions}
                                         onResume={this.props.onResume} onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>
                     </div>
                     <div className="stream-description">
@@ -54,7 +66,7 @@ var Stream = React.createClass({
 
                         , {this._formatNumberOfStreamRules(stream)}
 
-                        <CollapsableStreamList streamRules={stream.stream_rules}/>
+                        <CollapsableStreamList key={'streamRules-'+stream.id} stream={stream} permissions={this.props.permissions}/>
                     </div>
                 </div>
             </li>

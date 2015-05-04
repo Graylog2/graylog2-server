@@ -19,14 +19,14 @@ var CollapsableStreamList = React.createClass({
         this.setState({expanded:!this.state.expanded});
     },
     render() {
-        let styles = this.getCollapsableClassSet();
-        let text = this.isExpanded() ? 'Hide' : 'Show';
+        var styles = this.getCollapsableClassSet();
+        var text = this.isExpanded() ? 'Hide' : 'Show';
 
         return (
             <div>
                 <a onClick={this.onHandleToggle}>{text} stream rules</a>
                 <Well ref='well' className={styles}>
-                    <StreamRuleList streamRules={this.props.streamRules} />
+                    <StreamRuleList stream={this.props.stream} permissions={this.props.permissions} />
                 </Well>
             </div>
         );
