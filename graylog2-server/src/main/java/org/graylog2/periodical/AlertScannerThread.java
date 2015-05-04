@@ -111,7 +111,7 @@ public class AlertScannerThread extends Periodical {
                         }
                     } else {
                         // Alert not triggered.
-                        LOG.debug("Alert condition [{}] is triggered.", alertCondition);
+                        LOG.debug("Alert condition [{}] is not triggered.", alertCondition);
                     }
                 } catch(Exception e) {
                     LOG.error("Skipping alert check that threw an exception.", e);

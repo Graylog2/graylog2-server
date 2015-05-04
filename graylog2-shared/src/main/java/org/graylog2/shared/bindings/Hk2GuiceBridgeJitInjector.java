@@ -22,6 +22,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.Stage;
 import com.google.inject.TypeLiteral;
 
 import java.lang.reflect.InvocationHandler;
@@ -52,11 +53,11 @@ public class Hk2GuiceBridgeJitInjector implements InvocationHandler {
     private final Injector injector;
 
     public static Injector create(final Module module, final String... packagePrefixes) {
-        return create(Guice.createInjector(module), packagePrefixes);
+        return create(Guice.createInjector(Stage.PRODUCTION, module), packagePrefixes);
     }
 
     public static Injector create(final Iterable<? extends Module> modules, final String... packagePrefixes) {
-        return create(Guice.createInjector(modules), packagePrefixes);
+        return create(Guice.createInjector(Stage.PRODUCTION, modules), packagePrefixes);
     }
 
     public static Injector create(final Injector injector, final String... packagePrefixes) {
