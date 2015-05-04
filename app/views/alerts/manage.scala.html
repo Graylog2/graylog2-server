@@ -7,6 +7,7 @@
         alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
+@import play.libs.Json
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import views.helpers.Permissions
@@ -59,7 +60,7 @@
             The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
             on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
 
-            <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
+            <div class="react-alarmcallback-component" data-permissions='@Json.toJson(currentUser.getPermissions)'>
             </div>
 
             @if((stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) && isPermitted(STREAMS_EDIT, stream.getId)) {

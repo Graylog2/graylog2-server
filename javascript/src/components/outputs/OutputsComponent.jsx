@@ -99,7 +99,7 @@ var OutputComponent = React.createClass({
     render() {
         var permissions = this.props.permissions;
         var streamId = this.props.streamId;
-        var createOutputDropdown = (this.isPermitted(permissions, ["OUTPUTS_CREATE"]) ?
+        var createOutputDropdown = (this.isPermitted(permissions, ["outputs:create"]) ?
             <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput} getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : "");
         var assignOutputDropdown = (streamId ?
             <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId} outputs={this.state.assignableOutputs} onSubmit={this._handleAssignOutput}/> : "");
