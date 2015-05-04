@@ -46,7 +46,6 @@
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
         <module>graylog2-bootstrap</module>
-        <module>integration-tests</module>
         <module>graylog2-rest-models</module>
     </modules>
 
@@ -709,6 +708,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.jukito</groupId>
+                <artifactId>jukito</artifactId>
+                <version>1.4</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.github.fakemongo</groupId>
                 <artifactId>fongo</artifactId>
                 <version>1.6.2</version>
@@ -1159,6 +1164,17 @@
                     </plugin>
                 </plugins>
             </reporting>
+        </profile>
+        <profile>
+            <id>integration-tests</id>
+            <activation>
+                <property>
+                    <name>gl2.integration.tests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>integration-tests</module>
+            </modules>
         </profile>
     </profiles>
 </project>

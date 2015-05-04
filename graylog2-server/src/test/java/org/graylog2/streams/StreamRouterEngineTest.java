@@ -51,7 +51,7 @@ public class StreamRouterEngineTest {
 
     @Before
     public void setUp() throws Exception {
-        when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(50L);
+        when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
     private StreamRouterEngine newEngine(List<Stream> streams) {

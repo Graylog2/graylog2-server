@@ -1,0 +1,5 @@
+{
+  "agents" : [
+    {"id" : "agentId", "node_id" : "nodeId", "agent_version" : "0.0.1", "node_details" : {"operating_system" : "DummyOS 1.0"}, "last_seen" : ""}
+  ]
+}
