@@ -26,6 +26,10 @@ var SearchBar = React.createClass({
     },
     componentDidMount() {
         SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
+        SearchStore.onSubmitSearch = () => {
+            this._prepareSearch();
+            React.findDOMNode(this.refs.searchForm).submit();
+        };
         this._initalizeDatepicker();
     },
     componentDidUpdate() {
@@ -100,7 +104,7 @@ var SearchBar = React.createClass({
     _isValidDateString(dateString) {
         return dateString === undefined || momentHelper.parseFromString(dateString).isValid();
     },
-    _performSearch(event) {
+    _prepareSearch(event) {
         // Convert from and to values to UTC
         if (this.state.rangeType === 'absolute') {
             var fromInput = this.refs.fromFormatted.getValue();
@@ -206,10 +210,11 @@ var SearchBar = React.createClass({
                 <div className="col-md-12" id="universalsearch-container">
                     <div className="row no-bm">
                         <div ref="universalSearch" className="col-md-12" id="universalsearch">
-                            <form className="universalsearch-form"
-                                  action={this.props.streamId ?  "unimplemented" : jsRoutes.controllers.SearchControllerV2.index().url }
-                                  method="GET"
-                                  onSubmit={this._performSearch}>
+                            <form ref='searchForm'
+                                  className='universalsearch-form'
+                                  action={this.props.streamId ?  'unimplemented' : jsRoutes.controllers.SearchControllerV2.index().url }
+                                  method='GET'
+                                  onSubmit={this._prepareSearch}>
                                 <input type="hidden" name="rangetype" value={this.state.rangeType}/>
                                 <input type="hidden" name="fields" value=""/>
                                 <input type="hidden" name="width" value={$(window).width()}/>

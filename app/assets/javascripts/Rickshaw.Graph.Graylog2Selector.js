@@ -1,14 +1,16 @@
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
 
-    initialize: function(args) {
+    initialize: function (args) {
         var graph = args.graph;
         this.graph = args.graph;
         this.build();
-        graph.onUpdate(function() { this.update();  }.bind(this));
+        graph.onUpdate(function () {
+            this.update();
+        }.bind(this));
     },
 
-    build: function() {
+    build: function () {
         var graph = this.graph;
         var parent = graph.element.getElementsByTagName('svg')[0];
 
@@ -17,19 +19,19 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
 
         // Create selector box.
         var selectionBox = document.createElement('div');
-        selectionBox.setAttribute('class','graph-range-selector');
+        selectionBox.setAttribute('class', 'graph-range-selector');
         graph.element.appendChild(selectionBox);
 
-        parent.oncontextmenu = function(){
+        parent.oncontextmenu = function () {
             e.preventDefault();
         };
 
         // Function to reset selection.
-        var clearSelection = function() {
+        var clearSelection = function () {
             selectionBox.style.transition = 'opacity 0.2s ease-out';
             selectionBox.style.opacity = 0;
 
-            setTimeout(function() {
+            setTimeout(function () {
                 selectionBox.style.width = 0;
                 selectionBox.style.height = 0;
                 selectionBox.style.top = 0;
@@ -40,13 +42,13 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
             graph.element.style.cursor = 'auto';
         };
 
-        var selectionDraw = function(startPointX) {
+        var selectionDraw = function (startPointX) {
             if (selectingActive === true) {
                 parent.style.pointerEvents = 'none';
             }
 
             graph.element.style.cursor = 'crosshair';
-            graph.element.addEventListener('mousemove', function(e) {
+            graph.element.addEventListener('mousemove', function (e) {
                 if (selectingActive === true) {
                     position.x = e.offsetX | e.layerX;
                     position.deltaX = Math.round(Math.max(position.x, startPointX) - Math.min(position.x, startPointX));
@@ -65,7 +67,7 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
         };
 
         // On click in graph until button is released again. (begin of drag)
-        graph.element.addEventListener('mousedown', function(e) {
+        graph.element.addEventListener('mousedown', function (e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -74,13 +76,13 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
                 selectionBox.style.left = e.layerX;
                 selectingActive = true;
                 selectionDraw(startPointX);
-            } else{
+            } else {
                 return;
             }
         }, true);
 
         // On mouse button release after click. (end of drag / complete)
-        graph.element.addEventListener('mouseup', function(e) {
+        graph.element.addEventListener('mouseup', function (e) {
             selectingActive = false;
             position.xMin = Math.round(graph.x.invert(position.minX));
             position.xMax = Math.round(graph.x.invert(position.maxX));
@@ -88,24 +90,27 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
             var from = $('#universalsearch .absolute .absolute-from-human');
             var to = $('#universalsearch .absolute .absolute-to-human');
 
-            if (!isNumber(position.xMin) || !isNumber(position.xMax)) {
+            if (!isNumber(position.xMin) || !isNumber(position.xMax)) {
                 clearSelection();
                 return;
             }
 
-            fromDate = momentHelper.toUserTimeZone((position.xMin)*1000);
-            toDate = momentHelper.toUserTimeZone((position.xMax)*1000);
+            fromDate = momentHelper.toUserTimeZone((position.xMin) * 1000);
+            toDate = momentHelper.toUserTimeZone((position.xMax) * 1000);
 
-            activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-            from.val(fromDate.format(momentHelper.DATE_FORMAT_TZ));
-            to.val(toDate.format(momentHelper.DATE_FORMAT_TZ));
+            activateTimerangeChooserV2("absolute", {
+                from: fromDate.format(momentHelper.DATE_FORMAT_TZ),
+                to: toDate.format(momentHelper.DATE_FORMAT_TZ)
+            });
 
-            $(".timerange-selector-container").effect("bounce", { complete: function() {
-                // Submit search directly if alt key is pressed.
-                if(e.altKey) {
-                    $("#universalsearch form").submit();
+            $(".timerange-selector-container").effect("bounce", {
+                complete: function () {
+                    // Submit search directly if alt key is pressed.
+                    if (e.altKey) {
+                        submitSearch();
+                    }
                 }
-            }});
+            });
 
             clearSelection();
         }, false);
@@ -122,7 +127,7 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
         graph.window.xMax = position.xMax;
     },
 
-    update: function() {
+    update: function () {
         var graph = this.graph,
             position = this.position;
         graph.window.xMin = position.xMin;

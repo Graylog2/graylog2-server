@@ -23,6 +23,7 @@ class SearchStore {
     private _resolution: string;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
+    onSubmitSearch: ()=>void;
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
@@ -35,6 +36,8 @@ class SearchStore {
 
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
+        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
+        $(document).on('submit.graylog.search', this._submitSearch.bind(this));
     }
 
     get query(): string {
@@ -132,6 +135,20 @@ class SearchStore {
 
     _getOriginalSearchRequest(event, data) {
         data.callback(this.getOriginalSearchParams());
+    }
+
+    _changeTimeRange(event, data) {
+        var newRangeType = data['rangeType'];
+        var newRangeParams = Immutable.Map<string, any>(data['rangeParams']);
+
+        this.rangeType = newRangeType;
+        this.rangeParams = newRangeParams;
+    }
+
+    _submitSearch(event) {
+        if (this.onSubmitSearch !== undefined) {
+            this.onSubmitSearch();
+        }
     }
 
     static escape(source) {
