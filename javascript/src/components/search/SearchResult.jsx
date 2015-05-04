@@ -7,7 +7,6 @@ var SearchSidebar = require('./SearchSidebar');
 var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
 var Immutable = require('immutable');
-var Qs = require('qs');
 
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
 var SearchStore = require('../../stores/search/SearchStore');
