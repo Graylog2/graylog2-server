@@ -8,83 +8,134 @@
 @import controllers.routes
 @import org.graylog2.restclient.models._
 @import org.graylog2.restclient.lib.Tools
+@import views.helpers.InputHelper.sourceFieldForNode
 
 @for(input <- Seq(inputState.getInput)) {
-    <div class="row node-row">
-        <div class="col-md-12">
-            <span class="pull-right node-row-info">
-                <span class="text">Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)</span>
-                @if(input.getGlobal == false) {
-                    <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
-                }
-                @DateHelper.readablePeriodFromNow(input.getCreatedAt, "text")
-                    &nbsp;
 
-                @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
-                @if(isPermitted(INPUTS_TERMINATE)) {
-                    <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
-                        <button class="btn btn-danger btn-xs"
-                        type="submit"
-                        data-confirm="Really delete input @input.getTitle?">
-                            <i class="fa fa-remove"></i> Delete
-                        </button>
-                    </form>
-                }
-                @views.html.system.inputs.partials.input_action_menu.render(inputState.getNode, input)
-            </span>
 
-            <h4>
-                @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
+    <div class="graylog-input">
+        <div class="row row-sm">
+            <div class="col-md-6">
+                <h2 class="graylog-input-title">
+                    @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
 
-                <span class="label label-@InputStateHelper.labelClassForState(inputState.getState)">
-                    @inputState.getState
-                </span>
+                    <small>
+                        <span class="label label-@InputStateHelper.labelClassForState(inputState.getState)">
+                            @inputState.getState
+                        </span>
 
-                @if(input.getGlobal) {
-                    <span class="label label-info">global</span>
-                }
-            </h4>
+                        @if(input.getGlobal) {
+                            <span class="label label-info">global</span>
+                        }
+                    </small>
+                </h2>
 
-            @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
-                <div class="alert alert-error">
-                    <strong>Error starting input:</strong> @inputState.getDetailedMessage
-                </div>
-            }
-
-            <div class="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType" data-node-id="@inputState.getNode.getNodeId"></div>
-
-            <div class="well well-sm">
-                <ul>
-                @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
-                    <li>@k: @v</li>
-                }
-                </ul>
+                <p class="graylog-input-subtitle">
+                    Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)
+                    @if(!input.getGlobal) {
+                        <span title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
+                    }
+                    @DateHelper.readablePeriodFromNow(input.getCreatedAt)
+                </p>
             </div>
 
-            @if(!input.getStaticFields.isEmpty) {
-                <div class="static-fields">
-                    <h4 style="display: inline;">
-                        <i class="fa fa-tag"></i> Static fields
-                    </h4><br />
-                    <ul>
-                    @for((k,v) <- input.getStaticFields) {
+            <div class="col-md-6 graylog-input-actions">
+
+                @if(isPermitted(SEARCHES_RELATIVE)) {
+                    <a href="@routes.SearchController.index(sourceFieldForNode(inputState.getNode) + ":" + input.getId, "relative", 28800)" class="btn btn-info">Show received messages</a>
+                }
+
+                @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
+                    <a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)" class="btn btn-info">Manage extractors</a>
+                }
+
+                @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
+
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
+                    More actions <span class="caret"></span>
+                </button>
+
+                <ul class="dropdown-menu" role="menu">
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
+                    }
+
+                    @if(!input.getGlobal) {
+                        <li><a href="@routes.MetricsController.ofNode(inputState.getNode.getNodeId, ".*." + input.getId)">Show metrics</a></li>
+                    }
+
+                    @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    }
+
+                    @if(isPermitted(INPUTS_TERMINATE)) {
+                        <li class="divider"></li>
+
                         <li>
-                            @k: @v
-                        @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                        <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
-                        class="remove-static-field"
-                        style="display: none;"
-                        data-confirm="Really delete static field?">
-                            <i class="fa fa-remove"></i>
-                        </a>
-                        }
+                            <a href="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" data-confirm="Really delete input @input.getTitle?">
+                                Delete input
+                            </a>
                         </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
+            <div class="alert alert-danger graylog-input-error">
+                <strong>Error starting this input:</strong> @inputState.getDetailedMessage
+            </div>
+        }
+
+        <div class="row row-sm">
+            <div class="col-md-8">
+                <div class="well well-sm graylog-input-props">
+                    <ul>
+                    @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
+                        <li>@k: @v</li>
                     }
                     </ul>
                 </div>
-            }
+            </div>
 
-            @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
+            <div class="col-md-4">
+                <div class="graylog-input-metrics">
+                    <h3>Throughput / Metrics</h3>
+                    <div class="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType" data-node-id="@inputState.getNode.getNodeId"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
     </div>
+
+
+
+    @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
+
+    <!--
+    @if(!input.getStaticFields.isEmpty) {
+        <div class="static-fields">
+            <h4 style="display: inline;">
+                <i class="fa fa-tag"></i> Static fields
+            </h4><br />
+            <ul>
+            @for((k,v) <- input.getStaticFields) {
+                <li>
+                    @k: @v
+                @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
+                class="remove-static-field"
+                style="display: none;"
+                data-confirm="Really delete static field?">
+                    <i class="fa fa-remove"></i>
+                </a>
+                }
+                </li>
+            }
+            </ul>
+        </div>
+    }
     </div>
+    -->
 }

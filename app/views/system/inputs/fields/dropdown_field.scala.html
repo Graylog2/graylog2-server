@@ -19,19 +19,22 @@
     }
 }
 
-<label for="@(idPrefix + "-" + field.getTitle)">
-    @field.getHumanName
+<div class="form-group">
+    <label for="@(idPrefix + "-" + field.getTitle)">
+        @field.getHumanName
 
-    @if(field.isOptional) {
-        <span class="configuration-field-optional">(optional)</span>
-    }
-</label>
+        @if(field.isOptional) {
+            <span class="configuration-field-optional">(optional)</span>
+        }
+    </label>
 
-<select id="@(idPrefix + "-" + field.getTitle)" @htmlAttributes(field) class="input-xlarge form-control">
+    <select id="@(idPrefix + "-" + field.getTitle)" @htmlAttributes(field) class="input-xlarge form-control">
     @for((k, v) <- field.getValues.toSeq.sortBy(_._2)) {
-        <option value="@k" @if(isSelected(k, selected, field.getDefaultValue)) { selected="selected" }>
-            @v
+        <option value="@k" @if(isSelected(k, selected, field.getDefaultValue)) {
+            selected="selected" }>
+        @v
         </option>
     }
-</select>
-<p class="help-block">@field.getDescription</p>
+    </select>
+    <p class="help-block">@field.getDescription</p>
+</div>

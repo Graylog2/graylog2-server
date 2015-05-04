@@ -12,19 +12,25 @@
 
 <div class="row content input-list">
     <div class="col-md-12">
-        <h2><i class="fa fa-cogs"></i> Running global inputs</h2>
+        <h2>
+            Global inputs
+            <small>@globalInputs.size configured on this node</small>
+        </h2>
         @if(globalInputs.size > 0) {
             @for((input, nodeStates) <- orderedGlobalInputs) {
                 @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, node)
             }
         } else {
-            <div class="alert alert-info" role="alert">There are no global inputs.</div>
+            <div class="alert alert-info" role="alert">No global inputs running.</div>
         }
     </div>
 </div>
 <div class="row content input-list">
     <div class="col-md-12">
-        <h2><i class="fa fa-cogs"></i> Running local inputs</h2>
+        <h2>
+            Local inputs
+            <small>@localInputs.size configured on this node</small>
+        </h2>
 
         @if(localInputs.size > 0) {
             @for(inputState <- orderedLocalInputs) {
@@ -33,12 +39,5 @@
         } else {
             <div class="alert alert-info" role="alert">There are no local inputs.</div>
         }
-    </div>
-</div>
-
-<div class="row">
-    <div class="alert alert-info" role="alert">
-        Newly added input not appearing? You can find information about misfired inputs
-        in the <a href="@routes.SystemController.index()">system messages</a>.
     </div>
 </div>

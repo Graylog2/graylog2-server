@@ -76,9 +76,16 @@ GET           /system/inputs/radio/:radio_id                                    
 POST          /system/inputs/:node_id/:input_id/terminate                                        @controllers.InputsController.terminate(node_id: String, input_id: String)
 POST          /system/inputs/:input_id/update                                                    @controllers.InputsController.update(input_id: String)
 POST          /system/inputs/:input_id/terminate                                                 @controllers.InputsController.terminateGlobal(input_id: String)
+GET         /system/inputs/:input_id/terminate                                       @controllers.InputsController.terminateGlobal(input_id: String)
 POST          /system/inputs/:node_id/:input_id/staticfields                                     @controllers.InputsController.addStaticField(node_id: String, input_id: String)
 POST          /system/inputs/:input_id/staticfields                                              @controllers.InputsController.addStaticFieldGlobal(input_id: String)
 GET           /system/inputs/:node_id/:input_id/staticfields/:key/delete                         @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
+POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
+POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
+POST        /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
+GET         /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
+GET         /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
+GET         /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
 GET           /system/contentpacks                                                               @controllers.BundlesController.index()
 GET           /system/contentpacks/export                                                        @controllers.BundlesController.exportForm()
 POST          /system/contentpacks/export                                                        @controllers.BundlesController.export()
@@ -88,10 +95,6 @@ GET           /system/agents                                                    
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
-
-POST          /system/inputs/:input_id/start                                                     @controllers.InputsController.start(input_id: String)
-POST          /system/inputs/:input_id/stop                                                      @controllers.InputsController.stop(input_id: String)
-POST          /system/inputs/:input_id/restart                                                   @controllers.InputsController.restart(input_id: String)
 
 GET           /system/mappers                                                                    @controllers.MappersController.index()
 GET           /system/metrics/node/:node_id                                                      @controllers.MetricsController.ofNode(node_id: String, prefilter ?= "")

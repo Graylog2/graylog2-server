@@ -19,35 +19,40 @@
                 <div class="modal-body">
                     <input type="hidden" name="type" value="@inputType" />
 
-                    <label for="node-selector-@inputType">Node(s) to spawn input on:</label>
-                    <p class="help-block">Select the node you want to spawn this input on.</p>
-                    <select id="node-selector-@inputType" name="node" class="input-node-selector form-control">
-                        @if(nodes.size() > 0) {
-                            <option disabled="true">-- Server nodes --</option>
-                        }
-                        @for((node) <- nodes.toSeq.sortBy(_.getNodeId)) {
-                            <option value="@node.getNodeId">@node.getShortNodeId / @node.getHostname</option>
-                        }
+                    <div class="form-group">
+                        <label for="node-selector-@inputType">Node(s) to spawn input on:</label>
+                        <p class="help-block">Select the node you want to spawn this input on.</p>
+                        <select id="node-selector-@inputType" name="node" class="input-node-selector form-control">
+                            @if(nodes.size() > 0) {
+                                <option disabled="true">-- Server nodes --</option>
+                            }
+                            @for((node) <- nodes.toSeq.sortBy(_.getNodeId)) {
+                                <option value="@node.getNodeId">@node.getShortNodeId / @node.getHostname</option>
+                            }
 
-                        @if(radios.size() > 0) {
-                            <option disabled="true">-- Radio Nodes --</option>
-                        }
-                        @for((radio) <- radios.toSeq.sortBy(_.getNodeId)) {
-                            <option value="@radio.getNodeId">@radio.getShortNodeId / @radio.getHostname</option>
-                        }
-                    </select>
+                            @if(radios.size() > 0) {
+                                <option disabled="true">-- Radio Nodes --</option>
+                            }
+                            @for((radio) <- radios.toSeq.sortBy(_.getNodeId)) {
+                                <option value="@radio.getNodeId">@radio.getShortNodeId / @radio.getHostname</option>
+                            }
+                        </select>
 
-                    <p class="help-block">or:</p>
+                        <p class="help-block">or:</p>
+                    </div>
+
                     <div class="checkbox">
                         <label class="checkbox">
                             <input type="checkbox" class="input-global-checkbox" name="global">
-                            <span class="help-block">Global input (started on all nodes)</span>
+                            Global input (started on all nodes)
                         </label>
                     </div>
 
-                    <label for="title-@inputType">Title</label>
-                    <input id="title-@inputType" name="title" required="true" type="text" class="input-xlarge form-control">
-                    <p class="help-block">Select a name of your new input that describes it.</p>
+                    <div class="form-group">
+                        <label for="title-@inputType">Title</label>
+                        <input id="title-@inputType" name="title" required="true" type="text" class="input-xlarge form-control">
+                        <p class="help-block">Select a name of your new input that describes it.</p>
+                    </div>
 
                     @for(field <- inputInfo.getRequestedConfiguration) {
 

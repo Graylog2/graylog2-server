@@ -1,7 +1,7 @@
 @(input: org.graylog2.restclient.models.Input, inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
-<i class="fa fa-ellipsis-v"></i>
 @input.getTitle (@input.getName)
+
 @if(input.getContentPack != null) {
     <span title="Created from content pack"><i class="fa fa-gift"></i></span>
 }
