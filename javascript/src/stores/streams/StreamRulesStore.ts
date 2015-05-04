@@ -1,0 +1,57 @@
+'use strict';
+
+declare var jsRoutes: any;
+declare var $: any;
+
+import UserNotification = require("../../util/UserNotification");
+import URLUtils = require("../../util/URLUtils");
+
+interface StreamRuleType {
+    id: number;
+    short_desc: string;
+    long_desc: string;
+}
+
+interface StreamRule {
+    field: string;
+    type: number;
+    value: string;
+    inverted: boolean;
+}
+
+var StreamRulesStore = {
+    types(callback: ((streamRuleTypes: Array<StreamRuleType>) => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Fetching Stream Rule Types failed with status: " + errorThrown,
+                "Could not retrieve Stream Rule Types!");
+        };
+
+        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);
+    },
+    list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Fetching Stream Rules failed with status: " + errorThrown,
+                "Could not retrieve Stream Rules!");
+        };
+
+        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url, callback).fail(failCallback);
+    },
+    update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Updating Stream Rule failed with status: " + errorThrown,
+                "Could not update Stream Rule!");
+        };
+
+        var url = jsRoutes.controllers.api.StreamRulesApiController.update(streamId, streamRuleId).url;
+        var request = {field: data.field, type: data.type, value: data.value, inverted: data.inverted};
+
+        $.ajax({
+            type: "PUT",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(request)
+        }).done(callback).fail(failCallback);
+    }
+};
+
+export = StreamRulesStore;
