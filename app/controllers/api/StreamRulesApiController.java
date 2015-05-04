@@ -1,11 +1,18 @@
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import controllers.AuthenticatedController;
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.StreamRule;
+import org.graylog2.restclient.models.StreamRuleService;
+import org.graylog2.restclient.models.api.requests.streams.CreateStreamRuleRequest;
+import org.graylog2.restclient.models.api.results.StreamRulesResult;
 import play.libs.Json;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import java.io.IOException;
 import java.util.List;
 
 public class StreamRulesApiController extends AuthenticatedController {
@@ -20,11 +27,31 @@ public class StreamRulesApiController extends AuthenticatedController {
             this.longDesc = longDesc;
         }
     }
+
+    private final StreamRuleService streamRuleService;
+
+    @Inject
+    public StreamRulesApiController(StreamRuleService streamRuleService) {
+        this.streamRuleService = streamRuleService;
+    }
+
     public Result types(String streamId) {
         final List<Type> types = Lists.newArrayList();
         for (StreamRule.Type type : StreamRule.Type.values()) {
             types.add(new Type(type.getId(), type.getShortDesc(), type.getLongDesc()));
         }
         return ok(Json.toJson(types));
+    }
+
+    public Result list(String streamId) throws IOException, APIException {
+        final StreamRulesResult result = streamRuleService.all(streamId);
+        return ok(Json.toJson(result));
+    }
+
+    public Result update(String streamId, String streamRuleId) throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final CreateStreamRuleRequest request = Json.fromJson(json, CreateStreamRuleRequest.class);
+        streamRuleService.update(streamId, streamRuleId, request);
+        return ok();
     }
 }
