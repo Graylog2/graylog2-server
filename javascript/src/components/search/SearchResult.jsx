@@ -6,6 +6,7 @@ var React = require('react');
 var SearchSidebar = require('./SearchSidebar');
 var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
+var FieldGraphs = require('./FieldGraphs');
 var Immutable = require('immutable');
 
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
@@ -21,7 +22,8 @@ var SearchResult = React.createClass({
             showAllFields: false,
             currentSidebarWidth: null,
             dashboards: Immutable.Map(),
-            shouldHighlight: true
+            shouldHighlight: true,
+            fieldGraphs: Immutable.Set()
         };
     },
 
@@ -68,6 +70,10 @@ var SearchResult = React.createClass({
         return sortedFields.concat(remainingFieldsSorted);
     },
 
+    addFieldGraph(field) {
+        this.setState({fieldGraphs: this.state.fieldGraphs.add(field)});
+    },
+
     componentDidMount() {
         this._updateWidth();
         this._getWritableDashboardList();
@@ -107,6 +113,7 @@ var SearchResult = React.createClass({
                                        showAllFields={this.state.showAllFields}
                                        togglePageFields={this.togglePageFields}
                                        onFieldToggled={this.onFieldToggled}
+                                       onFieldSelectedForGraph={this.addFieldGraph}
                                        predefinedFieldSelection={this.predefinedFieldSelection}
                                        showHighlightToggle={anyHighlightRanges}
                                        shouldHighlight={this.state.shouldHighlight}
@@ -118,6 +125,10 @@ var SearchResult = React.createClass({
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                                      histogram={this.props.histogram}
                                      dashboards={this.state.dashboards}/>
+
+                    <FieldGraphs dataFields={this.state.fieldGraphs}
+                                 from={this.props.histogram['histogram_boundaries'].from}
+                                 to={this.props.histogram['histogram_boundaries'].to}/>
 
                     <ResultTable messages={this.props.result.messages}
                                  page={this.props.currentPage}
