@@ -21,19 +21,34 @@ class SearchStore {
     private _rangeParams: Immutable.Map<string, any>;
     private _page: number;
     private _resolution: string;
+    private _fields: Immutable.Set<string>;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
+        var parsedHash = Immutable.Map<string, any>(URLUtils.getParsedHash(window.location));
         this.originalSearch = SearchStore._initializeOriginalSearch(parsedSearch);
         this.query = this.originalSearch.get('query');
         this.rangeType = this.originalSearch.get('rangeType');
         this.rangeParams = this.originalSearch.get('rangeParams');
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
-
+        var fieldsFromHash = parsedHash.get('fields');
+        var fieldsFromQuery = parsedSearch.get('fields');
+        if (fieldsFromHash === undefined) {
+            // no hash value, fall back to query if present
+            if (fieldsFromQuery === undefined) {
+                // neither hash nor query set, fall back to defaults
+                this.fields = Immutable.Set<string>(['message', 'source']);
+            } else {
+                this.fields = Immutable.Set<string>(fieldsFromQuery.split(','));
+            }
+        } else {
+            // hash value, if present, always wins
+            this.fields = Immutable.Set<string>(fieldsFromHash.split(','));
+        }
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
         $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
@@ -97,6 +112,15 @@ class SearchStore {
         } else {
             this._reloadSearchWithNewParam('interval', newResolution);
         }
+    }
+
+    get fields(): Immutable.Set<string> {
+        return this._fields;
+    }
+
+    set fields(newFields: Immutable.Set<string>) {
+        URLUtils.replaceHashParam('fields', newFields.join(','));
+        this._fields = newFields;
     }
 
     static _initializeOriginalSearch(parsedSearch: Immutable.Map<string, any>): Immutable.Map<string, any> {
@@ -199,6 +223,7 @@ class SearchStore {
         simplifiedParams = simplifiedParams.set('q', this.originalSearch.get('query'));
         simplifiedParams = simplifiedParams.set('interval', this.originalSearch.get('resolution'));
         simplifiedParams = simplifiedParams.set('page', this.originalSearch.get('page'));
+        simplifiedParams = simplifiedParams.set('fields', this.fields.join(','));
 
         return simplifiedParams;
     }

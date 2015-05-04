@@ -7,15 +7,18 @@ var SearchSidebar = require('./SearchSidebar');
 var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
 var Immutable = require('immutable');
+var Qs = require('qs');
 
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
+var SearchStore = require('../../stores/search/SearchStore');
 
 var resizeMutex;
 
 var SearchResult = React.createClass({
     getInitialState() {
+        var initialFields = SearchStore.fields;
         return {
-            selectedFields: Immutable.Set(['message', 'source']),
+            selectedFields: initialFields,
             showAllFields: false,
             currentSidebarWidth: null,
             dashboards: Immutable.Map(),
@@ -34,9 +37,10 @@ var SearchResult = React.createClass({
     },
 
     updateSelectedFields(fieldSelection) {
-        this.setState({selectedFields: this.sortFields(fieldSelection)});
+        var selectedFields = this.sortFields(fieldSelection);
+        SearchStore.fields = selectedFields;
+        this.setState({selectedFields: selectedFields});
     },
-
     _fields() {
         return this.props.result[this.state.showAllFields ? 'all_fields' : 'page_fields'];
     },
@@ -49,7 +53,7 @@ var SearchResult = React.createClass({
         } else {
             newFieldSet = currentFields.add(fieldName);
         }
-        this.setState({selectedFields: this.sortFields(newFieldSet)});
+        this.updateSelectedFields(newFieldSet);
     },
     togglePageFields() {
         this.setState({showAllFields: !this.state.showAllFields});
