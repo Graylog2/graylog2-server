@@ -44,6 +44,11 @@ public class StreamsApiController extends AuthenticatedController {
         return ok(Json.toJson(this.streamService.create(request)));
     }
 
+    public Result pause(String streamId) throws APIException, IOException {
+        this.streamService.pause(streamId);
+        return ok();
+    }
+
     public Result resume(String streamId) throws APIException, IOException {
         this.streamService.resume(streamId);
         return ok();
