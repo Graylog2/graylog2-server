@@ -60,7 +60,7 @@
             The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
             on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
 
-            <div class="react-alarmcallback-component" data-permissions='@Json.toJson(currentUser.getPermissions)'>
+            <div class="react-alarmcallback-component" data-permissions='@Json.toJson(currentUser.getPermissions)' data-stream-id='@stream.getId'>
             </div>
 
             @if((stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) && isPermitted(STREAMS_EDIT, stream.getId)) {
