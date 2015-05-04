@@ -1,3 +1,6 @@
+/* global momentHelper */
+/* jshint -W079 */
+
 'use strict';
 
 var React = require('react/addons');
