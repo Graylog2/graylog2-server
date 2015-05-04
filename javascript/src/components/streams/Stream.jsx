@@ -6,7 +6,7 @@ var React = require('react/addons');
 var StreamThroughput = require('./StreamThroughput');
 var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');
-var CollapsableStreamList = require('./CollapsableStreamList');
+var CollapsableStreamRuleList = require('../streamrules/CollapsableStreamRuleList');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var Stream = React.createClass({
@@ -54,7 +54,8 @@ var Stream = React.createClass({
                         {deleteStreamLink}
 
                         <StreamControls stream={stream} permissions={this.props.permissions}
-                                        onResume={this.props.onResume} onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>
+                                        onResume={this.props.onResume} onUpdate={this.props.onUpdate}
+                                        onPause={this.props.onPause} onClone={this.props.onClone}/>
                     </div>
                     <div className="stream-description">
                         {createdFromContentPack}
@@ -66,7 +67,7 @@ var Stream = React.createClass({
 
                         , {this._formatNumberOfStreamRules(stream)}
 
-                        <CollapsableStreamList key={'streamRules-'+stream.id} stream={stream} permissions={this.props.permissions}/>
+                        <CollapsableStreamRuleList key={'streamRules-'+stream.id} stream={stream} permissions={this.props.permissions}/>
                     </div>
                 </div>
             </li>

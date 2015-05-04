@@ -52,6 +52,13 @@ var StreamComponent = React.createClass({
     _onCreateStream(evt) {
         this.refs.createStreamButton.onClick();
     },
+    _onPauseStream(stream) {
+        if (window.confirm("Do you really want to pause stream \"" + stream.title + "\"?")) {
+            StreamsStore.pause(stream.id, () => {
+                this.loadData();
+            });
+        }
+    },
     render() {
         var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ? <CreateStreamButton ref='createStreamButton' onSave={this._onSave} /> : "");
         return (
@@ -82,7 +89,7 @@ var StreamComponent = React.createClass({
                 <div className="row content">
                     <div className="col-md-12">
                         <StreamList streams={this.state.streams} permissions={this.props.permissions}
-                                    onCreate={this._onCreateStream}
+                                    onCreate={this._onCreateStream} onPause={this._onPauseStream}
                                     onDelete={this._onDeleteStream} onResume={this._onResumeStream}
                                     onUpdate={this._onUpdateStream} onClone={this._onCloneStream}/>
                     </div>

@@ -4,6 +4,7 @@ var React = require('react/addons');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Input = require('react-bootstrap').Input;
 var Bubble = require('../support/Bubble');
+var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 
 var StreamRuleForm = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
@@ -19,8 +20,14 @@ var StreamRuleForm = React.createClass({
         this.setState(this.props.streamRule);
     },
     _onSubmit(evt) {
+        if (this.state.type == 5) {
+            this.state.value = "";
+        }
         this.props.onSubmit(this.props.streamRule.id, this.state);
         this.refs.modal.close();
+    },
+    _formatStreamRuleType(streamRuleType) {
+        return <option key={'streamRuleType'+streamRuleType.id} value={streamRuleType.id}>{streamRuleType.short_desc}</option>;
     },
     open() {
         this._resetValues();
@@ -29,9 +36,9 @@ var StreamRuleForm = React.createClass({
     close() {
         this.refs.modal.close();
     },
-    componentDidMount() {
-    },
     render() {
+        var streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
+        var valueBox = (this.state.type != 5 ? <Input type='text' required={true} label='Value' placeholder='19983' valueLink={this.linkState('value')}/> : "");
         return (
             <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
                 <div>
@@ -41,16 +48,15 @@ var StreamRuleForm = React.createClass({
                     <div className='col-md-8'>
                         <Input type='text' required={true} label='Field' placeholder='user_id' valueLink={this.linkState('field')}/>
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
+                            {streamRuleTypes}
                         </Input>
-                        <Input type='text' required={true} label='Value' placeholder='19983' valueLink={this.linkState('value')}/>
-                        <Input type='checkbox' required={true} label='Inverted' valueLink={this.linkState('inverted')}/>
+                        {valueBox}
+                        <Input type='checkbox' label='Inverted' checkedLink={this.linkState('inverted')}/>
 
                         <p>
                             <strong>Result:</strong>
                             <span id="sr-result">
-                                Field <em ref="result-field">user_id</em> must
-                                <em ref="result-category">@StreamRule.Type.fromInt(1).getLongDesc()</em>
-                                <em ref="result-value">19983</em>
+                                Field <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
                             </span>
                         </p>
                     </div>

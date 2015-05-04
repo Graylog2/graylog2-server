@@ -5,7 +5,7 @@ var StreamRuleList = require('./StreamRuleList');
 var CollapsableMixin = require('react-bootstrap').CollapsableMixin;
 var Well = require('react-bootstrap').Well;
 
-var CollapsableStreamList = React.createClass({
+var CollapsableStreamRuleList = React.createClass({
     mixins: [CollapsableMixin],
     getCollapsableDOMNode: function(){
         return this.refs.well.getDOMNode();
@@ -33,4 +33,4 @@ var CollapsableStreamList = React.createClass({
     }
 });
 
-module.exports = CollapsableStreamList;
+module.exports = CollapsableStreamRuleList;
