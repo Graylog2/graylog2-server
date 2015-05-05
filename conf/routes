@@ -74,6 +74,7 @@ POST          /system/inputs                                                    
 GET           /system/inputs/:node_id                                                            @controllers.InputsController.manage(node_id: String)
 GET           /system/inputs/radio/:radio_id                                                     @controllers.InputsController.manageRadio(radio_id: String)
 POST          /system/inputs/:node_id/:input_id/terminate                                        @controllers.InputsController.terminate(node_id: String, input_id: String)
+GET           /system/inputs/:node_id/:input_id/terminate                                        @controllers.InputsController.terminate(node_id: String, input_id: String)
 POST          /system/inputs/:input_id/update                                                    @controllers.InputsController.update(input_id: String)
 POST          /system/inputs/:input_id/terminate                                                 @controllers.InputsController.terminateGlobal(input_id: String)
 GET         /system/inputs/:input_id/terminate                                       @controllers.InputsController.terminateGlobal(input_id: String)
