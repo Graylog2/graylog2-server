@@ -158,7 +158,8 @@ var MessageDetail = React.createClass({
 
                         <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
                             { streamList }
-                            { ! streamList && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
+                            { (! streamList && ! this.state.streamsListLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
+                            { (! streamList && this.state.streamsListLoaded) && <MenuItem header>No streams available</MenuItem> }
                         </DropdownButton>
                     </ButtonGroup>
                     <h3><i className="fa fa-envelope"></i> <a href={messageUrl} style={{color: '#000'}}>{this.props.message.id}</a></h3>
