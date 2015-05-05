@@ -182,7 +182,7 @@ class SearchStore {
 
     static escape(source) {
         // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-        return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+        return source.toString().replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
     }
 
     queryContainsTerm(termInQuestion: string): boolean {
