@@ -35,44 +35,37 @@ var StreamControls = React.createClass({
         var permissions = this.props.permissions;
         var stream = this.props.stream;
         // TODO: replace with real user
-        var user = {'is_readonly' : false};
+        var user = {'is_readonly': false};
 
-        //TODO: @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        if (this.isPermitted(permissions, ['streams:edit:'+stream.id])) {
-            var editStream = <MenuItem><a onClick={this._onEdit}>Edit stream</a></MenuItem>;
-            var quickAddRule = <MenuItem className={stream.stream_rules.length > 0 ? "" : "disabled"}><a href="#" data-stream-id={stream.id} className="show-stream-rule">Quick add rule</a></MenuItem>;
-        } else {
-            var editStream = "";
-            var quickAddRule = "";
+        var menuItems = [];
+
+        if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
+            menuItems.push(<MenuItem><a onClick={this._onEdit}>Edit stream</a></MenuItem>);
+            menuItems.push(<MenuItem className={stream.stream_rules.length > 0 ? "" : "disabled"}>
+                <a href="#" data-stream-id={stream.id} className="show-stream-rule">Quick add rule</a>
+            </MenuItem>);
         }
-        // }
 
-        //TODO: @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
-        var stateControl = (this.isPermitted(permissions, ["streams:changestate:"+stream.id]) ? (stream.disabled ?
-            <MenuItem><a onClick={this._onResume}>Start this stream</a></MenuItem> :
-            <MenuItem><a onClick={this._onPause}>Stop this stream</a></MenuItem>
-        ) : "");
-        //}
+        if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
+            if (stream.disabled) {
+                menuItems.push(<MenuItem><a onClick={this._onResume}>Start this stream</a></MenuItem>);
+            } else {
+                menuItems.push(<MenuItem><a onClick={this._onPause}>Stop this stream</a></MenuItem>);
+            }
+        }
 
-        //TODO: @if(isPermitted(STREAMS_CREATE) && isPermitted(STREAMS_READ, stream.getId)) {
-        var cloneStream = (this.isPermitted(permissions, ["streams:create", "streams:read:"+stream.id]) ? <MenuItem><a onClick={this._onClone}>Clone this stream</a></MenuItem> : "");
-        //}
+        if (this.isPermitted(permissions, ["streams:create", "streams:read:" + stream.id])) {
+            menuItems.push(<MenuItem><a onClick={this._onClone}>Clone this stream</a></MenuItem>);
+        }
 
-        var setAsStartpage = <MenuItem className={user.is_readonly ? "disabled" : ""}>
+        menuItems.push(<MenuItem className={user.is_readonly ? "disabled" : ""}>
             <a href={jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>Set as startpage</a>
-        </MenuItem>;
+        </MenuItem>);
 
         return (
             <ButtonGroup>
                 <DropdownButton title='More actions' ref='dropdownButton'>
-                    {editStream}
-                    {quickAddRule}
-
-                    {stateControl}
-
-                    {cloneStream}
-
-                    {setAsStartpage}
+                    {menuItems}
                 </DropdownButton>
                 <StreamForm ref='streamForm' title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream}/>
                 <StreamForm ref='cloneForm' title="Cloning Stream" onSubmit={this._onCloneSubmit}/>
