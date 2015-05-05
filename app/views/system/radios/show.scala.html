@@ -3,167 +3,168 @@
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions._
 
-@main("Radio " + radio.getId, views.html.system.sidebar(), "", currentUser) {
+@main("Radio " + radio.getId, null, "", currentUser, false) {
 
-    <div class="pull-right">
-        <div class="btn-group">
-            <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-                Actions
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                @if(isPermitted(THREADS_DUMP)) {
-                    <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
-                }
-                <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
-            </ul>
+    <div class="row content">
+
+        <div class="col-md-12">
+
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
+                        Actions
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        @if(isPermitted(THREADS_DUMP)) {
+                            <li><a href="@routes.RadiosController.threadDump(radio.getNodeId)">Get thread dump</a></li>
+                        }
+                        <li><a href="@routes.MetricsController.ofRadio(radio.getNodeId)">Metrics</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h1>Radio @radio.getHostname / @radio.getShortNodeId</h1>
+
+            <p class="description">This page shows details of a Graylog radio that is active and has registered itself in your cluster.</p>
+
         </div>
     </div>
 
-    @views.html.partials.breadcrumbs(breadcrumbs)
-
-    <div class="row">
-        <h1><i class="fa fa-sitemap"></i> Radio @radio.getHostname / @radio.getShortNodeId</h1>
-        This page shows details of a Graylog radio that is active and has registered itself in your cluster.
-    </div>
-
-    <div class="row">
-        <div class="alert alert-info">
-            <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
-            <strong>@radio.getLifecycle</strong>
+    <div class="row content">
+        <div class="col-md-4">
+            <div class="alert alert-info">
+                <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
+                <strong>@radio.getLifecycle</strong>
+                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+            </div>
         </div>
-    </div>
 
-
-    @if(radio.lbAlive()) {
-        <div class="row">
+        <div class="col-md-4">
+        @if(radio.lbAlive()) {
             <div class="alert alert-success">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
+                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
             </div>
-        </div>
-    } else {
-        <div class="row">
+        } else {
             <div class="alert alert-error">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
+                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+            </div>
+        }
+        </div>
+
+        <div class="col-md-4">
+            <div class="alert alert-success">
+                <span class="react-node-throughput" data-node-id="@radio.getNodeId"></span>
             </div>
         </div>
-    }
-
-    <div class="row">
-        <div class="alert alert-success">
-            <i class="fa fa-ok-sign"></i> &nbsp; Radio is producing <strong class="node-throughput focuslimit" data-node-type="radio" data-radio-id="@radio.getId">?</strong>
-            messages per second.
-        </div>
     </div>
 
-    <div class="row node-heap-usage" data-node-type="radio" data-radio-id="@radio.getId">
-        <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
-
-        <div class="progress">
-            <div class="bar bar-warning heap-used-percent" style="width: @radio.jvm.usedMemoryPercentage()%;"></div>
-            <div class="bar heap-total-percent" style="width: @(radio.jvm.totalMemoryPercentage()-radio.jvm.usedMemoryPercentage)%"></div>
-        </div>
-
-        The JVM is using <strong><span class="heap-used">@radio.jvm.getUsedMemory.getMegabytes</span> of <span class="heap-total">@radio.jvm.getTotalMemory.getMegabytes</span> MB</strong>
-        heap space and will not attempt to use more than <strong><span class="heap-max">@radio.jvm.getMaxMemory.getMegabytes</span> MB</strong>.
-    </div>
-
-    <hr />
-
-    <div class="row">
-        <h2><i class="fa fa-shield"></i> Buffers</h2>
-        <div class="row">
-            <div class="col-md-6">
-                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.InputBuffer")" class="btn btn-info btn-xs pull-right">Metrics</a>
-                <h3>Input buffer</h3>
-
-                <div class="progress progress-percentage node-buffer-usage">
-                    <div class="bar bar-warning" data-percentage="@radio.getBuffers.getInputBuffer.utilizationPercent" style="width: @radio.getBuffers.getInputBuffer.utilizationPercent%;"><span class="number-format" data-format="0.0%">@radio.getBuffers.getInputBuffer.utilizationPercent%</span></div>
+    <div class="row content">
+        <div class="col-md-12">
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Memory/Heap usage</h2>
                 </div>
-                <strong>@radio.getBuffers.getInputBuffer.utilization messages</strong> in input buffer.
-                (<span class="number-format" data-format="0.0%">@radio.getBuffers.getInputBuffer.utilizationPercent%</span> utilized)
             </div>
-            <div class="col-md-6">
-                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.ProcessBuffer")" class="btn btn-info btn-xs pull-right">Metrics</a>
-                <h3>Process buffer</h3>
 
-                <div class="progress progress-percentage node-buffer-usage">
-                    <div class="bar bar-warning" data-percentage="@radio.getBuffers.getProcessBuffer.utilizationPercent" style="width: @radio.getBuffers.getProcessBuffer.utilizationPercent%;"><span class="number-format" data-format="0.0%">@radio.getBuffers.getProcessBuffer.utilizationPercent%</span></div>
-                </div>
-                <strong>@radio.getBuffers.getProcessBuffer.utilization messages</strong> in process buffer.
-                (<span class="number-format" data-format="0.0%">@radio.getBuffers.getProcessBuffer.utilizationPercent%</span> utilized)
-            </div>
+            <div class="react-jvm-heap" data-node-id="@radio.getNodeId"></div>
+
         </div>
-
-        The buffers are built to cache small amounts of messages on their way through the different processors.
     </div>
 
-    <hr />
+    <div class="row content">
+        <div class="col-md-12">
 
-    <div class="row">
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Buffers</h2>
+
+                    <p class="description">
+                        The buffers are built to cache small amounts of messages for a very short time
+                        (usually milliseconds) on their way through the different processors.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row row-sm">
+                <div class="col-md-6">
+                    <div class="react-buffer-usage" data-node-id="@radio.getNodeId" data-title="Input buffer" data-buffer-type="input"></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="react-buffer-usage" data-node-id="@radio.getNodeId" data-title="Process buffer" data-buffer-type="process"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row content">
         <div class="col-md-6">
-            <h2><i class="fa fa-cogs"></i> System</h2>
+            <h2> System</h2>
 
             <dl class="system-system">
                 <dt>Hostname:</dt>
                 <dd>@radio.getHostname</dd>
 
-                <dt>Radio ID:</dt>
-                <dd>@radio.getId</dd>
+                <dt>Node ID:</dt>
+                <dd>@radio.getNodeId</dd>
 
                 <dt>Version:</dt>
                 <dd>@radio.getVersion</dd>
 
                 <dt>JVM:</dt>
                 <dd>PID @radio.getPid, @radio.getJVMDescription</dd>
+
             </dl>
         </div>
 
         <div class="col-md-6">
-            <h2><i class="fa fa-signin"></i> REST API</h2>
+            <h2>REST API</h2>
 
             <dl class="system-rest">
                 <dt>Transport address:</dt>
                 <dd>@radio.getTransportAddressUri</dd>
+
             </dl>
         </div>
     </div>
 
-    <hr />
-
-    <div class="row">
-        @if(isPermitted(INPUTS_EDIT)) {
-            <a href="@routes.InputsController.manageRadio(radio.getId)" class="btn btn-sm btn-success pull-right">
-                Manage inputs</a>
-        }
-        <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@radio.getInputs.size() @pluralize("input", radio.getInputs.size()) running.</span></h2>
-
-        <table class="table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th colspan="2">Type</th>
-                </tr>
-            </thead>
-
-            <tbody>
-            @for((inputType, info) <- radio.getAllInputTypeInformation.toSeq.sortBy(_._2.name)) {
-                <tr>
-                    <td>@info.name</td>
-                    <td>@inputType</td>
-                    <td>
-                    @if(info.linkToDocs != null && !info.linkToDocs.isEmpty) {
-                        <a href="@info.linkToDocs" target="_blank">
-                            <i class="fa fa-external-link"></i> Documentation
-                        </a>
-                    } else {
-                            &nbsp;
-                    }
-                    </td>
-                </tr>
+    <div class="row content">
+        <div class="col-md-12">
+            @if(isPermitted(INPUTS_EDIT)) {
+                <a href="@routes.InputsController.manageRadio(radio.getNodeId)" class="btn btn-sm btn-success pull-right">Manage inputs</a>
             }
-            </tbody>
-        </table>
+            <h2>Installed/available input types <span style="font-size: 12px;">@radio.getInputs.size() @pluralize("input", radio.getInputs.size) running.</span></h2>
+
+            <table class="table table-striped table-hover table-condensed table-sm">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th colspan="2">Type</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @for((inputType, info) <- radio.getAllInputTypeInformation.toSeq.sortBy(_._2.name)) {
+                    <tr>
+                        <td>@info.name</td>
+                        <td>@inputType</td>
+                        <td>
+                        @if(info.linkToDocs != null && !info.linkToDocs.isEmpty) {
+                            <a href="@info.linkToDocs" target="_blank">
+                                <i class="fa fa-external-link"></i> Documentation
+                            </a>
+                        } else {
+                                &nbsp;
+                        }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
 
 }
