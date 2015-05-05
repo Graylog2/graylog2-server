@@ -5,7 +5,7 @@
         localInputs: List[org.graylog2.restclient.models.InputState],
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
-@main("Inputs of node", null, "", currentUser, false) {
+@main("Inputs of node " + node.getShortNodeId, null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
@@ -23,6 +23,11 @@
 
             @views.html.partials.support.list_small() {
                 You can launch and terminate inputs on your cluster <a href="@routes.InputsController.index()">here</a>.
+            }
+
+            @views.html.partials.support.list_small() {
+                Newly added input not appearing? You can find information about misfired inputs
+                in the <a href="@routes.SystemController.index()">system messages</a>.
             }
         </div>
     </div>

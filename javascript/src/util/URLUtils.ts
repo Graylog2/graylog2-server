@@ -28,6 +28,22 @@ var URLUtils = {
         }
 
         return search;
+    },
+    getParsedHash(location) {
+        var result = {};
+        var hash = location.hash;
+        if (hash) {
+            if (hash.indexOf("#") === 0 && hash.length > 1) {
+                hash = hash.substr(1, hash.length - 1);
+                result = Qs.parse(hash);
+            }
+        }
+        return result;
+    },
+    replaceHashParam(name, newValue) {
+        var origHash = URLUtils.getParsedHash(window.location);
+        origHash[name] = newValue;
+        window.location.hash = Qs.stringify(origHash);
     }
 };
 

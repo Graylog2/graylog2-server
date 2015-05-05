@@ -13,7 +13,7 @@ momentHelper = {
     toUserTimeZone: function(momentDate) {
         var date;
 
-        if ((momentDate == null)) {
+        if ((typeof momentDate === 'undefined') || (momentDate === null)) {
             date = moment.utc();
         } else {
             date = moment.utc(momentDate);

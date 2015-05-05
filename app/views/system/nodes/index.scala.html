@@ -176,251 +176,114 @@
                 </div>
             }
 
-            <!--
-            @for(jvm <- jvms) {
-                <div class="message-processing-host node-row">
-                    <span class="pull-right node-throughput-info">
-                        @if(nodes.get(jvm.getNodeId).isProcessing) {
-                            <span class="sentence">
-                                Processing
-                                <strong class="node-throughput focuslimit" data-node-id="@jvm.getNodeId">?</strong>
-                                messages per second.
-                            </span>
-                        } else {
-                            <span class="sentence">
-                                Processing is <strong>paused</strong>.
-                            </span>
-                        }
-
-                        <div class="btn-group">
-                            <a class="btn btn-xs dropdown-toggle" data-toggle="dropdown" href="#">
-                                Action
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="@routes.NodesController.node(jvm.getNodeId)">Details</a></li>
-                                <li><a href="@routes.InputsController.manage(jvm.getNodeId)">Inputs</a></li>
-                                <li><a href="@routes.MetricsController.ofNode(jvm.getNodeId)">Metrics</a></li>
-                                <li>
-                                    <a href="@nodes.get(jvm.getNodeId).getTransportAddress/api-browser" target="_blank">
-                                        API Browser
-                                        <i class="fa fa-external-link" style="font-size: 11px;"></i>
-                                    </a>
-                                </li>
-                                @if(isPermitted(THREADS_DUMP)) {
-                                    <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
-                                }
-
-                                @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE) || isPermitted(NODE_SHUTDOWN)) {
-                                    <li class="divider"></li>
-                                }
-
-                                @if(isPermitted(PROCESSING_CHANGESTATE)) {
-                                <li>
-                                @if(nodes.get(jvm.getNodeId).isProcessing) {
-                                    <a class="change-message-processing"
-                                    data-action="pause"
-                                    data-node-id="@jvm.getNodeId"
-                                    href="#">Pause message processing</a>
-                                } else {
-                                    <a class="change-message-processing"
-                                    data-action="resume"
-                                    data-node-id="@jvm.getNodeId"
-                                    href="#">Resume message processing</a>
-                                }
-                                </li>
-                                }
-
-                                @if(isPermitted(LBSTATUS_CHANGE)) {
-                                    <li class="dropdown-submenu">
-                                        <a href="#">Override LB status</a>
-
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "alive")"
-                                                        data-confirm="Really change load balancer status?"
-                                                        @if(nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
-                                                    ALIVE
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "dead")"
-                                                        data-confirm="Really change load balancer status?"
-                                                        @if(!nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
-                                                    DEAD
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                }
-
-                                @if(isPermitted(NODE_SHUTDOWN)) {
-                                    <li>
-                                        <a href="@routes.NodesController.shutdown(jvm.getNodeId)"
-                                                data-super-confirm="Really shutdown node?"
-                                                data-super-confirm-word="SHUTDOWN">
-                                            Graceful shutdown
-                                        </a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </span>
-
-                    <h3>
-                        @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
-
-                        <span class="label label-info node-state" data-toggle="tooltip" title="Current lifecycle state">
-                            @nodes.get(jvm.getNodeId).getLifecycle()
-                        </span>
-
-                        @if(nodes.get(jvm.getNodeId).isProcessing) {
-                            <span class="label label-success node-state" data-toggle="tooltip" title="Message processing is enabled">
-                                processing
-                            </span>
-                        } else {
-                            <span class="label label-important node-state" data-toggle="tooltip" title="Message processing is paused">
-                                processing paused
-                            </span>
-                        }
-
-                        @if(nodes.get(jvm.getNodeId).lbAlive()) {
-                            <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
-                                lb:ALIVE
-                            </span>
-                            <span style="margin-left: 4px">@partials.support.bubble("setup/loadbalancer")</span>
-
-                        } else {
-                            <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
-                                lb:DEAD
-                            </span>
-                            <span style="margin-left: 4px">@partials.support.bubble("setup/loadbalancer")</span>
-                        }
-                    </h3>
-
-            <div class="node-information">
-                    <div class="node-heap-usage" data-node-id="@jvm.getNodeId">
-                        <div class="progress">
-                            <div class="bar bar-warning heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
-                            <div class="bar heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
-                        </div>
-
-
-                        The JVM is using <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
-                        of <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
-                        heap space and will not attempt to use more than
-                        <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
-                    </div>
-
-                @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
-                    <div class="node-journal-information" data-node-id="@jvm.getNodeId">
-                        There are
-                        <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span>
-                            unprocessed messages</strong>
-                        in the journal.
-                    </div>
-                }
-            </div>
-                </div>
-            }-->
         </div>
     </div>
 
 
-    <!--
-    <h2 class="radios-head"><i class="fa fa-double-angle-down"></i> Radio nodes</h2>
+    <div class="row content">
+        <div class="col-md-12">
+            @if(radios.size == 1) {
+                <h2>You are running one <span class="u-light">graylog-radio</span> node</h2>
+            } else {
+                <h2>You are running @radios.size <span class="u-light">graylog-radio</span> nodes</h2>
+            }
 
-    <div class="alert alert-warning">
-        The Graylog Radio components are deprecated and will not be supported in future versions. Read more about this
-        topic and how to adapt your infrastructure
-        <a href="http://docs.graylog.org/en/latest/pages/architecture.html#highly-available-setup-with-graylog-radio">here</a>.
-    </div>
-
-    @if(!radios.isEmpty) {
-        @for(radio <- radios.values()) {
-            <div class="row message-processing-host node-row">
-                <div class="pull-right node-throughput-info">
-                    <span class="sentence">
-                        Producing
-                        <strong class="node-throughput focuslimit" data-node-type="radio" data-radio-id="@radio.getId">?</strong>
-                        messages per second.
-                    </span>
-
-                    <div class="btn-group">
-                        <a class="btn btn-xs dropdown-toggle" data-toggle="dropdown" href="#">
-                                Action
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="@routes.RadiosController.show(radio.getId)">Details</a></li>
-                            <li><a href="@routes.InputsController.manageRadio(radio.getId)">Inputs</a></li>
-                            <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
-                            @if(isPermitted(THREADS_DUMP)) {
-                                <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
-                            }
-
-                            @if(isPermitted(LBSTATUS_CHANGE)) {
-                                <li class="divider"></li>
-
-                                <li class="dropdown-submenu">
-                                    <a href="#">Override LB status</a>
-
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "alive")"
-                                                    data-confirm="Really change load balancer status?"
-                                                    @if(radio.lbAlive()) { class="selected" }>
-                                                ALIVE
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "dead")"
-                                                    data-confirm="Really change load balancer status?"
-                                                    @if(!radio.lbAlive()) { class="selected" }>
-                                                DEAD
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
-
-                <h3>
-                    @views.html.partials.radio_title_link(radio)
-
-                    <span class="label label-info node-state" data-toggle="tooltip" title="Current lifecycle state">
-                        @radio.getLifecycle
-                    </span>
-
-                    @if(radio.lbAlive()) {
-                        <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
-                            lb:ALIVE
-                        </span>
-                    } else {
-                        <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
-                            lb:DEAD
-                        </span>
-                    }
-                </h3>
-
-                <div class="node-heap-usage" data-radio-id="@radio.getId" data-node-type="radio">
-                    <div class="progress">
-                        <div class="bar bar-warning heap-used-percent" style="width: @radio.jvm().usedMemoryPercentage()%;"></div>
-                        <div class="bar heap-total-percent" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
-                    </div>
-
-                    The JVM is using <strong><span class="heap-used">@radio.jvm().getUsedMemory.getMegabytes()</span>
-                    of <span class="heap-total">@radio.jvm().getTotalMemory.getMegabytes()</span> MB</strong>
-                    heap space and will not attempt to use more than
-                    <strong><span class="heap-max">@radio.jvm().getMaxMemory.getMegabytes()</span> MB</strong>.
-                </div>
+            <div class="alert alert-warning">
+                The Graylog Radio components are deprecated and will not be supported in future versions. Read more about this
+                topic and how to adapt your infrastructure
+                <a href="http://docs.graylog.org/en/latest/pages/architecture.html#highly-available-setup-with-graylog-radio">
+                    here</a>.
             </div>
-        }
-    } else {
-        <div class="alert alert-info no-active-nodes">No registered Graylog radio instances.</div>
-    }
-    -->
+
+            @if(!radios.isEmpty) {
+                @for(radio <- radios.values()) {
+                    <div class="graylog-node">
+                        <div class="row row-sm">
+                            <div class="col-md-5">
+                                <h2 class="graylog-node-title">
+                                @views.html.partials.radio_title_link(radio)
+                                </h2>
+                            </div>
+                            <div class="col-md-7" style="text-align: right;">
+                                <a href="@routes.RadiosController.show(radio.getId)" class="btn btn-info">Details</a>
+                                <a href="@routes.MetricsController.ofRadio(radio.getId)" class="btn btn-info">Metrics</a>
+
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
+                                More actions <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    @if(isPermitted(LBSTATUS_CHANGE)) {
+                                        <li class="dropdown-submenu">
+                                            <a href="#">Override LB status</a>
+
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li>
+                                                    <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "alive")"
+                                                    data-confirm="Really change load balancer status?"
+                                                        @if(radio.lbAlive()) { class="selected" }>
+                                                        ALIVE
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "dead")"
+                                                    data-confirm="Really change load balancer status?"
+                                                        @if(!radio.lbAlive()) { class="selected" }>
+                                                        DEAD
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+
+                                    @if(isPermitted(INPUTS_READ) || isPermitted(THREADS_DUMP)) {
+                                        <li class="divider"></li>
+                                    }
+
+                                    @if(isPermitted(INPUTS_READ)) {
+                                        <li>
+                                            <a href="@routes.InputsController.manage(radio.getNodeId)">Local message inputs</a>
+                                        </li>
+                                    }
+
+                                    @if(isPermitted(THREADS_DUMP)) {
+                                        <li><a href="@routes.RadiosController.threadDump(radio.getNodeId)">Get thread dump</a></li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row row-sm">
+                            <div class="col-md-3">
+                                <dl class="graylog-node-state">
+                                    <dt>Current lifecycle state:</dt>
+                                    <dd>@StringUtils.capitalize(radio.getLifecycle)</dd>
+                                    <dt>Load balancer indication:</dt>
+                                    <dd>
+                                    @if(radio.lbAlive()) {
+                                        ALIVE
+                                    } else {
+                                        <span class="text-danger">DEAD</span>
+                                    }
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <div class="react-jvm-heap col-md-9" data-node-id="@radio.getNodeId"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                    <span class="react-node-throughput" data-node-id="@radio.getNodeId"></span>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            } else {
+                <div class="alert alert-info no-active-nodes">No registered Graylog radio instances.</div>
+            }
+        </div>
+    </div>
 
 }

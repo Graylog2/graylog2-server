@@ -6,18 +6,8 @@
 @import lib.security.RestPermissions._
 
 @if(inputState.equals(InputState.InputStateType.RUNNING) && isPermitted(INPUTS_STOP)) {
-    <form action="@routes.InputsController.stop(input.getId)" method="POST">
-        <button class="btn btn-warning btn-xs"
-        type="submit"
-        data-confirm="Really pause input @input.getTitle?">
-            <i class="fa fa-pause"></i> Pause
-        </button>
-    </form>
+    <a href="@routes.InputsController.stop(input.getId)" class="btn btn-primary">Stop input</a>
 }
 @if(!inputState.equals(InputState.InputStateType.RUNNING) && isPermitted(INPUTS_START)) {
-    <form action="@routes.InputsController.start(input.getId)" method="POST">
-        <button class="btn btn-success btn-xs" type="submit">
-            <i class="fa fa-play"></i> Start
-        </button>
-    </form>
+    <a href="@routes.InputsController.start(input.getId)" class="btn btn-success">Start input</a>
 }

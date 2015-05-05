@@ -21,20 +21,38 @@ class SearchStore {
     private _rangeParams: Immutable.Map<string, any>;
     private _page: number;
     private _resolution: string;
+    private _fields: Immutable.Set<string>;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
+    onSubmitSearch: ()=>void;
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
+        var parsedHash = Immutable.Map<string, any>(URLUtils.getParsedHash(window.location));
         this.originalSearch = SearchStore._initializeOriginalSearch(parsedSearch);
         this.query = this.originalSearch.get('query');
         this.rangeType = this.originalSearch.get('rangeType');
         this.rangeParams = this.originalSearch.get('rangeParams');
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
-
+        var fieldsFromHash = parsedHash.get('fields');
+        var fieldsFromQuery = parsedSearch.get('fields');
+        if (fieldsFromHash === undefined) {
+            // no hash value, fall back to query if present
+            if (fieldsFromQuery === undefined) {
+                // neither hash nor query set, fall back to defaults
+                this.fields = Immutable.Set<string>(['message', 'source']);
+            } else {
+                this.fields = Immutable.Set<string>(fieldsFromQuery.split(','));
+            }
+        } else {
+            // hash value, if present, always wins
+            this.fields = Immutable.Set<string>(fieldsFromHash.split(','));
+        }
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
+        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
+        $(document).on('submit.graylog.search', this._submitSearch.bind(this));
     }
 
     get query(): string {
@@ -66,7 +84,8 @@ class SearchStore {
 
     set rangeType(newRangeType: string) {
         this._rangeType = newRangeType;
-        this.rangeParams = Immutable.Map<string, any>();
+        this.rangeParams = (this.originalSearch.get('rangeType') === newRangeType) ? this.originalSearch.get('rangeParams') : Immutable.Map<string, any>();
+
         if (this.onParamsChanged !== undefined) {
             this.onParamsChanged(this.getParams());
         }
@@ -95,6 +114,15 @@ class SearchStore {
         }
     }
 
+    get fields(): Immutable.Set<string> {
+        return this._fields;
+    }
+
+    set fields(newFields: Immutable.Set<string>) {
+        URLUtils.replaceHashParam('fields', newFields.join(','));
+        this._fields = newFields;
+    }
+
     static _initializeOriginalSearch(parsedSearch: Immutable.Map<string, any>): Immutable.Map<string, any> {
         var originalSearch = Immutable.Map<string, any>();
         originalSearch = originalSearch.set('query', parsedSearch.get('q', ''));
@@ -109,8 +137,8 @@ class SearchStore {
                 break;
             case 'absolute':
                 rangeParams = Immutable.Map<string, any>({
-                    from: parsedSearch.get('from', ''),
-                    to: parsedSearch.get('to', '')
+                    from: parsedSearch.get('from', null),
+                    to: parsedSearch.get('to', null)
                 });
                 break;
             case 'keyword':
@@ -131,6 +159,20 @@ class SearchStore {
 
     _getOriginalSearchRequest(event, data) {
         data.callback(this.getOriginalSearchParams());
+    }
+
+    _changeTimeRange(event, data) {
+        var newRangeType = data['rangeType'];
+        var newRangeParams = Immutable.Map<string, any>(data['rangeParams']);
+
+        this.rangeType = newRangeType;
+        this.rangeParams = newRangeParams;
+    }
+
+    _submitSearch(event) {
+        if (this.onSubmitSearch !== undefined) {
+            this.onSubmitSearch();
+        }
     }
 
     static escape(source) {
@@ -162,6 +204,7 @@ class SearchStore {
         };
     }
 
+    // Get initial search params, with names used in AJAX requests
     getOriginalSearchParams(): Immutable.Map<string,any> {
         var orignalParams = Immutable.Map<string, any>();
         orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
@@ -172,19 +215,21 @@ class SearchStore {
         return orignalParams;
     }
 
-    getSearchURLParams(): Immutable.Map<string, any> {
+    // Get initial search params, with the names used in a search URL request
+    getOriginalSearchURLParams(): Immutable.Map<string, any> {
         var simplifiedParams = Immutable.Map<string, any>();
         simplifiedParams = simplifiedParams.set('rangetype', this.originalSearch.get('rangeType'));
         simplifiedParams = simplifiedParams.merge(this.originalSearch.get('rangeParams'));
         simplifiedParams = simplifiedParams.set('q', this.originalSearch.get('query'));
         simplifiedParams = simplifiedParams.set('interval', this.originalSearch.get('resolution'));
         simplifiedParams = simplifiedParams.set('page', this.originalSearch.get('page'));
+        simplifiedParams = simplifiedParams.set('fields', this.fields.join(','));
 
         return simplifiedParams;
     }
 
     _reloadSearchWithNewParam(param: string, value: any) {
-        var searchURLParams = this.getSearchURLParams();
+        var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
         URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
     }

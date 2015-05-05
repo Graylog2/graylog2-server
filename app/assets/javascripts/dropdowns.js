@@ -7,10 +7,12 @@ $(document).ready(function() {
      * useParentWidth: (boolean) true if element will appear on the right size of parent.
      */
     function elementOverflowScreenWidth(parent, element, useParentWidth) {
+        var $parent = $(parent);
+        var $element = $(element);
         if (useParentWidth) {
-            return ((window.screen.width - $(parent).offset().left) <= ($(parent).outerWidth() + $(element).outerWidth()));
+            return (($(window).width() - $parent.offset().left) <= ($parent.outerWidth() + $element.outerWidth()));
         } else {
-            return ((window.screen.width - $(parent).offset().left) <= $(element).outerWidth());
+            return (($(window).width() - $parent.offset().left) <= $element.outerWidth());
         }
     }
 

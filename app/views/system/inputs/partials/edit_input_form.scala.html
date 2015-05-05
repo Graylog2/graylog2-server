@@ -25,26 +25,31 @@
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" class="input-global-checkbox" name="global" disabled="disabled" checked="checked">
-                                <span class="help-block">Global input (started on all nodes)</span>
+                                Global input (started on all nodes)
                             </label>
                         </div>
                         <input type="hidden" name="global" value="true">
                     } else {
-                        <label for="node-@input.getId">Started on node:</label>
-                        <select name="node-@input.getId" disabled="disabled" class="input-node-selector form-control">
-                                <option value="@inputNode.getNodeId">@inputNode.getShortNodeId / @inputNode.getHostname</option>
-                        </select>
-                        <input type="hidden" name="node" value="@inputNode.getNodeId">
+                        <div class="form-group">
+                            <label for="node-@input.getId">Started on node:</label>
+                            <select name="node-@input.getId" disabled="disabled" class="input-node-selector form-control">
+                                <option value="@inputNode.getNodeId">@inputNode.getShortNodeId
+                                    / @inputNode.getHostname</option>
+                            </select>
+                            <input type="hidden" name="node" value="@inputNode.getNodeId">
+                        </div>
                     }
 
-                    <label for="title-@input.getId">Title</label>
-                    <input id="title-@input.getId"
-                           name="title"
-                           type="text"
-                           value="@input.getTitle"
-                           class="input-xlarge form-control"
-                           required>
-                    <p class="help-block">Name describing the input.</p>
+                    <div class="form-group">
+                        <label for="title-@input.getId">Title</label>
+                        <input id="title-@input.getId"
+                        name="title"
+                        type="text"
+                        value="@input.getTitle"
+                        class="input-xlarge form-control"
+                        required>
+                        <p class="help-block">Name describing the input.</p>
+                    </div>
 
                     @for(field <- inputInfo.getRequestedConfiguration) {
 
@@ -84,7 +89,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary update-input" data-input-id="@input.getId">Update input</button>
+                    <button type="submit" class="btn btn-primary update-input" data-input-id="@input.getId">
+                        Update input</button>
                 </div>
             </div>
         </div>

@@ -1,0 +1,19 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList)
+
+@main("Agents in Cluster", null, "", currentUser, false) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1><i class="fa fa-cloud"></i> Agents in Cluster</h1>
+            <p class="description">
+                Agents deliver local resources to a remote Graylog cluster.
+            </p>
+        </div>
+    </div>
+    <div class="row content">
+        <div class="col-md-12" id="react-agent-list">
+        </div>
+    </div>
+}

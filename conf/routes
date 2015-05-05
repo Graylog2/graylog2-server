@@ -3,18 +3,18 @@
 # ~~~~
 
 # Authentication
-GET         /login                                                                   @controllers.SessionsController.index(destination: String ?= "")
-POST        /login                                                                   @controllers.SessionsController.create()
-GET         /logout                                                                  @controllers.SessionsController.destroy()
+GET           /login                                                                             @controllers.SessionsController.index(destination: String ?= "")
+POST          /login                                                                             @controllers.SessionsController.create()
+GET           /logout                                                                            @controllers.SessionsController.destroy()
 
 # Unconnected web interface
-GET         /disconnected                                                            @controllers.LonesomeInterfaceController.index()
+GET           /disconnected                                                                      @controllers.LonesomeInterfaceController.index()
 
 # Home page
-GET         /                                                                        @controllers.SearchController.globalSearch()
+GET           /                                                                                  @controllers.SearchController.globalSearch()
 
 # Redirect for personal startpage.
-GET         /startpage                                                               @controllers.StartpageController.redirect()
+GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
@@ -22,163 +22,167 @@ GET         /searchv2                                                           
 GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
-GET         /messages/:index/:id                                                     @controllers.MessagesController.show(index: String, id: String)
-GET         /messages/:index/:id/partial                                             @controllers.MessagesController.partial(index: String, id: String)
+GET           /messages/:index/:id                                                               @controllers.MessagesController.show(index: String, id: String)
+GET           /messages/:index/:id/partial                                                       @controllers.MessagesController.partial(index: String, id: String)
 
 # Streams
-GET         /streams                                                                 @controllers.StreamsController.index()
-GET         /streams/new                                                             @controllers.StreamsController.newStream()
-POST        /streams/new                                                             @controllers.StreamsController.create()
-GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "", width:Integer ?= -1)
-GET         /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
-POST        /streams/:stream_id/rules/:streamrule_id/delete                          @controllers.StreamRulesController.delete(stream_id: String, streamrule_id: String)
-GET         /streams/:stream_id/rules                                                @controllers.StreamRulesController.index(stream_id: String)
-POST        /streams/:stream_id/rules                                                @controllers.StreamRulesController.create(stream_id: String)
-POST        /streams/:stream_id/rules/:streamrule_id                                 @controllers.StreamRulesController.update(stream_id: String, streamrule_id: String)
-GET         /streams/:stream_id/pause                                                @controllers.StreamsController.pause(stream_id: String)
-GET         /streams/:stream_id/resume                                               @controllers.StreamsController.resume(stream_id: String)
-GET         /streams/:stream_id/edit                                                 @controllers.StreamsController.edit(stream_id: String)
-POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
-GET         /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStreamForm(stream_id: String)
-POST        /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStream(stream_id: String)
-GET         /streams/:stream_id/csv                                                  @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
+GET           /streams                                                                           @controllers.StreamsController.index()
+GET           /streams/new                                                                       @controllers.StreamsController.newStream()
+POST          /streams/new                                                                       @controllers.StreamsController.create()
+GET           /streams/:stream_id/messages                                                       @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "", width:Integer ?= -1)
+GET           /streams/:stream_id/delete                                                         @controllers.StreamsController.delete(stream_id: String)
+POST          /streams/:stream_id/rules/:streamrule_id/delete                                    @controllers.StreamRulesController.delete(stream_id: String, streamrule_id: String)
+GET           /streams/:stream_id/rules                                                          @controllers.StreamRulesController.index(stream_id: String)
+POST          /streams/:stream_id/rules                                                          @controllers.StreamRulesController.create(stream_id: String)
+POST          /streams/:stream_id/rules/:streamrule_id                                           @controllers.StreamRulesController.update(stream_id: String, streamrule_id: String)
+GET           /streams/:stream_id/pause                                                          @controllers.StreamsController.pause(stream_id: String)
+GET           /streams/:stream_id/resume                                                         @controllers.StreamsController.resume(stream_id: String)
+GET           /streams/:stream_id/edit                                                           @controllers.StreamsController.edit(stream_id: String)
+POST          /streams/:stream_id/update                                                         @controllers.StreamsController.update(stream_id: String)
+GET           /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStreamForm(stream_id: String)
+POST          /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStream(stream_id: String)
+GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
 GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
 
 # Alerts
-GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
-POST        /streams/:stream_id/alerts/conditions/add/messagecount                   @controllers.AlertsController.addTypeMessageCount(stream_id: String)
-POST        /streams/:stream_id/alerts/conditions/add/fieldvalue                     @controllers.AlertsController.addTypeFieldValue(stream_id: String)
-POST        /streams/:stream_id/alerts/conditions/:condition_id                      @controllers.AlertsController.updateCondition(stream_id: String, condition_id: String)
-POST        /streams/:stream_id/alerts/conditions/:condition_id/delete               @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
-POST        /streams/:stream_id/alerts/receivers/user/add                            @controllers.AlertsController.addReceiverUser(stream_id: String)
-POST        /streams/:stream_id/alerts/receivers/email/add                           @controllers.AlertsController.addReceiverEmail(stream_id: String)
-GET         /streams/:stream_id/alerts/receivers/user/delete                         @controllers.AlertsController.removeReceiverUser(stream_id: String, username: String)
-GET         /streams/:stream_id/alerts/receivers/email/delete                        @controllers.AlertsController.removeReceiverEmail(stream_id: String, email: String)
-POST        /streams/:stream_id/alerts/sendDummyAlert                                @controllers.AlertsController.sendDummyAlert(stream_id: String)
+GET           /streams/:stream_id/alerts                                                         @controllers.AlertsController.index(stream_id: String)
+POST          /streams/:stream_id/alerts/conditions/add/messagecount                             @controllers.AlertsController.addTypeMessageCount(stream_id: String)
+POST          /streams/:stream_id/alerts/conditions/add/fieldvalue                               @controllers.AlertsController.addTypeFieldValue(stream_id: String)
+POST          /streams/:stream_id/alerts/conditions/:condition_id                                @controllers.AlertsController.updateCondition(stream_id: String, condition_id: String)
+POST          /streams/:stream_id/alerts/conditions/:condition_id/delete                         @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
+POST          /streams/:stream_id/alerts/receivers/user/add                                      @controllers.AlertsController.addReceiverUser(stream_id: String)
+POST          /streams/:stream_id/alerts/receivers/email/add                                     @controllers.AlertsController.addReceiverEmail(stream_id: String)
+GET           /streams/:stream_id/alerts/receivers/user/delete                                   @controllers.AlertsController.removeReceiverUser(stream_id: String, username: String)
+GET           /streams/:stream_id/alerts/receivers/email/delete                                  @controllers.AlertsController.removeReceiverEmail(stream_id: String, email: String)
+POST          /streams/:stream_id/alerts/sendDummyAlert                                          @controllers.AlertsController.sendDummyAlert(stream_id: String)
 
 # Alarm Callbacks
-POST        /streams/:stream_id/alarmcallbacks                                       @controllers.AlarmCallbacksController.create(stream_id: String)
-POST        /streams/:stream_id/alarmcallbacks/:alarmcallback_id/delete              @controllers.AlarmCallbacksController.delete(stream_id: String, alarmcallback_id: String)
+POST          /streams/:stream_id/alarmcallbacks                                                 @controllers.AlarmCallbacksController.create(stream_id: String)
+POST          /streams/:stream_id/alarmcallbacks/:alarmcallback_id/delete                        @controllers.AlarmCallbacksController.delete(stream_id: String, alarmcallback_id: String)
 
 # System
-GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)
-GET         /system/nodes                                                            @controllers.NodesController.nodes()
-GET         /system/nodes/:node_id                                                   @controllers.NodesController.node(node_id: String)
-GET         /system/radios/:radio_id                                                 @controllers.RadiosController.show(radio_id: String)
-GET         /system/threaddump/:node_id                                              @controllers.NodesController.threadDump(node_id: String)
-GET         /system/threaddump/radio/:radio_id                                       @controllers.RadiosController.threadDump(radio_id: String)
-GET         /system/inputs                                                           @controllers.InputsController.index()
-POST        /system/inputs                                                           @controllers.InputsController.launch()
-GET         /system/inputs/:node_id                                                  @controllers.InputsController.manage(node_id: String)
-GET         /system/inputs/radio/:radio_id                                           @controllers.InputsController.manageRadio(radio_id: String)
-POST        /system/inputs/:node_id/:input_id/terminate                              @controllers.InputsController.terminate(node_id: String, input_id: String)
-POST        /system/inputs/:input_id/update                                          @controllers.InputsController.update(input_id: String)
-POST        /system/inputs/:input_id/terminate                                       @controllers.InputsController.terminateGlobal(input_id: String)
-POST        /system/inputs/:node_id/:input_id/staticfields                           @controllers.InputsController.addStaticField(node_id: String, input_id: String)
-POST        /system/inputs/:input_id/staticfields                                    @controllers.InputsController.addStaticFieldGlobal(input_id: String)
-GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete               @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
-GET         /system/contentpacks                                                     @controllers.BundlesController.index()
-GET         /system/contentpacks/export                                              @controllers.BundlesController.exportForm()
-POST        /system/contentpacks/export                                              @controllers.BundlesController.export()
-GET         /system/grokpatterns                                                     @controllers.GrokPatternsController.index()
-POST        /system/grokpatterns/import                                              @controllers.GrokPatternsController.upload()
+GET           /system                                                                            @controllers.SystemController.index(page:Integer ?= 1)
+GET           /system/nodes                                                                      @controllers.NodesController.nodes()
+GET           /system/nodes/:node_id                                                             @controllers.NodesController.node(node_id: String)
+GET           /system/radios/:radio_id                                                           @controllers.RadiosController.show(radio_id: String)
+GET           /system/threaddump/:node_id                                                        @controllers.NodesController.threadDump(node_id: String)
+GET           /system/threaddump/radio/:radio_id                                                 @controllers.RadiosController.threadDump(radio_id: String)
+GET           /system/inputs                                                                     @controllers.InputsController.index()
+POST          /system/inputs                                                                     @controllers.InputsController.launch()
+GET           /system/inputs/:node_id                                                            @controllers.InputsController.manage(node_id: String)
+GET           /system/inputs/radio/:radio_id                                                     @controllers.InputsController.manageRadio(radio_id: String)
+POST          /system/inputs/:node_id/:input_id/terminate                                        @controllers.InputsController.terminate(node_id: String, input_id: String)
+POST          /system/inputs/:input_id/update                                                    @controllers.InputsController.update(input_id: String)
+POST          /system/inputs/:input_id/terminate                                                 @controllers.InputsController.terminateGlobal(input_id: String)
+GET         /system/inputs/:input_id/terminate                                       @controllers.InputsController.terminateGlobal(input_id: String)
+POST          /system/inputs/:node_id/:input_id/staticfields                                     @controllers.InputsController.addStaticField(node_id: String, input_id: String)
+POST          /system/inputs/:input_id/staticfields                                              @controllers.InputsController.addStaticFieldGlobal(input_id: String)
+GET           /system/inputs/:node_id/:input_id/staticfields/:key/delete                         @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
+POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
+POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
+POST        /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
+GET         /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
+GET         /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
+GET         /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
+GET           /system/contentpacks                                                               @controllers.BundlesController.index()
+GET           /system/contentpacks/export                                                        @controllers.BundlesController.exportForm()
+POST          /system/contentpacks/export                                                        @controllers.BundlesController.export()
+GET           /system/grokpatterns                                                               @controllers.GrokPatternsController.index()
+POST          /system/grokpatterns/import                                                        @controllers.GrokPatternsController.upload()
+GET           /system/agents                                                                     @controllers.AgentsController.index()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
 
-POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
-POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
-POST        /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
-
-GET         /system/mappers                                                          @controllers.MappersController.index()
-GET         /system/metrics/node/:node_id                                            @controllers.MetricsController.ofNode(node_id: String, prefilter ?= "")
-GET         /system/metrics/master                                                   @controllers.MetricsController.ofMasterNode(prefilter ?= "")
-GET         /system/metrics/radio/:radio_id                                          @controllers.MetricsController.ofRadio(radio_id: String, prefilter ?= "")
-GET         /system/indices                                                          @controllers.IndicesController.index()
-GET         /system/indices/ranges/rebuild                                           @controllers.IndicesController.reCalculateRanges()
-GET         /system/deflector/cycle                                                  @controllers.IndicesController.cycleDeflector()
-POST        /system/nodes/:node_id/processing/pause                                  @controllers.NodesController.pauseMessageProcessing(node_id: String)
-POST        /system/nodes/:node_id/processing/resume                                 @controllers.NodesController.resumeMessageProcessing(node_id: String)
-GET         /system/indices/:index/close                                             @controllers.IndicesController.closeIndex(index: String)
-GET         /system/indices/:index/reopen                                            @controllers.IndicesController.reopenIndex(index: String)
-GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
-GET         /system/indices/failures                                                 @controllers.IndicesController.failures(page:Integer ?= 1)
-GET         /system/nodes/:node_id/lb/override/:status                               @controllers.NodesController.overrideLbStatus(node_id: String, status: String)
-GET         /system/radios/:radio_id/lb/override/:status                             @controllers.RadiosController.overrideLbStatus(radio_id: String, status: String)
-GET         /system/nodes/:node_id/shutdown                                          @controllers.NodesController.shutdown(node_id: String)
+GET           /system/mappers                                                                    @controllers.MappersController.index()
+GET           /system/metrics/node/:node_id                                                      @controllers.MetricsController.ofNode(node_id: String, prefilter ?= "")
+GET           /system/metrics/master                                                             @controllers.MetricsController.ofMasterNode(prefilter ?= "")
+GET           /system/metrics/radio/:radio_id                                                    @controllers.MetricsController.ofRadio(radio_id: String, prefilter ?= "")
+GET           /system/indices                                                                    @controllers.IndicesController.index()
+GET           /system/indices/ranges/rebuild                                                     @controllers.IndicesController.reCalculateRanges()
+GET           /system/deflector/cycle                                                            @controllers.IndicesController.cycleDeflector()
+POST          /system/nodes/:node_id/processing/pause                                            @controllers.NodesController.pauseMessageProcessing(node_id: String)
+POST          /system/nodes/:node_id/processing/resume                                           @controllers.NodesController.resumeMessageProcessing(node_id: String)
+GET           /system/indices/:index/close                                                       @controllers.IndicesController.closeIndex(index: String)
+GET           /system/indices/:index/reopen                                                      @controllers.IndicesController.reopenIndex(index: String)
+GET           /system/indices/:index/delete                                                      @controllers.IndicesController.deleteIndex(index: String)
+GET           /system/indices/failures                                                           @controllers.IndicesController.failures(page:Integer ?= 1)
+GET           /system/nodes/:node_id/lb/override/:status                                         @controllers.NodesController.overrideLbStatus(node_id: String, status: String)
+GET           /system/radios/:radio_id/lb/override/:status                                       @controllers.RadiosController.overrideLbStatus(radio_id: String, status: String)
+GET           /system/nodes/:node_id/shutdown                                                    @controllers.NodesController.shutdown(node_id: String)
 
 # Saved searches
-GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
-GET         /savedsearches/:search_id/execute                                        @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "", width:Integer ?= -1)
-POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
-GET         /savedsearches/:search_id/delete                                         @controllers.SavedSearchesController.delete(search_id: String)
+GET           /savedsearches                                                                     @controllers.api.SavedSearchesApiController.list()
+GET           /savedsearches/:search_id/execute                                                  @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "", width:Integer ?= -1)
+POST          /savedsearches/create                                                              @controllers.api.SavedSearchesApiController.create()
+GET           /savedsearches/:search_id/delete                                                   @controllers.SavedSearchesController.delete(search_id: String)
 
 # Extractors
-GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/new                         @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example_index ?= "", example_id ?= "")
-POST        /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.create(node_id: String, input_id: String)
-POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete        @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/:extractor_id/edit          @controllers.ExtractorsController.editExtractor(node_id: String, input_id: String, extractor_id: String)
-POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/update        @controllers.ExtractorsController.update(node_id: String, input_id: String, extractor_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.exportExtractors(node_id: String, input_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractorsPage(node_id: String, input_id: String)
-POST        /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractors(node_id: String, input_id: String)
+GET           /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.manage(node_id: String, input_id: String)
+GET           /system/inputs/:node_id/:input_id/extractors/new                                   @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example_index ?= "", example_id ?= "")
+POST          /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.create(node_id: String, input_id: String)
+POST          /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete                  @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
+GET           /system/inputs/:node_id/:input_id/extractors/:extractor_id/edit                    @controllers.ExtractorsController.editExtractor(node_id: String, input_id: String, extractor_id: String)
+POST          /system/inputs/:node_id/:input_id/extractors/:extractor_id/update                  @controllers.ExtractorsController.update(node_id: String, input_id: String, extractor_id: String)
+GET           /system/inputs/:node_id/:input_id/extractors/export                                @controllers.ExtractorsController.exportExtractors(node_id: String, input_id: String)
+GET           /system/inputs/:node_id/:input_id/extractors/import                                @controllers.ExtractorsController.importExtractorsPage(node_id: String, input_id: String)
+POST          /system/inputs/:node_id/:input_id/extractors/import                                @controllers.ExtractorsController.importExtractors(node_id: String, input_id: String)
 
 # Users
-GET         /system/users                                                            @controllers.UsersController.index()
-POST        /system/users                                                            @controllers.UsersController.create()
-POST        /system/users/delete/:username                                           @controllers.UsersController.delete(username: String)
-GET         /system/users/show/:username                                             @controllers.UsersController.show(username: String)
-POST        /system/users/save/:username                                             @controllers.UsersController.saveChanges(username: String)
-GET         /system/users/new                                                        @controllers.UsersController.newUserForm()
-GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
-POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
-POST        /system/users/startpage/reset/:username                                  @controllers.StartpageController.reset(username: String)
-POST        /system/users/resetpermissions/:username                                 @controllers.UsersController.resetPermissions(username: String)
+GET           /system/users                                                                      @controllers.UsersController.index()
+POST          /system/users                                                                      @controllers.UsersController.create()
+POST          /system/users/delete/:username                                                     @controllers.UsersController.delete(username: String)
+GET           /system/users/show/:username                                                       @controllers.UsersController.show(username: String)
+POST          /system/users/save/:username                                                       @controllers.UsersController.saveChanges(username: String)
+GET           /system/users/new                                                                  @controllers.UsersController.newUserForm()
+GET           /system/users/edit/:username                                                       @controllers.UsersController.editUserForm(username: String)
+POST          /system/users/password/:username                                                   @controllers.UsersController.changePassword(username: String)
+POST          /system/users/startpage/reset/:username                                            @controllers.StartpageController.reset(username: String)
+POST          /system/users/resetpermissions/:username                                           @controllers.UsersController.resetPermissions(username: String)
 
 # Sources
-GET         /sources                                                                 @controllers.SourcesController.list()
+GET           /sources                                                                           @controllers.SourcesController.list()
 
 # Startpages
-GET         /startpage/set                                                           @controllers.StartpageController.set(pageType ?= "", id ?= "")
+GET           /startpage/set                                                                     @controllers.StartpageController.set(pageType ?= "", id ?= "")
 
 # LDAP configuration
-GET         /system/ldap                                                             @controllers.LdapController.index()
-POST        /system/ldap                                                             @controllers.LdapController.saveLdapSettings()
-POST        /a/system/ldap/testconnect                                               @controllers.LdapController.apiTestLdapConnection()
-POST        /a/system/ldap/testlogin                                                 @controllers.LdapController.apiTestLdapLogin()
+GET           /system/ldap                                                                       @controllers.LdapController.index()
+POST          /system/ldap                                                                       @controllers.LdapController.saveLdapSettings()
+POST          /a/system/ldap/testconnect                                                         @controllers.LdapController.apiTestLdapConnection()
+POST          /a/system/ldap/testlogin                                                           @controllers.LdapController.apiTestLdapLogin()
 
 # Systemjobs
-POST        /systemjobs/trigger                                                      @controllers.SystemJobsController.trigger()
+POST          /systemjobs/trigger                                                                @controllers.SystemJobsController.trigger()
 
 # Logging
-GET         /system/logging                                                          @controllers.LoggingController.index()
-PUT         /system/logging/node/:node_id/subsystem/:subsystem/:level                @controllers.LoggingController.setSubsystemLevel(node_id: String, subsystem: String, level: String)
+GET           /system/logging                                                                    @controllers.LoggingController.index()
+PUT           /system/logging/node/:node_id/subsystem/:subsystem/:level                          @controllers.LoggingController.setSubsystemLevel(node_id: String, subsystem: String, level: String)
 
 # Dashboards
-GET         /dashboards                                                              @controllers.DashboardsController.index()
-GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
-GET         /dashboards/:id                                                          @controllers.DashboardsController.show(id: String)
-POST        /dashboards/create                                                       @controllers.DashboardsController.create()
-POST        /dashboards/:id/update                                                   @controllers.DashboardsController.update(id: String)
-POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)
+GET           /dashboards                                                                        @controllers.DashboardsController.index()
+GET           /dashboards/new                                                                    @controllers.DashboardsController.newDashboard()
+GET           /dashboards/:id                                                                    @controllers.DashboardsController.show(id: String)
+POST          /dashboards/create                                                                 @controllers.DashboardsController.create()
+POST          /dashboards/:id/update                                                             @controllers.DashboardsController.update(id: String)
+POST          /dashboards/:id/delete                                                             @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)
-GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
-GET         /a/search/fieldterms                                                     @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
-GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "", streamId ?= "")
-GET         /a/search/histogram                                                      @controllers.api.SearchApiController.histogram(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", streamId ?= "", maxDataPoints:Integer ?= -1)
+GET           /a/search/fieldstats                                                               @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
+GET           /a/search/fieldterms                                                               @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
+GET           /a/search/fieldhistogram                                                           @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "", streamId ?= "")
+GET           /a/search/histogram                                                                @controllers.api.SearchApiController.histogram(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", streamId ?= "", maxDataPoints:Integer ?= -1)
 
 # API: Message counts and histograms
-GET         /a/messagecounts/total                                                   @controllers.MessageCountsController.total()
+GET           /a/messagecounts/total                                                             @controllers.MessageCountsController.total()
 
 # API: Message analyzing
-GET         /a/analyze/:index/:id/:field                                             @controllers.MessagesController.analyze(index: String, id: String, field: String)
+GET           /a/analyze/:index/:id/:field                                                       @controllers.MessagesController.analyze(index: String, id: String, field: String)
 
 # Metrics via SockJS, set up new router
-->         /a/metrics                                                                controllers.api.MetricsController.metrics
+->            /a/metrics                                                                         controllers.api.MetricsController.metrics
 
 # API: System
 GET         /a/system/fields                                                         @controllers.api.SystemApiController.fields()
@@ -203,15 +207,15 @@ DELETE      /a/system/user/:username                                            
 PUT         /a/system/user/:username/preferences                                     @controllers.api.UsersApiController.saveUserPreferences(username: String)
 
 # API: Inputs
-GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
-GET         /a/system/inputs/:node_id/:input_id/recent_message/filtered              @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= true)
-GET         /a/system/inputs/global/:input_id/io                                     @controllers.api.InputsApiController.globaIO(input_id: String)
-GET         /a/system/inputs/:node_id/:input_id/io                                   @controllers.api.InputsApiController.io(node_id: String, input_id: String)
-GET         /a/system/inputs/:node_id/:input_id/connections                          @controllers.api.InputsApiController.connections(node_id: String, input_id: String)
+GET           /a/system/inputs/:node_id/:input_id/recent_message                                 @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
+GET           /a/system/inputs/:node_id/:input_id/recent_message/filtered                        @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= true)
+GET           /a/system/inputs/global/:input_id/io                                               @controllers.api.InputsApiController.globaIO(input_id: String)
+GET           /a/system/inputs/:node_id/:input_id/io                                             @controllers.api.InputsApiController.io(node_id: String, input_id: String)
+GET           /a/system/inputs/:node_id/:input_id/connections                                    @controllers.api.InputsApiController.connections(node_id: String, input_id: String)
 
 # API: Messages
-GET         /a/messages/:index/:id                                                   @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= false)
-GET         /a/messages/:index/:id/filtered                                          @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= true)
+GET           /a/messages/:index/:id                                                             @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= false)
+GET           /a/messages/:index/:id/filtered                                                    @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= true)
 
 # API: Tools
 POST        /a/tools/regex_test                                                      @controllers.api.ToolsApiController.regexTest()
@@ -221,7 +225,7 @@ POST        /a/tools/grok_test                                                  
 GET         /a/tools/natural_date_test                                               @controllers.api.ToolsApiController.naturalDateTest(string ?= "")
 
 # API: Server Connection
-GET         /a/connection/available                                                  @controllers.LonesomeInterfaceController.checkServerAvailability()
+GET           /a/connection/available                                                            @controllers.LonesomeInterfaceController.checkServerAvailability()
 
 # API: Dashboards
 GET         /a/dashboards                                                            @controllers.api.DashboardsApiController.index()
@@ -241,23 +245,23 @@ POST        /a/streams/:stream_id/testMatch                                     
 GET         /a/streams                                                               @controllers.api.StreamsApiController.listStreams()
 
 # API: Alerts
-GET         /a/streams/alerts/allowed                                                @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)
+GET           /a/streams/alerts/allowed                                                          @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)
 
 # API: Indices
-GET         /a/system/indices/failures/dynatable                                     @controllers.api.IndicesApiController.failures(perPage:Integer ?= 50, offset:Integer ?= 0)
-GET         /a/system/indices/index_info/:index_name/partial                         @controllers.api.IndicesApiController.indexInfo(index_name: String)
+GET           /a/system/indices/failures/dynatable                                               @controllers.api.IndicesApiController.failures(perPage:Integer ?= 50, offset:Integer ?= 0)
+GET           /a/system/indices/index_info/:index_name/partial                                   @controllers.api.IndicesApiController.indexInfo(index_name: String)
 
 # API: Extractors
-POST        /a/system/inputs/:input_id/extractors/order                              @controllers.api.ExtractorsApiController.order(input_id: String)
+POST          /a/system/inputs/:input_id/extractors/order                                        @controllers.api.ExtractorsApiController.order(input_id: String)
 
 # API: Bundles
-GET         /a/system/contentpacks                                                   @controllers.api.BundlesApiController.index()
-POST        /a/system/contentpacks                                                   @controllers.api.BundlesApiController.create()
-POST        /a/system/contentpacks/:pack_id/apply                                    @controllers.api.BundlesApiController.apply(pack_id: String)
-POST        /a/system/contentpacks/:pack_id/delete                                   @controllers.api.BundlesApiController.delete(pack_id: String)
+GET           /a/system/contentpacks                                                             @controllers.api.BundlesApiController.index()
+POST          /a/system/contentpacks                                                             @controllers.api.BundlesApiController.create()
+POST          /a/system/contentpacks/:pack_id/apply                                              @controllers.api.BundlesApiController.apply(pack_id: String)
+POST          /a/system/contentpacks/:pack_id/delete                                             @controllers.api.BundlesApiController.delete(pack_id: String)
 
 # API: Sources
-GET         /a/sources                                                               @controllers.api.SourcesApiController.list(range: Integer ?= 86400)
+GET           /a/sources                                                                         @controllers.api.SourcesApiController.list(range: Integer ?= 86400)
 
 # Grok patterns
 GET         /a/system/grokpatterns                                                   @controllers.api.GrokPatternsApiController.index()
@@ -283,9 +287,12 @@ POST        /a/streams/:stream_id/alarmcallbacks                                
 DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
 PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
-GET         /robots.txt                                                              controllers.Assets.at(path="/public", file="robots.txt")
+# API: Agents
+GET           /a/system/agents                                                                   @controllers.api.AgentsApiController.index()
+
+GET           /robots.txt                                                                        controllers.Assets.at(path="/public", file="robots.txt")
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)
+GET           /assets/*file                                                                      controllers.Assets.at(path="/public", file)
 
-GET         /opensearch.xml                                                          controllers.OpenSearchController.index()
+GET           /opensearch.xml                                                                    controllers.OpenSearchController.index()
