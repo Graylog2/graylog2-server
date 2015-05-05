@@ -93,20 +93,12 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         this.searchHits = Collections.emptyList();
         final List<MessageSummary> summaries = Lists.newArrayList();
         try {
-            String filter = "streams:" + stream.getId();
-            FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60));
-            if (getBacklog() != null && getBacklog() > 0) {
-                this.searchHits = Lists.newArrayList();
-                for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {
-                    final Message msg = new Message(resultMessage.getMessage());
-                    this.searchHits.add(msg);
-                    summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
-                }
-            }
+            final String filter = "streams:" + stream.getId();
+            final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60));
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
-                return new CheckResult(false);
+                return new NegativeCheckResult();
             }
 
             double result;
@@ -128,7 +120,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     break;
                 default:
                     LOG.error("No such field value check type: [{}]. Returning not triggered.", type);
-                    return new CheckResult(false);
+                    return new NegativeCheckResult();
             }
 
             LOG.debug("Alert check <{}> result: [{}]", id, result);
@@ -136,7 +128,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             if (Double.isInfinite(result)) {
                 // This happens when there are no ES results/docs.
                 LOG.debug("Infinite value. Returning not triggered.");
-                return new CheckResult(false);
+                return new NegativeCheckResult();
             }
 
             boolean triggered = false;
@@ -154,9 +146,19 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                         + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
                         + thresholdType + " than " + decimalFormat.format(threshold) + ". "
                         + "(Current grace time: " + grace + " minutes)";
+
+                if (getBacklog() > 0) {
+                    this.searchHits = Lists.newArrayList();
+                    for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {
+                        final Message msg = new Message(resultMessage.getMessage());
+                        this.searchHits.add(msg);
+                        summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
+                    }
+                }
+
                 return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
             } else {
-                return new CheckResult(false);
+                return new NegativeCheckResult();
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
@@ -168,7 +170,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             return null;
         } catch (Searches.FieldTypeException e) {
             LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
-            return new CheckResult(false);
+            return new NegativeCheckResult();
         }
     }
 
