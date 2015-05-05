@@ -23,6 +23,7 @@ import org.elasticsearch.client.Client;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Tools;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,10 +110,11 @@ public class Mapping {
         return type;
     }
 
-    private static Map<String, String> typeTimeWithMillis() {
-        final Map<String, String> type = Maps.newHashMap();
+    private static Map<String, Serializable> typeTimeWithMillis() {
+        final Map<String, Serializable> type = Maps.newHashMap();
         type.put("type", "date");
         type.put("format", Tools.ES_DATE_FORMAT);
+        type.put("doc_values", true);
 
         return type;
     }
