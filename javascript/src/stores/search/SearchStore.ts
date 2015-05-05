@@ -28,13 +28,22 @@ class SearchStore {
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
-        var parsedHash = Immutable.Map<string, any>(URLUtils.getParsedHash(window.location));
         this.originalSearch = SearchStore._initializeOriginalSearch(parsedSearch);
         this.query = this.originalSearch.get('query');
         this.rangeType = this.originalSearch.get('rangeType');
         this.rangeParams = this.originalSearch.get('rangeParams');
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
+
+        $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
+        $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
+        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
+        $(document).on('submit.graylog.search', this._submitSearch.bind(this));
+    }
+
+    initializeFieldsFromHash() {
+        var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
+        var parsedHash = Immutable.Map<string, any>(URLUtils.getParsedHash(window.location));
         var fieldsFromHash = parsedHash.get('fields');
         var fieldsFromQuery = parsedSearch.get('fields');
         if (fieldsFromHash === undefined) {
@@ -49,10 +58,6 @@ class SearchStore {
             // hash value, if present, always wins
             this.fields = Immutable.Set<string>(fieldsFromHash.split(','));
         }
-        $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
-        $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
-        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).on('submit.graylog.search', this._submitSearch.bind(this));
     }
 
     get query(): string {
