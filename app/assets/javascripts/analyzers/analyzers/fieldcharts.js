@@ -1,10 +1,11 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
     var position = initBottomPosition();
+
     function initBottomPosition() {
         position = 0;
         var charts = getPinnedCharts();
-        Object.keys(charts).forEach(function(chartId) {
+        Object.keys(charts).forEach(function (chartId) {
             var chart = charts[chartId];
             position = Math.max(chart.position, position);
         });
@@ -49,26 +50,38 @@ $(document).ready(function() {
         $("[data-position=" + position + "].spinner").remove();
     }
 
-    var palette = new Rickshaw.Color.Palette({ scheme: 'colorwheel' });
+    var palette = new Rickshaw.Color.Palette({scheme: 'colorwheel'});
 
-    $(".analyze-field .line-chart").on("click", function(e) {
-        e.preventDefault();
-
-        opts = {};
-        opts.field = $(this).attr("data-field");
-        var container = $(this).closest(".analyze-field");
-        if (!!container.attr("data-stream-id")) {
-            opts.streamid = container.attr("data-stream-id");
-        }
-
-        renderFieldChart(opts, container);
-        askBeforeUnload();
+    $(document).on('create.graylog.fieldgraph', function (event, data) {
+        var graphId = createFieldChart(data.field, data.container);
+        $(document).trigger('created.graylog.fieldgraph', {graphId: graphId});
     });
 
-    function renderFieldChart(opts, menuContainer) {
-        var field = opts.field;
-        var fieldCharts = $(".field-charts", menuContainer);
-        fieldCharts.hide();
+    function createFieldChart(field, graphContainer) {
+        "use strict";
+
+        var opts = {};
+        opts.field = field;
+        //var container = $(this).closest(".analyze-field");
+        //if (!!container.attr("data-stream-id")) {
+        //    opts.streamid = container.attr("data-stream-id");
+        //}
+        //
+        //renderFieldChart(opts, container);
+
+        renderFieldChart(opts, graphContainer);
+        askBeforeUnload();
+
+        return opts.chartid;
+    }
+
+    function getOptions(opts) {
+        var searchParams = {};
+        $(document).trigger("get-original-search.graylog.search", {
+            callback: function (params) {
+                searchParams = params.toJS()
+            }
+        });
 
         // Options.
         if (opts.chartid == undefined) {
@@ -76,7 +89,7 @@ $(document).ready(function() {
         }
 
         if (opts.interval == undefined) {
-            opts.interval = $("#universalsearch-interval-permanent").text().trim();
+            opts.interval = searchParams['interval'] || 'minute';
         }
 
         if (opts.interpolation == undefined) {
@@ -100,11 +113,11 @@ $(document).ready(function() {
         }
 
         if (opts.query == undefined) {
-            opts.query = $("#universalsearch-query-permanent").text().trim();
+            opts.query = searchParams['query'];
         }
 
         if (opts.rangetype == undefined) {
-            opts.rangetype = $("#universalsearch-rangetype-permanent").text().trim();
+            opts.rangetype = searchParams['range_type'];
         }
 
         if (opts.range == undefined) {
@@ -115,53 +128,74 @@ $(document).ready(function() {
             opts.position = getBottomPosition();
         }
 
+        switch (opts.rangetype) {
+            case "relative":
+                if (opts.range.relative == undefined) {
+                    opts.range.relative = searchParams['relative'];
+                }
+                break;
+            case "absolute":
+                if (opts.range.from == undefined) {
+                    opts.range.from = searchParams['from'];
+                }
+
+                if (opts.range.to == undefined) {
+                    opts.range.to = searchParams['to'];
+                }
+                break;
+            case "keyword":
+                if (opts.range.keyword == undefined) {
+                    opts.range.keyword = searchParams['keyword'];
+                }
+                break;
+        }
+
+        return opts;
+    }
+
+    function getParams(opts) {
+        "use strict";
         var params = {
             "rangetype": opts.rangetype,
             "q": opts.query,
-            "field": field,
+            "field": opts.field,
             "interval": opts.interval,
             "valueType": opts.valuetype,
             "streamId": opts.streamid
         };
 
-        switch(opts.rangetype) {
+        switch (opts.rangetype) {
             case "relative":
-                if (opts.range.relative == undefined) {
-                    opts.range.relative = $("#universalsearch-relative-permanent").text();
-                }
-
                 params["relative"] = opts.range.relative;
                 break;
             case "absolute":
-                if (opts.range.from == undefined) {
-                    opts.range.from = $("#universalsearch-from-permanent").text();
-                }
-
-                if (opts.range.to == undefined) {
-                    opts.range.to = $("#universalsearch-to-permanent").text();
-                }
-
                 params["from"] = opts.range.from;
                 params["to"] = opts.range.to;
                 break;
             case "keyword":
-                if (opts.range.keyword == undefined) {
-                    opts.range.keyword = $("#universalsearch-keyword-permanent").text();
-                }
-
                 params["keyword"] = opts.range.keyword;
                 break;
         }
 
-        insertSpinner(opts.position);
+        return params;
+    }
 
-        // Delete a possibly already existing graph with this id. (for updates)
-        $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs")).remove();
+    function renderFieldChart(opts, graphContainer, menuContainer) {
+        var field = opts.field;
+        var fieldCharts = $(".field-charts", menuContainer);
+        fieldCharts.hide();
+
+        opts = getOptions(opts);
+        var params = getParams(opts);
+
+        //insertSpinner(opts.position);
+
+        // TODO: Manage updates
 
         $.ajax({
             url: appPrefixed('/a/search/fieldhistogram'),
             data: params,
-            success: function(data) {
+            success: function (data) {
                 var template = $("#field-graph-template").clone();
                 template.removeAttr("id");
                 template.attr("data-chart-position", opts.position);
@@ -183,7 +217,7 @@ $(document).ready(function() {
 
                 $(".type-description", template).text("[" + opts.valuetype + "] " + opts.field + ", ");
 
-                if(opts.pinned) {
+                if (opts.pinned) {
                     $(".pin", template).hide();
                     $(".unpin", template).show();
                 }
@@ -192,36 +226,34 @@ $(document).ready(function() {
                 var previousElement = findElementBeforePosition(opts.position, "data-chart-position");
                 previousElement.after(template);
 
-                var graphContainer = $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs"));
-                var graphElement = $('.field-graph', graphContainer);
-                var graphYAxis = $('.field-graph-y-axis', graphContainer);
+                var $graphContainer = $(graphContainer);
+                var $graphElement = $('.field-graph', $graphContainer);
+                var $graphYAxis = $('.field-graph-y-axis', $graphContainer);
 
-                var resultGraphElement = $("#result-graph");
+                rickshawHelper.processHistogramData(data.values, $graphContainer.data("from"), $graphContainer.data("to"), data.interval);
 
-                rickshawHelper.processHistogramData(data.values, resultGraphElement.data("from"), resultGraphElement.data("to"), data.interval);
-
-                var graph = new Rickshaw.Graph( {
-                    element: graphElement[0],
-                    width: graphElement.width(),
+                var graph = new Rickshaw.Graph({
+                    element: $graphElement[0],
+                    width: $graphElement.width(),
                     height: 175,
                     interpolation: opts.interpolation,
                     renderer: rickshawHelper.getRenderer(opts.renderer),
                     resolution: data.interval,
-                    series: [ {
+                    series: [{
                         name: "value",
                         data: data.values,
                         color: '#26ADE4',
                         gl2_query: opts.query,
                         valuetype: opts.valuetype,
                         field: opts.field
-                    } ]
+                    }]
                 });
 
-                new Rickshaw.Graph.Axis.Y( {
+                new Rickshaw.Graph.Axis.Y({
                     graph: graph,
                     tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
                     orientation: 'left',
-                    element: graphYAxis[0],
+                    element: $graphYAxis[0],
                     pixelsPerTick: 30
                 });
 
@@ -233,8 +265,8 @@ $(document).ready(function() {
 
                 new Rickshaw.Graph.HoverDetail({
                     graph: graph,
-                    formatter: function(series, x, y) {
-                        var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
+                    formatter: function (series, x, y) {
+                        var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000));
                         var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
                         var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
@@ -242,7 +274,7 @@ $(document).ready(function() {
                     }
                 });
 
-                new Rickshaw.Graph.Graylog2Selector( {
+                new Rickshaw.Graph.Graylog2Selector({
                     graph: graph
                 });
 
@@ -257,17 +289,17 @@ $(document).ready(function() {
                 graph.render();
 
                 // Highlight menu items.
-                $("ul.interval-selector li a", graphContainer).removeClass("selected");
-                $('ul.interval-selector li a[data-type="' + opts.interval + '"]', graphContainer).addClass("selected");
+                $("ul.interval-selector li a", $graphContainer).removeClass("selected");
+                $('ul.interval-selector li a[data-type="' + opts.interval + '"]', $graphContainer).addClass("selected");
 
-                $("ul.interpolation-selector li a", graphContainer).removeClass("selected");
-                $('ul.interpolation-selector li a[data-type="' + opts.interpolation + '"]', graphContainer).addClass("selected");
+                $("ul.interpolation-selector li a", $graphContainer).removeClass("selected");
+                $('ul.interpolation-selector li a[data-type="' + opts.interpolation + '"]', $graphContainer).addClass("selected");
 
-                $("ul.type-selector li a", graphContainer).removeClass("selected");
-                $('ul.type-selector li a[data-type="' + opts.renderer + '"]', graphContainer).addClass("selected");
+                $("ul.type-selector li a", $graphContainer).removeClass("selected");
+                $('ul.type-selector li a[data-type="' + opts.renderer + '"]', $graphContainer).addClass("selected");
 
-                $("ul.valuetype-selector li a", graphContainer).removeClass("selected");
-                $('ul.valuetype-selector li a[data-type="' + opts.valuetype + '"]', graphContainer).addClass("selected");
+                $("ul.valuetype-selector li a", $graphContainer).removeClass("selected");
+                $('ul.valuetype-selector li a[data-type="' + opts.valuetype + '"]', $graphContainer).addClass("selected");
 
                 fieldGraphs[opts.chartid] = graph;
 
@@ -279,7 +311,7 @@ $(document).ready(function() {
                 }
 
                 // Make it draggable.
-                graphContainer.draggable({
+                $graphContainer.draggable({
                     handle: ".reposition-handle",
                     cursor: "move",
                     scope: "#field-graphs",
@@ -292,26 +324,26 @@ $(document).ready(function() {
                 });
 
                 // ...and droppable.
-                graphContainer.droppable({
+                $graphContainer.droppable({
                     scope: "#field-graphs",
                     tolerance: "intersect",
-                    activate: function(event, ui) {
+                    activate: function (event, ui) {
                         // Show merge hints on all charts except the dragged one when dragging starts.
                         $("#field-graphs .merge-hint").not($(".merge-hint", ui.draggable)).show();
                     },
-                    deactivate: function() {
+                    deactivate: function () {
                         // Hide all merge hints when dragging stops.
                         $("#field-graphs .merge-hint").hide();
                     },
-                    over: function() {
+                    over: function () {
                         $(this).css("background-color", "#C7E2ED");
                         $(".merge-hint span", $(this)).switchClass("alpha80", "merge-drop-ready");
                     },
-                    out: function() {
+                    out: function () {
                         $(this).css("background-color", "#fff");
                         $(".merge-hint span", $(this)).switchClass("merge-drop-ready", "alpha80");
                     },
-                    drop: function(event, ui) {
+                    drop: function (event, ui) {
                         // Merge charts.
                         var target = $(this).attr("data-chart-id");
                         var dragged = ui.draggable.attr("data-chart-id");
@@ -323,22 +355,24 @@ $(document).ready(function() {
                     }
                 });
             },
-            error: function(data) {
-                if(data.status != 400) {
+            error: function (data) {
+                if (data.status != 400) {
                     showError("Could not load histogram.");
                 }
             },
-            statusCode: { 400: function() {
-                fieldCharts.show();
-            }},
-            complete: function() {
+            statusCode: {
+                400: function () {
+                    fieldCharts.show();
+                }
+            },
+            complete: function () {
                 deleteSpinner(opts.position);
             }
         });
     }
 
     // Changing type of value graphs.
-    $(document).on("click", ".field-graph-container ul.type-selector li a", function(e) {
+    $(document).on("click", ".field-graph-container ul.type-selector li a", function (e) {
         e.preventDefault();
 
         var field = $(this).closest("ul").attr("data-field");
@@ -376,7 +410,7 @@ $(document).ready(function() {
     });
 
     // Changing interpolation of value graphs.
-    $(document).on("click", ".field-graph-container ul.interpolation-selector li a", function(e) {
+    $(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
         e.preventDefault();
 
         var field = $(this).closest("ul").attr("data-field");
@@ -403,7 +437,7 @@ $(document).ready(function() {
     });
 
     // Changing interval of value graphs.
-    $(document).on("click", ".field-graph-container ul.interval-selector li a", function(e) {
+    $(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -421,7 +455,7 @@ $(document).ready(function() {
     });
 
     // Changing value type of value graphs.
-    $(document).on("click", ".field-graph-container ul.valuetype-selector li a", function(e) {
+    $(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -439,7 +473,7 @@ $(document).ready(function() {
     });
 
     // Removing a value graph.
-    $(document).on("click", ".field-graph-container li a.hide", function(e) {
+    $(document).on("click", ".field-graph-container li a.hide", function (e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -462,7 +496,7 @@ $(document).ready(function() {
         graphContainer.attr("data-lines", JSON.stringify(opts));
     }
 
-    $(document).on("click", ".field-graph-container .pin", function(e) {
+    $(document).on("click", ".field-graph-container .pin", function (e) {
         e.preventDefault();
         var graphElem = $(this).closest(".field-graph-container");
 
@@ -483,7 +517,7 @@ $(document).ready(function() {
         $(".unpin", graphElem).show();
     });
 
-    $(document).on("click", ".field-graph-container .unpin", function(e) {
+    $(document).on("click", ".field-graph-container .unpin", function (e) {
         e.preventDefault();
         var graphElem = $(this).closest(".field-graph-container");
         var graphOpts = chartOptionsFromContainer(graphElem);
@@ -496,7 +530,7 @@ $(document).ready(function() {
         $(".pin", graphElem).show();
     });
 
-    $(".clear-pinned-charts").on("click", function(e) {
+    $(".clear-pinned-charts").on("click", function (e) {
         e.preventDefault();
 
         setPinnedCharts({});
@@ -526,7 +560,7 @@ $(document).ready(function() {
             var series = draggedChart.series[i];
             var query = series.gl2_query;
 
-            if (query == undefined || query == "") {
+            if (query == undefined || query == "") {
                 query = "*";
             }
 
@@ -560,7 +594,7 @@ $(document).ready(function() {
     }
 
     // Load all pinned charts
-    (function() {
+    (function () {
         if ($("#field-graphs").length > 0) {
             var charts = getPinnedCharts();
 
@@ -570,7 +604,7 @@ $(document).ready(function() {
                 $(".clear-pinned-charts").show();
 
                 // Display all charts.
-                for(var id in charts) {
+                for (var id in charts) {
                     var chart = charts[id];
                     chart.pinned = true;
 
@@ -600,7 +634,7 @@ $(document).ready(function() {
     }
 
     function askBeforeUnload() {
-        window.addEventListener("beforeunload", function(e) {
+        window.addEventListener("beforeunload", function (e) {
             var numFieldCharts = $(".field-graph-container").length - 1;
             var numPinnedCharts = Object.keys(getPinnedCharts()).length;
 

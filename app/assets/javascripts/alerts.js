@@ -1,8 +1,9 @@
 $(document).ready(function() {
 
-    $(".add-alert").on("click", function() {
+    $(".add-alert").on("click", function(e) {
         $(".alert-type-form").hide();
         $("#" + $(".add-alert-type").val()).show();
+        e.preventDefault();
     });
 
     $(".add-alert-destination").on("click", function() {

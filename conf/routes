@@ -22,7 +22,7 @@ GET         /searchv2                                                           
 GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
-GET           /messages/:index/:id                                                               @controllers.MessagesController.show(index: String, id: String)
+GET           /messages/:index/:id                                                               @controllers.SearchControllerV2.showMessage(index: String, id: String)
 GET           /messages/:index/:id/partial                                                       @controllers.MessagesController.partial(index: String, id: String)
 
 # Streams

@@ -42,7 +42,9 @@ var MessageField = React.createClass({
                         <ButtonGroup bsSize='xsmall'>
                             <Button>Statistics</Button>
                             <Button>Quick values</Button>
-                            <Button>Generate chart</Button>
+                            <Button onClick={() => this.props.onFieldSelectedForGraph(this.props.field.name)}>
+                                Generate chart
+                            </Button>
                         </ButtonGroup>
                     </div>}
                 </div>
@@ -90,6 +92,7 @@ var SearchSidebar = React.createClass({
                     <MessageField key={field.name}
                                   field={field}
                                   onToggled={this.props.onFieldToggled}
+                                  onFieldSelectedForGraph={this.props.onFieldSelectedForGraph}
                                   selected={this.props.selectedFields.contains(field.name)}/>
                 );
             });

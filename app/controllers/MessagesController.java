@@ -57,34 +57,6 @@ public class MessagesController extends AuthenticatedController {
         this.messagesService = messagesService;
     }
 
-    public Result show(String index, String id) {
-        try {
-            MessageResult message = messagesService.getMessage(index, id);
-            Node sourceNode = getSourceNode(message);
-            Radio sourceRadio = getSourceRadio(message);
-
-            List<Stream> messageInStreams = Lists.newArrayList();
-
-            for (String streamId : message.getStreamIds()) {
-                if (isPermitted(STREAMS_READ, streamId)) {
-                    try {
-                        messageInStreams.add(streamService.get(streamId));
-                    } catch (APIException e) {
-                        //  We get a 404 if the stream no longer exists.
-                        Logger.debug("Skipping stream of message", e);
-                    }
-                }
-            }
-
-            return ok(views.html.messages.show.render(currentUser(), message, messageInStreams, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
-        } catch (IOException e) {
-            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not get message. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(500, views.html.errors.error.render(message, e, request()));
-        }
-    }
-
     public Result partial(String index, String id) {
         try {
             MessageResult message = messagesService.getMessage(index, id);
