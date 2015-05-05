@@ -71,7 +71,7 @@ var MessageDetail = React.createClass({
         this.setState({streamsListLoaded: true, streamsList: Immutable.List(streams).sortBy(stream => stream.title)});
     },
     render() {
-        var messageUrl = jsRoutes.controllers.MessagesController.show(this.props.message.index, this.props.message.id).url;
+        var messageUrl = jsRoutes.controllers.SearchControllerV2.showMessage(this.props.message.index, this.props.message.id).url;
 
         var fields = [];
         var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a,b) => a.localeCompare(b));
@@ -128,6 +128,16 @@ var MessageDetail = React.createClass({
                 via <em>{this._inputName(this.props.message['source_radio_input_id'])}</em> on radio {this._nodeName(this.props.message['source_radio_id'])}
             </span>;
         }
+
+        var timestamp = null;
+        if (this.props.showTimestamp) {
+            var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format();
+            timestamp = [];
+
+            timestamp.push(<dt>Timestamp</dt>);
+            timestamp.push(<dd><time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time></dd>);
+        }
+
         return (<div>
 
             <Row>
@@ -157,6 +167,7 @@ var MessageDetail = React.createClass({
             <Row>
                 <Col md={3}>
                     <dl className="message-details">
+                        {timestamp}
                         <dt>Received by</dt>
                         <dd>
                             <em>{this._inputName(this.props.message['source_input_id'])}</em> on {this._nodeName(this.props.message['source_node_id'])}

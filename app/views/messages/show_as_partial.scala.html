@@ -10,7 +10,7 @@
 
     <h2>
         <i class="fa fa-envelope copy-clipboard" data-clipboard-text="@message.getId" data-toggle="tooltip" data-initial-title="Copy Id" data-trigger="manual"></i>
-        <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
+        <a href="@routes.SearchControllerV2.showMessage(message.getIndex, message.getId)">
             @message.getId
         </a>
     </h2>
@@ -82,7 +82,7 @@
                 </ul>
             </li>
             <li><a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="true">Show message terms</a></li>
-            <li><a href="@routes.MessagesController.show(message.getIndex, message.getId)">Permalink</a></li>
+            <li><a href="@routes.SearchControllerV2.showMessage(message.getIndex, message.getId)">Permalink</a></li>
         </ul>
     </div>
 
