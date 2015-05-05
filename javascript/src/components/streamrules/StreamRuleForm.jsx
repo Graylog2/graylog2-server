@@ -20,7 +20,7 @@ var StreamRuleForm = React.createClass({
         this.setState(this.props.streamRule);
     },
     _onSubmit(evt) {
-        if (this.state.type == 5) {
+        if (this.state.type === 5) {
             this.state.value = "";
         }
         this.props.onSubmit(this.props.streamRule.id, this.state);
@@ -38,7 +38,7 @@ var StreamRuleForm = React.createClass({
     },
     render() {
         var streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
-        var valueBox = (this.state.type != 5 ? <Input type='text' required={true} label='Value' placeholder='19983' valueLink={this.linkState('value')}/> : "");
+        var valueBox = (this.state.type !== 5 ? <Input type='text' required={true} label='Value' placeholder='19983' valueLink={this.linkState('value')}/> : "");
         return (
             <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
                 <div>
