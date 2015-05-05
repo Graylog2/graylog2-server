@@ -35,12 +35,15 @@ import java.util.Map;
  */
 public class Mapping {
 
-    public static PutMappingRequest getPutMappingRequest(final Client client, final String index, final String analyzer) {
+    public static PutMappingRequest getPutMappingRequest(final Client client,
+                                                         final String index,
+                                                         final String analyzer,
+                                                         boolean storeTimestampsAsDocValues) {
         final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(index);
         builder.setType(Messages.TYPE);
 
         final Map<String, Object> mapping = ImmutableMap.of(
-                "properties", partFieldProperties(analyzer),
+                "properties", partFieldProperties(analyzer, storeTimestampsAsDocValues),
                 "dynamic_templates", partDefaultAllInDynamicTemplate(),
                 // Compress source field
                 "_source", enabledAndCompressed(),
@@ -71,13 +74,14 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    private static Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer) {
+    private static Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer,
+                                                                                        boolean storeTimestampsAsDocValues) {
         return ImmutableMap.of(
                 "message", analyzedString(analyzer),
                 "full_message", analyzedString(analyzer),
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                "timestamp", typeTimeWithMillis(),
+                "timestamp", typeTimeWithMillis(storeTimestampsAsDocValues),
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 "source", analyzedString("analyzer_keyword"));
     }
@@ -89,11 +93,15 @@ public class Mapping {
                 "analyzer", analyzer);
     }
 
-    private static Map<String, Serializable> typeTimeWithMillis() {
-        return ImmutableMap.<String, Serializable>of(
-                "type", "date",
-                "format", Tools.ES_DATE_FORMAT,
-                "doc_values", true);
+    private static Map<String, Serializable> typeTimeWithMillis(boolean storeTimestampsAsDocValues) {
+        final ImmutableMap.Builder<String, Serializable> builder = ImmutableMap.builder();
+        builder.put("type", "date")
+                .put("format", Tools.ES_DATE_FORMAT);
+
+        if (storeTimestampsAsDocValues) {
+            builder.put("doc_values", true);
+        }
+        return builder.build();
     }
 
     private static Map<String, Boolean> enabled() {
