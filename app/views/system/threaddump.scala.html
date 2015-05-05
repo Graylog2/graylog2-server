@@ -1,20 +1,21 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.ClusterEntity, dump: String)
 @import org.graylog2.restclient.models._
-@main("Nodes", views.html.system.sidebar(), "", currentUser) {
+@main("Nodes", null, "", currentUser, false) {
 
-    @views.html.partials.breadcrumbs(breadcrumbs)
-
-    <div class="row">
-        <h1>
-            <i class="fa fa-film"></i>
-            Thread dump of @node.getShortNodeId
-            / @node.getHostname
-        </h1>
-        Taken at @views.helpers.DateHelper.current().
+    <div class="row content">
+        <div class="col-md-12">
+            <h1>
+                <i class="fa fa-film"></i>
+                Thread dump of @node.getShortNodeId
+                / @node.getHostname
+            </h1>
+            Taken at @views.helpers.DateHelper.current().
+        </div>
     </div>
-
-    <div class="well well-small" style="overflow: scroll;">
-        @Html(views.helpers.StringHelper.simpleFormat(dump))
+    <div class="row row-sm content">
+        <div class="col-md-12">
+            <pre>@Html(views.helpers.StringHelper.simpleFormat(dump))</pre>
+        </div>
     </div>
 
 }
