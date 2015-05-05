@@ -1,26 +1,17 @@
 'use strict';
 
-var $ = require('jquery');
-
 var React = require('react');
 var Button = require('react-bootstrap').Button;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 
 var SearchStore = require('../../stores/search/SearchStore');
+var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
 
 var LegacyFieldGraph = React.createClass({
-    getInitialState() {
-        return {
-            graphId: ""
-        };
-    },
     componentDidMount() {
         var graphContainer = React.findDOMNode(this.refs.fieldGraphContainer);
-        $(document).trigger("create.graylog.fieldgraph", {field: this.props.field, container: graphContainer});
-        $(document).on("created.graylog.fieldgraph", (graphId) => {
-            this.setState({graphId: graphId});
-        });
+        FieldGraphsStore.renderFieldGraph(this.props.graphId, this.props.graphOptions, graphContainer);
     },
     _getFirstGraphValue() {
         if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
@@ -41,8 +32,6 @@ var LegacyFieldGraph = React.createClass({
                  data-to={this.props.to}>
                 <div className="pull-right">
                     <ButtonGroup>
-                        <Button bsSize='small' className='pin hide-combined-chart'>Pin graph</Button>
-                        <Button bsSize='small' className='unpin hide-combined-chart'>Unpin graph</Button>
                         <DropdownButton bsSize='small' className='graph-settings' title='Customize' pullRight>
                             <li className="dropdown-submenu left-submenu hide-combined-chart">
                                 <a href="#">Value</a>
@@ -103,7 +92,7 @@ var LegacyFieldGraph = React.createClass({
                         </Button>
                     </div>
                 </div>
-                <h1>{this.props.field} graph</h1>
+                <h1>{this.props.graphOptions['field']} graph</h1>
 
                 <ul className="field-graph-query-container">
                     <li>
