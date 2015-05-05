@@ -1,8 +1,6 @@
 'use strict';
 
 var React = require('react');
-var Row = require('react-bootstrap').Row;
-var Col = require('react-bootstrap').Col;
 var MessageDetail = require('./MessageDetail');
 
 var MessageShow = React.createClass({
