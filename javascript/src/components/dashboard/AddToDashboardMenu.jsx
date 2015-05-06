@@ -36,7 +36,7 @@ var AddToDashboardMenu = React.createClass({
     _saveWidget(title, configuration) {
         var widgetConfig = Immutable.Map(this.props.configuration);
         var searchParams = Immutable.Map(this.searchParams);
-        widgetConfig = widgetConfig.concat(searchParams).concat(configuration);
+        widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
         var promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
         promise.done(() => this.refs.widgetModal.saved());
