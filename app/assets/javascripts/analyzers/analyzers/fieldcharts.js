@@ -415,7 +415,7 @@ $(document).ready(function () {
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         // Update title and description.
-        $(".title", targetElem).text("Combined chart");
+        $("h1", targetElem).text("Combined graph");
 
         for (var i = 0; i < draggedChart.series.length; i++) {
             var lineColor = palette.color();

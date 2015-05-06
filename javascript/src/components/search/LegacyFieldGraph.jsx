@@ -29,6 +29,7 @@ var LegacyFieldGraph = React.createClass({
         return (
             <div ref="fieldGraphContainer"
                  className="content-col field-graph-container"
+                 data-chart-id={this.props.graphId}
                  data-from={this._getFirstGraphValue()}
                  data-to={this.props.to}>
                 <div className="pull-right">
@@ -89,7 +90,11 @@ var LegacyFieldGraph = React.createClass({
                         </DropdownButton>
                     </ButtonGroup>
                     <div style={{display: 'inline', marginLeft: 20}}>
-                        <Button bsSize='small' className='reposition-handle' title='Drag and drop to merge the graph into another'>
+                        <Button href='#'
+                                bsSize='small'
+                                className='reposition-handle'
+                                onClick={(e) => e.preventDefault()}
+                                title='Drag and drop to merge the graph into another'>
                             <i className="fa fa-reorder"></i>
                         </Button>
                     </div>
@@ -98,7 +103,7 @@ var LegacyFieldGraph = React.createClass({
 
                 <ul className="field-graph-query-container">
                     <li>
-                        <div className="field-graph-query-color" style={{backgroundColor: "#4DBCE9"}}></div>
+                        <div className="field-graph-query-color" style={{backgroundColor: "#4DBCE9"}}></div>&nbsp;
                         <span className="type-description"></span>
                         Query: <span className="field-graph-query"></span>
                     </li>
