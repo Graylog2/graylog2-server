@@ -45,7 +45,7 @@ public interface AlertCondition {
 
     Map<String, Object> getParameters();
 
-    Integer getBacklogSize();
+    Integer getBacklog();
 
     int getGrace();
 

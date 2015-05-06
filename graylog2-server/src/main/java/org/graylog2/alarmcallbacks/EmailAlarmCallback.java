@@ -62,7 +62,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         AlertCondition alertCondition = result.getTriggeredCondition();
         if (stream.getAlertReceivers().size() > 0) {
             try {
-                if (alertCondition.getBacklogSize() > 0 && result.getMatchingMessages() != null) {
+                if (alertCondition.getBacklog() > 0 && result.getMatchingMessages() != null) {
                     alertSender.sendEmails(stream, result, getAlarmBacklog(result));
                 } else {
                     alertSender.sendEmails(stream, result);
@@ -98,7 +98,7 @@ public class EmailAlarmCallback implements AlarmCallback {
     protected List<Message> getAlarmBacklog(AlertCondition.CheckResult result) {
         final AlertCondition alertCondition = result.getTriggeredCondition();
         final List<MessageSummary> backlogSummaries = result.getMatchingMessages()
-                .subList(0, Math.min(alertCondition.getBacklogSize(), result.getMatchingMessages().size()));
+                .subList(0, Math.min(alertCondition.getBacklog(), result.getMatchingMessages().size()));
         final List<Message> backlog = Lists.newArrayList();
 
         for (MessageSummary messageSummary : backlogSummaries) {

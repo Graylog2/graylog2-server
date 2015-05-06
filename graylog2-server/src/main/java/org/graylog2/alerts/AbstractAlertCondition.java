@@ -106,7 +106,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     @Override
-    public Integer getBacklogSize() {
+    public Integer getBacklog() {
         final Object rawParameter = getParameters().get("backlog");
         if (rawParameter != null && rawParameter instanceof Number) {
             return (Integer) rawParameter;
