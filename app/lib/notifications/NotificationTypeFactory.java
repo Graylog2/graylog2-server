@@ -72,6 +72,8 @@ public class NotificationTypeFactory {
                 return new JournalUncommitedMessagesDeletedNotification(notification);
             case OUTPUT_DISABLED:
                 return new OutputDisabledNotification(notification);
+            case GENERIC:
+                return new GenericNotification(notification);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
