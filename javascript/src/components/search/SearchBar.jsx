@@ -116,6 +116,8 @@ var SearchBar = React.createClass({
             var toMoment = momentHelper.parseUserLocalFromString(toInput);
             this.refs.to.getInputDOMNode().value = toMoment.toISOString();
         }
+
+        this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
     },
     _getRangeTypeSelector() {
         var selector;
@@ -215,9 +217,9 @@ var SearchBar = React.createClass({
                                   action={this.props.streamId ?  'unimplemented' : jsRoutes.controllers.SearchControllerV2.index().url }
                                   method='GET'
                                   onSubmit={this._prepareSearch}>
-                                <input type="hidden" name="rangetype" value={this.state.rangeType}/>
-                                <input type="hidden" name="fields" value=""/>
-                                <input type="hidden" name="width" value={$(window).width()}/>
+                                <Input type='hidden' name='rangetype' value={this.state.rangeType}/>
+                                <Input type='hidden' ref='fields' name='fields' value=''/>
+                                <Input type='hidden' name='width' value={$(window).width()}/>
 
                                 <div className="timerange-selector-container">
                                     <ButtonToolbar className='timerange-chooser pull-left'>

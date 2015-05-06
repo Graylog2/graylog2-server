@@ -4,6 +4,7 @@ var React = require('react');
 var Button = require('react-bootstrap').Button;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var DropdownButton = require('react-bootstrap').DropdownButton;
+var MenuItem = require('react-bootstrap').MenuItem;
 
 var SearchStore = require('../../stores/search/SearchStore');
 var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
@@ -83,7 +84,8 @@ var LegacyFieldGraph = React.createClass({
                                 </ul>
                             </li>
 
-                            <li><a href="#" className="hide">Hide</a></li>
+                            <MenuItem divider={true}/>
+                            <MenuItem onSelect={this.props.onDelete}>Delete graph</MenuItem>
                         </DropdownButton>
                     </ButtonGroup>
                     <div style={{display: 'inline', marginLeft: 20}}>

@@ -29,7 +29,9 @@ class FieldGraphsStore {
     set fieldGraphs(newFieldGraphs: Immutable.Map<string, Object>) {
         this._fieldGraphs = newFieldGraphs;
         store.set("pinned-field-charts", newFieldGraphs.toJS());
-        this.onFieldGraphsUpdated(newFieldGraphs);
+        if (typeof this.onFieldGraphsUpdated === 'function') {
+            this.onFieldGraphsUpdated(newFieldGraphs);
+        }
     }
 
     saveGraph(graphId: string, graphOptions: Object) {
@@ -42,9 +44,11 @@ class FieldGraphsStore {
         }
     }
 
-    newFieldGraph(field: string) {
+    newFieldGraph(field: string, options?: Object) {
         var graphId = generateId();
-        this.saveGraph(graphId, { chartid: graphId, field: field });
+        var givenOptions = Immutable.Map<string, Object>(options);
+        var defaultOptions = Immutable.Map<string, Object>({ chartid: graphId, field: field });
+        this.saveGraph(graphId, defaultOptions.merge(givenOptions).toJS());
     }
 
     renderFieldGraph(graphId: string, graphOptions: Object, graphContainer: Element) {

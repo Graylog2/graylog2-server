@@ -17,14 +17,22 @@ var FieldGraphs = React.createClass({
         FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
     },
     addFieldGraph(field) {
-        FieldGraphsStore.newFieldGraph(field);
+        FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution});
+    },
+    deleteFieldGraph(graphId) {
+        FieldGraphsStore.deleteGraph(graphId);
     },
     render() {
         var fieldGraphs = [];
 
         this.state.fieldGraphs.forEach((graphOptions, graphId) => {
             fieldGraphs.push(
-                <LegacyFieldGraph key={graphId} graphId={graphId} graphOptions={graphOptions} from={this.props.from} to={this.props.to}/>
+                <LegacyFieldGraph key={graphId}
+                                  graphId={graphId}
+                                  graphOptions={graphOptions}
+                                  onDelete={() => this.deleteFieldGraph(graphId)}
+                                  from={this.props.from}
+                                  to={this.props.to}/>
             );
         });
 
