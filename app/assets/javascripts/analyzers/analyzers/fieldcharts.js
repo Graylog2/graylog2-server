@@ -169,7 +169,7 @@ $(document).ready(function () {
 
                 $(".type-description", $graphContainer).text("[" + opts.valuetype + "] " + opts.field + ", ");
 
-                rickshawHelper.processHistogramData(data.values, $graphContainer.data("from"), $graphContainer.data("to"), data.interval);
+                rickshawHelper.processHistogramData(data.values, data.from, data.to, data.interval);
 
                 var graph = new Rickshaw.Graph({
                     element: $graphElement[0],
