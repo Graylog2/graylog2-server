@@ -78,16 +78,14 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
 
     @Override
     protected CheckResult runCheck() {
-        this.searchHits = Collections.emptyList();
-        final List<MessageSummary> summaries = Lists.newArrayList();
         try {
-            String filter = "streams:" + stream.getId();
-            CountResult result = searches.count("*", new RelativeRange(time * 60), filter);
-            long count = result.getCount();
+            final String filter = "streams:" + stream.getId();
+            final CountResult result = searches.count("*", new RelativeRange(time * 60), filter);
+            final long count = result.getCount();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 
-            boolean triggered = false;
+            final boolean triggered;
             switch (thresholdType) {
                 case MORE:
                     triggered = count > threshold;
@@ -95,16 +93,16 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 case LESS:
                     triggered = count < threshold;
                     break;
+                default:
+                    triggered = false;
             }
 
             if (triggered) {
-                Integer backlogSize = getBacklog();
-                if (backlogSize != null && backlogSize > 0) {
-                    SearchResult backlogResult = searches.search("*", filter, new RelativeRange(time * 60), backlogSize, 0, new Sorting("timestamp", Sorting.Direction.DESC));
-                    this.searchHits = Lists.newArrayList();
+                final List<MessageSummary> summaries = Lists.newArrayList();
+                if (getBacklogSize() > 0) {
+                    final SearchResult backlogResult = searches.search("*", filter, new RelativeRange(time * 60), getBacklogSize(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
                         final Message msg = new Message(resultMessage.getMessage());
-                        searchHits.add(msg);
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }
                 }
@@ -114,7 +112,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                         + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
                 return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
             } else {
-                return new NegativeCheckResult();
+                return new NegativeCheckResult(this);
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
@@ -125,10 +123,5 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             LOG.error("Invalid timerange format.", e);
             return null;
         }
-    }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return this.searchHits;
     }
 }
