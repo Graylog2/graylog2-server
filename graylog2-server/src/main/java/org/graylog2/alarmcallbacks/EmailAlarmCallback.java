@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -97,9 +98,16 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     protected List<Message> getAlarmBacklog(AlertCondition.CheckResult result) {
         final AlertCondition alertCondition = result.getTriggeredCondition();
-        final int effectiveBacklogSize = Math.min(alertCondition.getBacklog(), result.getMatchingMessages().size());
-        final List<MessageSummary> backlogSummaries = result.getMatchingMessages()
-                .subList(0, effectiveBacklogSize-1);
+        final List<MessageSummary> matchingMessages = result.getMatchingMessages();
+
+        final int effectiveBacklogSize = Math.min(alertCondition.getBacklog(), matchingMessages.size());
+
+        if (effectiveBacklogSize == 0) {
+            return Collections.emptyList();
+        }
+
+        final List<MessageSummary> backlogSummaries = matchingMessages.subList(0, effectiveBacklogSize);
+
         final List<Message> backlog = Lists.newArrayListWithCapacity(effectiveBacklogSize);
 
         for (MessageSummary messageSummary : backlogSummaries) {
