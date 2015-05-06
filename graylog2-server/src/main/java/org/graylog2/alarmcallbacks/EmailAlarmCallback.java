@@ -99,7 +99,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         final AlertCondition alertCondition = result.getTriggeredCondition();
         final int effectiveBacklogSize = Math.min(alertCondition.getBacklog(), result.getMatchingMessages().size());
         final List<MessageSummary> backlogSummaries = result.getMatchingMessages()
-                .subList(0, Math.max(effectiveBacklogSize-1, 0));
+                .subList(0, effectiveBacklogSize-1);
         final List<Message> backlog = Lists.newArrayListWithCapacity(effectiveBacklogSize);
 
         for (MessageSummary messageSummary : backlogSummaries) {
