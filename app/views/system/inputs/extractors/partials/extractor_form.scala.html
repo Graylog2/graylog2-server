@@ -42,156 +42,188 @@
     extractor != null && get_converter(converterType) != null
 }
 
-<div id="react-extractor-example-message" data-field="@field" data-example="@example"></div>
+<div class="row">
+  <div class="col-md-12">
+      <div id="react-extractor-example-message" data-field="@field" data-example="@example"></div>
+  </div>
+</div>
 
-<form class="extractor-form" action="@action" method="POST">
+<div class="row">
+    <div class="col-md-12">
+        <form class="extractor-form" action="@action" method="POST">
 
-    @if(extractorType.equals(Extractor.Type.REGEX)) {
-        @views.html.system.inputs.extractors.configurations.regex(extractor)
-    }
+            <div class="row">
+                <div class="col-md-12">
+                    @if(extractorType.equals(Extractor.Type.REGEX)) {
+                        @views.html.system.inputs.extractors.configurations.regex(extractor)
+                    }
 
-    @if(extractorType.equals(Extractor.Type.SUBSTRING)) {
-        @views.html.system.inputs.extractors.configurations.substring(extractor)
-    }
+                    @if(extractorType.equals(Extractor.Type.SUBSTRING)) {
+                        @views.html.system.inputs.extractors.configurations.substring(extractor)
+                    }
 
-    @if(extractorType.equals(Extractor.Type.SPLIT_AND_INDEX)) {
-        @views.html.system.inputs.extractors.configurations.split_and_index(extractor)
-    }
+                    @if(extractorType.equals(Extractor.Type.SPLIT_AND_INDEX)) {
+                        @views.html.system.inputs.extractors.configurations.split_and_index(extractor)
+                    }
 
-    @if(extractorType.equals(Extractor.Type.COPY_INPUT)) {
-        @views.html.system.inputs.extractors.configurations.copy_input(extractor)
-    }
+                    @if(extractorType.equals(Extractor.Type.COPY_INPUT)) {
+                        @views.html.system.inputs.extractors.configurations.copy_input(extractor)
+                    }
 
-    @if(extractorType.equals(Extractor.Type.GROK)) {
-        @views.html.system.inputs.extractors.configurations.grok(extractor)
-    }
-
-    <div class="control-group">
-        <div class="controls">
-            <div class="radio-controls">
-                <label class="radio">
-                    <input type="radio" name="condition_type" id="no-condition-type" value="none" @if(is_condition_type_checked(ConditionType.NONE)) { checked="checked" } />
-                    Always try to extract
-                </label>
-            </div>
-            <div class="radio-controls">
-                <label class="radio">
-                    <input type="radio" name="condition_type" id="string-condition-type" value="string" @if(is_condition_type_checked(ConditionType.STRING)) { checked="checked" } />
-                    Only attempt extraction if field contains string
-                </label>
-            </div>
-            <div class="radio-controls">
-                <label class="radio">
-                    <input type="radio" name="condition_type" id="regex-condition-type" value="regex" @if(is_condition_type_checked(ConditionType.REGEX)) { checked="checked" } />
-                    Only attempt extraction if field matches regular expression
-                </label>
-            </div>
-            <span class="help-block">
-                Extracting only from messages that match a certain condition helps you
-                avoiding wrong or unnecessary extractions and can also save CPU resources.
-            </span>
-        </div>
-    </div>
-
-
-    <div id="condition-value-input" style="display:none;">
-        <div class="control-group">
-            <label for="condition_value"></label>
-            <div class="controls">
-                <div class="form-inline">
-                    <input name="condition_value" id="condition_value" type="text" class="input-xlarge" @if(extractor != null) { value="@extractor.getConditionValue" } />
-
-                    <button class="btn btn-info try-xtrc-condition" type="button" style="display:none;">
-                        Try!
-                    </button>
-                </div>
-
-                <div id="try-xtrc-condition-result" class="help-block" style="display:none;">
-                    Matches! Extractor would run against this example.
+                    @if(extractorType.equals(Extractor.Type.GROK)) {
+                        @views.html.system.inputs.extractors.configurations.grok(extractor)
+                    }
                 </div>
             </div>
-        </div>
-    </div>
 
-    @if(!extractorType.equals(Extractor.Type.GROK)) {
-        <div class="control-group">
-            <label for="target_field">Store as field:</label>
-            <div class="controls">
-                <input name="target_field" id="target_field" type="text" class="input-xlarge" required @if(extractor != null) { value="@extractor.getTargetField" } />
-                <span class="help-block">
-                    Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em>
-                    for example if you are extracting a HTTP response code.
-                </span>
-            </div>
-        </div>
-    }
-
-    <div class="control-group">
-        <div class="controls">
-            <label class="radio inline">
-                <input type="radio" name="cut_or_copy" value="copy" @if(is_cursor_strategy_checked(CursorStrategy.COPY)) { checked="checked" } />
-                Copy
-            </label>
-            <label class="radio inline">
-                <input type="radio" name="cut_or_copy" value="cut" @if(is_cursor_strategy_checked(CursorStrategy.CUT)) { checked="checked" } />
-                Cut
-            </label>
-            <span class="help-block">
-                Do you want to copy or cut from source? You cannot use the cutting feature on standard
-                fields like <em>message</em> and <em>source</em>.
-            </span>
-        </div>
-    </div>
-
-    <div class="control-group">
-        <label for="title">Extractor title:</label>
-        <div class="controls">
-            <input name="title" id="title" type="text" class="input-xlarge" required @if(extractor != null) { value="@extractor.getTitle" }/>
-            <span class="help-block">
-                A descriptive name of this extractor.
-            </span>
-        </div>
-    </div>
-
-
-    @if(!extractorType.equals(Extractor.Type.GROK)) {
-        <div class="control-group">
-            <div id="add-converter-fields">
-                <label for="add-converter">Add converter:</label>
-                <div class="controls">
-                    <select id="add-converter">
-                        <option value="number">Numeric</option>
-                        <option value="date">Date</option>
-                        <option value="flexdate">Flexible date</option>
-                        <option value="hash">Hash</option>
-                        <option value="lowercase">Lowercase</option>
-                        <option value="uppercase">Uppercase</option>
-                        <option value="split-and-count">Split & Count</option>
-                        <option value="tokenizer">Key=Value pairs to fields</option>
-                        <option value="csv">CSV to fields</option>
-                        <option value="ip-anonymizer">Anonymize IPv4 addresses</option>
-                        <option value="syslog-pri-level">Syslog level from PRI</option>
-                        <option value="syslog-pri-facility">Syslog facility from PRI</option>
-                    </select>
-                    <button class="btn btn-info">Add</button>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="condition_type" id="no-condition-type" value="none" @if(is_condition_type_checked(ConditionType.NONE)) { checked="checked" } />
+                            Always try to extract
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="condition_type" id="string-condition-type" value="string" @if(is_condition_type_checked(ConditionType.STRING)) { checked="checked" } />
+                            Only attempt extraction if field contains string
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="condition_type" id="regex-condition-type" value="regex" @if(is_condition_type_checked(ConditionType.REGEX)) { checked="checked" } />
+                            Only attempt extraction if field matches regular expression
+                        </label>
+                    </div>
+                    <span class="help-block">
+                        Extracting only from messages that match a certain condition helps you
+                        avoiding wrong or unnecessary extractions and can also save CPU resources.
+                    </span>
                 </div>
             </div>
-        </div>
 
-        @views.html.system.inputs.extractors.converters.numeric(is_converter_enabled(Converter.Type.NUMERIC))
-        @views.html.system.inputs.extractors.converters.date(is_converter_enabled(Converter.Type.DATE), get_converter(Converter.Type.DATE))
-        @views.html.system.inputs.extractors.converters.hash(is_converter_enabled(Converter.Type.HASH))
-        @views.html.system.inputs.extractors.converters.syslog_pri_level(is_converter_enabled(Converter.Type.SYSLOG_PRI_LEVEL))
-        @views.html.system.inputs.extractors.converters.syslog_pri_facility(is_converter_enabled(Converter.Type.SYSLOG_PRI_FACILITY))
-        @views.html.system.inputs.extractors.converters.split_and_count(is_converter_enabled(Converter.Type.SPLIT_AND_COUNT), get_converter(Converter.Type.SPLIT_AND_COUNT))
-        @views.html.system.inputs.extractors.converters.ip_anonymizer(is_converter_enabled(Converter.Type.IP_ANONYMIZER))
-        @views.html.system.inputs.extractors.converters.tokenizer(is_converter_enabled(Converter.Type.TOKENIZER))
-        @views.html.system.inputs.extractors.converters.csv(is_converter_enabled(Converter.Type.CSV), get_converter(Converter.Type.CSV))
-        @views.html.system.inputs.extractors.converters.lowercase(is_converter_enabled(Converter.Type.LOWERCASE))
-        @views.html.system.inputs.extractors.converters.uppercase(is_converter_enabled(Converter.Type.UPPERCASE))
-        @views.html.system.inputs.extractors.converters.flexdate(is_converter_enabled(Converter.Type.FLEXDATE))
-    }
+            <div class="row" id="condition-value-input" style="display:none;">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="condition_value"></label>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <input name="condition_value" id="condition_value" type="text" class="form-control" @if(extractor != null) { value="@extractor.getConditionValue" } />
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-info try-xtrc-condition" type="button">
+                                            Try!
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="try-xtrc-condition-result" class="help-block" style="display:none;">
+                        Matches! Extractor would run against this example.
+                    </div>
+                </div>
+            </div>
 
-    <input type="hidden" name="source_field" value="@field" />
-    <button type="submit" class="btn btn-success" id="create-extractor">@if(extractor == null) {Create extractor} else {Update extractor}</button>
-</form>
+            @if(!extractorType.equals(Extractor.Type.GROK)) {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="target_field">Store as field:</label>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <input name="target_field" id="target_field" type="text" class="form-control" required @if(extractor != null) { value="@extractor.getTargetField" } />
+                                </div>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em>
+                            for example if you are extracting a HTTP response code.
+                        </span>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="radio-inline">
+                        <input type="radio" name="cut_or_copy" value="copy" @if(is_cursor_strategy_checked(CursorStrategy.COPY)) { checked="checked" } />
+                        Copy
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="cut_or_copy" value="cut" @if(is_cursor_strategy_checked(CursorStrategy.CUT)) { checked="checked" } />
+                        Cut
+                    </label>
+                    <span class="help-block">
+                        Do you want to copy or cut from source? You cannot use the cutting feature on standard
+                        fields like <em>message</em> and <em>source</em>.
+                    </span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="title">Extractor title:</label>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <input name="title" id="title" type="text" class="form-control" required @if(extractor != null) { value="@extractor.getTitle" }/>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            A descriptive name for this extractor.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            @if(!extractorType.equals(Extractor.Type.GROK)) {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div id="add-converter-fields">
+                                <label for="add-converter">Add converter:</label>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <select class="form-control" id="add-converter">
+                                            <option value="number">Numeric</option>
+                                            <option value="date">Date</option>
+                                            <option value="flexdate">Flexible date</option>
+                                            <option value="hash">Hash</option>
+                                            <option value="lowercase">Lowercase</option>
+                                            <option value="uppercase">Uppercase</option>
+                                            <option value="split-and-count">Split & Count</option>
+                                            <option value="tokenizer">Key=Value pairs to fields</option>
+                                            <option value="csv">CSV to fields</option>
+                                            <option value="ip-anonymizer">Anonymize IPv4 addresses</option>
+                                            <option value="syslog-pri-level">Syslog level from PRI</option>
+                                            <option value="syslog-pri-facility">Syslog facility from PRI</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-info">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        @views.html.system.inputs.extractors.converters.numeric(is_converter_enabled(Converter.Type.NUMERIC))
+                        @views.html.system.inputs.extractors.converters.date(is_converter_enabled(Converter.Type.DATE), get_converter(Converter.Type.DATE))
+                        @views.html.system.inputs.extractors.converters.hash(is_converter_enabled(Converter.Type.HASH))
+                        @views.html.system.inputs.extractors.converters.syslog_pri_level(is_converter_enabled(Converter.Type.SYSLOG_PRI_LEVEL))
+                        @views.html.system.inputs.extractors.converters.syslog_pri_facility(is_converter_enabled(Converter.Type.SYSLOG_PRI_FACILITY))
+                        @views.html.system.inputs.extractors.converters.split_and_count(is_converter_enabled(Converter.Type.SPLIT_AND_COUNT), get_converter(Converter.Type.SPLIT_AND_COUNT))
+                        @views.html.system.inputs.extractors.converters.ip_anonymizer(is_converter_enabled(Converter.Type.IP_ANONYMIZER))
+                        @views.html.system.inputs.extractors.converters.tokenizer(is_converter_enabled(Converter.Type.TOKENIZER))
+                        @views.html.system.inputs.extractors.converters.csv(is_converter_enabled(Converter.Type.CSV), get_converter(Converter.Type.CSV))
+                        @views.html.system.inputs.extractors.converters.lowercase(is_converter_enabled(Converter.Type.LOWERCASE))
+                        @views.html.system.inputs.extractors.converters.uppercase(is_converter_enabled(Converter.Type.UPPERCASE))
+                        @views.html.system.inputs.extractors.converters.flexdate(is_converter_enabled(Converter.Type.FLEXDATE))
+                    </div>
+                </div>
+            }
+
+            <input type="hidden" name="source_field" value="@field" />
+            <button type="submit" class="btn btn-success" id="create-extractor">@if(extractor == null) {Create extractor} else {Update extractor}</button>
+        </form>
+    </div>
+</div>

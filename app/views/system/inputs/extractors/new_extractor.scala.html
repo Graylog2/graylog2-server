@@ -6,26 +6,35 @@
         field: String,
         example: String)
 
-@main("New Extractor", views.html.system.sidebar(), "", currentUser) {
+@main("New Extractor", null, "", currentUser, false, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-beaker"></i>
-            New extractor for input <em>@input.getTitle</em>
-        </h1>
-
-        <h2>
-            Type: <em>@extractorType.toHumanReadable</em>,
-            Field: <em>@field</em>
-        </h2>
-
-        @views.html.system.inputs.extractors.partials.extractor_form(
-            routes.ExtractorsController.create(node.getNodeId, input.getId),
-            example,
-            field,
-            extractorType
-        )
+    <div class="row content">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1><i class="fa fa-flask"></i> New extractor for input <em>@input.getTitle</em></h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>
+                        Type: <em>@extractorType.toHumanReadable</em>,
+                        Field: <em>@field</em>
+                    </h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                @views.html.system.inputs.extractors.partials.extractor_form(
+                    routes.ExtractorsController.create(node.getNodeId, input.getId),
+                    example,
+                    field,
+                    extractorType
+                )
+                </div>
+            </div>
+        </div>
     </div>
 }

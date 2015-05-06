@@ -1,38 +1,43 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, input: org.graylog2.restclient.models.Input, extractors: List[org.graylog2.restclient.models.Extractor])
 @import org.graylog2.restclient.models.Extractor
-@main("Extractors", views.html.system.sidebar(), "", currentUser) {
-
-    <div class="pull-right">
-        <div class="btn-group">
-            <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-                Actions
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <li><a href="@routes.ExtractorsController.importExtractorsPage(node.getNodeId, input.getId)">Import extractors</a></li>
-                <li><a href="@routes.ExtractorsController.exportExtractors(node.getNodeId, input.getId)">Export extractors</a></li>
-            </ul>
-        </div>
-    </div>
+@main("Extractors", null, "", currentUser, false, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-beaker"></i>
-            Extractors of <em>@input.getTitle</em>
-        </h1>
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                        Actions
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@routes.ExtractorsController.importExtractorsPage(node.getNodeId, input.getId)">Import extractors</a></li>
+                        <li><a href="@routes.ExtractorsController.exportExtractors(node.getNodeId, input.getId)">Export extractors</a></li>
+                    </ul>
+                </div>
+            </div>
 
-        Extractors are applied on every message that is received by this input. Use them to extract and transform
-        any text data into fields that allow you easy filtering and analysis later on.
-        Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it
-        as <em>http_response_code</em> to the message.
+           <h1>
+                <i class="fa fa-flask"></i>
+                Extractors of <em>@input.getTitle</em>
+           </h1>
+
+            <p class="description">
+                Extractors are applied on every message that is received by this input. Use them to extract and transform
+                any text data into fields that allow you easy filtering and analysis later on.
+                Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it
+                as <em>http_response_code</em> to the message.
+            </p>
+        </div>
     </div>
 
     @*Add extractor wizard *@
-    <div class="row xtrc-select-message">
+    <div class="row content xtrc-select-message">
+        <div class="col-md-12">
         <h2>
-            <i class="fa fa-signin"></i>
+            <i class="fa fa-sign-in"></i>
             Add extractor
         </h2>
 
@@ -66,13 +71,13 @@
             can be found in the detail view of any message. Make sure that the selected message has the exact
             same format as those received by this input or your extractor might not match later.
             <form class="form-inline manual-selector-form">
-                <input type="text" name="message_id" class="input-xlarge" placeholder="Message ID" required="true">
-                <input type="text" name="index" class="input-medium" placeholder="Index" required="true">
+                <input type="text" name="message_id" class="form-control" style="width: 20%;" placeholder="Message ID" required="true">
+                <input type="text" name="index" class="form-control" placeholder="Index" required="true">
                 <button type="submit" class="btn manual-selector-load">Load message</button>
             </form>
         </div>
 
-        <div class="spinner" style="display: none;"><h2><i class='fa-refresh fa-spin'></i> &nbsp;Loading message</h2></div>
+        <div class="spinner" style="display: none;"><h2><i class='fa fa-spinner fa-spin'></i> &nbsp;Loading message</h2></div>
 
         <div class="xtrc-message" style="display: none;">
             We found this message.
@@ -87,11 +92,13 @@
             </div>
 
         </div>
+        </div>
     </div>
 
-    <div class="row xtrc-wizard" style="display: none;">
+    <div class="row content xtrc-wizard" style="display: none;">
+        <div class="col-md-12">
         <h2>
-            <i class="fa fa-signin"></i>
+            <i class="fa fa-sign-in"></i>
             Add extractor on field
             <span class="xtrc-wizard-field"></span>
         </h2>
@@ -101,25 +108,28 @@
             <span class="xtrc-wizard-example"></span>
         </div>
 
-        <form action="@routes.ExtractorsController.newExtractor(node.getNodeId, input.getId)" method="GET">
-            <label for="extractor_type">How do you want to extract data from this field?</label>
-            <select name="extractor_type" id="extractor_type">
+        <label for="extractor_type">How do you want to extract data from this field?</label>
+        <form action="@routes.ExtractorsController.newExtractor(node.getNodeId, input.getId)" class="form-inline" method="GET">
+            <div class="form-group">
+                <select name="extractor_type" class="form-control" id="extractor_type">
                 @for(et <- Extractor.Type.values()) {
                     <option value="@et.toString.toLowerCase">@et.toHumanReadable</option>
                 }
-            </select>
-
+                </select>
+            </div>
             <input type="hidden" name="field" value="" />
             <input type="hidden" name="example_index" value="" />
             <input type="hidden" name="example_id" value="" />
             <button type="submit" class="btn btn-success">Next step</button>
         </form>
+        </div>
     </div>
 
     @*Extractor list*@
-    <div class="row xtrc-list-container">
+    <div class="row content xtrc-list-container">
+        <div class="col-md-12">
         <span class="pull-right">
-            <i class="fa fa-lightbulb"></i>
+            <i class="fa fa-lightbulb-o"></i>
             Change execution order by dragging on the icons.
         </span>
 
@@ -129,10 +139,10 @@
         </h2>
 
         @if(extractors.size() > 0) {
-            <ul class="xtrc-list-drag" data-input-persist-id="@input.getPersistId">
+            <ul class="xtrc-list-drag list-unstyled" data-input-persist-id="@input.getPersistId">
             @for(extractor <- extractors.sortBy(_.getOrder)) {
                 <li id="@extractor.getId">
-                <div class="row node-row">
+                <div class="node-row">
                     <h3>
                         <i class="fa fa-reorder xtrc-order-handle"></i>
                         <strong>@extractor.getTitle</strong> (@extractor.getType().toHumanReadable)
@@ -171,7 +181,7 @@
 
                         @if(extractor.getTotalExceptions > 0) {
                             <div class="alert alert-danger">
-                                <i class="fa fa-warning-sign"></i>
+                                <i class="fa fa-exclamation-triangle"></i>
                                 This extractor has thrown <em>@extractor.getExceptions</em> exception@if(extractor.getExceptions != 1) {s}
                                 during extraction and <em>@extractor.getConverterExceptions</em>
                                 exception@if(extractor.getConverterExceptions != 1) {s}
@@ -239,6 +249,7 @@
         } else {
             <div class="alert alert-danger">This input has no configured extractors.</div>
         }
+        </div>
     </div>
 
 }

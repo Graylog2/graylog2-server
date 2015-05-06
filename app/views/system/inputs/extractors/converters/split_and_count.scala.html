@@ -2,24 +2,26 @@
         converter: org.graylog2.restclient.models.Converter = null)
 
 <div class="xtrc-converter xtrc-converter-split-and-count" @if(!enabled) { style="display:none;" } >
-    <div class="control-group">
-        <div class="controls">
-            <label class="checkbox">
-                <input type="checkbox" value="enabled" name="converter_split_and_count" @if(enabled) { checked="checked" } />
-                Split & Count
-            </label>
-        </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="enabled" name="converter_split_and_count" @if(enabled) { checked="checked" } />
+            Split & Count
+        </label>
     </div>
 
-    <div class="xtrc-converter-subfield control-group">
-        <label for="converter_split_and_count_by">
+    <div class="xtrc-converter-subfield">
+        <div class="form-group">
+            <label for="converter_split_and_count_by">
             Split by:
-        </label>
-        <div class="controls">
-            <input name="converter_split_and_count_by" id="converter_split_and_count_by"
-                type="text" class="input-xlarge"
-                @if(converter != null) { value="@converter.getConfig.get("split_by")" } />
+            </label>
+            <div class="row">
+                <div class="col-md-4">
 
+                    <input name="converter_split_and_count_by" id="converter_split_and_count_by"
+                    type="text" class="form-control"
+                        @if(converter != null) { value="@converter.getConfig.get("split_by")" } />
+                </div>
+            </div>
             <span class="help-block">
                 The Split & Count converter is splitting the extracted part by the defined char and stores the token
                 count as field.

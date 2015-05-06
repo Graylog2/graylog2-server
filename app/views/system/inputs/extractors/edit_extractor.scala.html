@@ -5,26 +5,38 @@
         extractor: org.graylog2.restclient.models.Extractor,
         example: String)
 
-@main("Edit Extractor", views.html.system.sidebar(), "", currentUser) {
+@main("Edit Extractor", null, "", currentUser, false, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-beaker"></i>
-            Edit extractor <em>@extractor.getTitle</em> for input <em>@input.getTitle</em>
-        </h1>
-
-        <h2>
-            Type: <em>@extractor.getType.toHumanReadable</em>,
-            Field: <em>@extractor.getSourceField</em>
-        </h2>
-
-        @views.html.system.inputs.extractors.partials.extractor_form(
-            routes.ExtractorsController.update(node.getNodeId, input.getId, extractor.getId),
-            example,
-            extractor.getSourceField,
-            extractor.getType,
-            extractor
-        )
+    <div class="row content">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>
+                        <i class="fa fa-flask"></i>
+                        Edit extractor <em>@extractor.getTitle</em> for input <em>@input.getTitle</em>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>
+                        Type: <em>@extractor.getType.toHumanReadable</em>,
+                        Field: <em>@extractor.getSourceField</em>
+                    </h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    @views.html.system.inputs.extractors.partials.extractor_form(
+                        routes.ExtractorsController.update(node.getNodeId, input.getId, extractor.getId),
+                        example,
+                        extractor.getSourceField,
+                        extractor.getType,
+                        extractor
+                    )
+                </div>
+            </div>
+        </div>
     </div>
 }

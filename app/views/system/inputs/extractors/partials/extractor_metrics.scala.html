@@ -2,7 +2,7 @@
 
 <div class="xtrc-metrics">
     <h3>
-        <i class="fa fa-time"></i>
+        <i class="fa fa-clock-o"></i>
         Metrics
         <span class="unit">(timings in microseconds, rates in events/second since boot)</span>
     </h3>
@@ -18,21 +18,23 @@
         </div>
     }
 
-    <div class="col-md-4">
-        <h3 class="u-light" style="display: inline;">Total extractor time</h3><br />
-        @if(metrics.getTotalTiming == null) {
-            No message passed through here yet.
-        } else {
-            @views.html.partials.metrics.timing(metrics.getTotalTiming)
-        }
-    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <h3 style="display: inline;">Total extractor time</h3><br />
+            @if(metrics.getTotalTiming == null) {
+                No message passed through here yet.
+            } else {
+                @views.html.partials.metrics.timing(metrics.getTotalTiming)
+            }
+        </div>
 
-    <div class="col-md-4">
-        <h3 class="u-light" style="display: inline;">Converter time</h3><br />
-        @if(metrics.getConverterTiming == null) {
-            No message passed through here yet.
-        } else {
-            @views.html.partials.metrics.timing(metrics.getConverterTiming)
-        }
+        <div class="col-md-2">
+            <h3 style="display: inline;">Converter time</h3><br />
+            @if(metrics.getConverterTiming == null) {
+                No message passed through here yet.
+            } else {
+                @views.html.partials.metrics.timing(metrics.getConverterTiming)
+            }
+        </div>
     </div>
 </div>
