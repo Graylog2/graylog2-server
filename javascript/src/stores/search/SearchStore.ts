@@ -38,7 +38,7 @@ class SearchStore {
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
         $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).on('submit.graylog.search', this._submitSearch.bind(this));
+        $(document).on('execute.graylog.search', this._submitSearch.bind(this));
     }
 
     initializeFieldsFromHash() {
