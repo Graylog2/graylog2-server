@@ -22,8 +22,7 @@ var SearchResult = React.createClass({
             showAllFields: false,
             currentSidebarWidth: null,
             dashboards: Immutable.Map(),
-            shouldHighlight: true,
-            fieldGraphs: Immutable.Set()
+            shouldHighlight: true
         };
     },
 
@@ -71,7 +70,7 @@ var SearchResult = React.createClass({
     },
 
     addFieldGraph(field) {
-        this.setState({fieldGraphs: this.state.fieldGraphs.add(field)});
+        this.refs.fieldGraphsComponent.addFieldGraph(field);
     },
 
     componentDidMount() {
@@ -126,7 +125,7 @@ var SearchResult = React.createClass({
                                      histogram={this.props.histogram}
                                      dashboards={this.state.dashboards}/>
 
-                    <FieldGraphs dataFields={this.state.fieldGraphs}
+                    <FieldGraphs ref='fieldGraphsComponent'
                                  from={this.props.histogram['histogram_boundaries'].from}
                                  to={this.props.histogram['histogram_boundaries'].to}/>
 
