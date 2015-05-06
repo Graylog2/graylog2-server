@@ -83,6 +83,10 @@ $(document).ready(function () {
             opts.range = {};
         }
 
+        if (opts.createdAt === undefined) {
+            opts.createdAt = moment().valueOf();
+        }
+
         switch (opts.rangetype) {
             case "relative":
                 if (opts.range.relative == undefined) {
