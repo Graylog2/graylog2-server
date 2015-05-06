@@ -126,6 +126,7 @@ var SearchResult = React.createClass({
                                      dashboards={this.state.dashboards}/>
 
                     <FieldGraphs ref='fieldGraphsComponent'
+                                 resolution={this.props.histogram['interval']}
                                  from={this.props.histogram['histogram_boundaries'].from}
                                  to={this.props.histogram['histogram_boundaries'].to}/>
 

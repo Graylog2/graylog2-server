@@ -17,7 +17,7 @@ var FieldGraphs = React.createClass({
         FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
     },
     addFieldGraph(field) {
-        FieldGraphsStore.newFieldGraph(field);
+        FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution});
     },
     deleteFieldGraph(graphId) {
         FieldGraphsStore.deleteGraph(graphId);
