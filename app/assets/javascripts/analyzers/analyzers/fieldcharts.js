@@ -1,7 +1,8 @@
 $(document).ready(function () {
+    var GRAPH_HEIGHT = 120;
 
     function insertSpinner($graphContainer) {
-        var spinnerElement = $('<div class="spinner" style="height: 170px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>');
+        var spinnerElement = $('<div class="spinner" style="height: ' + GRAPH_HEIGHT + 'px; line-height: ' + GRAPH_HEIGHT + 'px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>');
         $graphContainer.append(spinnerElement);
     }
 
@@ -173,7 +174,7 @@ $(document).ready(function () {
                 var graph = new Rickshaw.Graph({
                     element: $graphElement[0],
                     width: $graphElement.width(),
-                    height: 175,
+                    height: GRAPH_HEIGHT,
                     interpolation: opts.interpolation,
                     renderer: rickshawHelper.getRenderer(opts.renderer),
                     resolution: data.interval,

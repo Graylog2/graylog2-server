@@ -44,7 +44,7 @@ resultHistogram = {
         var resultGraph = new Rickshaw.Graph( {
             element: this._histogramContainer[0],
             width: this._getHistogramContainerWidth(),
-            height: 175,
+            height: 120,
             renderer: rickshawHelper.getRenderer("bar"),
             resolution: selectedResolution,
             series: [ {
