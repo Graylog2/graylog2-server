@@ -7,6 +7,8 @@ var Immutable = require('immutable');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Widget = require('./Widget');
 
+var StringUtils = require('../../util/StringUtils');
+
 var WidgetCreationModal = React.createClass({
     getInitialState() {
         return {
@@ -24,7 +26,6 @@ var WidgetCreationModal = React.createClass({
         return Immutable.Map(this.state.configuration);
     },
     save(e) {
-        e.preventDefault();
         var configuration = this.getConfiguration();
         this.props.onConfigurationSaved(this.state.title, configuration);
     },
@@ -38,11 +39,17 @@ var WidgetCreationModal = React.createClass({
         switch (this.props.widgetType) {
             case Widget.Type.SEARCH_RESULT_COUNT:
             case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
-                title = "messages";
+                title = "message count";
                 break;
             case Widget.Type.STATS_COUNT:
             case Widget.Type.QUICKVALUES:
+                break;
             case Widget.Type.FIELD_CHART:
+                if (this.props.configuration['field'] !== undefined && this.props.configuration['valuetype'] !== undefined) {
+                    title = this.props.configuration['field'] + " " + this.props.configuration['valuetype'] + " value graph";
+                } else {
+                    title = "field graph";
+                }
                 break;
             case Widget.Type.SEARCH_RESULT_CHART:
                 title = "search histogram";
@@ -51,7 +58,7 @@ var WidgetCreationModal = React.createClass({
                 throw("Unsupported widget type " + this.props.widgetType);
         }
 
-        return title;
+        return StringUtils.capitalizeFirstLetter(title);
     },
     _getSpecificWidgetInputs() {
         var controls = [];

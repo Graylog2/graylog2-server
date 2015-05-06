@@ -2,9 +2,11 @@
 
 var React = require('react');
 var Button = require('react-bootstrap').Button;
-var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
+
+var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
+var Widget = require('../widgets/Widget');
 
 var SearchStore = require('../../stores/search/SearchStore');
 var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
@@ -12,7 +14,7 @@ var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
 var LegacyFieldGraph = React.createClass({
     componentDidMount() {
         var graphContainer = React.findDOMNode(this.refs.fieldGraphContainer);
-        FieldGraphsStore.renderFieldGraph(this.props.graphId, this.props.graphOptions, graphContainer);
+        FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
     },
     _getFirstGraphValue() {
         if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
@@ -22,9 +24,7 @@ var LegacyFieldGraph = React.createClass({
         return this.props.from;
     },
     render() {
-        // TODO:
-        // * add to dashboard
-        // * work with streams
+        // TODO: work with streams
 
         return (
             <div ref="fieldGraphContainer"
@@ -33,8 +33,13 @@ var LegacyFieldGraph = React.createClass({
                  data-from={this._getFirstGraphValue()}
                  data-to={this.props.to}>
                 <div className="pull-right">
-                    <ButtonGroup>
-                        <DropdownButton bsSize='small' className='graph-settings' title='Customize' pullRight>
+                    <AddToDashboardMenu title='Add to dashboard'
+                                        dashboards={this.props.dashboards}
+                                        widgetType={Widget.Type.FIELD_CHART}
+                                        configuration={FieldGraphsStore.getGraphOptionsAsCreateWidgetRequestParams(this.props.graphId)}
+                                        bsStyle='default'
+                                        pullRight={true}>
+                        <DropdownButton bsSize='small' className='graph-settings' title='Customize'>
                             <li className="dropdown-submenu left-submenu hide-combined-chart">
                                 <a href="#">Value</a>
 
@@ -88,7 +93,8 @@ var LegacyFieldGraph = React.createClass({
                             <MenuItem divider={true}/>
                             <MenuItem onSelect={this.props.onDelete}>Delete graph</MenuItem>
                         </DropdownButton>
-                    </ButtonGroup>
+                    </AddToDashboardMenu>
+
                     <div style={{display: 'inline', marginLeft: 20}}>
                         <Button href='#'
                                 bsSize='small'
@@ -103,7 +109,8 @@ var LegacyFieldGraph = React.createClass({
 
                 <ul className="field-graph-query-container">
                     <li>
-                        <div className="field-graph-query-color" style={{backgroundColor: "#4DBCE9"}}></div>&nbsp;
+                        <div className="field-graph-query-color" style={{backgroundColor: "#4DBCE9"}}></div>
+                        &nbsp;
                         <span className="type-description"></span>
                         Query: <span className="field-graph-query"></span>
                     </li>
