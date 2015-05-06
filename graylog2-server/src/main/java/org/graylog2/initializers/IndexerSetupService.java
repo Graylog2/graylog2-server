@@ -59,7 +59,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
     private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
-    private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.4.99");
+    private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.5.99");
 
     private final Node node;
     private final ElasticsearchConfiguration configuration;

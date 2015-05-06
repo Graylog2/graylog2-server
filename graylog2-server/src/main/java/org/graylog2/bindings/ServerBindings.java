@@ -164,7 +164,7 @@ public class ServerBindings extends AbstractModule {
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
-        bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
+        bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(BundleService.class).in(Scopes.SINGLETON);
