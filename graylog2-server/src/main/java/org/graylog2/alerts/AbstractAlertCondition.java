@@ -69,7 +69,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     }
 
-    protected abstract CheckResult runCheck();
+    protected abstract AlertCondition.CheckResult runCheck();
 
     @Override
     public String getId() {
@@ -106,7 +106,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     @Override
-    public Integer getBacklog() {
+    public Integer getBacklogSize() {
         final Object rawParameter = getParameters().get("backlog");
         if (rawParameter != null && rawParameter instanceof Number) {
             return (Integer) rawParameter;
@@ -188,8 +188,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     public static class NegativeCheckResult extends CheckResult {
-        public NegativeCheckResult() {
-            super(false, null, null, null, null);
+        public NegativeCheckResult(AlertCondition alertCondition) {
+            super(false, alertCondition, null, null, null);
         }
     }
 
