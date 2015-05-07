@@ -4,7 +4,7 @@ var React = require('react');
 var Immutable = require('immutable');
 
 var LegacyFieldGraph = require('./LegacyFieldGraph');
-var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
+var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 
 var FieldGraphs = React.createClass({
     getInitialState() {
