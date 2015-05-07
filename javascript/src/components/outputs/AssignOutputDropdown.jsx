@@ -25,17 +25,20 @@ var AssignOutputDropdown = React.createClass({
         var style = {marginTop: '10px'};
         return (
             <div className="output-add" style={style}>
-                <form className="form-inline">
-                    <select value={this.state.selectedOutput} name="outputId" className="form-control" onChange={this._handleUpdate}>
-                        <option value={this.PLACEHOLDER} disabled>--- Select existing output ---</option>
-                        {outputList}
-                    </select>
-
-                    <button ref="submitButton" type="button" disabled={this.state.selectedOutput === this.PLACEHOLDER}
-                            id="add-existing-output" className="btn btn-success form-control" onClick={this._handleClick}>
-                        Assign existing Output
-                    </button>
-                </form>
+                <div className="form-group">
+                    <div className="row">
+                        <div className="col-md-2">
+                            <select value={this.state.selectedOutput} name="outputId" className="form-control" onChange={this._handleUpdate}>
+                                <option value={this.PLACEHOLDER} disabled>--- Select existing output ---</option>
+                                {outputList}
+                            </select>
+                        </div>
+                        <button ref="submitButton" type="button" disabled={this.state.selectedOutput === this.PLACEHOLDER}
+                                id="add-existing-output" className="btn btn-success" onClick={this._handleClick}>
+                            Assign existing Output
+                        </button>
+                    </div>
+                </div>
             </div>
         );
     }
