@@ -15,13 +15,16 @@ interface Stream {
 }
 
 var StreamsStore = {
+    listStreams() {
+        return $.getJSON(jsRoutes.controllers.api.StreamsApiController.list().url);
+    },
     load(callback: ((streams: Array<Stream>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Streams failed with status: " + errorThrown,
                 "Could not retrieve Streams!");
         };
 
-        $.getJSON(jsRoutes.controllers.api.StreamsApiController.list().url, callback).fail(failCallback);
+        this.listStreams().done(callback).fail(failCallback);
     },
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {

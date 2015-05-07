@@ -192,9 +192,9 @@ public class InputsApiController extends AuthenticatedController {
     }
 
     public static class RecentMessageResult {
-        private final String id;
-        private final String index;
-        private final Map<String, Object> fields;
+        public final String id;
+        public final String index;
+        public final Map<String, Object> fields;
 
         public RecentMessageResult(String id, String index, Map<String, Object> fields) {
             this.id = id;

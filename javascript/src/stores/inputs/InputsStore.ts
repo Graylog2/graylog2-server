@@ -15,13 +15,21 @@ interface Input {
 }
 
 var InputsStore = {
-    load(callback: ((streams: Array<Stream>) => void)) {
+    list(callback: ((inputs: Array<Input>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Inputs failed with status: " + errorThrown,
                 "Could not retrieve Inputs!");
         };
 
         $.getJSON(jsRoutes.controllers.api.InputsApiController.list().url, callback).fail(failCallback);
+    },
+    globalRecentMessage(inputId: string, callback: ((message: any) => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Loading recent message failed with status: " + errorThrown,
+                "Could not retrieve recent message from input " + inputId + "!");
+        };
+
+        $.getJSON(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(inputId, true).url, callback).fail(failCallback);
     }
 };
 
