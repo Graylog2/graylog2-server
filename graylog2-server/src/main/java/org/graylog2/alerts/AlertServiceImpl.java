@@ -209,7 +209,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
         if (inGracePeriod(alertCondition)) {
             LOG.debug("Alert condition [{}] is in grace period. Not triggered.", this);
-            return new AbstractAlertCondition.CheckResult(false);
+            return new AbstractAlertCondition.NegativeCheckResult(alertCondition);
         }
 
         return ((AbstractAlertCondition) alertCondition).runCheck();

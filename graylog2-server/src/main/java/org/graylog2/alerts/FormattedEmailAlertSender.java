@@ -18,10 +18,12 @@ package org.graylog2.alerts;
 
 import com.floreysoft.jmte.Engine;
 import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 
@@ -36,12 +38,13 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "Date: ${check_result.triggeredAt}\n" +
             "Stream ID: ${stream.id}\n" +
             "Stream title: ${stream.title}\n" +
+            "Stream description: ${stream.description}\n" +
             "${if stream_url}Stream URL: ${stream_url}${end}\n" +
             "\n" +
             "Triggered condition: ${check_result.triggeredCondition}\n" +
             "##########\n\n" +
-            "Last messages accounting for this alert:\n" +
             "${if backlog_size > 0}" +
+            "Last messages accounting for this alert:\n" +
             "${foreach backlog message}\n" +
             "${message}\n" +
             "${end}\n" +
@@ -52,8 +55,12 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
     private Configuration pluginConfig;
 
     @Inject
-    public FormattedEmailAlertSender(EmailConfiguration configuration, StreamRuleService streamRuleService, UserService userService) {
-        super(configuration, streamRuleService, userService);
+    public FormattedEmailAlertSender(EmailConfiguration configuration,
+                                     StreamRuleService streamRuleService,
+                                     UserService userService,
+                                     NotificationService notificationService,
+                                     NodeId nodeId) {
+        super(configuration, streamRuleService, userService, notificationService, nodeId);
     }
 
     @Override

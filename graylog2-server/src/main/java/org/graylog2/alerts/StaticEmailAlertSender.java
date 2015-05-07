@@ -16,18 +16,22 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.joda.time.DateTime;
@@ -47,14 +51,20 @@ public class StaticEmailAlertSender implements AlertSender {
     private final StreamRuleService streamRuleService;
     protected final EmailConfiguration configuration;
     private final UserService userService;
+    private final NotificationService notificationService;
+    private final NodeId nodeId;
 
     @Inject
     public StaticEmailAlertSender(EmailConfiguration configuration,
                                   StreamRuleService streamRuleService,
-                                  UserService userService) {
+                                  UserService userService,
+                                  NotificationService notificationService,
+                                  NodeId nodeId) {
         this.configuration = configuration;
         this.streamRuleService = streamRuleService;
         this.userService = userService;
+        this.notificationService = notificationService;
+        this.nodeId = nodeId;
     }
 
     @Override
@@ -69,10 +79,10 @@ public class StaticEmailAlertSender implements AlertSender {
     private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
         if(!configuration.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled!");
+            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
-        Email email = new SimpleEmail();
+        final Email email = new SimpleEmail();
         email.setHostName(configuration.getHostname());
         email.setSmtpPort(configuration.getPort());
         if (configuration.isUseSsl()) {
@@ -160,7 +170,7 @@ public class StaticEmailAlertSender implements AlertSender {
         if (backlog == null || backlog.isEmpty())
             return "";
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         MessageFormatter messageFormatter = new MessageFormatter();
 
         sb.append("\n\nLast ");
@@ -170,7 +180,7 @@ public class StaticEmailAlertSender implements AlertSender {
             sb.append("relevant message:\n");
         sb.append("======================\n\n");
 
-        for (Message message : backlog) {
+        for (final Message message : backlog) {
             sb.append(messageFormatter.formatForMail(message));
             sb.append("\n");
         }
@@ -182,20 +192,22 @@ public class StaticEmailAlertSender implements AlertSender {
     @Override
     public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         if(!configuration.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled!");
+            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
         if (stream.getAlertReceivers() == null || stream.getAlertReceivers().isEmpty()) {
             throw new RuntimeException("Stream [" + stream + "] has no alert receivers.");
         }
 
+        final List<String> recipients = Lists.newArrayList();
+
         // Send emails to subscribed users.
         if(stream.getAlertReceivers().get("users") != null) {
             for (String username : stream.getAlertReceivers().get("users")) {
-                User user = userService.load(username);
+                final User user = userService.load(username);
 
                 if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
-                    sendEmail(user.getEmail(), stream, checkResult, backlog);
+                    recipients.add(user.getEmail());
                 }
             }
         }
@@ -204,9 +216,22 @@ public class StaticEmailAlertSender implements AlertSender {
         if(stream.getAlertReceivers().get("emails") != null) {
             for (String email : stream.getAlertReceivers().get("emails")) {
                 if(!email.isEmpty()) {
-                    sendEmail(email, stream, checkResult, backlog);
+                    recipients.add(email);
                 }
             }
         }
+
+        if (recipients.size() == 0) {
+            final Notification notification = notificationService.buildNow()
+                    .addNode(nodeId.toString())
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("title", "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")
+                    .addDetail("description", "To fix this, go to the alerting configuration of the stream and add at least one alert recipient.");
+            notificationService.publishIfFirst(notification);
+        }
+
+        for (String email : recipients)
+            sendEmail(email, stream, checkResult, backlog);
     }
 }

@@ -118,6 +118,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
+    @Parameter(value = "elasticsearch_store_timestamps_as_doc_values")
+    private boolean storeTimestampsAsDocValues = true;
+
     public String getClusterName() {
         return clusterName;
     }
@@ -244,5 +247,9 @@ public class ElasticsearchConfiguration {
 
     public String getPathData() {
         return pathData;
+    }
+
+    public boolean isStoreTimestampsAsDocValues() {
+        return storeTimestampsAsDocValues;
     }
 }
