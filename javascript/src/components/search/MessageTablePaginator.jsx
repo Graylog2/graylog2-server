@@ -90,7 +90,7 @@ var MessageTablePaginator = React.createClass({
         if (this.props.position === 'bottom') {
             nav = (
                 <div data-spy="affix"
-                     data-offset-top="450"
+                     data-offset-top="500"
                      data-offset-bottom="10">
                     {this.props.children}
                     <nav className="text-center"

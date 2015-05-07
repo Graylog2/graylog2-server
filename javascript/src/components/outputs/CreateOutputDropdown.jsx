@@ -21,13 +21,18 @@ var CreateOutputDropdown = React.createClass({
         var outputTypes = $.map(this.props.types, this._formatOutputType);
         return (
             <div>
-                <div className="form-group form-inline">
-                    <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
-                        <option value={this.PLACEHOLDER} disabled>--- Select Output Type ---</option>
-                        {outputTypes}
-                    </select>
+                <div className="form-group">
+                    <div className="row">
+                        <div className="col-md-2">
+                            <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
+                                <option value={this.PLACEHOLDER} disabled>--- Select Output Type ---</option>
+                                {outputTypes}
+                            </select>
+                        </div>
+                        <button className="btn btn-success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</button>
+                    </div>
 
-                    <button className="btn btn-success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</button>
+
                 </div>
 
                 <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"

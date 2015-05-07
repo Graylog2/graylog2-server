@@ -26,7 +26,7 @@ var AlarmCallback = React.createClass({
                 </span>
 
                 <h3>
-                    <i className="fa fa-ellipsis-vertical"></i>
+                    <i className="fa fa-ellipsis-v"></i>
                     <span>{humanReadableType}</span>
                 </h3>
 

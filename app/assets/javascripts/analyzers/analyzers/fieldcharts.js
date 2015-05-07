@@ -23,6 +23,10 @@ $(document).ready(function () {
         $(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
     }
 
+    function sendFailureEvent(graphId, errorMessage) {
+        $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
+    }
+
     function createFieldChart(options, graphContainer) {
         "use strict";
 
@@ -81,6 +85,10 @@ $(document).ready(function () {
 
         if (opts.range == undefined) {
             opts.range = {};
+        }
+
+        if (opts.createdAt === undefined) {
+            opts.createdAt = moment().valueOf();
         }
 
         switch (opts.rangetype) {
@@ -291,12 +299,12 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
-                    showError("Could not load histogram.");
+                    showError("Could not load field graph for '" + opts.field + "'.");
                 }
             },
             statusCode: {
                 400: function () {
-                    fieldCharts.show();
+                    sendFailureEvent(opts.chartid, "Field graphs are only available for numeric fields.");
                 }
             },
             complete: function () {
@@ -415,7 +423,7 @@ $(document).ready(function () {
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         // Update title and description.
-        $(".title", targetElem).text("Combined chart");
+        $("h1", targetElem).text("Combined graph");
 
         for (var i = 0; i < draggedChart.series.length; i++) {
             var lineColor = palette.color();

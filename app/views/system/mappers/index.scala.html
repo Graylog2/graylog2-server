@@ -1,7 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User)
 @main("Mappers", views.html.system.sidebar(), "", currentUser) {
     <div class="row">
-        <h1><i class="fa fa-indent-right"></i> Field mappers</h1>
+        <h1><i class="fa fa-indent"></i> Field mappers</h1>
         You sometimes have values in your messages that you want to display in another way. Map for example every
         field called <em>level</em> to syslog levels and see <em>Error</em> instead of just a <em>3</em>.
     </div>
@@ -11,7 +11,7 @@
 
         <div class="row node-row">
             <h3>
-                <i class="fa fa-ellipsis-vertical"></i>
+                <i class="fa fa-ellipsis-v"></i>
                 <strong>Syslog levels</strong>
             </h3>
 
@@ -23,7 +23,7 @@
         </div>
         <div class="row node-row">
             <h3>
-                <i class="fa fa-ellipsis-vertical"></i>
+                <i class="fa fa-ellipsis-v"></i>
                 <strong>Newlines to &lt;br> tags</strong>
             </h3>
 

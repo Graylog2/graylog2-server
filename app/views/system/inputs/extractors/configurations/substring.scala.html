@@ -10,28 +10,28 @@
 
 <input type="hidden" name="extractor_type" value="substring" />
 
-<div class="control-group">
+<div class="form-group">
     <label for="begin_index">Begin index:</label>
-    <div class="controls">
-        <input name="begin_index" id="begin_index" type="number" class="input-small" value="@index_value("begin_index")" required />
-        <span class="help-block">Character position from where to start extracting. (Inclusive)</span>
+    <div class="row">
+        <div class="col-md-5">
+            <input name="begin_index" id="begin_index" type="number" class="form-control" value="@index_value("begin_index")" required />
+        </div>
     </div>
+    <span class="help-block">Character position from where to start extracting. (Inclusive)</span>
 </div>
 
-<div class="control-group">
+<div class="form-group">
     <label for="end_index">End index:</label>
-    <div class="controls">
-        <input name="end_index" id="end_index" type="number" class="input-small" value="@index_value("end_index")" required />
-        <span class="help-block">
-            Where to end extracting. (Exclusive)
-            <strong>Example:</strong>
-            <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.
-        </span>
+    <div class="row">
+        <div class="col-md-5">
+            <input name="end_index" id="end_index" type="number" class="form-control" value="@index_value("end_index")" required />
+        </div>
     </div>
+    <span class="help-block">
+        Where to end extracting. (Exclusive)
+        <strong>Example:</strong>
+        <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.
+    </span>
 </div>
 
-<div class="control-group">
-    <div class="controls">
-        <button class="btn btn-info xtrc-try-substring" type="button">Try!</button>
-    </div>
-</div>
+<button class="btn btn-info xtrc-try-substring" type="button">Try!</button>

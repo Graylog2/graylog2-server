@@ -25,16 +25,19 @@ var FieldGraphs = React.createClass({
     render() {
         var fieldGraphs = [];
 
-        this.state.fieldGraphs.forEach((graphOptions, graphId) => {
-            fieldGraphs.push(
-                <LegacyFieldGraph key={graphId}
-                                  graphId={graphId}
-                                  graphOptions={graphOptions}
-                                  onDelete={() => this.deleteFieldGraph(graphId)}
-                                  from={this.props.from}
-                                  to={this.props.to}/>
-            );
-        });
+        this.state.fieldGraphs
+            .sortBy(graph => graph['createdAt'])
+            .forEach((graphOptions, graphId) => {
+                fieldGraphs.push(
+                    <LegacyFieldGraph key={graphId}
+                                      graphId={graphId}
+                                      graphOptions={graphOptions}
+                                      onDelete={() => this.deleteFieldGraph(graphId)}
+                                      from={this.props.from}
+                                      to={this.props.to}
+                                      dashboards={this.props.dashboards}/>
+                );
+            });
 
         return (
             <div id="field-graphs">

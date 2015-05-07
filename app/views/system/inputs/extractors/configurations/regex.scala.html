@@ -8,21 +8,23 @@
     }
 }
 
-<input type="hidden" name="extractor_type" value="regex" />
+    <input type="hidden" name="extractor_type" value="regex" />
 
-<div class="control-group">
-    <label for="regex_value">Regular expression:</label>
-    <div class="controls">
-        <div class="form-inline">
-            <input name="regex_value" id="regex_value" type="text"
-                placeholder="^.*string(.+)$" class="input-xlarge" value="@regex_value" required />
-            <button class="btn btn-info xtrc-try-regex" type="button">
-                Try!
-            </button>
+    <div class="form-group">
+        <label for="regex_value">Regular expression:</label>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <input name="regex_value" id="regex_value" type="text"
+                    placeholder="^.*string(.+)$" class="form-control" value="@regex_value" required />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info xtrc-try-regex" type="button">Try!</button>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
     <span class="help-block">
         The regular expression used for extraction. First matcher group is used.
         @views.html.partials.support.bubble.render("general/extractors")
     </span>
-</div>

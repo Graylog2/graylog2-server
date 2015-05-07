@@ -10,6 +10,7 @@ var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
+var StringUtils = require('../../util/StringUtils');
 
 var HistogramVisualization = React.createClass({
     getInitialState() {
@@ -80,7 +81,7 @@ var HistogramVisualization = React.createClass({
         this.histogram.render();
     },
     _formatInterval() {
-        return this.props.interval.charAt(0).toUpperCase() + this.props.interval.slice(1) + "s";
+        return StringUtils.capitalizeFirstLetter(this.props.interval) + "s";
     },
     drawData() {
         this.histogram.xUnits(() => this.state.dataPoints.length - 1);

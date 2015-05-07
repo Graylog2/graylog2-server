@@ -40,7 +40,7 @@ var ConfigurationForm = React.createClass({
         var helpBlock = this.props.helpBlock;
         var header = (
             <h2 className="modal-title">
-                <i className="fa fa-signin"></i>
+                <i className="fa fa-sign-in"></i>
                 {title}
             </h2>
         );
