@@ -398,8 +398,14 @@ $(document).ready(function () {
 
     // Extractor export formatting.
     if ($(".extractor-json").size() > 0) {
-        var formatted = JSON.stringify(JSON.parse($(".extractor-json").val()), null, 2);
-        $(".extractor-json").val(formatted);
+        var jsonString = $(".extractor-json").val().trim();
+
+        // Only try to format the JSON if there is any. Avoids a JavaScript runtime error if the text field is
+        // empty.
+        if (jsonString.length > 0) {
+            var formatted = JSON.stringify(JSON.parse(jsonString), null, 2);
+            $(".extractor-json").val(formatted);
+        }
     }
 
 })
