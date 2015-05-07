@@ -11,6 +11,8 @@ var generateId: ()=>string;
 
 import Immutable = require('immutable');
 
+import UserNotification = require("../../util/UserNotification");
+
 interface CreateFieldChartWidgetRequestParams {
     widgetType: string;
     valuetype: string;
@@ -32,10 +34,14 @@ class FieldGraphsStore {
 
     constructor() {
         this._fieldGraphs = Immutable.Map<string, Object>(store.get("pinned-field-charts"));
-        $(document).on("created.graylog.fieldgraph", (event, data) => {
+        $(document).on('created.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
         });
-        $(document).on("updated.graylog.fieldgraph", (event, data) => {
+        $(document).on('failed.graylog.fieldgraph', (event, data) => {
+            UserNotification.error(data.errorMessage, "Could not create field graph");
+            this.deleteGraph(data.graphId);
+        });
+        $(document).on('updated.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
         });
     }
@@ -81,7 +87,7 @@ class FieldGraphsStore {
         var graphOptions = this.fieldGraphs.get(graphId);
 
         if (graphOptions === undefined) {
-            throw new Error('Invalid graph ID "' + graphId + '"');
+            throw('Invalid graph ID "' + graphId + '"');
         }
 
         var requestParams = {

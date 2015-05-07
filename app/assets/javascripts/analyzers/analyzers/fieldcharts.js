@@ -23,6 +23,10 @@ $(document).ready(function () {
         $(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
     }
 
+    function sendFailureEvent(graphId, errorMessage) {
+        $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
+    }
+
     function createFieldChart(options, graphContainer) {
         "use strict";
 
@@ -295,12 +299,12 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
-                    showError("Could not load histogram.");
+                    showError("Could not load field graph for '" + opts.field + "'.");
                 }
             },
             statusCode: {
                 400: function () {
-                    fieldCharts.show();
+                    sendFailureEvent(opts.chartid, "Field graphs are only available for numeric fields.");
                 }
             },
             complete: function () {
