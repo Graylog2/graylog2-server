@@ -52,12 +52,6 @@ public abstract class AgentImpl implements Agent {
                 getLastSeen(), getAgentVersion(), isActive != null && isActive);
     }
 
-    @Override
-    @JsonIgnore
-    public String getOperatingSystem() {
-        return getNodeDetails().operatingSystem();
-    }
-
     @JsonProperty("last_seen")
     @Override
     public abstract DateTime getLastSeen();

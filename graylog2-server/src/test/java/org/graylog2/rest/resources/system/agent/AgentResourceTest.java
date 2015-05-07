@@ -79,7 +79,7 @@ public class AgentResourceTest extends RestResourceBaseTest {
         final Agent agent = agents.get(agents.size() - 1);
         when(agentService.findById(agent.getId())).thenReturn(agent);
         final AgentSummary agentSummary = mock(AgentSummary.class);
-        when(agent.toSummary(any(Function.class))).thenReturn(agentSummary);
+        when(agent.toSummary(any(AgentResource.LostAgentFunction.class))).thenReturn(agentSummary);
 
         final AgentSummary response = this.resource.get(agent.getId());
 
@@ -96,7 +96,7 @@ public class AgentResourceTest extends RestResourceBaseTest {
         when(agent.getNodeId()).thenReturn(nodeId);
         when(agent.getLastSeen()).thenReturn(lastSeen);
         when(agent.getNodeDetails()).thenReturn(agentNodeDetails);
-        when(agent.getOperatingSystem()).thenReturn(operatingSystem);
+        when(agent.getNodeDetails().operatingSystem()).thenReturn(operatingSystem);
 
         return agent;
     }
