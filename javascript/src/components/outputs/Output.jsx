@@ -4,12 +4,10 @@ var React = require('react/addons');
 var EditOutputButton = require('./EditOutputButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
 var UserLink = require('../users/UserLink');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var Output = React.createClass({
-    _isPermitted(permissions) {
-        var result = permissions.every((p) => this.props.permissions[p]);
-        return result;
-    },
+    mixins: [PermissionsMixin],
     _deleteFromStreamButton(output) {
         return (
             <button className="btn btn-warning btn-xs"
@@ -28,11 +26,11 @@ var Output = React.createClass({
     },
     render() {
         var output = this.props.output;
-        var deletionForm = (this.props.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
+        var deletionForm = (this.props.streamId && this.isPermitted(this.props.permissions, ["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
 
-        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ?
+        var editButton = (this.isPermitted(this.props.permissions, ["OUTPUTS_EDIT"]) ?
             <EditOutputButton output={output} onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition} /> : "");
-        var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
+        var terminationForm = (this.isPermitted(this.props.permissions, ["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
 
