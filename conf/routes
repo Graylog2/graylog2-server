@@ -247,6 +247,7 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime            
 # API: Streams
 GET         /a/streams                                                               @controllers.api.StreamsApiController.list()
 POST        /a/streams                                                               @controllers.api.StreamsApiController.create()
+GET         /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.get(stream_id: String)
 PUT         /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.update(stream_id: String)
 DELETE      /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.delete(stream_id: String)
 POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)

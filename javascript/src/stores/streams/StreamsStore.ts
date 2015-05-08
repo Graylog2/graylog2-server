@@ -14,6 +14,11 @@ interface Stream {
     createdAt: number;
 }
 
+interface TestMatchResponse {
+    matches: boolean;
+    rules: any;
+}
+
 var StreamsStore = {
     listStreams() {
         return $.getJSON(jsRoutes.controllers.api.StreamsApiController.list().url);
@@ -25,6 +30,15 @@ var StreamsStore = {
         };
 
         this.listStreams().done(callback).fail(failCallback);
+    },
+    get(streamId: string, callback: ((stream: Stream) => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Loading Stream failed with status: " + errorThrown,
+                "Could not retrieve Stream!");
+        };
+
+        var url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
+        $.getJSON(url).done(callback).fail(failCallback);
     },
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -125,6 +139,20 @@ var StreamsStore = {
             },
             success: callback
         });
+    },
+    testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
+        var config = {
+            url: jsRoutes.controllers.api.StreamsApiController.testMatch(streamId).url,
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify(message),
+            error: (jqXHR, textStatus, errorThrown) => {
+                UserNotification.error("Testing stream rules of stream failed with status: " + errorThrown,
+                    "Could not test stream rules of stream");
+            },
+            success: callback
+        };
+        $.ajax(config);
     }
 };
 
