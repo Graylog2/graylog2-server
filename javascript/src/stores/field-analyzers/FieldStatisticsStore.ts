@@ -12,6 +12,15 @@ import UserNotification = require("../../util/UserNotification");
 import SearchStore = require('../search/SearchStore');
 
 var FieldStatisticsStore = {
+    FUNCTIONS: Immutable.OrderedMap({
+        count: 'Total',
+        mean: 'Mean',
+        min: 'Minimum',
+        max: 'Maximum',
+        std_deviation: 'Std. deviation',
+        variance: 'Variance',
+        sum: 'Sum',
+    }),
     getFieldStatistics(field: string): JQueryPromise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
 

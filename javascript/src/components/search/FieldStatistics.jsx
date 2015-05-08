@@ -54,18 +54,23 @@ var FieldStatistics = React.createClass({
                 statistics.push(
                     <tr key={field}>
                         <td>{field}</td>
-                        <td>{NumberUtils.formatNumber(stats['count'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['mean'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['min'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['max'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['std_deviation'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['variance'])}</td>
-                        <td>{NumberUtils.formatNumber(stats['sum'])}</td>
+                        {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                            return <td key={statFunction + "-td"}>{NumberUtils.formatNumber(stats[statFunction])}</td>;
+                        })}
                     </tr>
                 );
             });
 
         return statistics;
+    },
+    _renderStatisticalFunctionsHeaders() {
+        return FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+            return (
+                <th key={statFunction + "-th"} onClick={() => this._changeSortOrder(statFunction)}>
+                    {FieldStatisticsStore.FUNCTIONS.get(statFunction)} {this._getHeaderCaret(statFunction)}
+                </th>
+            );
+        });
     },
     _getHeaderCaret(column) {
         if (this.state.sortBy !== column) {
@@ -74,9 +79,10 @@ var FieldStatistics = React.createClass({
         return this.state.sortDescending ? <i className='fa fa-caret-down'></i> : <i className='fa fa-caret-up'></i>;
     },
     render() {
-        return (
-            <div id='field-statistics'>
-                {!this.state.fieldStatistics.isEmpty() &&
+        var content;
+
+        if (!this.state.fieldStatistics.isEmpty()) {
+            content = (
                 <div className="content-col">
                     <div className="pull-right">
                         <AddToDashboardMenu title='Add to dashboard'
@@ -97,27 +103,7 @@ var FieldStatistics = React.createClass({
                                 <th onClick={() => this._changeSortOrder('field')}>
                                     Field {this._getHeaderCaret('field')}
                                 </th>
-                                <th onClick={() => this._changeSortOrder('count')}>
-                                    Total {this._getHeaderCaret('count')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('mean')}>
-                                    Mean {this._getHeaderCaret('mean')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('min')}>
-                                    Minimum {this._getHeaderCaret('min')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('max')}>
-                                    Maximum {this._getHeaderCaret('max')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('std_deviation')}>
-                                    Std. deviation {this._getHeaderCaret('std_deviation')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('variance')}>
-                                    Variance {this._getHeaderCaret('variance')}
-                                </th>
-                                <th onClick={() => this._changeSortOrder('sum')}>
-                                    Sum {this._getHeaderCaret('sum')}
-                                </th>
+                                {this._renderStatisticalFunctionsHeaders()}
                             </tr>
                             </thead>
                             <tbody>
@@ -126,7 +112,12 @@ var FieldStatistics = React.createClass({
                         </table>
                     </div>
                 </div>
-                }
+            );
+        }
+
+        return (
+            <div id='field-statistics'>
+                {content}
             </div>
         );
     }
