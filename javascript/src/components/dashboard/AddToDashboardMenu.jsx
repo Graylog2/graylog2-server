@@ -14,18 +14,11 @@ var WidgetCreationModal = require('../widgets/WidgetCreationModal');
 var AddToDashboardMenu = React.createClass({
     getInitialState() {
         return {
-            dashboards: Immutable.Map(),
             selectedDashboard: ""
         };
     },
     componentDidMount() {
         $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
-    },
-    componentWillReceiveProps(newProps) {
-        this._setDashboards(newProps.dashboards);
-    },
-    _setDashboards(dashboards) {
-        this.setState({dashboards: dashboards});
     },
     _setOriginalSearchParams(originalSearchParams) {
         this.searchParams = originalSearchParams;
@@ -45,7 +38,7 @@ var AddToDashboardMenu = React.createClass({
     render() {
         var dashboards = Immutable.List();
 
-        this.state.dashboards
+        Immutable.Map(this.props.dashboards)
             .sortBy(dashboard => dashboard.title)
             .forEach((dashboard, id) => {
                 dashboards = dashboards.push(
