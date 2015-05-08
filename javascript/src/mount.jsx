@@ -25,6 +25,7 @@ $(document).ready(() => {
     require('./components/alarmcallbacks/mount');
     require('./components/agents/mount');
     require('./components/messageloaders/mount');
+    require('./components/streamrules/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }

@@ -7,6 +7,7 @@ var RecentMessageLoader = require('./RecentMessageLoader');
 var MessageShow = require('../search/MessageShow');
 var InputsStore = require('../../stores/inputs/InputsStore');
 var Immutable = require('immutable');
+var MessageLoader = require('../extractors/MessageLoader');
 
 var LoaderTabs = React.createClass({
     getInitialState() {
@@ -16,7 +17,11 @@ var LoaderTabs = React.createClass({
         };
     },
     onMessageLoaded(message) {
+        message['formatted_fields'] = message.fields;
         this.setState({message: message});
+        if (this.props.onMessageLoaded) {
+            this.props.onMessageLoaded(message);
+        }
     },
     loadData() {
         InputsStore.list((inputsList) => {
@@ -41,7 +46,9 @@ var LoaderTabs = React.createClass({
                     <TabPane eventKey={1} tab='Recent'>
                         <RecentMessageLoader onMessageLoaded={this.onMessageLoaded}/>
                     </TabPane>
-                    <TabPane eventKey={2} tab='Manual'>TabPane 2 content</TabPane>
+                    <TabPane eventKey={2} tab='Manual'>
+                        <MessageLoader onMessageLoaded={this.onMessageLoaded} hidden={false}/>
+                    </TabPane>
                 </TabbedArea>
                 {displayMessage}
             </div>

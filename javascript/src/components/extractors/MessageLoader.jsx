@@ -7,8 +7,13 @@ var MessagesStore = require('../../stores/messages/MessagesStore');
 var MessageLoader = React.createClass({
     getInitialState() {
         return ({
-            hidden: true
+            hidden: this.props.hidden
         });
+    },
+    getDefaultProps() {
+        return {
+            hidden: true
+        };
     },
     toggleMessageForm() {
         this.setState({hidden: !this.state.hidden}, this._focusMessageLoaderForm);

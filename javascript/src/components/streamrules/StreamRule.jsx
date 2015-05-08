@@ -24,12 +24,16 @@ var StreamRule = React.createClass({
             </span>
         );
     },
+    _getMatchDataClassNames() {
+        return (this.props.matchData.rules[this.props.streamRule.id] ? "alert-success" : "alert-danger");
+    },
     render() {
         var streamRule = this.props.streamRule;
         var streamRuleTypes = this.props.streamRuleTypes;
         var actionItems = (this.isPermitted(this.props.permissions, ['streams:edit:'+this.props.stream.id]) ? this._formatActionItems() : "");
+        var className = (this.props.matchData ? this._getMatchDataClassNames() : "");
         return (
-            <li>
+            <li className={className}>
                 {actionItems} <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
                 <StreamRuleForm ref='streamRuleForm' streamRule={streamRule} streamRuleTypes={streamRuleTypes}
                                 title="Edit Stream Rule" onSubmit={this.props.onSubmit}/>

@@ -1,5 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule], breadcrumbs: lib.BreadcrumbList)
 
+@import play.libs.Json
+
 @main("Rules of stream \"" + stream.getTitle + "\"" , null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -16,53 +18,7 @@
     </div>
 
 
-    <div class="row content">
-        <div class="col-md-12 streamrule-sample-message">
-            <h2>
-                1. Load a message to test rules
-            </h2>
-
-            <div class="react-message-loader-tabs">
-            </div>
-            <div class="spinner" style="display: none;"><h2><i class='fa fa-spinner fa-spin'></i> &nbsp;Loading message</h2></div>
-
-            <div class="sample-message-display" style="display: none; margin-top: 5px;">
-                <strong>Next step:</strong>
-                Add/delete/modify stream rules in step 2 and see if the example message would have been routed into the stream or not.
-
-                <div class="alert alert-info" id="sample-message" style="margin-top: 10px; margin-bottom: 0px;">
-                    <h3>Message {{messageId}}<span></span></h3>
-
-                    <dl class="sample-message-fields">
-                        <dt data-field="{{field}}" data-value="{{raw-value}}" data-occurrence="repeat">{{field}}</dt><dd data-occurrence="repeat">{{value}}</dd>
-                    </dl>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="buttons pull-right">
-                <button class="btn btn-success btn-sm show-stream-rule" data-stream-id="@stream.getId">
-                    Add stream rule
-                </button>
-            </div>
-
-            <h2>
-                <i class="fa fa-cogs"></i>
-                2. Manage stream rules
-            </h2>
-
-            The example message would have been routed into this stream if every rule below has a green background.
-
-            <div class="streamrules-list-container streamrule-checker" data-stream-id="@stream.getId">
-                @views.html.partials.streamrules.list_well.render(streamrules)
-                @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
-            </div>
-
-            <p style="margin-top: 10px;">
-                <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
-            </p>
-        </div>
+    <div class="react-streamrules-editor" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
 
     <script type="text/javascript">

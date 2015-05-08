@@ -13,7 +13,7 @@ var AlarmCallbacksStore = {
                 "Could not retrieve available AlarmCallbacks!");
         };
 
-        $.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.available(streamId).url, callback).fail(failCallback);
+        setTimeout(() => {$.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.available(streamId).url, callback).fail(failCallback)}, 2000);
     },
     loadForStream(streamId: string, callback: ((alarmCallbacks: any) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
