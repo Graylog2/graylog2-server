@@ -64,7 +64,8 @@ var AddToDashboardMenu = React.createClass({
                                      widgetType={this.props.widgetType}
                                      supportsTrending={true}
                                      configuration={this.props.configuration}
-                                     onConfigurationSaved={this._saveWidget}/>
+                                     onConfigurationSaved={this._saveWidget}
+                                     fields={this.props.fields}/>
             </div>
         );
     }

@@ -90,6 +90,7 @@ var FieldStatistics = React.createClass({
                                             widgetType={Widget.Type.STATS_COUNT}
                                             configuration={{}}
                                             bsStyle='default'
+                                            fields={this.state.fieldStatistics.keySeq()}
                                             pullRight={true}>
                             <Button bsSize='small' onClick={() => this._resetStatus()}>Dismiss</Button>
                         </AddToDashboardMenu>
