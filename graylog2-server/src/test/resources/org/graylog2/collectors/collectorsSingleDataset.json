@@ -1,0 +1,5 @@
+{
+  "collectors" : [
+    {"id" : "collectorId", "node_id" : "nodeId", "collector_version" : "0.0.1", "node_details" : {"operating_system" : "DummyOS 1.0"}, "last_seen" : ""}
+  ]
+}

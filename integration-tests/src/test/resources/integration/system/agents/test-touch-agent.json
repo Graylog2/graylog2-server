@@ -1,7 +1,0 @@
-{
-  "id" : "testTouchAgentId",
-  "node_id" : "testTouchNodeId",
-  "node_details" : {
-    "operating_system" : "Integration Test OS 1.0"
-  }
-}
