@@ -19,6 +19,7 @@ package org.graylog2.inputs.transports;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Callables;
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.apache.commons.lang3.SystemUtils;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -50,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -113,7 +115,9 @@ public class UdpTransportTest {
     }
 
     @Test
-    public void transportDiscardsDataLargerRecvBufferSize() throws Exception {
+    public void transportDiscardsDataLargerRecvBufferSizeOnMacOsX() throws Exception {
+        assumeTrue(SystemUtils.IS_OS_MAC_OSX);
+
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
 
@@ -123,6 +127,25 @@ public class UdpTransportTest {
         transport.stop();
 
         assertThat(handler.getBytesWritten()).isEmpty();
+    }
+
+    @Test
+    public void transportTruncatesDataLargerRecvBufferSizeOnLinux() throws Exception {
+        assumeTrue(SystemUtils.IS_OS_LINUX);
+
+        final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
+        final UdpTransport transport = launchTransportForBootStrapTest(handler);
+
+        sendUdpDatagram(BIND_ADDRESS, PORT, 2 * RECV_BUFFER_SIZE);
+        await().atMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return !handler.getBytesWritten().isEmpty();
+            }
+        });
+        transport.stop();
+
+        assertThat(handler.getBytesWritten()).containsExactly(RECV_BUFFER_SIZE);
     }
 
     private UdpTransport launchTransportForBootStrapTest(final ChannelHandler channelHandler) throws MisfireException {
