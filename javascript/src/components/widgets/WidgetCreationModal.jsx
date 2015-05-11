@@ -26,13 +26,13 @@ var WidgetCreationModal = React.createClass({
             var fieldsetChildren = this.refs['inputFieldset'].props.children;
             React.Children.forEach(fieldsetChildren, (child) => {
                 // We only care about children with refs, as all inputs have one
-                if (child.ref !== undefined) {
+                if (child.ref !== undefined && child.ref !== 'title') {
                     var input = this.refs[child.ref];
                     var value;
-                    if (typeof input.getValue === 'function') {
-                        value = input.getValue();
-                    } else if (typeof input.getChecked === 'function') {
+                    if (input.props.type === 'checkbox') {
                         value = input.getChecked();
+                    } else {
+                        value = input.getValue();
                     }
 
                     if (value !== undefined) {
