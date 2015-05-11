@@ -63,6 +63,21 @@ var StreamRulesStore = {
             type: "DELETE",
             url: url
         }).done(callback).fail(failCallback);
+    },
+    create(streamId: string, data: StreamRule, callback: (() => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Creating Stream Rule failed with status: " + errorThrown,
+                "Could not create Stream Rule!");
+        };
+
+        var url = jsRoutes.controllers.api.StreamRulesApiController.create(streamId).url;
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        }).done(callback).fail(failCallback);
     }
 };
 

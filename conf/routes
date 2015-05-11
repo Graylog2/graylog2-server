@@ -257,6 +257,7 @@ POST        /a/streams/:stream_id/cloneStream                                   
 
 # API: Stream Rules
 GET         /a/streams/:stream_id/rules                                              @controllers.api.StreamRulesApiController.list(stream_id: String)
+POST        /a/streams/:stream_id/rules                                              @controllers.api.StreamRulesApiController.create(stream_id: String)
 GET         /a/streams/:stream_id/rules/types                                        @controllers.api.StreamRulesApiController.types(stream_id: String)
 PUT         /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.update(stream_id: String, streamrule_id: String)
 DELETE      /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.delete(stream_id: String, streamrule_id: String)

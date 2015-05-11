@@ -7,6 +7,7 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.StreamRule;
 import org.graylog2.restclient.models.StreamRuleService;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRuleRequest;
+import org.graylog2.restclient.models.api.responses.streams.CreateStreamRuleResponse;
 import org.graylog2.restclient.models.api.results.StreamRulesResult;
 import play.libs.Json;
 import play.mvc.Result;
@@ -58,5 +59,12 @@ public class StreamRulesApiController extends AuthenticatedController {
     public Result delete(String streamId, String streamRuleId) throws APIException, IOException {
         streamRuleService.delete(streamId, streamRuleId);
         return ok();
+    }
+
+    public Result create(String streamId) throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final CreateStreamRuleRequest request = Json.fromJson(json, CreateStreamRuleRequest.class);
+        final CreateStreamRuleResponse result = streamRuleService.create(streamId, request);
+        return ok(Json.toJson(result));
     }
 }
