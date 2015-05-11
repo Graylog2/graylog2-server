@@ -1,13 +1,13 @@
 @(conditionDecorator: views.helpers.AlertConditionDecorator)
 
 and <br /> then wait at least
-<input name="grace" type="number" class="input-mini pluralsingular validatable" data-pluralsingular="grace-descr" data-validate="not_negative_number" value="@conditionDecorator.getGrace"/>
+<input name="grace" type="number" class="form-control pluralsingular validatable" data-pluralsingular="grace-descr" data-validate="not_negative_number" value="@conditionDecorator.getGrace"/>
 <span class="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
 a new alert. (grace period)
 
 <p>
     When sending an alert, include the last
-    <input name="backlog" type="number" class="input-mini pluralsingular validatable" data-pluralsingular="backlog-descr" data-validate="not_negative_numer" value="@conditionDecorator.getBacklog"/>
+    <input name="backlog" type="number" class="form-control pluralsingular validatable" data-pluralsingular="backlog-descr" data-validate="not_negative_numer" value="@conditionDecorator.getBacklog"/>
     <span class="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
 </p>
 

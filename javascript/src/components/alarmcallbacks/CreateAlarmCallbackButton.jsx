@@ -18,18 +18,18 @@ var CreateAlarmCallbackButton = React.createClass({
         var configurationForm = (this.state.typeName !== this.PLACEHOLDER ? <ConfigurationForm ref="configurationForm"
                   key="configuration-form-output" configFields={this.state.typeDefinition} title={"Create new " + humanTypeName}
                   typeName={this.state.typeName} includeTitleField={false}
-                  submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : "");
+                  submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
 
 
         return (
-            <div>
-                <div className="form-group form-inline">
+            <div className="form-inline">
+                <div className="form-group">
                     <select id="input-type" value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
                         <option value={this.PLACEHOLDER} disabled>--- Select Alarm Callback Type ---</option>
                         {alarmCallbackTypes}
                     </select>
-
-                    <button className="btn btn-success btn-sm" disabled={this.state.typeName === this.PLACEHOLDER}
+                    {' '}
+                    <button className="btn btn-success form-control" disabled={this.state.typeName === this.PLACEHOLDER}
                             onClick={this._openModal}>Configure new alert destination</button>
                 </div>
                 {configurationForm}

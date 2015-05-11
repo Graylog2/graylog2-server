@@ -2176,14 +2176,14 @@ form.edit-dashboard-form {
   margin-top: 15px;
 }
 
-.alert-type-form input {
-  margin: 0px 5px;
-  padding: 2px;
+.alert-type-form input[type=number], .alert-type-form input[type=text], .alert-type-form select {
+  padding: 0 0 0 5px;
+  height: 25px;
+  width: 50px;
 }
 
-.alert-type-form select {
-  position: relative;
-  top: 5px;
+.alert-type-form input[type=text] {
+  width: 200px;
 }
 
 .add-alert-destination-type {
@@ -2204,21 +2204,8 @@ form.edit-dashboard-form {
   vertical-align: middle;
 }
 
-#add-alert-receivers input {
-  display: inline-block;
-  margin-bottom: 0;
-  vertical-align: middle;
-}
-
 .threshold-type {
-  position: relative;
-  top: -5px;
   margin-left: 5px;
-}
-
-.threshold-type input {
-  position: relative;
-  top: 3px;
 }
 
 .alerts {
