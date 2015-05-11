@@ -47,7 +47,7 @@ var FieldQuickValues = React.createClass({
                     <div>
                         <QuickValuesVisualization id={this.state.field}
                                                   horizontal={true}
-                                                  config={{show_pie_chart: true}}
+                                                  config={{show_pie_chart: true, show_data_table: true}}
                                                   data={this.state.data}/>
                     </div>
                 </div>

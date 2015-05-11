@@ -150,7 +150,13 @@ var QuickValuesVisualization = React.createClass({
             pieChartClassName = 'hidden';
         }
 
-        var dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
+        var dataTableClassName;
+
+        if (this.props.config.show_data_table) {
+            dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
+        } else {
+            dataTableClassName = 'hidden';
+        }
 
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
