@@ -34,10 +34,10 @@ var MessageTableEntry = React.createClass({
                 });
                 return <span>{chunks}</span>;
             } else {
-                return origValue;
+                return origValue.toString();
             }
         } else {
-            return origValue;
+            return origValue.toString();
         }
     },
     render() {
