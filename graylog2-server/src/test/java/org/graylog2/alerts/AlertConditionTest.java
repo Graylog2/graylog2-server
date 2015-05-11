@@ -18,6 +18,7 @@ package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.alerts.types.FieldStringValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
@@ -73,6 +74,16 @@ public abstract class AlertConditionTest {
                                                                            @Assisted("userid") String creatorUserId,
                                                                            Map<String, Object> parameters) {
                         return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
+                    }
+                },
+                new FieldStringValueAlertCondition.Factory() {
+                    @Override
+                    public FieldStringValueAlertCondition createAlertCondition(Stream stream,
+                                                                           String id,
+                                                                           DateTime createdAt,
+                                                                           @Assisted("userid") String creatorUserId,
+                                                                           Map<String, Object> parameters) {
+                        return new FieldStringValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters);
                     }
                 });
 

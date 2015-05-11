@@ -28,6 +28,7 @@ import org.elasticsearch.node.Node;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
+import org.graylog2.alerts.types.FieldStringValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.bindings.providers.BundleExporterProvider;
@@ -137,6 +138,7 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
         install(new FactoryModuleBuilder().build(FieldValueAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(MessageCountAlertCondition.Factory.class));
+        install(new FactoryModuleBuilder().build(FieldStringValueAlertCondition.Factory.class));
     }
 
     private void bindSingletons() {

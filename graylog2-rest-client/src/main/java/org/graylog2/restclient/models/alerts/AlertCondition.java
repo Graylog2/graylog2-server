@@ -37,7 +37,8 @@ public class AlertCondition {
 
     public enum Type {
         MESSAGE_COUNT,
-        FIELD_VALUE
+        FIELD_VALUE,
+        FIELD_STRING_VALUE
     }
 
     private final String id;
@@ -87,6 +88,8 @@ public class AlertCondition {
                 return "Message count condition";
             case FIELD_VALUE:
                 return "Field value condition";
+            case FIELD_STRING_VALUE:
+                return "Field string value condition";
         }
 
         throw new RuntimeException("Cannot build summary for unknown alert condition type [" + type + "]");
@@ -106,6 +109,9 @@ public class AlertCondition {
             case FIELD_VALUE:
                 sb.append(buildFieldValueDescription());
                 break;
+            case FIELD_STRING_VALUE:
+                sb.append(buildFieldStringValueDescription());
+                break;
             default:
                 throw new RuntimeException("Cannot build description for unknown alert condition type [" + type + "]");
         }
@@ -114,6 +120,10 @@ public class AlertCondition {
         sb.append(buildBacklogDescription(backlog));
 
         return sb.toString();
+    }
+
+    private String buildFieldStringValueDescription() {
+        return "TODO: you better add description in org.graylog2.restclient.models.alerts.AlertCondition#buildFieldStringValueDescription";
     }
 
     private String buildBacklogDescription(int backlog) {
