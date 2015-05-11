@@ -130,34 +130,6 @@ $(document).ready(function() {
         });
     }
 
-    function configuration(widgetType, element, callback) {
-        var funcName = "configureDialog_" + widgetType;
-        var func = window[funcName];
-        if (func) {
-            func(callback, element);
-        } else {
-            var description = prompt("Give the widget a title:");
-            if (description != null && description != "") {
-                callback(description);
-            }
-        }
-    }
-
-    $(document).on("click", "ul.dashboard-selector li a[data-dashboard-id]", function () {
-        var elem = $(this).closest("ul.dashboard-selector");
-        var widgetType = elem.attr("data-widget-type");
-        var dashboardId = $(this).attr("data-dashboard-id");
-        configuration(widgetType, elem, createDashboard);
-        function createDashboard(description) {
-            delegateAddToDashboard(
-                widgetType,
-                dashboardId,
-                description,
-                elem
-            );
-        }
-    });
-
     if (dashboard.length > 0) {
         dashboard.on("delete.graylog.widget", function (event, details) {
             var dashboardId = $(".dashboard .gridster").data("dashboard-id");
@@ -176,11 +148,6 @@ $(document).ready(function() {
                 }
             });
         });
-    }
-
-    function delegateAddToDashboard(widgetType, dashboardId, description, elem) {
-        var funcName = "addWidget_" + widgetType;
-        window[funcName](dashboardId, description, elem);
     }
 
     var updateInBackground = function() {
@@ -255,21 +222,3 @@ $(document).ready(function() {
         lockDashboard();
     }
 });
-
-function addWidget(dashboardId, description, params) {
-    if (description !== undefined && description !== "") {
-        params.description = description;
-    }
-
-    $.ajax({
-        url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets'),
-        type: 'POST',
-        data: params,
-        success: function() {
-            showSuccess("Widget added to dashboard!")
-        },
-        error: function(data) {
-            showError("Could not add widget to dashboard.");
-        }
-    });
-}
