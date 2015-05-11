@@ -40,25 +40,25 @@ var StreamControls = React.createClass({
         var menuItems = [];
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
-            menuItems.push(<MenuItem><a onClick={this._onEdit}>Edit stream</a></MenuItem>);
-            menuItems.push(<MenuItem className={stream.stream_rules.length > 0 ? "" : "disabled"}>
+            menuItems.push(<MenuItem key={"editStreams-" + stream.id}><a onClick={this._onEdit}>Edit stream</a></MenuItem>);
+            menuItems.push(<MenuItem  key={"quickAddRule-" + stream.id}className={stream.stream_rules.length > 0 ? "" : "disabled"}>
                 <a href="#" data-stream-id={stream.id} className="show-stream-rule">Quick add rule</a>
             </MenuItem>);
         }
 
         if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
             if (stream.disabled) {
-                menuItems.push(<MenuItem><a onClick={this._onResume}>Start this stream</a></MenuItem>);
+                menuItems.push(<MenuItem key={"startStream-" + stream.id}><a onClick={this._onResume}>Start this stream</a></MenuItem>);
             } else {
-                menuItems.push(<MenuItem><a onClick={this._onPause}>Stop this stream</a></MenuItem>);
+                menuItems.push(<MenuItem key={"stopStream-" + stream.id}><a onClick={this._onPause}>Stop this stream</a></MenuItem>);
             }
         }
 
         if (this.isPermitted(permissions, ["streams:create", "streams:read:" + stream.id])) {
-            menuItems.push(<MenuItem><a onClick={this._onClone}>Clone this stream</a></MenuItem>);
+            menuItems.push(<MenuItem key={"cloneStream-" + stream.id}><a onClick={this._onClone}>Clone this stream</a></MenuItem>);
         }
 
-        menuItems.push(<MenuItem className={user.is_readonly ? "disabled" : ""}>
+        menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={user.is_readonly ? "disabled" : ""}>
             <a href={jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>Set as startpage</a>
         </MenuItem>);
 

@@ -20,24 +20,22 @@ var Stream = React.createClass({
     render() {
         var stream = this.props.stream;
         var permissions = this.props.permissions;
-        // @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        var editRulesLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : "");
-        // @if(isPermitted(STREAMS_EDIT, stream.getId) && isPermitted(STREAM_OUTPUTS_READ)) {
+        var editRulesLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : null);
+
+        var manageOutputsLink = null;
+        var manageAlertsLink = null;
         if (this.isPermitted(permissions, ['streams:edit:'+stream.id, 'stream_outputs:read'])) {
-            var manageOutputsLink = <a href={jsRoutes.controllers.StreamOutputsController.index(stream.id).url}
+            manageOutputsLink = <a href={jsRoutes.controllers.StreamOutputsController.index(stream.id).url}
                                        className="btn btn-info">Manage outputs</a>;
-            var manageAlertsLink = <a href={jsRoutes.controllers.AlertsController.index(stream.id).url}
+            manageAlertsLink = <a href={jsRoutes.controllers.AlertsController.index(stream.id).url}
                                       className="btn btn-info">Manage alerts</a>;
-        } else {
-            var manageOutputsLink = "";
-            var manageAlertsLink = "";
         }
-        // @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+
         var deleteStreamLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a className="btn btn-danger" onClick={this._handleDelete}>
             <i className="fa fa-trash"></i>
-        </a> : "");
+        </a> : null);
 
-        var createdFromContentPack = (stream.content_pack ? <i className="fa fa-cube" title="Created from content pack"></i> : "");
+        var createdFromContentPack = (stream.content_pack ? <i className="fa fa-cube" title="Created from content pack"></i> : null);
 
         return (
             <li className="stream">

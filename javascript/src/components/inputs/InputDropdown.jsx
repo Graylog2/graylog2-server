@@ -24,8 +24,7 @@ var InputDropdown = React.createClass({
         } else {
             this.setState({inputs: this.props.inputs});
         }
-    }
-    ,
+    },
     _formatInput(input) {
         return <option key={input.id} value={input.id}>{input.title} ({input.type})</option>;
     },
