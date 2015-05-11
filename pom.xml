@@ -637,9 +637,9 @@
                 <version>${sigar.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.thekraken</groupId>
+                <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>grok</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-graylog</version>
             </dependency>
             <dependency>
                 <groupId>com.wordnik</groupId>

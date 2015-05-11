@@ -270,7 +270,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.thekraken</groupId>
+            <groupId>org.graylog2.repackaged</groupId>
             <artifactId>grok</artifactId>
         </dependency>
         <dependency>
