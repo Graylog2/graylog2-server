@@ -3,30 +3,42 @@
         node: org.graylog2.restclient.models.Node,
         input: org.graylog2.restclient.models.Input)
 
-@main("Import extractors", views.html.system.sidebar(), "", currentUser) {
+@main("Import extractors", null, "", currentUser, false, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row">
-        <h1>
-            <i class="fa fa-cloud-download"></i>
-            Import extractors to input <em>@input.getTitle</em>
-        </h1>
+        <div class="col-md-12">
+            <div class="row content content-head">
+                <div class="col-md-12">
+                    <h1>
+                        <i class="fa fa-cloud-download"></i>
+                        Import extractors to input <em>@input.getTitle</em>
+                    </h1>
 
-        Exported extractors can be imported to an input. All you need is the JSON export of extractors from any other
-        Graylog setup or from the extractor directory on
-        <a href="https://www.graylog.org/resources/data-sources/" target="_blank">the Graylog website</a>.
-    </div>
+                    <p>
+                        Exported extractors can be imported to an input. All you need is the JSON export of extractors from any other
+                        Graylog setup or from the extractor directory on
+                        <a href="https://www.graylog.org/resources/data-sources/" target="_blank">the Graylog website</a>.
+                    </p>
+                </div>
+            </div>
 
-    <form action="@routes.ExtractorsController.importExtractors(node.getNodeId, input.getId)" method="POST">
-        <div class="row">
-            <textarea class="extractor-json" name="extractors"></textarea>
+            <div class="row content">
+                <div class="col-md-12">
+                    <form action="@routes.ExtractorsController.importExtractors(node.getNodeId, input.getId)" method="POST">
+                        <div class="form-group">
+                            <label for="extractor-json-field">Extractor JSON</label>
+                            <textarea rows="30" id="extractor-json-field" class="form-control extractor-json" name="extractors"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success" data-confirm="Really add all extractors to this input?">
+                            <i class="fa fa-cloud-download"></i>
+                            Add extractors to input
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-success" data-confirm="Really add all extractors to this input?">
-            <i class="fa fa-cloud-download"></i>
-            Add extractors to input
-        </button>
-    </form>
-
+    </div>
 }

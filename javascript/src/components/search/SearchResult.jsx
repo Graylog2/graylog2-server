@@ -7,6 +7,7 @@ var SearchSidebar = require('./SearchSidebar');
 var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
 var FieldGraphs = require('./FieldGraphs');
+var FieldStatistics = require('./FieldStatistics');
 var Immutable = require('immutable');
 
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
@@ -72,6 +73,9 @@ var SearchResult = React.createClass({
     addFieldGraph(field) {
         this.refs.fieldGraphsComponent.addFieldGraph(field);
     },
+    addFieldStatistics(field) {
+        this.refs.fieldStatisticsComponent.addFieldStatistics(field);
+    },
 
     componentDidMount() {
         this._updateWidth();
@@ -113,6 +117,7 @@ var SearchResult = React.createClass({
                                        togglePageFields={this.togglePageFields}
                                        onFieldToggled={this.onFieldToggled}
                                        onFieldSelectedForGraph={this.addFieldGraph}
+                                       onFieldSelectedForStats={this.addFieldStatistics}
                                        predefinedFieldSelection={this.predefinedFieldSelection}
                                        showHighlightToggle={anyHighlightRanges}
                                        shouldHighlight={this.state.shouldHighlight}
@@ -121,6 +126,9 @@ var SearchResult = React.createClass({
                     </div>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
+                    <FieldStatistics ref='fieldStatisticsComponent'
+                                     dashboards={this.state.dashboards}/>
+
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                                      histogram={this.props.histogram}
                                      dashboards={this.state.dashboards}/>

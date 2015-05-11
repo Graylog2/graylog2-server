@@ -299,7 +299,7 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
-                    showError("Could not load field graph for '" + opts.field + "'.");
+                    showError("Loading field graph for '" + opts.field + "' failed with status: " + data.status);
                 }
             },
             statusCode: {

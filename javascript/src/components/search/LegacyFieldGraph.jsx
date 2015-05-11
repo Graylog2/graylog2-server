@@ -9,7 +9,7 @@ var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 var Widget = require('../widgets/Widget');
 
 var SearchStore = require('../../stores/search/SearchStore');
-var FieldGraphsStore = require('../../stores/field-graphs/FieldGraphsStore');
+var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 
 var LegacyFieldGraph = React.createClass({
     componentDidMount() {
@@ -91,7 +91,7 @@ var LegacyFieldGraph = React.createClass({
                             </li>
 
                             <MenuItem divider={true}/>
-                            <MenuItem onSelect={this.props.onDelete}>Delete graph</MenuItem>
+                            <MenuItem onSelect={this.props.onDelete}>Dismiss</MenuItem>
                         </DropdownButton>
                     </AddToDashboardMenu>
 
