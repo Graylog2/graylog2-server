@@ -259,6 +259,7 @@ POST        /a/streams/:stream_id/cloneStream                                   
 GET         /a/streams/:stream_id/rules                                              @controllers.api.StreamRulesApiController.list(stream_id: String)
 GET         /a/streams/:stream_id/rules/types                                        @controllers.api.StreamRulesApiController.types(stream_id: String)
 PUT         /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.update(stream_id: String, streamrule_id: String)
+DELETE      /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.delete(stream_id: String, streamrule_id: String)
 
 # API: Alerts
 GET           /a/streams/alerts/allowed                                                          @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)

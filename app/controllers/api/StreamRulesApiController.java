@@ -54,4 +54,9 @@ public class StreamRulesApiController extends AuthenticatedController {
         streamRuleService.update(streamId, streamRuleId, request);
         return ok();
     }
+
+    public Result delete(String streamId, String streamRuleId) throws APIException, IOException {
+        streamRuleService.delete(streamId, streamRuleId);
+        return ok();
+    }
 }

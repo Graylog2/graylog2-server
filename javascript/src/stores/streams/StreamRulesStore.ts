@@ -51,6 +51,18 @@ var StreamRulesStore = {
             contentType: "application/json",
             data: JSON.stringify(request)
         }).done(callback).fail(failCallback);
+    },
+    remove(streamId: string, streamRuleId: string, callback: (() => void)) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Deleting Stream Rule failed with status: " + errorThrown,
+                "Could not delete Stream Rule!");
+        };
+
+        var url = jsRoutes.controllers.api.StreamRulesApiController.delete(streamId, streamRuleId).url;
+        $.ajax({
+            type: "DELETE",
+            url: url
+        }).done(callback).fail(failCallback);
     }
 };
 
