@@ -56,7 +56,7 @@ class StreamRulesStore {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(request)
-        }).done(callback).done(this._emitChange()).fail(failCallback);
+        }).done(callback).done(this._emitChange.bind(this)()).fail(failCallback);
     }
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -68,7 +68,7 @@ class StreamRulesStore {
         $.ajax({
             type: "DELETE",
             url: url
-        }).done(callback).done(this._emitChange()).fail(failCallback);
+        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
     }
     create(streamId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -83,7 +83,7 @@ class StreamRulesStore {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(data)
-        }).done(callback).done(this._emitChange()).fail(failCallback);
+        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
     }
     onChange(callback) {
         this.callbacks.push(callback);
