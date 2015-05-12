@@ -35,11 +35,14 @@ import com.google.common.net.MediaType;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
+import com.ning.http.client.listener.TransferCompletionHandler;
+import com.ning.http.client.listener.TransferListener;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
@@ -55,11 +58,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -723,6 +728,84 @@ class ApiClientImpl implements ApiClient {
                 // TODO handle this properly
                 LOG.error("Could not build target URL", e);
                 throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public InputStream executeStreaming() throws APIException, IOException {
+            if (radio != null && (node != null || nodes != null)) {
+                throw new RuntimeException("You set both and a Node and a Radio as target. This is not possible.");
+            }
+
+            final ClusterEntity target;
+
+            if (radio == null) {
+                if (node == null) {
+                    if (nodes != null) {
+                        LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
+                    }
+                    node(serverNodes.any());
+                }
+
+                target = node;
+            } else {
+                target = radio;
+            }
+
+            ensureAuthentication();
+            final URL url = prepareUrl(target);
+            final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
+            requestBuilder.addHeader(HttpHeaders.ACCEPT, mediaType.toString());
+
+            final Request request = requestBuilder.build();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("API Request: {}", request.toString());
+            }
+
+            // Set 200 OK as standard if not defined.
+            ensureExpectedResponseCodes();
+
+            try {
+                final AsyncByteBufferInputStream stream = new AsyncByteBufferInputStream();
+                requestBuilder.execute(new TransferCompletionHandler().addTransferListener(new TransferListener() {
+                    @Override
+                    public void onRequestHeadersSent(FluentCaseInsensitiveStringsMap headers) {
+                    }
+
+                    @Override
+                    public void onResponseHeadersReceived(FluentCaseInsensitiveStringsMap headers) {
+                        target.touch();
+                    }
+
+                    @Override
+                    public void onBytesReceived(ByteBuffer buffer) throws IOException {
+                        stream.putBuffer(buffer);
+                    }
+
+                    @Override
+                    public void onBytesSent(ByteBuffer buffer) {
+
+                    }
+
+                    @Override
+                    public void onRequestResponseCompleted() {
+                        stream.setDone(true);
+                    }
+
+                    @Override
+                    public void onThrowable(Throwable t) {
+                        stream.setFailed(t);
+                    }
+                }));
+                return stream;
+            } catch (MalformedURLException e) {
+                LOG.error("Malformed URL", e);
+                throw new RuntimeException("Malformed URL.", e);
+            } catch (IOException e) {
+                // TODO
+                LOG.error("unhandled IOException", rootCause(e));
+                target.markFailure();
+                throw e;
             }
         }
     }
