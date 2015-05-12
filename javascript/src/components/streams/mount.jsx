@@ -16,7 +16,8 @@ if (streamThroughput) {
 
 $(".react-stream-component").each(function() {
     var permissions = JSON.parse(this.getAttribute('data-permissions'));
-    var component = <StreamComponent permissions={permissions} />;
+    var username = this.getAttribute('data-user-name');
+    var component = <StreamComponent permissions={permissions} username={username}/>;
 
     React.render(component, this);
 });

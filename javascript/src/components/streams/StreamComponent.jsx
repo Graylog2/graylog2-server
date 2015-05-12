@@ -67,7 +67,7 @@ var StreamComponent = React.createClass({
                     <div className="row content">
                         <div className="col-md-12">
                             <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
-                                        permissions={this.props.permissions}/>
+                                        permissions={this.props.permissions} username={this.props.username}/>
                         </div>
                     </div>
                 </div>
