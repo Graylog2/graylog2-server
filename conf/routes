@@ -92,7 +92,7 @@ GET           /system/contentpacks/export                                       
 POST          /system/contentpacks/export                                                        @controllers.BundlesController.export()
 GET           /system/grokpatterns                                                               @controllers.GrokPatternsController.index()
 POST          /system/grokpatterns/import                                                        @controllers.GrokPatternsController.upload()
-GET           /system/agents                                                                     @controllers.AgentsController.index()
+GET           /system/collectors                                                                 @controllers.CollectorsController.index()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
@@ -288,8 +288,8 @@ POST        /a/streams/:stream_id/alarmcallbacks                                
 DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
 PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
-# API: Agents
-GET           /a/system/agents                                                                   @controllers.api.AgentsApiController.index()
+# API: Collectors
+GET           /a/system/collectors                                                               @controllers.api.CollectorsApiController.index()
 
 GET           /robots.txt                                                                        controllers.Assets.at(path="/public", file="robots.txt")
 

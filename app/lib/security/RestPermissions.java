@@ -94,7 +94,7 @@ public enum RestPermissions {
     THREADS_DUMP("threads:dump"),
     LBSTATUS_CHANGE("lbstatus:change"),
     NODE_SHUTDOWN("node:shutdown"),
-    AGENTS_READ("agents:read");
+    COLLECTORS_READ("collectors:read");
 
     private final String permission;
 
