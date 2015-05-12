@@ -112,7 +112,7 @@ public class RestPermissions {
     public static final String BUNDLE_EXPORT = "bundle:export";
     public static final String JOURNAL_READ = "journal:read";
     public static final String JOURNAL_EDIT = "journal:edit";
-    public static final String AGENTS_READ = "agents:read";
+    public static final String COLLECTORS_READ = "collectors:read";
 
     private static Map<String, Collection<String>> allPermissions;
 
