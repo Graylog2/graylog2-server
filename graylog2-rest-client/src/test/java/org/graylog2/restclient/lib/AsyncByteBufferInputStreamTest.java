@@ -82,13 +82,9 @@ public class AsyncByteBufferInputStreamTest {
             @Override
             public void run() {
                 for (int i = 0; i < 10; i++) {
-                    try {
-                        stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
-                        stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
-                        System.out.println("Wrote buffers step " + i);
-                    } catch (InterruptedException ignored) {
-
-                    }
+                    stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
+                    stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
+                    System.out.println("Wrote buffers step " + i);
                     sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
                 }
                 stream.setDone(true);
@@ -127,13 +123,9 @@ public class AsyncByteBufferInputStreamTest {
             @Override
             public void run() {
                 for (int i = 0; i < 10; i++) {
-                    try {
-                        stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
-                        stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
-                        System.out.println("Wrote buffers step " + i);
-                    } catch (InterruptedException ignored) {
-
-                    }
+                    stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
+                    stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
+                    System.out.println("Wrote buffers step " + i);
                     sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
                     if (i == 3) {
                         stream.setFailed(new Throwable());
