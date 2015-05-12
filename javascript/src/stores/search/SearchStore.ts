@@ -22,6 +22,7 @@ class SearchStore {
     private _page: number;
     private _resolution: string;
     private _fields: Immutable.Set<string>;
+    savedSearch: string;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
@@ -34,6 +35,7 @@ class SearchStore {
         this.rangeParams = this.originalSearch.get('rangeParams');
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
+        this.savedSearch = this.originalSearch.get('saved');
 
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
@@ -134,6 +136,11 @@ class SearchStore {
         originalSearch = originalSearch.set('resolution', parsedSearch.get('interval'));
         originalSearch = originalSearch.set('page', Math.max(parsedSearch.get('page', 1), 1));
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
+
+        if (parsedSearch.get('saved') !== undefined) {
+            originalSearch = originalSearch.set('saved', parsedSearch.get('saved'));
+        }
+
         var rangeParams;
 
         switch (originalSearch.get('rangeType')) {
@@ -222,27 +229,31 @@ class SearchStore {
 
     // Get initial search params with the current selected fields
     getOriginalSearchParamsWithFields(): Immutable.Map<string,any> {
-        var orignalParams = Immutable.Map<string, any>();
-        orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
-        orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
-        orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
-        orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
-        orignalParams = orignalParams.set('fields', this.fields.join(','));
+        var originalParams = Immutable.Map<string, any>();
+        originalParams = originalParams.set('range_type', this.originalSearch.get('rangeType'));
+        originalParams = originalParams.merge(this.originalSearch.get('rangeParams'));
+        originalParams = originalParams.set('query', this.originalSearch.get('query'));
+        originalParams = originalParams.set('interval', this.originalSearch.get('resolution'));
+        originalParams = originalParams.set('fields', this.fields.join(','));
 
-        return orignalParams;
+        return originalParams;
     }
 
     // Get initial search params, with the names used in a search URL request
     getOriginalSearchURLParams(): Immutable.Map<string, any> {
-        var simplifiedParams = Immutable.Map<string, any>();
-        simplifiedParams = simplifiedParams.set('rangetype', this.originalSearch.get('rangeType'));
-        simplifiedParams = simplifiedParams.merge(this.originalSearch.get('rangeParams'));
-        simplifiedParams = simplifiedParams.set('q', this.originalSearch.get('query'));
-        simplifiedParams = simplifiedParams.set('interval', this.originalSearch.get('resolution'));
-        simplifiedParams = simplifiedParams.set('page', this.originalSearch.get('page'));
-        simplifiedParams = simplifiedParams.set('fields', this.fields.join(','));
+        var originalURLParams = Immutable.Map<string, any>();
+        originalURLParams = originalURLParams.set('rangetype', this.originalSearch.get('rangeType'));
+        originalURLParams = originalURLParams.merge(this.originalSearch.get('rangeParams'));
+        originalURLParams = originalURLParams.set('q', this.originalSearch.get('query'));
+        originalURLParams = originalURLParams.set('interval', this.originalSearch.get('resolution'));
+        originalURLParams = originalURLParams.set('page', this.originalSearch.get('page'));
+        originalURLParams = originalURLParams.set('fields', this.fields.join(','));
 
-        return simplifiedParams;
+        if (this.originalSearch.has('saved')) {
+            originalURLParams = originalURLParams.set('saved', this.originalSearch.get('saved'));
+        }
+
+        return originalURLParams;
     }
 
     _reloadSearchWithNewParam(param: string, value: any) {

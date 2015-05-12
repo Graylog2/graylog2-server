@@ -120,7 +120,7 @@ var SearchSidebar = React.createClass({
                                         widgetType={Widget.Type.SEARCH_RESULT_COUNT}
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
-                    <SavedSearchControls/>
+                    <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
                 </div>
 
                 <hr />

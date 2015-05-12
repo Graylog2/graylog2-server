@@ -128,6 +128,7 @@ var SearchResult = React.createClass({
                                        showHighlightToggle={anyHighlightRanges}
                                        shouldHighlight={this.state.shouldHighlight}
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
+                                       currentSavedSearch={SearchStore.savedSearch}
                                        dashboards={this.state.dashboards}/>
                     </div>
                 </div>
