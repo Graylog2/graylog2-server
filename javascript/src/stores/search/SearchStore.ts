@@ -132,7 +132,7 @@ class SearchStore {
         var originalSearch = Immutable.Map<string, any>();
         originalSearch = originalSearch.set('query', parsedSearch.get('q', ''));
         originalSearch = originalSearch.set('resolution', parsedSearch.get('interval'));
-        originalSearch = originalSearch.set('page', parsedSearch.get('page', 1));
+        originalSearch = originalSearch.set('page', Math.max(parsedSearch.get('page', 1), 1));
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
         var rangeParams;
 
