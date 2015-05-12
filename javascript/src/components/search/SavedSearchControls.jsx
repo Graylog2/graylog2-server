@@ -16,8 +16,19 @@ var SavedSearchControls = React.createClass({
             title: ""
         };
     },
+    componentDidMount() {
+        if (this._isSearchSaved()) {
+            SavedSearchesStore.addOnSavedSearchesChangedListener(this._updateTitle);
+        }
+    },
     _isSearchSaved() {
         return this.props.currentSavedSearch !== undefined;
+    },
+    _updateTitle(newSavedSearches) {
+        var currentSavedSearch = SavedSearchesStore.getSavedSearch(this.props.currentSavedSearch);
+        if (currentSavedSearch !== undefined) {
+            this.setState({title: currentSavedSearch.title});
+        }
     },
     _openModal() {
         this.refs['saveSearchModal'].open();
@@ -28,6 +39,12 @@ var SavedSearchControls = React.createClass({
     _save() {
         var promise = SavedSearchesStore.create(this.refs.title.getValue());
         promise.done(() => this._hide());
+    },
+    _deleteSavedSearch(e) {
+        e.preventDefault();
+        if (window.confirm('Do you really want to delete this saved search?')) {
+            SavedSearchesStore.delete(this.props.currentSavedSearch);
+        }
     },
     _getNewSavedSearchButtons() {
         return <Button bsStyle='success' bsSize='small' onClick={this._openModal}>Save search criteria</Button>;

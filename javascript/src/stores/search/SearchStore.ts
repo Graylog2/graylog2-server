@@ -41,6 +41,7 @@ class SearchStore {
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
         $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
         $(document).on('execute.graylog.search', this._submitSearch.bind(this));
+        $(document).on('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     initializeFieldsFromHash() {
@@ -184,6 +185,12 @@ class SearchStore {
     _submitSearch(event) {
         if (this.onSubmitSearch !== undefined) {
             this.onSubmitSearch();
+        }
+    }
+
+    _savedSearchDeleted(event, data) {
+        if (data.savedSearchId === this.savedSearch) {
+            this._submitSearch(event);
         }
     }
 

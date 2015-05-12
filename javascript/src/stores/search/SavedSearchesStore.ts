@@ -86,9 +86,32 @@ class SavedSearchesStore {
         return promise;
     }
 
+    getSavedSearch(searchId: string): SavedSearch {
+        return this.savedSearches.find((savedSearch) => savedSearch.id === searchId);
+    }
+
     execute(searchId: string, streamId?: string, width?: string) {
         var url = jsRoutes.controllers.SavedSearchesController.execute(searchId, streamId, width).url;
         URLUtils.openLink(url, false);
+    }
+
+    delete(searchId: string): JQueryPromise<string[]> {
+        var url = jsRoutes.controllers.SavedSearchesController.delete(searchId).url;
+        var promise = $.ajax({
+            type: 'DELETE',
+            url: url
+        });
+
+        promise.done(() => {
+            UserNotification.success("Saved search '" + this.savedSearches[searchId] + "' was deleted successfully.");
+            $(document).trigger('deleted.graylog.saved-search', {savedSearchId: searchId});
+        });
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Deleting saved search '" + this.savedSearches[searchId] + "' failed with status: " + errorThrown,
+                "Could not delete saved search");
+        });
+
+        return promise;
     }
 }
 
