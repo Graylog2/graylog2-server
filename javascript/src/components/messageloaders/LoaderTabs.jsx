@@ -37,18 +37,30 @@ var LoaderTabs = React.createClass({
     },
     componentDidMount() {
         this.loadData();
+        var messageId = this.props.messageId;
+        var index = this.props.index;
+        if (messageId && index) {
+            this.refs.messageLoader.submit(messageId, index);
+        }
     },
     render() {
         var displayMessage = (this.state.message && this.state.inputs ?
             <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={this.state.nodes}/> : "");
+        var defaultActiveKey;
+        if (this.props.messageId && this.props.index) {
+            defaultActiveKey = 2;
+        } else {
+            defaultActiveKey = 1;
+        }
         return (
             <div>
-                <TabbedArea defaultActiveKey={1}>
+                <TabbedArea defaultActiveKey={defaultActiveKey}>
                     <TabPane eventKey={1} tab='Recent'>
                         <RecentMessageLoader onMessageLoaded={this.onMessageLoaded}/>
                     </TabPane>
                     <TabPane eventKey={2} tab='Manual'>
-                        <MessageLoader onMessageLoaded={this.onMessageLoaded} hidden={false}/>
+                        Please provide the id and index of the message that you want to load in this form:
+                        <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText={true}/>
                     </TabPane>
                 </TabbedArea>
                 {displayMessage}

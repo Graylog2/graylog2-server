@@ -34,13 +34,23 @@ var MessageLoader = React.createClass({
 
         e.preventDefault();
     },
+    submit(messageId, index) {
+        this.refs.messageId.getDOMNode().value = messageId;
+        this.refs.index.getDOMNode().value = index;
+        this.refs.submitButton.getDOMNode().click();
+    },
     render() {
+        var explanatoryText = (this.props.hideText ? null :
+            <p>
+                Wrong example? You can <button className="btn btn-link btn-small btn-text" onClick={this.toggleMessageForm}>load another message</button>.
+            </p>
+        );
         var loadMessageForm = (
             <div>
                 <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
                     <input type="text" ref="messageId" className="input-xlarge" placeholder="Message ID" required/>
                     <input type="text" ref="index" className="input-medium" placeholder="Index" required/>
-                    <button type="submit" className="btn">
+                    <button ref="submitButton" type="submit" className="btn">
                         Load a message
                     </button>
                 </form>
@@ -49,9 +59,7 @@ var MessageLoader = React.createClass({
         );
         return (
             <div className="message-loader">
-                <p>
-                    Wrong example? You can <button className="btn btn-link btn-small btn-text" onClick={this.toggleMessageForm}>load another message</button>.
-                </p>
+                {explanatoryText}
                 {this.state.hidden ? null : loadMessageForm}
             </div>
         );

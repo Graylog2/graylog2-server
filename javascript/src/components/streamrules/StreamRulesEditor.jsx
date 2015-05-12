@@ -74,7 +74,7 @@ var StreamRulesEditor = React.createClass({
                             1. Load a message to test rules
                         </h2>
 
-                        <LoaderTabs onMessageLoaded={this.onMessageLoaded}/>
+                        <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded}/>
 
                         <div className="spinner" style={{display: "none"}}><h2><i
                             className='fa fa-spinner fa-spin'></i> &nbsp;Loading message</h2></div>
