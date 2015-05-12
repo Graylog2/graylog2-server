@@ -433,8 +433,10 @@ public class DashboardsApiController extends AuthenticatedController {
                         widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
                         break;
                     case QUICKVALUES:
+                        final Boolean showPieChart = request.config().containsKey("show_pie_chart") && request.config().get("show_pie_chart").equals(true);
+                        final Boolean showDataTable = request.config().containsKey("show_data_table") && request.config().get("show_data_table").equals(true);
                         if (!canReadStream(streamId)) return unauthorized();
-                        widget = new QuickvaluesWidget(dashboard, query, timerange, (String) request.config().get("field"), description, streamId);
+                        widget = new QuickvaluesWidget(dashboard, query, timerange, (String) request.config().get("field"), description, showPieChart, showDataTable, streamId);
                         break;
                     case SEARCH_RESULT_CHART:
                         if (!canReadStream(streamId)) return unauthorized();

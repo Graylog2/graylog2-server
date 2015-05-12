@@ -1,14 +1,14 @@
 @(stream: org.graylog2.restclient.models.Stream, conditionDecorator: views.helpers.FieldValueAlertConditionDecorator)
 
 <form action="@conditionDecorator.getFormAction(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value" id="@conditionDecorator.getFormId">
-    <div class="well well-small">
-        <h2 style="margin-bottom: 10px;">
-            <i class="fa fa-bell"></i>
-            @conditionDecorator.getFormTitle
-        </h2>
+    <h2 style="margin-bottom: 10px;">
+        <i class="fa fa-bell"></i>
+        @conditionDecorator.getFormTitle
+    </h2>
 
+    <div class="form-inline">
         Trigger alert when the field
-        <input name="field" type="text" class="input-large typeahead-fields" autocomplete="off" required value="@conditionDecorator.getField"/>
+        <input name="field" type="text" class="form-control typeahead-fields" autocomplete="off" required value="@conditionDecorator.getField"/>
 
         <br />
         has a
@@ -19,11 +19,11 @@
         @Html(conditionDecorator.getThresholdTypesHtml)
         than
 
-        <input name="threshold" type="text" class="input-small validatable" data-validate="number" value="@conditionDecorator.getThreshold" />
+        <input name="threshold" type="text" class="form-control validatable" data-validate="number" value="@conditionDecorator.getThreshold" />
 
         in the last
 
-        <input name="time" type="number" class="input-mini pluralsingular validatable" data-pluralsingular="time-descr" data-validate="positive_number" value="@conditionDecorator.getTime" />
+        <input name="time" type="number" class="form-control pluralsingular validatable" data-pluralsingular="time-descr" data-validate="positive_number" value="@conditionDecorator.getTime" />
         <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
 

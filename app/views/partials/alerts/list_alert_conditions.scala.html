@@ -18,11 +18,17 @@
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;
-                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
-                        <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">Delete</button>
-                    </form>
+                    <a href="#" class="btn btn-success btn-xs edit-alert-condition">
+                        <i class="fa fa-edit"></i>
+                        Edit
+                    </a>
 
-                    <a href="#" class="btn btn-xs edit-alert-condition">Edit</a>
+                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
+                        <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">
+                            <i class="fa fa-remove"></i>
+                            Delete
+                        </button>
+                    </form>
                 }
                 </span>
 

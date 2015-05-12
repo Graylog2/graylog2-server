@@ -26,13 +26,13 @@ var WidgetCreationModal = React.createClass({
             var fieldsetChildren = this.refs['inputFieldset'].props.children;
             React.Children.forEach(fieldsetChildren, (child) => {
                 // We only care about children with refs, as all inputs have one
-                if (child.ref !== undefined) {
+                if (child.ref !== undefined && child.ref !== 'title') {
                     var input = this.refs[child.ref];
                     var value;
-                    if (typeof input.getValue === 'function') {
-                        value = input.getValue();
-                    } else if (typeof input.getChecked === 'function') {
+                    if (input.props.type === 'checkbox') {
                         value = input.getChecked();
+                    } else {
+                        value = input.getValue();
                     }
 
                     if (value !== undefined) {
@@ -72,6 +72,11 @@ var WidgetCreationModal = React.createClass({
                 title = "field statistical value";
                 break;
             case Widget.Type.QUICKVALUES:
+                if (this.props.configuration['field'] !== undefined) {
+                    title = this.props.configuration['field'] + " quick values";
+                } else {
+                    title = "field quick values";
+                }
                 break;
             case Widget.Type.FIELD_CHART:
                 if (this.props.configuration['field'] !== undefined && this.props.configuration['valuetype'] !== undefined) {
@@ -164,6 +169,15 @@ var WidgetCreationModal = React.createClass({
                            defaultChecked={false}
                            onChange={() => this._onConfigurationCheckboxChange("show_pie_chart")}
                            help="Include a pie chart representation of the data."/>
+                );
+                controls.push(
+                    <Input key="showDataTable"
+                           type="checkbox"
+                           ref="show_data_table"
+                           label="Show data table"
+                           defaultChecked={true}
+                           onChange={() => this._onConfigurationCheckboxChange("show_data_table")}
+                           help="Include a table with quantitative information."/>
                 );
                 break;
             default:

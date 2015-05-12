@@ -20,15 +20,20 @@ var AlarmCallback = React.createClass({
             <div className="node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
                 <span className="pull-right node-row-info">
                     Created by <UserLink username={alarmCallback.creator_user_id} />
+                    {' '}
                     <span title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
+                    {' '}
                     {editAlarmCallbackButton}
+                    {' '}
                     {deleteAlarmCallbackButton}
                 </span>
 
                 <h3>
                     <i className="fa fa-ellipsis-v"></i>
+                    {' '}
                     <span>{humanReadableType}</span>
                 </h3>
+                <br/>
 
                 <ConfigurationWell configuration={alarmCallback.configuration}/>
             </div>
