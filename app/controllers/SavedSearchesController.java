@@ -102,20 +102,25 @@ public class SavedSearchesController extends AuthenticatedController {
             fields = (String) searchQuery.get("fields");
         }
 
+        String interval = "";
+        if (searchQuery.containsKey("interval")) {
+            interval = (String) searchQuery.get("interval");
+        }
+
         String searchId = "";
         if (includeOriginal) {
             searchId = search.getId();
         }
 
         if (streamId == null || streamId.isEmpty()) {
-            return routes.SearchController.index(
-                    (String) search.getQuery().get("query"),
-                    (String) search.getQuery().get("rangeType"),
+            return routes.SearchControllerV2.index(
+                    (String) searchQuery.get("query"),
+                    (String) searchQuery.get("rangeType"),
                     relative,
                     from,
                     to,
                     keyword,
-                    "",
+                    interval,
                     0,
                     searchId,
                     "",
@@ -126,13 +131,13 @@ public class SavedSearchesController extends AuthenticatedController {
         } else {
             return routes.StreamSearchController.index(
                     streamId,
-                    (String) search.getQuery().get("query"),
-                    (String) search.getQuery().get("rangeType"),
+                    (String) searchQuery.get("query"),
+                    (String) searchQuery.get("rangeType"),
                     relative,
                     from,
                     to,
                     keyword,
-                    "",
+                    interval,
                     0,
                     searchId,
                     "",
