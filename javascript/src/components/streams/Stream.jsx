@@ -8,6 +8,7 @@ var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');
 var CollapsableStreamRuleList = require('../streamrules/CollapsableStreamRuleList');
 var PermissionsMixin = require('../../util/PermissionsMixin');
+var StreamsStore = require('../../stores/streams/StreamsStore');
 
 var Stream = React.createClass({
     mixins: [PermissionsMixin],
@@ -15,7 +16,26 @@ var Stream = React.createClass({
         return (stream.stream_rules.length > 0 ? stream.stream_rules.length + " configured stream rule(s)." : "no configured rules.");
     },
     _handleDelete() {
-        this.props.onDelete(this.props.stream);
+        this._onDelete(this.props.stream);
+    },
+    _onDelete(stream) {
+        if (window.confirm("Do you really want to remove this stream?")) {
+            StreamsStore.remove(stream.id, () => {});
+        }
+    },
+    _onResume(stream) {
+        StreamsStore.resume(stream.id, () => {});
+    },
+    _onUpdate(streamId, stream) {
+        StreamsStore.update(streamId, stream, () => {});
+    },
+    _onClone(streamId, stream) {
+        StreamsStore.cloneStream(streamId, stream, () => {});
+    },
+    _onPause(stream) {
+        if (window.confirm("Do you really want to pause stream \"" + stream.title + "\"?")) {
+            StreamsStore.pause(stream.id, () => {});
+        }
     },
     render() {
         var stream = this.props.stream;
@@ -52,8 +72,8 @@ var Stream = React.createClass({
                         {deleteStreamLink}
 
                         <StreamControls stream={stream} permissions={this.props.permissions}
-                                        onResume={this.props.onResume} onUpdate={this.props.onUpdate}
-                                        onPause={this.props.onPause} onClone={this.props.onClone}/>
+                                        onResume={this._onResume} onUpdate={this._onUpdate}
+                                        onPause={this._onPause} onClone={this._onClone} onQuickAdd={this._onQuickAdd}/>
                     </div>
                     <div className="stream-description">
                         {createdFromContentPack}

@@ -31,6 +31,9 @@ var StreamControls = React.createClass({
     _onCloneSubmit(streamId, stream) {
         this.props.onClone(this.props.stream.id, stream);
     },
+    _onQuickAdd() {
+        this.props.onQuickAdd(this.props.stream.id);
+    },
     render() {
         var permissions = this.props.permissions;
         var stream = this.props.stream;
@@ -42,7 +45,7 @@ var StreamControls = React.createClass({
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
             menuItems.push(<MenuItem key={"editStreams-" + stream.id}><a onClick={this._onEdit}>Edit stream</a></MenuItem>);
             menuItems.push(<MenuItem  key={"quickAddRule-" + stream.id}className={stream.stream_rules.length > 0 ? "" : "disabled"}>
-                <a href="#" data-stream-id={stream.id} className="show-stream-rule">Quick add rule</a>
+                <a href="#" onClick={this._onQuickAdd}>Quick add rule</a>
             </MenuItem>);
         }
 
