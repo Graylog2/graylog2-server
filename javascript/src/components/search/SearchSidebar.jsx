@@ -1,3 +1,4 @@
+/* global jsRoutes */
 'use strict';
 
 var React = require('react');
@@ -8,6 +9,7 @@ var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
 
 var Widget = require('../widgets/Widget');
+var SearchStore = require('../../stores/search/SearchStore');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 
 var numeral = require('numeral');
@@ -120,6 +122,7 @@ var SearchSidebar = React.createClass({
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
                     <a href="#" className="btn btn-success btn-sm">Save search criteria</a>
+                    <a href={SearchStore.getCsvExportURL()} className="btn btn-default btn-sm">Export as CSV</a>
                 </div>
 
                 <hr />

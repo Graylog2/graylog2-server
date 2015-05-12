@@ -67,6 +67,7 @@ import play.mvc.Result;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -423,10 +424,10 @@ public class SearchControllerV2 extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
-        final String s;
+        final InputStream stream;
         try {
             Set<String> selectedFields = getSelectedFields(fields);
-            s = search.searchAsCsv(selectedFields);
+            stream = search.searchAsCsv(selectedFields);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -434,10 +435,9 @@ public class SearchControllerV2 extends AuthenticatedController {
             return status(504, views.html.errors.error.render(message, e, request()));
         }
 
-        // TODO streaming the result
         response().setContentType(MediaType.CSV_UTF_8.toString());
         response().setHeader("Content-Disposition", "attachment; filename=graylog-searchresult.csv");
-        return ok(s);
+        return ok(stream);
     }
 
     protected List<Field> getAllFields() {

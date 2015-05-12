@@ -238,6 +238,13 @@ class SearchStore {
         searchURLParams = searchURLParams.set(param, value);
         URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
     }
+
+    getCsvExportURL(): string {
+        var searchURLParams = this.getOriginalSearchURLParams();
+        searchURLParams = searchURLParams.delete('page');
+        // function (q,filter,rangetype,relative,from,to,keyword,fields)
+        return jsRoutes.controllers.SearchControllerV2.exportAsCsv().url + "?" + Qs.stringify(searchURLParams.toJS());
+    }
 }
 
 var searchStore = new SearchStore();
