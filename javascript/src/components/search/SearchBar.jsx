@@ -5,6 +5,7 @@
 var $ = require('jquery');
 
 var React = require('react');
+var Immutable = require('immutable');
 var Input = require('react-bootstrap').Input;
 var Button = require('react-bootstrap').Button;
 var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
@@ -12,6 +13,7 @@ var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
 var SearchStore = require('../../stores/search/SearchStore');
+var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 
 var SearchBar = React.createClass({
     getInitialState() {
@@ -21,7 +23,9 @@ var SearchBar = React.createClass({
             rangeType: this.initialSearchParams.rangeType,
             rangeParams: this.initialSearchParams.rangeParams,
             query: this.initialSearchParams.query,
-            streamId: null
+            streamId: null,
+            savedSearch: SearchStore.savedSearch,
+            savedSearches: Immutable.List()
         };
     },
     componentDidMount() {
@@ -30,6 +34,7 @@ var SearchBar = React.createClass({
             this._prepareSearch();
             React.findDOMNode(this.refs.searchForm).submit();
         };
+        SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => this.setState({savedSearches: newSavedSearches}));
         this._initalizeDatepicker();
     },
     componentDidUpdate() {
@@ -119,6 +124,11 @@ var SearchBar = React.createClass({
 
         this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
     },
+    _savedSearchSelected() {
+        var selectedSavedSearch = this.refs['savedSearchesSelector'].getValue();
+        SavedSearchesStore.execute(selectedSavedSearch, undefined, $(window).width());
+    },
+
     _getRangeTypeSelector() {
         var selector;
 
@@ -206,6 +216,26 @@ var SearchBar = React.createClass({
         return selector;
     },
 
+    _getSavedSearchesSelector() {
+        var sortedSavedSearches = this.state.savedSearches.sort((a,b) => {
+            return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+        });
+
+        return (
+            <Input type='select'
+                   ref='savedSearchesSelector'
+                   className='input-sm'
+                   value={this.state.savedSearch}
+                   placeholder='placeholder'
+                   onChange={this._savedSearchSelected}>
+                <option value='placeholder'>Saved searches</option>
+                {sortedSavedSearches.map((savedSearch) => {
+                    return <option key={savedSearch.id} value={savedSearch.id}>{savedSearch.title}</option>;
+                })}
+            </Input>
+        );
+    },
+
     render() {
         return (
             <div className="row no-bm">
@@ -222,26 +252,36 @@ var SearchBar = React.createClass({
                                 <Input type='hidden' name='width' value={$(window).width()}/>
 
                                 <div className="timerange-selector-container">
-                                    <ButtonToolbar className='timerange-chooser pull-left'>
-                                        <DropdownButton bsStyle='info'
-                                                        title={<i className="fa fa-clock-o"></i>}
-                                                        onSelect={this._rangeTypeChanged}>
-                                            <MenuItem eventKey='relative'
-                                                      className={this.state.rangeType === 'relative' ? 'selected' : null}>
-                                                Relative
-                                            </MenuItem>
-                                            <MenuItem eventKey='absolute'
-                                                      className={this.state.rangeType === 'absolute' ? 'selected' : null}>
-                                                Absolute
-                                            </MenuItem>
-                                            <MenuItem eventKey='keyword'
-                                                      className={this.state.rangeType === 'keyword' ? 'selected' : null}>
-                                                Keyword
-                                            </MenuItem>
-                                        </DropdownButton>
-                                    </ButtonToolbar>
+                                    <div className='row no-bm'>
+                                        <div className='col-md-9'>
+                                            <ButtonToolbar className='timerange-chooser pull-left'>
+                                                <DropdownButton bsStyle='info'
+                                                                title={<i className="fa fa-clock-o"></i>}
+                                                                onSelect={this._rangeTypeChanged}>
+                                                    <MenuItem eventKey='relative'
+                                                              className={this.state.rangeType === 'relative' ? 'selected' : null}>
+                                                        Relative
+                                                    </MenuItem>
+                                                    <MenuItem eventKey='absolute'
+                                                              className={this.state.rangeType === 'absolute' ? 'selected' : null}>
+                                                        Absolute
+                                                    </MenuItem>
+                                                    <MenuItem eventKey='keyword'
+                                                              className={this.state.rangeType === 'keyword' ? 'selected' : null}>
+                                                        Keyword
+                                                    </MenuItem>
+                                                </DropdownButton>
+                                            </ButtonToolbar>
 
-                                    {this._getRangeTypeSelector()}
+                                            {this._getRangeTypeSelector()}
+                                        </div>
+                                        <div className='col-md-3'>
+                                            <div className="saved-searches-selector-container"
+                                                 style={{float: 'right', marginRight: 10, width: 270}}>
+                                                {this._getSavedSearchesSelector()}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div id="search-container">
