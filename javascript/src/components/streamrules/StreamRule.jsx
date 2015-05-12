@@ -12,7 +12,7 @@ var StreamRule = React.createClass({
         this.refs.streamRuleForm.open();
     },
     _onDelete() {
-        if (confirm("Do you really want to delete this stream rule?")) {
+        if (window.confirm("Do you really want to delete this stream rule?")) {
             StreamRulesStore.remove(this.props.stream.id, this.props.streamRule.id, () => {
                 if (this.props.onDelete) {
                     this.props.onDelete(this.props.streamRule.id);
