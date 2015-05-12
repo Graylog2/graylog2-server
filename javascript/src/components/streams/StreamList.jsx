@@ -11,7 +11,8 @@ var StreamList = React.createClass({
         return {};
     },
     _formatStream(stream) {
-        return <Stream key={"stream-" + stream.id} stream={stream} permissions={this.props.permissions}
+        return <Stream key={"stream-" + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+                       permissions={this.props.permissions}
                        onDelete={this.props.onDelete} onResume={this.props.onResume} onPause={this.props.onPause}
                        onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>;
     },

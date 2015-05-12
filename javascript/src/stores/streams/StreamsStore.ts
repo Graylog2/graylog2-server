@@ -19,10 +19,16 @@ interface TestMatchResponse {
     rules: any;
 }
 
-var StreamsStore = {
+interface Callback {
+    (): void;
+}
+
+class StreamsStore {
+    private callbacks: Array<Callback> = [];
+
     listStreams() {
         return $.getJSON(jsRoutes.controllers.api.StreamsApiController.list().url);
-    },
+    }
     load(callback: ((streams: Array<Stream>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Streams failed with status: " + errorThrown,
@@ -30,7 +36,7 @@ var StreamsStore = {
         };
 
         this.listStreams().done(callback).fail(failCallback);
-    },
+    }
     get(streamId: string, callback: ((stream: Stream) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading Stream failed with status: " + errorThrown,
@@ -39,7 +45,7 @@ var StreamsStore = {
 
         var url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
         $.getJSON(url).done(callback).fail(failCallback);
-    },
+    }
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Removing Stream failed with status: " + errorThrown,
@@ -50,8 +56,8 @@ var StreamsStore = {
         $.ajax({
             type: "DELETE",
             url: url
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     pause(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Pausing Stream failed with status: " + errorThrown,
@@ -62,8 +68,8 @@ var StreamsStore = {
         $.ajax({
             type: "POST",
             url: url
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     resume(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Resuming Stream failed with status: " + errorThrown,
@@ -74,8 +80,8 @@ var StreamsStore = {
         $.ajax({
             type: "POST",
             url: url
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     save(stream: any, callback: ((streamId: string) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving Stream failed with status: " + errorThrown,
@@ -88,8 +94,8 @@ var StreamsStore = {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(stream)
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     update(streamId: string, data: any, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating Stream failed with status: " + errorThrown,
@@ -102,8 +108,8 @@ var StreamsStore = {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(data)
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     cloneStream(streamId: string, data: any, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Cloning Stream failed with status: " + errorThrown,
@@ -116,8 +122,8 @@ var StreamsStore = {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(data)
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange).fail(failCallback);
+    }
     removeOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
         $.ajax({
             url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
@@ -125,10 +131,9 @@ var StreamsStore = {
             error: (jqXHR, textStatus, errorThrown) => {
                 UserNotification.error("Removing output from stream failed with status: " + errorThrown,
                     "Could not remove output from stream");
-            },
-            success: callback
-        });
-    },
+            }
+        }).done(callback).done(this._emitChange);
+    }
     addOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
         $.ajax({
             url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
@@ -136,10 +141,9 @@ var StreamsStore = {
             error: (jqXHR, textStatus, errorThrown) => {
                 UserNotification.error("Adding output to stream failed with status: " + errorThrown,
                     "Could not add output to stream");
-            },
-            success: callback
-        });
-    },
+            }
+        }).done(callback).done(this._emitChange);
+    }
     testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
         var config = {
             url: jsRoutes.controllers.api.StreamsApiController.testMatch(streamId).url,
@@ -154,6 +158,14 @@ var StreamsStore = {
         };
         $.ajax(config);
     }
-};
+    onChange(callback: () => void) {
+        this.callbacks.push(callback);
+    }
+    _emitChange() {
+        this.callbacks.forEach((callback) => callback());
+    }
+}
 
-export = StreamsStore;
+var streamsStore = new StreamsStore();
+export = streamsStore;
+

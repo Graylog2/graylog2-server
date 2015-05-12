@@ -13,7 +13,7 @@ var StreamRuleForm = React.createClass({
     },
     getDefaultProps() {
         return {
-            streamRule: {field: "", type: "", value: "", inverted: false}
+            streamRule: {field: "", type: 1, value: "", inverted: false}
         };
     },
     _resetValues() {

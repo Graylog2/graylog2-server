@@ -65,7 +65,8 @@ var Stream = React.createClass({
 
                         , {this._formatNumberOfStreamRules(stream)}
 
-                        <CollapsableStreamRuleList key={'streamRules-'+stream.id} stream={stream} permissions={this.props.permissions}/>
+                        <CollapsableStreamRuleList key={'streamRules-'+stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+                                                   permissions={this.props.permissions}/>
                     </div>
                 </div>
             </li>

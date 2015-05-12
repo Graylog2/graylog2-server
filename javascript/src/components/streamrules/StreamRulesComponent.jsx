@@ -14,6 +14,12 @@ var StreamRulesComponent = React.createClass({
             this.setState({stream: stream});
         });
     },
+    _onSubmit(streamRuleId, data) {
+        this.loadData(this.props);
+        if (this.props.onSubmit) {
+            this.props.onSubmit(streamRuleId, data);
+        }
+    },
     componentDidMount() {
         this.loadData(this.props);
     },
@@ -29,7 +35,8 @@ var StreamRulesComponent = React.createClass({
             return (
                 <div className={alertClassName}>
                     <StreamRuleList permissions={this.props.permissions} stream={this.state.stream}
-                                    matchData={this.props.matchData} onSubmit={this.props.onSubmit}/>
+                                    streamRuleTypes={this.props.streamRuleTypes}
+                                    matchData={this.props.matchData} onSubmit={this._onSubmit}/>
                 </div>
             );
         } else {

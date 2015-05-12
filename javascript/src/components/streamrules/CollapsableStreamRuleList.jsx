@@ -3,7 +3,7 @@
 var React = require('react/addons');
 var StreamRuleList = require('./StreamRuleList');
 var CollapsableMixin = require('react-bootstrap').CollapsableMixin;
-var Well = require('react-bootstrap').Well;
+var Alert = require('react-bootstrap').Alert;
 
 var CollapsableStreamRuleList = React.createClass({
     mixins: [CollapsableMixin],
@@ -25,9 +25,10 @@ var CollapsableStreamRuleList = React.createClass({
         return (
             <div>
                 <a onClick={this.onHandleToggle}>{text} stream rules</a>
-                <Well ref='well' className={styles}>
-                    <StreamRuleList stream={this.props.stream} permissions={this.props.permissions} />
-                </Well>
+                <Alert ref='well' className={styles}>
+                    <StreamRuleList stream={this.props.stream} streamRuleTypes={this.props.streamRuleTypes}
+                                    permissions={this.props.permissions} />
+                </Alert>
             </div>
         );
     }

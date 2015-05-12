@@ -6,20 +6,37 @@ var HumanReadableStreamRule = React.createClass({
     _getTypeForInteger(type, streamRuleTypes) {
         if (streamRuleTypes) {
             return streamRuleTypes.filter((streamRuleType) => {
-                return streamRuleType.id === type;
+                return String(streamRuleType.id) === String(type);
             })[0];
         } else {
             return undefined;
         }
     },
+    _formatRuleValue(streamRule) {
+        if (streamRule.type !== 5) {
+            if (streamRule.value) {
+                return streamRule.value;
+            } else {
+                return "<empty>";
+            }
+        } else {
+            return null;
+        }
+    },
+    _formatRuleField(streamRule) {
+        if (streamRule.field) {
+            return streamRule.field;
+        } else {
+            return "<empty>";
+        }
+    },
     render() {
         var streamRule = this.props.streamRule;
         var streamRuleType = this._getTypeForInteger(streamRule.type, this.props.streamRuleTypes);
-        var negation = (streamRule.inverted ? "not " : "");
-        var valueDisplay = (streamRule.type !== 5 ? <em>{streamRule.value}</em> : "");
-        var longDesc = (streamRuleType ? streamRuleType.long_desc : "");
+        var negation = (streamRule.inverted ? "not " : null);
+        var longDesc = (streamRuleType ? streamRuleType.long_desc : null);
         return (
-            <span><em>{streamRule.field}</em> must {negation}{longDesc} {valueDisplay}</span>
+            <span><em>{this._formatRuleField(streamRule)}</em> must {negation}{longDesc} <em>{this._formatRuleValue(streamRule)}</em></span>
         );
     }
 });

@@ -19,7 +19,13 @@ interface StreamRule {
     inverted: boolean;
 }
 
-var StreamRulesStore = {
+interface Callback {
+    (): void;
+}
+
+class StreamRulesStore {
+    private callbacks: Array<Callback> = [];
+
     types(callback: ((streamRuleTypes: Array<StreamRuleType>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Stream Rule Types failed with status: " + errorThrown,
@@ -27,7 +33,7 @@ var StreamRulesStore = {
         };
 
         $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);
-    },
+    }
     list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Stream Rules failed with status: " + errorThrown,
@@ -35,7 +41,7 @@ var StreamRulesStore = {
         };
 
         $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url, callback).fail(failCallback);
-    },
+    }
     update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating Stream Rule failed with status: " + errorThrown,
@@ -50,8 +56,8 @@ var StreamRulesStore = {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(request)
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange()).fail(failCallback);
+    }
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Deleting Stream Rule failed with status: " + errorThrown,
@@ -62,8 +68,8 @@ var StreamRulesStore = {
         $.ajax({
             type: "DELETE",
             url: url
-        }).done(callback).fail(failCallback);
-    },
+        }).done(callback).done(this._emitChange()).fail(failCallback);
+    }
     create(streamId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Creating Stream Rule failed with status: " + errorThrown,
@@ -77,8 +83,16 @@ var StreamRulesStore = {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(data)
-        }).done(callback).fail(failCallback);
+        }).done(callback).done(this._emitChange()).fail(failCallback);
     }
-};
+    onChange(callback) {
+        this.callbacks.push(callback);
+    }
+    _emitChange() {
+        this.callbacks.forEach((callback) => callback());
+    }
+}
 
-export = StreamRulesStore;
+var streamRulesStore = new StreamRulesStore();
+
+export = streamRulesStore;

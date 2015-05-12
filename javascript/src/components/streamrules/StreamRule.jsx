@@ -4,16 +4,33 @@ var React = require('react/addons');
 var StreamRuleForm = require('./StreamRuleForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
+var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 
 var StreamRule = React.createClass({
     mixins: [PermissionsMixin],
-    _onEdit(evt) {
+    _onEdit() {
         this.refs.streamRuleForm.open();
+    },
+    _onDelete() {
+        if (confirm("Do you really want to delete this stream rule?")) {
+            StreamRulesStore.remove(this.props.stream.id, this.props.streamRule.id, () => {
+                if (this.props.onDelete) {
+                    this.props.onDelete(this.props.streamRule.id);
+                }
+            });
+        }
+    },
+    _onSubmit(streamRuleId, data) {
+        StreamRulesStore.update(this.props.stream.id, streamRuleId, data, () => {
+            if (this.props.onSubmit) {
+                this.props.onSubmit(streamRuleId, data);
+            }
+        });
     },
     _formatActionItems() {
         return (
             <span>
-                <a onClick={this.props.onDelete.bind(null, this.props.streamRule.id)}>
+                <a onClick={this._onDelete}>
                     <i className="fa fa-trash-o"></i>
                 </a>
 
@@ -36,7 +53,7 @@ var StreamRule = React.createClass({
             <li className={className}>
                 {actionItems} <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
                 <StreamRuleForm ref='streamRuleForm' streamRule={streamRule} streamRuleTypes={streamRuleTypes}
-                                title="Edit Stream Rule" onSubmit={this.props.onSubmit}/>
+                                title="Edit Stream Rule" onSubmit={this._onSubmit}/>
             </li>
         );
     }
