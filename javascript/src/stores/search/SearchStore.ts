@@ -220,6 +220,18 @@ class SearchStore {
         return orignalParams;
     }
 
+    // Get initial search params with the current selected fields
+    getOriginalSearchParamsWithFields(): Immutable.Map<string,any> {
+        var orignalParams = Immutable.Map<string, any>();
+        orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
+        orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
+        orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
+        orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
+        orignalParams = orignalParams.set('fields', this.fields.join(','));
+
+        return orignalParams;
+    }
+
     // Get initial search params, with the names used in a search URL request
     getOriginalSearchURLParams(): Immutable.Map<string, any> {
         var simplifiedParams = Immutable.Map<string, any>();

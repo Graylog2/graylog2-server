@@ -8,6 +8,7 @@ var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
 
 var Widget = require('../widgets/Widget');
+var SavedSearchControls = require('./SavedSearchControls');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 
 var numeral = require('numeral');
@@ -119,7 +120,7 @@ var SearchSidebar = React.createClass({
                                         widgetType={Widget.Type.SEARCH_RESULT_COUNT}
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
-                    <a href="#" className="btn btn-success btn-sm">Save search criteria</a>
+                    <SavedSearchControls/>
                 </div>
 
                 <hr />

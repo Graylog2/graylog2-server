@@ -63,11 +63,9 @@ public class SavedSearchesApiController extends AuthenticatedController {
         }
     }
 
-    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
+    @BodyParser.Of(BodyParser.Json.class)
     public Result create() {
-        Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
-
-        CreateSavedSearchRequest request = Json.fromJson(Json.parse(params.get("params")), CreateSavedSearchRequest.class);
+        CreateSavedSearchRequest request = Json.fromJson(request().body().asJson(), CreateSavedSearchRequest.class);
 
         try {
             savedSearchService.create(request);
