@@ -20,9 +20,8 @@ import org.graylog2.plugin.database.Persisted;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface SavedSearch extends Persisted {
     Map<String,Object> asMap();
+
+    String getTitle();
 }

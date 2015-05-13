@@ -20,9 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SavedSearchSummaryResponse {
 
     public String id;
