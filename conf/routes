@@ -117,6 +117,7 @@ GET           /system/nodes/:node_id/shutdown                                   
 # Saved searches
 GET           /savedsearches                                                                     @controllers.api.SavedSearchesApiController.list()
 GET           /savedsearches/:search_id/execute                                                  @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "", width:Integer ?= -1)
+PUT           /savedsearches/:search_id                                                          @controllers.api.SavedSearchesApiController.update(search_id: String)
 POST          /savedsearches/create                                                              @controllers.api.SavedSearchesApiController.create()
 DELETE        /savedsearches/:search_id/delete                                                   @controllers.SavedSearchesController.delete(search_id: String)
 

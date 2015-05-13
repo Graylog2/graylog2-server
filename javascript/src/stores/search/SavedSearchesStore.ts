@@ -48,19 +48,33 @@ class SavedSearchesStore {
         promise.done((savedSearches) => this.savedSearches = Immutable.List<SavedSearch>(savedSearches));
     }
 
-    create(title: string): JQueryPromise<string[]> {
+    _createOrUpdate(title: string, stringId?: string): JQueryPromise<string[]> {
         var originalSearchParams = SearchStore.getOriginalSearchParamsWithFields();
         var queryParams = originalSearchParams.set('rangeType', originalSearchParams.get('range_type')).delete('range_type');
         var params = {title: title, query: queryParams.toJS()};
 
-        var url = jsRoutes.controllers.api.SavedSearchesApiController.create().url;
-        var promise = $.ajax({
-            type: "POST",
+        var url;
+        var verb;
+
+        if (typeof stringId === 'undefined') {
+            url = jsRoutes.controllers.api.SavedSearchesApiController.create().url;
+            verb = 'POST';
+        } else {
+            url = jsRoutes.controllers.api.SavedSearchesApiController.update(stringId).url;
+            verb = 'PUT';
+        }
+
+        return $.ajax({
+            type: verb,
             url: url,
             data: JSON.stringify(params),
             dataType: 'json',
             contentType: 'application/json'
         });
+    }
+
+    create(title: string): JQueryPromise<string[]> {
+        var promise = this._createOrUpdate(title);
 
         promise.done(() => {
             UserNotification.success("Search criteria saved as '" + title + "'.");
@@ -69,6 +83,21 @@ class SavedSearchesStore {
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving search criteria failed with status: " + errorThrown,
                 "Could not save search criteria");
+        });
+
+        return promise;
+    }
+
+    update(stringId: string, title: string): JQueryPromise<string[]> {
+        var promise = this._createOrUpdate(title, stringId);
+
+        promise.done(() => {
+            UserNotification.success("Saved search '" + title + "' was updated.");
+            this._updateSavedSearches();
+        });
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Updating saved search '" + title + "' failed with status: " + errorThrown,
+                "Could not update saved search");
         });
 
         return promise;
@@ -88,6 +117,10 @@ class SavedSearchesStore {
 
     getSavedSearch(searchId: string): SavedSearch {
         return this.savedSearches.find((savedSearch) => savedSearch.id === searchId);
+    }
+
+    isValidTitle(searchId: string, title: string): boolean {
+        return !this.savedSearches.some((savedSearch) => savedSearch.id !== searchId && savedSearch.title === title);
     }
 
     execute(searchId: string, streamId?: string, width?: string) {

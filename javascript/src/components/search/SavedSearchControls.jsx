@@ -13,7 +13,8 @@ var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 var SavedSearchControls = React.createClass({
     getInitialState() {
         return {
-            title: ""
+            title: "",
+            error: false
         };
     },
     componentDidMount() {
@@ -37,7 +38,16 @@ var SavedSearchControls = React.createClass({
         this.refs['saveSearchModal'].close();
     },
     _save() {
-        var promise = SavedSearchesStore.create(this.refs.title.getValue());
+        if (this.state.error) {
+            return;
+        }
+
+        var promise;
+        if (this._isSearchSaved()) {
+            promise = SavedSearchesStore.update(this.props.currentSavedSearch, this.refs.title.getValue());
+        } else {
+            promise = SavedSearchesStore.create(this.refs.title.getValue());
+        }
         promise.done(() => this._hide());
     },
     _deleteSavedSearch(e) {
@@ -45,6 +55,9 @@ var SavedSearchControls = React.createClass({
         if (window.confirm('Do you really want to delete this saved search?')) {
             SavedSearchesStore.delete(this.props.currentSavedSearch);
         }
+    },
+    _titleChanged(e) {
+        this.setState({error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.refs.title.getValue())});
     },
     _getNewSavedSearchButtons() {
         return <Button bsStyle='success' bsSize='small' onClick={this._openModal}>Save search criteria</Button>;
@@ -67,13 +80,15 @@ var SavedSearchControls = React.createClass({
                                 onConfirm={this._save}
                                 cancel="Cancel"
                                 confirm="Save">
-                    <h2 className="modal-title">{this._isSearchSaved() ? 'Update search criteria' : 'Save search criteria'}</h2>
+                    <h2 className="modal-title">{this._isSearchSaved() ? 'Update saved search' : 'Save search criteria'}</h2>
                     <Input type="text"
                            label="Title"
                            ref="title"
                            required
                            defaultValue={this.state.title}
-                           help="Type a name that describes the current search."/>
+                           onChange={this._titleChanged}
+                           bsStyle={this.state.error ? 'error' : null}
+                           help={this.state.error ? 'Title was already taken.' : 'Type a name describing the current search.'}/>
                 </BootstrapModal>
             </div>
         );

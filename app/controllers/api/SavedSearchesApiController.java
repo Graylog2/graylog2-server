@@ -78,4 +78,18 @@ public class SavedSearchesApiController extends AuthenticatedController {
         return status(202);
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result update(String searchId) {
+        CreateSavedSearchRequest request = Json.fromJson(request().body().asJson(), CreateSavedSearchRequest.class);
+
+        try {
+            savedSearchService.update(searchId, request);
+            return ok();
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
 }
