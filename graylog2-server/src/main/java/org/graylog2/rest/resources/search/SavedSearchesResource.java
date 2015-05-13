@@ -37,6 +37,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -70,8 +71,14 @@ public class SavedSearchesResource extends SearchResource {
     @RequiresPermissions(RestPermissions.SAVEDSEARCHES_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponse(code = 400, message = "Validation error")
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid CreateSavedSearchRequest cr) throws ValidationException {
+        if (!isTitleTaken("", cr.title())) {
+            final String msg = "Cannot save search " + cr.title() + ". Title is already taken.";
+            throw new BadRequestException(msg);
+        }
+
         final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.iso8601());
         final String id = savedSearchService.save(search);
 
@@ -116,6 +123,12 @@ public class SavedSearchesResource extends SearchResource {
                                       @ApiParam(name = "JSON body", required = true)
                                       @Valid CreateSavedSearchRequest cr) throws NotFoundException, ValidationException {
         final SavedSearch search = savedSearchService.load(searchId);
+
+        if (!isTitleTaken(searchId, cr.title())) {
+            final String msg = "Cannot save search " + cr.title() + ". Title is already taken.";
+            throw new BadRequestException(msg);
+        }
+
         savedSearchService.update(search, cr.title(), cr.query());
         return search.asMap();
     }
@@ -148,5 +161,15 @@ public class SavedSearchesResource extends SearchResource {
         checkPermission(RestPermissions.SAVEDSEARCHES_EDIT, searchId);
         final SavedSearch search = savedSearchService.load(searchId);
         savedSearchService.destroy(search);
+    }
+
+    private boolean isTitleTaken(String searchId, String title) {
+        for (SavedSearch savedSearch : savedSearchService.all()) {
+            if (!savedSearch.getId().equals(searchId) && savedSearch.getTitle().equals(title)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
