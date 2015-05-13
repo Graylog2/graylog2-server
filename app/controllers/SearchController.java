@@ -44,7 +44,6 @@ import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.responses.QueryParseError;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
-import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import play.libs.Json;
 import play.mvc.Result;
@@ -253,16 +252,16 @@ public class SearchController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
-        final String s;
-        try {
+        final String s = "obsolete";
+//        try {
             Set<String> selectedFields = getSelectedFields(fields);
-            s = search.searchAsCsv(selectedFields);
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        }
+            //s = search.searchAsCsv(selectedFields);
+//        } catch (IOException e) {
+//            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+//        } catch (APIException e) {
+//            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+//            return status(504, views.html.errors.error.render(message, e, request()));
+//        }
 
         // TODO streaming the result
         response().setContentType(MediaType.CSV_UTF_8.toString());

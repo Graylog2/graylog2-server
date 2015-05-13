@@ -87,7 +87,7 @@ public class SearchRouteHelper {
         TimeRange timeRange = search.getTimeRange();
 
         if (stream == null) {
-            return routes.SearchController.exportAsCsv(
+            return routes.SearchControllerV2.exportAsCsv(
                     query,
                     "",
                     timeRange.getType().toString().toLowerCase(),
