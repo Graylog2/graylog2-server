@@ -28,6 +28,7 @@ import play.api.mvc.Call;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -72,29 +73,38 @@ public class SavedSearchesController extends AuthenticatedController {
     }
 
     private Call callFromSavedSearch(SavedSearch search, String streamId, boolean includeOriginal, int displayWidth) {
+        Map<String, Object> searchQuery = search.getQuery();
+
         int relative = 0;
-        if (search.getQuery().containsKey("relative")) {
-            relative = Integer.parseInt((String) search.getQuery().get("relative"));
+        if (searchQuery.containsKey("relative")) {
+            final Object persistedRelative = searchQuery.get("relative");
+
+            relative = persistedRelative instanceof String ? Integer.parseInt(String.valueOf(persistedRelative)) : (Integer) persistedRelative;
         }
 
         String from = "";
-        if (search.getQuery().containsKey("from")) {
-            from = (String) search.getQuery().get("from");
+        if (searchQuery.containsKey("from")) {
+            from = (String) searchQuery.get("from");
         }
 
         String to = "";
-        if (search.getQuery().containsKey("to")) {
-            to = (String) search.getQuery().get("to");
+        if (searchQuery.containsKey("to")) {
+            to = (String) searchQuery.get("to");
         }
 
         String keyword = "";
-        if (search.getQuery().containsKey("keyword")) {
-            keyword = (String) search.getQuery().get("keyword");
+        if (searchQuery.containsKey("keyword")) {
+            keyword = (String) searchQuery.get("keyword");
         }
 
         String fields = "";
-        if (search.getQuery().containsKey("fields")) {
-            fields = (String) search.getQuery().get("fields");
+        if (searchQuery.containsKey("fields")) {
+            fields = (String) searchQuery.get("fields");
+        }
+
+        String interval = "";
+        if (searchQuery.containsKey("interval")) {
+            interval = (String) searchQuery.get("interval");
         }
 
         String searchId = "";
@@ -103,14 +113,14 @@ public class SavedSearchesController extends AuthenticatedController {
         }
 
         if (streamId == null || streamId.isEmpty()) {
-            return routes.SearchController.index(
-                    (String) search.getQuery().get("query"),
-                    (String) search.getQuery().get("rangeType"),
+            return routes.SearchControllerV2.index(
+                    (String) searchQuery.get("query"),
+                    (String) searchQuery.get("rangeType"),
                     relative,
                     from,
                     to,
                     keyword,
-                    "",
+                    interval,
                     0,
                     searchId,
                     "",
@@ -121,13 +131,13 @@ public class SavedSearchesController extends AuthenticatedController {
         } else {
             return routes.StreamSearchController.index(
                     streamId,
-                    (String) search.getQuery().get("query"),
-                    (String) search.getQuery().get("rangeType"),
+                    (String) searchQuery.get("query"),
+                    (String) searchQuery.get("rangeType"),
                     relative,
                     from,
                     to,
                     keyword,
-                    "",
+                    interval,
                     0,
                     searchId,
                     "",

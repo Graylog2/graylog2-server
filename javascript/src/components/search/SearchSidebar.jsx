@@ -9,6 +9,7 @@ var Input = require('react-bootstrap').Input;
 
 var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
+var SavedSearchControls = require('./SavedSearchControls');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 
 var numeral = require('numeral');
@@ -115,12 +116,11 @@ var SearchSidebar = React.createClass({
                 </p>
 
                 <div style={{marginTop: 10}}>
-                    <span>TODO Missing stream thingie</span><br/>
                     <AddToDashboardMenu title="Add count to dashboard"
                                         widgetType={Widget.Type.SEARCH_RESULT_COUNT}
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
-                    <a href="#" className="btn btn-success btn-sm">Save search criteria</a>
+                    <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
                     <a href={SearchStore.getCsvExportURL()} className="btn btn-default btn-sm">Export as CSV</a>
                 </div>
 

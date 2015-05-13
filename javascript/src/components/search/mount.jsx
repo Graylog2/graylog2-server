@@ -63,7 +63,6 @@ if (searchResultElem) {
     if (formattedHistogram) {
         formattedHistogram = JSON.parse(formattedHistogram);
     }
-    var currentPage = searchResultElem.getAttribute('data-current-page');
 
     var streams = searchResultElem.getAttribute('data-streams');
     if (streams) {
@@ -84,7 +83,6 @@ if (searchResultElem) {
                                result={searchResult}
                                histogram={histogram}
                                formattedHistogram={formattedHistogram}
-                               currentPage={currentPage}
                                streams={Immutable.Map(streams)}
                                inputs={Immutable.Map(inputs)}
                                nodes={Immutable.Map(nodes)}

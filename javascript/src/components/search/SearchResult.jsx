@@ -24,7 +24,8 @@ var SearchResult = React.createClass({
             showAllFields: false,
             currentSidebarWidth: null,
             dashboards: Immutable.Map(),
-            shouldHighlight: true
+            shouldHighlight: true,
+            currentPage: SearchStore.page
         };
     },
 
@@ -127,6 +128,7 @@ var SearchResult = React.createClass({
                                        showHighlightToggle={anyHighlightRanges}
                                        shouldHighlight={this.state.shouldHighlight}
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
+                                       currentSavedSearch={SearchStore.savedSearch}
                                        dashboards={this.state.dashboards}/>
                     </div>
                 </div>
@@ -148,7 +150,7 @@ var SearchResult = React.createClass({
                                  dashboards={this.state.dashboards}/>
 
                     <ResultTable messages={this.props.result.messages}
-                                 page={this.props.currentPage}
+                                 page={this.state.currentPage}
                                  selectedFields={this.state.selectedFields}
                                  resultCount={this.props.result['total_result_count']}
                                  inputs={this.props.inputs}
