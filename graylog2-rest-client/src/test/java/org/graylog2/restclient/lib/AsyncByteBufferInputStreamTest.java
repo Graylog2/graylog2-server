@@ -85,7 +85,7 @@ public class AsyncByteBufferInputStreamTest {
                     stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
                     stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
 
-                    sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+                    sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
                 }
                 stream.setDone(true);
 
@@ -124,7 +124,7 @@ public class AsyncByteBufferInputStreamTest {
                     stream.putBuffer(ByteBuffer.wrap("12345".getBytes()));
                     stream.putBuffer(ByteBuffer.wrap("6\n".getBytes()));
 
-                    sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+                    sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
                     if (i == 3) {
                         stream.setFailed(new Throwable());
                         return;
