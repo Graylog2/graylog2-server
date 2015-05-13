@@ -26,6 +26,7 @@ class SearchStore {
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
+    searchInStreamId: string;
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
@@ -230,17 +231,16 @@ class SearchStore {
         orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
         orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
         orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
+        if (this.searchInStreamId) {
+            orignalParams = orignalParams.set('streamId', this.searchInStreamId);
+        }
 
         return orignalParams;
     }
 
     // Get initial search params with the current selected fields
     getOriginalSearchParamsWithFields(): Immutable.Map<string,any> {
-        var originalParams = Immutable.Map<string, any>();
-        originalParams = originalParams.set('range_type', this.originalSearch.get('rangeType'));
-        originalParams = originalParams.merge(this.originalSearch.get('rangeParams'));
-        originalParams = originalParams.set('query', this.originalSearch.get('query'));
-        originalParams = originalParams.set('interval', this.originalSearch.get('resolution'));
+        var originalParams = this.getOriginalSearchParams();
         originalParams = originalParams.set('fields', this.fields.join(','));
 
         return originalParams;
@@ -263,16 +263,26 @@ class SearchStore {
         return originalURLParams;
     }
 
+    _searchBaseLocation(action) {
+        var location;
+        if (this.searchInStreamId) {
+            location = jsRoutes.controllers.StreamSearchController[action](this.searchInStreamId).url;
+        } else {
+            location = jsRoutes.controllers.SearchControllerV2[action]().url;
+        }
+        return location;
+    }
+
     _reloadSearchWithNewParam(param: string, value: any) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
-        URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
+        URLUtils.openLink(this._searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
     }
 
     getCsvExportURL(): string {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.delete('page');
-        return jsRoutes.controllers.SearchControllerV2.exportAsCsv().url + "?" + Qs.stringify(searchURLParams.toJS());
+        return this._searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
     }
 }
 

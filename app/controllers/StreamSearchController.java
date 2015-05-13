@@ -3,7 +3,6 @@ package controllers;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.SearchSort;
 import org.graylog2.restclient.models.Startpage;
 import org.graylog2.restclient.models.Stream;
@@ -12,11 +11,9 @@ import play.mvc.Result;
 
 import java.io.IOException;
 
-public class StreamSearchController extends SearchController {
+public class StreamSearchController extends SearchControllerV2 {
     @Inject
     private StreamService streamService;
-    @Inject
-    private ServerNodes serverNodes;
 
     public Result index(String streamId,
                         String q,

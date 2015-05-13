@@ -79,6 +79,9 @@ if (searchResultElem) {
         nodes = JSON.parse(nodes);
     }
 
+    var searchInStreamId = searchResultElem.getAttribute('data-search-in-stream');
+    SearchStore.searchInStreamId = searchInStreamId;
+
     React.render(<SearchResult query={query}
                                result={searchResult}
                                histogram={histogram}
@@ -86,5 +89,6 @@ if (searchResultElem) {
                                streams={Immutable.Map(streams)}
                                inputs={Immutable.Map(inputs)}
                                nodes={Immutable.Map(nodes)}
+                               searchInStreamId={searchInStreamId}
         />, searchResultElem);
 }

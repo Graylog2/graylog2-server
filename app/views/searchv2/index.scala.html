@@ -14,6 +14,14 @@
 
 @import play.libs.Json;
 
+@streamId = @{
+        if (stream == null) {
+                null
+        } else {
+                stream.getId
+        }
+}
+
 @main("Search V2", null, query, currentUser, false, true) {
 
     <div id="react-search-result"
@@ -27,6 +35,7 @@
             data-streams="@Json.toJson(streams)"
             data-inputs="@Json.toJson(inputs)"
             data-nodes="@Json.toJson(nodes)"
+            data-search-in-stream="@streamId"
         >
     </div>
 }

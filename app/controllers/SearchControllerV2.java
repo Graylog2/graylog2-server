@@ -300,11 +300,6 @@ public class SearchControllerV2 extends AuthenticatedController {
                                                    }),
                                                    stream));
 
-//        if (searchResult.getTotalResultCount() > 0) {
-//            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
-//        } else {
-//            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
-//        }
     }
 
     protected String determineHistogramResolution(final SearchResult searchResult) {

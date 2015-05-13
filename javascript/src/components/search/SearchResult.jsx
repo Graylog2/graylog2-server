@@ -129,7 +129,9 @@ var SearchResult = React.createClass({
                                        shouldHighlight={this.state.shouldHighlight}
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
                                        currentSavedSearch={SearchStore.savedSearch}
-                                       dashboards={this.state.dashboards}/>
+                                       dashboards={this.state.dashboards}
+                                       searchInStreamId={this.props.searchInStreamId}
+                            />
                     </div>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">

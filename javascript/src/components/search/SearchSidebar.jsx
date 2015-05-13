@@ -117,7 +117,7 @@ var SearchSidebar = React.createClass({
 
                 <div style={{marginTop: 10}}>
                     <AddToDashboardMenu title="Add count to dashboard"
-                                        widgetType={Widget.Type.SEARCH_RESULT_COUNT}
+                                        widgetType={this.props.searchInStreamId ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
                     <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
