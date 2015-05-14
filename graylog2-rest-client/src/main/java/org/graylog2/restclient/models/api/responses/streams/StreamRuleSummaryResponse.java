@@ -18,6 +18,8 @@ package org.graylog2.restclient.models.api.responses.streams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.annotation.Nullable;
+
 public class StreamRuleSummaryResponse {
     public String id;
     public String field;
@@ -28,5 +30,6 @@ public class StreamRuleSummaryResponse {
     public String stream_id;
 
     @JsonProperty("content_pack")
+    @Nullable
     public String contentPack;
 }

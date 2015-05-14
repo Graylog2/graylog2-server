@@ -16,18 +16,19 @@
  */
 package org.graylog2.radio.buffers.processors;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import javax.inject.Inject;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -38,23 +39,22 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(RadioProcessBufferProcessor.class);
     private static final AtomicInteger errorCount = new AtomicInteger(0);
-    private final ThroughputStats throughputStats;
     private final RadioTransport radioTransport;
     private final ServerStatus serverStatus;
     private final int radioTransportMaxErrors;
     private final Meter erroredMessages;
+    private final Counter globalOutgoingMessages;
 
     @Inject
     public RadioProcessBufferProcessor(MetricRegistry metricRegistry,
-                                       ThroughputStats throughputStats,
                                        RadioTransport radioTransport,
                                        ServerStatus serverStatus,
                                        Configuration configuration) {
         super(metricRegistry);
-        this.throughputStats = throughputStats;
         this.radioTransport = radioTransport;
         this.serverStatus = serverStatus;
         this.radioTransportMaxErrors = configuration.getRadioTransportMaxErrors();
+        globalOutgoingMessages = metricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
         this.erroredMessages = metricRegistry.meter(name(RadioProcessBufferProcessor.class, "erroredMessages"));
     }
 
@@ -62,7 +62,7 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     protected void handleMessage(Message msg) {
         try {
             radioTransport.send(msg);
-            throughputStats.getThroughputCounter().add(1);
+            globalOutgoingMessages.inc();
             errorCount.set(0);
             if (LOG.isDebugEnabled())
                 LOG.debug("Message <{}> written to RadioTransport.", msg.getId());

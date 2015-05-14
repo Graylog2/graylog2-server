@@ -20,9 +20,9 @@ import com.google.common.net.MediaType;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
-import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -80,4 +80,6 @@ public interface ApiRequestBuilder<T> {
 
     // solely for test purposes
     URL prepareUrl(ClusterEntity node);
+
+    InputStream executeStreaming() throws APIException, IOException;
 }

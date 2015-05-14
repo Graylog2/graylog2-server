@@ -16,10 +16,10 @@
  */
 package org.graylog2.streams;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -29,22 +29,21 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
-import org.mongojack.Aggregation;
-import org.mongojack.AggregationResult;
 import org.mongojack.DBQuery;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class OutputServiceMJImpl implements OutputService {
     private final JacksonDBCollection<OutputAVImpl, String> coll;
+    private final DBCollection dbCollection;
     private final StreamService streamService;
 
     @Inject
@@ -53,7 +52,7 @@ public class OutputServiceMJImpl implements OutputService {
                                StreamService streamService) {
         this.streamService = streamService;
         final String collectionName = OutputAVImpl.class.getAnnotation(CollectionName.class).value();
-        final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
+        this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, OutputAVImpl.class, String.class, mapperProvider.get());
     }
 
@@ -110,23 +109,19 @@ public class OutputServiceMJImpl implements OutputService {
 
     @Override
     public Map<String, Long> countByType() {
-        final DBObject groupFields = new BasicDBObject("_id", "$type");
-        groupFields.put("count", new BasicDBObject("$sum", 1));
-        final DBObject countOperation = new BasicDBObject("$group", groupFields);
+        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
 
-        final AggregationResult<TypeCountResult> aggregationResult = coll.aggregate(new Aggregation<>(TypeCountResult.class, countOperation, new BasicDBObject()));
+        final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());
+        for (DBObject outputType : outputTypes) {
+            final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
+            if (type != null) {
+                final Long oldValue = outputsCountByType.get(type);
+                final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
+                outputsCountByType.put(type, newValue);
+            }
+        }
 
-        final Map<String, Long> result = Maps.newHashMap();
-
-        for (TypeCountResult typeResult : aggregationResult.results())
-            result.put(typeResult.type, typeResult.count);
-
-        return result;
-    }
-
-    class TypeCountResult {
-        String type;
-        Long count;
+        return outputsCountByType;
     }
 
     private OutputAVImpl implOrFail(Output output) {

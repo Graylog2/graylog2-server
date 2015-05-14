@@ -107,4 +107,7 @@ public class MessageSummary {
     public Object getField(String key) {
         return message.getField(key);
     }
+
+    @JsonIgnore
+    public Message getRawMessage() { return message;}
 }

@@ -24,7 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
@@ -67,11 +67,24 @@ public class SavedSearchServiceImpl extends PersistedServiceImpl implements Save
     public SavedSearch create(String title, Map<String, Object> query, String creatorUserId, DateTime createdAt) {
         // Create saved search
         final Map<String, Object> searchData = ImmutableMap.of(
-                "title", title,
-                "query", query,
-                "creator_user_id", creatorUserId,
-                "created_at", createdAt);
+                SavedSearchImpl.FIELD_TITLE, title,
+                SavedSearchImpl.FIELD_QUERY, query,
+                SavedSearchImpl.FIELD_CREATOR_USER_ID, creatorUserId,
+                SavedSearchImpl.FIELD_CREATED_AT, createdAt);
 
         return new SavedSearchImpl(searchData);
+    }
+
+    @Override
+    public void update(SavedSearch search, String title, Map<String, Object> query) throws ValidationException {
+        if (title != null) {
+            search.getFields().put(SavedSearchImpl.FIELD_TITLE, title);
+        }
+
+        if (query != null) {
+            search.getFields().put(SavedSearchImpl.FIELD_QUERY, query);
+        }
+
+        save(search);
     }
 }

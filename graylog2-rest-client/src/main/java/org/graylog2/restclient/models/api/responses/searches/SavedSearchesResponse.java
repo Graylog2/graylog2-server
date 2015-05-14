@@ -18,9 +18,6 @@ package org.graylog2.restclient.models.api.responses.searches;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SavedSearchesResponse {
 
     public int total;

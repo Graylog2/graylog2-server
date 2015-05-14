@@ -1,0 +1,7 @@
+{
+"collectors" : [
+{"id" : "collector1id", "node_id" : "uniqueid1", "collector_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
+{"id" : "collector2id", "node_id" : "uniqueid2", "collector_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
+{"id" : "collector3id", "node_id" : "uniqueid3", "collector_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"}
+]
+}

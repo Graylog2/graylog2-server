@@ -17,6 +17,7 @@
 package org.graylog2.restclient.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
@@ -42,6 +43,7 @@ public class StreamRule {
             this.longDesc = longDesc;
         }
 
+        @JsonValue
         public int getId() {
             return id;
         }

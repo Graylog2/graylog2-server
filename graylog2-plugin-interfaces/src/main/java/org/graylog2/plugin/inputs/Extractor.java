@@ -383,7 +383,7 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     public static class Result {
 
-        private final String value;
+        private final Object value;
         private final String target;
         private final int beginIndex;
         private final int endIndex;
@@ -392,14 +392,14 @@ public abstract class Extractor implements EmbeddedPersistable {
             this(value, null, beginIndex, endIndex);
         }
 
-        public Result(String value, String target, int beginIndex, int endIndex) {
+        public Result(Object value, String target, int beginIndex, int endIndex) {
             this.value = value;
             this.target = target;
             this.beginIndex = beginIndex;
             this.endIndex = endIndex;
         }
 
-        public String getValue() {
+        public Object getValue() {
             return value;
         }
 

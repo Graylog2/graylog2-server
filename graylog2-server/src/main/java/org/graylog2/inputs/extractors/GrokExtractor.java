@@ -93,7 +93,7 @@ public class GrokExtractor extends Extractor {
         for (final Map.Entry<String, Object> entry : matches.entrySet()) {
             // never add null values to the results, those don't make sense for us
             if (entry.getValue() != null) {
-                results.add(new Result(entry.getValue().toString(), entry.getKey(), -1, -1));
+                results.add(new Result(entry.getValue(), entry.getKey(), -1, -1));
             }
         }
 

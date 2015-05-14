@@ -27,9 +27,9 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchService;
@@ -37,10 +37,12 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -69,8 +71,14 @@ public class SavedSearchesResource extends SearchResource {
     @RequiresPermissions(RestPermissions.SAVEDSEARCHES_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponse(code = 400, message = "Validation error")
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid CreateSavedSearchRequest cr) throws ValidationException {
+        if (!isTitleTaken("", cr.title())) {
+            final String msg = "Cannot save search " + cr.title() + ". Title is already taken.";
+            throw new BadRequestException(msg);
+        }
+
         final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.iso8601());
         final String id = savedSearchService.save(search);
 
@@ -96,6 +104,33 @@ public class SavedSearchesResource extends SearchResource {
         return ImmutableMap.of(
                 "total", searches.size(),
                 "searches", searches);
+    }
+
+    @PUT
+    @Path("/{searchId}")
+    @Timed
+    @RequiresPermissions(RestPermissions.SAVEDSEARCHES_EDIT)
+    @ApiOperation(value = "Update a saved search")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Saved search not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
+            @ApiResponse(code = 400, message = "Validation error")
+    })
+    public Map<String, Object> update(@ApiParam(name = "searchId", required = true)
+                                      @PathParam("searchId") String searchId,
+                                      @ApiParam(name = "JSON body", required = true)
+                                      @Valid CreateSavedSearchRequest cr) throws NotFoundException, ValidationException {
+        final SavedSearch search = savedSearchService.load(searchId);
+
+        if (!isTitleTaken(searchId, cr.title())) {
+            final String msg = "Cannot save search " + cr.title() + ". Title is already taken.";
+            throw new BadRequestException(msg);
+        }
+
+        savedSearchService.update(search, cr.title(), cr.query());
+        return search.asMap();
     }
 
     @GET
@@ -126,5 +161,15 @@ public class SavedSearchesResource extends SearchResource {
         checkPermission(RestPermissions.SAVEDSEARCHES_EDIT, searchId);
         final SavedSearch search = savedSearchService.load(searchId);
         savedSearchService.destroy(search);
+    }
+
+    private boolean isTitleTaken(String searchId, String title) {
+        for (SavedSearch savedSearch : savedSearchService.all()) {
+            if (!savedSearch.getId().equals(searchId) && savedSearch.getTitle().equals(title)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

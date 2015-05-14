@@ -203,7 +203,8 @@ public class Indices implements IndexManagement {
         if (!acknowledged) {
             return false;
         }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(c, indexName, configuration.getAnalyzer());
+        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(c, indexName, configuration.getAnalyzer(),
+                configuration.isStoreTimestampsAsDocValues());
         return c.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
     }
 

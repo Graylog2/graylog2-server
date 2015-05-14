@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
@@ -230,6 +231,7 @@ public class Node extends ClusterEntity {
                 .execute();
     }
 
+    @JsonIgnore
     public List<InputState> getInputStates() {
         List<InputState> inputStates = Lists.newArrayList();
         for (InputStateSummaryResponse issr : inputs().inputs) {
@@ -334,6 +336,7 @@ public class Node extends ClusterEntity {
         return api.path(routes.InputTypesResource().info(type), InputTypeSummaryResponse.class).node(this).execute();
     }
 
+    @JsonIgnore
     public Map<String, InputTypeSummaryResponse> getAllInputTypeInformation() throws IOException, APIException {
         Map<String, InputTypeSummaryResponse> types = Maps.newHashMap();
 

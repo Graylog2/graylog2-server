@@ -22,8 +22,6 @@
  */
 package org.graylog2.plugin.alarms;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -36,15 +34,6 @@ import java.util.Map;
  */
 public interface AlertCondition {
     String getDescription();
-
-    /**
-     * The limited list of internal message objects that matched the alert.
-     * @see org.graylog2.plugin.alarms.AlertCondition.CheckResult#getMatchingMessages()
-     * @return list of Message objects
-     */
-    @Deprecated
-    @JsonIgnore
-    List<Message> getSearchHits();
 
     String getId();
 
@@ -62,7 +51,7 @@ public interface AlertCondition {
 
     String getTypeString();
 
-    public interface CheckResult {
+    interface CheckResult {
         boolean isTriggered();
         String getResultDescription();
         AlertCondition getTriggeredCondition();

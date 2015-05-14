@@ -18,14 +18,12 @@ package org.graylog2.savedsearches;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface SavedSearchService extends PersistedService {
     @SuppressWarnings("unchecked")
     List<SavedSearch> all();
@@ -34,4 +32,6 @@ public interface SavedSearchService extends PersistedService {
     SavedSearch load(String id) throws NotFoundException;
 
     SavedSearch create(String title, Map<String, Object> query, String creatorUserId, DateTime createdAt);
+
+    void update(SavedSearch search, String title, Map<String, Object> query) throws ValidationException;
 }

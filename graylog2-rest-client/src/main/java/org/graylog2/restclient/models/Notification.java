@@ -38,7 +38,8 @@ public class Notification {
         GC_TOO_LONG,
         JOURNAL_UTILIZATION_TOO_HIGH,
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
-        OUTPUT_DISABLED;
+        OUTPUT_DISABLED,
+        GENERIC;
 
         public static Type fromString(String name) {
             return valueOf(name.toUpperCase());

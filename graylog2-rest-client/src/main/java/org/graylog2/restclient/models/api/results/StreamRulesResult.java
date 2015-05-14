@@ -16,9 +16,6 @@
  */
 package org.graylog2.restclient.models.api.results;
 
-import com.google.common.collect.Lists;
-import javax.inject.Inject;
-import org.graylog2.restclient.models.StreamRule;
 import org.graylog2.restclient.models.api.responses.streams.StreamRuleSummaryResponse;
 
 import java.util.List;
@@ -40,13 +37,7 @@ public class StreamRulesResult {
         return total;
     }
 
-    public List<StreamRule> getStreamRules() {
-        List<StreamRule> streamRules = Lists.newArrayList();
-
-        /*for (StreamRuleSummaryResponse srsr : this.streamRules) {
-            streamRules.add(streamRuleFactory.fromSummaryResponse(srsr));
-        }*/
-
+    public List<StreamRuleSummaryResponse> getStreamRules() {
         return streamRules;
     }
 }
