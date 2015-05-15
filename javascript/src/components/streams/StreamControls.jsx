@@ -47,27 +47,27 @@ var StreamControls = React.createClass({
         var menuItems = [];
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
-            menuItems.push(<MenuItem key={"editStreams-" + stream.id}><a onClick={this._onEdit}>Edit stream</a></MenuItem>);
-            menuItems.push(<MenuItem  key={"quickAddRule-" + stream.id}className={stream.stream_rules.length > 0 ? "" : "disabled"}>
-                <a href="#" onClick={this._onQuickAdd}>Quick add rule</a>
-            </MenuItem>);
+            menuItems.push(<MenuItem key={"editStreams-" + stream.id} onClick={this._onEdit}>Edit stream</MenuItem>);
+            menuItems.push(<MenuItem key={"quickAddRule-" + stream.id}className={stream.stream_rules.length > 0 ? "" : "disabled"}
+                                     onClick={this._onQuickAdd}>Quick add rule</MenuItem>);
         }
 
         if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
             if (stream.disabled) {
-                menuItems.push(<MenuItem key={"startStream-" + stream.id}><a onClick={this._onResume}>Start this stream</a></MenuItem>);
+                menuItems.push(<MenuItem key={"startStream-" + stream.id} onClick={this._onResume}>Start this stream</MenuItem>);
             } else {
-                menuItems.push(<MenuItem key={"stopStream-" + stream.id}><a onClick={this._onPause}>Stop this stream</a></MenuItem>);
+                menuItems.push(<MenuItem key={"stopStream-" + stream.id} onClick={this._onPause}>Stop this stream</MenuItem>);
             }
         }
 
         if (this.isPermitted(permissions, ["streams:create", "streams:read:" + stream.id])) {
-            menuItems.push(<MenuItem key={"cloneStream-" + stream.id}><a onClick={this._onClone}>Clone this stream</a></MenuItem>);
+            menuItems.push(<MenuItem key={"cloneStream-" + stream.id} onClick={this._onClone}>Clone this stream</MenuItem>);
         }
 
         if (this.state.user) {
-            menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={this.state.user.readonly ? "disabled" : ""}>
-                <a href={jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>Set as startpage</a>
+            menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={this.state.user.readonly ? "disabled" : ""}
+                                     href={this.state.user.readonly ? null : jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>
+                Set as startpage
             </MenuItem>);
         }
 
