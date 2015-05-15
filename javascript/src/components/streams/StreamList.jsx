@@ -29,7 +29,6 @@ var StreamList = React.createClass({
                 </ul>
             );
         } else {
-            // @if(isPermitted(STREAMS_CREATE))
             var createLink = (this.isPermitted(this.props.permissions, ['streams:create']) ? <a onClick={this.props.onCreate}>Create one now</a> : "");
             return (
                 <Alert bsStyle='warning'>
