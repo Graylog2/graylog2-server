@@ -8,11 +8,11 @@ var Alert = require('react-bootstrap').Alert;
 var CollapsableStreamRuleList = React.createClass({
     mixins: [CollapsableMixin],
     getCollapsableDOMNode: function(){
-        return this.refs.well.getDOMNode();
+        return React.findDOMNode(this.refs.well);
     },
 
     getCollapsableDimensionValue: function(){
-        return this.refs.well.getDOMNode().scrollHeight;
+        return React.findDOMNode(this.refs.well).scrollHeight;
     },
     onHandleToggle: function(e){
         e.preventDefault();

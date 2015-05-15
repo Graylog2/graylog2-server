@@ -24,8 +24,8 @@ var MessageLoader = React.createClass({
         }
     },
     loadMessage(e) {
-        var messageId = this.refs.messageId.getDOMNode().value;
-        var index = this.refs.index.getDOMNode().value;
+        var messageId = React.findDOMNode(this.refs.messageId).value;
+        var index = React.findDOMNode(this.refs.index).value;
         if (messageId === "" || index === "") {
             return;
         }
@@ -35,9 +35,9 @@ var MessageLoader = React.createClass({
         e.preventDefault();
     },
     submit(messageId, index) {
-        this.refs.messageId.getDOMNode().value = messageId;
-        this.refs.index.getDOMNode().value = index;
-        this.refs.submitButton.getDOMNode().click();
+        React.findDOMNode(this.refs.messageId).value = messageId;
+        React.findDOMNode(this.refs.index).value = index;
+        React.findDOMNode(this.refs.submitButton).click();
     },
     render() {
         var explanatoryText = (this.props.hideText ? null :
