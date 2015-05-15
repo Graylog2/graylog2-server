@@ -12,6 +12,9 @@ var MessageTableEntry = React.createClass({
 
     possiblyHighlight(fieldName) {
         var origValue = this.props.message.fields[fieldName];
+        if (origValue === undefined) {
+            return "";
+        }
         if (this.props.highlight && this.props.message.highlight_ranges) {
             if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
                 var chunks = [];
