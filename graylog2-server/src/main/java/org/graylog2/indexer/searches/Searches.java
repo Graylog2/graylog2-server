@@ -251,9 +251,9 @@ public class Searches {
 
         SearchRequestBuilder srb;
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
@@ -294,9 +294,9 @@ public class Searches {
 
         SearchRequestBuilder srb;
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         }
 
 
@@ -378,9 +378,9 @@ public class Searches {
         SearchRequestBuilder srb;
 
         if (filter == null) {
-            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         } else {
-            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range));
+            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexRangeService, deflector, range), range);
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
