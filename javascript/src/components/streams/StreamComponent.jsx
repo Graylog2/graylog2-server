@@ -17,15 +17,15 @@ var StreamComponent = React.createClass({
     },
     componentDidMount() {
         this.loadData();
+        StreamRulesStore.types((types) => {
+            this.setState({streamRuleTypes: types});
+        });
         StreamsStore.onChange(this.loadData);
         StreamRulesStore.onChange(this.loadData);
     },
     loadData() {
         StreamsStore.load((streams) => {
             this.setState({streams: streams});
-        });
-        StreamRulesStore.types((types) => {
-            this.setState({streamRuleTypes: types});
         });
     },
     _onSave(streamId, stream) {
