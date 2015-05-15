@@ -36,7 +36,7 @@ public class StreamRulesApiController extends AuthenticatedController {
         this.streamRuleService = streamRuleService;
     }
 
-    public Result types(String streamId) {
+    public Result types() {
         final List<Type> types = Lists.newArrayList();
         for (StreamRule.Type type : StreamRule.Type.values()) {
             types.add(new Type(type.getId(), type.getShortDesc(), type.getLongDesc()));
