@@ -120,7 +120,7 @@ var SearchResult = React.createClass({
                 streamDescription = "in stream " + this.props.searchInStream.title;
             }
             return (
-                <div className="col-md-12" id="main-content">
+                <div>
                     <div className="row content content-head">
                         <div className="col-md-12">
                             <h1>
@@ -157,7 +157,7 @@ var SearchResult = React.createClass({
                 </div>);
         }
         return (
-            <div >
+            <div id='main-content-search' className='row'>
                 <div ref="opa" className="col-md-3" id="sidebar">
                     <div data-spy="affix" data-offset-top="90" style={style} className="hidden-sm hidden-xs">
                         <SearchSidebar result={this.props.result}

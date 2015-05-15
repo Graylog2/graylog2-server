@@ -273,8 +273,7 @@ label {
 }
 
 #sidebar {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 0;
 }
 
 #sidebar .affix {
@@ -284,11 +283,17 @@ label {
 
 #main-content-sidebar {
   padding-left: 0;
-  padding-right: 10px;
+  padding-right: 0;
 }
 
 #main-content {
   padding: 15px 25px;
+}
+
+// This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer
+#main-content-search {
+  margin-bottom: 0;
+  margin-top: -15px;
 }
 
 #universalsearch {

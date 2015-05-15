@@ -8,13 +8,13 @@
         searchResult: org.graylog2.restclient.models.api.results.SearchResult,
         histogram: org.graylog2.restclient.models.api.results.DateHistogramResult,
         formattedHistogramResults: String,
-        nodes: Map[String, controllers.SearchControllerV2.NodeDescription],
-        streams: Map[String, controllers.SearchControllerV2.StreamDescription],
-        inputs: Map[String, controllers.SearchControllerV2.InputDescription]
+        nodes: Map[String, controllers.SearchController.NodeDescription],
+        streams: Map[String, controllers.SearchController.StreamDescription],
+        inputs: Map[String, controllers.SearchController.InputDescription]
         )(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import play.libs.Json;
-@import controllers.SearchControllerV2.StreamDescription
+@import controllers.SearchController.StreamDescription
 
 @streamId = @{
         if (stream == null) {
@@ -24,7 +24,7 @@
         }
 }
 
-@main("Search V2", null, query, currentUser, false, true) {
+@main("Search", null, query, currentUser, true) {
 
     <div id="react-search-result"
             data-query="@query"

@@ -11,18 +11,17 @@ GET           /logout                                                           
 GET           /disconnected                                                                      @controllers.LonesomeInterfaceController.index()
 
 # Home page
-GET           /                                                                                  @controllers.SearchController.globalSearch()
+GET           /                                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
 
 # Redirect for personal startpage.
 GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /searchv2                                                                @controllers.SearchControllerV2.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /searchv2/csv                                                              @controllers.SearchControllerV2.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
+GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET           /search/csv                                                                        @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
-GET           /messages/:index/:id                                                               @controllers.SearchControllerV2.showMessage(index: String, id: String)
+GET           /messages/:index/:id                                                               @controllers.SearchController.showMessage(index: String, id: String)
 GET           /messages/:index/:id/partial                                                       @controllers.MessagesController.partial(index: String, id: String)
 
 # Streams
@@ -44,7 +43,7 @@ POST          /streams/:stream_id/clone                                         
 GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
-GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
+GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)
 
 # Alerts
 GET           /streams/:stream_id/alerts                                                         @controllers.AlertsController.index(stream_id: String)

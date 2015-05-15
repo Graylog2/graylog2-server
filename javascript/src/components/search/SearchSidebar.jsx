@@ -65,7 +65,7 @@ var SearchSidebar = React.createClass({
     getInitialState() {
         return {
             fieldFilter: ""
-        }
+        };
     },
     _updateFieldSelection(setName) {
         this.props.predefinedFieldSelection(setName);

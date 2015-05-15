@@ -11,7 +11,7 @@ import play.mvc.Result;
 
 import java.io.IOException;
 
-public class StreamSearchController extends SearchControllerV2 {
+public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
 

@@ -26,7 +26,7 @@ var Navigation = React.createClass({
 
     render() {
         var logoUrl = jsRoutes.controllers.Assets.at("images/toplogo.png").url;
-        var homeUrl = jsRoutes.controllers.SearchController.globalSearch().url;
+        var homeUrl = jsRoutes.controllers.SearchController.index().url;
         var brand = (<a href={homeUrl}>
             <img src={logoUrl}/>
         </a>);
@@ -35,12 +35,8 @@ var Navigation = React.createClass({
                 <CollapsableNav eventKey={0}>
                     <Nav navbar>
                         {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
-                            <NavItem href={jsRoutes.controllers.SearchController.globalSearch().url}
+                            <NavItem href={jsRoutes.controllers.SearchController.index().url}
                                      active={this.props.requestPath === '/' || this._isActive("/search")}>Search</NavItem>
-                        }
-                        {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
-                        <NavItem href={jsRoutes.controllers.SearchControllerV2.index().url}
-                                 active={this._isActive("/searchv2")}>Search V2</NavItem>
                         }
                         <NavItem href={jsRoutes.controllers.StreamsController.index().url}
                                  active={this._isActive("/streams")}>Streams</NavItem>
