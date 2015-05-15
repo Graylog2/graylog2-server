@@ -14,7 +14,6 @@ var RecentMessageLoader = React.createClass({
         }
         InputsStore.globalRecentMessage(input, (message) => {
             message['source_input_id'] = input.id;
-            message['source_node_id'] = 'unknown';
             this.props.onMessageLoaded(message);
         });
     },

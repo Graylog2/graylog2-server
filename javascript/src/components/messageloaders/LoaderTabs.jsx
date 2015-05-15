@@ -45,7 +45,8 @@ var LoaderTabs = React.createClass({
     },
     render() {
         var displayMessage = (this.state.message && this.state.inputs ?
-            <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={this.state.nodes}/> : "");
+            <MessageShow message={this.state.message} inputs={this.state.inputs}
+                         disableTestAgainstStream={true} disableFieldActions={true}/> : null);
         var defaultActiveKey;
         if (this.props.messageId && this.props.index) {
             defaultActiveKey = 2;
