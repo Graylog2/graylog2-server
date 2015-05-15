@@ -59,8 +59,8 @@ var StreamComponent = React.createClass({
 
                             <SupportLink>
                                 Take a look at the
-                                <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html"
-                                   target="_blank">Graylog stream dashboards</a>
+                                {' '}<a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html"
+                                   target="_blank">Graylog stream dashboards</a>{' '}
                                 for wall-mounted displays or other integrations.
                             </SupportLink>
                         </div>
