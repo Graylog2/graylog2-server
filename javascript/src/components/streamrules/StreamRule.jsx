@@ -11,7 +11,8 @@ var StreamRule = React.createClass({
     _onEdit() {
         this.refs.streamRuleForm.open();
     },
-    _onDelete() {
+    _onDelete(e) {
+        e.preventDefault();
         if (window.confirm("Do you really want to delete this stream rule?")) {
             StreamRulesStore.remove(this.props.stream.id, this.props.streamRule.id, () => {
                 if (this.props.onDelete) {
@@ -30,12 +31,12 @@ var StreamRule = React.createClass({
     _formatActionItems() {
         return (
             <span>
-                <a onClick={this._onDelete}>
+                <a href="#" onClick={this._onDelete}>
                     <i className="fa fa-trash-o"></i>
                 </a>
 
 
-                <a onClick={this._onEdit}>
+                <a href="#" onClick={this._onEdit}>
                     <i className="fa fa-edit"></i>
                 </a>
             </span>
