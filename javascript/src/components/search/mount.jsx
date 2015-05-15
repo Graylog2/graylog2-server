@@ -7,6 +7,7 @@ var SearchResult = require('./SearchResult');
 var React = require('react');
 var Immutable = require('immutable');
 var SearchStore = require('../../stores/search/SearchStore');
+var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 
 var queryInputContainer = document.getElementById('universalsearch-query');
 if (queryInputContainer) {
@@ -17,6 +18,7 @@ if (queryInputContainer) {
 var searchBarElem = document.getElementById('react-search-bar');
 if (searchBarElem) {
     SearchStore.initializeFieldsFromHash();
+    SavedSearchesStore.updateSavedSearches();
     React.render(<SearchBar />, searchBarElem);
 }
 
