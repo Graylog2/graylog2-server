@@ -35,6 +35,7 @@ var StreamRule = React.createClass({
                     <i className="fa fa-trash-o"></i>
                 </a>
 
+                {' '}
 
                 <a href="#" onClick={this._onEdit}>
                     <i className="fa fa-edit"></i>

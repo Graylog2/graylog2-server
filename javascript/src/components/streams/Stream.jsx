@@ -66,10 +66,10 @@ var Stream = React.createClass({
                 </h2>
                 <div className="stream-data">
                     <div className="stream-actions pull-right">
-                        {editRulesLink}
-                        {manageOutputsLink}
-                        {manageAlertsLink}
-                        {deleteStreamLink}
+                        {editRulesLink}{' '}
+                        {manageOutputsLink}{' '}
+                        {manageAlertsLink}{' '}
+                        {deleteStreamLink}{' '}
 
                         <StreamControls stream={stream} permissions={this.props.permissions} user={this.props.user}
                                         onResume={this._onResume} onUpdate={this._onUpdate}
