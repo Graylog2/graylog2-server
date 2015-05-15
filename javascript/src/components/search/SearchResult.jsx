@@ -161,6 +161,7 @@ var SearchResult = React.createClass({
                 <div ref="opa" className="col-md-3" id="sidebar">
                     <div data-spy="affix" data-offset-top="90" style={style} className="hidden-sm hidden-xs">
                         <SearchSidebar result={this.props.result}
+                                       builtQuery={this.props.builtQuery}
                                        selectedFields={this.state.selectedFields}
                                        fields={this._fields()}
                                        showAllFields={this.state.showAllFields}

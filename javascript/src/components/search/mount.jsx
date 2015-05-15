@@ -48,6 +48,7 @@ if (messageDetails) {
 var searchResultElem = document.getElementById('react-search-result');
 if (searchResultElem) {
     var query = searchResultElem.getAttribute('data-query');
+    var builtQuery = searchResultElem.getAttribute('data-built-query');
 
     var searchResult = searchResultElem.getAttribute('data-search-result');
     if (searchResult) {
@@ -86,6 +87,7 @@ if (searchResultElem) {
     }
 
     React.render(<SearchResult query={query}
+                               builtQuery={builtQuery}
                                result={searchResult}
                                histogram={histogram}
                                formattedHistogram={formattedHistogram}
