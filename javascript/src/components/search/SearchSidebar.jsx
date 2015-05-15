@@ -62,21 +62,23 @@ var MessageField = React.createClass({
 });
 
 var SearchSidebar = React.createClass({
-    _updateFieldSelection(event, setName) {
-        this.props.predefinedFieldSelection(setName);
-        event.preventDefault();
+    getInitialState() {
+        return {
+            fieldFilter: ""
+        }
     },
-    _showAllFields(event) {
+    _updateFieldSelection(setName) {
+        this.props.predefinedFieldSelection(setName);
+    },
+    _showAllFields() {
         if (!this.props.showAllFields) {
             this.props.togglePageFields();
         }
-        event.preventDefault();
     },
-    _showPageFields(event) {
+    _showPageFields() {
         if (this.props.showAllFields) {
             this.props.togglePageFields();
         }
-        event.preventDefault();
     },
     render() {
         var indicesModal =
@@ -94,6 +96,7 @@ var SearchSidebar = React.createClass({
             </Modal>;
 
         var messageFields = this.props.fields
+            .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((field) => {
                 return (
@@ -140,22 +143,24 @@ var SearchSidebar = React.createClass({
                     &nbsp;
                     <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
-                    <DropdownButton caret bsSize="small" title="More actions">
+                    <DropdownButton bsSize="small" title="More actions">
                         {moreActions}
                     </DropdownButton>
                 </div>
 
                 <hr />
 
-                <h3 style={{display: 'inline-block'}}>Fields</h3>
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
-                |
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'all')}>All</a>
-                |
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'none')}>None</a>
+
+                <h3>Fields</h3>
+
+                <div className="input-group input-group-sm">
+                    <span className="input-group-btn">
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('default')}>Default</button>
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('all')}>All</button>
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('none')}>None</button>
+                    </span>
+                    <input type="text" className="form-control" placeholder="Filter fields" onChange={(event) => this.setState({fieldFilter: event.target.value})} value={this.state.fieldFilter}/>
+                </div>
 
                 <ul className="search-result-fields">
                     {messageFields}
