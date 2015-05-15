@@ -20,18 +20,4 @@
 
     <div class="react-streamrules-editor" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
-
-    <script type="text/javascript">
-    $(document).ready(function() {
-        var hash = window.location.hash.substring(1);
-        var info = hash.split(".");
-        if (info.length > 1) { // lol JS
-            // Looks like a message deeplink was provided! Fill out fields and submit form.
-            $("input[name=message_id]", "#message-selector").val(info[0]);
-            $("input[name=index]", "#message-selector").val(info[1]);
-            $(".manual-selector-load", "#message-selector").click();
-        }
-    });
-    </script>
-
 }
