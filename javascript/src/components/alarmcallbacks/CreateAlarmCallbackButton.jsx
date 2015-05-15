@@ -25,12 +25,12 @@ var CreateAlarmCallbackButton = React.createClass({
             <div className="form-inline">
                 <div className="form-group">
                     <select id="input-type" value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
-                        <option value={this.PLACEHOLDER} disabled>--- Select Alarm Callback Type ---</option>
+                        <option value={this.PLACEHOLDER} disabled>Select Callback Type</option>
                         {alarmCallbackTypes}
                     </select>
                     {' '}
                     <button className="btn btn-success form-control" disabled={this.state.typeName === this.PLACEHOLDER}
-                            onClick={this._openModal}>Configure new alert destination</button>
+                            onClick={this._openModal}>Add callback</button>
                 </div>
                 {configurationForm}
             </div>

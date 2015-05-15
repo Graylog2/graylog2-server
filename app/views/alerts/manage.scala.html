@@ -53,7 +53,7 @@
 
     <div class="row content alert-conditions">
         <div class="col-md-12">
-            <h2 style="margin-bottom: 5px;">Configured alert conditions</h2>
+            <h2 style="margin-bottom: 10px;">Configured alert conditions</h2>
 
             @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
         </div>
@@ -70,14 +70,6 @@
 
             <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
             </div>
-
-            @if((stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) && isPermitted(STREAMS_EDIT, stream.getId)) {
-                <div class="sendDummyAlert">
-                    <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
-                        <button type="submit" class="btn btn-info pull-right">Send test alert</button>
-                    </form>
-                </div>
-            }
         </div>
     </div>
 
@@ -120,6 +112,14 @@
                             }
                         </li>
                     }
+
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        <div class="sendDummyAlert">
+                            <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
+                                <button type="submit" class="btn btn-info pull-right">Send test alert</button>
+                            </form>
+                        </div>
+                    }
                 </ul>
             }
 
@@ -156,7 +156,6 @@
 
     <div class="row content">
         <div class="col-md-12">
-
             @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
         </div>
     </div>

@@ -12,12 +12,12 @@
 } else {
     @for(condition <- alertConditions) {
         <div class="row alert-condition" data-condition-id="@condition.getId">
-            <div class="col-md-10">
+            <div class="col-md-9">
                 <h3>
                     @condition.getSummary
 
                     @if(condition.isInGrace) {
-                        <span class="in-grace">(in grace period)</span>
+                        <span class="badge badge-info">in grace period</span>
                     }
 
                     <small>
@@ -35,29 +35,14 @@
                 }
             </div>
 
-            <div class="col-md-2" style="text-align: right;">
-                <a href="#" class="btn btn-success edit-alert-condition">Edit condition</a>
+            <div class="col-md-3" style="text-align: right;">
+                @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                    <a href="#" class="btn btn-success edit-alert-condition">Edit condition</a>
+                    <a href="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" class="btn btn-danger" data-confirm="Really delete alarm condition?">Delete condition</a>
+                }
             </div>
         </div>
 
         <hr />
-
-        <!--
-<span class="pull-right node-row-info">
-
-        @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-            <a href="#" class="btn btn-success btn-xs edit-alert-condition">
-                <i class="fa fa-edit"></i>
-
-            </a>
-
-            <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
-                <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">
-                    <i class="fa fa-remove"></i>
-                    Delete
-                </button>
-            </form>
-        }
-        </span>-->
     }
 }

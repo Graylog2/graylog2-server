@@ -11,7 +11,7 @@ var AlarmCallbackList = React.createClass({
             if (available) {
                 return available.name;
             } else {
-                return "Unknown Alarmcallback type";
+                return "Unknown callback type";
             }
         }
         return <span><i className="fa fa-spin fa-spinner"></i> Loading</span>;
@@ -31,7 +31,7 @@ var AlarmCallbackList = React.createClass({
             );
         } else {
             return (
-                <div className="alert alert-info">
+                <div className="alert alert-info no-alarm-callbacks">
                     No configured alarm callbacks.
                 </div>
             );
