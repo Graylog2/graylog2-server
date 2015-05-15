@@ -63,6 +63,7 @@ import org.joda.time.Minutes;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -95,6 +96,17 @@ public class SearchController extends AuthenticatedController {
     private NodeService nodeService;
     @Inject
     private ObjectMapper objectMapper;
+
+    public Result globalSearch() {
+        // User would not be allowed to do any global searches anyway, so we can redirect him to the streams page to avoid confusion.
+        if (Permissions.isPermitted(RestPermissions.SEARCHES_ABSOLUTE)
+                || Permissions.isPermitted(RestPermissions.SEARCHES_RELATIVE)
+                || Permissions.isPermitted(RestPermissions.SEARCHES_KEYWORD)) {
+            return index("", "relative", 600, "", "", "", "", 1, "", "", "", "", DEFAULT_ASSUMED_GRAPH_RESOLUTION);
+        } else {
+            return redirect(routes.StreamsController.index());
+        }
+    }
 
     public Result index(String q,
                         String rangeType,
