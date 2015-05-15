@@ -21,7 +21,6 @@ interface SplitQuery {
 }
 
 class QueryInput {
-    private static DEBUG = true;
     private typeAheadConfig: any;
     private typeAheadSource: any;
     private fields: string[];
@@ -84,18 +83,6 @@ class QueryInput {
             var splitQuery = this.splitQuery(ast, currentAST);
             query = splitQuery.current;
             prefix = splitQuery.prefix;
-
-            // TODO: disable debug once the completion is stable
-            if (QueryInput.DEBUG) {
-                console.log("ast length: " + serializedAst.length);
-                console.log("prefix: " + prefix);
-                console.log("query: " + query);
-                console.log(twoASTago);
-                console.log(previousAST);
-                console.log(currentAST);
-                console.log("no errors: " + parser.errors.length);
-                console.log(parser.errors);
-            }
 
             if (currentAST instanceof queryParser.TermAST) {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());

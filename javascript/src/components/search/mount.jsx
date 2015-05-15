@@ -1,6 +1,5 @@
 'use strict';
 
-var QueryInput = require('./QueryInput');
 var SearchBar = require('./SearchBar');
 var MessageShow = require('./MessageShow');
 var SearchResult = require('./SearchResult');
@@ -8,12 +7,6 @@ var React = require('react');
 var Immutable = require('immutable');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
-
-var queryInputContainer = document.getElementById('universalsearch-query');
-if (queryInputContainer) {
-    var queryInput = new QueryInput(queryInputContainer);
-    queryInput.display();
-}
 
 var searchBarElem = document.getElementById('react-search-bar');
 if (searchBarElem) {
