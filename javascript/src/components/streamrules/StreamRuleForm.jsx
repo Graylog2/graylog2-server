@@ -8,6 +8,7 @@ var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 
 var StreamRuleForm = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
+    FIELD_PRESENCE_RULE_TYPE: 5,
     getInitialState() {
         return this.props.streamRule;
     },
@@ -20,7 +21,7 @@ var StreamRuleForm = React.createClass({
         this.setState(this.props.streamRule);
     },
     _onSubmit(evt) {
-        if (this.state.type === 5) {
+        if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE) {
             this.state.value = "";
         }
         this.props.onSubmit(this.props.streamRule.id, this.state);

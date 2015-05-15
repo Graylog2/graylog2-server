@@ -3,6 +3,7 @@
 var React = require('react/addons');
 
 var HumanReadableStreamRule = React.createClass({
+    FIELD_PRESENCE_RULE_TYPE: 5,
     _getTypeForInteger(type, streamRuleTypes) {
         if (streamRuleTypes) {
             return streamRuleTypes.filter((streamRuleType) => {
@@ -13,7 +14,7 @@ var HumanReadableStreamRule = React.createClass({
         }
     },
     _formatRuleValue(streamRule) {
-        if (streamRule.type !== 5) {
+        if (streamRule.type !== this.FIELD_PRESENCE_RULE_TYPE) {
             if (streamRule.value) {
                 return streamRule.value;
             } else {
