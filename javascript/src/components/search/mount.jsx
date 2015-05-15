@@ -79,8 +79,11 @@ if (searchResultElem) {
         nodes = JSON.parse(nodes);
     }
 
-    var searchInStreamId = searchResultElem.getAttribute('data-search-in-stream');
-    SearchStore.searchInStreamId = searchInStreamId;
+    var searchInStream = searchResultElem.getAttribute('data-search-in-stream');
+    if (searchInStream) {
+        searchInStream = JSON.parse(searchInStream);
+        SearchStore.searchInStream = searchInStream;
+    }
 
     React.render(<SearchResult query={query}
                                result={searchResult}
@@ -89,6 +92,6 @@ if (searchResultElem) {
                                streams={Immutable.Map(streams)}
                                inputs={Immutable.Map(inputs)}
                                nodes={Immutable.Map(nodes)}
-                               searchInStreamId={searchInStreamId}
+                               searchInStream={searchInStream}
         />, searchResultElem);
 }

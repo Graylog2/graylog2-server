@@ -26,7 +26,7 @@ class SearchStore {
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
-    searchInStreamId: string;
+    searchInStream: any;
 
     constructor() {
         var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
@@ -231,8 +231,8 @@ class SearchStore {
         orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
         orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
         orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
-        if (this.searchInStreamId) {
-            orignalParams = orignalParams.set('streamId', this.searchInStreamId);
+        if (this.searchInStream) {
+            orignalParams = orignalParams.set('streamId', this.searchInStream.id);
         }
 
         return orignalParams;
@@ -263,10 +263,10 @@ class SearchStore {
         return originalURLParams;
     }
 
-    _searchBaseLocation(action) {
+    searchBaseLocation(action) {
         var location;
-        if (this.searchInStreamId) {
-            location = jsRoutes.controllers.StreamSearchController[action](this.searchInStreamId).url;
+        if (this.searchInStream) {
+            location = jsRoutes.controllers.StreamSearchController[action](this.searchInStream.id).url;
         } else {
             location = jsRoutes.controllers.SearchControllerV2[action]().url;
         }
@@ -276,13 +276,13 @@ class SearchStore {
     _reloadSearchWithNewParam(param: string, value: any) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
-        URLUtils.openLink(this._searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
+        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
     }
 
     getCsvExportURL(): string {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.delete('page');
-        return this._searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
+        return this.searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
     }
 }
 

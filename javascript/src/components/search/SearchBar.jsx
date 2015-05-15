@@ -1,4 +1,4 @@
-/* global jsRoutes, momentHelper */
+/* global momentHelper */
 
 'use strict';
 
@@ -244,7 +244,7 @@ var SearchBar = React.createClass({
                         <div ref="universalSearch" className="col-md-12" id="universalsearch">
                             <form ref='searchForm'
                                   className='universalsearch-form'
-                                  action={this.props.streamId ?  'unimplemented' : jsRoutes.controllers.SearchControllerV2.index().url }
+                                  action={SearchStore.searchBaseLocation("index")}
                                   method='GET'
                                   onSubmit={this._prepareSearch}>
                                 <Input type='hidden' name='rangetype' value={this.state.rangeType}/>

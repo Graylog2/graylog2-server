@@ -6,6 +6,8 @@ var ModalTrigger = require('react-bootstrap').ModalTrigger;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
+var DropdownButton = require('react-bootstrap').DropdownButton;
+var MenuItem = require('react-bootstrap').MenuItem;
 
 var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
@@ -104,29 +106,48 @@ var SearchSidebar = React.createClass({
                                   selected={this.props.selectedFields.contains(field.name)}/>
                 );
             });
-
+        var searchTitle = null;
+        var moreActions = [
+            <MenuItem key="export" href={SearchStore.getCsvExportURL()}>Export as CSV</MenuItem>
+        ];
+        if (this.props.searchInStream) {
+            searchTitle = <span>{this.props.searchInStream.title}</span>;
+            // add stream actions to dropdown
+            moreActions.push(<MenuItem divider key="div" />);
+            moreActions.push(<MenuItem key="todo" href="#">TODO Stream actions</MenuItem>);
+        } else {
+            searchTitle = <span>Search result</span>;
+        }
         return (
             <div className="content-col">
-                <h3>Found {numeral(this.props.result['total_result_count']).format("0,0")} messages</h3>
+                <h2>
+                    {searchTitle}
+                </h2>
 
                 <p style={{marginTop: 3}}>
-                    Search took {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in <ModalTrigger
-                    modal={indicesModal}><a href="#"
-                                            onClick={event => event.preventDefault()}>{this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}</a></ModalTrigger>.
+                    Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong> in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
+                    <ModalTrigger modal={indicesModal}>
+                        <a href="#" onClick={event => event.preventDefault()}>
+                            {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
+                        </a>
+                    </ModalTrigger>.
                 </p>
 
                 <div style={{marginTop: 10}}>
                     <AddToDashboardMenu title="Add count to dashboard"
-                                        widgetType={this.props.searchInStreamId ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
+                                        widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
                                         dashboards={this.props.dashboards}/>
                     &nbsp;
                     <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
-                    <a href={SearchStore.getCsvExportURL()} className="btn btn-default btn-sm">Export as CSV</a>
+
+                    <DropdownButton caret bsSize="small" title="More actions">
+                        {moreActions}
+                    </DropdownButton>
                 </div>
 
                 <hr />
 
-                <h1 style={{display: 'inline-block'}}>Fields</h1>
+                <h3 style={{display: 'inline-block'}}>Fields</h3>
                 <a href="#" className="fields-set-chooser"
                    onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
                 |

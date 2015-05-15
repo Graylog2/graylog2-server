@@ -551,6 +551,13 @@ public class SearchControllerV2 extends AuthenticatedController {
             this.stream = stream;
         }
 
+        public static StreamDescription of(Stream stream) {
+            if (stream == null) {
+                return null;
+            }
+            return new StreamDescription(stream);
+        }
+
         @JsonProperty
         public String getDescription() {
             return stream.getDescription();

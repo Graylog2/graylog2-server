@@ -115,15 +115,18 @@ var SearchResult = React.createClass({
 
         // short circuit if the result turned up empty
         if (this.props.result['total_result_count'] === 0) {
-
+            var streamDescription = null;
+            if (this.props.searchInStream) {
+                streamDescription = "in stream " + this.props.searchInStream.title;
+            }
             return (
                 <div className="col-md-12" id="main-content">
                     <div className="row content content-head">
                         <div className="col-md-12">
                             <h1>
-                                <span><i className="fa fa-search"></i> Nothing found</span>
+                                <span><i className="fa fa-search"></i> Nothing found {streamDescription}</span>
                                 <AddToDashboardMenu title="Add count to dashboard"
-                                                    widgetType={this.props.searchInStreamId ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
+                                                    widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
                                                     dashboards={this.state.dashboards}/>
                             </h1>
 
@@ -172,7 +175,7 @@ var SearchResult = React.createClass({
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
                                        currentSavedSearch={SearchStore.savedSearch}
                                        dashboards={this.state.dashboards}
-                                       searchInStreamId={this.props.searchInStreamId}
+                                       searchInStream={this.props.searchInStream}
                             />
                     </div>
                 </div>

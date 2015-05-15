@@ -1,3 +1,4 @@
+
 @(currentUser: org.graylog2.restclient.models.User,
         query: String,
         search: org.graylog2.restclient.models.UniversalSearch,
@@ -13,6 +14,7 @@
         )(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import play.libs.Json;
+@import controllers.SearchControllerV2.StreamDescription
 
 @streamId = @{
         if (stream == null) {
@@ -35,7 +37,7 @@
             data-streams="@Json.toJson(streams)"
             data-inputs="@Json.toJson(inputs)"
             data-nodes="@Json.toJson(nodes)"
-            data-search-in-stream="@streamId"
+            data-search-in-stream="@Json.toJson(StreamDescription.of(stream))"
         >
     </div>
 }
