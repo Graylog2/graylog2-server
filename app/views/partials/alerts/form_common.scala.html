@@ -5,12 +5,12 @@ and <br /> then wait at least
 <span class="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
 a new alert. (grace period)
 
-<p>
-    When sending an alert, include the last
-    <input name="backlog" type="number" class="form-control pluralsingular validatable" data-pluralsingular="backlog-descr" data-validate="not_negative_numer" value="@conditionDecorator.getBacklog"/>
-    <span class="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
-</p>
+<br />
 
-<p style="margin-top: 10px;">
+When sending an alert, include the last
+<input name="backlog" type="number" class="form-control pluralsingular validatable" data-pluralsingular="backlog-descr" data-validate="not_negative_numer" value="@conditionDecorator.getBacklog"/>
+<span class="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
+
+<p style="margin-top: 5px; margin-bottom: 0px;">
     @Html(conditionDecorator.getSaveButtonHtml)
 </p>

@@ -11,43 +11,53 @@
     </div>
 } else {
     @for(condition <- alertConditions) {
-        <div class="node-row alert-condition" data-condition-id="@condition.getId">
-            <span class="pull-right node-row-info">
-                Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
-                @DateHelper.readablePeriodFromNow(condition.getCreatedAt())
+        <div class="row alert-condition" data-condition-id="@condition.getId">
+            <div class="col-md-10">
+                <h3>
+                    @condition.getSummary
+
+                    @if(condition.isInGrace) {
+                        <span class="in-grace">(in grace period)</span>
+                    }
+
+                    <small>
+                        Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
+                        @DateHelper.readablePeriodFromNow(condition.getCreatedAt())
+                    </small>
+                </h3>
+
+                <div class="alert-condition">
+                    @condition.getDescription
+                </div>
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                        &nbsp;
-                    <a href="#" class="btn btn-success btn-xs edit-alert-condition">
-                        <i class="fa fa-edit"></i>
-                        Edit
-                    </a>
-
-                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
-                        <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">
-                            <i class="fa fa-remove"></i>
-                            Delete
-                        </button>
-                    </form>
+                    @AlertConditionDecorator.loadTemplate(stream, condition)
                 }
-                </span>
-
-            <h3>
-                <i class="fa fa-ellipsis-v"></i>
-                @condition.getSummary
-
-                @if(condition.isInGrace) {
-                    <span class="in-grace">(in grace period)</span>
-                }
-            </h3>
-
-            <div class="alert-condition">
-            @condition.getDescription
             </div>
 
-            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                @AlertConditionDecorator.loadTemplate(stream, condition)
-            }
+            <div class="col-md-2" style="text-align: right;">
+                <a href="#" class="btn btn-success edit-alert-condition">Edit condition</a>
+            </div>
         </div>
+
+        <hr />
+
+        <!--
+<span class="pull-right node-row-info">
+
+        @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+            <a href="#" class="btn btn-success btn-xs edit-alert-condition">
+                <i class="fa fa-edit"></i>
+
+            </a>
+
+            <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
+                <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">
+                    <i class="fa fa-remove"></i>
+                    Delete
+                </button>
+            </form>
+        }
+        </span>-->
     }
 }

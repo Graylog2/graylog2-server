@@ -15,17 +15,25 @@
     <div class="row content content-head">
         <div class="col-md-12">
             <h1>
-                <i class="fa fa-fire"></i>
                 Alerts configuration for stream &raquo;@stream.getTitle&laquo;
             </h1>
             <p class="description">
                 You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
             </p>
+
+            @views.html.partials.support.list_small() {
+                Learn more about alerts in the <a href="http://docs.graylog.org/en/latest/pages/streams.html#alerts" target="_blank">documentation</a>.
+            }
         </div>
     </div>
+
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
         <div class="row content input-new">
             <div class="col-md-12">
+                <h2 style="margin-bottom: 10px;">
+                    Add new alert condition
+                </h2>
+
                 <form class="form-inline">
                     <div class="form-group">
                         <select class="add-alert-type form-control">
@@ -43,10 +51,9 @@
         </div>
     }
 
-    <div class="row content">
+    <div class="row content alert-conditions">
         <div class="col-md-12">
-            <h2 style="margin-bottom: 5px;"><i class="fa fa-tasks"></i> Configured alert conditions</h2>
-
+            <h2 style="margin-bottom: 5px;">Configured alert conditions</h2>
 
             @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
         </div>
@@ -54,10 +61,12 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-mail-forward"></i> Alert callbacks</h2>
+            <h2>Callbacks</h2>
 
-            The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
-            on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+            <p class="description">
+                The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
+                on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+            </p>
 
             <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
             </div>
@@ -75,7 +84,7 @@
     <div class="row content">
         <div class="col-md-12">
 
-            <h2><i class="fa fa-group"></i> Alert receivers</h2>
+            <h2>Receivers</h2>
 
             The following Graylog users will be notified about alerts via email if they have configured
             an email address in their profile.
