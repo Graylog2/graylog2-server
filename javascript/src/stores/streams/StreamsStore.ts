@@ -27,7 +27,13 @@ class StreamsStore {
     private callbacks: Array<Callback> = [];
 
     listStreams() {
-        return $.getJSON(jsRoutes.controllers.api.StreamsApiController.list().url);
+        var url = jsRoutes.controllers.api.StreamsApiController.listStreams().url;
+        var promise = $.getJSON(url);
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Loading streams failed with status: " + errorThrown,
+                "Could not load streams.");
+        });
+        return promise;
     }
     load(callback: ((streams: Array<Stream>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
