@@ -124,8 +124,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     private final Timer readTime;
     private final KafkaScheduler kafkaScheduler;
-    private final Meter messagesWritten;
-    private final Meter messagesRead;
+    private final Meter writtenMessages;
+    private final Meter readMessages;
 
     private final OffsetFileFlusher offsetFlusher;
     private final DirtyLogFlusher dirtyLogFlusher;
@@ -153,8 +153,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         MetricRegistry metricRegistry) {
         this.scheduler = scheduler;
 
-        this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
-        this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
+        this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
+        this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
 
         registerUncommittedGauge(metricRegistry, name(this.getClass(), "uncommittedMessages"));
 
@@ -393,7 +393,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             long lastWriteOffset = appendInfo.lastOffset();
             LOG.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
                     entries.size(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
-            messagesWritten.mark(entries.size());
+            writtenMessages.mark(entries.size());
             return lastWriteOffset;
         }
     }
@@ -495,7 +495,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
 
         }
-        messagesRead.mark(messages.size());
+        readMessages.mark(messages.size());
         return messages;
     }
 
@@ -688,7 +688,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     public ThrottleState getThrottleState() {
         return throttleState.get();
     }
-    
+
     public void setThrottleState(ThrottleState state) {
         throttleState.set(state);
     }
