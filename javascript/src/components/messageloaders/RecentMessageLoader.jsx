@@ -3,11 +3,17 @@
 var React = require('react/addons');
 var InputDropdown = require('../inputs/InputDropdown');
 var InputsStore = require('../../stores/inputs/InputsStore');
+var UserNotification = require("../../util/UserNotification");
 
 var RecentMessageLoader = React.createClass({
     onClick(inputId) {
-        InputsStore.globalRecentMessage(inputId, (message) => {
-            message['source_input_id'] = inputId;
+        var input = this.props.inputs.get(inputId);
+        if (!input) {
+            UserNotification.error("Invalid input selected: " + inputId,
+                "Could not load message from invalid Input " + inputId);
+        }
+        InputsStore.globalRecentMessage(input, (message) => {
+            message['source_input_id'] = input.id;
             message['source_node_id'] = 'unknown';
             this.props.onMessageLoaded(message);
         });
