@@ -8,7 +8,6 @@ var MenuItem = require('react-bootstrap').MenuItem;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var StreamForm = require('./StreamForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
-var UsersStore = require('../../stores/users/UsersStore');
 
 var StreamControls = React.createClass({
     mixins: [PermissionsMixin],
@@ -35,11 +34,6 @@ var StreamControls = React.createClass({
     _onQuickAdd() {
         this.props.onQuickAdd(this.props.stream.id);
     },
-    componentDidMount() {
-        UsersStore.load(this.props.username).done((user) => {
-            this.setState({user: user});
-        });
-    },
     render() {
         var permissions = this.props.permissions;
         var stream = this.props.stream;
@@ -64,9 +58,9 @@ var StreamControls = React.createClass({
             menuItems.push(<MenuItem key={"cloneStream-" + stream.id} onClick={this._onClone}>Clone this stream</MenuItem>);
         }
 
-        if (this.state.user) {
-            menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={this.state.user.readonly ? "disabled" : ""}
-                                     href={this.state.user.readonly ? null : jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>
+        if (this.props.user) {
+            menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={this.props.user.readonly ? "disabled" : ""}
+                                     href={this.props.user.readonly ? null : jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>
                 Set as startpage
             </MenuItem>);
         }

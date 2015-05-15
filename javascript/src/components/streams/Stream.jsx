@@ -71,7 +71,7 @@ var Stream = React.createClass({
                         {manageAlertsLink}
                         {deleteStreamLink}
 
-                        <StreamControls stream={stream} permissions={this.props.permissions} username={this.props.username}
+                        <StreamControls stream={stream} permissions={this.props.permissions} user={this.props.user}
                                         onResume={this._onResume} onUpdate={this._onUpdate}
                                         onPause={this._onPause} onClone={this._onClone} onQuickAdd={this._onQuickAdd}/>
                     </div>

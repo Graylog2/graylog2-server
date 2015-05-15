@@ -7,6 +7,7 @@ var CreateStreamButton = require('./CreateStreamButton');
 var SupportLink = require('../support/SupportLink');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
+var UsersStore = require('../../stores/users/UsersStore');
 
 var StreamComponent = React.createClass({
     mixins: [PermissionsMixin],
@@ -19,6 +20,9 @@ var StreamComponent = React.createClass({
         this.loadData();
         StreamRulesStore.types((types) => {
             this.setState({streamRuleTypes: types});
+        });
+        UsersStore.load(this.props.username).done((user) => {
+            this.setState({user: user});
         });
         StreamsStore.onChange(this.loadData);
         StreamRulesStore.onChange(this.loadData);
@@ -67,7 +71,7 @@ var StreamComponent = React.createClass({
                     <div className="row content">
                         <div className="col-md-12">
                             <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
-                                        permissions={this.props.permissions} username={this.props.username}/>
+                                        permissions={this.props.permissions} user={this.state.user}/>
                         </div>
                     </div>
                 </div>
