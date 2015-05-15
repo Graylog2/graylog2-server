@@ -39,7 +39,7 @@ var StreamRuleForm = React.createClass({
     },
     render() {
         var streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
-        var valueBox = (this.state.type !== 5 ? <Input type='text' required={true} label='Value' placeholder='19983' valueLink={this.linkState('value')}/> : "");
+        var valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) ? <Input type='text' required={true} label='Value' valueLink={this.linkState('value')}/> : "");
         return (
             <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
                 <div>
@@ -47,7 +47,7 @@ var StreamRuleForm = React.createClass({
                 </div>
                 <div>
                     <div className='col-md-8'>
-                        <Input type='text' required={true} label='Field' placeholder='user_id' valueLink={this.linkState('field')}/>
+                        <Input type='text' required={true} label='Field' valueLink={this.linkState('field')}/>
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
                             {streamRuleTypes}
                         </Input>

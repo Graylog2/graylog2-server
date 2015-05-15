@@ -14,7 +14,7 @@ var HumanReadableStreamRule = React.createClass({
         }
     },
     _formatRuleValue(streamRule) {
-        if (streamRule.type !== this.FIELD_PRESENCE_RULE_TYPE) {
+        if (String(streamRule.type) !== String(this.FIELD_PRESENCE_RULE_TYPE)) {
             if (streamRule.value) {
                 return streamRule.value;
             } else {
