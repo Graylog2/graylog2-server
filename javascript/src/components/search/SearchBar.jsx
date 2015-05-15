@@ -1,4 +1,4 @@
-/* global jsRoutes, momentHelper */
+/* global momentHelper */
 
 'use strict';
 

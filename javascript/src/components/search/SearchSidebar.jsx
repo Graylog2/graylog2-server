@@ -111,12 +111,12 @@ var SearchSidebar = React.createClass({
             <MenuItem key="export" href={SearchStore.getCsvExportURL()}>Export as CSV</MenuItem>
         ];
         if (this.props.searchInStream) {
-            searchTitle = <span>{this.props.searchInStream.title}</span>
+            searchTitle = <span>{this.props.searchInStream.title}</span>;
             // add stream actions to dropdown
             moreActions.push(<MenuItem divider key="div" />);
             moreActions.push(<MenuItem key="todo" href="#">TODO Stream actions</MenuItem>);
         } else {
-            searchTitle = <span>Search result</span>
+            searchTitle = <span>Search result</span>;
         }
         return (
             <div className="content-col">
