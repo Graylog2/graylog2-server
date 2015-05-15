@@ -7,12 +7,28 @@ var MessageTableEntry = require('./MessageTableEntry');
 var MessageTablePaginator = require('./MessageTablePaginator');
 var Immutable = require('immutable');
 
+var StreamsStore = require('../../stores/streams/StreamsStore');
+
 var ResultTable = React.createClass({
     getInitialState() {
         return {
-            expandedMessages: Immutable.Set()
+            expandedMessages: Immutable.Set(),
+            allStreamsLoaded: false,
+            allStreams: Immutable.List()
         };
     },
+    componentDidMount() {
+        // only load the streams per page
+        if (this.state.allStreamsLoaded) {
+            return;
+        }
+        var promise = StreamsStore.listStreams();
+        promise.done((streams) => this._onStreamsLoaded(streams));
+    },
+    _onStreamsLoaded(streams) {
+        this.setState({allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title)});
+    },
+
     _toggleMessageDetail(id) {
         var newSet;
         if (this.state.expandedMessages.contains(id)) {
@@ -71,6 +87,8 @@ var ResultTable = React.createClass({
                                                                               toggleDetail={this._toggleMessageDetail}
                                                                               inputs={this.props.inputs}
                                                                               streams={this.props.streams}
+                                                                              allStreams={this.state.allStreams}
+                                                                              allStreamsLoaded={this.state.allStreamsLoaded}
                                                                               nodes={this.props.nodes}
                                                                               highlight={this.props.highlight}
                         />) }

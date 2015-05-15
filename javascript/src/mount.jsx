@@ -23,7 +23,7 @@ $(document).ready(() => {
     require('./components/inputs/mount');
     require('./components/outputs/mount');
     require('./components/alarmcallbacks/mount');
-    require('./components/agents/mount');
+    require('./components/collectors/mount');
     require('./components/messageloaders/mount');
     require('./components/streamrules/mount');
     if (userPreferences.enableSmartSearch) {

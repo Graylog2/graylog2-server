@@ -6,7 +6,7 @@
 var React = require('react/addons');
 var moment = require('moment');
 
-var AgentRow = React.createClass({
+var CollectorRow = React.createClass({
     getInitialState() {
         return {
             showRelativeTime: true
@@ -31,34 +31,34 @@ var AgentRow = React.createClass({
         this.setState({showRelativeTime: !this.state.showRelativeTime});
     },
     render() {
-        var agent = this.props.agent;
-        var agentClass = agent.active ? "" : "greyed-out inactive";
+        var collector = this.props.collector;
+        var collectorClass = collector.active ? "" : "greyed-out inactive";
         var style = {};
-        var annotation = agent.active ? "" : "(inactive)";
-        var osGlyph = this._getOsGlyph(agent.node_details.operating_system);
-        var formattedTime = (this.state.showRelativeTime ? moment(agent.last_seen).fromNow() :  momentHelper.toUserTimeZone(moment(agent.last_seen)).format());
+        var annotation = collector.active ? "" : "(inactive)";
+        var osGlyph = this._getOsGlyph(collector.node_details.operating_system);
+        var formattedTime = (this.state.showRelativeTime ? moment(collector.last_seen).fromNow() :  momentHelper.toUserTimeZone(moment(collector.last_seen)).format());
         return (
-            <tr className={agentClass} style={style}>
+            <tr className={collectorClass} style={style}>
                 <td className="limited">
-                    {agent.id}
+                    {collector.id}
                     {annotation}
                 </td>
                 <td className="limited">
-                    {agent.node_id}
+                    {collector.node_id}
                 </td>
                 <td className="limited">
-                    {agent.agent_version}
+                    {collector.collector_version}
                 </td>
                 <td className="limited">
                     {osGlyph}
-                    {agent.node_details.operating_system}
+                    {collector.node_details.operating_system}
                 </td>
                 <td className="limited">
-                    <time dateTime={agent.last_seen} onClick={this._toggleRelativeTime}>{formattedTime}</time>
+                    <time dateTime={collector.last_seen} onClick={this._toggleRelativeTime}>{formattedTime}</time>
                 </td>
             </tr>
         );
     }
 });
 
-module.exports = AgentRow;
+module.exports = CollectorRow;

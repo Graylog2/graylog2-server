@@ -9,6 +9,8 @@ var LegacyHistogram = require('./LegacyHistogram');
 var FieldGraphs = require('./FieldGraphs');
 var FieldQuickValues = require('./FieldQuickValues');
 var FieldStatistics = require('./FieldStatistics');
+var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
+var Widget = require('../widgets/Widget');
 var Immutable = require('immutable');
 
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
@@ -24,7 +26,8 @@ var SearchResult = React.createClass({
             showAllFields: false,
             currentSidebarWidth: null,
             dashboards: Immutable.Map(),
-            shouldHighlight: true
+            shouldHighlight: true,
+            currentPage: SearchStore.page
         };
     },
 
@@ -110,6 +113,46 @@ var SearchResult = React.createClass({
         }
         var anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
+        // short circuit if the result turned up empty
+        if (this.props.result['total_result_count'] === 0) {
+
+            return (
+                <div className="col-md-12" id="main-content">
+                    <div className="row content content-head">
+                        <div className="col-md-12">
+                            <h1>
+                                <span><i className="fa fa-search"></i> Nothing found</span>
+                                <AddToDashboardMenu title="Add count to dashboard"
+                                                    widgetType={this.props.searchInStreamId ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
+                                                    dashboards={this.state.dashboards}/>
+                            </h1>
+
+                            <p>
+                                Your search returned no results.&nbsp;
+                                <strong>Take a look at the&nbsp;<a
+                                    href="https://www.graylog.org/documentation/general/queries/" target="_blank">documentation</a>
+                                    &nbsp;if you need help with the search syntax.</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="row content">
+                        <div className="col-md-12">
+                            <div className="support-sources">
+                                <h2>Need help?</h2>
+                                Do not hesitate to consult the Graylog community if your questions are not answered in the&nbsp;
+                                <a href="https://www.graylog.org/documentation/" target="_blank">documentation</a>.
+
+                                <ul>
+                                    <li><i className="fa fa-group"></i> <a href="https://www.graylog.org/community-support/" target="_blank">Forum / Mailing list</a></li>
+                                    <li><i className="fa fa-github-alt"></i> <a href="https://github.com/Graylog2/graylog2-web-interface/issues" target="_blank">Issue tracker</a></li>
+                                    <li><i className="fa fa-heart"></i> <a href="https://www.graylog.com/support/" target="_blank">Commercial support</a></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>);
+        }
         return (
             <div >
                 <div ref="opa" className="col-md-3" id="sidebar">
@@ -127,7 +170,10 @@ var SearchResult = React.createClass({
                                        showHighlightToggle={anyHighlightRanges}
                                        shouldHighlight={this.state.shouldHighlight}
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
-                                       dashboards={this.state.dashboards}/>
+                                       currentSavedSearch={SearchStore.savedSearch}
+                                       dashboards={this.state.dashboards}
+                                       searchInStreamId={this.props.searchInStreamId}
+                            />
                     </div>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
@@ -148,7 +194,7 @@ var SearchResult = React.createClass({
                                  dashboards={this.state.dashboards}/>
 
                     <ResultTable messages={this.props.result.messages}
-                                 page={this.props.currentPage}
+                                 page={this.state.currentPage}
                                  selectedFields={this.state.selectedFields}
                                  resultCount={this.props.result['total_result_count']}
                                  inputs={this.props.inputs}

@@ -63,7 +63,6 @@ if (searchResultElem) {
     if (formattedHistogram) {
         formattedHistogram = JSON.parse(formattedHistogram);
     }
-    var currentPage = searchResultElem.getAttribute('data-current-page');
 
     var streams = searchResultElem.getAttribute('data-streams');
     if (streams) {
@@ -80,13 +79,16 @@ if (searchResultElem) {
         nodes = JSON.parse(nodes);
     }
 
+    var searchInStreamId = searchResultElem.getAttribute('data-search-in-stream');
+    SearchStore.searchInStreamId = searchInStreamId;
+
     React.render(<SearchResult query={query}
                                result={searchResult}
                                histogram={histogram}
                                formattedHistogram={formattedHistogram}
-                               currentPage={currentPage}
                                streams={Immutable.Map(streams)}
                                inputs={Immutable.Map(inputs)}
                                nodes={Immutable.Map(nodes)}
+                               searchInStreamId={searchInStreamId}
         />, searchResultElem);
 }

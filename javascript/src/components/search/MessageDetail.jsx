@@ -25,13 +25,26 @@ var MessageDetail = React.createClass({
     getInitialState() {
         return {
             messageTerms: Immutable.Map(),
-            streamsListLoaded: false,
-            streamsList: Immutable.List()
+            allStreamsLoaded: false,
+            allStreams: Immutable.List()
         };
     },
     componentDidMount() {
-        this._loadStreams();
+        if (this.props.allStreams === undefined) {
+            // our parent does not provide allStreams for the test against stream menu, we have to load it ourselves
+            // this can happen if the component is used outside the regular search result
+            // only load the streams per page
+            if (this.state.allStreamsLoaded) {
+                return;
+            }
+            var promise = StreamsStore.listStreams();
+            promise.done((streams) => this._onStreamsLoaded(streams));
+        }
     },
+    _onStreamsLoaded(streams) {
+        this.setState({allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title)});
+    },
+
     _inputName(inputId) {
         var input = this.props.inputs.get(inputId);
         return input ? <span style={{wordBreak: 'break-word'}}>{input['title']}</span> : "deleted input";
@@ -58,17 +71,12 @@ var MessageDetail = React.createClass({
         var map = Immutable.Map().set(field, terms);
         this.setState({messageTerms: map});
     },
-
-    _loadStreams() {
-        // only load the streams once per message.
-        if (this.state.streamsListLoaded) {
-            return;
+    _getAllStreams() {
+        if (this.props.allStreams) {
+            return this.props.allStreams;
+        } else {
+            return this.state.allStreams;
         }
-        var promise = StreamsStore.listStreams();
-        promise.done((streams) => this._onStreamsLoaded(streams));
-    },
-    _onStreamsLoaded(streams) {
-        this.setState({streamsListLoaded: true, streamsList: Immutable.List(streams).sortBy(stream => stream.title)});
     },
     render() {
         var messageUrl = jsRoutes.controllers.SearchControllerV2.showMessage(this.props.message.index, this.props.message.id).url;
@@ -108,7 +116,7 @@ var MessageDetail = React.createClass({
         });
 
         var streamList = null;
-        this.state.streamsList.forEach((stream) => {
+        this._getAllStreams().forEach((stream) => {
             if (!streamList) {
                 streamList = [];
             }
@@ -134,8 +142,8 @@ var MessageDetail = React.createClass({
             var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format();
             timestamp = [];
 
-            timestamp.push(<dt>Timestamp</dt>);
-            timestamp.push(<dd><time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time></dd>);
+            timestamp.push(<dt key="0">Timestamp</dt>);
+            timestamp.push(<dd key="1"><time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time></dd>);
         }
 
         return (<div>
@@ -158,8 +166,8 @@ var MessageDetail = React.createClass({
 
                         <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
                             { streamList }
-                            { (! streamList && ! this.state.streamsListLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
-                            { (! streamList && this.state.streamsListLoaded) && <MenuItem header>No streams available</MenuItem> }
+                            { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
+                            { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
                         </DropdownButton>
                     </ButtonGroup>
                     <h3><i className="fa fa-envelope"></i> <a href={messageUrl} style={{color: '#000'}}>{this.props.message.id}</a></h3>
