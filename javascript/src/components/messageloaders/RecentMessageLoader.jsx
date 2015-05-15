@@ -5,11 +5,6 @@ var InputDropdown = require('../inputs/InputDropdown');
 var InputsStore = require('../../stores/inputs/InputsStore');
 
 var RecentMessageLoader = React.createClass({
-    getInitialState() {
-        return {
-            inputId: undefined
-        };
-    },
     onClick(inputId) {
         InputsStore.globalRecentMessage(inputId, (message) => {
             message['source_input_id'] = inputId;
@@ -18,14 +13,12 @@ var RecentMessageLoader = React.createClass({
         });
     },
     render() {
-        if (!this.state.inputId) {
-            return (
-                <div>
-                    Select an Input from the list below and click "Load Message" to load the most recent message from this input.
-                    <InputDropdown inputs={this.props.inputs} onClick={this.onClick} title="Load Message"/>
-                </div>
-            );
-        }
+        return (
+            <div>
+                Select an Input from the list below and click "Load Message" to load the most recent message from this input.
+                <InputDropdown inputs={this.props.inputs} onClick={this.onClick} title="Load Message"/>
+            </div>
+        );
     }
 });
 
