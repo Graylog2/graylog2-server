@@ -73,7 +73,7 @@ var StreamControls = React.createClass({
 
         return (
             <ButtonGroup>
-                <DropdownButton title='More actions' ref='dropdownButton'>
+                <DropdownButton title='More actions' ref='dropdownButton' pullRight={true}>
                     {menuItems}
                 </DropdownButton>
                 <StreamForm ref='streamForm' title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream}/>
