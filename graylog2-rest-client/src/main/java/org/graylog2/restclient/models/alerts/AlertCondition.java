@@ -123,7 +123,15 @@ public class AlertCondition {
     }
 
     private String buildFieldStringValueDescription() {
-        return "TODO: you better add description in org.graylog2.restclient.models.alerts.AlertCondition#buildFieldStringValueDescription";
+        String query = new StringBuilder()
+                .append(parameters.get("field")).append(":").append(parameters.get("value"))
+                .toString();
+
+        StringBuilder sb = new StringBuilder()
+                .append("Alert is triggered when messages matching <")
+                .append(query).append("> are received.");
+
+        return sb.toString();
     }
 
     private String buildBacklogDescription(int backlog) {

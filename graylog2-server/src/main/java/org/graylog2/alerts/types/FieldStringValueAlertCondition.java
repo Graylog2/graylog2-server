@@ -17,17 +17,21 @@
 
 package org.graylog2.alerts.types;
 
+import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.indexer.InvalidRangeFormatException;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -45,7 +49,6 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
     private final Configuration configuration;
     private final String field;
     private final String value;
-    private List<Message> searchHits = Collections.emptyList();
 
     public interface Factory {
         FieldStringValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
@@ -83,10 +86,25 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
                     new Sorting("timestamp", Sorting.Direction.DESC)
             );
 
-            if (result.getTotalResults() > 0) {
-                LOG.info("OMG I FOUND THEM");
+            final List<MessageSummary> summaries = Lists.newArrayList();
+            if (getBacklog() > 0) {
+                for (ResultMessage resultMessage : result.getResults()) {
+                    final Message msg = new Message(resultMessage.getMessage());
+                    summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
+                }
+            }
+
+            final long count = result.getTotalResults();
+
+            final String resultDescription = "Stream received messages matching <" + query + "> "
+                    + "(Current grace time: " + grace + " minutes)";
+
+            if (count > 0) {
+                LOG.debug("Alert check <{}> found [{}] messages.", id, count);
+                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
             } else {
-                LOG.debug("Search returned no results.");
+                LOG.debug("Alert check <{}> returned no results.", id);
+                return new NegativeCheckResult(this);
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
@@ -97,18 +115,11 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
             LOG.error("Invalid timerange format.", e);
             return null;
         }
-
-        return new CheckResult(false);
     }
 
     @Override
     public String getDescription() {
         return "field: " + field + ", value: " + value;
-    }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return this.searchHits;
     }
 
 }
