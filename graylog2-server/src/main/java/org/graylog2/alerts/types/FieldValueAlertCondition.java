@@ -97,7 +97,8 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60));
             if (getBacklog() != null && getBacklog() > 0) {
                 this.searchHits = Lists.newArrayList();
-                for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {
+                final int backlogSize = Math.min(getBacklog(), fieldStatsResult.getSearchHits().size());
+                for (ResultMessage resultMessage : fieldStatsResult.getSearchHits().subList(0, backlogSize)) {
                     final Message msg = new Message(resultMessage.getMessage());
                     this.searchHits.add(msg);
                     summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
