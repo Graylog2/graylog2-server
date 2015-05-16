@@ -1,37 +1,44 @@
-@(alerts: List[org.graylog2.restclient.models.alerts.Alert], totalAlerts: Long, stream: org.graylog2.restclient.models.Stream, node: org.graylog2.restclient.models.Node)
+@(alerts: List[org.graylog2.restclient.models.alerts.Alert],
+        totalAlerts: Long, stream: org.graylog2.restclient.models.Stream,
+        node: org.graylog2.restclient.models.Node)
+
 @import views.helpers.DateHelper
 
-<h2><i class="fa fa-bell"></i> Triggered alerts</h2>
-Showing the most recent alerts. This stream triggered a total of <b>@totalAlerts alerts</b>.<br>
-    Alerts can be retrieved from the server's <a href="@node.getTransportAddress/api-browser#!/Alerts/checkConditions_get_1" target="_blank">API Browser <i class="fa fa-external-link" style="font-size: 11px;"></i></a>,
-        for example to hook them into an existing monitoring system. Learn more in the knowledgebase. @views.html.partials.support.bubble("general/streams")
-@if(stream.getAlerts.isEmpty) {
-    <div style="margin-top: 10px;" class="alert alert-info">
-        This stream has never triggered an alert.
-    </div>
-} else {
-    <table class="alerts table table-striped table-hover table-condensed">
-        <thead>
-            <tr>
-                <th style="width: 130px;" data-dynatable-sorts="timestamp">Triggered</th>
-                <th style="display:none">Timestamp</th>
-                <th>Condition</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-        @for(alert <- alerts) {
-            <tr>
-                <td>
-                    @DateHelper.readablePeriodFromNow(alert.getTriggeredAt)
-                </td>
-                <td style="display:none">@DateHelper.timestampShortTZ(alert.getTriggeredAt)</td>
-                <td>
-                    <a href="#" class="condition-id" data-condition-id="@alert.getConditionId">@alert.getConditionId</a>
-                </td>
-                <td>@alert.getDescription</td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+<h2>
+    Triggered alerts
+
+    <small>@totalAlerts alerts total</small>
+</h2>
+
+<div class="alerts-container">
+    @if(stream.getAlerts.isEmpty) {
+        <div style="margin-top: 10px;" class="alert alert-info">
+            This stream has never triggered an alert.
+        </div>
+    } else {
+        <table class="alerts table table-striped table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th style="width: 130px;" data-dynatable-sorts="timestamp">Triggered</th>
+                    <th style="display:none">Timestamp</th>
+                    <th>Condition</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for(alert <- alerts) {
+                <tr>
+                    <td>
+                        @DateHelper.readablePeriodFromNow(alert.getTriggeredAt)
+                    </td>
+                    <td style="display:none">@DateHelper.timestampShortTZ(alert.getTriggeredAt)</td>
+                    <td>
+                        <a href="#" class="condition-id" data-condition-id="@alert.getConditionId">@alert.getConditionId</a>
+                    </td>
+                    <td>@alert.getDescription</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>

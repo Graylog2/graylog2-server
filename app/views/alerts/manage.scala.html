@@ -53,7 +53,7 @@
 
     <div class="row content alert-conditions">
         <div class="col-md-12">
-            <h2 style="margin-bottom: 10px;">Configured alert conditions</h2>
+            <h2 style="margin-bottom: 15px;">Configured alert conditions</h2>
 
             @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
         </div>
@@ -75,18 +75,28 @@
 
     <div class="row content">
         <div class="col-md-12">
+            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                <div class="sendDummyAlert">
+                    <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
+                        <button type="submit" class="btn btn-info pull-right">Send test alert</button>
+                    </form>
+                </div>
+            }
 
             <h2>Receivers</h2>
 
-            The following Graylog users will be notified about alerts via email if they have configured
-            an email address in their profile.
+            <p class="description">
+                The following Graylog users will be notified about alerts via email if they have configured
+                an email address in their profile. You can also add any other email address to the alert
+                receivers if it has no Graylog user associated.
+            </p>
 
             @if(stream.getEmailAlertReceivers.isEmpty && stream.getUserAlertReceivers.isEmpty) {
                 <div style="margin-top: 10px;" class="alert alert-info">
                     No configured alert receivers.
                 </div>
             } else {
-                <ul>
+                <ul class="alert-receivers">
                     @for(user <- stream.getUserAlertReceivers) {
                         <li>
                             <i class="fa fa-user"></i>&nbsp;
@@ -112,19 +122,12 @@
                             }
                         </li>
                     }
-
-                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                        <div class="sendDummyAlert">
-                            <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
-                                <button type="submit" class="btn btn-info pull-right">Send test alert</button>
-                            </form>
-                        </div>
-                    }
                 </ul>
             }
 
             @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                <div id="add-alert-receivers" class="row">
+                <div id="add-alert-receivers" class="row row-sm">
+
                     <div class="col-md-6">
                         <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST" class="form-inline">
                             <div class="form-group">
