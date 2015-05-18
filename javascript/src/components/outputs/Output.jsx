@@ -4,7 +4,6 @@ var React = require('react/addons');
 var EditOutputButton = require('./EditOutputButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
 var UserLink = require('../users/UserLink');
-var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
 
 var Output = React.createClass({
