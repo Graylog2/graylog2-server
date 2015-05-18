@@ -67,7 +67,7 @@ public class UdpTransport extends NettyTransport {
     public Bootstrap getBootstrap() {
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerExecutor));
 
-        final int recvBufferSize = Integer.min(Ints.saturatedCast(getRecvBufferSize()), 65536);
+        final int recvBufferSize = Math.min(Ints.saturatedCast(getRecvBufferSize()), 65536);
         LOG.debug("Setting receive buffer size to {} bytes", recvBufferSize);
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(recvBufferSize));
         bootstrap.setOption("receiveBufferSize", recvBufferSize);
