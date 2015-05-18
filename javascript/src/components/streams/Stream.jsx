@@ -9,6 +9,8 @@ var StreamStateBadge = require('./StreamStateBadge');
 var CollapsableStreamRuleList = require('../streamrules/CollapsableStreamRuleList');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamsStore = require('../../stores/streams/StreamsStore');
+var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
+var StreamRuleForm = require('../streamrules/StreamRuleForm');
 
 var Stream = React.createClass({
     mixins: [PermissionsMixin],
@@ -36,6 +38,12 @@ var Stream = React.createClass({
         if (window.confirm("Do you really want to pause stream \"" + stream.title + "\"?")) {
             StreamsStore.pause(stream.id, () => {});
         }
+    },
+    _onQuickAdd() {
+        this.refs.quickAddStreamRuleForm.open();
+    },
+    _onSaveStreamRule(streamRuleId, streamRule) {
+        StreamRulesStore.create(this.props.stream.id, streamRule, () => {});
     },
     render() {
         var stream = this.props.stream;
@@ -89,6 +97,7 @@ var Stream = React.createClass({
                                                    permissions={this.props.permissions}/>
                     </div>
                 </div>
+                <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule" onSubmit={this._onSaveStreamRule} streamRuleTypes={this.props.streamRuleTypes}/>
             </li>
         );
     }
