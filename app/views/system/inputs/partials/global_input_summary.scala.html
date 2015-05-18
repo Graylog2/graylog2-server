@@ -33,7 +33,7 @@
             }
 
             @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                <a href="@routes.ExtractorsController.manage(masterNode.getNodeId, input.getId)" class="btn btn-info">Manage extractors</a>
+                <a href="@routes.ExtractorsController.manageGlobal(input.getId)" class="btn btn-info">Manage extractors</a>
             }
 
             @if(nodeStates.values().filter(iS => !iS.getState.equals(InputState.InputStateType.RUNNING)).isEmpty) {
