@@ -8,8 +8,8 @@ var $ = require('jquery'); // excluded and shimed
 
 var TypeAheadFieldInput = React.createClass({
     componentDidMount() {
-        if (this.refs['fieldInput']) {
-            var fieldInput = $(this.refs['fieldInput'].getInputDOMNode());
+        if (this.refs.fieldInput) {
+            var fieldInput = $(this.refs.fieldInput.getInputDOMNode());
             $.ajax({
                 url: jsRoutes.controllers.api.SystemApiController.fields().url,
                 success: function (data) {
@@ -25,14 +25,24 @@ var TypeAheadFieldInput = React.createClass({
                         });
                 }
             });
+
+            var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
+            $(fieldFormGroup).on('typeahead:change', (event) => {
+                if (this.props.valueLink) {
+                    this.props.valueLink.requestChange(event.target.value);
+                }
+            })
         }
     },
     componentWillUnmount() {
-        if (this.refs['fieldInput']) {
-            var fieldInput = $(this.refs['fieldInput'].getInputDOMNode());
+        if (this.refs.fieldInput) {
+            var fieldInput = $(this.refs.fieldInput.getInputDOMNode());
             fieldInput.typeahead('destroy');
+            var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
+            $(fieldFormGroup).off('typeahead:change');
         }
     },
+
     render() {
         return <Input ref="fieldInput" wrapperClassName="typeahead-wrapper" {...this.props}/>;
     }
