@@ -1,7 +1,6 @@
 'use strict';
 
 var React = require('react/addons');
-var InputsStore = require('../../stores/inputs/InputsStore');
 var Input = require('react-bootstrap').Input;
 var Spinner = require('../common/Spinner');
 
@@ -39,7 +38,7 @@ var InputDropdown = React.createClass({
                 </div>
             );
         } else {
-            return <Spinner />
+            return <Spinner />;
         }
     }
 });
