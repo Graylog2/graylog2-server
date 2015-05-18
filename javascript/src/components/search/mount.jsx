@@ -1,22 +1,17 @@
 'use strict';
 
-var QueryInput = require('./QueryInput');
 var SearchBar = require('./SearchBar');
 var MessageShow = require('./MessageShow');
 var SearchResult = require('./SearchResult');
 var React = require('react');
 var Immutable = require('immutable');
 var SearchStore = require('../../stores/search/SearchStore');
-
-var queryInputContainer = document.getElementById('universalsearch-query');
-if (queryInputContainer) {
-    var queryInput = new QueryInput(queryInputContainer);
-    queryInput.display();
-}
+var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 
 var searchBarElem = document.getElementById('react-search-bar');
 if (searchBarElem) {
     SearchStore.initializeFieldsFromHash();
+    SavedSearchesStore.updateSavedSearches();
     React.render(<SearchBar />, searchBarElem);
 }
 
@@ -48,6 +43,7 @@ if (messageDetails) {
 var searchResultElem = document.getElementById('react-search-result');
 if (searchResultElem) {
     var query = searchResultElem.getAttribute('data-query');
+    var builtQuery = searchResultElem.getAttribute('data-built-query');
 
     var searchResult = searchResultElem.getAttribute('data-search-result');
     if (searchResult) {
@@ -86,6 +82,7 @@ if (searchResultElem) {
     }
 
     React.render(<SearchResult query={query}
+                               builtQuery={builtQuery}
                                result={searchResult}
                                histogram={histogram}
                                formattedHistogram={formattedHistogram}

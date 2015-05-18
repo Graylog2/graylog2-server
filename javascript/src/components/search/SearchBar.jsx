@@ -1,4 +1,4 @@
-/* global momentHelper */
+/* global momentHelper, userPreferences */
 
 'use strict';
 
@@ -12,6 +12,7 @@ var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
+var QueryInput = require('./QueryInput');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 
@@ -35,10 +36,17 @@ var SearchBar = React.createClass({
             React.findDOMNode(this.refs.searchForm).submit();
         };
         SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => this.setState({savedSearches: newSavedSearches}));
+        this._initializeSearchQueryInput();
         this._initalizeDatepicker();
     },
     componentDidUpdate() {
         this._initalizeDatepicker();
+    },
+    _initializeSearchQueryInput() {
+        if (userPreferences.enableSmartSearch) {
+            var queryInput = new QueryInput(this.refs.query.getInputDOMNode());
+            queryInput.display();
+        }
     },
     // We need to initialize datepicker every time the absolute timerange is selected, but only once :/
     _initalizeDatepicker() {

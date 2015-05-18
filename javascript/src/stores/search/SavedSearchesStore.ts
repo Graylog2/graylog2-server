@@ -23,7 +23,6 @@ class SavedSearchesStore {
 
     constructor() {
         this._savedSearches = Immutable.List<SavedSearch>();
-        this._updateSavedSearches();
     }
 
     get savedSearches(): Immutable.List<SavedSearch> {
@@ -43,7 +42,7 @@ class SavedSearchesStore {
         this._onSavedSearchesChanged.push(savedSearchesCallback);
     }
 
-    _updateSavedSearches() {
+    updateSavedSearches() {
         var promise = this.list();
         promise.done((savedSearches) => this.savedSearches = Immutable.List<SavedSearch>(savedSearches));
     }
@@ -78,7 +77,7 @@ class SavedSearchesStore {
 
         promise.done(() => {
             UserNotification.success("Search criteria saved as '" + title + "'.");
-            this._updateSavedSearches();
+            this.updateSavedSearches();
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving search criteria failed with status: " + errorThrown,
@@ -93,7 +92,7 @@ class SavedSearchesStore {
 
         promise.done(() => {
             UserNotification.success("Saved search '" + title + "' was updated.");
-            this._updateSavedSearches();
+            this.updateSavedSearches();
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating saved search '" + title + "' failed with status: " + errorThrown,

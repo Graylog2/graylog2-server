@@ -8,6 +8,9 @@ var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
+var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
+var Tooltip = require('react-bootstrap').Tooltip;
+var ReactZeroClipboard = require('react-zeroclipboard');
 
 var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
@@ -62,21 +65,23 @@ var MessageField = React.createClass({
 });
 
 var SearchSidebar = React.createClass({
-    _updateFieldSelection(event, setName) {
-        this.props.predefinedFieldSelection(setName);
-        event.preventDefault();
+    getInitialState() {
+        return {
+            fieldFilter: ""
+        };
     },
-    _showAllFields(event) {
+    _updateFieldSelection(setName) {
+        this.props.predefinedFieldSelection(setName);
+    },
+    _showAllFields() {
         if (!this.props.showAllFields) {
             this.props.togglePageFields();
         }
-        event.preventDefault();
     },
-    _showPageFields(event) {
+    _showPageFields() {
         if (this.props.showAllFields) {
             this.props.togglePageFields();
         }
-        event.preventDefault();
     },
     render() {
         var indicesModal =
@@ -93,7 +98,27 @@ var SearchSidebar = React.createClass({
                 </div>
             </Modal>;
 
+        var queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
+        var queryModal =
+            <Modal title='Elasticsearch Query' onRequestHide={() => {}}>
+                <div className="modal-body">
+                    <pre>{queryText}</pre>
+                </div>
+                <div className="modal-footer">
+                    <OverlayTrigger
+                        placement="top"
+                        ref="copyBtnTooltip"
+                        overlay={<Tooltip>Query copied to clipboard.</Tooltip>}>
+                        <ReactZeroClipboard
+                            text={queryText}
+                            onAfterCopy={() => { this.refs['copyBtnTooltip'].toggle(); window.setTimeout(() => this.refs['copyBtnTooltip'] && this.refs['copyBtnTooltip'].toggle(), 1000); } }>
+                            <Button>Copy query</Button>
+                        </ReactZeroClipboard>
+                    </OverlayTrigger>
+                </div>
+            </Modal>;
         var messageFields = this.props.fields
+            .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((field) => {
                 return (
@@ -118,6 +143,13 @@ var SearchSidebar = React.createClass({
         } else {
             searchTitle = <span>Search result</span>;
         }
+
+        // always add the debug query link as last elem
+        moreActions.push(<MenuItem divider key="div2" />);
+        moreActions.push(<ModalTrigger key="debugQuery" modal={queryModal}>
+                <MenuItem>Show query</MenuItem>
+            </ModalTrigger>);
+
         return (
             <div className="content-col">
                 <h2>
@@ -140,34 +172,35 @@ var SearchSidebar = React.createClass({
                     &nbsp;
                     <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
-                    <DropdownButton caret bsSize="small" title="More actions">
+                    <DropdownButton bsSize="small" title="More actions">
                         {moreActions}
                     </DropdownButton>
                 </div>
 
                 <hr />
 
-                <h3 style={{display: 'inline-block'}}>Fields</h3>
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
-                |
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'all')}>All</a>
-                |
-                <a href="#" className="fields-set-chooser"
-                   onClick={(event) => this._updateFieldSelection(event, 'none')}>None</a>
+
+                <h3>Fields</h3>
+
+                <div className="input-group input-group-sm">
+                    <span className="input-group-btn">
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('default')}>Default</button>
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('all')}>All</button>
+                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('none')}>None</button>
+                    </span>
+                    <input type="text" className="form-control" placeholder="Filter fields" onChange={(event) => this.setState({fieldFilter: event.target.value})} value={this.state.fieldFilter}/>
+                </div>
 
                 <ul className="search-result-fields">
                     {messageFields}
                 </ul>
 
                 <p style={{marginTop: 13, marginBottom: 0}}>
-                    List <span className="message-result-fields-range">
+                    List <span className="message-result-fields-range"> fields of&nbsp;
                 <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
-                   onClick={this._showPageFields}>fields of current page</a> or <a href="#"
+                   onClick={this._showPageFields}>current page</a> or <a href="#"
                                                                                    style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
-                                                                                   onClick={this._showAllFields}>all
-                    fields</a>.
+                                                                                   onClick={this._showAllFields}>all fields</a>.
                 </span>
                     <br/>
                     { this.props.showHighlightToggle &&

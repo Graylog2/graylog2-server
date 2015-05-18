@@ -17,12 +17,11 @@ GET           /                                                                 
 GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /searchv2                                                                @controllers.SearchControllerV2.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /searchv2/csv                                                              @controllers.SearchControllerV2.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
+GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET           /search/csv                                                                        @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
-GET           /messages/:index/:id                                                               @controllers.SearchControllerV2.showMessage(index: String, id: String)
+GET           /messages/:index/:id                                                               @controllers.SearchController.showMessage(index: String, id: String)
 GET           /messages/:index/:id/partial                                                       @controllers.MessagesController.partial(index: String, id: String)
 
 # Streams
@@ -44,14 +43,14 @@ POST          /streams/:stream_id/clone                                         
 GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
-GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
+GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)
 
 # Alerts
 GET           /streams/:stream_id/alerts                                                         @controllers.AlertsController.index(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/add/messagecount                             @controllers.AlertsController.addTypeMessageCount(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/add/fieldvalue                               @controllers.AlertsController.addTypeFieldValue(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/:condition_id                                @controllers.AlertsController.updateCondition(stream_id: String, condition_id: String)
-POST          /streams/:stream_id/alerts/conditions/:condition_id/delete                         @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
+GET           /streams/:stream_id/alerts/conditions/:condition_id/delete                         @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
 POST          /streams/:stream_id/alerts/receivers/user/add                                      @controllers.AlertsController.addReceiverUser(stream_id: String)
 POST          /streams/:stream_id/alerts/receivers/email/add                                     @controllers.AlertsController.addReceiverEmail(stream_id: String)
 GET           /streams/:stream_id/alerts/receivers/user/delete                                   @controllers.AlertsController.removeReceiverUser(stream_id: String, username: String)

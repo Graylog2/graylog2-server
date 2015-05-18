@@ -79,7 +79,7 @@ var MessageDetail = React.createClass({
         }
     },
     render() {
-        var messageUrl = jsRoutes.controllers.SearchControllerV2.showMessage(this.props.message.index, this.props.message.id).url;
+        var messageUrl = jsRoutes.controllers.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
 
         var fields = [];
         var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a,b) => a.localeCompare(b));

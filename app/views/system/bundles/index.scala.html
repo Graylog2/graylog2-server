@@ -1,7 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User,
     breadcrumbs: lib.BreadcrumbList)
 
-@main("Content packs", null, "", currentUser) {
+@main("Content packs", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-header">

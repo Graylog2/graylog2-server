@@ -26,7 +26,5 @@ $(document).ready(() => {
     require('./components/collectors/mount');
     require('./components/messageloaders/mount');
     require('./components/streamrules/mount');
-    if (userPreferences.enableSmartSearch) {
-        require('./components/search/mount');
-    }
+    require('./components/search/mount');
 });

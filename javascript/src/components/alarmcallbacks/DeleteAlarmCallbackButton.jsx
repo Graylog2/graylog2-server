@@ -10,8 +10,8 @@ var DeleteAlarmCallbackButton = React.createClass({
     },
     render() {
         return (
-            <button className="btn btn-danger btn-xs" onClick={this.handleClick}>
-                <i className="fa fa-remove"></i>  Delete
+            <button className="btn btn-danger" onClick={this.handleClick}>
+                Delete callback
             </button>
         );
     }

@@ -1,13 +1,13 @@
 @(currentUser: org.graylog2.restclient.models.User,
         message: org.graylog2.restclient.models.api.results.MessageResult,
-        nodes: Map[String, controllers.SearchControllerV2.NodeDescription],
-        streams: Map[String, controllers.SearchControllerV2.StreamDescription],
-        inputs: Map[String, controllers.SearchControllerV2.InputDescription]
+        nodes: Map[String, controllers.SearchController.NodeDescription],
+        streams: Map[String, controllers.SearchController.StreamDescription],
+        inputs: Map[String, controllers.SearchController.InputDescription]
         )
 
 @import play.libs.Json;
 
-@main("Message " + message.getId, null, "", currentUser, false, true) {
+@main("Message " + message.getId, null, "", currentUser, true) {
 
     <div id="react-message-details"
       data-message="@Json.toJson(message)"

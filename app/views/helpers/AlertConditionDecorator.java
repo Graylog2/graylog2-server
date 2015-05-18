@@ -57,7 +57,7 @@ public abstract class AlertConditionDecorator {
 
     public String getFormTitle() {
         if (isEmptyCondition()) {
-            return "New alert condition";
+            return "Add new alert condition";
         } else {
             return "Edit alert condition";
         }

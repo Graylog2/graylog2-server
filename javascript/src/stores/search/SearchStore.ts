@@ -268,7 +268,7 @@ class SearchStore {
         if (this.searchInStream) {
             location = jsRoutes.controllers.StreamSearchController[action](this.searchInStream.id).url;
         } else {
-            location = jsRoutes.controllers.SearchControllerV2[action]().url;
+            location = jsRoutes.controllers.SearchController[action]().url;
         }
         return location;
     }

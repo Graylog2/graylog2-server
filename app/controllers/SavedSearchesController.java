@@ -113,7 +113,7 @@ public class SavedSearchesController extends AuthenticatedController {
         }
 
         if (streamId == null || streamId.isEmpty()) {
-            return routes.SearchControllerV2.index(
+            return routes.SearchController.index(
                     (String) searchQuery.get("query"),
                     (String) searchQuery.get("rangeType"),
                     relative,
