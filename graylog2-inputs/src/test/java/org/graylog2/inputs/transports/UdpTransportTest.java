@@ -203,7 +203,7 @@ public class UdpTransportTest {
         final UdpTransport.Config config = new UdpTransport.Config();
         final ConfigurationRequest requestedConfiguration = config.getRequestedConfiguration();
 
-        assertThat(requestedConfiguration.getField(NettyTransport.CK_RECV_BUFFER_SIZE).getDefaultValue()).isEqualTo(65535);
+        assertThat(requestedConfiguration.getField(NettyTransport.CK_RECV_BUFFER_SIZE).getDefaultValue()).isEqualTo(16384);
     }
 
     private void sendUdpDatagram(String hostname, int port, int size) throws IOException {

@@ -90,7 +90,7 @@ public class UdpTransport extends NettyTransport {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = super.getRequestedConfiguration();
 
-            r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 65535));
+            r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 16384));
 
             return r;
         }
