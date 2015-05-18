@@ -42,10 +42,24 @@ var SearchBar = React.createClass({
     componentDidUpdate() {
         this._initalizeDatepicker();
     },
+    componentWillUnmount() {
+        this._removeSearchQueryInput();
+    },
     _initializeSearchQueryInput() {
         if (userPreferences.enableSmartSearch) {
             var queryInput = new QueryInput(this.refs.query.getInputDOMNode());
             queryInput.display();
+            // We need to update on changes made on typeahead
+            var queryDOMElement = React.findDOMNode(this.refs.query);
+            $(queryDOMElement).on('typeahead:change', (event) => {
+                SearchStore.query = event.target.value;
+            });
+        }
+    },
+    _removeSearchQueryInput() {
+        if (userPreferences.enableSmartSearch) {
+            var queryDOMElement = React.findDOMNode(this.refs.query);
+            $(queryDOMElement).off('typeahead:change');
         }
     },
     // We need to initialize datepicker every time the absolute timerange is selected, but only once :/
