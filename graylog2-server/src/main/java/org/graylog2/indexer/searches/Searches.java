@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Sets;
@@ -55,6 +56,7 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,6 +145,7 @@ public class Searches {
     private final Client c;
     private final MetricRegistry metricRegistry;
     private final Timer esRequestTimer;
+    private final Histogram esTimeRangeHistogram;
 
     @Inject
     public Searches(Configuration configuration,
@@ -157,6 +160,7 @@ public class Searches {
         this.metricRegistry = checkNotNull(metricRegistry);
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
+        this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -614,6 +618,7 @@ public class Searches {
         if (range != null) {
             bfb.must(IndexHelper.getTimestampRangeFilter(range));
             set = true;
+            esTimeRangeHistogram.update(TimeRanges.toSeconds(range));
         }
 
         if (filter != null && !filter.isEmpty() && !filter.equals("*")) {
