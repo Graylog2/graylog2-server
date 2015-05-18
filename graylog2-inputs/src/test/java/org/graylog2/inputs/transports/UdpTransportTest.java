@@ -174,6 +174,18 @@ public class UdpTransportTest {
     }
 
     @Test
+    public void receiveBufferSizeIsLimited() throws Exception {
+        ImmutableMap<String, Object> source = ImmutableMap.<String, Object>of(
+                NettyTransport.CK_BIND_ADDRESS, BIND_ADDRESS,
+                NettyTransport.CK_PORT, PORT,
+                NettyTransport.CK_RECV_BUFFER_SIZE, Integer.MAX_VALUE);
+        Configuration config = new Configuration(source);
+        UdpTransport udpTransport = new UdpTransport(config, throughputCounter, new LocalMetricRegistry());
+
+        assertThat(udpTransport.getBootstrap().getOption("receiveBufferSize")).isEqualTo(65536);
+    }
+
+    @Test
     public void receiveBufferSizePredictorIsUsingDefaultSize() throws Exception {
         ReceiveBufferSizePredictorFactory receiveBufferSizePredictorFactory =
                 (ReceiveBufferSizePredictorFactory) udpTransport.getBootstrap().getOption("receiveBufferSizePredictorFactory");

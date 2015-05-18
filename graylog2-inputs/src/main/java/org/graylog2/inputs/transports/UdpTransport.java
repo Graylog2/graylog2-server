@@ -33,6 +33,8 @@ import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -41,6 +43,7 @@ import java.util.concurrent.ThreadFactory;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class UdpTransport extends NettyTransport {
+    private static final Logger LOG = LoggerFactory.getLogger(UdpTransport.class);
 
     private final Executor workerExecutor;
 
@@ -64,7 +67,8 @@ public class UdpTransport extends NettyTransport {
     public Bootstrap getBootstrap() {
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerExecutor));
 
-        final int recvBufferSize = Ints.saturatedCast(getRecvBufferSize());
+        final int recvBufferSize = Integer.min(Ints.saturatedCast(getRecvBufferSize()), 65536);
+        LOG.debug("Setting receive buffer size to {} bytes", recvBufferSize);
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(recvBufferSize));
         bootstrap.setOption("receiveBufferSize", recvBufferSize);
 
