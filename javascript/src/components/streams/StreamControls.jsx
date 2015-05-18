@@ -42,8 +42,7 @@ var StreamControls = React.createClass({
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
             menuItems.push(<MenuItem key={"editStreams-" + stream.id} onClick={this._onEdit}>Edit stream</MenuItem>);
-            menuItems.push(<MenuItem key={"quickAddRule-" + stream.id}className={stream.stream_rules.length > 0 ? "" : "disabled"}
-                                     onClick={this._onQuickAdd}>Quick add rule</MenuItem>);
+            menuItems.push(<MenuItem key={"quickAddRule-" + stream.id} onClick={this._onQuickAdd}>Quick add rule</MenuItem>);
         }
 
         if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
