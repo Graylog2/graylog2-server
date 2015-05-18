@@ -6,6 +6,7 @@ var Input = require('react-bootstrap').Input;
 var Bubble = require('../support/Bubble');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 var Col = require('react-bootstrap').Col;
+var TypeAheadFieldInput = require('./TypeAheadFieldInput');
 
 var StreamRuleForm = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
@@ -48,7 +49,7 @@ var StreamRuleForm = React.createClass({
                 </div>
                 <div>
                     <Col md={8}>
-                        <Input type='text' required={true} label='Field' valueLink={this.linkState('field')}/>
+                        <TypeAheadFieldInput ref='fieldInput' type='text' required={true} label='Field' valueLink={this.linkState('field')}/>
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
                             {streamRuleTypes}
                         </Input>
