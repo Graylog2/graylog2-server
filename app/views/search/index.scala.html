@@ -15,6 +15,8 @@
 
 @import play.libs.Json;
 @import controllers.SearchController.StreamDescription
+@import views.helpers.Permissions
+@import lib.security.RestPermissions._
 
 @streamId = @{
         if (stream == null) {
@@ -39,6 +41,7 @@
             data-inputs="@Json.toJson(inputs)"
             data-nodes="@Json.toJson(nodes)"
             data-search-in-stream="@Json.toJson(StreamDescription.of(stream))"
+            data-permissions="@Permissions.asJson(DASHBOARDS_CREATE)"
         >
     </div>
 }

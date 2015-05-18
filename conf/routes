@@ -167,7 +167,6 @@ GET           /dashboards                                                       
 GET           /dashboards/new                                                                    @controllers.DashboardsController.newDashboard()
 GET           /dashboards/:id                                                                    @controllers.DashboardsController.show(id: String)
 POST          /dashboards/create                                                                 @controllers.DashboardsController.create()
-POST          /dashboards/:id/update                                                             @controllers.DashboardsController.update(id: String)
 POST          /dashboards/:id/delete                                                             @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)
@@ -230,8 +229,10 @@ GET           /a/connection/available                                           
 
 # API: Dashboards
 GET         /a/dashboards                                                            @controllers.api.DashboardsApiController.index()
+POST        /a/dashboards                                                            @controllers.api.DashboardsApiController.create()
 GET         /a/dashboards/writable                                                   @controllers.api.DashboardsApiController.listWritable()
 POST        /a/dashboards/:id/positions                                              @controllers.api.DashboardsApiController.setWidgetPositions(id: String)
+PUT         /a/dashboards/:dashboard_id                                              @controllers.api.DashboardsApiController.update(dashboard_id: String)
 GET         /a/dashboards/:dashboard_id/widgets/:widget_id                           @controllers.api.DashboardsApiController.widget(dashboard_id: String, widget_id: String)
 PUT         /a/dashboards/:dashboard_id/widgets/:widget_id                           @controllers.api.DashboardsApiController.updateWidget(dashboard_id: String, widget_id: String)
 GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String, resolution: Integer ?= -1)

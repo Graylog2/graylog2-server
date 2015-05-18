@@ -86,12 +86,12 @@ var FieldStatistics = React.createClass({
                 <div className="content-col">
                     <div className="pull-right">
                         <AddToDashboardMenu title='Add to dashboard'
-                                            dashboards={this.props.dashboards}
                                             widgetType={Widget.Type.STATS_COUNT}
                                             configuration={{}}
                                             bsStyle='default'
                                             fields={this.state.fieldStatistics.keySeq()}
-                                            pullRight={true}>
+                                            pullRight={true}
+                                            permissions={this.props.permissions}>
                             <Button bsSize='small' onClick={() => this._resetStatus()}>Dismiss</Button>
                         </AddToDashboardMenu>
                     </div>

@@ -49,7 +49,6 @@ var WidgetsStore = {
 
     addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): JQueryPromise<string[]> {
         var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
-        console.log(widgetData);
         var url = jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url;
         var promise = $.ajax({
             type: "POST",

@@ -81,6 +81,8 @@ if (searchResultElem) {
         SearchStore.searchInStream = searchInStream;
     }
 
+    var permissions = JSON.parse(searchResultElem.getAttribute('data-permissions'));
+
     React.render(<SearchResult query={query}
                                builtQuery={builtQuery}
                                result={searchResult}
@@ -90,5 +92,6 @@ if (searchResultElem) {
                                inputs={Immutable.Map(inputs)}
                                nodes={Immutable.Map(nodes)}
                                searchInStream={searchInStream}
+                               permissions={permissions}
         />, searchResultElem);
 }

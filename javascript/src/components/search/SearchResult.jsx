@@ -25,7 +25,6 @@ var SearchResult = React.createClass({
             selectedFields: initialFields,
             showAllFields: false,
             currentSidebarWidth: null,
-            dashboards: Immutable.Map(),
             shouldHighlight: true,
             currentPage: SearchStore.page
         };
@@ -86,7 +85,7 @@ var SearchResult = React.createClass({
 
     componentDidMount() {
         this._updateWidth();
-        this._getWritableDashboardList();
+        DashboardStore.updateDashboards();
         $(window).on('resize', this._resizeCallback);
     },
     componentWillUnmount() {
@@ -100,10 +99,6 @@ var SearchResult = React.createClass({
     _updateWidth() {
         var node = React.findDOMNode(this.refs.opa);
         this.setState({currentSidebarWidth: $(node).width()});
-    },
-    _getWritableDashboardList() {
-        var promise = DashboardStore.getWritableDashboardList();
-        promise.done(dashboards => this.setState({dashboards: Immutable.Map(dashboards)}));
     },
 
     render() {
@@ -127,7 +122,7 @@ var SearchResult = React.createClass({
                                 <span><i className="fa fa-search"></i> Nothing found {streamDescription}</span>
                                 <AddToDashboardMenu title="Add count to dashboard"
                                                     widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                                    dashboards={this.state.dashboards}/>
+                                                    permissions={this.props.permissions}/>
                             </h1>
 
                             <p>
@@ -175,27 +170,27 @@ var SearchResult = React.createClass({
                                        shouldHighlight={this.state.shouldHighlight}
                                        toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
                                        currentSavedSearch={SearchStore.savedSearch}
-                                       dashboards={this.state.dashboards}
                                        searchInStream={this.props.searchInStream}
+                                       permissions={this.props.permissions}
                             />
                     </div>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
                     <FieldStatistics ref='fieldStatisticsComponent'
-                                     dashboards={this.state.dashboards}/>
+                                     permissions={this.props.permissions}/>
 
                     <FieldQuickValues ref='fieldQuickValuesComponent'
-                                      dashboards={this.state.dashboards}/>
+                                      permissions={this.props.permissions}/>
 
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                                      histogram={this.props.histogram}
-                                     dashboards={this.state.dashboards}/>
+                                     permissions={this.props.permissions}/>
 
                     <FieldGraphs ref='fieldGraphsComponent'
                                  resolution={this.props.histogram['interval']}
                                  from={this.props.histogram['histogram_boundaries'].from}
                                  to={this.props.histogram['histogram_boundaries'].to}
-                                 dashboards={this.state.dashboards}/>
+                                 permissions={this.props.permissions}/>
 
                     <ResultTable messages={this.props.result.messages}
                                  page={this.state.currentPage}

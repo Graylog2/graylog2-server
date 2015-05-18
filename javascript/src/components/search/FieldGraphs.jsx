@@ -35,7 +35,7 @@ var FieldGraphs = React.createClass({
                                       onDelete={() => this.deleteFieldGraph(graphId)}
                                       from={this.props.from}
                                       to={this.props.to}
-                                      dashboards={this.props.dashboards}/>
+                                      permissions={this.props.permissions}/>
                 );
             });
 
