@@ -41,29 +41,31 @@
                 @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.STOPPED, input)
             }
 
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
-                More actions <span class="caret"></span>
-            </button>
+            @if(isPermitted(INPUTS_EDIT) || isPermitted(INPUTS_TERMINATE)) {
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
+                    More actions <span class="caret"></span>
+                </button>
 
-            <ul class="dropdown-menu" role="menu">
-                @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                    <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
-                }
+                <ul class="dropdown-menu" role="menu">
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
+                    }
 
-                @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                    <li><a href="#" class="add-static-field" data-node-id="@masterNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
-                }
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#" class="add-static-field" data-node-id="@masterNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    }
 
-                @if(isPermitted(INPUTS_TERMINATE)) {
-                    <li class="divider"></li>
+                    @if(isPermitted(INPUTS_TERMINATE)) {
+                        <li class="divider"></li>
 
-                    <li>
-                        <a href="@routes.InputsController.terminateGlobal(input.getId)" data-confirm="Do you really want to terminate global input @input.getTitle, stopping it permanently on all active nodes in the cluster?">
-                            Delete input
-                        </a>
-                    </li>
-                }
-            </ul>
+                        <li>
+                            <a href="@routes.InputsController.terminateGlobal(input.getId)" data-confirm="Do you really want to terminate global input @input.getTitle, stopping it permanently on all active nodes in the cluster?">
+                                Delete input
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
         </div>
     </div>
 
