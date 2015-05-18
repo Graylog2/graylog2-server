@@ -5,6 +5,7 @@ var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Input = require('react-bootstrap').Input;
 var Bubble = require('../support/Bubble');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
+var Col = require('react-bootstrap').Col;
 
 var StreamRuleForm = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
@@ -46,7 +47,7 @@ var StreamRuleForm = React.createClass({
                     <h2>{this.props.title}</h2>
                 </div>
                 <div>
-                    <div className='col-md-8'>
+                    <Col md={8}>
                         <Input type='text' required={true} label='Field' valueLink={this.linkState('field')}/>
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
                             {streamRuleTypes}
@@ -60,8 +61,8 @@ var StreamRuleForm = React.createClass({
                                 Field <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
                             </span>
                         </p>
-                    </div>
-                    <div className='col-md-4'>
+                    </Col>
+                    <Col md={4}>
                         <div className="well well-small matcher-github">
                             The server will try to convert to strings or numbers based on the matcher type as good as it can.
 
@@ -73,7 +74,7 @@ var StreamRuleForm = React.createClass({
                             <br /><br />
                             Regular expressions use Java syntax. <Bubble link="general/streams" />
                         </div>
-                    </div>
+                    </Col>
                 </div>
             </BootstrapModal>
         );

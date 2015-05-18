@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var Input = require('react-bootstrap').Input;
 var Spinner = require('../common/Spinner');
+var Col = require('react-bootstrap').Col;
 
 var InputDropdown = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
@@ -25,17 +26,17 @@ var InputDropdown = React.createClass({
         if (this.props.inputs) {
             var inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
             return (
-                <div className="col-md-12">
-                    <div className="col-md-6">
+                <Col md={12}>
+                    <Col md={6}>
                         <Input type='select' valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
                             <option value={this.PLACEHOLDER}>--- Select an Input ---</option>
                             {inputs}
                         </Input>
-                    </div>
-                    <div className="colo-md-6">
+                    </Col>
+                    <Col md={6}>
                         <a className="btn btn-success" disabled={this.state.selectedInput === this.PLACEHOLDER} onClick={this._onClick}>{this.props.title}</a>
-                    </div>
-                </div>
+                    </Col>
+                </Col>
             );
         } else {
             return <Spinner />;

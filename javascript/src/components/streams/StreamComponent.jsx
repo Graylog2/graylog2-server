@@ -8,6 +8,7 @@ var SupportLink = require('../support/SupportLink');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 var UsersStore = require('../../stores/users/UsersStore');
+var Col = require('react-bootstrap').Col;
 
 var StreamComponent = React.createClass({
     mixins: [PermissionsMixin],
@@ -41,7 +42,7 @@ var StreamComponent = React.createClass({
             return (
                 <div>
                     <div className="row content content-head">
-                        <div className="col-md-10">
+                        <Col md={10}>
                             <h1>Streams</h1>
 
                             <p className="description">
@@ -63,16 +64,16 @@ var StreamComponent = React.createClass({
                                    target="_blank">Graylog stream dashboards</a>{' '}
                                 for wall-mounted displays or other integrations.
                             </SupportLink>
-                        </div>
+                        </Col>
 
                         {createStreamButton}
                     </div>
 
                     <div className="row content">
-                        <div className="col-md-12">
+                        <Col md={12}>
                             <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
                                         permissions={this.props.permissions} user={this.state.user}/>
-                        </div>
+                        </Col>
                     </div>
                 </div>
             );
