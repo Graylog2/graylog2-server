@@ -31,8 +31,7 @@ var LoaderTabs = React.createClass({
                 var input = inputsList[idx];
                 inputs[input.id] = input;
             }
-            this.setState({inputs: Immutable.Map(inputs),
-                            nodes: Immutable.Map({"unknown": {}})});
+            this.setState({inputs: Immutable.Map(inputs)});
         });
     },
     componentDidMount() {
