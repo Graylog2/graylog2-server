@@ -1,5 +1,3 @@
-/* global userPreferences */
-
 'use strict';
 
 var $ = require('jquery'); // excluded and shimed
