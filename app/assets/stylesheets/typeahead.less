@@ -1,3 +1,7 @@
+.twitter-typeahead {
+  width: 100%;
+}
+
 .typeahead,
 .tt-query,
 .tt-hint {
@@ -22,20 +26,27 @@ input[type="text"].tt-hint {
   color: #999
 }
 
-.tt-dropdown-menu {
+.tt-menu {
   min-width: 160px;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  width: 100%;
+}
+
+.tt-dataset {
+  margin-top: 10px;
 }
 
 .tt-suggestion {
   font-size: 12px;
   line-height: 20px;
   padding: 3px 20px;
+  cursor: pointer;
 }
 
+.tt-suggestion:hover,
 .tt-suggestion.tt-cursor {
   color: #ffffff;
   text-decoration: none;
@@ -50,11 +61,7 @@ input[type="text"].tt-hint {
   margin: 0;
 }
 
-.universalsearch-form .query span {
-  width: 100%;
-}
-
-.universalsearch-form .query .tt-dropdown-menu {
+.universalsearch-form .query .tt-menu {
   height: auto;
   overflow: visible;
 }
