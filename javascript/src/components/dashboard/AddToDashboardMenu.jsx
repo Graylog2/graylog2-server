@@ -5,6 +5,7 @@ var $ = require('jquery');
 var React = require('react');
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
+var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Immutable = require('immutable');
 
 var WidgetStore = require('../../stores/widgets/WidgetsStore');
@@ -13,18 +14,11 @@ var WidgetCreationModal = require('../widgets/WidgetCreationModal');
 var AddToDashboardMenu = React.createClass({
     getInitialState() {
         return {
-            dashboards: Immutable.Map(),
             selectedDashboard: ""
         };
     },
     componentDidMount() {
         $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
-    },
-    componentWillReceiveProps(newProps) {
-        this._setDashboards(newProps.dashboards);
-    },
-    _setDashboards(dashboards) {
-        this.setState({dashboards: dashboards});
     },
     _setOriginalSearchParams(originalSearchParams) {
         this.searchParams = originalSearchParams;
@@ -36,7 +30,7 @@ var AddToDashboardMenu = React.createClass({
     _saveWidget(title, configuration) {
         var widgetConfig = Immutable.Map(this.props.configuration);
         var searchParams = Immutable.Map(this.searchParams);
-        widgetConfig = widgetConfig.concat(searchParams).concat(configuration);
+        widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
         var promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
         promise.done(() => this.refs.widgetModal.saved());
@@ -44,7 +38,7 @@ var AddToDashboardMenu = React.createClass({
     render() {
         var dashboards = Immutable.List();
 
-        this.state.dashboards
+        Immutable.Map(this.props.dashboards)
             .sortBy(dashboard => dashboard.title)
             .forEach((dashboard, id) => {
                 dashboards = dashboards.push(
@@ -56,18 +50,22 @@ var AddToDashboardMenu = React.createClass({
 
         return (
             <div style={{display: 'inline'}}>
-                <DropdownButton bsStyle="info"
-                                bsSize="small"
-                                noCaret
-                                title={this.props.title}
-                                pullRight={this.props.pullRight}
-                                onSelect={this._selectDashboard}>
-                    {dashboards}
-                </DropdownButton>
+                <ButtonGroup>
+                    {this.props.children}
+                    <DropdownButton bsStyle={this.props.bsStyle || "info"}
+                                    bsSize="small"
+                                    title={this.props.title}
+                                    pullRight={this.props.pullRight}
+                                    onSelect={this._selectDashboard}>
+                        {dashboards}
+                    </DropdownButton>
+                </ButtonGroup>
                 <WidgetCreationModal ref="widgetModal"
                                      widgetType={this.props.widgetType}
                                      supportsTrending={true}
-                                     onConfigurationSaved={this._saveWidget}/>
+                                     configuration={this.props.configuration}
+                                     onConfigurationSaved={this._saveWidget}
+                                     fields={this.props.fields}/>
             </div>
         );
     }

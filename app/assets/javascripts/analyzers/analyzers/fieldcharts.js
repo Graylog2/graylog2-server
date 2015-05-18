@@ -1,7 +1,8 @@
 $(document).ready(function () {
+    var GRAPH_HEIGHT = 120;
 
     function insertSpinner($graphContainer) {
-        var spinnerElement = $('<div class="spinner" style="height: 170px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>');
+        var spinnerElement = $('<div class="spinner" style="height: ' + GRAPH_HEIGHT + 'px; line-height: ' + GRAPH_HEIGHT + 'px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>');
         $graphContainer.append(spinnerElement);
     }
 
@@ -20,6 +21,10 @@ $(document).ready(function () {
     function sendUpdateGraphEvent(opts) {
         "use strict";
         $(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
+    }
+
+    function sendFailureEvent(graphId, errorMessage) {
+        $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
     }
 
     function createFieldChart(options, graphContainer) {
@@ -80,6 +85,10 @@ $(document).ready(function () {
 
         if (opts.range == undefined) {
             opts.range = {};
+        }
+
+        if (opts.createdAt === undefined) {
+            opts.createdAt = moment().valueOf();
         }
 
         switch (opts.rangetype) {
@@ -168,12 +177,12 @@ $(document).ready(function () {
 
                 $(".type-description", $graphContainer).text("[" + opts.valuetype + "] " + opts.field + ", ");
 
-                rickshawHelper.processHistogramData(data.values, $graphContainer.data("from"), $graphContainer.data("to"), data.interval);
+                rickshawHelper.processHistogramData(data.values, data.from, data.to, data.interval);
 
                 var graph = new Rickshaw.Graph({
                     element: $graphElement[0],
                     width: $graphElement.width(),
-                    height: 175,
+                    height: GRAPH_HEIGHT,
                     interpolation: opts.interpolation,
                     renderer: rickshawHelper.getRenderer(opts.renderer),
                     resolution: data.interval,
@@ -290,12 +299,12 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
-                    showError("Could not load histogram.");
+                    showError("Loading field graph for '" + opts.field + "' failed with status: " + data.status);
                 }
             },
             statusCode: {
                 400: function () {
-                    fieldCharts.show();
+                    sendFailureEvent(opts.chartid, "Field graphs are only available for numeric fields.");
                 }
             },
             complete: function () {
@@ -414,7 +423,7 @@ $(document).ready(function () {
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         // Update title and description.
-        $(".title", targetElem).text("Combined chart");
+        $("h1", targetElem).text("Combined graph");
 
         for (var i = 0; i < draggedChart.series.length; i++) {
             var lineColor = palette.color();

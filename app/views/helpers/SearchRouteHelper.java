@@ -88,8 +88,8 @@ public class SearchRouteHelper {
 
         if (stream == null) {
             return routes.SearchController.exportAsCsv(
-                    query,
                     "",
+                    query,
                     timeRange.getType().toString().toLowerCase(),
                     relative,
                     from,
@@ -99,8 +99,8 @@ public class SearchRouteHelper {
             );
         } else {
             return routes.StreamSearchController.exportAsCsv(
-                    query,
                     stream.getId(),
+                    query,
                     timeRange.getType().toString().toLowerCase(),
                     relative,
                     from,

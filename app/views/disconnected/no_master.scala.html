@@ -23,7 +23,7 @@
                                     <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress</h5>
                                     <h6>
                                     @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
-                                        <span class="muted never-seen-warning"><i class="fa fa-warning-sign"></i> Never connected!</span>
+                                        <span class="muted never-seen-warning"><i class="fa fa-exclamation-triangle"></i> Never connected!</span>
                                     } else {
                                         <span class="muted discovered-node-link" data-discovered-node="@serverNodes.getDiscoveredNodeVia(node).getNodeId"><i class="fa fa-sitemap"></i> @serverNodes.getDiscoveredNodeVia(node).getTransportAddress</span>
                                     }

@@ -7,12 +7,41 @@ var Immutable = require('immutable');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Widget = require('./Widget');
 
+var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
+
+var StringUtils = require('../../util/StringUtils');
+
 var WidgetCreationModal = React.createClass({
     getInitialState() {
+        this.initialConfiguration = Immutable.Map();
         return {
             title: this._getDefaultWidgetTitle(),
-            configuration: Immutable.Map()
+            configuration: this.initialConfiguration
         };
+    },
+    // We need to set the default configuration in case some inputs are never changed
+    _setInitialConfiguration() {
+        var initialConfiguration = this.initialConfiguration;
+        if (this.refs['inputFieldset'] !== undefined) {
+            var fieldsetChildren = this.refs['inputFieldset'].props.children;
+            React.Children.forEach(fieldsetChildren, (child) => {
+                // We only care about children with refs, as all inputs have one
+                if (child.ref !== undefined && child.ref !== 'title') {
+                    var input = this.refs[child.ref];
+                    var value;
+                    if (input.props.type === 'checkbox') {
+                        value = input.getChecked();
+                    } else {
+                        value = input.getValue();
+                    }
+
+                    if (value !== undefined) {
+                        initialConfiguration = initialConfiguration.set(child.ref, value);
+                    }
+                }
+            }, this);
+        }
+        this.initialConfiguration = initialConfiguration;
     },
     open() {
         this.refs.createModal.open();
@@ -20,12 +49,11 @@ var WidgetCreationModal = React.createClass({
     hide() {
         this.refs.createModal.close();
     },
-    getConfiguration() {
-        return Immutable.Map(this.state.configuration);
+    getEffectiveConfiguration() {
+        return this.initialConfiguration.merge(Immutable.Map(this.state.configuration));
     },
     save(e) {
-        e.preventDefault();
-        var configuration = this.getConfiguration();
+        var configuration = this.getEffectiveConfiguration();
         this.props.onConfigurationSaved(this.state.title, configuration);
     },
     saved() {
@@ -38,11 +66,24 @@ var WidgetCreationModal = React.createClass({
         switch (this.props.widgetType) {
             case Widget.Type.SEARCH_RESULT_COUNT:
             case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
-                title = "messages";
+                title = "message count";
                 break;
             case Widget.Type.STATS_COUNT:
+                title = "field statistical value";
+                break;
             case Widget.Type.QUICKVALUES:
+                if (this.props.configuration['field'] !== undefined) {
+                    title = this.props.configuration['field'] + " quick values";
+                } else {
+                    title = "field quick values";
+                }
+                break;
             case Widget.Type.FIELD_CHART:
+                if (this.props.configuration['field'] !== undefined && this.props.configuration['valuetype'] !== undefined) {
+                    title = this.props.configuration['field'] + " " + this.props.configuration['valuetype'] + " value graph";
+                } else {
+                    title = "field graph";
+                }
                 break;
             case Widget.Type.SEARCH_RESULT_CHART:
                 title = "search histogram";
@@ -51,7 +92,7 @@ var WidgetCreationModal = React.createClass({
                 throw("Unsupported widget type " + this.props.widgetType);
         }
 
-        return title;
+        return StringUtils.capitalizeFirstLetter(title);
     },
     _getSpecificWidgetInputs() {
         var controls = [];
@@ -60,6 +101,40 @@ var WidgetCreationModal = React.createClass({
             case Widget.Type.SEARCH_RESULT_COUNT:
             case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
             case Widget.Type.STATS_COUNT:
+                if (this.props.widgetType === Widget.Type.STATS_COUNT) {
+                    controls.push(
+                        <Input key="field"
+                               type="select"
+                               ref="field"
+                               label="Field name"
+                               help="Select the field name you want to use in the widget."
+                               onChange={() => this._onConfigurationInputChange('field')}>
+                            {this.props.fields
+                                .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+                                .map((field) => {
+                                    return <option key={field} value={field}>{field}</option>;
+                                })
+                            }
+                        </Input>
+                    );
+                    controls.push(
+                        <Input key="statsFunction"
+                               type="select"
+                               ref="statsFunction"
+                               label="Statistical function"
+                               help="Select the statistical function to use in the widget."
+                               onChange={() => this._onConfigurationInputChange('statsFunction')}>
+                            {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                                return (
+                                    <option key={statFunction} value={statFunction}>
+                                        {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                    </option>
+                                );
+                            })}
+                        </Input>
+                    );
+                }
+
                 if (this.props.supportsTrending) {
                     controls.push(
                         <Input key="trend"
@@ -93,7 +168,16 @@ var WidgetCreationModal = React.createClass({
                            label="Show pie chart"
                            defaultChecked={false}
                            onChange={() => this._onConfigurationCheckboxChange("show_pie_chart")}
-                           help="Include a pie chart representation of the data"/>
+                           help="Include a pie chart representation of the data."/>
+                );
+                controls.push(
+                    <Input key="showDataTable"
+                           type="checkbox"
+                           ref="show_data_table"
+                           label="Show data table"
+                           defaultChecked={true}
+                           onChange={() => this._onConfigurationCheckboxChange("show_data_table")}
+                           help="Include a table with quantitative information."/>
                 );
                 break;
             default:
@@ -112,10 +196,13 @@ var WidgetCreationModal = React.createClass({
     _onConfigurationCheckboxChange(ref) {
         this._onConfigurationChange(ref, this.refs[ref].getChecked());
     },
+    _onConfigurationInputChange(ref) {
+        this._onConfigurationChange(ref, this.refs[ref].getValue());
+    },
     render() {
         var configModalHeader = <h2 className="modal-title">Create Dashboard Widget</h2>;
         var configModalBody = (
-            <fieldset>
+            <fieldset ref="inputFieldset">
                 <Input type="text"
                        label="Title"
                        ref="title"
@@ -131,6 +218,7 @@ var WidgetCreationModal = React.createClass({
             <BootstrapModal ref="createModal"
                             onCancel={this.hide}
                             onConfirm={this.save}
+                            onShown={this._setInitialConfiguration}
                             onHidden={this.props.onModalHidden}
                             cancel="Cancel"
                             confirm="Create">

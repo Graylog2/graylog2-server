@@ -1,4 +1,4 @@
-@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true, reactSearch: Boolean = false)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
+@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, reactSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
 @import play.libs.Json
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
@@ -25,10 +25,7 @@
 
 		<div class="container-fluid">
 
-            @if(hasSearch && (stream != null || (isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD)))) {
-			    @partials.universalsearch(searchQuery)
-            }
-            @if(reactSearch) {
+            @if(reactSearch && (stream != null || (isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD)))) {
                 <div id="react-search-bar"></div>
             }
 
@@ -51,27 +48,9 @@
                 </div>
             </div>
             <div class="row">
-                @if(reactSearch) {
-                    @content
-                } else {
-                    @if(sidebarContent != null) {
-                        <div class="col-md-3" id="sidebar">
-                            <div class="content-col" id="sidebar-inner">
-                            @sidebarContent
-                            </div>
-                        </div>
-                    }
-
-                    @if(sidebarContent != null) {
-                        <div class="col-md-9" id="main-content-sidebar">
-                        @content
-                        </div>
-                    } else {
-                        <div class="col-md-12" id="main-content">
-                        @content
-                        </div>
-                    }
-                }
+                <div class="col-md-12" id="main-content">
+                @content
+                </div>
            </div>
 	   </div>
 

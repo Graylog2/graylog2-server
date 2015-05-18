@@ -10,8 +10,6 @@ var AlarmCallbackComponent = React.createClass({
     mixins: [PermissionsMixin],
     getInitialState() {
         return {
-            alarmCallbacks: [],
-            availableAlarmCallbacks: []
         };
     },
     componentDidMount() {
@@ -42,17 +40,25 @@ var AlarmCallbackComponent = React.createClass({
     },
     render() {
         var permissions = this.props.permissions;
-        var createAlarmCallbackButton = (this.isPermitted(permissions, ["STREAMS_EDIT"]) ?
+        if (this.state.alarmCallbacks && this.state.availableAlarmCallbacks) {
+            var createAlarmCallbackButton = (this.isPermitted(permissions, ["STREAMS_EDIT"]) ?
                 <CreateAlarmCallbackButton streamId={this.props.streamId} types={this.state.availableAlarmCallbacks} onCreate={this._createAlarmCallback} /> : "");
-        return (
-            <div className="alarm-callback-component">
-                {createAlarmCallbackButton}
+            return (
+                <div className="alarm-callback-component">
+                    {createAlarmCallbackButton}
 
-                <AlarmCallbackList alarmCallbacks={this.state.alarmCallbacks}
-                                   streamId={this.props.streamId}permissions={permissions} types={this.state.availableAlarmCallbacks}
-                                   onUpdate={this._updateAlarmCallback} onDelete={this._deleteAlarmCallback} onCreate={this._createAlarmCallback} />
-            </div>
-        );
+                    <AlarmCallbackList alarmCallbacks={this.state.alarmCallbacks}
+                                       streamId={this.props.streamId}permissions={permissions} types={this.state.availableAlarmCallbacks}
+                                       onUpdate={this._updateAlarmCallback} onDelete={this._deleteAlarmCallback} onCreate={this._createAlarmCallback} />
+                </div>
+            );
+        } else {
+            return (
+                <div className="alarm-callback-component">
+                    <i className="fa fa-spin fa-spinner"/> Loading
+                </div>
+            );
+        }
     }
 });
 

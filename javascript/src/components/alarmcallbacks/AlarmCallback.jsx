@@ -17,20 +17,39 @@ var AlarmCallback = React.createClass({
         var deleteAlarmCallbackButton = (this.isPermitted(this.props.permissions, ["STREAMS_EDIT"]) ?
             <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.props.deleteAlarmCallback} /> : "");
         return (
-            <div className="node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
-                <span className="pull-right node-row-info">
-                    Created by <UserLink username={alarmCallback.creator_user_id} />
-                    <span title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
-                    {editAlarmCallbackButton}
-                    {deleteAlarmCallbackButton}
-                </span>
+            <div className="alert-callback" data-destination-id={alarmCallback.id}>
+                <div className="row" style={{marginBottom: 0}}>
+                    <div className="col-md-9">
+                        <h3>
+                            {' '}
+                            <span>{humanReadableType}</span>
 
-                <h3>
-                    <i className="fa fa-ellipsis-vertical"></i>
-                    <span>{humanReadableType}</span>
-                </h3>
+                            &nbsp;
+                            <small>
+                                Created by <UserLink username={alarmCallback.creator_user_id} />
+                                {' '}
+                                <span title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
+                            </small>
+                        </h3>
 
-                <ConfigurationWell configuration={alarmCallback.configuration}/>
+                        Executed once per triggered alert condition.
+                    </div>
+
+                    <div className="col-md-3" style={{textAlign: "right"}}>
+                        {' '}
+                        {editAlarmCallbackButton}
+                        {' '}
+                        {deleteAlarmCallbackButton}
+                    </div>
+                </div>
+
+                <div className="row" style={{marginBottom: 0}}>
+                    <div className="col-md-12">
+                        <ConfigurationWell configuration={alarmCallback.configuration}/>
+                    </div>
+                </div>
+
+                <hr />
             </div>
         );
     }

@@ -10,6 +10,7 @@ var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
+var StringUtils = require('../../util/StringUtils');
 
 var GraphFactory = {
     create(config, domNode, tooltipTitleFormatter) {
@@ -124,7 +125,7 @@ var GraphVisualization = React.createClass({
         return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
     },
     _formatInterval() {
-        return this.props.config.interval.charAt(0).toUpperCase() + this.props.config.interval.slice(1) + "s";
+        return StringUtils.capitalizeFirstLetter(this.props.config.interval) + "s";
     },
     drawData() {
         this.graph.xUnits(() => Math.max(this.state.dataPoints.length - 1, 1));

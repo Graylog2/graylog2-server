@@ -60,7 +60,7 @@
         <div class="col-md-12">
             @if(!closedIndices.isEmpty) {
                 <div class="alert alert-info closed-indices">
-                    <i class="fa fa-ban-circle"></i>&nbsp;
+                    <i class="fa fa-ban"></i>&nbsp;
 
                     @if(closedIndices.size() == 1) {
                         There is a closed index you can reopen.
@@ -97,12 +97,12 @@
         <div class="row index-description content">
             <div class="col-md-12">
                 <h3>
-                    <i class="fa fa-ellipsis-vertical"></i>
+                    <i class="fa fa-ellipsis-v"></i>
 
                     <i class="fa fa-bolt" title="Write-active index"></i> @deflectorTarget
                 </h3>
                 <div class="index-info">
-                    <div class="alert alert-info"><i class="fa fa-info-sign"></i> Deflector information is not available at the moment. Please try again once the index range calculation finishes.</div>
+                    <div class="alert alert-info"><i class="fa fa-info-circle"></i> Deflector information is not available at the moment. Please try again once the index range calculation finishes.</div>
                 </div>
 
                 <hr style="margin-bottom: 5px; margin-top: 10px;">
@@ -114,7 +114,7 @@
         <div class="row index-description content">
             <div class="col-md-12">
                 <h3>
-                    <i class="fa fa-ellipsis-vertical"></i>
+                    <i class="fa fa-ellipsis-v"></i>
 
                     @if(index.getName.equals(deflectorTarget)) {
                         <i class="fa fa-bolt" title="Write-active index"></i>

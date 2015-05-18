@@ -1,5 +1,3 @@
-/* global userPreferences */
-
 'use strict';
 
 var $ = require('jquery'); // excluded and shimed
@@ -23,8 +21,6 @@ $(document).ready(() => {
     require('./components/inputs/mount');
     require('./components/outputs/mount');
     require('./components/alarmcallbacks/mount');
-    require('./components/agents/mount');
-    if (userPreferences.enableSmartSearch) {
-        require('./components/search/mount');
-    }
+    require('./components/collectors/mount');
+    require('./components/search/mount');
 });

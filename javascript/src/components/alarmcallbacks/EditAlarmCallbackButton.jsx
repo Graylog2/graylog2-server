@@ -16,8 +16,8 @@ var EditAlarmCallbackButton = React.createClass({
 
         return (
             <span>
-                <button className="btn btn-success btn-xs" onClick={this._handleClick}>
-                    <i className="fa fa-edit"></i>  Edit
+                <button className="btn btn-success" onClick={this._handleClick}>
+                    Edit callback
                 </button>
                 <ConfigurationForm ref="configurationForm" key={"configuration-form-alarm-callback-"+alarmCallback.id}
                                    configFields={definition.requested_configuration}

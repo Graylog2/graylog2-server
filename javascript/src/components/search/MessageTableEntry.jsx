@@ -12,6 +12,9 @@ var MessageTableEntry = React.createClass({
 
     possiblyHighlight(fieldName) {
         var origValue = this.props.message.fields[fieldName];
+        if (origValue === undefined) {
+            return "";
+        }
         if (this.props.highlight && this.props.message.highlight_ranges) {
             if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
                 var chunks = [];
@@ -34,10 +37,10 @@ var MessageTableEntry = React.createClass({
                 });
                 return <span>{chunks}</span>;
             } else {
-                return origValue;
+                return String(origValue);
             }
         } else {
-            return origValue;
+            return String(origValue);
         }
     },
     render() {
@@ -67,6 +70,7 @@ var MessageTableEntry = React.createClass({
             <tr className="message-detail-row" style={{display: "table-row"}}>
                 <td colSpan={colSpanFixup}>
                     <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
+                                   allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
                                    nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}/>
                 </td>
             </tr>

@@ -36,7 +36,7 @@ var LegacyHistogram = React.createClass({
     render() {
         var resolutionLinks = this.RESOLUTIONS.map((resolution) => {
             var className = "date-histogram-res-selector";
-            if (SearchStore.resolution === resolution) {
+            if (this.props.histogram.interval === resolution) {
                 className += " selected-resolution";
             }
             var suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? "" : ",";
@@ -63,7 +63,7 @@ var LegacyHistogram = React.createClass({
                 <AddToDashboardMenu title="Add to dashboard"
                                     dashboards={this.props.dashboards}
                                     widgetType={Widget.Type.SEARCH_RESULT_CHART}
-                                    configuration={{resolution: this.props.histogram.interval}}
+                                    configuration={{interval: this.props.histogram.interval}}
                                     pullRight={true}/>
             </div>
             <h1>Histogram</h1>

@@ -1,14 +1,12 @@
 @(enabled: Boolean = false)
 
 <div class="xtrc-converter xtrc-converter-flexdate" @if(!enabled) { style="display:none;" } >
-    <div class="control-group">
-        <div class="controls">
-            <label class="checkbox">
-                <input type="checkbox" value="enabled" name="converter_flexdate" @if(enabled) { checked="checked" } />
-                Flexibly parse to date
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="enabled" name="converter_flexdate" @if(enabled) { checked="checked" } />
+            Flexibly parse to date
 
-                @views.html.partials.support.bubble("general/extractors#flexdate-converter")
-            </label>
-        </div>
+            @views.html.partials.support.bubble("general/extractors#flexdate-converter")
+        </label>
     </div>
 </div>

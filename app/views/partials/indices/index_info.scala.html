@@ -9,7 +9,7 @@
     }
 
     @if(index.getInfo == null) {
-        <div class="alert alert-info"><i class="fa fa-info-sign"></i> Index information is not available at the moment, please try again later.</div>
+        <div class="alert alert-info"><i class="fa fa-info-circle"></i> Index information is not available at the moment, please try again later.</div>
     } else {
         @index.getInfo.getSegments segments,
         @index.getInfo.getOpenSearchContexts open search contexts,
@@ -21,7 +21,7 @@
         </div>
 
         <div class="shard-routing">
-            <h3 class="u-light" style="display: inline;">Shard routing</h3>
+            <h3 style="display: inline;">Shard routing</h3>
 
             <ul class="shards">
             @for(route <- index.getInfo.getShardRouting.sortBy(_.id)) {

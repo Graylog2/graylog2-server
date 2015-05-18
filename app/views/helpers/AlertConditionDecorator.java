@@ -57,7 +57,7 @@ public abstract class AlertConditionDecorator {
 
     public String getFormTitle() {
         if (isEmptyCondition()) {
-            return "New alert condition";
+            return "Add new alert condition";
         } else {
             return "Edit alert condition";
         }
@@ -82,7 +82,7 @@ public abstract class AlertConditionDecorator {
         sb.append("<span class=\"threshold-type\">");
 
         for (Enum thresholdType : values) {
-            sb.append("<label class=\"radio inline\">");
+            sb.append("<label class=\"radio-inline\">");
             sb.append("<input type=\"radio\" name=\"threshold_type\" value=\"");
             sb.append(thresholdType.toString().toLowerCase());
             if (thresholdType == selected) {

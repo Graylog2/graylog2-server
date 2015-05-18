@@ -57,6 +57,12 @@ var BootstrapModal = React.createClass({
         }
         this.refs.modal.open();
     },
+    _onModalShown() {
+        this._focusFirstInput();
+        if (typeof this.props.onShown === 'function') {
+            this.props.onShown();
+        }
+    },
     _focusFirstInput() {
         var element = $("input[type!=hidden],select,textarea", React.findDOMNode(this.refs.body)).first();
 
@@ -122,7 +128,7 @@ var BootstrapModal = React.createClass({
 
         return (
             <BootstrapModalTrigger ref="modal"
-                                   onShown={this._focusFirstInput}
+                                   onShown={this._onModalShown}
                                    onRequestHide={this.props.onHidden}>
                 {form}
             </BootstrapModalTrigger>

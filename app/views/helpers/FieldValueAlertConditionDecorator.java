@@ -83,7 +83,7 @@ public class FieldValueAlertConditionDecorator extends AlertConditionDecorator {
 
     public String getCheckTypesHtml() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<select name=\"type\">");
+        sb.append("<select name=\"type\" class=\"form-control\">");
 
         for (CheckType checkType : CheckType.values()) {
             sb.append("<option value=\"");

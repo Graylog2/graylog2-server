@@ -51,7 +51,7 @@ var Output = React.createClass({
                         {terminationForm}
                     </span>
                     <h3>
-                        <i className="fa fa-ellipsis-vertical"></i> {output.title} ({output.type})
+                        <i className="fa fa-ellipsis-v"></i> {output.title} ({output.type})
                         {contentPack}
                     </h3>
                     <ConfigurationWell key={"configuration-well-output-" + output.id} id={output.id} configuration={output.configuration} />

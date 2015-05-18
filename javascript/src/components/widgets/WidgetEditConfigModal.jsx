@@ -187,6 +187,15 @@ var WidgetEditConfigModal = React.createClass({
                        onChange={this._onConfigurationCheckboxChange("show_pie_chart")}
                        help="Represent data in a pie chart"/>
             );
+
+            controls.push(
+                <Input key="showDataTable"
+                       type="checkbox"
+                       label="Show data table"
+                       defaultChecked={this.state.config.show_data_table}
+                       onChange={this._onConfigurationCheckboxChange("show_data_table")}
+                       help="Include a table with quantitative information."/>
+            );
         }
 
         return controls;

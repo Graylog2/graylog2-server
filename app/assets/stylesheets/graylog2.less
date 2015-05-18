@@ -273,21 +273,27 @@ label {
 }
 
 #sidebar {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 0;
 }
 
 #sidebar .affix {
   top: 45px;
+  z-index: 1000;
 }
 
 #main-content-sidebar {
   padding-left: 0;
-  padding-right: 10px;
+  padding-right: 0;
 }
 
 #main-content {
   padding: 15px 25px;
+}
+
+// This is rendered inside a #main-content, and we need to compensate the margin-top to make it look nicer
+#main-content-search {
+  margin-bottom: 0;
+  margin-top: -15px;
 }
 
 #universalsearch {
@@ -742,11 +748,6 @@ s
   padding-bottom: 3px;
 }
 
-#add-converter-fields button {
-  position: relative;
-  top: -5px;
-}
-
 #create-extractor {
   margin-top: 10px;
 }
@@ -787,11 +788,6 @@ s
 
 .xtrc-wizard form {
   margin-bottom: 0px;
-}
-
-.xtrc-wizard .btn {
-  position: relative;
-  top: -5px;
 }
 
 .node-row .xtrc-converters {
@@ -1251,7 +1247,6 @@ s
 }
 
 .detail_swatch {
-  float: right;
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -1309,7 +1304,7 @@ s
 }
 
 #field-graphs .spinner {
-  margin-top: 40px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
@@ -2187,14 +2182,14 @@ form.edit-dashboard-form {
   margin-top: 15px;
 }
 
-.alert-type-form input {
-  margin: 0px 5px;
-  padding: 2px;
+.alert-type-form input[type=number], .alert-type-form input[type=text], .alert-type-form select {
+  padding: 0 0 0 5px;
+  height: 25px;
+  width: 50px;
 }
 
-.alert-type-form select {
-  position: relative;
-  top: 5px;
+.alert-type-form input[type=text] {
+  width: 200px;
 }
 
 .add-alert-destination-type {
@@ -2215,27 +2210,18 @@ form.edit-dashboard-form {
   vertical-align: middle;
 }
 
-#add-alert-receivers input {
-  display: inline-block;
-  margin-bottom: 0;
-  vertical-align: middle;
+.alert-receivers {
+  padding-left: 10px;
 }
 
 .threshold-type {
-  position: relative;
-  top: -5px;
   margin-left: 5px;
-}
-
-.threshold-type input {
-  position: relative;
-  top: 3px;
 }
 
 .alerts {
   position: relative;
-  top: -10px;
-  margin-bottom: -5px;
+  top: -25px;
+  margin-bottom: -15px;
 }
 
 .alerts th a {
@@ -2262,10 +2248,9 @@ form.edit-dashboard-form {
   color: #8c8e86;
 }
 
-.alert-condition .well {
-  margin: 0;
-  font-size: 14px;
-  font-family: 'Open Sans', sans-serif;
+.alert-conditions hr {
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 
 .streameditpermissions, .dashboardeditpermissions {
@@ -2441,8 +2426,6 @@ textarea.textarea-xlarge {
 }
 
 .extractor-json {
-  width: 90%;
-  height: 700px;
   font-family: monospace;
   font-size: 13px;
 }
@@ -2482,28 +2465,11 @@ textarea.textarea-xlarge {
   border-radius: 5px 5px 5px 0;
 }
 
-.alert-callbacks {
-  margin-top: 8px;
-}
-
-.alert-callback {
-  margin-top: 15px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 8px;
-  margin-top: 0px;
-  margin-bottom: 8px;
-}
-
 .alert-callback .well {
   margin-bottom: 0px;
   margin-top: 3px;
   font-family: monospace;
   font-size: 11px;
-}
-
-.alert-callback dl {
-  margin: 0;
-  padding: 0;
 }
 
 .card {
@@ -3060,4 +3026,51 @@ dl.system-system, dl.system-rest {
 .input-io .channel-direction-up {
   position: relative;
   top: -1px;
+}
+
+#field-statistics th {
+  cursor: pointer;
+}
+
+form.alert-type-form {
+  line-height: 26px;
+}
+
+form.alert-type-form label.radio-inline {
+  margin-right: 0;
+}
+
+form.alert-type-form div.well {
+  margin-bottom: 0;
+}
+
+.no-alarm-callbacks {
+  margin-top: 10px;
+}
+
+div.alert-callback hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+div.alert-callback .well {
+  margin-top: 5px;
+  padding: 9px;
+}
+
+div.alert-callback .well ul {
+  padding: 0;
+}
+
+div.alert-callbacks {
+  margin-top: 10px;
+}
+
+div.alerts-container .dynatable-record-count {
+  margin-top: 10px;
+}
+
+div.alerts-container .dynatable-search {
+  position: relative;
+  top: -20px;
 }

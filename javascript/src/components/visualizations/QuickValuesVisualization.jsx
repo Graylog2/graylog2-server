@@ -142,14 +142,30 @@ var QuickValuesVisualization = React.createClass({
         }
     },
     render() {
+        var pieChartClassName;
+
+        if (this.props.config.show_pie_chart) {
+            pieChartClassName = this.props.horizontal ? 'col-md-4' : 'col-md-12';
+        } else {
+            pieChartClassName = 'hidden';
+        }
+
+        var dataTableClassName;
+
+        if (this.props.config.show_data_table) {
+            dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
+        } else {
+            dataTableClassName = 'hidden';
+        }
+
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className={this.props.config.show_pie_chart ? "col-md-12" : "hidden"}>
+                        <div className={pieChartClassName}>
                             <div ref="graph" className="quickvalues-graph"/>
                         </div>
-                        <div className="col-md-12">
+                        <div className={dataTableClassName}>
                             <div className="quickvalues-table">
                                 <table ref="table" className="table table-condensed table-striped table-hover">
                                     <thead>

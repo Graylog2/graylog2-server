@@ -71,7 +71,7 @@ $(document).ready(function () {
     $(".xtrc-try-regex").on("click", function () {
         var button = $(this);
 
-        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
         var promise = testRegex($("#regex_value").val());
 
         promise.done(function (matchResult) {
@@ -108,7 +108,7 @@ $(document).ready(function () {
             return;
         }
 
-        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
 
         var promise = testSubstring(beginIndex, endIndex);
 
@@ -156,7 +156,7 @@ $(document).ready(function () {
 
         var warningText = "We were not able to run the split&index extraction. Please check your parameters.";
 
-        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
 
         var promise = testSplitAndIndex($("#split_by").val(), $("#index").val());
 
@@ -205,7 +205,7 @@ $(document).ready(function () {
 
         var warningText = "We were not able to run the grok extraction. Please check your parameters.";
 
-        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
 
         var promise = testGrok($("#grok_pattern").val());
 
@@ -291,19 +291,20 @@ $(document).ready(function () {
 
     function stringConditionTypeChecked() {
         var fieldContainer = $("#condition-value-input");
-        $(".try-xtrc-condition").hide();
         $("#try-xtrc-condition-result").hide();
         fieldContainer.show();
         $("input", fieldContainer).attr("placeholder", "");
+        $("input", fieldContainer).attr("data-escape", true);
         $("label", fieldContainer).html("Field must include this string:");
     }
 
     function regexConditionTypeChecked() {
         var div = $("#condition-value-input");
+        $("#try-xtrc-condition-result").hide();
         div.show();
         $("input", div).attr("placeholder", "^\d{3,}");
+        $("input", div).attr("data-escape", false);
         $("label", div).html("Field must match this regular expression:");
-        $(".try-xtrc-condition").show();
     }
 
     // If we are editing an extractor, we want to show the form for the selected condition type
@@ -320,9 +321,17 @@ $(document).ready(function () {
     $(".try-xtrc-condition").on("click", function () {
         var button = $(this);
 
-        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
 
-        var promise = testRegex($("#condition_value").val());
+        var conditionValue = $("#condition_value").val();
+
+        if ($("#condition_value").attr("data-escape") === "true") {
+          // Escape regular expression if data-escape is set.
+          // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
+          conditionValue = conditionValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        var promise = testRegex(conditionValue);
 
         promise.done(function (matchResult) {
             var resultMsg = $("#try-xtrc-condition-result");
@@ -389,8 +398,14 @@ $(document).ready(function () {
 
     // Extractor export formatting.
     if ($(".extractor-json").size() > 0) {
-        var formatted = JSON.stringify(JSON.parse($(".extractor-json").val()), null, 2);
-        $(".extractor-json").val(formatted);
+        var jsonString = $(".extractor-json").val().trim();
+
+        // Only try to format the JSON if there is any. Avoids a JavaScript runtime error if the text field is
+        // empty.
+        if (jsonString.length > 0) {
+            var formatted = JSON.stringify(JSON.parse(jsonString), null, 2);
+            $(".extractor-json").val(formatted);
+        }
     }
 
 })

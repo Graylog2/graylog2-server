@@ -17,12 +17,11 @@ GET           /                                                                 
 GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /searchv2                                                                @controllers.SearchControllerV2.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
+GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET           /search/csv                                                                        @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
-GET           /messages/:index/:id                                                               @controllers.SearchControllerV2.showMessage(index: String, id: String)
+GET           /messages/:index/:id                                                               @controllers.SearchController.showMessage(index: String, id: String)
 GET           /messages/:index/:id/partial                                                       @controllers.MessagesController.partial(index: String, id: String)
 
 # Streams
@@ -41,17 +40,17 @@ GET           /streams/:stream_id/edit                                          
 POST          /streams/:stream_id/update                                                         @controllers.StreamsController.update(stream_id: String)
 GET           /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStreamForm(stream_id: String)
 POST          /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStream(stream_id: String)
-GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
+GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
-GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
+GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)
 
 # Alerts
 GET           /streams/:stream_id/alerts                                                         @controllers.AlertsController.index(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/add/messagecount                             @controllers.AlertsController.addTypeMessageCount(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/add/fieldvalue                               @controllers.AlertsController.addTypeFieldValue(stream_id: String)
 POST          /streams/:stream_id/alerts/conditions/:condition_id                                @controllers.AlertsController.updateCondition(stream_id: String, condition_id: String)
-POST          /streams/:stream_id/alerts/conditions/:condition_id/delete                         @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
+GET           /streams/:stream_id/alerts/conditions/:condition_id/delete                         @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
 POST          /streams/:stream_id/alerts/receivers/user/add                                      @controllers.AlertsController.addReceiverUser(stream_id: String)
 POST          /streams/:stream_id/alerts/receivers/email/add                                     @controllers.AlertsController.addReceiverEmail(stream_id: String)
 GET           /streams/:stream_id/alerts/receivers/user/delete                                   @controllers.AlertsController.removeReceiverUser(stream_id: String, username: String)
@@ -92,7 +91,7 @@ GET           /system/contentpacks/export                                       
 POST          /system/contentpacks/export                                                        @controllers.BundlesController.export()
 GET           /system/grokpatterns                                                               @controllers.GrokPatternsController.index()
 POST          /system/grokpatterns/import                                                        @controllers.GrokPatternsController.upload()
-GET           /system/agents                                                                     @controllers.AgentsController.index()
+GET           /system/collectors                                                                 @controllers.CollectorsController.index()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
@@ -117,8 +116,9 @@ GET           /system/nodes/:node_id/shutdown                                   
 # Saved searches
 GET           /savedsearches                                                                     @controllers.api.SavedSearchesApiController.list()
 GET           /savedsearches/:search_id/execute                                                  @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "", width:Integer ?= -1)
+PUT           /savedsearches/:search_id                                                          @controllers.api.SavedSearchesApiController.update(search_id: String)
 POST          /savedsearches/create                                                              @controllers.api.SavedSearchesApiController.create()
-GET           /savedsearches/:search_id/delete                                                   @controllers.SavedSearchesController.delete(search_id: String)
+DELETE        /savedsearches/:search_id/delete                                                   @controllers.SavedSearchesController.delete(search_id: String)
 
 # Extractors
 GET           /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.manage(node_id: String, input_id: String)
@@ -288,8 +288,8 @@ POST        /a/streams/:stream_id/alarmcallbacks                                
 DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
 PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
-# API: Agents
-GET           /a/system/agents                                                                   @controllers.api.AgentsApiController.index()
+# API: Collectors
+GET           /a/system/collectors                                                               @controllers.api.CollectorsApiController.index()
 
 GET           /robots.txt                                                                        controllers.Assets.at(path="/public", file="robots.txt")
 

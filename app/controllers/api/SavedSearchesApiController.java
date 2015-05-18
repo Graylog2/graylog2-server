@@ -63,11 +63,9 @@ public class SavedSearchesApiController extends AuthenticatedController {
         }
     }
 
-    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
+    @BodyParser.Of(BodyParser.Json.class)
     public Result create() {
-        Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
-
-        CreateSavedSearchRequest request = Json.fromJson(Json.parse(params.get("params")), CreateSavedSearchRequest.class);
+        CreateSavedSearchRequest request = Json.fromJson(request().body().asJson(), CreateSavedSearchRequest.class);
 
         try {
             savedSearchService.create(request);
@@ -78,6 +76,20 @@ public class SavedSearchesApiController extends AuthenticatedController {
         }
 
         return status(202);
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result update(String searchId) {
+        CreateSavedSearchRequest request = Json.fromJson(request().body().asJson(), CreateSavedSearchRequest.class);
+
+        try {
+            savedSearchService.update(searchId, request);
+            return ok();
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
     }
 
 }

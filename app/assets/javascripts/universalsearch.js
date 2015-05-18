@@ -240,5 +240,5 @@ function activateTimerangeChooserV2(rangeType, rangeParams) {
 
 function submitSearch() {
     "use strict";
-    $(document).trigger('submit.graylog.search');
+    $(document).trigger('execute.graylog.search');
 }

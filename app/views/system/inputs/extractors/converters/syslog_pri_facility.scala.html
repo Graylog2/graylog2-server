@@ -1,12 +1,10 @@
 @(enabled: Boolean = false)
 
 <div class="xtrc-converter xtrc-converter-syslog-pri-facility" @if(!enabled) { style="display:none;" } >
-    <div class="control-group">
-        <div class="controls">
-            <label class="checkbox">
-                <input type="checkbox" value="enabled" name="converter_syslog_pri_facility" @if(enabled) { checked="checked" } />
-                Convert from PRI to syslog facility
-            </label>
-        </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="enabled" name="converter_syslog_pri_facility" @if(enabled) { checked="checked" } />
+            Convert from PRI to syslog facility
+        </label>
     </div>
 </div>

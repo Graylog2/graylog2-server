@@ -190,7 +190,7 @@ gulp.task('prepare-dev', function (callback) {
 gulp.task('default', ['deploy-prod']);
 
 gulp.task('watch', ['prepare-dev'], function () {
-    var bundler = watchify(browserifyCall(true));
+    var bundler = watchify(browserifyCall(true), {delay: 50});
 
     bundler.on('update', rebundle);
 

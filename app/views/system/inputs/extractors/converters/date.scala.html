@@ -2,24 +2,26 @@
         converter: org.graylog2.restclient.models.Converter = null)
 
 <div class="xtrc-converter xtrc-converter-date" @if(!enabled) { style="display:none;" } >
-    <div class="control-group">
-        <div class="controls">
-            <label class="checkbox">
-                <input type="checkbox" value="enabled" name="converter_date" @if(enabled) { checked="checked" } />
-                Convert to date type
-            </label>
-        </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" value="enabled" name="converter_date" @if(enabled) { checked="checked" } />
+            Convert to date type
+        </label>
     </div>
 
-    <div class="xtrc-converter-subfield control-group">
-        <label for="converter_date_format">
+    <div class="xtrc-converter-subfield">
+        <div class="form-group">
+            <label for="converter_date_format">
             Format string:
-            @views.html.partials.support.bubble("general/extractors#date-converter")
-        </label>
-        <div class="controls">
-            <input name="converter_date_format" id="converter_date_format"
-                type="text" placeholder="yyyy-MM-dd HH:mm:ss.SSS" class="input-xlarge"
-                @if(converter != null) { value="@converter.getConfig.get("date_format")" } />
+                @views.html.partials.support.bubble("general/extractors#date-converter")
+            </label>
+            <div class="row">
+                <div class="col-md-4">
+                    <input name="converter_date_format" id="converter_date_format"
+                    type="text" placeholder="yyyy-MM-dd HH:mm:ss.SSS" class="form-control"
+                        @if(converter != null) { value="@converter.getConfig.get("date_format")" } />
+                </div>
+            </div>
         </div>
     </div>
 </div>
