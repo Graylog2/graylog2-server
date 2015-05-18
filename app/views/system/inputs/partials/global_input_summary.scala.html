@@ -32,7 +32,7 @@
                 <a href="@routes.SearchController.index(sourceFieldForNode(masterNode) + ":" + input.getId, "relative", 28800)" class="btn btn-info">Show received messages</a>
             }
 
-            @if(!masterNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
+            @if(isPermitted(INPUTS_EDIT, input.getId)) {
                 <a href="@routes.ExtractorsController.manage(masterNode.getNodeId, input.getId)" class="btn btn-info">Manage extractors</a>
             }
 
@@ -51,7 +51,7 @@
                     <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
                 }
 
-                @if(!masterNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
+                @if(isPermitted(INPUTS_EDIT, input.getId)) {
                     <li><a href="#" class="add-static-field" data-node-id="@masterNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
                 }
 
