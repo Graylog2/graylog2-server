@@ -42,6 +42,8 @@ public class MessageResult {
             "gl2_source_node",
             "gl2_source_radio",
             "gl2_source_radio_input",
+            "gl2_source_collector",
+            "gl2_source_collector_input",
             "g2eid"
     );
 

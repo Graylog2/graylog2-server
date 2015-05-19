@@ -82,6 +82,8 @@ public class Message {
             "gl2_source_input",
             "gl2_source_radio",
             "gl2_source_radio_input",
+            "gl2_source_collector",
+            "gl2_source_collector_input",
             "gl2_remote_ip",
             "gl2_remote_port",
             "gl2_remote_hostname"
@@ -95,6 +97,8 @@ public class Message {
             "gl2_source_input",
             "gl2_source_radio",
             "gl2_source_radio_input",
+            "gl2_source_collector",
+            "gl2_source_collector_input",
             "gl2_remote_ip",
             "gl2_remote_port",
             "gl2_remote_hostname"
