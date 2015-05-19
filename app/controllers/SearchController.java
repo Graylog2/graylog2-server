@@ -102,7 +102,7 @@ public class SearchController extends AuthenticatedController {
         if (Permissions.isPermitted(RestPermissions.SEARCHES_ABSOLUTE)
                 || Permissions.isPermitted(RestPermissions.SEARCHES_RELATIVE)
                 || Permissions.isPermitted(RestPermissions.SEARCHES_KEYWORD)) {
-            return index("", "relative", 600, "", "", "", "", 1, "", "", "", "", DEFAULT_ASSUMED_GRAPH_RESOLUTION);
+            return index("", "relative", 300, "", "", "", "", 1, "", "", "", "", DEFAULT_ASSUMED_GRAPH_RESOLUTION);
         } else {
             return redirect(routes.StreamsController.index());
         }
