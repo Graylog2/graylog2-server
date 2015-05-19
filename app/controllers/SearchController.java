@@ -18,8 +18,6 @@
  */
 package controllers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -34,6 +32,9 @@ import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import lib.SearchTools;
 import lib.security.RestPermissions;
+import models.descriptions.InputDescription;
+import models.descriptions.NodeDescription;
+import models.descriptions.StreamDescription;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -42,7 +43,6 @@ import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
-import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Input;
 import org.graylog2.restclient.models.MessagesService;
 import org.graylog2.restclient.models.Node;
@@ -58,7 +58,6 @@ import org.graylog2.restclient.models.api.responses.QueryParseError;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
-import org.joda.time.DateTime;
 import org.joda.time.Minutes;
 import play.Logger;
 import play.libs.Json;
@@ -490,174 +489,6 @@ public class SearchController extends AuthenticatedController {
             return new SearchSort(sortField, SearchSort.Direction.valueOf(sortOrder.toUpperCase()));
         } catch (IllegalArgumentException e) {
             return UniversalSearch.DEFAULT_SORT;
-        }
-    }
-
-
-    public static class InputDescription {
-        @JsonIgnore
-        private final Input input;
-
-        public InputDescription(Input input) {
-            this.input = input;
-        }
-
-        @JsonProperty
-        public String getId() {
-            return input.getId();
-        }
-
-        @JsonProperty
-        public String getName() {
-            return input.getName();
-        }
-
-        @JsonProperty
-        public String getTitle() {
-            return input.getTitle();
-        }
-
-        @JsonProperty
-        public String getCreatorUser() {
-            return input.getCreatorUser().getName();
-        }
-
-        @JsonProperty
-        public Boolean getGlobal() {
-            return input.getGlobal();
-        }
-
-        @JsonProperty
-        public DateTime getCreatedAt() {
-            return input.getCreatedAt();
-        }
-
-        @JsonProperty
-        public String getType() {
-            return input.getType();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            InputDescription that = (InputDescription) o;
-
-            return input.equals(that.input);
-
-        }
-
-        @Override
-        public int hashCode() {
-            return input.hashCode();
-        }
-    }
-
-    public static class StreamDescription {
-        @JsonIgnore
-        private final Stream stream;
-
-        public StreamDescription(Stream stream) {
-            this.stream = stream;
-        }
-
-        public static StreamDescription of(Stream stream) {
-            if (stream == null) {
-                return null;
-            }
-            return new StreamDescription(stream);
-        }
-
-        @JsonProperty
-        public String getDescription() {
-            return stream.getDescription();
-        }
-
-        @JsonProperty
-        public String getTitle() {
-            return stream.getTitle();
-        }
-
-        @JsonProperty
-        public String getCreatorUser() {
-            return stream.getCreatorUser().getName();
-        }
-
-        @JsonProperty
-        public DateTime getCreatedAt() {
-            return stream.getCreatedAt();
-        }
-
-        @JsonProperty
-        public String getId() {
-            return stream.getId();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            StreamDescription that = (StreamDescription) o;
-
-            return stream.equals(that.stream);
-
-        }
-
-        @Override
-        public int hashCode() {
-            return stream.hashCode();
-        }
-    }
-
-    public static class NodeDescription {
-        @JsonIgnore
-        private final ClusterEntity entity;
-
-        public NodeDescription(ClusterEntity cluster) {
-            this.entity = cluster;
-        }
-
-        @JsonProperty
-        public String getNodeId() {
-            return entity.getNodeId();
-        }
-
-        @JsonProperty
-        public String getShortNodeId() {
-            return entity.getShortNodeId();
-        }
-
-        @JsonProperty
-        public String getHostname() {
-            return entity.getHostname();
-        }
-
-        @JsonProperty
-        public boolean isMaster() {
-            return entity instanceof Node && ((Node) entity).isMaster();
-        }
-
-        @JsonProperty
-        public boolean isRadio() {
-            return entity instanceof Radio;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            NodeDescription that = (NodeDescription) o;
-
-            return entity.equals(that.entity);
-
-        }
-
-        @Override
-        public int hashCode() {
-            return entity.hashCode();
         }
     }
 

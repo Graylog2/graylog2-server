@@ -3,7 +3,7 @@ package controllers.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import controllers.AuthenticatedController;
-import controllers.SearchController;
+import models.descriptions.StreamDescription;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
@@ -11,7 +11,6 @@ import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
 import play.libs.Json;
-import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -89,11 +88,11 @@ public class StreamsApiController extends AuthenticatedController {
     }
 
     public Result listStreams() {
-        List<SearchController.StreamDescription> streamDescriptions = Lists.newArrayList();
+        List<StreamDescription> streamDescriptions = Lists.newArrayList();
         try {
             final List<Stream> streams = streamService.all();
             for (Stream stream : streams) {
-                streamDescriptions.add(new SearchController.StreamDescription(stream));
+                streamDescriptions.add(new StreamDescription(stream));
             }
         } catch (IOException e) {
             return status(500, "Could not load streams");

@@ -22,6 +22,7 @@ package controllers.api;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
+import models.descriptions.InputDescription;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Tools;
@@ -65,11 +66,11 @@ public class InputsApiController extends AuthenticatedController {
     }
 
     public Result list() {
-        final List<Input> result = Lists.newArrayList();
+        final List<InputDescription> result = Lists.newArrayList();
         final List<InputState> inputStates = inputService.loadAllInputStates();
 
         for (InputState inputState : inputStates) {
-            result.add(inputState.getInput());
+            result.add(new InputDescription(inputState.getInput()));
         }
 
         return ok(Json.toJson(result));
