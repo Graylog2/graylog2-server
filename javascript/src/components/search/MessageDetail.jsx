@@ -20,6 +20,7 @@ var ReactZeroClipboard = require('react-zeroclipboard');
 var Immutable = require('immutable');
 var MessagesStore = require('../../stores/messages/MessagesStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
+var StreamLink = require('../streams/StreamLink');
 
 var MessageDetail = React.createClass({
     getInitialState() {
@@ -130,7 +131,7 @@ var MessageDetail = React.createClass({
         var streamIds = Immutable.Set(this.props.message['stream_ids']);
         var streams = streamIds
             .map((id) => this.props.streams.get(id))
-            .map((stream) => <li key={stream.id}><a href="#">{stream.title}</a></li>);
+            .map((stream) => <li key={stream.id}><StreamLink stream={stream}/></li>);
 
         var viaRadio = this.props.message['source_radio_id'];
         if (viaRadio) {
