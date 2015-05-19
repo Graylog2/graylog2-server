@@ -41,7 +41,7 @@
             data-inputs="@Json.toJson(inputs)"
             data-nodes="@Json.toJson(nodes)"
             data-search-in-stream="@Json.toJson(StreamDescription.of(stream))"
-            data-permissions="@Permissions.asJson(DASHBOARDS_CREATE)"
+            data-permissions="@Json.toJson(currentUser.getPermissions)"
         >
     </div>
 }
