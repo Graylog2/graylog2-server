@@ -14,12 +14,8 @@ var StreamControls = React.createClass({
     getInitialState() {
         return {};
     },
-    _onResume(evt) {
-        this.props.onResume(this.props.stream);
-        this.refs.dropdownButton.setDropdownState(false);
-    },
-    _onPause(evt) {
-        this.props.onPause(this.props.stream);
+    _onDelete(evt) {
+        this.props.onDelete(this.props.stream);
         this.refs.dropdownButton.setDropdownState(false);
     },
     _onEdit(evt) {
@@ -45,14 +41,6 @@ var StreamControls = React.createClass({
             menuItems.push(<MenuItem key={"quickAddRule-" + stream.id} onClick={this._onQuickAdd}>Quick add rule</MenuItem>);
         }
 
-        if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
-            if (stream.disabled) {
-                menuItems.push(<MenuItem key={"startStream-" + stream.id} onClick={this._onResume}>Start this stream</MenuItem>);
-            } else {
-                menuItems.push(<MenuItem key={"stopStream-" + stream.id} onClick={this._onPause}>Stop this stream</MenuItem>);
-            }
-        }
-
         if (this.isPermitted(permissions, ["streams:create", "streams:read:" + stream.id])) {
             menuItems.push(<MenuItem key={"cloneStream-" + stream.id} onClick={this._onClone}>Clone this stream</MenuItem>);
         }
@@ -62,6 +50,11 @@ var StreamControls = React.createClass({
                                      href={this.props.user.readonly ? null : jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>
                 Set as startpage
             </MenuItem>);
+        }
+
+        if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
+            menuItems.push(<MenuItem key={'divider-' + stream.id} divider />);
+            menuItems.push(<MenuItem key={'deleteStream-' + stream.id} onClick={this._onDelete}>Delete this stream</MenuItem>);
         }
 
         return (
