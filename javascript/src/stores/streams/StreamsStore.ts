@@ -67,7 +67,7 @@ class StreamsStore {
     pause(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Pausing Stream failed with status: " + errorThrown,
-                "Could not resume Stream!");
+                "Could not pause Stream!");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.pause(streamId).url;
