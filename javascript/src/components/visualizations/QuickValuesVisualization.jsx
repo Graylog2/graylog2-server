@@ -26,28 +26,34 @@ var QuickValuesVisualization = React.createClass({
         };
     },
     componentDidMount() {
+        this._formatProps(this.props);
         this._renderDataTable();
         this._renderPieChart();
     },
     componentWillReceiveProps(newProps) {
-        var quickValues = newProps.data;
+        this._formatProps(newProps);
+    },
+    _formatProps(newProps) {
+        if (newProps.data) {
+            var quickValues = newProps.data;
 
-        var terms = Object.keys(quickValues.terms);
+            var terms = Object.keys(quickValues.terms);
 
-        var formattedTerms = terms.map((term) => {
-            var count = quickValues.terms[term];
-            return {
-                term: term,
-                count: count
-            };
-        });
+            var formattedTerms = terms.map((term) => {
+                var count = quickValues.terms[term];
+                return {
+                    term: term,
+                    count: count
+                };
+            });
 
-        this.setState({
-            total: quickValues.total,
-            others: quickValues.other,
-            missing: quickValues.missing,
-            terms: formattedTerms
-        }, this.drawData);
+            this.setState({
+                total: quickValues.total,
+                others: quickValues.other,
+                missing: quickValues.missing,
+                terms: formattedTerms
+            }, this.drawData);
+        }
     },
     _renderDataTable() {
         var tableDomNode = this.refs.table.getDOMNode();
