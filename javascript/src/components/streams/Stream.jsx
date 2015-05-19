@@ -17,16 +17,13 @@ var Stream = React.createClass({
     _formatNumberOfStreamRules(stream) {
         return (stream.stream_rules.length > 0 ? stream.stream_rules.length + " configured stream rule(s)." : "no configured rules.");
     },
-    _handleDelete() {
-        this._onDelete(this.props.stream);
-    },
     _onDelete(stream) {
         if (window.confirm("Do you really want to remove this stream?")) {
             StreamsStore.remove(stream.id, () => {});
         }
     },
-    _onResume(stream) {
-        StreamsStore.resume(stream.id, () => {});
+    _onResume(evt) {
+        StreamsStore.resume(this.props.stream.id, () => {});
     },
     _onUpdate(streamId, stream) {
         StreamsStore.update(streamId, stream, () => {});
@@ -34,9 +31,9 @@ var Stream = React.createClass({
     _onClone(streamId, stream) {
         StreamsStore.cloneStream(streamId, stream, () => {});
     },
-    _onPause(stream) {
-        if (window.confirm("Do you really want to pause stream \"" + stream.title + "\"?")) {
-            StreamsStore.pause(stream.id, () => {});
+    _onPause(evt) {
+        if (window.confirm("Do you really want to pause stream \"" + this.props.stream.title + "\"?")) {
+            StreamsStore.pause(this.props.stream.id, () => {});
         }
     },
     _onQuickAdd() {
@@ -59,9 +56,14 @@ var Stream = React.createClass({
                                       className="btn btn-info">Manage alerts</a>;
         }
 
-        var deleteStreamLink = (this.isPermitted(permissions, ['streams:edit:'+stream.id]) ? <a className="btn btn-danger" onClick={this._handleDelete}>
-            <i className="fa fa-trash"></i>
-        </a> : null);
+        var toggleStreamLink = null;
+        if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
+            if (stream.disabled) {
+                toggleStreamLink = (<a className="btn btn-success toggle-stream-button" onClick={this._onResume}>Start stream</a>);
+            } else {
+                toggleStreamLink = (<a className="btn btn-primary toggle-stream-button" onClick={this._onPause}>Pause stream</a>);
+            }
+        }
 
         var createdFromContentPack = (stream.content_pack ? <i className="fa fa-cube" title="Created from content pack"></i> : null);
 
@@ -77,11 +79,11 @@ var Stream = React.createClass({
                         {editRulesLink}{' '}
                         {manageOutputsLink}{' '}
                         {manageAlertsLink}{' '}
-                        {deleteStreamLink}{' '}
+                        {toggleStreamLink}{' '}
 
                         <StreamControls stream={stream} permissions={this.props.permissions} user={this.props.user}
-                                        onResume={this._onResume} onUpdate={this._onUpdate}
-                                        onPause={this._onPause} onClone={this._onClone} onQuickAdd={this._onQuickAdd}/>
+                                        onDelete={this._onDelete} onUpdate={this._onUpdate} onClone={this._onClone}
+                                        onQuickAdd={this._onQuickAdd}/>
                     </div>
                     <div className="stream-description">
                         {createdFromContentPack}
