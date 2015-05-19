@@ -12,7 +12,9 @@ var D3Utils = require('../../util/D3Utils');
 
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
+    DEFAULT_PIE_CHART_SIZE: 200,
     getInitialState() {
+        this.triggerRender = true;
         this.dcGroupName = "quickvalue-" + this.props.id;
         this.quickValuesData = crossfilter();
         this.dimension = this.quickValuesData.dimension((d) => d.term);
@@ -26,13 +28,16 @@ var QuickValuesVisualization = React.createClass({
         };
     },
     componentDidMount() {
+        this._resizeVisualization(this.props.width, this.props.height, this.props.config['show_data_table']);
         this._formatProps(this.props);
         this._renderDataTable();
         this._renderPieChart();
     },
     componentWillReceiveProps(newProps) {
+        this._resizeVisualization(newProps.width, newProps.height, newProps.config['show_data_table']);
         this._formatProps(newProps);
     },
+
     _formatProps(newProps) {
         if (newProps.data) {
             var quickValues = newProps.data;
@@ -99,8 +104,8 @@ var QuickValuesVisualization = React.createClass({
         this.pieChart
             .dimension(this.dimension)
             .group(this.group)
-            .height(200)
-            .width(200)
+            .height(this.DEFAULT_PIE_CHART_SIZE)
+            .width(this.DEFAULT_PIE_CHART_SIZE)
             .renderLabel(false)
             .renderTitle(false)
             .slicesCap(this.NUMBER_OF_TOP_VALUES)
@@ -138,13 +143,38 @@ var QuickValuesVisualization = React.createClass({
             return count;
         }
     },
+    _resizeVisualization(width, height, showDataTable) {
+        var computedSize;
+
+        if (this.props.config['show_pie_chart']) {
+            if (showDataTable) {
+                computedSize = this.DEFAULT_PIE_CHART_SIZE;
+            } else {
+                computedSize = Math.min(width, height);
+            }
+
+            if (this.pieChart !== undefined && this.pieChart.width() !== computedSize) {
+                console.log("resizing...");
+                this.pieChart
+                    .width(computedSize)
+                    .height(computedSize)
+                    .radius(computedSize / 2);
+                this.triggerRender = true;
+            }
+        }
+    },
     drawData() {
         this.quickValuesData.remove();
         this.quickValuesData.add(this.state.terms);
         this.dataTable.redraw();
 
-        if (this.props.config.show_pie_chart) {
-            this.pieChart.redraw();
+        if (this.props.config['show_pie_chart']) {
+            if (this.triggerRender) {
+                this.pieChart.render();
+                this.triggerRender = false;
+            } else {
+                this.pieChart.redraw();
+            }
         }
     },
     render() {

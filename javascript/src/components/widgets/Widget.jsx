@@ -168,9 +168,14 @@ var Widget = React.createClass({
                                                         width={this.state.width}/>;
                 break;
             case this.constructor.Type.QUICKVALUES:
+                // We need to correct the size due to overflow on this DOM element
+                var quickValuesWidth = this.state.width * 0.85;
+                var quickValuesHeight = this.state.height * 0.85;
                 visualization = <QuickValuesVisualization id={this.props.widgetId}
                                                           config={this.state.config}
-                                                          data={this.state.result}/>;
+                                                          data={this.state.result}
+                                                          height={quickValuesHeight}
+                                                          width={quickValuesWidth}/>;
                 break;
             case this.constructor.Type.FIELD_CHART:
                 visualization = <GraphVisualization id={this.props.widgetId}
