@@ -124,12 +124,12 @@ public class AlertCondition {
 
     private String buildFieldStringValueDescription() {
         String query = new StringBuilder()
-                .append(parameters.get("field")).append(":").append(parameters.get("value"))
+                .append(parameters.get("field")).append(":\"").append(parameters.get("value")).append("\"")
                 .toString();
 
         StringBuilder sb = new StringBuilder()
                 .append("Alert is triggered when messages matching <")
-                .append(query).append("> are received.");
+                .append(query).append("> are received. ");
 
         return sb.toString();
     }
