@@ -54,7 +54,7 @@ var GraphFactory = {
 
 var GraphVisualization = React.createClass({
     getInitialState() {
-        this.firstRender = true;
+        this.triggerRender = true;
         this.graphData = crossfilter();
         this.dimension = this.graphData.dimension((d) => momentHelper.toUserTimeZone(d.x * 1000));
         this.group = this.dimension.group().reduceSum((d) => d.y);
@@ -69,15 +69,18 @@ var GraphVisualization = React.createClass({
         this.renderGraph();
     },
     componentWillReceiveProps(nextProps) {
+        if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
+            this._resizeVisualization(nextProps.width, nextProps.height);
+        }
         this.setState({dataPoints: nextProps.data}, this.drawData);
     },
     renderGraph() {
-        var graphDomNode = this.getDOMNode();
+        var graphDomNode = React.findDOMNode(this);
 
         this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
         this.graph
-            .width(810)
-            .height(120)
+            .width(this.props.width)
+            .height(this.props.height)
             .margins({left: 50, right: 15, top: 10, bottom: 35})
             .dimension(this.dimension)
             .group(this.group)
@@ -127,6 +130,12 @@ var GraphVisualization = React.createClass({
     _formatInterval() {
         return StringUtils.capitalizeFirstLetter(this.props.config.interval) + "s";
     },
+    _resizeVisualization(width, height) {
+        this.graph
+            .width(width)
+            .height(height);
+        this.triggerRender = true;
+    },
     drawData() {
         this.graph.xUnits(() => Math.max(this.state.dataPoints.length - 1, 1));
         this.graphData.remove();
@@ -134,9 +143,9 @@ var GraphVisualization = React.createClass({
 
         // Fix to make Firefox render tooltips in the right place
         // TODO: Find the cause of this
-        if (this.firstRender) {
+        if (this.triggerRender) {
             this.graph.render();
-            this.firstRender = false;
+            this.triggerRender = false;
         } else {
             this.graph.redraw();
         }

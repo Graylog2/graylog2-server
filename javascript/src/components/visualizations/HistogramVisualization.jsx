@@ -14,7 +14,7 @@ var StringUtils = require('../../util/StringUtils');
 
 var HistogramVisualization = React.createClass({
     getInitialState() {
-        this.firstRender = true;
+        this.triggerRender = true;
         this.histogramData = crossfilter();
         this.dimension = this.histogramData.dimension((d) => momentHelper.toUserTimeZone(d.x * 1000));
         this.group = this.dimension.group().reduceSum((d) => d.y);
@@ -27,15 +27,18 @@ var HistogramVisualization = React.createClass({
         this.renderHistogram();
     },
     componentWillReceiveProps(nextProps) {
+        if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
+            this._resizeVisualization(nextProps.width, nextProps.height);
+        }
         this.setState({dataPoints: nextProps.data}, this.drawData);
     },
     renderHistogram() {
-        var histogramDomNode = this.getDOMNode();
+        var histogramDomNode = React.findDOMNode(this);
 
         this.histogram = dc.barChart(histogramDomNode);
         this.histogram
-            .width(810)
-            .height(120)
+            .width(this.props.width)
+            .height(this.props.height)
             .margins({left: 50, right: 15, top: 10, bottom: 30})
             .dimension(this.dimension)
             .group(this.group)
@@ -66,7 +69,7 @@ var HistogramVisualization = React.createClass({
             'selector': '[rel="tooltip"]',
             'container': 'body',
             'placement': 'auto',
-            'delay': { show: 300, hide: 100 },
+            'delay': {show: 300, hide: 100},
             'html': true
         });
 
@@ -83,6 +86,12 @@ var HistogramVisualization = React.createClass({
     _formatInterval() {
         return StringUtils.capitalizeFirstLetter(this.props.interval) + "s";
     },
+    _resizeVisualization(width, height) {
+        this.histogram
+            .width(width)
+            .height(height);
+        this.triggerRender = true;
+    },
     drawData() {
         this.histogram.xUnits(() => this.state.dataPoints.length - 1);
         this.histogramData.remove();
@@ -90,9 +99,9 @@ var HistogramVisualization = React.createClass({
 
         // Fix to make Firefox render tooltips in the right place
         // TODO: Find the cause of this
-        if (this.firstRender) {
+        if (this.triggerRender) {
             this.histogram.render();
-            this.firstRender = false;
+            this.triggerRender = false;
         } else {
             this.histogram.redraw();
         }

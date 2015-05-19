@@ -25,6 +25,7 @@ var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 var Widget = React.createClass({
     WIDGET_DATA_REFRESH: 30 * 1000,
     DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
+    WIDGET_FOOTER_HEIGHT: 25,
     statics: {
         Type: {
             SEARCH_RESULT_COUNT: "SEARCH_RESULT_COUNT",
@@ -48,7 +49,9 @@ var Widget = React.createClass({
             result: undefined,
             calculatedAt: undefined,
             error: false,
-            errorMessage: undefined
+            errorMessage: undefined,
+            height: undefined,
+            width: undefined
         };
     },
     _isBoundToStream() {
@@ -66,21 +69,24 @@ var Widget = React.createClass({
         };
     },
     _getWidgetNode() {
-        return this.refs.widget.getDOMNode();
+        return React.findDOMNode(this.refs.widget);
     },
     componentDidMount() {
-        this.loadData();
-        this.loadValue();
+        this._calculateWidgetSize();
+        this._loadData();
+        this._loadValue();
 
         $(this._getWidgetNode()).on("unlocked.graylog.dashboard", this._dashboardUnlocked);
         $(this._getWidgetNode()).on("locked.graylog.dashboard", this._dashboardLocked);
+        $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
     },
     componentWillUnmount() {
         $(this._getWidgetNode()).off("unlocked.graylog.dashboard", this._dashboardUnlocked);
         $(this._getWidgetNode()).off("locked.graylog.dashboard", this._dashboardLocked);
+        $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
     },
-    loadData() {
-        if (!assertUpdateEnabled(this.loadData) || this.state.deleted) {
+    _loadData() {
+        if (!assertUpdateEnabled(this._loadData) || this.state.deleted) {
             return;
         }
 
@@ -102,10 +108,10 @@ var Widget = React.createClass({
                 config: widget.config
             });
         });
-        setTimeout(this.loadData, this.WIDGET_DATA_REFRESH);
+        setTimeout(this._loadData, this.WIDGET_DATA_REFRESH);
     },
-    loadValue() {
-        if (!assertUpdateEnabled(this.loadValue) || this.state.deleted) {
+    _loadValue() {
+        if (!assertUpdateEnabled(this._loadValue) || this.state.deleted) {
             return;
         }
 
@@ -127,7 +133,7 @@ var Widget = React.createClass({
             });
         });
 
-        setTimeout(this.loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
+        setTimeout(this._loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
     },
     _dashboardLocked() {
         this.setState({locked: true});
@@ -135,7 +141,13 @@ var Widget = React.createClass({
     _dashboardUnlocked() {
         this.setState({locked: false});
     },
-    getVisualization() {
+    _calculateWidgetSize() {
+        var $widgetNode = $(this._getWidgetNode());
+        var availableHeight = $widgetNode.height() - this.WIDGET_FOOTER_HEIGHT;
+        var availableWidth = $widgetNode.width();
+        this.setState({height: availableHeight, width: availableWidth});
+    },
+    _getVisualization() {
         if (this.state.type === "") {
             return;
         }
@@ -151,7 +163,9 @@ var Widget = React.createClass({
             case this.constructor.Type.SEARCH_RESULT_CHART:
                 visualization = <HistogramVisualization id={this.props.widgetId}
                                                         data={this.state.result}
-                                                        interval={this.state.config.interval}/>;
+                                                        interval={this.state.config.interval}
+                                                        height={this.state.height}
+                                                        width={this.state.width}/>;
                 break;
             case this.constructor.Type.QUICKVALUES:
                 visualization = <QuickValuesVisualization id={this.props.widgetId}
@@ -161,7 +175,9 @@ var Widget = React.createClass({
             case this.constructor.Type.FIELD_CHART:
                 visualization = <GraphVisualization id={this.props.widgetId}
                                                     data={this.state.result}
-                                                    config={this.state.config}/>;
+                                                    config={this.state.config}
+                                                    height={this.state.height}
+                                                    width={this.state.width}/>;
                 break;
             default:
                 throw("Error: Widget type '" + this.state.type + "' not supported");
@@ -264,7 +280,7 @@ var Widget = React.createClass({
                               error={this.state.error}
                               errorMessage={this.state.errorMessage}/>
 
-                {this.getVisualization()}
+                {this._getVisualization()}
 
                 <WidgetFooter locked={this.state.locked}
                               onReplaySearch={this._replaySearch}
