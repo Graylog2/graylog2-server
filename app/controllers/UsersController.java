@@ -84,19 +84,6 @@ public class UsersController extends AuthenticatedController {
         return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), permissions));
     }
 
-    public Result show(String username) {
-        final User user = userService.load(username);
-        if (user == null) {
-            String message = "User not found! Maybe it has been deleted.";
-            return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
-        }
-
-        BreadcrumbList bc = breadcrumbs();
-        bc.addCrumb(user.getFullName(), routes.UsersController.show(username));
-
-        return ok(show.render(user, currentUser(), bc));
-    }
-
     public Result newUserForm() {
         if (!Permissions.isPermitted(RestPermissions.USERS_CREATE)) {
             return redirect(routes.StartpageController.redirect());
