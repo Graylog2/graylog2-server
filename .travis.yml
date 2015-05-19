@@ -20,9 +20,9 @@ before_script:
   - npm install -g npm@latest
   - node --version
   - npm --version
-  - pushd javascript && npm install && popd
+  - pushd javascript ; npm install ; popd
 script:
-  - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
+  - pushd javascript ; (npm test && node_modules/.bin/gulp deploy-prod) ; popd
   - sbt test
 after_success:
   - sbt universal:package-zip-tarball
