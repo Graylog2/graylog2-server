@@ -58,9 +58,8 @@ var StreamRuleForm = React.createClass({
 
                         <p>
                             <strong>Result:</strong>
-                            <span id="sr-result">
-                                Field <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
-                            </span>
+                            {' '}
+                            Field <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
                         </p>
                     </Col>
                     <Col md={4}>

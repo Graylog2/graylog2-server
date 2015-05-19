@@ -27,7 +27,7 @@ var TypeAheadFieldInput = React.createClass({
             });
 
             var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
-            $(fieldFormGroup).on('typeahead:change', (event) => {
+            $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
                 if (this.props.valueLink) {
                     this.props.valueLink.requestChange(event.target.value);
                 }
