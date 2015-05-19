@@ -28,7 +28,7 @@ public class InputStateHelper {
     public static String labelClassForState(InputStateType state) {
         switch(state) {
             case RUNNING: return "success";
-            case FAILED: return "important";
+            case FAILED: return "danger";
             case STARTING: return "info";
             default: return "warning";
         }

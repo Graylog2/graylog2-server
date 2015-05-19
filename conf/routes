@@ -122,6 +122,7 @@ DELETE        /savedsearches/:search_id/delete                                  
 
 # Extractors
 GET           /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.manage(node_id: String, input_id: String)
+GET           /system/inputs/:input_id/extractors                                                @controllers.ExtractorsController.manageGlobal(input_id: String)
 GET           /system/inputs/:node_id/:input_id/extractors/new                                   @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example_index ?= "", example_id ?= "")
 POST          /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.create(node_id: String, input_id: String)
 POST          /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete                  @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)

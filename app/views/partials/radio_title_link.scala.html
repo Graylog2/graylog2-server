@@ -2,8 +2,4 @@
 
 <i class="fa fa-angle-double-down"></i>
 
-<a href="@routes.RadiosController.show(radio.getId())" class="node-link">
-    @radio.getShortNodeId()
-    /
-    @radio.getHostname()
-</a>
+<a href="@routes.RadiosController.show(radio.getId())" class="node-link">@radio.getShortNodeId() / @radio.getHostname()</a>
