@@ -108,7 +108,6 @@
                         @if(isPermitted(INPUTS_EDIT, input.getId)) {
                             <a href="@routes.InputsController.removeStaticField(masterNode.getNodeId, input.getId, k)"
                             class="remove-static-field"
-                            style="display: none;"
                             data-confirm="Really delete static field?">
                                 <i class="fa fa-remove"></i>
                             </a>
