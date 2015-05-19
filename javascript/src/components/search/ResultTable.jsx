@@ -62,10 +62,10 @@ var ResultTable = React.createClass({
             <h1 className="pull-left">Messages</h1>
 
             <ButtonGroup bsSize='small' className="pull-right">
-                <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-plus"></i></Button>
+                <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"></i></Button>
                 <Button title="Collapse all messages"
                         onClick={this.collapseAll}
-                        disabled={this.state.expandedMessages.size === 0}><i className="fa fa-minus"></i></Button>
+                        disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"></i></Button>
             </ButtonGroup>
 
             <MessageTablePaginator position="top" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}/>
@@ -97,10 +97,10 @@ var ResultTable = React.createClass({
 
             <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}>
                 <ButtonGroup bsSize='small' className="pull-right" style={{marginTop: 20}}>
-                    <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-plus"></i></Button>
+                    <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"></i></Button>
                     <Button title="Collapse all messages"
                             onClick={this.collapseAll}
-                            disabled={this.state.expandedMessages.size === 0}><i className="fa fa-minus"></i></Button>
+                            disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"></i></Button>
                 </ButtonGroup>
             </MessageTablePaginator>
         </div>);

@@ -13,7 +13,7 @@ if (dialogConfigurationDiv) {
 }
 
 var $ = require('jquery');
-var EditDashboardModal = require('./EditDashboardModal');
+var EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
 
 $('.react-edit-dashboard').each(function() {
     var id = this.getAttribute('data-dashboard-id');
@@ -23,9 +23,9 @@ $('.react-edit-dashboard').each(function() {
     var content = this.innerHTML;
 
     var component = (
-        <EditDashboardModal id={id} title={title} description={description} buttonClass={buttonClass}>
+        <EditDashboardModalTrigger id={id} action="edit" title={title} description={description} buttonClass={buttonClass}>
             {content}
-        </EditDashboardModal>
+        </EditDashboardModalTrigger>
     );
 
     React.render(component, this);

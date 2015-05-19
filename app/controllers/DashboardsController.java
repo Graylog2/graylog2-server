@@ -123,27 +123,6 @@ public class DashboardsController extends AuthenticatedController {
         return redirect(routes.DashboardsController.index());
     }
 
-    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
-    public Result update(String id) {
-        Map<String,String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
-
-        UpdateDashboardRequest udr = new UpdateDashboardRequest();
-        udr.title = params.get("title");
-        udr.description = params.get("description");
-
-        try {
-            Dashboard dashboard = dashboardService.get(id);
-            dashboard.update(udr);
-        } catch (APIException e) {
-            String message = "Could not update dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        }
-
-        return redirect(routes.DashboardsController.show(id));
-    }
-
     public Result delete(String id) {
         try {
             dashboardService.delete(id);

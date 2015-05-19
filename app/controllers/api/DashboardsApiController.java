@@ -29,6 +29,8 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.api.requests.dashboards.CreateDashboardRequest;
+import org.graylog2.restclient.models.api.requests.dashboards.UpdateDashboardRequest;
 import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPositionsRequest;
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
@@ -53,13 +55,15 @@ import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Http;
 import play.mvc.Result;
-import views.helpers.Permissions;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static views.helpers.Permissions.isPermitted;
 
 public class DashboardsApiController extends AuthenticatedController {
     private final DashboardService dashboardService;
@@ -117,7 +121,7 @@ public class DashboardsApiController extends AuthenticatedController {
         List<Dashboard> writable = Lists.newArrayList();
 
         for (Dashboard dashboard : dashboardService.getAll()) {
-            if (Permissions.isPermitted(user, RestPermissions.DASHBOARDS_EDIT, dashboard.getId())) {
+            if (isPermitted(user, RestPermissions.DASHBOARDS_EDIT, dashboard.getId())) {
                 writable.add(dashboard);
             }
         }
@@ -125,7 +129,51 @@ public class DashboardsApiController extends AuthenticatedController {
         return writable;
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
+    public Result create() {
+        if (!isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+            return forbidden();
+        }
+
+        CreateDashboardRequest cdr = Json.fromJson(request().body().asJson(), CreateDashboardRequest.class);
+        if (isNullOrEmpty(cdr.getTitle()) || isNullOrEmpty(cdr.getDescription())) {
+            return badRequest("Missing field");
+        }
+
+        try {
+            final String dashboardId = dashboardService.create(cdr);
+
+            return ok(Json.toJson(dashboardId));
+        } catch (APIException e) {
+            String message = "Could not create dashboard. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    public Result update(String id) {
+        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, id)) {
+            return forbidden();
+        }
+
+        UpdateDashboardRequest udr = Json.fromJson(request().body().asJson(), UpdateDashboardRequest.class);
+        if (isNullOrEmpty(udr.title) || isNullOrEmpty(udr.description)) {
+            return badRequest("Missing field");
+        }
+
+        try {
+            Dashboard dashboard = dashboardService.get(id);
+            dashboard.update(udr);
+
+            return ok();
+        } catch (APIException e) {
+            String message = "Could not update dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result setWidgetPositions(String dashboardId) {
 
         try {
@@ -484,7 +532,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
     private boolean canReadStream(String streamId) {
         if (streamId == null) return true;
-        return Permissions.isPermitted(RestPermissions.STREAMS_READ, streamId);
+        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     public Result removeWidget(String dashboardId, String widgetId) {
@@ -503,7 +551,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result updateWidget(String dashboardId, String widgetId) {
-        if (!Permissions.isPermitted(RestPermissions.DASHBOARDS_EDIT, dashboardId)) {
+        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, dashboardId)) {
             return redirect(controllers.routes.StartpageController.redirect());
         }
 

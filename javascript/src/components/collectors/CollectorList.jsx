@@ -63,7 +63,7 @@ var CollectorList = React.createClass({
                 <div>
                     <div className="row">
                         <div className="col-md-12">
-                            <form className="form-inline collectors-filter-form">
+                            <form className="form-inline collectors-filter-form" onSubmit={(e) => e.preventDefault() }>
                                 <label htmlFor="collectorsfilter">Filter collectors:</label>
                                 <input type="text" name="filter" id="collectorsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
                             </form>
@@ -73,13 +73,13 @@ var CollectorList = React.createClass({
                             <table className="table table-striped users-list">
                                 <thead>
                                 <tr>
+                                    <th onClick={this.sortByNodeId}>Host Name</th>
+                                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
+                                    <th onClick={this.sortByLastSeen}>Last Seen</th>
                                     <th className="name" onClick={this.sortById}>
                                         Collector Id
                                     </th>
-                                    <th onClick={this.sortByNodeId}>Host Name</th>
                                     <th onClick={this.sortByCollectorVersion}>Collector Version</th>
-                                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
-                                    <th onClick={this.sortByLastSeen}>Last Seen</th>
                                 </tr>
                                 </thead>
                                 <tbody>

@@ -8,16 +8,23 @@ var MenuItem = require('react-bootstrap').MenuItem;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Immutable = require('immutable');
 
-var WidgetStore = require('../../stores/widgets/WidgetsStore');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 var WidgetCreationModal = require('../widgets/WidgetCreationModal');
+var EditDashboardModal = require('./EditDashboardModal');
+
+var DashboardStore = require('../../stores/dashboard/DashboardStore');
+var WidgetStore = require('../../stores/widgets/WidgetsStore');
 
 var AddToDashboardMenu = React.createClass({
+    mixins: [PermissionsMixin],
     getInitialState() {
         return {
+            dashboards: DashboardStore.dashboards,
             selectedDashboard: ""
         };
     },
     componentDidMount() {
+        DashboardStore.addOnDashboardsChangedCallback(dashboards => this.setState({dashboards: dashboards}));
         $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
     },
     _setOriginalSearchParams(originalSearchParams) {
@@ -35,10 +42,13 @@ var AddToDashboardMenu = React.createClass({
         var promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
         promise.done(() => this.refs.widgetModal.saved());
     },
-    render() {
+    _createNewDashboard() {
+        this.refs['createDashboardModal'].open();
+    },
+    _renderDashboardMenu() {
         var dashboards = Immutable.List();
 
-        Immutable.Map(this.props.dashboards)
+        this.state.dashboards
             .sortBy(dashboard => dashboard.title)
             .forEach((dashboard, id) => {
                 dashboards = dashboards.push(
@@ -49,16 +59,44 @@ var AddToDashboardMenu = React.createClass({
             });
 
         return (
+            <DropdownButton bsStyle={this.props.bsStyle || "info"}
+                            bsSize="small"
+                            title={this.props.title}
+                            pullRight={this.props.pullRight}
+                            onSelect={this._selectDashboard}>
+                {dashboards}
+            </DropdownButton>
+        );
+    },
+    _renderNoDashboardsMenu() {
+        var canCreateDashboard = this.isPermitted(this.props.permissions, ["DASHBOARDS_CREATE"]);
+        var option;
+        if (canCreateDashboard) {
+            option = <MenuItem key="createDashboard">No dashboards, create one?</MenuItem>;
+        } else {
+            option = <MenuItem key="noDashboards">No dashboards available</MenuItem>;
+        }
+
+        return (
+            <div style={{display: 'inline'}}>
+                <DropdownButton bsStyle={this.props.bsStyle || "info"}
+                                bsSize="small"
+                                title={this.props.title}
+                                pullRight={this.props.pullRight}
+                                onSelect={canCreateDashboard ? this._createNewDashboard : () => {}}>
+                    {option}
+                </DropdownButton>
+                <EditDashboardModal ref="createDashboardModal" onSaved={(id) => this._selectDashboard(id)}/>
+            </div>
+        );
+    },
+    render() {
+        return (
             <div style={{display: 'inline'}}>
                 <ButtonGroup>
                     {this.props.children}
-                    <DropdownButton bsStyle={this.props.bsStyle || "info"}
-                                    bsSize="small"
-                                    title={this.props.title}
-                                    pullRight={this.props.pullRight}
-                                    onSelect={this._selectDashboard}>
-                        {dashboards}
-                    </DropdownButton>
+                    {this.state.dashboards.size > 0 ?
+                        this._renderDashboardMenu() : this._renderNoDashboardsMenu()}
                 </ButtonGroup>
                 <WidgetCreationModal ref="widgetModal"
                                      widgetType={this.props.widgetType}

@@ -14,14 +14,22 @@ var EditDashboardModal = React.createClass({
             title: this.props.title
         };
     },
+    getDefaultProps() {
+        return {
+            action: 'create'
+        };
+    },
     _onDescriptionChange(event) {
         this.setState({description: event.target.value});
     },
     _onTitleChange(event) {
         this.setState({title: event.target.value});
     },
+    _isCreateModal() {
+        return this.props.action === 'create';
+    },
     render() {
-        var header = <h2 className="modal-title">Edit Dashboard {this.props.title}</h2>;
+        var header = <h2 className="modal-title">{this._isCreateModal() ? "New Dashboard" : "Edit Dashboard " + this.props.title}</h2>;
         var body = (
             <fieldset>
                 <div className="form-group">
@@ -35,44 +43,47 @@ var EditDashboardModal = React.createClass({
                 </div>
                 <div className="form-group">
                     <label>Description:</label>
-                    <input type="text" className="form-control" onChange={this._onDescriptionChange} value={this.state.description}  required/>
+                    <input type="text" className="form-control" onChange={this._onDescriptionChange} value={this.state.description} required/>
                 </div>
             </fieldset>
         );
-        var triggerButtonContent;
-
-        if (this.props.children === undefined || this.props.children.trim() === "") {
-            triggerButtonContent = {__html: "Edit dashboard"};
-        } else {
-            triggerButtonContent = {__html: this.props.children};
-        }
 
         return (
-            <span>
-                <button onClick={this.openModal}
-                    className={"btn btn-info " + this.props.buttonClass}
-                    dangerouslySetInnerHTML={triggerButtonContent}>
-                </button>
-                <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
-                   {header}
-                   {body}
-                </BootstrapModal>
-            </span>
+            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+               {header}
+               {body}
+            </BootstrapModal>
         );
     },
-    _closeModal() {
+    close() {
         this.refs.modal.close();
     },
-    openModal() {
+    open() {
         this.refs.modal.open();
     },
     _save() {
-        DashboardStore.saveDashboard(this.state, () => {
-            this._closeModal();
-            var idSelector = '[data-dashboard-id="' + this.state.id + '"]';
-            $(idSelector + '.dashboard-title').html(this.state.title);
-            $(idSelector + '.dashboard-description').html(this.state.description);
-        });
+        var promise;
+
+        if (this._isCreateModal()) {
+            promise = DashboardStore.createDashboard(this.state.title, this.state.description);
+            promise.done((id) => {
+                this.close();
+                if (typeof this.props.onSaved === 'function') {
+                    this.props.onSaved(id);
+                }
+            });
+        } else {
+            promise = DashboardStore.saveDashboard(this.state);
+            promise.done(() => {
+                this.close();
+                var idSelector = '[data-dashboard-id="' + this.state.id + '"]';
+                $(idSelector + '.dashboard-title').html(this.state.title);
+                $(idSelector + '.dashboard-description').html(this.state.description);
+                if (typeof this.props.onSaved === 'function') {
+                    this.props.onSaved(this.state.id);
+                }
+            });
+        }
     }
 });
 

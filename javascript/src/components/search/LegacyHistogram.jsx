@@ -61,10 +61,10 @@ var LegacyHistogram = React.createClass({
         return (<div className="content-col">
             <div className="pull-right">
                 <AddToDashboardMenu title="Add to dashboard"
-                                    dashboards={this.props.dashboards}
                                     widgetType={Widget.Type.SEARCH_RESULT_CHART}
                                     configuration={{interval: this.props.histogram.interval}}
-                                    pullRight={true}/>
+                                    pullRight={true}
+                                    permissions={this.props.permissions}/>
             </div>
             <h1>Histogram</h1>
 

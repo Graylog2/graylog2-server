@@ -25,10 +25,9 @@ var CollectorRow = React.createClass({
             glyphClass = "fa-windows";
         }
 
+        glyphClass += " collector-os";
+
         return (<i className={"fa " + glyphClass}></i>);
-    },
-    _toggleRelativeTime() {
-        this.setState({showRelativeTime: !this.state.showRelativeTime});
     },
     render() {
         var collector = this.props.collector;
@@ -40,21 +39,21 @@ var CollectorRow = React.createClass({
         return (
             <tr className={collectorClass} style={style}>
                 <td className="limited">
-                    {collector.id}
-                    {annotation}
-                </td>
-                <td className="limited">
                     {collector.node_id}
-                </td>
-                <td className="limited">
-                    {collector.collector_version}
                 </td>
                 <td className="limited">
                     {osGlyph}
                     {collector.node_details.operating_system}
                 </td>
                 <td className="limited">
-                    <time dateTime={collector.last_seen} onClick={this._toggleRelativeTime}>{formattedTime}</time>
+                    <time dateTime={collector.last_seen} title={momentHelper.toUserTimeZone(moment(collector.last_seen)).format()}>{formattedTime}</time>
+                </td>
+                <td className="limited">
+                    {collector.id}
+                    {annotation}
+                </td>
+                <td className="limited">
+                    {collector.collector_version}
                 </td>
             </tr>
         );

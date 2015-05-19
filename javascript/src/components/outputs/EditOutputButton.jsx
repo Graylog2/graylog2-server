@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
+var Button = require('react-bootstrap').Button;
 
 var EditOutputButton = React.createClass({
     getInitialState() {
@@ -32,12 +33,12 @@ var EditOutputButton = React.createClass({
             : ""
         );
         return (
-            <div>
-                <button className="btn btn-success btn-xs" onClick={this.handleClick.bind(null, output)}>
+            <span>
+                <Button className="btn btn-success btn-xs" onClick={this.handleClick.bind(null, output)}>
                     <i className="fa fa-edit"></i> Edit
-                </button>
+                </Button>
                 {configurationForm}
-            </div>
+            </span>
         );
     }
 });
