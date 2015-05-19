@@ -4,6 +4,7 @@ var React = require('react/addons');
 var Input = require('react-bootstrap').Input;
 var Spinner = require('../common/Spinner');
 var Col = require('react-bootstrap').Col;
+var Immutable = require('immutable');
 
 var InputDropdown = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
@@ -24,7 +25,7 @@ var InputDropdown = React.createClass({
     },
     render() {
         if (this.props.inputs) {
-            var inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
+            var inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).map(this._formatInput));
             return (
                 <Col md={12}>
                     <Col md={6}>
