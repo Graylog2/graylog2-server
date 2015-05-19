@@ -20,6 +20,7 @@ before_script:
   - npm install -g npm@latest
   - node --version
   - npm --version
+  - npm config set spin false
   - pushd javascript ; npm install ; popd
 script:
   - pushd javascript ; (npm test && node_modules/.bin/gulp deploy-prod) ; popd
