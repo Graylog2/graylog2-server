@@ -139,7 +139,7 @@ var MessageDetail = React.createClass({
 
         var timestamp = null;
         if (this.props.showTimestamp) {
-            var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format();
+            var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format('YYYY-MM-DD HH:mm:ss.SSS');
             timestamp = [];
 
             timestamp.push(<dt key="0">Timestamp</dt>);
