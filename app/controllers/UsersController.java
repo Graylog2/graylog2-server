@@ -44,7 +44,6 @@ import play.mvc.Result;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
-import views.html.system.users.show;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
