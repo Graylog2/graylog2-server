@@ -13,9 +13,6 @@
     @for(callback <- alarmCallbacks) {
         <div class="row node-row alert-condition alert-callback" data-destination-id="@callback">
             <span class="pull-right node-row-info">
-                Created by @views.html.partials.links.to_user.render(callback.getCreatorUser)
-                @DateHelper.readablePeriodFromNow(callback.getCreatedAt())
-
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;
                         <!-- <button type="submit" id="edit-alarm-destination" data-alarm-destination-id="@callback.getId" class="btn btn-success btn-xs">Edit</button> -->

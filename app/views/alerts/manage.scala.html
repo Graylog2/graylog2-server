@@ -100,8 +100,7 @@
                 <ul class="alert-receivers">
                     @for(user <- stream.getUserAlertReceivers) {
                         <li>
-                            <i class="fa fa-user"></i>&nbsp;
-                            <a href="@routes.UsersController.show(user)">@user</a>
+                            <i class="fa fa-user"></i>&nbsp;@user
 
                             @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                                 <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
