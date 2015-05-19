@@ -59,7 +59,7 @@ var CollectorList = React.createClass({
                     }
                 );
 
-                var showOrHideInactive = (this.state.showInactive ? "Hide" : "Show");
+                var showOrHideInactive = (this.state.showInactive ? "Hide" : "Include");
 
                 return (
                     <Row>
