@@ -9,6 +9,7 @@ var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 var UsersStore = require('../../stores/users/UsersStore');
 var Col = require('react-bootstrap').Col;
+var UserNotification = require('../../util/UserNotification');
 
 var StreamComponent = React.createClass({
     mixins: [PermissionsMixin],
@@ -34,7 +35,9 @@ var StreamComponent = React.createClass({
         });
     },
     _onSave(streamId, stream) {
-        StreamsStore.save(stream, () => {});
+        StreamsStore.save(stream, () => {
+            UserNotification.success("Stream has been successfully created!", "Success!");
+        });
     },
     render() {
         var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ? <CreateStreamButton ref='createStreamButton' onSave={this._onSave} /> : "");
