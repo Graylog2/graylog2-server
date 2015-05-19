@@ -4,15 +4,19 @@ var React = require('react');
 
 var WidgetFooter = React.createClass({
     _replaySearch(e) {
+        e.preventDefault();
         this.props.onReplaySearch(e);
     },
-    _showConfig() {
+    _showConfig(e) {
+        e.preventDefault();
         this.props.onShowConfig();
     },
-    _editConfig() {
+    _editConfig(e) {
+        e.preventDefault();
         this.props.onEditConfig();
     },
-    _delete() {
+    _delete(e) {
+        e.preventDefault();
         this.props.onDelete();
     },
     render() {
