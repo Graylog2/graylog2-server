@@ -36,7 +36,7 @@ var DataFilter = React.createClass({
     },
     render() {
         return (
-            <form className="form-inline">
+            <form className="form-inline" onSubmit={(e) => e.preventDefault()}>
                 <Input type="text"
                        groupClassName="form-group-sm"
                        label={this.props.label}
