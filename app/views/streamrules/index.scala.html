@@ -1,5 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule], breadcrumbs: lib.BreadcrumbList)
 
+@import play.libs.Json
+
 @main("Rules of stream \"" + stream.getTitle + "\"" , null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -16,89 +18,6 @@
     </div>
 
 
-    <div class="row content">
-        <div class="col-md-12 streamrule-sample-message">
-            <h2>
-                1. Load a message to test rules
-            </h2>
-
-            <div class="manual-selector">
-                <p style="margin-top: 5px;">
-                    Start by loading a sample message, so we have some data to work on. This allows you to see the effect
-                    of your stream rules immediately and enables you to tweak them to the desired result.
-                    <strong>This step is optional but makes it easy to immediately see matching of your rules.</strong>
-                </p>
-
-                <form class="form-inline manual-selector-form" style="margin-bottom: 10px; margin-top: 10px;" id="message-selector">
-
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="message_id" placeholder="Message ID" required="true" style="width: 300px;">
-                    </div>
-
-                    <div class="form-group">
-                        <input type="text" name="index" class="form-control" placeholder="Index" required="true">
-                    </div>
-
-
-                    <button type="submit" class="btn btn-info manual-selector-load" data-stream-id="@stream.getId">
-                        <i class="fa fa-magic"></i> Load message
-                    </button>
-                </form>
-
-                The <em>message ID</em> and <em>index</em> can be found in the detail view of any message.
-            </div>
-            <div class="spinner" style="display: none;"><h2><i class='fa fa-spinner fa-spin'></i> &nbsp;Loading message</h2></div>
-
-            <div class="sample-message-display" style="display: none; margin-top: 5px;">
-                <strong>Next step:</strong>
-                Add/delete/modify stream rules in step 2 and see if the example message would have been routed into the stream or not.
-
-                <div class="alert alert-info" id="sample-message" style="margin-top: 10px; margin-bottom: 0px;">
-                    <h3>Message {{messageId}}<span></span></h3>
-
-                    <dl class="sample-message-fields">
-                        <dt data-field="{{field}}" data-value="{{raw-value}}" data-occurrence="repeat">{{field}}</dt><dd data-occurrence="repeat">{{value}}</dd>
-                    </dl>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="buttons pull-right">
-                <button class="btn btn-success btn-sm show-stream-rule" data-stream-id="@stream.getId">
-                    Add stream rule
-                </button>
-            </div>
-
-            <h2>
-                <i class="fa fa-cogs"></i>
-                2. Manage stream rules
-            </h2>
-
-            The example message would have been routed into this stream if every rule below has a green background.
-
-            <div class="streamrules-list-container streamrule-checker" data-stream-id="@stream.getId">
-                @views.html.partials.streamrules.list_well.render(streamrules)
-                @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
-            </div>
-
-            <p style="margin-top: 10px;">
-                <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
-            </p>
-        </div>
+    <div class="react-streamrules-editor" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
-
-    <script type="text/javascript">
-    $(document).ready(function() {
-        var hash = window.location.hash.substring(1);
-        var info = hash.split(".");
-        if (info.length > 1) { // lol JS
-            // Looks like a message deeplink was provided! Fill out fields and submit form.
-            $("input[name=message_id]", "#message-selector").val(info[0]);
-            $("input[name=index]", "#message-selector").val(info[1]);
-            $(".manual-selector-load", "#message-selector").click();
-        }
-    });
-    </script>
-
 }

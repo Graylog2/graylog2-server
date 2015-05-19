@@ -22,5 +22,7 @@ $(document).ready(() => {
     require('./components/outputs/mount');
     require('./components/alarmcallbacks/mount');
     require('./components/collectors/mount');
+    require('./components/messageloaders/mount');
+    require('./components/streamrules/mount');
     require('./components/search/mount');
 });

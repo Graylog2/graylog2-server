@@ -2,8 +2,7 @@
     breadcrumbs: lib.BreadcrumbList,
     stream: org.graylog2.restclient.models.Stream)
 
-@import views.helpers.Permissions
-@import lib.security.RestPermissions._;
+@import play.libs.Json;
 
 @main("Outputs of stream \"" + stream.getTitle + "\"", null, "", currentUser, false) {
 
@@ -28,6 +27,6 @@
         </div>
     </div>
 
-    <div class="react-output-component" data-stream-id="@stream.getId" data-permissions='@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_CREATE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)'>
+    <div class="react-output-component" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
 }

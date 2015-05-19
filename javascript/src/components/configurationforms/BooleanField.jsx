@@ -36,7 +36,7 @@ var BooleanField = React.createClass({
                             {FieldHelpers.optionalMarker(field)}
                     </label>
                 </div>
-                <p class="help-block">{field.description}</p>
+                <p className="help-block">{field.description}</p>
             </div>
         );
     }

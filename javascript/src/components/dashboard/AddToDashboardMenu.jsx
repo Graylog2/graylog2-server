@@ -68,8 +68,11 @@ var AddToDashboardMenu = React.createClass({
             </DropdownButton>
         );
     },
+    _isPermitted(permissionSet, permissions) {
+        return permissions.every((p) => permissionSet[p]);
+    },
     _renderNoDashboardsMenu() {
-        var canCreateDashboard = this.isPermitted(this.props.permissions, ["DASHBOARDS_CREATE"]);
+        var canCreateDashboard = this._isPermitted(this.props.permissions, ["DASHBOARDS_CREATE"]);
         var option;
         if (canCreateDashboard) {
             option = <MenuItem key="createDashboard">No dashboards, create one?</MenuItem>;

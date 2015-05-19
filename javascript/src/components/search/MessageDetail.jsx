@@ -89,25 +89,27 @@ var MessageDetail = React.createClass({
             var showTerms = this.state.messageTerms.has(key);
             var terms = showTerms ? Immutable.fromJS(this.state.messageTerms.get(key)) : Immutable.List();
             var termsMarkup = [];
+            var fieldActions = (this.props.disableFieldActions ? null : <div className="message-field-actions pull-right">
+                <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1} onClick={() => $(document).trigger('add-search-term.graylog.search', {field: key, value: value})}>
+                    <li className="dropdown-submenu left-submenu">
+                        <a href="#">Create extractor for field {key}</a>
+                        <ul className="dropdown-menu">
+                            <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "regex", key, this.props.message.index, this.props.message.id).url}>Regular expression</a></li>
+                            <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "substring", key, this.props.message.index, this.props.message.id).url}>Substring</a></li>
+                            <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "split_and_index", key, this.props.message.index, this.props.message.id).url}>Split &amp; Index</a></li>
+                            <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "copy_input", key, this.props.message.index, this.props.message.id).url}>Copy Input</a></li>
+                            <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "grok", key, this.props.message.index, this.props.message.id).url}>Grok pattern</a></li>
+                        </ul>
+                    </li>
+                    <MenuItem onClick={this._loadTerms(key)}>Show terms of {key}</MenuItem>
+                </SplitButton>
+            </div>);
+
             terms.forEach((term, idx) => termsMarkup.push(<span key={idx} className="message-terms">{term}</span>));
             fields.push(<dt key={key + "dt"}>{key}</dt>);
             fields.push(
                 <dd key={key + "dd"}>
-                    <div className="message-field-actions pull-right">
-                        <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1} onClick={() => $(document).trigger('add-search-term.graylog.search', {field: key, value: value})}>
-                            <li className="dropdown-submenu left-submenu">
-                                <a href="#">Create extractor for field {key}</a>
-                                <ul className="dropdown-menu">
-                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "regex", key, this.props.message.index, this.props.message.id).url}>Regular expression</a></li>
-                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "substring", key, this.props.message.index, this.props.message.id).url}>Substring</a></li>
-                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "split_and_index", key, this.props.message.index, this.props.message.id).url}>Split &amp; Index</a></li>
-                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "copy_input", key, this.props.message.index, this.props.message.id).url}>Copy Input</a></li>
-                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "grok", key, this.props.message.index, this.props.message.id).url}>Grok pattern</a></li>
-                                </ul>
-                            </li>
-                            <MenuItem onClick={this._loadTerms(key)}>Show terms of {key}</MenuItem>
-                        </SplitButton>
-                    </div>
+                    {fieldActions}
                     {this.props.possiblyHighlight(key)}
                     {showTerms && <br />}
                     {showTerms && <Alert bsStyle='info' onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>Field terms: {termsMarkup}</Alert>}
@@ -146,6 +148,28 @@ var MessageDetail = React.createClass({
             timestamp.push(<dd key="1"><time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time></dd>);
         }
 
+        var receivedBy;
+        if (this.props.message['source_input_id'] && this.props.message['source_node_id']) {
+            receivedBy = (
+                <div>
+                    <dt>Received by</dt>
+                    <dd>
+                        <em>{this._inputName(this.props.message['source_input_id'])}</em> on {this._nodeName(this.props.message['source_node_id'])}
+                        { viaRadio && <br /> }
+                        {viaRadio}
+                    </dd>
+                </div>
+            );
+        } else {
+            receivedBy = null;
+        }
+
+        var testAgainstStream = (this.props.disableTestAgainstStream ? null : <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
+            { streamList }
+            { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
+            { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
+        </DropdownButton>);
+
         return (<div>
 
             <Row>
@@ -164,11 +188,7 @@ var MessageDetail = React.createClass({
                             </ReactZeroClipboard>
                         </OverlayTrigger>
 
-                        <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
-                            { streamList }
-                            { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
-                            { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
-                        </DropdownButton>
+                        {testAgainstStream}
                     </ButtonGroup>
                     <h3><i className="fa fa-envelope"></i> <a href={messageUrl} style={{color: '#000'}}>{this.props.message.id}</a></h3>
                 </Col>
@@ -177,12 +197,7 @@ var MessageDetail = React.createClass({
                 <Col md={3}>
                     <dl className="message-details">
                         {timestamp}
-                        <dt>Received by</dt>
-                        <dd>
-                            <em>{this._inputName(this.props.message['source_input_id'])}</em> on {this._nodeName(this.props.message['source_node_id'])}
-                            { viaRadio && <br /> }
-                            {viaRadio}
-                        </dd>
+                        {receivedBy}
 
                         <dt>Stored in index</dt>
                         <dd>{this.props.message.index}</dd>
