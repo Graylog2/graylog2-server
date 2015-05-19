@@ -31,7 +31,7 @@ var TypeAheadFieldInput = React.createClass({
                 if (this.props.valueLink) {
                     this.props.valueLink.requestChange(event.target.value);
                 }
-            })
+            });
         }
     },
     componentWillUnmount() {
