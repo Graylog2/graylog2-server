@@ -83,6 +83,8 @@ public class Global extends GlobalSettings {
 
     private static Injector injector;
 
+    private boolean gelfAccessLog = false;
+
     /**
      * Retrieve the application's global Guice injector.
      * <p/>
@@ -139,6 +141,9 @@ public class Global extends GlobalSettings {
             }
         }
         log.info("Using application default timezone {}", DateTools.getApplicationTimeZone());
+
+        // Dirty hack to disable the play2-graylog2 AccessLog if the plugin isn't there
+        gelfAccessLog = app.configuration().getBoolean("graylog2.appender.send-access-log", false);
 
         final ObjectMapper objectMapper = buildObjectMapper();
         Json.setObjectMapper(objectMapper);
@@ -211,7 +216,15 @@ public class Global extends GlobalSettings {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends EssentialFilter> Class<T>[] filters() {
-        return new Class[]{AccessLog.class, NoCacheHeader.class};
+        final List<Class<T>> filters = Lists.newArrayList();
+        filters.add((Class<T>) NoCacheHeader.class);
+
+        if (gelfAccessLog) {
+            filters.add((Class<T>) AccessLog.class);
+        }
+
+        final Class<T>[] result = new Class[filters.size()];
+        return filters.toArray(result);
     }
 
     @Override
