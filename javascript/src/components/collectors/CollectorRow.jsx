@@ -1,4 +1,4 @@
-/* global momentHelper */
+/* global momentHelper, jsRoutes */
 /* jshint -W079 */
 
 'use strict';
