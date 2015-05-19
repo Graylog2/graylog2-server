@@ -41,7 +41,7 @@ var AlarmCallbackComponent = React.createClass({
     render() {
         var permissions = this.props.permissions;
         if (this.state.alarmCallbacks && this.state.availableAlarmCallbacks) {
-            var createAlarmCallbackButton = (this.isPermitted(permissions, ["STREAMS_EDIT"]) ?
+            var createAlarmCallbackButton = (this.isPermitted(permissions, ["streams:edit:"+this.props.streamId]) ?
                 <CreateAlarmCallbackButton streamId={this.props.streamId} types={this.state.availableAlarmCallbacks} onCreate={this._createAlarmCallback} /> : "");
             return (
                 <div className="alarm-callback-component">

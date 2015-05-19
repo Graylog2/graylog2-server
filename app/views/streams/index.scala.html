@@ -1,52 +1,8 @@
-@(currentUser: org.graylog2.restclient.models.User, streams: List[org.graylog2.restclient.models.Stream], nodes: Map[String, org.graylog2.restclient.models.Node])
+@(currentUser: org.graylog2.restclient.models.User)
 
-@import lib.security.RestPermissions._
-@import views.helpers.Permissions._
-@import controllers.routes
+@import play.libs.Json
 
 @main("Streams", null, "", currentUser, false) {
-
-    <div class="row content content-head">
-        <div class="col-md-10">
-            <h1>Streams</h1>
-
-            <p class="description">
-                You can route incoming messages into streams by applying rules against them. If a message
-                matches all rules of a stream it is routed into it. A message can be routed into multiple
-                streams. You can for example create a stream that contains all SSH logins and configure
-                to be alerted whenever there are more logins than usual.
-
-                Read more about streams in <a href="http://docs.graylog.org/en/latest/pages/streams.html" target="_blank">the documentation</a>.
-            </p>
-
-            @views.html.partials.support.list() {
-                Take a look at the
-                <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" target="_blank">Graylog stream dashboards</a>
-                for wall-mounted displays or other integrations.
-            }
-        </div>
-
-        <div class="col-md-2" style="text-align: center; margin-top: 35px;">
-            @if(isPermitted(STREAMS_CREATE)) {
-                <a href="@routes.StreamsController.newStream()" class="btn btn-lg btn-success">Create stream</a>
-            }
-        </div>
-    </div>
-
-    <div class="row content">
-        <div class="col-md-12">
-            <ul class="streams">
-                @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
-                    @views.html.streams.stream.render(stream, nodes, currentUser)
-                }
-            </ul>
-
-            @if(streams.isEmpty) {
-                <div class="alert alert-warning">
-                    <i class="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. @if(isPermitted(STREAMS_CREATE)) { <a href="@routes.StreamsController.create()">Create one now</a>. }
-                </div>
-            }
-        </div>
+    <div class="react-stream-component" data-permissions='@Json.toJson(currentUser.getPermissions)' data-user-name="@currentUser.getName">
     </div>
 }

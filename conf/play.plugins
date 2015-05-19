@@ -1,1 +1,2 @@
-1000:org.graylog2.logback.appender.Graylog2Plugin
+# Graylog plugin to send logs of the application to Graylog
+# 1000:org.graylog2.logback.appender.Graylog2Plugin

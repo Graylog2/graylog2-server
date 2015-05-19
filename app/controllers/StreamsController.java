@@ -22,8 +22,6 @@ import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.ServerNodes;
-import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
@@ -32,8 +30,6 @@ import play.mvc.Result;
 import views.html.streams.clone_stream;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 public class StreamsController extends AuthenticatedController {
     private static final Form<CreateStreamRequest> createStreamForm = Form.form(CreateStreamRequest.class);
@@ -41,21 +37,8 @@ public class StreamsController extends AuthenticatedController {
     @Inject
     private StreamService streamService;
 
-    @Inject
-    private ServerNodes serverNodes;
-
     public Result index() {
-		try {
-			List<Stream> streams = streamService.all();
-            Map<String, Node> nodes = serverNodes.asMap();
-
-			return ok(views.html.streams.index.render(currentUser(), streams, nodes));
-		} catch (IOException e) {
-			return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-		} catch (APIException e) {
-			String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-			return status(504, views.html.errors.error.render(message, e, request()));
-		}
+        return ok(views.html.streams.index.render(currentUser()));
 	}
 
     public Result newStream() {

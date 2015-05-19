@@ -6,72 +6,116 @@
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes
-@import org.graylog2.restclient.lib.Tools
 @import views.helpers.DateHelper
+@import views.helpers.InputHelper.sourceFieldForNode
 
-<div class="row node-row">
-    <div class="col-md-12">
+<div class="graylog-input">
+    <div class="row row-sm">
+        <div class="col-md-6">
+            <h2 class="graylog-input-title">
+                @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
+                <small>
+                    @views.html.system.inputs.partials.global_input_states(nodeStates)
+                </small>
+            </h2>
+        </div>
 
-    <span class="pull-right node-row-info">
-        <span class="text">Started by @views.html.partials.links.to_user(input.getCreatorUser)</span>
-        @DateHelper.readablePeriodFromNow(input.getCreatedAt, "text")
-            &nbsp;
+        <div class="col-md-6 graylog-input-actions">
 
-        @if(nodeStates.values().filter(iS => !iS.getState.equals(InputState.InputStateType.RUNNING)).isEmpty) {
-            @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.RUNNING, input)
-        } else {
-            @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.STOPPED, input)
-        }
-        @if(isPermitted(PROCESSING_CHANGESTATE)) {
-            <form action="@routes.InputsController.terminateGlobal(input.getId)" method="POST">
-                <button class="btn btn-danger btn-xs"
-                type="submit"
-                data-confirm="Do you really want to terminate this global input, stopping it permanently on all active nodes in the cluster?">
-                    <i class="fa fa-remove"></i> Delete
+            @if(isPermitted(SEARCHES_RELATIVE)) {
+                <a href="@routes.SearchController.index(sourceFieldForNode(masterNode) + ":" + input.getId, "relative", 28800)" class="btn btn-info">Show received messages</a>
+            }
+
+            @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                <a href="@routes.ExtractorsController.manageGlobal(input.getId)" class="btn btn-info">Manage extractors</a>
+            }
+
+            @if(nodeStates.values().filter(iS => !iS.getState.equals(InputState.InputStateType.RUNNING)).isEmpty) {
+                @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.RUNNING, input)
+            } else {
+                @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.STOPPED, input)
+            }
+
+            @if(isPermitted(INPUTS_EDIT) || isPermitted(INPUTS_TERMINATE)) {
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
+                    More actions <span class="caret"></span>
                 </button>
-            </form>
-        }
-        @views.html.system.inputs.partials.input_action_menu.render(masterNode, input)
-    </span>
 
-    <h3>
-        @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
-        @views.html.system.inputs.partials.global_input_states(nodeStates)
-    </h3>
+                <ul class="dropdown-menu" role="menu">
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
+                    }
 
-    <div class="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType"></div>
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <li><a href="#" class="add-static-field" data-node-id="@masterNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    }
 
-    <div class="well well-sm">
-        <ul>
-        @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
-            <li>@k: @v</li>
-        }
-        </ul>
+                    @if(isPermitted(INPUTS_TERMINATE)) {
+                        <li class="divider"></li>
+
+                        <li>
+                            <a href="@routes.InputsController.terminateGlobal(input.getId)" data-confirm="Do you really want to terminate global input @input.getTitle, stopping it permanently on all active nodes in the cluster?">
+                                Delete input
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
     </div>
 
-    @if(!input.getStaticFields.isEmpty) {
-        <div class="static-fields">
-            <h4 style="display: inline;">
-                <i class="fa fa-tag"></i> Static fields
-            </h4><br />
-            <ul>
-            @for((k,v) <- input.getStaticFields) {
-                <li>
-                    @k: @v
-                @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                <a href="@routes.InputsController.removeStaticField(masterNode.getNodeId, input.getPersistId, k)"
-                class="remove-static-field"
-                style="display: none;"
-                data-confirm="Really delete static field?">
-                    <i class="fa fa-remove"></i>
-                </a>
-                }
-                </li>
-            }
-            </ul>
-        </div>
+    @for((clusterEntity, inputState) <- nodeStates) {
+        @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
+            <div class="alert alert-danger graylog-input-error">
+                <strong>Error starting this input on node @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode):</strong> @inputState.getDetailedMessage
+            </div>
+        }
     }
 
-    @views.html.system.inputs.partials.edit_input_form(input, masterNode, input.getType, inputTypes.get(input.getType))
+    <div class="row row-sm">
+        <div class="col-md-8">
+            <div class="well well-sm graylog-input-props">
+                <ul>
+                @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
+                    <li>@k: @v</li>
+                }
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="graylog-input-metrics">
+                <h3>Throughput / Metrics</h3>
+                <div class="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-sm">
+        <div class="col-md-8">
+        @if(!input.getStaticFields.isEmpty) {
+            <div class="static-fields">
+                <h4 style="display: inline;">Static fields</h4><br />
+                <ul>
+                @for((k,v) <- input.getStaticFields) {
+                    <li>
+                        @k: @v
+                        @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                            <a href="@routes.InputsController.removeStaticField(masterNode.getNodeId, input.getId, k)"
+                            class="remove-static-field"
+                            data-confirm="Really delete static field?">
+                                <i class="fa fa-remove"></i>
+                            </a>
+                        }
+                    </li>
+                }
+                </ul>
+            </div>
+        }
+        </div>
+    </div>
+
+    <hr />
 </div>
-</div>
+
+@views.html.system.inputs.partials.edit_input_form(input, masterNode, input.getType, inputTypes.get(input.getType))

@@ -7,6 +7,7 @@
         alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
+@import play.libs.Json
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import views.helpers.Permissions
@@ -68,7 +69,7 @@
                 on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
             </p>
 
-            <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
+            <div class="react-alarmcallback-component" data-permissions='@Json.toJson(currentUser.getPermissions)' data-stream-id='@stream.getId'>
             </div>
         </div>
     </div>
@@ -99,8 +100,7 @@
                 <ul class="alert-receivers">
                     @for(user <- stream.getUserAlertReceivers) {
                         <li>
-                            <i class="fa fa-user"></i>&nbsp;
-                            <a href="@routes.UsersController.show(user)">@user</a>
+                            <i class="fa fa-user"></i>&nbsp;@user
 
                             @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                                 <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">

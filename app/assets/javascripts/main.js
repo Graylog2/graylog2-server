@@ -348,13 +348,6 @@ $(document).ready(function() {
     $(".edit-input-configuration.modal").on("shown.bs.modal", focusFirstFormInput);
 
 
-    // Remove static field.
-    $(".input-list .static-fields ul li").on("mouseenter", function() {
-        $(".remove-static-field", $(this)).show();
-    }).on("mouseleave", function() {
-        $(".remove-static-field", $(this)).hide();
-    });
-
     // Validate static fields
     $(".new-static-field").on("click", function(e) {
         if (!validate("#new-static-field-form")) {

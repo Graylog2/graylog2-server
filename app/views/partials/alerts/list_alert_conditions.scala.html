@@ -19,11 +19,6 @@
                     @if(condition.isInGrace) {
                         <span class="badge badge-info">in grace period</span>
                     }
-
-                    <small>
-                        Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
-                        @DateHelper.readablePeriodFromNow(condition.getCreatedAt())
-                    </small>
                 </h3>
 
                 <div class="alert-condition">

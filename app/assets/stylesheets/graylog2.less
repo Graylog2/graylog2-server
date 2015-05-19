@@ -2985,6 +2985,15 @@ dl.system-system, dl.system-rest {
   padding: 7px 7px 7px 10px;
 }
 
+.graylog-input-error a {
+  font-weight: normal;
+}
+
+/* Hide the star icon... */
+.graylog-input-error i.master-node {
+  display: none;
+}
+
 .graylog-input-props {
   margin: 0;
   margin-top: 3px;
@@ -3078,4 +3087,9 @@ div.alerts-container .dynatable-search {
 .collector-os {
   margin-right: 5px;
   margin-left: 2px;
+}
+
+// Ensure that the stream start/pause buttons have the same size.
+.toggle-stream-button {
+  width: 8.5em;
 }

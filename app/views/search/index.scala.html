@@ -8,13 +8,13 @@
         searchResult: org.graylog2.restclient.models.api.results.SearchResult,
         histogram: org.graylog2.restclient.models.api.results.DateHistogramResult,
         formattedHistogramResults: String,
-        nodes: Map[String, controllers.SearchController.NodeDescription],
-        streams: Map[String, controllers.SearchController.StreamDescription],
-        inputs: Map[String, controllers.SearchController.InputDescription]
+        nodes: Map[String, models.descriptions.NodeDescription],
+        streams: Map[String, models.descriptions.StreamDescription],
+        inputs: Map[String, models.descriptions.InputDescription]
         )(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import play.libs.Json;
-@import controllers.SearchController.StreamDescription
+@import models.descriptions.StreamDescription
 @import views.helpers.Permissions
 @import lib.security.RestPermissions._
 
@@ -41,7 +41,7 @@
             data-inputs="@Json.toJson(inputs)"
             data-nodes="@Json.toJson(nodes)"
             data-search-in-stream="@Json.toJson(StreamDescription.of(stream))"
-            data-permissions="@Permissions.asJson(DASHBOARDS_CREATE)"
+            data-permissions="@Json.toJson(currentUser.getPermissions)"
         >
     </div>
 }

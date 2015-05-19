@@ -45,7 +45,7 @@ var MessageTableEntry = React.createClass({
     },
     render() {
         var colSpanFixup = this.props.selectedFields.size + 1;
-        var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format();
+        var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format('YYYY-MM-DD HH:mm:ss.SSS');
 
         var classes = "message-group";
         if (this.props.expanded) {

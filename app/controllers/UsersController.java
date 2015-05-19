@@ -44,7 +44,6 @@ import play.mvc.Result;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
-import views.html.system.users.show;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -82,19 +81,6 @@ public class UsersController extends AuthenticatedController {
     public Result index() {
         final List<String> permissions = permissionsService.all();
         return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), permissions));
-    }
-
-    public Result show(String username) {
-        final User user = userService.load(username);
-        if (user == null) {
-            String message = "User not found! Maybe it has been deleted.";
-            return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
-        }
-
-        BreadcrumbList bc = breadcrumbs();
-        bc.addCrumb(user.getFullName(), routes.UsersController.show(username));
-
-        return ok(show.render(user, currentUser(), bc));
     }
 
     public Result newUserForm() {

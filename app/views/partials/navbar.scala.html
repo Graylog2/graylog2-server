@@ -18,6 +18,9 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
 
 @helper.javascriptRouter("jsRoutes")(
     routes.javascript.Assets.at,
+    routes.javascript.SearchController.globalSearch,
+    routes.javascript.StreamSearchController.index,
+    routes.javascript.StreamsController.index,
     routes.javascript.BundlesController.index,
     routes.javascript.DashboardsController.index,
     routes.javascript.ExtractorsController.newExtractor,
@@ -44,7 +47,6 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     routes.javascript.SystemController.index,
     routes.javascript.UsersController.editUserForm,
     routes.javascript.UsersController.index,
-    routes.javascript.UsersController.show,
     routes.javascript.CollectorsController.index,
     api.routes.javascript.AlarmCallbacksApiController.available,
     api.routes.javascript.AlarmCallbacksApiController.create,
@@ -69,11 +71,32 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     api.routes.javascript.SavedSearchesApiController.update,
     api.routes.javascript.SearchApiController.fieldStats,
     api.routes.javascript.SearchApiController.fieldTerms,
-    api.routes.javascript.StreamsApiController.listStreams,
     api.routes.javascript.StreamOutputsApiController.add,
     api.routes.javascript.StreamOutputsApiController.delete,
     api.routes.javascript.StreamOutputsApiController.index,
-    api.routes.javascript.UsersApiController.loadUser
+    api.routes.javascript.UsersApiController.loadUser,
+    api.routes.javascript.StreamsApiController.list,
+    api.routes.javascript.StreamsApiController.get,
+    api.routes.javascript.StreamsApiController.create,
+    api.routes.javascript.StreamsApiController.delete,
+    api.routes.javascript.StreamsApiController.update,
+    api.routes.javascript.StreamsApiController.pause,
+    api.routes.javascript.StreamsApiController.resume,
+    api.routes.javascript.StreamsApiController.cloneStream,
+    api.routes.javascript.StreamsApiController.testMatch,
+    api.routes.javascript.StreamRulesApiController.list,
+    api.routes.javascript.StreamRulesApiController.create,
+    api.routes.javascript.StreamRulesApiController.types,
+    api.routes.javascript.StreamRulesApiController.update,
+    api.routes.javascript.StreamRulesApiController.delete,
+    api.routes.javascript.InputsApiController.list,
+    api.routes.javascript.InputsApiController.globalRecentMessage,
+    api.routes.javascript.SystemApiController.fields,
+    routes.javascript.StreamsController.pause,
+    routes.javascript.StreamRulesController.index,
+    routes.javascript.StreamOutputsController.index,
+    routes.javascript.AlertsController.index,
+    routes.javascript.StartpageController.set
 )
 
 <div id="navigation-bar"

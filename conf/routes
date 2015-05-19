@@ -17,7 +17,7 @@ GET           /                                                                 
 GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
-GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 300, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
 GET           /search/csv                                                                        @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
@@ -122,6 +122,7 @@ DELETE        /savedsearches/:search_id/delete                                  
 
 # Extractors
 GET           /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.manage(node_id: String, input_id: String)
+GET           /system/inputs/:input_id/extractors                                                @controllers.ExtractorsController.manageGlobal(input_id: String)
 GET           /system/inputs/:node_id/:input_id/extractors/new                                   @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example_index ?= "", example_id ?= "")
 POST          /system/inputs/:node_id/:input_id/extractors                                       @controllers.ExtractorsController.create(node_id: String, input_id: String)
 POST          /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete                  @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
@@ -135,7 +136,6 @@ POST          /system/inputs/:node_id/:input_id/extractors/import               
 GET           /system/users                                                                      @controllers.UsersController.index()
 POST          /system/users                                                                      @controllers.UsersController.create()
 POST          /system/users/delete/:username                                                     @controllers.UsersController.delete(username: String)
-GET           /system/users/show/:username                                                       @controllers.UsersController.show(username: String)
 POST          /system/users/save/:username                                                       @controllers.UsersController.saveChanges(username: String)
 GET           /system/users/new                                                                  @controllers.UsersController.newUserForm()
 GET           /system/users/edit/:username                                                       @controllers.UsersController.editUserForm(username: String)
@@ -207,9 +207,12 @@ DELETE      /a/system/user/:username                                            
 PUT         /a/system/user/:username/preferences                                     @controllers.api.UsersApiController.saveUserPreferences(username: String)
 
 # API: Inputs
+GET           /a/system/inputs                                                                   @controllers.api.InputsApiController.list()
+GET           /a/system/inputs/global/:input_id/recent_message                                   @controllers.api.InputsApiController.globalRecentMessage(input_id: String, filtered: Boolean ?= false)
+GET           /a/system/inputs/global/:input_id/recent_message/filtered                          @controllers.api.InputsApiController.globalRecentMessage(input_id: String, filtered: Boolean ?= true)
+GET           /a/system/inputs/global/:input_id/io                                               @controllers.api.InputsApiController.globaIO(input_id: String)
 GET           /a/system/inputs/:node_id/:input_id/recent_message                                 @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
 GET           /a/system/inputs/:node_id/:input_id/recent_message/filtered                        @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= true)
-GET           /a/system/inputs/global/:input_id/io                                               @controllers.api.InputsApiController.globaIO(input_id: String)
 GET           /a/system/inputs/:node_id/:input_id/io                                             @controllers.api.InputsApiController.io(node_id: String, input_id: String)
 GET           /a/system/inputs/:node_id/:input_id/connections                                    @controllers.api.InputsApiController.connections(node_id: String, input_id: String)
 
@@ -243,8 +246,22 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description          
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime                 @controllers.api.DashboardsApiController.updateWidgetCacheTime(dashboard_id: String, widget_id: String)
 
 # API: Streams
+GET         /a/streams                                                               @controllers.api.StreamsApiController.list()
+POST        /a/streams                                                               @controllers.api.StreamsApiController.create()
+GET         /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.get(stream_id: String)
+PUT         /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.update(stream_id: String)
+DELETE      /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.delete(stream_id: String)
 POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
-GET         /a/streams                                                               @controllers.api.StreamsApiController.listStreams()
+POST        /a/streams/:stream_id/pause                                              @controllers.api.StreamsApiController.pause(stream_id: String)
+POST        /a/streams/:stream_id/resume                                             @controllers.api.StreamsApiController.resume(stream_id: String)
+POST        /a/streams/:stream_id/cloneStream                                        @controllers.api.StreamsApiController.cloneStream(stream_id: String)
+
+# API: Stream Rules
+GET         /a/streams/:stream_id/rules                                              @controllers.api.StreamRulesApiController.list(stream_id: String)
+POST        /a/streams/:stream_id/rules                                              @controllers.api.StreamRulesApiController.create(stream_id: String)
+GET         /a/streams/rules/types                                                   @controllers.api.StreamRulesApiController.types()
+PUT         /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.update(stream_id: String, streamrule_id: String)
+DELETE      /a/streams/:stream_id/rules/:streamrule_id                               @controllers.api.StreamRulesApiController.delete(stream_id: String, streamrule_id: String)
 
 # API: Alerts
 GET           /a/streams/alerts/allowed                                                          @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)

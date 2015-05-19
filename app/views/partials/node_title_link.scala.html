@@ -4,8 +4,4 @@
     <i class="fa fa-star master-node" title="Master Node"></i>
 }
 
-<a href="@routes.NodesController.node(node.getNodeId())">
-    @node.getShortNodeId()
-    /
-    @node.getHostname()
-</a>
+<a href="@routes.NodesController.node(node.getNodeId())">@node.getShortNodeId() / @node.getHostname()</a>

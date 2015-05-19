@@ -19,15 +19,22 @@
  */
 package controllers.api;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
+import models.descriptions.InputDescription;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Tools;
+import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.Input;
+import org.graylog2.restclient.models.InputService;
+import org.graylog2.restclient.models.InputState;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +43,7 @@ import play.mvc.Result;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class InputsApiController extends AuthenticatedController {
@@ -43,11 +51,29 @@ public class InputsApiController extends AuthenticatedController {
 
     private final NodeService nodeService;
     private final ClusterService clusterService;
+    private final InputService inputService;
+    private final UniversalSearch.Factory searchFactory;
 
     @Inject
-    public InputsApiController(NodeService nodeService, ClusterService clusterService) {
+    public InputsApiController(NodeService nodeService,
+                               ClusterService clusterService,
+                               InputService inputService,
+                               UniversalSearch.Factory searchFactory) {
         this.nodeService = nodeService;
         this.clusterService = clusterService;
+        this.inputService = inputService;
+        this.searchFactory = searchFactory;
+    }
+
+    public Result list() {
+        final List<InputDescription> result = Lists.newArrayList();
+        final List<InputState> inputStates = inputService.loadAllInputStates();
+
+        for (InputState inputState : inputStates) {
+            result.add(new InputDescription(inputState.getInput()));
+        }
+
+        return ok(Json.toJson(result));
     }
 
     public Result io(String nodeId, String inputId) {
@@ -120,6 +146,19 @@ public class InputsApiController extends AuthenticatedController {
         }
     }
 
+    public Result globalRecentMessage(String inputId, boolean filtered) throws InvalidRangeParametersException, IOException, APIException {
+        final String query = "gl2_source_input:" + inputId;
+
+        final UniversalSearch search = this.searchFactory.queryWithRange(query, new RelativeRange(86400));
+
+        List<MessageResult> messages = search.search().getMessages();
+        if (messages.size() > 0) {
+            return ok(Json.toJson(buildResultFromMessage(messages.get(0), filtered)));
+        } else {
+            return notFound();
+        }
+    }
+
     public Result recentMessage(String nodeId, String inputId) {
         return recentMessage(nodeId, inputId, true);
     }
@@ -133,21 +172,35 @@ public class InputsApiController extends AuthenticatedController {
                 return notFound();
             }
 
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("id", recentlyReceivedMessage.getId());
-            result.put("index", recentlyReceivedMessage.getIndex());
-            if (filtered)
-                result.put("fields", recentlyReceivedMessage.getFilteredFields());
-            else
-                result.put("fields", recentlyReceivedMessage.getFields());
-
-            return ok(Json.toJson(result));
+            return ok(Json.toJson(buildResultFromMessage(recentlyReceivedMessage, filtered)));
         } catch (IOException e) {
             return status(500);
         } catch (APIException e) {
             return status(e.getHttpCode());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    protected RecentMessageResult buildResultFromMessage(MessageResult message, boolean filtered) {
+        final Map<String, Object> fields;
+        if (filtered)
+            fields = message.getFilteredFields();
+        else
+            fields = message.getFields();
+
+        return new RecentMessageResult(message.getId(), message.getIndex(), fields);
+    }
+
+    public static class RecentMessageResult {
+        public final String id;
+        public final String index;
+        public final Map<String, Object> fields;
+
+        public RecentMessageResult(String id, String index, Map<String, Object> fields) {
+            this.id = id;
+            this.index = index;
+            this.fields = fields;
         }
     }
 }

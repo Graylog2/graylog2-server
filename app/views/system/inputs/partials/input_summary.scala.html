@@ -7,7 +7,6 @@
 @import lib.security.RestPermissions._
 @import controllers.routes
 @import org.graylog2.restclient.models._
-@import org.graylog2.restclient.lib.Tools
 @import views.helpers.InputHelper.sourceFieldForNode
 
 @for(input <- Seq(inputState.getInput)) {
@@ -31,11 +30,9 @@
                 </h2>
 
                 <p class="graylog-input-subtitle">
-                    Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)
                     @if(!input.getGlobal) {
-                        <span title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
+                        <span title="@inputState.getNode.getNodeId">On node @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
                     }
-                    @DateHelper.readablePeriodFromNow(input.getCreatedAt)
                 </p>
             </div>
 
@@ -106,36 +103,32 @@
             </div>
         </div>
 
+        <div class="row row-sm">
+            <div class="col-md-8">
+            @if(!input.getStaticFields.isEmpty) {
+                <div class="static-fields">
+                    <h4 style="display: inline;">Static fields</h4><br />
+                    <ul>
+                    @for((k,v) <- input.getStaticFields) {
+                        <li>
+                            @k: @v
+                            @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                                <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
+                                class="remove-static-field"
+                                data-confirm="Really delete static field?">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            }
+                        </li>
+                    }
+                    </ul>
+                </div>
+            }
+            </div>
+        </div>
+
         <hr />
     </div>
 
-
-
     @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
-
-    <!--
-    @if(!input.getStaticFields.isEmpty) {
-        <div class="static-fields">
-            <h4 style="display: inline;">
-                <i class="fa fa-tag"></i> Static fields
-            </h4><br />
-            <ul>
-            @for((k,v) <- input.getStaticFields) {
-                <li>
-                    @k: @v
-                @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
-                class="remove-static-field"
-                style="display: none;"
-                data-confirm="Really delete static field?">
-                    <i class="fa fa-remove"></i>
-                </a>
-                }
-                </li>
-            }
-            </ul>
-        </div>
-    }
-    </div>
-    -->
 }
