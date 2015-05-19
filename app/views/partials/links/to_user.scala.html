@@ -1,6 +1,0 @@
-@(user: org.graylog2.restclient.models.User)
-@if(user != null) {
-<a href="@routes.UsersController.show(user.getName)"><i class="fa fa-user"></i> @user.getFullName</a>
-} else {
-	Unknown user
-}

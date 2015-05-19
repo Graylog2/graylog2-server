@@ -136,7 +136,6 @@ POST          /system/inputs/:node_id/:input_id/extractors/import               
 GET           /system/users                                                                      @controllers.UsersController.index()
 POST          /system/users                                                                      @controllers.UsersController.create()
 POST          /system/users/delete/:username                                                     @controllers.UsersController.delete(username: String)
-GET           /system/users/show/:username                                                       @controllers.UsersController.show(username: String)
 POST          /system/users/save/:username                                                       @controllers.UsersController.saveChanges(username: String)
 GET           /system/users/new                                                                  @controllers.UsersController.newUserForm()
 GET           /system/users/edit/:username                                                       @controllers.UsersController.editUserForm(username: String)

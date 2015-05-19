@@ -3,7 +3,6 @@
 var React = require('react/addons');
 var EditOutputButton = require('./EditOutputButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
-var UserLink = require('../users/UserLink');
 var Button = require('react-bootstrap').Button;
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
@@ -34,16 +33,10 @@ var Output = React.createClass({
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : null);
 
-        var creatorUserLink = (<UserLink username={output.creator_user_id} />);
-
         return (
             <div key={output.id} className="row content node-row">
                 <div className="col-md-12">
                     <span className="pull-right node-row-info">
-                        <span className="text">Started by {creatorUserLink}</span>
-                        {' '}
-                        <span className="text" title={moment(output.created_at).format()}>{moment(output.created_at).fromNow()}</span>
-                        {' '}
                         {editButton}
                         {' '}
                         {deleteButton}

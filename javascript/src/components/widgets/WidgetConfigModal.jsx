@@ -66,8 +66,6 @@ var WidgetConfigModal = React.createClass({
                         <dd>{this.props.widget.widgetId}</dd>
                         <dt>Dashboard ID:</dt>
                         <dd>{this.props.widget.dashboardId}</dd>
-                        <dt>Created by:</dt>
-                        <dd>{this.props.widget.creatorUserId}</dd>
                         {this._getConfigAsDescriptionList()}
                     </dl>
                 </div>

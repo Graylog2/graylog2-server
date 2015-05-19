@@ -4,7 +4,6 @@ var React = require('react/addons');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var DeleteAlarmCallbackButton = require('./DeleteAlarmCallbackButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
-var UserLink = require('../users/UserLink');
 var EditAlarmCallbackButton = require('./EditAlarmCallbackButton');
 
 var AlarmCallback = React.createClass({
@@ -23,13 +22,6 @@ var AlarmCallback = React.createClass({
                         <h3>
                             {' '}
                             <span>{humanReadableType}</span>
-
-                            &nbsp;
-                            <small>
-                                Created by <UserLink username={alarmCallback.creator_user_id} />
-                                {' '}
-                                <span title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
-                            </small>
                         </h3>
 
                         Executed once per triggered alert condition.

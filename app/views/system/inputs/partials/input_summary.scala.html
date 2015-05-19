@@ -30,11 +30,9 @@
                 </h2>
 
                 <p class="graylog-input-subtitle">
-                    Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)
                     @if(!input.getGlobal) {
-                        <span title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
+                        <span title="@inputState.getNode.getNodeId">On node @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
                     }
-                    @DateHelper.readablePeriodFromNow(input.getCreatedAt)
                 </p>
             </div>
 
