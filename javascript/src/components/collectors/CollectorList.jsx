@@ -63,14 +63,14 @@ var CollectorList = React.createClass({
                 <div>
                     <div className="row">
                         <div className="col-md-12">
-                            <a onClick={this.toggleShowInactive} className="btn btn-primary pull-right">{showOrHideInactive} inactive collectors</a>
-
                             <form className="form-inline collectors-filter-form">
                                 <label htmlFor="collectorsfilter">Filter collectors:</label>
                                 <input type="text" name="filter" id="collectorsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
                             </form>
 
-                            <table className="table table-striped collectors-list">
+                            <a onClick={this.toggleShowInactive}>{showOrHideInactive}</a> inactive collectors
+
+                            <table className="table table-striped users-list">
                                 <thead>
                                 <tr>
                                     <th onClick={this.sortByNodeId}>Host Name</th>
@@ -80,7 +80,6 @@ var CollectorList = React.createClass({
                                         Collector Id
                                     </th>
                                     <th onClick={this.sortByCollectorVersion}>Collector Version</th>
-                                    <th>&nbsp;</th>
                                 </tr>
                                 </thead>
                                 <tbody>

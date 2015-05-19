@@ -55,9 +55,6 @@ var CollectorRow = React.createClass({
                 <td className="limited">
                     {collector.collector_version}
                 </td>
-                <td className="limited">
-                    <a href={jsRoutes.controllers.SearchController.index("gl2_source_collector:" + collector.id, "relative", 28800).url} className="btn btn-info btn-xs">Show messages from this collector</a>
-                </td>
             </tr>
         );
     }
