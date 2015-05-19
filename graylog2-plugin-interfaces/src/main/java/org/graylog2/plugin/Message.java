@@ -51,14 +51,15 @@ import static com.google.common.base.Predicates.not;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
-
 public class Message {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
     public static final String FIELD_ID = "_id";
     public static final String FIELD_MESSAGE = "message";
+    public static final String FIELD_FULL_MESSAGE = "full_message";
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_TIMESTAMP = "timestamp";
+    public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
 
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
@@ -81,6 +82,8 @@ public class Message {
             "gl2_source_input",
             "gl2_source_radio",
             "gl2_source_radio_input",
+            "gl2_source_collector",
+            "gl2_source_collector_input",
             "gl2_remote_ip",
             "gl2_remote_port",
             "gl2_remote_hostname"
@@ -94,6 +97,8 @@ public class Message {
             "gl2_source_input",
             "gl2_source_radio",
             "gl2_source_radio_input",
+            "gl2_source_collector",
+            "gl2_source_collector_input",
             "gl2_remote_ip",
             "gl2_remote_port",
             "gl2_remote_hostname"

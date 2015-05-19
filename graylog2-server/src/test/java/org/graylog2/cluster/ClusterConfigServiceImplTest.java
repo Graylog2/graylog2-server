@@ -156,6 +156,59 @@ public class ClusterConfigServiceImplTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void getOrDefaultReturnsExistingConfig() throws Exception {
+        DBObject dbObject = new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get();
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(dbObject);
+
+        assertThat(collection.count()).isEqualTo(1L);
+
+        CustomConfig defaultValue = new CustomConfig();
+        defaultValue.text = "DEFAULT";
+
+        CustomConfig customConfig = clusterConfigService.getOrDefault(CustomConfig.class, defaultValue);
+        assertThat(customConfig.text).isEqualTo("TEST");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void getOrDefaultReturnsDefaultValueOnNonExistingConfig() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        assertThat(collection.count()).isEqualTo(0L);
+
+        CustomConfig defaultValue = new CustomConfig();
+        defaultValue.text = "DEFAULT";
+
+        assertThat(clusterConfigService.getOrDefault(CustomConfig.class, defaultValue)).isSameAs(defaultValue);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void getOrDefaultReturnsDefaultValueOnInvalidPayload() throws Exception {
+        DBObject dbObject = new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", "wrong payload")
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get();
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(dbObject);
+
+        assertThat(collection.count()).isEqualTo(1L);
+
+        CustomConfig defaultValue = new CustomConfig();
+        defaultValue.text = "DEFAULT";
+
+        assertThat(clusterConfigService.getOrDefault(CustomConfig.class, defaultValue)).isSameAs(defaultValue);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void writeIgnoresNull() throws Exception {
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);

@@ -25,19 +25,15 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
 public class GelfOutputTest {
     @Test
     public void testWrite() throws Exception {
@@ -50,7 +46,6 @@ public class GelfOutputTest {
                 "port", 12201));
 
         final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(configuration, transport));
-        doReturn(transport).when(gelfOutput).buildTransport(any(Configuration.class));
         doReturn(gelfMessage).when(gelfOutput).toGELFMessage(message);
 
         gelfOutput.write(message);
@@ -82,5 +77,22 @@ public class GelfOutputTest {
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
 
         assertEquals(gelfMessage.getTimestamp(), now.getMillis() / 1000.0d, 0.0d);
+    }
+
+    @Test
+    public void testToGELFMessageFullMessage() throws Exception {
+        final GelfTransport transport = mock(GelfTransport.class);
+        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
+                "hostname", "localhost",
+                "protocol", "tcp",
+                "port", 12201));
+        final GelfOutput gelfOutput = new GelfOutput(configuration, transport);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final Message message = new Message("Test", "Source", now);
+        message.addField(Message.FIELD_FULL_MESSAGE, "Full Message");
+
+        final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
+
+        assertEquals("Full Message", gelfMessage.getFullMessage());
     }
 }

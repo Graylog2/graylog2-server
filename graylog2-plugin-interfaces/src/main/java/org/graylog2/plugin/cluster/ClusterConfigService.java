@@ -36,6 +36,17 @@ public interface ClusterConfigService {
     <T> T get(Class<T> type);
 
     /**
+     * Retrieve Java class of a certain type from the cluster configuration or return a default value
+     * in case that failed.
+     *
+     * @param type         The {@link Class} of the Java configuration bean to retrieve.
+     * @param defaultValue An instance of {@code T} which is returned as default value.
+     * @param <T>          The type of the Java configuration bean.
+     * @return An instance of the requested type.
+     */
+    <T> T getOrDefault(Class<T> type, T defaultValue);
+
+    /**
      * Write a configuration bean to the cluster configuration.
      *
      * @param payload The object to write to the cluster configuration. Must be serializable by Jackson!

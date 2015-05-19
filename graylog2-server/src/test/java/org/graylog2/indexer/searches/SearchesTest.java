@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSet;
@@ -71,6 +72,7 @@ public class SearchesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
+    private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -162,6 +164,7 @@ public class SearchesTest {
                 new DateTime(2015, 1, 2, 0, 0)));
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
@@ -192,9 +195,14 @@ public class SearchesTest {
                 new DateTime(2015, 1, 2, 0, 0)));
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
+
+        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
+        assertThat(histogram.getCount()).isEqualTo(1L);
+        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     @Test
@@ -222,9 +230,14 @@ public class SearchesTest {
         );
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
+
+        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
+        assertThat(histogram.getCount()).isEqualTo(1L);
+        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     @Test
@@ -253,9 +266,14 @@ public class SearchesTest {
                 new DateTime(2015, 1, 2, 0, 0)));
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
+
+        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
+        assertThat(histogram.getCount()).isEqualTo(1L);
+        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     @Test
@@ -284,9 +302,14 @@ public class SearchesTest {
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
+
+        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
+        assertThat(histogram.getCount()).isEqualTo(1L);
+        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     @Test
@@ -316,9 +339,14 @@ public class SearchesTest {
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
+
+        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
+        assertThat(histogram.getCount()).isEqualTo(1L);
+        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
