@@ -221,22 +221,25 @@ $(document).ready(function() {
         });
     });
 
-    // Typeahead for message fields.
-    $.ajax({
-        url: appPrefixed('/a/system/fields'),
-        success: function(data) {
-            $('.typeahead-fields').typeahead({
-                    hint: true,
-                    highlight: true,
-                    minLength: 1
-                },
-                {
-                    name: 'fields',
-                    displayKey: 'value',
-                    source: substringMatcher(data.fields, 'value', 6)
-                });
-        }
-    });
+    var $typeaheadFields = $('.typeahead-fields');
+    if ($typeaheadFields.length > 0) {
+        // Typeahead for message fields.
+        $.ajax({
+            url: appPrefixed('/a/system/fields'),
+            success: function (data) {
+                $typeaheadFields.typeahead({
+                        hint: true,
+                        highlight: true,
+                        minLength: 1
+                    },
+                    {
+                        name: 'fields',
+                        displayKey: 'value',
+                        source: substringMatcher(data.fields, 'value', 6)
+                    });
+            }
+        });
+    }
 
     // Update progress for systemjobs that provide it.
     if ($(".systemjob-progress").size() > 0) {
