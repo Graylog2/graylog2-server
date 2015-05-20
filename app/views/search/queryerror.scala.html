@@ -2,36 +2,59 @@
 
 @import views.helpers.QueryErrorHelper
 
-@main("Query error", sidebars.standard(currentUser), query, currentUser) {
+@main("Query error", null, query, currentUser) {
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1>
+                <i class="fa fa-search fa-lg"></i>
+                Malformed query
+            </h1>
 
-    @if(savedSearch != null) {
-        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-sm btn-danger pull-right" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
-    }
+            <p>
+                Your search could not be executed. <strong>
+                Take a look at the @views.html.partials.search_query_documentation() if you need help with the search syntax.</strong>
+            </p>
 
-    <h1>
-        <i class="fa fa-search fa-lg"></i>
-        Malformed query
-    </h1>
-
-    <p>
-        Your search could not be executed. <strong>Take a look at the @views.html.partials.search_query_documentation() if you need help with the search syntax.</strong>
-    </p>
-
-    @if(QueryErrorHelper.canMarkupParseError(error)) {
-    <p>
-        Your query was malformed at the following position: (highlighted red)
-    </p>
-    <pre>@Html(QueryErrorHelper.markupOriginalQuery(error))</pre>
-    }
-
-    @if(QueryErrorHelper.isGenericError(error)) {
-    <p>
-        Your query was malformed and executing it caused the following error:
-    </p>
-    <div class="query-exception alert alert-error">
-        <b>@{error.exceptionName}</b><br>
-        @{error.message}
+        </div>
     </div>
-    }
-    @views.html.partials.support_sources()
+    <div class="row content">
+        <div class="col-md-12">
+            @if(QueryErrorHelper.canMarkupParseError(error)) {
+                <p>
+                    Your query was malformed at the following position: (highlighted red)
+                </p>
+                <pre>@Html(QueryErrorHelper.markupOriginalQuery(error))</pre>
+            }
+
+            @if(QueryErrorHelper.isGenericError(error)) {
+                <p>
+                    Your query was malformed and executing it caused the following error:
+                </p>
+                <div class="query-exception alert alert-error">
+                    <b>@{
+                        error.exceptionName
+                    }</b><br>
+                @{
+                    error.message
+                }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="row content">
+        <div class="col-md-12">
+            <h2>Need help?</h2>
+            Do not hesitate to consult the Graylog community if your questions are not answered in the
+            <a href="https://www.graylog.org/documentation/" target="_blank">documentation</a>.
+
+            <ul>
+                <li><i class="fa fa-group"></i> <a href="https://www.graylog.org/community-support/" target="_blank">
+                    Forum / Mailing list</a></li>
+                <li><i class="fa fa-github-alt"></i> <a href="https://github.com/Graylog2/graylog2-web-interface/issues" target="_blank">
+                    Issue tracker</a></li>
+                <li><i class="fa fa-heart"></i> <a href="https://www.graylog.com/support/" target="_blank">
+                    Commercial support</a></li>
+            </ul>
+        </div>
+    </div>
 }
