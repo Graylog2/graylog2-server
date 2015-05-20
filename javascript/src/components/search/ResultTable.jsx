@@ -87,7 +87,7 @@ var ResultTable = React.createClass({
             sortLinks = <span className="sort-order">
                 <a href="#" onClick={(e) => this._handleSort(e, fieldName, "asc")}><i className={classesAsc}></i></a>
                 <a href="#" onClick={(e) => this._handleSort(e, fieldName, "desc")}><i className={classesDesc}></i></a>
-            </span>
+            </span>;
         }
         return <span>{sortLinks}</span>;
     },
