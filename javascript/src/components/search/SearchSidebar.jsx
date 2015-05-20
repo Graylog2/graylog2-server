@@ -122,12 +122,14 @@ var SearchSidebar = React.createClass({
     _updateFieldSelection(setName) {
         this.props.predefinedFieldSelection(setName);
     },
-    _showAllFields() {
+    _showAllFields(event) {
+        event.preventDefault();
         if (!this.props.showAllFields) {
             this.props.togglePageFields();
         }
     },
-    _showPageFields() {
+    _showPageFields(event) {
+        event.preventDefault();
         if (this.props.showAllFields) {
             this.props.togglePageFields();
         }
