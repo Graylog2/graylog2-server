@@ -1,4 +1,11 @@
-.twitter-typeahead {
+.universalsearch-form .twitter-typeahead,
+form:not(.form-inline) .twitter-typeahead {
+  width: 100%;
+}
+
+.universalsearch-form .tt-menu {
+  height: auto;
+  overflow: visible;
   width: 100%;
 }
 
@@ -59,9 +66,4 @@ input[type="text"].tt-hint {
 
 .tt-suggestion p {
   margin: 0;
-}
-
-.universalsearch-form .query .tt-menu {
-  height: auto;
-  overflow: visible;
 }

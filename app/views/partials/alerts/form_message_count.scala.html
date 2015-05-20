@@ -1,7 +1,7 @@
 @(stream: org.graylog2.restclient.models.Stream, conditionDecorator: views.helpers.MessageCountAlertConditionDecorator)
 
-<form action="@conditionDecorator.getFormAction(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="@conditionDecorator.getFormId">
-    <div class="well well-sm form-inline">
+<form action="@conditionDecorator.getFormAction(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count form-inline" id="@conditionDecorator.getFormId">
+    <div class="well well-sm">
         Trigger alert when there are
         @Html(conditionDecorator.getThresholdTypesHtml)
 

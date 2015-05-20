@@ -1,7 +1,7 @@
 @(stream: org.graylog2.restclient.models.Stream, conditionDecorator: views.helpers.FieldValueAlertConditionDecorator)
 
-<form action="@conditionDecorator.getFormAction(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value" id="@conditionDecorator.getFormId">
-    <div class="well well-sm form-inline">
+<form action="@conditionDecorator.getFormAction(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value form-inline" id="@conditionDecorator.getFormId">
+    <div class="well well-sm">
         Trigger alert when the field
         <input name="field" type="text" class="form-control typeahead-fields" autocomplete="off" required value="@conditionDecorator.getField"/>
 
