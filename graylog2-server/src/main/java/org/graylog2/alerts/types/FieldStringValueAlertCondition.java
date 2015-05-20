@@ -69,10 +69,12 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
                 .append(field).append(":\"").append(value).append("\"")
                 .toString();
         Integer backlogSize = getBacklog();
+        boolean backlogEnabled = false;
+        int searchLimit = 1;
 
-        if(backlogSize == null || backlogSize == 0) {
-            LOG.debug("No backlog size configured. Setting to default 100.");
-            backlogSize = 100;
+        if(backlogSize != null && backlogSize > 0) {
+            backlogEnabled = true;
+            searchLimit = backlogSize;
         }
 
         try {
@@ -80,13 +82,13 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
                     query,
                     filter,
                     new RelativeRange(configuration.getAlertCheckInterval() * 60),
-                    backlogSize,
+                    searchLimit,
                     0,
                     new Sorting("timestamp", Sorting.Direction.DESC)
             );
 
             final List<MessageSummary> summaries = Lists.newArrayList();
-            if (getBacklog() > 0) {
+            if (backlogEnabled) {
                 for (ResultMessage resultMessage : result.getResults()) {
                     final Message msg = new Message(resultMessage.getMessage());
                     summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
