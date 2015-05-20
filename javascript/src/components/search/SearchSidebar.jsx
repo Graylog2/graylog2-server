@@ -111,11 +111,10 @@ var SearchSidebar = React.createClass({
 
         var viewPortHeight = window.innerHeight;
         var maxHeight =
-            viewPortHeight
-            - header.clientHeight
-            - footer.clientHeight
-            - sidebarTop - sidebarPaddingTop - sidebarPaddingBottom
-            -35; // for good measure™
+            viewPortHeight -
+            header.clientHeight - footer.clientHeight -
+            sidebarTop - sidebarPaddingTop - sidebarPaddingBottom -
+            35; // for good measure™
 
         this.setState({maxFieldsHeight: maxHeight});
     },
@@ -188,17 +187,17 @@ var SearchSidebar = React.createClass({
         if (this.props.searchInStream) {
             searchTitle = <span>{this.props.searchInStream.title}</span>;
             // add stream actions to dropdown
-            moreActions.push(<MenuItem divider key="div" />);
+            moreActions.push(<MenuItem divider key="div"/>);
             moreActions.push(<MenuItem key="todo" href="#">TODO Stream actions</MenuItem>);
         } else {
             searchTitle = <span>Search result</span>;
         }
 
         // always add the debug query link as last elem
-        moreActions.push(<MenuItem divider key="div2" />);
+        moreActions.push(<MenuItem divider key="div2"/>);
         moreActions.push(<ModalTrigger key="debugQuery" modal={queryModal}>
-                <MenuItem>Show query</MenuItem>
-            </ModalTrigger>);
+            <MenuItem>Show query</MenuItem>
+        </ModalTrigger>);
 
         return (
             <div className="content-col" ref='sidebar'>
@@ -208,7 +207,8 @@ var SearchSidebar = React.createClass({
                     </h2>
 
                     <p style={{marginTop: 3}}>
-                        Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong> in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
+                        Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong>
+                        in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
                         <ModalTrigger modal={indicesModal}>
                             <a href="#" onClick={event => event.preventDefault()}>
                                 {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
@@ -235,11 +235,19 @@ var SearchSidebar = React.createClass({
 
                     <div className="input-group input-group-sm">
                         <span className="input-group-btn">
-                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('default')}>Default</button>
-                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('all')}>All</button>
-                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('none')}>None</button>
+                            <button type="button" className="btn btn-default"
+                                    onClick={() => this._updateFieldSelection('default')}>Default
+                            </button>
+                            <button type="button" className="btn btn-default"
+                                    onClick={() => this._updateFieldSelection('all')}>All
+                            </button>
+                            <button type="button" className="btn btn-default"
+                                    onClick={() => this._updateFieldSelection('none')}>None
+                            </button>
                         </span>
-                        <input type="text" className="form-control" placeholder="Filter fields" onChange={(event) => this.setState({fieldFilter: event.target.value})} value={this.state.fieldFilter}/>
+                        <input type="text" className="form-control" placeholder="Filter fields"
+                               onChange={(event) => this.setState({fieldFilter: event.target.value})}
+                               value={this.state.fieldFilter}/>
                     </div>
                 </div>
                 <div ref='fields' style={{maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll'}}>
@@ -250,10 +258,11 @@ var SearchSidebar = React.createClass({
                 <div ref='footer'>
                     <p style={{marginTop: 13, marginBottom: 0}}>
                         List <span className="message-result-fields-range"> fields of&nbsp;
-                    <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
-                       onClick={this._showPageFields}>current page</a> or <a href="#"
-                                                                                       style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
-                                                                                       onClick={this._showAllFields}>all fields</a>.
+                        <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
+                           onClick={this._showPageFields}>current page</a> or <a href="#"
+                                                                                 style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
+                                                                                 onClick={this._showAllFields}>all
+                            fields</a>.
                     </span>
                         <br/>
                         { this.props.showHighlightToggle &&
