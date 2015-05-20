@@ -30,6 +30,7 @@ deploy:
     branch:
       - master
       - 1.0
+      - 1.1
 env:
   global:
   - secure: MYZwUwFkHwWfJ79JKyDK8VrYVcsax4t+7atMLLVNI4CDxTWZzR4qFGUfauf+7fDEmnGYbMHDRSnzzhVtSR0ZSuvWoSkZ+v62ASmSfglzI2GcMD/VBREq+9TlLasSIa+wR60VvgYwxJnawwJlV6sbjmetT6MWug7/icdi5KgfDlQ=
