@@ -1,4 +1,4 @@
-/* global activateTimerangeChooser, momentHelper */
+/* global momentHelper */
 /* jshint -W107, -W079 */
 
 'use strict';
@@ -13,6 +13,7 @@ var Qs = require('qs');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
+var SearchStore = require('../../stores/search/SearchStore');
 
 var SourceDataTable = require('./SourceDataTable');
 var SourcePieChart = require('./SourcePieChart');
@@ -69,12 +70,10 @@ var SourceOverview = React.createClass({
                 var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
                 var toDateTime = momentHelper.toUserTimeZone(filter[1]);
 
-                activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-                var fromInput = $('#universalsearch .absolute .absolute-from-human');
-                var toInput = $('#universalsearch .absolute .absolute-to-human');
-
-                fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                SearchStore.changeTimeRange('absolute', {
+                    from: fromDateTime.format(momentHelper.DATE_FORMAT_TZ),
+                    to: toDateTime.format(momentHelper.DATE_FORMAT_TZ)
+                });
             } else {
                 this.syncRangeWithQuery();
             }
@@ -222,13 +221,11 @@ var SourceOverview = React.createClass({
     syncRangeWithQuery() {
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
         if (Number(rangeSelectBox.value) === 0) {
-            activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
-            $('#relative-timerange-selector').val(0);
+            SearchStore.changeTimeRange('relative', {relative: 0});
         } else {
             var selectedOptions = $(":selected", rangeSelectBox);
             var text = selectedOptions && selectedOptions[0] && selectedOptions[0].text;
-            activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
-            $('#universalsearch .timerange-selector.keyword > input').val(text);
+            SearchStore.changeTimeRange('keyword', {keyword: text});
         }
     },
     _toggleResetButtons() {

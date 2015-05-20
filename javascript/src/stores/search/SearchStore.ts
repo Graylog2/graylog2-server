@@ -186,11 +186,12 @@ class SearchStore {
     }
 
     _changeTimeRange(event, data) {
-        var newRangeType = data['rangeType'];
-        var newRangeParams = Immutable.Map<string, any>(data['rangeParams']);
+        this.changeTimeRange(data['rangeType'], data['rangeParams']);
+    }
 
+    changeTimeRange(newRangeType: string, newRangeParams: Object) {
         this.rangeType = newRangeType;
-        this.rangeParams = newRangeParams;
+        this.rangeParams = Immutable.fromJS(newRangeParams);
     }
 
     _submitSearch(event) {
