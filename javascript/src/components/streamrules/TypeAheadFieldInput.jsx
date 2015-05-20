@@ -12,7 +12,7 @@ var TypeAheadFieldInput = React.createClass({
             var fieldInput = $(this.refs.fieldInput.getInputDOMNode());
             $.ajax({
                 url: jsRoutes.controllers.api.SystemApiController.fields().url,
-                success: function (data) {
+                success: (data) => {
                     fieldInput.typeahead({
                             hint: true,
                             highlight: true,
@@ -23,6 +23,10 @@ var TypeAheadFieldInput = React.createClass({
                             displayKey: 'value',
                             source: substringMatcher(data.fields, 'value', 6)
                         });
+
+                    if (typeof this.props.onTypeaheadLoaded === 'function') {
+                        this.props.onTypeaheadLoaded();
+                    }
                 }
             });
 

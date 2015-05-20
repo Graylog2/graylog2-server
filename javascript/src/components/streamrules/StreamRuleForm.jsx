@@ -30,7 +30,11 @@ var StreamRuleForm = React.createClass({
         this.refs.modal.close();
     },
     _formatStreamRuleType(streamRuleType) {
-        return <option key={'streamRuleType'+streamRuleType.id} value={streamRuleType.id}>{streamRuleType.short_desc}</option>;
+        return <option key={'streamRuleType'+streamRuleType.id}
+                       value={streamRuleType.id}>{streamRuleType.short_desc}</option>;
+    },
+    _focusInput() {
+        this.refs.modal.focusFirstInput();
     },
     open() {
         this._resetValues();
@@ -41,7 +45,8 @@ var StreamRuleForm = React.createClass({
     },
     render() {
         var streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
-        var valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) ? <Input type='text' required={true} label='Value' valueLink={this.linkState('value')}/> : "");
+        var valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) ?
+            <Input type='text' required={true} label='Value' valueLink={this.linkState('value')}/> : "");
         return (
             <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
                 <div>
@@ -49,7 +54,12 @@ var StreamRuleForm = React.createClass({
                 </div>
                 <div>
                     <Col md={8}>
-                        <TypeAheadFieldInput ref='fieldInput' type='text' required={true} label='Field' valueLink={this.linkState('field')}/>
+                        <TypeAheadFieldInput ref='fieldInput'
+                                             type='text'
+                                             required={true}
+                                             label='Field'
+                                             valueLink={this.linkState('field')}
+                                             onTypeaheadLoaded={this._focusInput}/>
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
                             {streamRuleTypes}
                         </Input>
@@ -59,20 +69,23 @@ var StreamRuleForm = React.createClass({
                         <p>
                             <strong>Result:</strong>
                             {' '}
-                            Field <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
+                            Field <HumanReadableStreamRule streamRule={this.state}
+                                                           streamRuleTypes={this.props.streamRuleTypes}/>
                         </p>
                     </Col>
                     <Col md={4}>
                         <div className="well well-small matcher-github">
-                            The server will try to convert to strings or numbers based on the matcher type as good as it can.
+                            The server will try to convert to strings or numbers based on the matcher type as good as it
+                            can.
 
                             <br /><br />
                             <i className="fa fa-github"></i>
-                            <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers" target="_blank">
+                            <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers"
+                               target="_blank">
                                 Take a look at the matcher code on GitHub
                             </a>
                             <br /><br />
-                            Regular expressions use Java syntax. <Bubble link="general/streams" />
+                            Regular expressions use Java syntax. <Bubble link="general/streams"/>
                         </div>
                     </Col>
                 </div>
