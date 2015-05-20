@@ -40,4 +40,10 @@ popd
 date
 echo "Your package(s) are ready in 'target/universal':"
 echo
-ls -lt ./target/universal/*
+ls -lt ./target/universal/graylog-web-interface-*.tgz
+
+echo
+echo "* MD5 hash"
+md5sum ./target/universal/graylog-web-interface-*.tgz
+echo "* SHA256 hash"
+sha256sum ./target/universal/graylog-web-interface-*.tgz
