@@ -1,5 +1,7 @@
 'use strict';
 
+var $ = require('jquery');
+
 var React = require('react');
 var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
@@ -64,12 +66,60 @@ var MessageField = React.createClass({
     }
 });
 
+var resizeMutex;
+
 var SearchSidebar = React.createClass({
     getInitialState() {
         return {
-            fieldFilter: ""
+            fieldFilter: "",
+            maxFieldsHeight: 1000
         };
     },
+
+    componentDidMount() {
+        this._updateHeight();
+        $(window).on('resize', this._resizeCallback);
+        $('#sidebar-affix').on('affixed.bs.affix', this._updateHeight);
+        $('#sidebar-affix').on('affixed-top.bs.affix', this._updateHeight);
+    },
+    componentWillUnmount() {
+        $(window).off("resize", this._resizeCallback);
+        $('#sidebar-affix').off('affixed.bs.affix', this._updateHeight);
+        $('#sidebar-affix').off('affixed-top.bs.affix', this._updateHeight);
+    },
+    componentWillReceiveProps(newProps) {
+        // update max-height of fields when we toggle per page/all fields
+        if (this.props.showAllFields !== newProps.showAllFields) {
+            this._updateHeight();
+        }
+    },
+    _resizeCallback() {
+        // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
+        clearTimeout(resizeMutex);
+        resizeMutex = setTimeout(() => this._updateHeight(), 100);
+    },
+    _updateHeight() {
+        var header = React.findDOMNode(this.refs.header);
+
+        var footer = React.findDOMNode(this.refs.footer);
+
+        var sidebar = React.findDOMNode(this.refs.sidebar);
+        var sidebarTop = sidebar.getBoundingClientRect().top;
+        var sidebarCss = window.getComputedStyle(React.findDOMNode(this.refs.sidebar));
+        var sidebarPaddingTop = parseFloat(sidebarCss['padding-top']);
+        var sidebarPaddingBottom = parseFloat(sidebarCss['padding-bottom']);
+
+        var viewPortHeight = window.innerHeight;
+        var maxHeight =
+            viewPortHeight
+            - header.clientHeight
+            - footer.clientHeight
+            - sidebarTop - sidebarPaddingTop - sidebarPaddingBottom
+            -35; // for good measure™
+
+        this.setState({maxFieldsHeight: maxHeight});
+    },
+
     _updateFieldSelection(setName) {
         this.props.predefinedFieldSelection(setName);
     },
@@ -151,64 +201,68 @@ var SearchSidebar = React.createClass({
             </ModalTrigger>);
 
         return (
-            <div className="content-col">
-                <h2>
-                    {searchTitle}
-                </h2>
+            <div className="content-col" ref='sidebar'>
+                <div ref='header'>
+                    <h2>
+                        {searchTitle}
+                    </h2>
 
-                <p style={{marginTop: 3}}>
-                    Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong> in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
-                    <ModalTrigger modal={indicesModal}>
-                        <a href="#" onClick={event => event.preventDefault()}>
-                            {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
-                        </a>
-                    </ModalTrigger>.
-                </p>
+                    <p style={{marginTop: 3}}>
+                        Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong> in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
+                        <ModalTrigger modal={indicesModal}>
+                            <a href="#" onClick={event => event.preventDefault()}>
+                                {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
+                            </a>
+                        </ModalTrigger>.
+                    </p>
 
-                <div style={{marginTop: 10}}>
-                    <AddToDashboardMenu title="Add count to dashboard"
-                                        widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                        permissions={this.props.permissions}/>
-                    &nbsp;
-                    <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
+                    <div style={{marginTop: 10}}>
+                        <AddToDashboardMenu title="Add count to dashboard"
+                                            widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
+                                            permissions={this.props.permissions}/>
+                        &nbsp;
+                        <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
-                    <DropdownButton bsSize="small" title="More actions">
-                        {moreActions}
-                    </DropdownButton>
+                        <DropdownButton bsSize="small" title="More actions">
+                            {moreActions}
+                        </DropdownButton>
+                    </div>
+
+                    <hr />
+
+
+                    <h3>Fields</h3>
+
+                    <div className="input-group input-group-sm">
+                        <span className="input-group-btn">
+                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('default')}>Default</button>
+                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('all')}>All</button>
+                            <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('none')}>None</button>
+                        </span>
+                        <input type="text" className="form-control" placeholder="Filter fields" onChange={(event) => this.setState({fieldFilter: event.target.value})} value={this.state.fieldFilter}/>
+                    </div>
                 </div>
-
-                <hr />
-
-
-                <h3>Fields</h3>
-
-                <div className="input-group input-group-sm">
-                    <span className="input-group-btn">
-                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('default')}>Default</button>
-                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('all')}>All</button>
-                        <button type="button" className="btn btn-default" onClick={() => this._updateFieldSelection('none')}>None</button>
+                <div ref='fields' style={{maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll'}}>
+                    <ul className="search-result-fields">
+                        {messageFields}
+                    </ul>
+                </div>
+                <div ref='footer'>
+                    <p style={{marginTop: 13, marginBottom: 0}}>
+                        List <span className="message-result-fields-range"> fields of&nbsp;
+                    <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
+                       onClick={this._showPageFields}>current page</a> or <a href="#"
+                                                                                       style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
+                                                                                       onClick={this._showAllFields}>all fields</a>.
                     </span>
-                    <input type="text" className="form-control" placeholder="Filter fields" onChange={(event) => this.setState({fieldFilter: event.target.value})} value={this.state.fieldFilter}/>
+                        <br/>
+                        { this.props.showHighlightToggle &&
+                        <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
+                               onChange={this.props.toggleShouldHighlight} label="Highlight results"
+                               groupClassName="result-highlight-control"/>
+                        }
+                    </p>
                 </div>
-
-                <ul className="search-result-fields">
-                    {messageFields}
-                </ul>
-
-                <p style={{marginTop: 13, marginBottom: 0}}>
-                    List <span className="message-result-fields-range"> fields of&nbsp;
-                <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
-                   onClick={this._showPageFields}>current page</a> or <a href="#"
-                                                                                   style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
-                                                                                   onClick={this._showAllFields}>all fields</a>.
-                </span>
-                    <br/>
-                    { this.props.showHighlightToggle &&
-                    <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
-                           onChange={this.props.toggleShouldHighlight} label="Highlight results"
-                           groupClassName="result-highlight-control"/>
-                    }
-                </p>
             </div>
         );
     }
