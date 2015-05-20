@@ -153,7 +153,7 @@ public class AsyncByteBufferInputStreamTest {
         reader.join();
         writer.join();
 
-        await().atMost(1, TimeUnit.SECONDS).untilTrue(caughtExceptionInReader);
+        await().atMost(5, TimeUnit.SECONDS).untilTrue(caughtExceptionInReader);
         assertTrue(stream.getFailed() instanceof Exception);
         assertEquals("Some weird error", stream.getFailed().getMessage());
     }
@@ -188,7 +188,7 @@ public class AsyncByteBufferInputStreamTest {
         reader.join();
         writer.join();
 
-        await().atMost(1, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+        await().atMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return stream.isDone();
