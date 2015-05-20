@@ -188,9 +188,7 @@ var SearchSidebar = React.createClass({
         ];
         if (this.props.searchInStream) {
             searchTitle = <span>{this.props.searchInStream.title}</span>;
-            // add stream actions to dropdown
-            moreActions.push(<MenuItem divider key="div"/>);
-            moreActions.push(<MenuItem key="todo" href="#">TODO Stream actions</MenuItem>);
+            // TODO: add stream actions to dropdown
         } else {
             searchTitle = <span>Search result</span>;
         }
