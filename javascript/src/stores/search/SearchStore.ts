@@ -22,6 +22,8 @@ class SearchStore {
     private _page: number;
     private _resolution: string;
     private _fields: Immutable.Set<string>;
+    public sortField: string;
+    public sortOrder: string;
     savedSearch: string;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
@@ -37,6 +39,8 @@ class SearchStore {
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
         this.savedSearch = this.originalSearch.get('saved');
+        this.sortField = this.originalSearch.get('sortField');
+        this.sortOrder = this.originalSearch.get('sortOrder');
 
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
@@ -132,12 +136,18 @@ class SearchStore {
         this._fields = newFields;
     }
 
+    sort(sortField: string, sortOrder: string): void {
+        this._reloadSearchWithNewParams(Immutable.Map<string, any>({sortField: sortField, sortOrder: sortOrder}));
+    }
+
     static _initializeOriginalSearch(parsedSearch: Immutable.Map<string, any>): Immutable.Map<string, any> {
         var originalSearch = Immutable.Map<string, any>();
         originalSearch = originalSearch.set('query', parsedSearch.get('q', ''));
         originalSearch = originalSearch.set('resolution', parsedSearch.get('interval'));
         originalSearch = originalSearch.set('page', Math.max(parsedSearch.get('page', 1), 1));
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
+        originalSearch = originalSearch.set('sortField', parsedSearch.get('sortField', 'timestamp'));
+        originalSearch = originalSearch.set('sortOrder', parsedSearch.get('sortOrder', 'desc'));
 
         if (parsedSearch.get('saved') !== undefined) {
             originalSearch = originalSearch.set('saved', parsedSearch.get('saved'));
@@ -255,6 +265,8 @@ class SearchStore {
         originalURLParams = originalURLParams.set('interval', this.originalSearch.get('resolution'));
         originalURLParams = originalURLParams.set('page', this.originalSearch.get('page'));
         originalURLParams = originalURLParams.set('fields', this.fields.join(','));
+        originalURLParams = originalURLParams.set('sortField', this.originalSearch.get('sortField'));
+        originalURLParams = originalURLParams.set('sortOrder', this.originalSearch.get('sortOrder'));
 
         if (this.originalSearch.has('saved')) {
             originalURLParams = originalURLParams.set('saved', this.originalSearch.get('saved'));
@@ -276,6 +288,12 @@ class SearchStore {
     _reloadSearchWithNewParam(param: string, value: any) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
+        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
+    }
+
+    _reloadSearchWithNewParams(newParams: Immutable.Map<string, any>) {
+        var searchURLParams = this.getOriginalSearchURLParams();
+        searchURLParams = searchURLParams.merge(newParams);
         URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
     }
 

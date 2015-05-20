@@ -738,13 +738,6 @@ $(document).ready(function() {
         }
     });
 
-    // Show sort order icons on message table hover.
-    $(".messages td, .messages th").on("mouseover", function() {
-        $(".choose-sort-order", $(this).closest("table").find("th").eq($(this).index())).show();
-    }).on("mouseout", function() {
-        $(".choose-sort-order").hide();
-    });
-
     // Make a word plural/singular based on input field value.
     $("input.pluralsingular").on("keyup", function() {
         var target = $("." + $(this).attr("data-pluralsingular"));

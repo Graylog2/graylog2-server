@@ -23,6 +23,8 @@ var SearchResult = React.createClass({
         var initialFields = SearchStore.fields;
         return {
             selectedFields: initialFields,
+            sortField: SearchStore.sortField,
+            sortOrder: SearchStore.sortOrder,
             showAllFields: false,
             currentSidebarWidth: null,
             shouldHighlight: true,
@@ -195,6 +197,8 @@ var SearchResult = React.createClass({
                     <ResultTable messages={this.props.result.messages}
                                  page={this.state.currentPage}
                                  selectedFields={this.state.selectedFields}
+                                 sortField={this.state.sortField}
+                                 sortOrder={this.state.sortOrder}
                                  resultCount={this.props.result['total_result_count']}
                                  inputs={this.props.inputs}
                                  streams={this.props.streams}

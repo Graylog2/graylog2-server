@@ -2148,27 +2148,18 @@ form.edit-dashboard-form {
   margin-right: 1px;
 }
 
-.messages th .sort-order {
-  margin-left: 2px;
-  font-size: 11px;
-  color: #fff;
-}
-
-.messages th .sort-order:hover {
-  color: #4DBCE9;
-  text-decoration: none;
-}
-
-.messages th a:hover {
-  text-decoration: none;
-}
-
-.messages th .sort-order-asc {
+.messages th i.sort-order-desc {
   position: relative;
   top: -1px;
 }
 
-.messages th .choose-sort-order {
+.messages th i.sort-order-item {
+  margin-right: 2px;
+  color: #222; // same color as .messsages th cannot display: none it because it would push the table columns out on hover :(
+}
+
+.messages th i.sort-order-active,
+.messages th:hover i.sort-order-item {
   color: #fff;
 }
 

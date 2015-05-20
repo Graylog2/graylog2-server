@@ -8,6 +8,7 @@ var MessageTablePaginator = require('./MessageTablePaginator');
 var Immutable = require('immutable');
 
 var StreamsStore = require('../../stores/streams/StreamsStore');
+var SearchStore = require('../../stores/search/SearchStore');
 
 var ResultTable = React.createClass({
     getInitialState() {
@@ -55,6 +56,41 @@ var ResultTable = React.createClass({
     collapseAll() {
         this.setState({expandedMessages: Immutable.Set()});
     },
+    _handleSort(e, field, order) {
+        e.preventDefault();
+        SearchStore.sort(field, order);
+    },
+    _sortIcons(fieldName) {
+        var sortLinks = null;
+        // the classes look funny, but using the default asc/desc icons looks odd.
+        // .sort-order-item does the margins
+        // .sort-order-desc does the top: offset for the flipped icon
+        // .sort-order-active indicates the currently active sort order
+        var classesAsc = "fa fa-sort-amount-asc sort-order-item";
+        var classesDesc = "fa fa-sort-amount-asc fa-flip-vertical sort-order-desc sort-order-item";
+        // if the given field name is the one we sorted on
+        if (this.props.sortField.toLowerCase().localeCompare(fieldName.toLowerCase()) === 0) {
+
+            if (this.props.sortOrder.toLowerCase().localeCompare("desc") === 0) {
+                sortLinks = <span>
+                    <i className={classesDesc + " sort-order-active"}></i>
+                    <a href="#" onClick={(e) => this._handleSort(e, fieldName, "asc")}><i className={classesAsc}></i></a>
+                    </span>;
+            } else {
+                sortLinks = <span>
+                    <i className={classesAsc + " sort-order-active"}></i>
+                    <a href="#" onClick={(e) => this._handleSort(e, fieldName, "desc")}><i className={classesDesc}></i></a>
+                    </span>;
+            }
+        } else {
+            // the given fieldname is not being sorted on
+            sortLinks = <span className="sort-order">
+                <a href="#" onClick={(e) => this._handleSort(e, fieldName, "asc")}><i className={classesAsc}></i></a>
+                <a href="#" onClick={(e) => this._handleSort(e, fieldName, "desc")}><i className={classesDesc}></i></a>
+            </span>
+        }
+        return <span>{sortLinks}</span>;
+    },
 
     render() {
         var selectedColumns = this._fieldColumns();
@@ -74,9 +110,9 @@ var ResultTable = React.createClass({
                 <table className="table table-condensed messages">
                     <thead>
                     <tr>
-                        <th style={{width: 180}}>Timestamp</th>
+                        <th style={{width: 180}}>Timestamp {this._sortIcons("timestamp")}</th>
                         { selectedColumns.map(selectedFieldName => <th key={selectedFieldName}
-                                                                       style={this._columnStyle(selectedFieldName)}>{selectedFieldName}</th>) }
+                                                                       style={this._columnStyle(selectedFieldName)}>{selectedFieldName} {this._sortIcons(selectedFieldName) }</th>) }
                     </tr>
                     </thead>
                     { this.props.messages.map((message) => <MessageTableEntry key={message.id}
