@@ -79,13 +79,20 @@ var SearchSidebar = React.createClass({
     componentDidMount() {
         this._updateHeight();
         $(window).on('resize', this._resizeCallback);
-        $('#sidebar-affix').on('affixed.bs.affix', this._updateHeight);
-        $('#sidebar-affix').on('affixed-top.bs.affix', this._updateHeight);
+        var $sidebarAffix = $('#sidebar-affix');
+        $sidebarAffix.on('affixed.bs.affix', () => {
+            $(window).off('scroll', this._updateHeight);
+            this._updateHeight();
+        });
+        $sidebarAffix.on('affixed-top.bs.affix', () => {
+            $(window).on('scroll', this._updateHeight)
+        });
     },
     componentWillUnmount() {
         $(window).off("resize", this._resizeCallback);
-        $('#sidebar-affix').off('affixed.bs.affix', this._updateHeight);
-        $('#sidebar-affix').off('affixed-top.bs.affix', this._updateHeight);
+        var $sidebarAffix = $('#sidebar-affix');
+        $sidebarAffix.off('affixed.bs.affix');
+        $sidebarAffix.off('affixed-top.bs.affix');
     },
     componentWillReceiveProps(newProps) {
         // update max-height of fields when we toggle per page/all fields
