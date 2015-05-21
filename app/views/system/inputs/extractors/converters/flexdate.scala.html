@@ -1,12 +1,24 @@
-@(enabled: Boolean = false)
+@(enabled: Boolean = false, converter: org.graylog2.restclient.models.Converter = null)
 
 <div class="xtrc-converter xtrc-converter-flexdate" @if(!enabled) { style="display:none;" } >
     <div class="checkbox">
         <label>
             <input type="checkbox" value="enabled" name="converter_flexdate" @if(enabled) { checked="checked" } />
             Flexibly parse to date
-
-            @views.html.partials.support.bubble("general/extractors#flexdate-converter")
         </label>
+    </div>
+    <div class="xtrc-converter-subfield">
+        <div class="form-group">
+            <label for="converter_flexdate_time_zone">
+            Time zone ID: @views.html.partials.support.bubble("general/extractors#flexdate-converter")
+            </label>
+            <div class="row">
+                <div class="col-md-4">
+                    <input name="converter_flexdate_time_zone" id="converter_flexdate_time_zone"
+                    type="text" class="form-control"
+                        @if(converter != null) { value="@converter.getConfig.get("time_zone")" } />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
