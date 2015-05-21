@@ -85,7 +85,7 @@ var SearchSidebar = React.createClass({
             this._updateHeight();
         });
         $sidebarAffix.on('affixed-top.bs.affix', () => {
-            $(window).on('scroll', this._updateHeight)
+            $(window).on('scroll', this._updateHeight);
         });
     },
     componentWillUnmount() {
