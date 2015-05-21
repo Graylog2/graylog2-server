@@ -52,9 +52,6 @@ var BootstrapModal = React.createClass({
         this.refs.modal.close();
     },
     open() {
-        if (window.event) {
-            window.event.preventDefault();
-        }
         this.refs.modal.open();
     },
     _onModalShown() {

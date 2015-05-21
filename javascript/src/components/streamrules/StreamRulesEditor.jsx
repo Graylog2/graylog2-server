@@ -23,7 +23,8 @@ var StreamRulesEditor = React.createClass({
     _onStreamRuleFormSubmit(streamRuleId, data) {
         StreamRulesStore.create(this.props.streamId, data, () => {});
     },
-    _onAddStreamRule() {
+    _onAddStreamRule(event) {
+        event.preventDefault();
         this.refs.newStreamRuleForm.open();
     },
     loadData() {

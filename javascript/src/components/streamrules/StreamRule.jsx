@@ -9,11 +9,12 @@ var UserNotification = require('../../util/UserNotification');
 
 var StreamRule = React.createClass({
     mixins: [PermissionsMixin],
-    _onEdit() {
+    _onEdit(event) {
+        event.preventDefault();
         this.refs.streamRuleForm.open();
     },
-    _onDelete(e) {
-        e.preventDefault();
+    _onDelete(event) {
+        event.preventDefault();
         if (window.confirm("Do you really want to delete this stream rule?")) {
             StreamRulesStore.remove(this.props.stream.id, this.props.streamRule.id, () => {
                 if (this.props.onDelete) {
