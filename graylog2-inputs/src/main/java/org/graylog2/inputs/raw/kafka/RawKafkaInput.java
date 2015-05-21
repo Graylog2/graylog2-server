@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.kafka;
+package org.graylog2.inputs.raw.kafka;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.codecs.RadioMessageCodec;
+import org.graylog2.inputs.codecs.RawCodec;
 import org.graylog2.inputs.transports.KafkaTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
@@ -30,17 +30,17 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import javax.inject.Inject;
 
-public class KafkaInput extends MessageInput {
-    private static final String NAME = "Kafka Input";
+public class RawKafkaInput extends MessageInput {
+    private static final String NAME = "Raw/Plaintext Kafka";
 
     @AssistedInject
-    public KafkaInput(@Assisted Configuration configuration,
-                      MetricRegistry metricRegistry,
-                      KafkaTransport.Factory transport,
-                      RadioMessageCodec.Factory codec,
-                      LocalMetricRegistry localRegistry,
-                      Config config,
-                      Descriptor descriptor, ServerStatus serverStatus) {
+    public RawKafkaInput(@Assisted Configuration configuration,
+                         MetricRegistry metricRegistry,
+                         KafkaTransport.Factory transport,
+                         RawCodec.Factory codec,
+                         LocalMetricRegistry localRegistry,
+                         Config config,
+                         Descriptor descriptor, ServerStatus serverStatus) {
         this(metricRegistry,
                 configuration,
                 transport.create(configuration),
@@ -50,20 +50,20 @@ public class KafkaInput extends MessageInput {
                 descriptor, serverStatus);
     }
 
-    protected KafkaInput(MetricRegistry metricRegistry,
-                         Configuration configuration,
-                         KafkaTransport radioKafkaTransport,
-                         RadioMessageCodec radioMessageCodec,
-                         LocalMetricRegistry localRegistry,
-                         MessageInput.Config config,
-                         MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, configuration, radioKafkaTransport, localRegistry, radioMessageCodec, config, descriptor, serverStatus);
+    protected RawKafkaInput(MetricRegistry metricRegistry,
+                            Configuration configuration,
+                            KafkaTransport radioKafkaTransport,
+                            RawCodec codec,
+                            LocalMetricRegistry localRegistry,
+                            MessageInput.Config config,
+                            MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
+        super(metricRegistry, configuration, radioKafkaTransport, localRegistry, codec, config, descriptor, serverStatus);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<KafkaInput> {
+    public interface Factory extends MessageInput.Factory<RawKafkaInput> {
         @Override
-        KafkaInput create(Configuration configuration);
+        RawKafkaInput create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -82,7 +82,7 @@ public class KafkaInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(KafkaTransport.Factory transport, RadioMessageCodec.Factory codec) {
+        public Config(KafkaTransport.Factory transport, RawCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }
