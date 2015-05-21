@@ -23,12 +23,14 @@ import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class NodeDescription {
     @JsonIgnore
     private final ClusterEntity entity;
 
     public NodeDescription(ClusterEntity cluster) {
-        this.entity = cluster;
+        this.entity = checkNotNull(cluster);
     }
 
     @JsonProperty

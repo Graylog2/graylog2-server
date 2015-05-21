@@ -22,12 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.Stream;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class StreamDescription {
     @JsonIgnore
     private final Stream stream;
 
-    public StreamDescription(Stream stream) {
-        this.stream = stream;
+    private StreamDescription(Stream stream) {
+        this.stream = checkNotNull(stream);
     }
 
     public static StreamDescription of(Stream stream) {
@@ -49,7 +51,7 @@ public class StreamDescription {
 
     @JsonProperty
     public String getCreatorUser() {
-        return stream.getCreatorUser().getName();
+        return stream.getCreatorUser() == null ? null : stream.getCreatorUser().getName();
     }
 
     @JsonProperty

@@ -214,7 +214,7 @@ public class SearchController extends AuthenticatedController {
                 @Nullable
                 @Override
                 public StreamDescription apply(@Nullable Stream stream) {
-                    return new StreamDescription(stream);
+                    return StreamDescription.of(stream);
                 }
             }));
 
@@ -517,7 +517,7 @@ public class SearchController extends AuthenticatedController {
                 if (isPermitted(RestPermissions.STREAMS_READ, streamId)) {
                     try {
                         final Stream stream = streamService.get(streamId);
-                        streams.add(new StreamDescription(stream));
+                        streams.add(StreamDescription.of(stream));
                     } catch (APIException e) {
                         //  We get a 404 if the stream no longer exists.
                         Logger.debug("Skipping stream of message", e);

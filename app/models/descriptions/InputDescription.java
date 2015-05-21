@@ -22,12 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.Input;
 import org.joda.time.DateTime;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class InputDescription {
     @JsonIgnore
     private final Input input;
 
     public InputDescription(Input input) {
-        this.input = input;
+        this.input = checkNotNull(input);
     }
 
     @JsonProperty
@@ -47,7 +49,7 @@ public class InputDescription {
 
     @JsonProperty
     public String getCreatorUser() {
-        return input.getCreatorUser().getName();
+        return input.getCreatorUser() == null ? null : input.getCreatorUser().getName();
     }
 
     @JsonProperty

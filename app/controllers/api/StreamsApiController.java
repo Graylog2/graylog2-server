@@ -92,7 +92,7 @@ public class StreamsApiController extends AuthenticatedController {
         try {
             final List<Stream> streams = streamService.all();
             for (Stream stream : streams) {
-                streamDescriptions.add(new StreamDescription(stream));
+                streamDescriptions.add(StreamDescription.of(stream));
             }
         } catch (IOException e) {
             return status(500, "Could not load streams");
