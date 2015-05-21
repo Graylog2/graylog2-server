@@ -118,7 +118,12 @@ public class UsersController extends AuthenticatedController {
         BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 
-        User user = userService.load(username);
+        final User user = userService.load(username);
+        if (user == null) {
+            flash("error", "User '" + username + "' not found.");
+            return redirect(routes.UsersController.index());
+        }
+
         final Form<ChangeUserRequestForm> form = changeUserForm.fill(new ChangeUserRequestForm(user));
         boolean requiresOldPassword = checkRequireOldPassword(username);
         try {
@@ -199,7 +204,12 @@ public class UsersController extends AuthenticatedController {
         }
 
         final Form<ChangeUserRequestForm> requestForm = Form.form(ChangeUserRequestForm.class).bindFromRequest();
+
         final User user = userService.load(username);
+        if (user == null) {
+            flash("error", "User '" + username + "' not found.");
+            return redirect(routes.UsersController.index());
+        }
 
         if (requestForm.hasErrors()) {
             final BreadcrumbList bc = new BreadcrumbList();
@@ -299,6 +309,11 @@ public class UsersController extends AuthenticatedController {
 
         final ChangePasswordRequest request = requestForm.get();
         final User user = userService.load(username);
+        if (user == null) {
+            flash("error", "User '" + username + "' not found.");
+            return redirect(routes.UsersController.index());
+        }
+
 
         if (checkRequireOldPassword(username) && request.old_password == null) {
             requestForm.reject("Old password is required.");
@@ -324,7 +339,12 @@ public class UsersController extends AuthenticatedController {
         if (field != null && field.equalsIgnoreCase("admin")) {
             isAdmin = true;
         }
+
         final User user = userService.load(username);
+        if (user == null) {
+            flash("error", "User '" + username + "' not found.");
+            return redirect(routes.UsersController.index());
+        }
 
         if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
             flash("error", "Unable to change user role");
