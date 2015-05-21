@@ -318,12 +318,42 @@ $(document).ready(function() {
     });
 
     // Check input configuration according to provided plugin attributes.
-    $(".launch-input").on("click", function() {
-        return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
+    $(".launch-input").on("click", function(event) {
+        var $editForm = $('[data-inputtype="' + $(this).attr("data-type") + '"]').closest('form');
+        var validated = validate($editForm);
+        if (!validated) {
+            event.preventDefault();
+        }
+
+        return validated;
     });
 
-    $(".update-input").on("click", function() {
-        return validate('#edit-input-' + $(this).data("input-id") + ' form');
+    $(".update-input").on("click", function(event) {
+        var $editForm = $('#edit-input-' + $(this).data("input-id")).closest('form');
+        var validated = validate($editForm);
+        if (!validated) {
+            event.preventDefault();
+        }
+
+        return validated;
+    });
+
+    $("#create-user-form").on("submit", function (event) {
+        var validated = validate($("#create-user-form"));
+        if (!validated) {
+            event.preventDefault();
+        }
+
+        return validated;
+    });
+
+    $("#edit-user-form").on("submit", function (event) {
+        var validated = validate($("#edit-user-form"));
+        if (!validated) {
+            event.preventDefault();
+        }
+
+        return validated;
     });
 
     // Add static field to input.

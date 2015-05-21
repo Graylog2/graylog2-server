@@ -1,11 +1,11 @@
-function validate(formcontainer) {
-    errors = false;
-    $(formcontainer + " .validatable").each(function() {
+function validate(formContainer) {
+    var errors = false;
+    $(".validatable", formContainer).each(function () {
         // Do not check disabled form fields.
-        if(!$(this).is(':disabled')) {
+        if (!$(this).is(':disabled')) {
             var validatorTypes = $(this).attr("data-validate").split(" ");
             for (var i = 0; i < validatorTypes.length; i++) {
-                dispatchRuleValidation($(this), validatorTypes[i]);
+                errors = dispatchRuleValidation($(this), validatorTypes[i]);
             }
         }
     });
@@ -13,63 +13,66 @@ function validate(formcontainer) {
     return !errors;
 }
 
-function dispatchRuleValidation(ref, validatorType) {
-    switch(validatorType) {
+function dispatchRuleValidation($ref, validatorType) {
+    var errors = false;
+
+    switch (validatorType) {
         case "defined":
-            if (!validateDefined(ref)) {
-                validationFailure(ref, "must be set");
+            if (!validateDefined($ref)) {
+                validationFailure($ref, "Must be set");
                 errors = true;
             }
             break;
         case "port_number":
-            if (!validatePortNumber(ref)) {
-                validationFailure(ref, "must be a valid port number");
+            if (!validatePortNumber($ref)) {
+                validationFailure($ref, "Must be a valid port number");
                 errors = true;
             }
             break;
         case "number":
-            if (!validateNumber(ref)) {
-                validationFailure(ref, "must be a number");
+            if (!validateNumber($ref)) {
+                validationFailure($ref, "Must be a number");
                 errors = true;
             }
             break;
         case "positive_number":
-            if (!validatePositiveNumber(ref)) {
-                validationFailure(ref, "must be a positive number");
+            if (!validatePositiveNumber($ref)) {
+                validationFailure($ref, "Must be a positive number");
                 errors = true;
             }
             break;
         case "negative_number":
-            if (!validateNegativeNumber(ref)) {
-                validationFailure(ref, "must be a negative number");
+            if (!validateNegativeNumber($ref)) {
+                validationFailure($ref, "Must be a negative number");
                 errors = true;
             }
             break;
         case "not_negative_number":
-            if (!validateNotNegativeNumber(ref)) {
-                validationFailure(ref, "must be a not negative number");
+            if (!validateNotNegativeNumber($ref)) {
+                validationFailure($ref, "Must be a not negative number");
                 errors = true;
             }
             break;
         case "alphanum_underscore":
-            if (!validateAlphanumericUnderscores(ref)) {
-                validationFailure(ref, "must only contain alphanum chars or underscores");
+            if (!validateAlphanumericUnderscores($ref)) {
+                validationFailure($ref, "Must only contain alphanumeric chars or underscores");
                 errors = true;
             }
             break;
         case "datetime_format":
-            if (!validateDatetimeFormat(ref)) {
-                validationFailure(ref, "is not in a valid format");
+            if (!validateDatetimeFormat($ref)) {
+                validationFailure($ref, "Is not in a valid format");
                 errors = true;
             }
             break;
         case "timerange":
-            if (!validateAbsoluteTimerange(ref)) {
-                validationFailure(ref, "cannot be earlier than 'From'");
+            if (!validateAbsoluteTimerange($ref)) {
+                validationFailure($ref, "cannot be earlier than 'From'");
                 errors = true;
             }
             break;
     }
+    return errors;
 }
 
 function validationFailure(el, msg) {
