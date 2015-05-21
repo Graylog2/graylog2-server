@@ -24,12 +24,26 @@ import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class FlexibleDateConverter extends Converter {
+    private final DateTimeZone timeZone;
 
     public FlexibleDateConverter(Map<String, Object> config) {
         super(Type.FLEXDATE, config);
+
+        this.timeZone = buildTimeZone(config.get("time_zone"));
+    }
+
+    private static DateTimeZone buildTimeZone(Object timeZoneId) {
+        if (timeZoneId instanceof String) {
+            try {
+                return DateTimeZone.forID((String) timeZoneId);
+            } catch (IllegalArgumentException e) {
+                return DateTimeZone.UTC;
+            }
+        } else {
+            return DateTimeZone.UTC;
+        }
     }
 
     @Override
@@ -39,19 +53,18 @@ public class FlexibleDateConverter extends Converter {
         }
 
         // Parser is using local timezone with no constructor parameter passed.
-        Parser parser = new Parser(TimeZone.getTimeZone("UTC"));
+        Parser parser = new Parser(timeZone.toTimeZone());
         List<DateGroup> r = parser.parse(value);
 
         if (r.isEmpty() || r.get(0).getDates().isEmpty()) {
             return null;
         }
 
-        return new DateTime(r.get(0).getDates().get(0), DateTimeZone.UTC);
+        return new DateTime(r.get(0).getDates().get(0), timeZone);
     }
 
     @Override
     public boolean buildsMultipleFields() {
         return false;
     }
-
 }
