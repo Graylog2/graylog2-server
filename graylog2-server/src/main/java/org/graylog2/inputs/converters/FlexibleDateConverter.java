@@ -52,9 +52,8 @@ public class FlexibleDateConverter extends Converter {
             return null;
         }
 
-        // Parser is using local timezone with no constructor parameter passed.
-        Parser parser = new Parser(timeZone.toTimeZone());
-        List<DateGroup> r = parser.parse(value);
+        final Parser parser = new Parser(timeZone.toTimeZone());
+        final List<DateGroup> r = parser.parse(value);
 
         if (r.isEmpty() || r.get(0).getDates().isEmpty()) {
             return null;
