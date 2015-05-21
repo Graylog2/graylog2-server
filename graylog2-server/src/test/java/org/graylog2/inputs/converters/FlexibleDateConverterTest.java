@@ -69,4 +69,20 @@ public class FlexibleDateConverterTest {
         Assertions.assertThat(textualDateTime)
                 .isEqualTo(new DateTime(2014, 3, 12, 14, 0, DateTimeZone.forOffsetHours(12)));
     }
+
+    @Test
+    public void convertUsesUTCIfTimeZoneSettingIsEmpty() throws Exception {
+        Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", ""));
+
+        final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.UTC);
+    }
+
+    @Test
+    public void convertUsesUTCIfTimeZoneSettingIsBlank() throws Exception {
+        Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", " "));
+
+        final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.UTC);
+    }
 }
