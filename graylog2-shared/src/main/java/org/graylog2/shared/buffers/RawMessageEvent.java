@@ -27,11 +27,11 @@ import java.nio.ByteBuffer;
 public class RawMessageEvent {
 
     // the rawmessage will get be nulled as soon as the encoded raw message is being generated
-    private RawMessage rawMessage;
+    private volatile RawMessage rawMessage;
 
     // once these fields are set, do NOT rely on rawMessage still being non-null!
-    private byte[] messageIdBytes;
-    private byte[] encodedRawMessage;
+    private volatile byte[] messageIdBytes;
+    private volatile byte[] encodedRawMessage;
 
     public static final EventFactory<RawMessageEvent> FACTORY = new EventFactory<RawMessageEvent>() {
         @Override
