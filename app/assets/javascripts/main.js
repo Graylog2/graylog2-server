@@ -405,14 +405,6 @@ $(document).ready(function() {
     });
     toggleSessionTimeoutEditableState($("#session-timeout-never").is(":checked"));
 
-    $("#create-user-form").on("submit", function() {
-        return validate("#create-user-form")}
-    );
-
-    $("#edit-user-form").on("submit", function() {
-            return validate("#edit-user-form")}
-    );
-
     var createUsernameField = $("form#create-user-form #username");
     if (createUsernameField.length) {
         var domElement = createUsernameField[0];
