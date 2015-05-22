@@ -127,7 +127,7 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "- - tralala");
+        assertEquals(message.getMessage(), "tralala");
         assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-11T15:35:21.335797Z", DateTimeZone.UTC));
         assertEquals(message.getField("source"), "s000000.example.com");
         assertEquals(message.getField("level"), 0);
