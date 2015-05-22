@@ -9,6 +9,8 @@ var LegacyHistogram = require('./LegacyHistogram');
 var FieldGraphs = require('./FieldGraphs');
 var FieldQuickValues = require('./FieldQuickValues');
 var FieldStatistics = require('./FieldStatistics');
+var ModalTrigger = require('react-bootstrap').ModalTrigger;
+var ShowQueryModal = require('./ShowQueryModal');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 var Widget = require('../widgets/Widget');
 var Immutable = require('immutable');
@@ -129,7 +131,10 @@ var SearchResult = React.createClass({
 
                             <p>
                                 Your search returned no results.&nbsp;
-                                <strong>Take a look at the&nbsp;<a
+                                <ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
+                                    <a href="#" onClick={(e) => e.preventDefault()}>Show the Elasticsearch query.</a>
+                                </ModalTrigger>
+                                <strong>&nbsp;Take a look at the&nbsp;<a
                                     href="https://www.graylog.org/documentation/general/queries/" target="_blank">documentation</a>
                                     &nbsp;if you need help with the search syntax.</strong>
                             </p>

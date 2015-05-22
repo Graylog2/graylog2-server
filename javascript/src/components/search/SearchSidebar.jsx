@@ -10,13 +10,11 @@ var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
-var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
-var Tooltip = require('react-bootstrap').Tooltip;
-var ReactZeroClipboard = require('react-zeroclipboard');
 
 var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchControls = require('./SavedSearchControls');
+var ShowQueryModal = require('./ShowQueryModal');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 
 var numeral = require('numeral');
@@ -156,25 +154,6 @@ var SearchSidebar = React.createClass({
                 </div>
             </Modal>;
 
-        var queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
-        var queryModal =
-            <Modal title='Elasticsearch Query' onRequestHide={() => {}}>
-                <div className="modal-body">
-                    <pre>{queryText}</pre>
-                </div>
-                <div className="modal-footer">
-                    <OverlayTrigger
-                        placement="top"
-                        ref="copyBtnTooltip"
-                        overlay={<Tooltip>Query copied to clipboard.</Tooltip>}>
-                        <ReactZeroClipboard
-                            text={queryText}
-                            onAfterCopy={() => { this.refs['copyBtnTooltip'].toggle(); window.setTimeout(() => this.refs['copyBtnTooltip'] && this.refs['copyBtnTooltip'].toggle(), 1000); } }>
-                            <Button>Copy query</Button>
-                        </ReactZeroClipboard>
-                    </OverlayTrigger>
-                </div>
-            </Modal>;
         var messageFields = this.props.fields
             .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -202,7 +181,7 @@ var SearchSidebar = React.createClass({
 
         // always add the debug query link as last elem
         moreActions.push(<MenuItem divider key="div2"/>);
-        moreActions.push(<ModalTrigger key="debugQuery" modal={queryModal}>
+        moreActions.push(<ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
             <MenuItem>Show query</MenuItem>
         </ModalTrigger>);
 
