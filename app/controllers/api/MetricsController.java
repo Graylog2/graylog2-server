@@ -9,6 +9,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import controllers.AuthenticatedController;
 import lib.security.RedirectAuthenticator;
+import lib.sockjs.SockJsRouter;
 import models.sockjs.CreateSessionCommand;
 import models.sockjs.MetricValuesUpdate;
 import models.sockjs.SockJsCommand;
@@ -26,11 +27,13 @@ import play.Logger;
 import play.Play;
 import play.libs.F;
 import play.libs.Json;
+import play.sockjs.CookieCalculator;
+import play.sockjs.ScriptLocation;
 import play.sockjs.SockJS;
-import play.sockjs.SockJSRouter;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -62,72 +65,7 @@ public class MetricsController extends AuthenticatedController {
         public boolean hasError = false;
     }
 
-    public static SockJSRouter metrics = new SockJSRouter() {
-
-        @Override
-        public SockJS sockjs() {
-
-            // this is the dance to get DI working
-            final MetricsController controllerInstance =
-                    Play.application()
-                            .getWrappedApplication()
-                            .global()
-                            .getControllerInstance(MetricsController.class);
-
-            return new SockJS() {
-
-                private Multimap<String, String> metricsPerNode =
-                        Multimaps.synchronizedMultimap(HashMultimap.<String, String>create());
-
-                private final AtomicReference<String> clearSessionId = new AtomicReference<>(null);
-
-                @Override
-                public void onReady(final In in, final Out out) {
-
-                    in.onMessage(new F.Callback<String>() {
-                        @Override
-                        public void invoke(String s) throws Throwable {
-                            try {
-                                final SockJsCommand command = objectMapper.readValue(s, SockJsCommand.class);
-                                if (command instanceof CreateSessionCommand) {
-
-                                    final String sessionId = ((CreateSessionCommand) command).sessionId;
-
-                                    final String[] userAndSessionId = RedirectAuthenticator.decodeSession(sessionId);
-                                    if (userAndSessionId == null) {
-                                        Logger.warn("No valid session id, cannot load metrics.");
-                                        return;
-                                    }
-                                    clearSessionId.set(userAndSessionId[1]);
-                                } else if (command instanceof SubscribeMetricsUpdates) {
-                                    final SubscribeMetricsUpdates metricsUpdates = (SubscribeMetricsUpdates) command;
-                                    Logger.debug("Subscribed to metrics {} on node {}",
-                                                metricsUpdates.metrics,
-                                                MoreObjects.firstNonNull(metricsUpdates.nodeId, "ALL"));
-
-                                    metricsPerNode.putAll(metricsUpdates.nodeId, metricsUpdates.metrics);
-                                }
-                            } catch (Exception e) {
-                                Logger.error("Unhandled exception", e);
-                            }
-                        }
-                    });
-
-                    final ScheduledFuture<?> scheduledFuture = controllerInstance.executor.scheduleAtFixedRate(
-                            new PollingJob(clearSessionId, controllerInstance, out, metricsPerNode), 0, 1, TimeUnit.SECONDS);
-
-                    in.onClose(new F.Callback0() {
-                        @Override
-                        public void invoke() throws Throwable {
-                            scheduledFuture.cancel(true);
-                            controllerInstance.executor.shutdown();
-                        }
-                    });
-
-                }
-            };
-        }
-    };
+    public static SockJsRouter metrics = new MySockJSRouter();
 
     private static class PollingJob implements Runnable {
         private final AtomicReference<String> clearSessionId;
@@ -219,6 +157,113 @@ public class MetricsController extends AuthenticatedController {
                 valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
             }
             return valuesUpdate;
+        }
+    }
+
+    private static class MySockJSRouter extends SockJsRouter {
+
+        // defaults: ScriptLocation.DefaultCdn.class, CookieCalculator.None.class, true, 25000, 5000, 128*1024
+        public MySockJSRouter() {
+            super(F.<SockJS.Settings>Some(new SockJS.Settings() {
+                @Override
+                public Class<? extends ScriptLocation> script() {
+                    return ScriptLocation.DefaultCdn.class;
+                }
+
+                @Override
+                public Class<? extends CookieCalculator> cookies() {
+                    return CookieCalculator.None.class;
+                }
+
+                @Override
+                public boolean websocket() {
+                    return Boolean.valueOf(System.getProperty("websockets.enabled", "true"));
+                }
+
+                @Override
+                public long heartbeat() {
+                    return 25000;
+                }
+
+                @Override
+                public long sessionTimeout() {
+                    return 5000;
+                }
+
+                @Override
+                public long streamingQuota() {
+                    return 128 * 1024;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return SockJS.Settings.class;
+                }
+            }));
+        }
+
+        @Override
+        public SockJS sockjs() {
+
+            // this is the dance to get DI working
+            final MetricsController controllerInstance =
+                    Play.application()
+                            .getWrappedApplication()
+                            .global()
+                            .getControllerInstance(MetricsController.class);
+
+            return new SockJS() {
+
+                private Multimap<String, String> metricsPerNode =
+                        Multimaps.synchronizedMultimap(HashMultimap.<String, String>create());
+
+                private final AtomicReference<String> clearSessionId = new AtomicReference<>(null);
+
+                @Override
+                public void onReady(final In in, final Out out) {
+
+                    in.onMessage(new F.Callback<String>() {
+                        @Override
+                        public void invoke(String s) throws Throwable {
+                            try {
+                                final SockJsCommand command = objectMapper.readValue(s, SockJsCommand.class);
+                                if (command instanceof CreateSessionCommand) {
+
+                                    final String sessionId = ((CreateSessionCommand) command).sessionId;
+
+                                    final String[] userAndSessionId = RedirectAuthenticator.decodeSession(sessionId);
+                                    if (userAndSessionId == null) {
+                                        Logger.warn("No valid session id, cannot load metrics.");
+                                        return;
+                                    }
+                                    clearSessionId.set(userAndSessionId[1]);
+                                } else if (command instanceof SubscribeMetricsUpdates) {
+                                    final SubscribeMetricsUpdates metricsUpdates = (SubscribeMetricsUpdates) command;
+                                    Logger.debug("Subscribed to metrics {} on node {}",
+                                                metricsUpdates.metrics,
+                                                MoreObjects.firstNonNull(metricsUpdates.nodeId, "ALL"));
+
+                                    metricsPerNode.putAll(metricsUpdates.nodeId, metricsUpdates.metrics);
+                                }
+                            } catch (Exception e) {
+                                Logger.error("Unhandled exception", e);
+                            }
+                        }
+                    });
+
+                    final ScheduledFuture<?> scheduledFuture = controllerInstance.executor.scheduleAtFixedRate(
+                            new PollingJob(clearSessionId, controllerInstance, out, metricsPerNode), 0, 1, TimeUnit.SECONDS);
+
+                    in.onClose(new F.Callback0() {
+                        @Override
+                        public void invoke() throws Throwable {
+                            scheduledFuture.cancel(true);
+                            controllerInstance.executor.shutdown();
+                        }
+                    });
+
+                }
+            };
         }
     }
 }
