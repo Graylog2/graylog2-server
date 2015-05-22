@@ -217,7 +217,7 @@
                         @views.html.system.inputs.extractors.converters.csv(is_converter_enabled(Converter.Type.CSV), get_converter(Converter.Type.CSV))
                         @views.html.system.inputs.extractors.converters.lowercase(is_converter_enabled(Converter.Type.LOWERCASE))
                         @views.html.system.inputs.extractors.converters.uppercase(is_converter_enabled(Converter.Type.UPPERCASE))
-                        @views.html.system.inputs.extractors.converters.flexdate(is_converter_enabled(Converter.Type.FLEXDATE))
+                        @views.html.system.inputs.extractors.converters.flexdate(is_converter_enabled(Converter.Type.FLEXDATE), get_converter(Converter.Type.FLEXDATE))
                     </div>
                 </div>
             }
