@@ -23,6 +23,8 @@ var FieldStatisticsStore = {
     }),
     getFieldStatistics(field: string): JQueryPromise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
+        var searchInStream = SearchStore.searchInStream;
+        var streamId = searchInStream === undefined ? null : searchInStream.id;
 
         var url = jsRoutes.controllers.api.SearchApiController.fieldStats(
             originalSearchURLParams.get('q'),
@@ -31,7 +33,8 @@ var FieldStatisticsStore = {
             originalSearchURLParams.get('relative'),
             originalSearchURLParams.get('from'),
             originalSearchURLParams.get('to'),
-            originalSearchURLParams.get('keyword')
+            originalSearchURLParams.get('keyword'),
+            streamId
         ).url;
 
         var promise = $.getJSON(url);
