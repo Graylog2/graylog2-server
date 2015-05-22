@@ -234,4 +234,26 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
                 .put("in_grace", inGracePeriod(alertCondition))
                 .build();
     }
+
+    @Override
+    public List<Alert> listForStreamId(String streamId, int skip, int limit) {
+        QueryBuilder qb = QueryBuilder.start("stream_id").is(streamId);
+
+        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
+
+        final List<DBObject> alertObjects = query(AlertImpl.class,
+                qb.get(),
+                sort,
+                limit,
+                skip
+        );
+
+        List<Alert> alerts = Lists.newArrayList();
+
+        for (DBObject alertObj : alertObjects) {
+            alerts.add(new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap()));
+        }
+
+        return alerts;
+    }
 }

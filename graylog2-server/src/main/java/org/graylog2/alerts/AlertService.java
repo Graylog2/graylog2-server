@@ -50,4 +50,6 @@ public interface AlertService extends PersistedService {
     AlertCondition.CheckResult triggered(AlertCondition alertCondition);
 
     Map<String, Object> asMap(final AlertCondition alertCondition);
+
+    List<Alert> listForStreamId(String streamId, int skip, int limit);
 }

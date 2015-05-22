@@ -46,7 +46,6 @@ public class AlertImpl extends PersistedImpl implements Alert {
         super(id, fields);
     }
 
-    @Override
     public Map<String,Object> toMap() {
         Map<String, Object> map = Maps.newHashMap();
 
@@ -72,4 +71,28 @@ public class AlertImpl extends PersistedImpl implements Alert {
         return Collections.emptyMap();
     }
 
+    @Override
+    public String getStreamId() {
+        return (String) fields.get("stream_id");
+    }
+
+    @Override
+    public String getConditionId() {
+        return (String) fields.get("condition_id");
+    }
+
+    @Override
+    public DateTime getTriggeredAt() {
+        return (DateTime) fields.get("triggered_at");
+    }
+
+    @Override
+    public String getDescription() {
+        return (String) fields.get("description");
+    }
+
+    @Override
+    public Map<String, Object> getConditionParameters() {
+        return (Map<String, Object>) fields.get("condition_parameters");
+    }
 }
