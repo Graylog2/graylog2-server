@@ -38,7 +38,6 @@ var UserList = React.createClass({
 
         promise.done(() => {
             this.loadUsers();
-
         });
     },
     _deleteUserFunction(username) {

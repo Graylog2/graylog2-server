@@ -186,6 +186,7 @@ public class UsersController extends AuthenticatedController {
         if (!userService.create(request.toApiRequest())) {
             flash("error", "Could not create user due to an internal error.");
         }
+        flash("success", "User created successfully");
         return redirect(routes.UsersController.index());
     }
 
