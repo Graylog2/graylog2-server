@@ -41,13 +41,13 @@ public class FlexibleDateConverter extends Converter {
         if (timeZoneId instanceof String) {
             try {
                 final String timeZoneString = (String) timeZoneId;
-                final String zoneId = firstNonNull(emptyToNull(timeZoneString.trim()), "UTC");
+                final String zoneId = firstNonNull(emptyToNull(timeZoneString.trim()), "Etc/UTC");
                 return DateTimeZone.forID(zoneId);
             } catch (IllegalArgumentException e) {
-                return DateTimeZone.UTC;
+                return DateTimeZone.forID("Etc/UTC");
             }
         } else {
-            return DateTimeZone.UTC;
+            return DateTimeZone.forID("Etc/UTC");
         }
     }
 
