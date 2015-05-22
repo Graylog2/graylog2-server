@@ -134,6 +134,17 @@ public class MongoDbConfigurationTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void validateFailsIfUriAndReplicaSetAreMissing() throws RepositoryException, ValidationException {
+        MongoDbConfiguration configuration = new MongoDbConfiguration();
+        final ImmutableMap<String, String> config = ImmutableMap.of(
+                "mongodb_host", "",
+                "mongodb_replica_set", "",
+                "mongodb_database", "graylog"
+        );
+        new JadConfig(new InMemoryRepository(config), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
     public void validateFailsIfUriAndDatabaseAreMissing() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         final ImmutableMap<String, String> properties = ImmutableMap.of(
