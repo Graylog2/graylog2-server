@@ -20,6 +20,8 @@ import org.graylog2.Configuration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
@@ -45,6 +47,7 @@ public class AlertScannerThread extends Periodical {
     private final IndexerSetupService indexerSetupService;
     private final AlertService alertService;
     private final Configuration configuration;
+    private final AlarmCallbackHistoryService alarmCallbackHistoryService;
 
     @Inject
     public AlertScannerThread(final AlertService alertService,
@@ -53,7 +56,8 @@ public class AlertScannerThread extends Periodical {
                               final AlarmCallbackFactory alarmCallbackFactory,
                               final EmailAlarmCallback emailAlarmCallback,
                               final IndexerSetupService indexerSetupService,
-                              final Configuration configuration) {
+                              final Configuration configuration,
+                              final AlarmCallbackHistoryService alarmCallbackHistoryService) {
         this.alertService = alertService;
         this.streamService = streamService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
@@ -61,6 +65,7 @@ public class AlertScannerThread extends Periodical {
         this.emailAlarmCallback = emailAlarmCallback;
         this.indexerSetupService = indexerSetupService;
         this.configuration = configuration;
+        this.alarmCallbackHistoryService = alarmCallbackHistoryService;
     }
 
     @Override
@@ -102,10 +107,19 @@ public class AlertScannerThread extends Periodical {
                         if (callConfigurations.size() > 0)
                             for (AlarmCallbackConfiguration configuration : callConfigurations) {
                                 final AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
+                                AlarmCallbackHistory alarmCallbackHistory;
                                 try {
                                     alarmCallback.call(stream, result);
+                                    alarmCallbackHistory = alarmCallbackHistoryService.success(configuration, alert, alertCondition);
                                 } catch (Exception e) {
                                     LOG.warn("Alarm callback <" + alarmCallback.getName() + "> failed. Skipping.", e);
+                                    alarmCallbackHistory = alarmCallbackHistoryService.error(configuration, alert, alertCondition, e.toString());
+                                }
+
+                                try {
+                                    alarmCallbackHistoryService.save(alarmCallbackHistory);
+                                } catch (Exception e) {
+                                    LOG.warn("Unable to save history of alarm callback run: ", e);
                                 }
                             }
                         else {
