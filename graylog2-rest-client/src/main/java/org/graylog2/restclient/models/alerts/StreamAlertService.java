@@ -16,9 +16,13 @@
  */
 package org.graylog2.restclient.models.alerts;
 
+import org.graylog2.rest.models.streams.alerts.AlertListSummary;
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restroutes.generated.routes;
 
 import javax.inject.Inject;
+import java.io.IOException;
 
 public class StreamAlertService {
     private final ApiClient api;
@@ -26,5 +30,12 @@ public class StreamAlertService {
     @Inject
     public StreamAlertService(ApiClient api) {
         this.api = api;
+    }
+
+    public AlertListSummary listPaginated(String streamId, int skip, int limit) throws APIException, IOException {
+        return api.path(routes.StreamAlertResource().listPaginated(streamId), AlertListSummary.class)
+                .queryParam("skip", skip)
+                .queryParam("limit", limit)
+                .execute();
     }
 }
