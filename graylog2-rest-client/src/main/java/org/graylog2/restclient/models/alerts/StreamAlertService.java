@@ -19,7 +19,6 @@ package org.graylog2.restclient.models.alerts;
 import org.graylog2.rest.models.streams.alerts.AlertListSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restroutes.generated.routes;
 
 import javax.inject.Inject;
 import java.io.IOException;
