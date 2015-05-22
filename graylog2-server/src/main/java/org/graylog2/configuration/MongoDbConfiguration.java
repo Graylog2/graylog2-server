@@ -173,8 +173,8 @@ public class MongoDbConfiguration {
 
     @ValidatorMethod
     public void validate() throws ValidationException {
-        if ((isNullOrEmpty(getHost()) || isNullOrEmpty(getDatabase()) || getReplicaSet() == null) && isNullOrEmpty(getUri())) {
-            throw new ValidationException("Either mongodb_uri OR mongodb_host and mongodb_database must not be empty");
+        if ((isNullOrEmpty(getHost()) && (getReplicaSet() == null || getReplicaSet().isEmpty()) || isNullOrEmpty(getDatabase()) && isNullOrEmpty(getUri()))) {
+            throw new ValidationException("Either mongodb_uri OR mongodb_host/mongodb_replica_set and mongodb_database must not be empty");
         }
 
         if (isNullOrEmpty(getUri())) {
