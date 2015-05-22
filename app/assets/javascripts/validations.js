@@ -75,12 +75,19 @@ function dispatchRuleValidation($ref, validatorType) {
     return errors;
 }
 
-function validationFailure(el, msg) {
-    el.popover({
-        container: 'body',
+function validationFailure($el, msg) {
+    "use strict";
+    $el.popover({
         content: msg,
-        placement: 'auto'
-    }).popover("show");
+        placement: 'bottom',
+        trigger: 'manual'
+    });
+    $el.on('shown.bs.popover', function () {
+        window.setTimeout(function () {
+            $el.popover('destroy');
+        }, 3000);
+    });
+    $el.popover('show');
 }
 
 // Validators.
