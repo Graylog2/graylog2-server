@@ -173,11 +173,11 @@ public class MongoDbConfiguration {
 
     @ValidatorMethod
     public void validate() throws ValidationException {
-        if((isNullOrEmpty(getHost()) || isNullOrEmpty(getDatabase())) && isNullOrEmpty(getUri())) {
+        if ((isNullOrEmpty(getHost()) || isNullOrEmpty(getDatabase()) || getReplicaSet() == null) && isNullOrEmpty(getUri())) {
             throw new ValidationException("Either mongodb_uri OR mongodb_host and mongodb_database must not be empty");
         }
 
-        if(isNullOrEmpty(getUri())) {
+        if (isNullOrEmpty(getUri())) {
             LOG.info("You're using deprecated configuration options for MongoDB. Please use mongodb_uri.");
             LOG.info("Suggested value for mongodb_uri = {}", getMongoClientURI());
         }
