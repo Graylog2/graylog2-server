@@ -1,3 +1,5 @@
+/* global validate */
+
 'use strict';
 
 var React = require('react/addons');
@@ -70,15 +72,23 @@ var BootstrapModal = React.createClass({
         element.focus();
     },
     _submit(event) {
-        event.target.checkValidity();
-        this.props.onConfirm(event);
-        event.preventDefault();
+        var formDOMNode = React.findDOMNode(this.refs.form);
+
+        if (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) {
+            event.preventDefault();
+            return;
+        }
+
+        if (typeof this.props.onConfirm === 'function') {
+            event.preventDefault();
+            this.props.onConfirm(event);
+        }
     },
     render() {
         var confirmButton = null;
         var cancelButton = null;
 
-        if (this.props.confirm && this.props.onConfirm) {
+        if (this.props.confirm) {
             confirmButton = <button type="submit" className="btn btn-primary">{this.props.confirm}</button>;
         }
         if (this.props.cancel && this.props.onCancel) {
@@ -113,12 +123,12 @@ var BootstrapModal = React.createClass({
             </div>
         );
         var form = (
-            <form
-                onSubmit={this._submit}
-                className={this.props.formClass}
-                encType={this.props.encType}
-                method={this.props.method}
-                action={this.props.action}>
+            <form ref="form"
+                  onSubmit={this._submit}
+                  className={this.props.formClass}
+                  encType={this.props.encType}
+                  method={this.props.method}
+                  action={this.props.action}>
                 {formContent}
             </form>
         );

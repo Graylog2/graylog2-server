@@ -31,7 +31,6 @@ var BulkLoadPatternModal = React.createClass({
 
                 <BootstrapModal
                     ref="modal"
-                    onConfirm={this.uploadPatterns}
                     confirm="Upload"
                     onCancel={this._closeModal}
                     cancel="Cancel"
@@ -49,12 +48,7 @@ var BulkLoadPatternModal = React.createClass({
     },
     openModal() {
         this.refs.modal.open();
-    },
-    uploadPatterns(event) {
-        event.target.submit();
-        this._closeModal();
     }
-
 });
 
 module.exports = BulkLoadPatternModal;
