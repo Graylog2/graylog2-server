@@ -154,7 +154,6 @@ var QuickValuesVisualization = React.createClass({
             }
 
             if (this.pieChart !== undefined && this.pieChart.width() !== computedSize) {
-                console.log("resizing...");
                 this.pieChart
                     .width(computedSize)
                     .height(computedSize)
