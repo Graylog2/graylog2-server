@@ -198,16 +198,24 @@ var Widget = React.createClass({
         }
     },
     _getUrlQueryString() {
+        var rangeType = this.state.config['range_type'];
+
         var query = {
             q: this.state.config.query,
-            rangetype: this.state.config.range_type,
+            rangetype: rangeType,
             interval: this.state.config.interval
         };
-        if (this.state.config.range_type !== "absolute") {
-            query[this.state.config.range_type] = this.state.config.range;
-        } else {
-            query["from"] = this.state.config.from;
-            query["to"] = this.state.config.to;
+        switch(rangeType) {
+            case 'relative':
+                query[rangeType] = this.state.config.range;
+                break;
+            case 'absolute':
+                query["from"] = this.state.config.from;
+                query["to"] = this.state.config.to;
+                break;
+            case 'keyword':
+                query[rangeType] = this.state.config[rangeType];
+                break;
         }
 
         return Qs.stringify(query);
