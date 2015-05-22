@@ -322,7 +322,7 @@ public class KafkaTransport extends ThrottleableTransport {
             cr.addField(new TextField(
                     CK_ZOOKEEPER,
                     "ZooKeeper address",
-                    "192.168.1.1:2181",
+                    "127.0.0.1:2181",
                     "Host and port of the ZooKeeper that is managing your Kafka cluster.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 
