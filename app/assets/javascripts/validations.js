@@ -1,3 +1,54 @@
+$(document).ready(function () {
+    "use strict";
+
+    var $createUsernameField = $("form#create-user-form #username");
+    if ($createUsernameField.length > 0) {
+        var domElement = $createUsernameField[0];
+        delayedAjaxCallOnKeyup(domElement, function () {
+            var username = $createUsernameField.val();
+            $.ajax({
+                url: appPrefixed("/a/system/users/" + encodeURIComponent(username)),
+                type: "GET",
+                cache: false,
+                global: false,
+                statusCode: {
+                    204: function () {
+                        $createUsernameField.setCustomValidity('The entered user name is already taken.');
+                    },
+                    404: function () {
+                        $createUsernameField.setCustomValidity('');
+                    }
+                }
+            });
+        }, 150);
+    }
+
+    var $passwordField = $("form #password");
+    if ($passwordField.length > 0) {
+        $passwordField.on('keyup', function () {
+            var password = $passwordField.val();
+            if (password.length < 6) {
+                $passwordField.setCustomValidity("Password is too short!");
+            } else {
+                $passwordField.setCustomValidity('');
+            }
+        });
+    }
+
+    var $repeatPasswordField = $("form #password-repeat");
+    if ($repeatPasswordField.length) {
+        $repeatPasswordField.on('keyup', function () {
+            var $password = $("form #password").val();
+            if ($password == $repeatPasswordField.val()) {
+                $repeatPasswordField.setCustomValidity('');
+            } else {
+                $repeatPasswordField.setCustomValidity("Passwords do not match!");
+            }
+        });
+    }
+});
+
+
 function validate(formContainer) {
     var errors = false;
     $(".validatable", formContainer).each(function () {
