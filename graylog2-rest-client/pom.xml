@@ -5,7 +5,7 @@
         <maven>3.0.1</maven>
     </prerequisites>
     <properties>
-        <play.version>2.3.6</play.version>
+        <play.version>2.3.9</play.version>
     </properties>
 
     <parent>
