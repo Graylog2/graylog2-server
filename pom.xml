@@ -301,7 +301,7 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>syslog4j</artifactId>
-                <version>0.9.52</version>
+                <version>0.9.53</version>
             </dependency>
 
             <dependency>
