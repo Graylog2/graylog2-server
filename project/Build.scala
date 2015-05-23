@@ -25,12 +25,6 @@ object ApplicationBuild extends Build {
     "org.graylog2" % "play2-graylog2_2.10" % "1.2.1",
     "org.graylog2" % "graylog2-rest-client" % appVersion,
 
-    // TODO this is stupid, just to get that UriBuilder...
-    "javax.ws.rs" % "jsr311-api" % "1.1.1",
-    "com.sun.jersey" % "jersey-server" % "1.18.1",
-    "com.sun.jersey" % "jersey-grizzly2" % "1.18.1",
-    "com.sun.jersey" % "jersey-bundle" % "1.18.1",
-
     "com.github.fdimuccio" %% "play2-sockjs" % "0.3.1",
 
     "junit" % "junit" % "4.12" % "test",
