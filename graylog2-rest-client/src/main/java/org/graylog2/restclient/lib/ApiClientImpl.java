@@ -43,6 +43,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.client.listener.TransferCompletionHandler;
 import com.ning.http.client.listener.TransferListener;
+import com.squareup.okhttp.HttpUrl;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
@@ -56,13 +57,10 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -633,11 +631,10 @@ class ApiClientImpl implements ApiClient {
             final AsyncHttpClient.BoundRequestBuilder requestBuilder;
             final String userInfo = url.getUserInfo();
             // have to hack around here, because the userInfo will unescape the @ in usernames :(
-            try {
-                url = UriBuilder.fromUri(url.toURI()).userInfo(null).build().toURL();
-            } catch (URISyntaxException | MalformedURLException ignore) {
-                // cannot happen, because it was a valid url before
-            }
+            url = HttpUrl.get(url).newBuilder()
+                    .encodedUsername("")
+                    .encodedPassword("")
+                    .build().url();
 
             switch (method) {
                 case GET:
@@ -691,7 +688,6 @@ class ApiClientImpl implements ApiClient {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 
-            URI builtUrl;
             try {
                 String path;
                 if (pathParams.isEmpty()) {
@@ -699,16 +695,11 @@ class ApiClientImpl implements ApiClient {
                 } else {
                     path = MessageFormat.format(pathTemplate, pathParams.toArray());
                 }
-                final UriBuilder uriBuilder = UriBuilder.fromUri(target.getTransportAddress());
-                uriBuilder.path(path);
+                HttpUrl.Builder uriBuilder = HttpUrl.parse(target.getTransportAddress()).newBuilder()
+                        .encodedPath(path);
                 for (String key : queryParams.keySet()) {
                     for (String value : queryParams.get(key)) {
-                        // Jersey's UriBuilderImpl doesn't encode double quotes, which is correct per RFC 3986
-                        // (http://tools.ietf.org/html/rfc3986#section-3.4), but causes problems down the stack,
-                        // see https://github.com/Graylog2/graylog2-server/issues/793
-                        // So we fall back manually encoding double quotes right now because URLEncoder.encode does
-                        // too much and we'd end up with partially double encoded URIs. F... my life.
-                        uriBuilder.queryParam(key, value.replace("\"", "%22"));
+                        uriBuilder.addQueryParameter(key, value);
                     }
                 }
 
@@ -717,13 +708,14 @@ class ApiClientImpl implements ApiClient {
                 }
                 if (sessionId != null) {
                     // pass the current session id via basic auth and special "password"
-                    uriBuilder.userInfo(sessionId + ":session");
+                    uriBuilder
+                            .username(sessionId)
+                            .password("session");
                 }
-                builtUrl = uriBuilder.build();
-                return builtUrl.toURL();
-            } catch (MalformedURLException e) {
+                return uriBuilder.build().url();
+            } catch (RuntimeException e) {
                 LOG.error("Could not build target URL", e);
-                throw new RuntimeException(e);
+                throw e;
             }
         }
 
