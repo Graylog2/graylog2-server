@@ -200,20 +200,29 @@ public class ToolsTest {
 
     @Test
     public void testGetInt() throws Exception {
-        assertEquals(null, Tools.getInt(null));
+        assertEquals(null, Tools.getDouble(null));
+        assertEquals(null, Tools.getDouble(""));
 
-        assertEquals((Integer) 0, Tools.getInt(0));
-        assertEquals((Integer) 1, Tools.getInt(1));
-        assertEquals((Integer) 9001, Tools.getInt(9001));
+        assertEquals(0.0, Tools.getDouble(0), 0);
+        assertEquals(1.0, Tools.getDouble(1), 0);
+        assertEquals(1.42, Tools.getDouble(1.42), 0);
+        assertEquals(9001.0, Tools.getDouble(9001), 0);
+        assertEquals(9001.23, Tools.getDouble(9001.23), 0);
 
-        assertEquals((Integer) 1253453, Tools.getInt((long) 1253453));
-        assertEquals(null, Tools.getInt((double) 5));
-        assertEquals(null, Tools.getInt(18.2));
+        assertEquals(1253453.0, Tools.getDouble((long) 1253453), 0);
 
-        assertEquals((Integer) 88, Tools.getInt("88"));
-        assertEquals(null, Tools.getInt("lol NOT A NUMBER"));
+        assertEquals(88.0, Tools.getDouble("88"), 0);
+        assertEquals(1.42, Tools.getDouble("1.42"), 0);
+        assertEquals(null, Tools.getDouble("lol NOT A NUMBER"));
 
-        assertEquals(null, Tools.getInt(new HashMap<String, String>()));
+        assertEquals(null, Tools.getDouble(new HashMap<String, String>()));
+
+        assertEquals(42.23, Tools.getDouble(new Object() {
+            @Override
+            public String toString() {
+                return "42.23";
+            }
+        }), 0);
     }
 
     @Test
