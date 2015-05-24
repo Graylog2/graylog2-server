@@ -16,9 +16,10 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Tools;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -38,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class GelfChunkAggregator implements CodecAggregator {
     private static final Logger log = LoggerFactory.getLogger(GelfChunkAggregator.class);
 
@@ -46,12 +50,29 @@ public class GelfChunkAggregator implements CodecAggregator {
     public static final int VALIDITY_PERIOD = 5000; // millis
     private static final long CHECK_PERIOD = 1000;
 
+    public static final String CHUNK_COUNTER = name(GelfChunkAggregator.class, "total-chunks");
+    public static final String WAITING_MESSAGES = name(GelfChunkAggregator.class, "waiting-messages");
+    public static final String COMPLETE_MESSAGES = name(GelfChunkAggregator.class, "complete-messages");
+    public static final String EXPIRED_MESSAGES = name(GelfChunkAggregator.class, "expired-messages");
+    public static final String EXPIRED_CHUNKS = name(GelfChunkAggregator.class, "expired-chunks");
+
     private final ConcurrentMap<String, ChunkEntry> chunks = Maps.newConcurrentMap();
     private final ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet<>();
+    private final Counter chunkCounter;
+    private final Counter waitingMessages;
+    private final Counter expiredMessages;
+    private final Counter expiredChunks;
+    private final Counter completeMessages;
 
     @Inject
-    public GelfChunkAggregator(@Named("daemonScheduler") ScheduledExecutorService scheduler) {
+    public GelfChunkAggregator(@Named("daemonScheduler") ScheduledExecutorService scheduler, MetricRegistry metricRegistry) {
         scheduler.scheduleAtFixedRate(new ChunkEvictionTask(), VALIDITY_PERIOD, CHECK_PERIOD, TimeUnit.MILLISECONDS);
+        chunkCounter = metricRegistry.counter(CHUNK_COUNTER);
+        // this is a counter instead of a Gauge, because calling sortedEvictionSet.size() is expensive
+        waitingMessages = metricRegistry.counter(WAITING_MESSAGES);
+        completeMessages = metricRegistry.counter(COMPLETE_MESSAGES);
+        expiredMessages = metricRegistry.counter(EXPIRED_MESSAGES);
+        expiredChunks = metricRegistry.counter(EXPIRED_CHUNKS);
     }
 
     @Nonnull
@@ -66,6 +87,7 @@ public class GelfChunkAggregator implements CodecAggregator {
         switch (msg.getGELFType()) {
             case CHUNKED:
                 try {
+                    chunkCounter.inc();
                     aggregatedBuffer = checkForCompletion(msg);
                     if (aggregatedBuffer == null) {
                         return VALID_EMPTY_RESULT;
@@ -109,6 +131,7 @@ public class GelfChunkAggregator implements CodecAggregator {
         final ChunkEntry existing = chunks.putIfAbsent(messageId, entry);
         if (existing == null) {
             // add this chunk entry to the eviction set
+            waitingMessages.inc();
             sortedEvictionSet.add(entry);
         } else {
             // the entry is already in the eviction set and chunk map
@@ -130,6 +153,7 @@ public class GelfChunkAggregator implements CodecAggregator {
                 allChunks[i] = messageChunk.getData();
 
             }
+            completeMessages.inc();
             return ChannelBuffers.wrappedBuffer(allChunks);
         }
 
@@ -137,9 +161,15 @@ public class GelfChunkAggregator implements CodecAggregator {
         if (isOutdated(entry)) {
             // chunks are outdated, the oldest came in over 5 seconds ago, clean them all up
             log.debug("Not all chunks of <{}> arrived within {}ms. Dropping chunks.", messageId, VALIDITY_PERIOD);
-            getAndCleanupEntry(messageId);
+            expireEntry(messageId);
         }
         return null;
+    }
+
+    private void expireEntry(String messageId) {
+        final ChunkEntry cleanupEntry = getAndCleanupEntry(messageId);
+        expiredMessages.inc();
+        expiredChunks.inc(cleanupEntry.chunkSlotsWritten.get());
     }
 
     private boolean isOutdated(ChunkEntry entry) {
@@ -149,6 +179,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     private ChunkEntry getAndCleanupEntry(String id) {
         final ChunkEntry entry = chunks.remove(id);
         sortedEvictionSet.remove(entry);
+        waitingMessages.dec();
         return entry;
     }
 
@@ -221,7 +252,7 @@ public class GelfChunkAggregator implements CodecAggregator {
                 while (true) {
                     final ChunkEntry oldestChunkEntry = sortedEvictionSet.first();
                     if (isOutdated(oldestChunkEntry)) {
-                        getAndCleanupEntry(oldestChunkEntry.id);
+                        expireEntry(oldestChunkEntry.id);
                     } else {
                         log.debug("No more outdated chunk entries found to evict, leaving cleanup loop.");
                         break;
