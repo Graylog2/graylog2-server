@@ -45,8 +45,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         STATS_COUNT
     }
 
-    public static final int DEFAULT_CACHE_TIME = 10;
-
     private final MetricRegistry metricRegistry;
     private final Type type;
     private final String id;
@@ -56,14 +54,14 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     private String description;
     private Supplier<ComputationResult> cachedResult;
 
-    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
         this.metricRegistry = metricRegistry;
         this.type = type;
         this.id = id;
         this.config = config;
         this.creatorUserId = creatorUserId;
         this.description = description;
-        this.cacheTime = cacheTimeS < 1 ? DEFAULT_CACHE_TIME : cacheTimeS;
+        this.cacheTime = cacheTime.getCacheTime();
         this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
     }
 

@@ -41,7 +41,7 @@ public class FieldChartWidget extends DashboardWidget {
     private final Map<String, Object> config;
     private final Searches searches;
 
-    public FieldChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+    public FieldChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
         super(metricRegistry, Type.FIELD_CHART, id, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 

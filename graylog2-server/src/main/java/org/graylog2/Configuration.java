@@ -130,6 +130,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "collector_inactive_threshold", validator = PositiveIntegerValidator.class)
     private Duration collectorInactiveThreshold = Duration.minutes(1);
 
+    @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveIntegerValidator.class)
+    private int dashboardWidgetDefaultCacheTime = 10;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -261,5 +264,9 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getCollectorInactiveThreshold() {
         return collectorInactiveThreshold;
+    }
+
+    public int getDashboardWidgetDefaultCacheTime() {
+        return dashboardWidgetDefaultCacheTime;
     }
 }

@@ -39,10 +39,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DashboardWidgetCreator {
     private final MetricRegistry metricRegistry;
+    private final WidgetCacheTime.Factory cacheTimeFactory;
 
     @Inject
-    public DashboardWidgetCreator(MetricRegistry metricRegistry) {
+    public DashboardWidgetCreator(MetricRegistry metricRegistry, WidgetCacheTime.Factory cacheTimeFactory) {
         this.metricRegistry = metricRegistry;
+        this.cacheTimeFactory = cacheTimeFactory;
     }
 
     public DashboardWidget fromRequest(Searches searches, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
@@ -132,11 +134,14 @@ public class DashboardWidgetCreator {
             final Searches searches,
             final String widgetId,
             final String description,
-            final int cacheTime,
+            final int requestedCacheTime,
             final Map<String, Object> config,
             final String query,
             final TimeRange timeRange,
             final String creatorUserId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
+
+        final WidgetCacheTime cacheTime = cacheTimeFactory.create(requestedCacheTime);
+
         switch (type) {
             case SEARCH_RESULT_COUNT:
                 return new SearchResultCountWidget(metricRegistry, searches,

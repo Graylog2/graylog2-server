@@ -36,7 +36,7 @@ public class SearchResultChartWidget extends DashboardWidget {
     private final String streamId;
     private final Searches searches;
 
-    public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+    public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, Type.SEARCH_RESULT_CHART, id, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 

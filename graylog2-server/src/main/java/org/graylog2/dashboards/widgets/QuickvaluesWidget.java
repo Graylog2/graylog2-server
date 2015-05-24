@@ -45,7 +45,7 @@ public class QuickvaluesWidget extends DashboardWidget {
     private final Boolean showPieChart;
     private final Boolean showDataTable;
 
-    public QuickvaluesWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+    public QuickvaluesWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
         super(metricRegistry, Type.QUICKVALUES, id, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 
