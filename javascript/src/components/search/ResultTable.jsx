@@ -58,8 +58,12 @@ var ResultTable = React.createClass({
         return {};
     },
     expandAll() {
+        // If more than 30% of the messages are being expanded, show a loading indicator
+        var expandedChangeRatio = (this.props.messages.length - this.state.expandedMessages.size) / 100;
+        var renderLoadingIndicator = expandedChangeRatio > 0.3;
+
         var newSet = Immutable.Set(this.props.messages.map((message) => message.id));
-        this.setState({expandedMessages: newSet, expandingAll: true});
+        this.setState({expandedMessages: newSet, expandingAll: renderLoadingIndicator});
     },
     collapseAll() {
         this.setState({expandedMessages: Immutable.Set()});
