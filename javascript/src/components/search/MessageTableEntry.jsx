@@ -77,7 +77,8 @@ var MessageTableEntry = React.createClass({
                 <td colSpan={colSpanFixup}>
                     <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
                                    allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
-                                   nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}/>
+                                   nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
+                                   expandingAll={this.props.expandingAll}/>
                 </td>
             </tr>
             }

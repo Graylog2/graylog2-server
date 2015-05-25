@@ -15,7 +15,8 @@ var ResultTable = React.createClass({
         return {
             expandedMessages: Immutable.Set(),
             allStreamsLoaded: false,
-            allStreams: Immutable.List()
+            allStreams: Immutable.List(),
+            expandingAll: false
         };
     },
     componentDidMount() {
@@ -25,6 +26,13 @@ var ResultTable = React.createClass({
         }
         var promise = StreamsStore.listStreams();
         promise.done((streams) => this._onStreamsLoaded(streams));
+    },
+    componentDidUpdate(oldProps, oldState) {
+        if (this.state.expandingAll) {
+            // This may take some time, so we ensure we display a loading indicator in the page
+            // while all messages are being expanded
+            setTimeout(() => this.setState({expandingAll: false}), 1000 / 60);
+        }
     },
     _onStreamsLoaded(streams) {
         this.setState({allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title)});
@@ -51,7 +59,7 @@ var ResultTable = React.createClass({
     },
     expandAll() {
         var newSet = Immutable.Set(this.props.messages.map((message) => message.id));
-        this.setState({expandedMessages: newSet});
+        this.setState({expandedMessages: newSet, expandingAll: true});
     },
     collapseAll() {
         this.setState({expandedMessages: Immutable.Set()});
@@ -127,6 +135,7 @@ var ResultTable = React.createClass({
                                                                               allStreamsLoaded={this.state.allStreamsLoaded}
                                                                               nodes={this.props.nodes}
                                                                               highlight={this.props.highlight}
+                                                                              expandingAll={this.state.expandingAll}
                         />) }
                 </table>
             </div>

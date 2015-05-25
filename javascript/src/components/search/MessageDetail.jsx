@@ -17,6 +17,7 @@ var Immutable = require('immutable');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamLink = require('../streams/StreamLink');
 var MessageFields = require('./MessageFields');
+var Spinner = require('../common/Spinner');
 
 var MessageDetail = React.createClass({
     getInitialState() {
@@ -71,6 +72,17 @@ var MessageDetail = React.createClass({
         return this.formattedTimestamp;
     },
     render() {
+        // Short circuit when all messages are being expanded at the same time
+        if (this.props.expandingAll) {
+            return (
+                <Row>
+                    <Col md={12}>
+                        <Spinner/>
+                    </Col>
+                </Row>
+            );
+        }
+
         var messageUrl = jsRoutes.controllers.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
 
         var streamList = null;
