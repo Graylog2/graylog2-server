@@ -1,15 +1,12 @@
 /* global momentHelper */
-/* jshint -W079 */
 
 'use strict';
 
 var React = require('react');
-var moment = require('moment');
 var MessageDetail = require('./MessageDetail');
 var Immutable = require('immutable');
 
 var MessageTableEntry = React.createClass({
-
     possiblyHighlight(fieldName) {
         var origValue = this.props.message.fields[fieldName];
         if (origValue === undefined) {
@@ -43,9 +40,15 @@ var MessageTableEntry = React.createClass({
             return String(origValue);
         }
     },
+    _getFormattedTime() {
+        if (this.formattedTime === undefined) {
+            this.formattedTime = momentHelper.toUserTimeZone(this.props.message.fields['timestamp']).format('YYYY-MM-DD HH:mm:ss.SSS');
+        }
+
+        return this.formattedTime;
+    },
     render() {
         var colSpanFixup = this.props.selectedFields.size + 1;
-        var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format('YYYY-MM-DD HH:mm:ss.SSS');
 
         var classes = "message-group";
         if (this.props.expanded) {
@@ -55,7 +58,7 @@ var MessageTableEntry = React.createClass({
             <tbody className={classes}>
             <tr className="fields-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
                 <td><strong>
-                    <time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time>
+                    <time dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time>
                 </strong></td>
                 { this.props.selectedFields.map(selectedFieldName => <td
                     key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }
