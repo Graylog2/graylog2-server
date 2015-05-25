@@ -47,6 +47,9 @@ var MessageTableEntry = React.createClass({
 
         return this.formattedTime;
     },
+    _toggleDetail() {
+        this.props.toggleDetail(this.props.message.id);
+    },
     render() {
         var colSpanFixup = this.props.selectedFields.size + 1;
 
@@ -56,7 +59,7 @@ var MessageTableEntry = React.createClass({
         }
         return (
             <tbody className={classes}>
-            <tr className="fields-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
+            <tr className="fields-row" onClick={this._toggleDetail}>
                 <td><strong>
                     <time dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time>
                 </strong></td>
@@ -65,7 +68,7 @@ var MessageTableEntry = React.createClass({
             </tr>
 
             {this.props.showMessageRow &&
-            <tr className="message-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
+            <tr className="message-row" onClick={this._toggleDetail}>
                 <td colSpan={colSpanFixup}>{this.possiblyHighlight('message')}</td>
             </tr>
             }
