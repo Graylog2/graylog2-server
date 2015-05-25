@@ -7,6 +7,24 @@ var MessageDetail = require('./MessageDetail');
 var Immutable = require('immutable');
 
 var MessageTableEntry = React.createClass({
+    shouldComponentUpdate(newProps, newState) {
+        if (this.props.highlight !== newProps.highlight) {
+            return true;
+        }
+        if (!Immutable.is(this.props.selectedFields, newProps.selectedFields)) {
+            return true;
+        }
+        if (this.props.expanded !== newProps.expanded) {
+            return true;
+        }
+        if (this.props.expandingAll !== newProps.expandingAll) {
+            return true;
+        }
+        if (this.props.allStreamsLoaded !== newProps.allStreamsLoaded) {
+            return true;
+        }
+        return false;
+    },
     possiblyHighlight(fieldName) {
         var origValue = this.props.message.fields[fieldName];
         if (origValue === undefined) {
