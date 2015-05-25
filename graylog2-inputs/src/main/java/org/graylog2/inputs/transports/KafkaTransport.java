@@ -29,6 +29,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
+import kafka.consumer.ConsumerTimeoutException;
 import kafka.consumer.KafkaStream;
 import kafka.consumer.TopicFilter;
 import kafka.consumer.Whitelist;
@@ -181,6 +182,8 @@ public class KafkaTransport extends ThrottleableTransport {
         // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
+        // Set a consumer timeout to avoid blocking on the consumer iterator.
+        props.put("consumer.timeout.ms", "1000");
 
         final int numThreads = configuration.getInt(CK_THREADS);
         final ConsumerConfig consumerConfig = new ConsumerConfig(props);
@@ -200,37 +203,49 @@ public class KafkaTransport extends ThrottleableTransport {
             executor.submit(new Runnable() {
                 public void run() {
                     final ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
+                    boolean retry;
 
-                    // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
-                    //noinspection WhileLoopReplaceableByForEach
-                    while (consumerIterator.hasNext()) {
-                        if (paused) {
-                            // we try not to spin here, so we wait until the lifecycle goes back to running.
-                            LOG.debug(
-                                    "Message processing is paused, blocking until message processing is turned back on.");
-                            Uninterruptibles.awaitUninterruptibly(pausedLatch);
+                    do {
+                        retry = false;
+
+                        try {
+                            // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
+                            // noinspection WhileLoopReplaceableByForEach
+                            while (consumerIterator.hasNext()) {
+                                if (paused) {
+                                    // we try not to spin here, so we wait until the lifecycle goes back to running.
+                                    LOG.debug(
+                                            "Message processing is paused, blocking until message processing is turned back on.");
+                                    Uninterruptibles.awaitUninterruptibly(pausedLatch);
+                                }
+                                // check for being stopped before actually getting the message, otherwise we could end up losing that message
+                                if (stopped) {
+                                    break;
+                                }
+                                if (isThrottled()) {
+                                    blockUntilUnthrottled();
+                                }
+
+                                // process the message, this will immediately mark the message as having been processed. this gets tricky
+                                // if we get an exception about processing it down below.
+                                final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
+
+                                final byte[] bytes = message.message();
+                                totalBytesRead.addAndGet(bytes.length);
+                                lastSecBytesReadTmp.addAndGet(bytes.length);
+
+                                final RawMessage rawMessage = new RawMessage(bytes);
+
+                                // TODO implement throttling
+                                input.processRawMessage(rawMessage);
+                            }
+                        } catch (ConsumerTimeoutException e) {
+                            // Happens when there is nothing to consume, retry to check again.
+                            retry = true;
+                        } catch (Exception e) {
+                            LOG.error("Kafka consumer error, stopping consumer thread.", e);
                         }
-                        // check for being stopped before actually getting the message, otherwise we could end up losing that message
-                        if (stopped) {
-                            break;
-                        }
-                        if (isThrottled()) {
-                            blockUntilUnthrottled();
-                        }
-
-                        // process the message, this will immediately mark the message as having been processed. this gets tricky
-                        // if we get an exception about processing it down below.
-                        final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
-
-                        final byte[] bytes = message.message();
-                        totalBytesRead.addAndGet(bytes.length);
-                        lastSecBytesReadTmp.addAndGet(bytes.length);
-
-                        final RawMessage rawMessage = new RawMessage(bytes);
-
-                        // TODO implement throttling
-                        input.processRawMessage(rawMessage);
-                    }
+                    } while (retry && !stopped);
                     // explicitly commit our offsets when stopping.
                     // this might trigger a couple of times, but it won't hurt
                     cc.commitOffsets();
@@ -307,7 +322,7 @@ public class KafkaTransport extends ThrottleableTransport {
             cr.addField(new TextField(
                     CK_ZOOKEEPER,
                     "ZooKeeper address",
-                    "192.168.1.1:2181",
+                    "127.0.0.1:2181",
                     "Host and port of the ZooKeeper that is managing your Kafka cluster.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 

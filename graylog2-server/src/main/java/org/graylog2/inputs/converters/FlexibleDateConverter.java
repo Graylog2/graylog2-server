@@ -24,12 +24,31 @@ import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.emptyToNull;
 
 public class FlexibleDateConverter extends Converter {
+    private final DateTimeZone timeZone;
 
     public FlexibleDateConverter(Map<String, Object> config) {
         super(Type.FLEXDATE, config);
+
+        this.timeZone = buildTimeZone(config.get("time_zone"));
+    }
+
+    private static DateTimeZone buildTimeZone(Object timeZoneId) {
+        if (timeZoneId instanceof String) {
+            try {
+                final String timeZoneString = (String) timeZoneId;
+                final String zoneId = firstNonNull(emptyToNull(timeZoneString.trim()), "UTC");
+                return DateTimeZone.forID(zoneId);
+            } catch (IllegalArgumentException e) {
+                return DateTimeZone.UTC;
+            }
+        } else {
+            return DateTimeZone.UTC;
+        }
     }
 
     @Override
@@ -38,20 +57,18 @@ public class FlexibleDateConverter extends Converter {
             return null;
         }
 
-        // Parser is using local timezone with no constructor parameter passed.
-        Parser parser = new Parser(TimeZone.getTimeZone("UTC"));
-        List<DateGroup> r = parser.parse(value);
+        final Parser parser = new Parser(timeZone.toTimeZone());
+        final List<DateGroup> r = parser.parse(value);
 
         if (r.isEmpty() || r.get(0).getDates().isEmpty()) {
             return null;
         }
 
-        return new DateTime(r.get(0).getDates().get(0), DateTimeZone.UTC);
+        return new DateTime(r.get(0).getDates().get(0), timeZone);
     }
 
     @Override
     public boolean buildsMultipleFields() {
         return false;
     }
-
 }
