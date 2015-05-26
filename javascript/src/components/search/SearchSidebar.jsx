@@ -193,7 +193,7 @@ var SearchSidebar = React.createClass({
                     </h2>
 
                     <p style={{marginTop: 3}}>
-                        Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong>
+                        Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong>&nbsp;
                         in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
                         <ModalTrigger modal={indicesModal}>
                             <a href="#" onClick={event => event.preventDefault()}>
