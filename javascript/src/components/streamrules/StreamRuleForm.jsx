@@ -6,7 +6,7 @@ var Input = require('react-bootstrap').Input;
 var Bubble = require('../support/Bubble');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 var Col = require('react-bootstrap').Col;
-var TypeAheadFieldInput = require('./TypeAheadFieldInput');
+var TypeAheadFieldInput = require('../common/TypeAheadFieldInput');
 
 var StreamRuleForm = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
