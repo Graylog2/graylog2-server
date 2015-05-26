@@ -12,23 +12,26 @@ var InputIOMetrics = React.createClass({
         return {
             initialized: false,
             hasError: false,
+            global: this._newMetricState()
+        };
+    },
 
+    _prefix: function (metric) {
+        return this.props.metricsPrefix + '.' + this.props.inputId + '.' + metric;
+    },
+
+    _newMetricState: function () {
+        return {
             incomingMessages: 0,
-
             hasConnectionMetrics: false,
             open_connections: 0,
             total_connections: 0,
-
             hasNetworkMetrics: false,
             written_bytes_1sec: 0,
             written_bytes_total: 0,
             read_bytes_1sec: 0,
             read_bytes_total: 0
         };
-    },
-
-    _prefix: function (metric) {
-        return this.props.metricsPrefix + '.' + this.props.inputId + '.' + metric;
     },
 
     componentWillMount() {
@@ -51,28 +54,19 @@ var InputIOMetrics = React.createClass({
                     return;
                 }
 
-                var newState = {
-                    hasError: false,
-                    initialized: true,
-                    incomingMessages: 0,
-                    open_connections: 0,
-                    total_connections: 0,
-                    written_bytes_1sec: 0,
-                    written_bytes_total: 0,
-                    read_bytes_1sec: 0,
-                    read_bytes_total: 0
-                };
+                var newState = this.getInitialState();
+                newState.initialized = true;
 
                 if (this.props.nodeId) {
                     // input on a single node, don't need to aggregate the updated metrics
                     update[0].values.forEach((namedMetric) => {
-                        this._processNodeUpdate(namedMetric, newState);
+                        this._processNodeUpdate(namedMetric, newState.global);
                     });
                 } else {
                     // this is a global input, we need to aggregate the values for all nodes that are being returned
                     update.forEach((perNode) => {
                         perNode.values.forEach((namedMetric) => {
-                            this._processNodeUpdate(namedMetric, newState);
+                            this._processNodeUpdate(namedMetric, newState.global);
                         });
                     });
                 }
@@ -108,6 +102,54 @@ var InputIOMetrics = React.createClass({
         }
     },
 
+    _renderNetworkMetrics(nodeState) {
+        if (nodeState === null) {
+            return null;
+        }
+
+        // ugh, is there a way of not doing it globally?
+        numeral.zeroFormat('0B');
+
+        var network = (
+            <span className="input-io">
+                    <span>Network IO: </span>
+                    <span className="persec">
+                        <i className="fa fa-caret-down channel-direction channel-direction-down"></i>
+                        <span className="rx value">{numeral(nodeState.read_bytes_1sec).format("0.0b")} </span>
+
+                        <i className="fa fa-caret-up channel-direction channel-direction-up"></i>
+                        <span className="tx value">{numeral(nodeState.written_bytes_1sec).format("0.0b")}</span>
+                    </span>
+
+                    <span className="total">
+                        <span> (total: </span>
+                        <i className="fa fa-caret-down channel-direction channel-direction-down"></i>
+                        <span className="rx value">{numeral(nodeState.read_bytes_total).format("0.0b")} </span>
+
+                        <i className="fa fa-caret-up channel-direction channel-direction-up"></i>
+                        <span className="tx value">{numeral(nodeState.written_bytes_total).format("0.0b")}</span>
+                        <span> )</span>
+                    </span>
+                </span>
+        );
+        // wow this sucks
+        numeral.zeroFormat(null);
+
+        return network;
+    },
+
+    _renderConnectionMetrics(nodeState) {
+        if (nodeState === null) {
+            return null;
+        }
+
+        return (
+            <span>Active connections: <span className="active">{numeral(nodeState.open_connections).format("0,0")} </span>
+                    (<span className="total">{numeral(nodeState.open_connections).format("0,0")}</span> total)
+            </span>
+        );
+    },
+
     render() {
         if (this.state.hasError) {
             return (<span>Input metrics unavailable</span>);
@@ -118,46 +160,17 @@ var InputIOMetrics = React.createClass({
         }
 
         var network = null;
-        if (this.state.hasNetworkMetrics) {
-            // ugh, is there a way of not doing it globally?
-            numeral.zeroFormat('0B');
-            network = (
-                <span className="input-io">
-                    <span>Network IO: </span>
-                    <span className="persec">
-                        <i className="fa fa-caret-down channel-direction channel-direction-down"></i>
-                        <span className="rx value">{numeral(this.state.read_bytes_1sec).format("0.0b")} </span>
-
-                        <i className="fa fa-caret-up channel-direction channel-direction-up"></i>
-                        <span className="tx value">{numeral(this.state.written_bytes_1sec).format("0.0b")}</span>
-                    </span>
-
-                    <span className="total">
-                        <span> (total: </span>
-                        <i className="fa fa-caret-down channel-direction channel-direction-down"></i>
-                        <span className="rx value">{numeral(this.state.read_bytes_total).format("0.0b")} </span>
-
-                        <i className="fa fa-caret-up channel-direction channel-direction-up"></i>
-                        <span className="tx value">{numeral(this.state.written_bytes_total).format("0.0b")}</span>
-                        <span> )</span>
-                    </span>
-                </span>
-            );
-            // wow this sucks
-            numeral.zeroFormat(null);
+        if (this.state.global.hasNetworkMetrics) {
+            network = this._renderNetworkMetrics(this.state.global);
         }
 
         var connections = null;
-        if (this.state.hasConnectionMetrics) {
-            connections = (
-                <span>Active connections: <span className="active">{numeral(this.state.open_connections).format("0,0")} </span>
-                    (<span className="total">{numeral(this.state.open_connections).format("0,0")}</span> total)
-                </span>
-            );
+        if (this.state.global.hasConnectionMetrics) {
+            connections = this._renderConnectionMetrics(this.state.global);
         }
 
         var messages = (<span>
-            1 minute average rate: {numeral(this.state.incomingMessages).format('0,0')} msg/s
+            1 minute average rate: {numeral(this.state.global.incomingMessages).format('0,0')} msg/s
         </span>);
 
         return (<span>
