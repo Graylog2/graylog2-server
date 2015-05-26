@@ -17,6 +17,7 @@
 
 package org.graylog2.dashboards.widgets;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,12 +26,12 @@ public class WidgetCacheTimeTest {
 
     @Test
     public void test() throws Exception {
-        assertEquals(10, getCacheTime(10, 0));
-        assertEquals(1, getCacheTime(10, 1));
-        assertEquals(2, getCacheTime(10, 2));
+        assertEquals(10, getCacheTime(Duration.seconds(10), 0));
+        assertEquals(1, getCacheTime(Duration.seconds(10), 1));
+        assertEquals(2, getCacheTime(Duration.seconds(10), 2));
     }
 
-    private int getCacheTime(int defaultCacheTime, int cacheTime) {
+    private int getCacheTime(Duration defaultCacheTime, int cacheTime) {
         return new WidgetCacheTime(defaultCacheTime, cacheTime).getCacheTime();
     }
 }

@@ -18,6 +18,7 @@ package org.graylog2;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.graylog2.plugin.BaseConfiguration;
@@ -130,8 +131,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "collector_inactive_threshold", validator = PositiveIntegerValidator.class)
     private Duration collectorInactiveThreshold = Duration.minutes(1);
 
-    @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveIntegerValidator.class)
-    private int dashboardWidgetDefaultCacheTime = 10;
+    @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
+    private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10l);
 
     public boolean isMaster() {
         return isMaster;
@@ -266,7 +267,7 @@ public class Configuration extends BaseConfiguration {
         return collectorInactiveThreshold;
     }
 
-    public int getDashboardWidgetDefaultCacheTime() {
+    public Duration getDashboardWidgetDefaultCacheTime() {
         return dashboardWidgetDefaultCacheTime;
     }
 }
