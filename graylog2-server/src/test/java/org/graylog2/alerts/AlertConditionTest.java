@@ -38,7 +38,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
     protected Stream stream;
@@ -86,7 +90,7 @@ public abstract class AlertConditionTest {
         assertNotNull("Timestamp of returned check result should not be null!", result.getTriggeredAt());
         assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
         long difference = Tools.iso8601().getMillis() - result.getTriggeredAt().getMillis();
-        assertTrue("AlertCondition should be triggered about now", difference < 50);
+        assertTrue("AlertCondition should be triggered about now", difference < 1000);
         assertFalse("Alert was triggered, so we should not be in grace period!", alertService.inGracePeriod(alertCondition));
     }
 
