@@ -1,15 +1,30 @@
 /* global momentHelper */
-/* jshint -W079 */
 
 'use strict';
 
 var React = require('react');
-var moment = require('moment');
 var MessageDetail = require('./MessageDetail');
 var Immutable = require('immutable');
 
 var MessageTableEntry = React.createClass({
-
+    shouldComponentUpdate(newProps, newState) {
+        if (this.props.highlight !== newProps.highlight) {
+            return true;
+        }
+        if (!Immutable.is(this.props.selectedFields, newProps.selectedFields)) {
+            return true;
+        }
+        if (this.props.expanded !== newProps.expanded) {
+            return true;
+        }
+        if (this.props.expandAllRenderAsync !== newProps.expandAllRenderAsync) {
+            return true;
+        }
+        if (this.props.allStreamsLoaded !== newProps.allStreamsLoaded) {
+            return true;
+        }
+        return false;
+    },
     possiblyHighlight(fieldName) {
         var origValue = this.props.message.fields[fieldName];
         if (origValue === undefined) {
@@ -43,9 +58,18 @@ var MessageTableEntry = React.createClass({
             return String(origValue);
         }
     },
+    _getFormattedTime() {
+        if (this.formattedTime === undefined) {
+            this.formattedTime = momentHelper.toUserTimeZone(this.props.message.fields['timestamp']).format('YYYY-MM-DD HH:mm:ss.SSS');
+        }
+
+        return this.formattedTime;
+    },
+    _toggleDetail() {
+        this.props.toggleDetail(this.props.message.id);
+    },
     render() {
         var colSpanFixup = this.props.selectedFields.size + 1;
-        var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format('YYYY-MM-DD HH:mm:ss.SSS');
 
         var classes = "message-group";
         if (this.props.expanded) {
@@ -53,16 +77,16 @@ var MessageTableEntry = React.createClass({
         }
         return (
             <tbody className={classes}>
-            <tr className="fields-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
+            <tr className="fields-row" onClick={this._toggleDetail}>
                 <td><strong>
-                    <time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time>
+                    <time dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time>
                 </strong></td>
                 { this.props.selectedFields.map(selectedFieldName => <td
                     key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }
             </tr>
 
             {this.props.showMessageRow &&
-            <tr className="message-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
+            <tr className="message-row" onClick={this._toggleDetail}>
                 <td colSpan={colSpanFixup}>{this.possiblyHighlight('message')}</td>
             </tr>
             }
@@ -71,7 +95,8 @@ var MessageTableEntry = React.createClass({
                 <td colSpan={colSpanFixup}>
                     <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
                                    allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
-                                   nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}/>
+                                   nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
+                                   expandAllRenderAsync={this.props.expandAllRenderAsync}/>
                 </td>
             </tr>
             }
