@@ -35,8 +35,7 @@ deploy:
   bucket: graylog2-builds
   region: eu-west-1
   skip_cleanup: true
-  file_glob: true
-  file: "target/universal/*.tgz"
+  local-dir: target/universal
   on:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7
