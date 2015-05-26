@@ -5,6 +5,7 @@ var $ = require('jquery'); // excluded and shimed
 $(document).ready(() => {
     // must come first because it registers a global (ahem) singleton.
     require('./stores/metrics/mount');
+    require('./stores/nodes/mount');
 
     require('./components/users/mount');
     require('./components/source-tagging/mount');

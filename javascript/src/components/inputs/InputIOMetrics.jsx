@@ -3,9 +3,11 @@
 var React = require('react');
 //noinspection JSUnusedGlobalSymbols
 var MetricsStore = require('../../stores/metrics/MetricsStore');
+var NodesStore = require('../../stores/nodes/NodesStore');
 var numeral = require('numeral');
 
 var metricsStore = MetricsStore.instance;
+var nodesStore = NodesStore.instance;
 
 var InputIOMetrics = React.createClass({
     getInitialState() {
@@ -47,6 +49,11 @@ var InputIOMetrics = React.createClass({
             this._prefix('read_bytes_total')
         ];
 
+        // We currently only need the NodeStore if we are rendering a global input.
+        if (this._isGlobalInput()) {
+            nodesStore.load();
+        }
+
         metricsStore.listen({
             nodeId: this.props.nodeId, // might be null for global inputs
             metricNames: metricNames,
@@ -60,7 +67,7 @@ var InputIOMetrics = React.createClass({
                 newState.initialized = true;
                 newState.showDetails = this.state.showDetails;
 
-                if (this.props.nodeId) {
+                if (!this._isGlobalInput()) {
                     // input on a single node, don't need to aggregate the updated metrics
                     update[0].values.forEach((namedMetric) => {
                         this._processNodeUpdate(namedMetric, newState.global);
@@ -163,11 +170,24 @@ var InputIOMetrics = React.createClass({
             return nodes;
         }
 
-        nodes.push(<hr/>);
+        nodes.push(<hr key={'separator'}/>);
 
         for (var nodeId in nodesState) {
-            nodes.push(<div key={"details-" + nodeId}><strong>{nodeId}</strong></div>);
-            nodes.push(this._renderNetworkMetrics(nodesState[nodeId]));
+            var nodeName = nodeId;
+            var nodeDetails = nodesStore.get(nodeId);
+
+            if (nodeDetails) {
+                nodeName = nodeDetails.short_node_id + " / " + nodeDetails.hostname;
+            }
+
+            nodes.push(
+                <span key={this.props.inputId + nodeId}>
+                    <strong>{nodeName}</strong>
+                    <br/>
+                    {this._renderNetworkMetrics(nodesState[nodeId])}
+                    <br/>
+                </span>
+            );
         }
 
         return nodes;
@@ -181,6 +201,10 @@ var InputIOMetrics = React.createClass({
         } else {
             this.setState({showDetails: true});
         }
+    },
+
+    _isGlobalInput() {
+        return !this.props.nodeId;
     },
 
     render() {
@@ -207,7 +231,7 @@ var InputIOMetrics = React.createClass({
         </span>);
 
         var showDetailsLink = null;
-        if (!this.props.nodeId) {
+        if (this._isGlobalInput()) {
             showDetailsLink = (<a href="" onClick={this._toggleShowDetails}>Show details</a>);
         }
 
