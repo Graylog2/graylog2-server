@@ -12,6 +12,7 @@ var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
+var ChosenSelectInput = require('../common/ChosenSelectInput');
 var QueryInput = require('./QueryInput');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
@@ -239,22 +240,20 @@ var SearchBar = React.createClass({
     },
 
     _getSavedSearchesSelector() {
-        var sortedSavedSearches = this.state.savedSearches.sort((a,b) => {
+        var sortedSavedSearches = this.state.savedSearches.sort((a, b) => {
             return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
         });
 
         return (
-            <Input type='select'
-                   ref='savedSearchesSelector'
-                   className='input-sm'
-                   value={this.state.savedSearch}
-                   placeholder='placeholder'
-                   onChange={this._savedSearchSelected}>
-                <option value='placeholder'>Saved searches</option>
+            <ChosenSelectInput ref='savedSearchesSelector'
+                               className='input-sm'
+                               value={this.state.savedSearch}
+                               dataPlaceholder='Saved searches'
+                               onChange={this._savedSearchSelected}>
                 {sortedSavedSearches.map((savedSearch) => {
                     return <option key={savedSearch.id} value={savedSearch.id}>{savedSearch.title}</option>;
                 })}
-            </Input>
+            </ChosenSelectInput>
         );
     },
 
