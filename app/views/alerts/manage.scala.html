@@ -159,9 +159,6 @@
         </div>
     </div>
 
-    <div class="row content">
-        <div class="col-md-12">
-            @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
-        </div>
+    <div class="react-alerts-component" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
     </div>
 }
