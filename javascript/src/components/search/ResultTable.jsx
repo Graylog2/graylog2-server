@@ -11,6 +11,7 @@ var StreamsStore = require('../../stores/streams/StreamsStore');
 var SearchStore = require('../../stores/search/SearchStore');
 
 var ResultTable = React.createClass({
+    EXPAND_ALL_RENDER_ASYNC_DELAY: 10,
     getInitialState() {
         return {
             expandedMessages: Immutable.Set(),
@@ -31,7 +32,7 @@ var ResultTable = React.createClass({
         if (this.state.expandingAll) {
             // This may take some time, so we ensure we display a loading indicator in the page
             // while all messages are being expanded
-            setTimeout(() => this.setState({expandingAll: false}), 1000 / 60);
+            setTimeout(() => this.setState({expandingAll: false}), this.EXPAND_ALL_RENDER_ASYNC_DELAY);
         }
     },
     _onStreamsLoaded(streams) {
