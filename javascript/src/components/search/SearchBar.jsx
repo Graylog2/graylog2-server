@@ -11,11 +11,13 @@ var Button = require('react-bootstrap').Button;
 var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
+var Alert = require('react-bootstrap').Alert;
 
 var ChosenSelectInput = require('../common/ChosenSelectInput');
 var QueryInput = require('./QueryInput');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
+var ToolsStore = require('../../stores/tools/ToolsStore');
 
 var SearchBar = React.createClass({
     getInitialState() {
@@ -27,7 +29,8 @@ var SearchBar = React.createClass({
             query: this.initialSearchParams.query,
             streamId: null,
             savedSearch: SearchStore.savedSearch,
-            savedSearches: Immutable.List()
+            savedSearches: Immutable.List(),
+            keywordPreview: Immutable.Map()
         };
     },
     componentDidMount() {
@@ -102,6 +105,26 @@ var SearchBar = React.createClass({
             var ref = (key === 'from' || key === 'to') ? key + "Formatted" : key;
             SearchStore.rangeParams = this.state.rangeParams.set(key, this.refs[ref].getValue());
         };
+    },
+    _keywordSearchChanged(event) {
+        this._rangeParamsChanged('keyword')();
+        var value = this.refs.keyword.getValue();
+
+        if (value === "") {
+            this._resetKeywordPreview();
+        } else {
+            var promise = ToolsStore.testNaturalDate(value);
+            promise.fail(() => this._resetKeywordPreview());
+            promise.done((data) => this._onKeywordPreviewLoaded(data));
+        }
+    },
+    _resetKeywordPreview() {
+        this.setState({keywordPreview: Immutable.Map()});
+    },
+    _onKeywordPreviewLoaded(data) {
+        var from = momentHelper.toUserTimeZone(data.from).format(momentHelper.DATE_FORMAT_NO_MS);
+        var to = momentHelper.toUserTimeZone(data.to).format(momentHelper.DATE_FORMAT_NO_MS);
+        this.setState({keywordPreview: Immutable.Map({from: from, to: to})});
     },
     _formattedDateStringInUserTZ(field) {
         var dateString = this.state.rangeParams.get(field);
@@ -221,14 +244,27 @@ var SearchBar = React.createClass({
                 break;
             case 'keyword':
                 selector = (
-                    <div className="timerange-selector keyword" style={{width: 270, marginLeft: 50}}>
-                        <Input type='text'
-                               ref='keyword'
-                               name='keyword'
-                               value={this.state.rangeParams.get('keyword')}
-                               onChange={this._rangeParamsChanged('keyword')}
-                               placeholder='Last week'
-                               className='input-sm'/>
+                    <div className="timerange-selector keyword" style={{width: 650}}>
+                        <div className='row no-bm' style={{marginLeft: 50}}>
+                            <div className='col-md-5' style={{padding: 0}}>
+                                <Input type='text'
+                                       ref='keyword'
+                                       name='keyword'
+                                       value={this.state.rangeParams.get('keyword')}
+                                       onChange={this._keywordSearchChanged}
+                                       placeholder='Last week'
+                                       className='input-sm'
+                                       required/>
+                            </div>
+                            <div className='col-md-7' style={{paddingRight: 0}}>
+                                {this.state.keywordPreview.size > 0 &&
+                                <Alert bsStyle='info' style={{height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0}}>
+                                    <strong style={{marginRight: 8}}>Preview:</strong>
+                                    {this.state.keywordPreview.get('from')} to {this.state.keywordPreview.get('to')}
+                                </Alert>
+                                }
+                            </div>
+                        </div>
                     </div>
                 );
                 break;
