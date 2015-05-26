@@ -23,7 +23,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.io.BaseEncoding;
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.Doubles;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -360,21 +360,21 @@ public final class Tools {
     }
 
     /**
-     * Convert something to an int in a fast way having a good guess
-     * that it is an int. This is perfect for MongoDB data that *should*
-     * have been stored as integers already so there is a high probability
+     * Convert something to a double in a fast way having a good guess
+     * that it is a double. This is perfect for MongoDB data that *should*
+     * have been stored as doubles already so there is a high probability
      * of easy converting.
      *
-     * @param x The object to convert to an int
+     * @param x The object to convert to a double
      * @return Converted object, 0 if empty or something went wrong.
      */
-    public static Integer getInt(Object x) {
+    public static Double getDouble(Object x) {
         if (x == null) {
             return null;
         }
 
-        if (x instanceof Integer) {
-            return (Integer) x;
+        if (x instanceof Double) {
+            return (Double) x;
         }
 
         if (x instanceof String) {
@@ -386,12 +386,12 @@ public final class Tools {
 
         /*
          * This is the last and probably expensive fallback. This should be avoided by
-         * only passing in Integers, Longs or stuff that can be parsed from it's String
+         * only passing in Doubles, Integers, Longs or stuff that can be parsed from it's String
          * representation. You might have to build cached objects that did a safe conversion
          * once for example. There is no way around for the actual values we compare if the
          * user sent them in as non-numerical type.
          */
-        return Ints.tryParse(x.toString());
+        return Doubles.tryParse(x.toString());
     }
 
     /**

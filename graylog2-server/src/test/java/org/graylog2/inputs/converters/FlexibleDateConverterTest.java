@@ -31,7 +31,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FlexibleDateConverterTest {
-
     @Test
     public void testConvert() throws Exception {
         Converter c = new FlexibleDateConverter(Collections.<String, Object>emptyMap());
@@ -71,18 +70,34 @@ public class FlexibleDateConverterTest {
     }
 
     @Test
-    public void convertUsesUTCIfTimeZoneSettingIsEmpty() throws Exception {
+    public void convertUsesEtcUTCIfTimeZoneSettingIsEmpty() throws Exception {
         Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", ""));
 
         final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
-        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.UTC);
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
     }
 
     @Test
-    public void convertUsesUTCIfTimeZoneSettingIsBlank() throws Exception {
+    public void convertUsesEtcUTCIfTimeZoneSettingIsBlank() throws Exception {
         Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", " "));
 
         final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
-        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.UTC);
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+    }
+
+    @Test
+    public void convertUsesEtcUTCIfTimeZoneSettingIsInvalid() throws Exception {
+        Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", "TEST"));
+
+        final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+    }
+
+    @Test
+    public void convertUsesEtcUTCIfTimeZoneSettingIsNotAString() throws Exception {
+        Converter c = new FlexibleDateConverter(ImmutableMap.<String, Object>of("time_zone", 42));
+
+        final DateTime dateOnly = (DateTime) c.convert("2014-3-12");
+        assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
     }
 }
