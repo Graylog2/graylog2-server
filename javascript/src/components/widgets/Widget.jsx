@@ -152,6 +152,12 @@ var Widget = React.createClass({
             return;
         }
 
+        if (this.state.result === undefined) {
+            return <div className="loading">
+                <i className="fa fa-spin fa-3x fa-refresh spinner"></i>
+            </div>;
+        }
+
         var visualization;
 
         switch (this.state.type) {

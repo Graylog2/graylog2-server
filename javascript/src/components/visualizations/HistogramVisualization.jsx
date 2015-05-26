@@ -25,6 +25,7 @@ var HistogramVisualization = React.createClass({
     },
     componentDidMount() {
         this.renderHistogram();
+        this.setState({dataPoints: this.props.data}, this.drawData);
     },
     componentWillReceiveProps(nextProps) {
         if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {

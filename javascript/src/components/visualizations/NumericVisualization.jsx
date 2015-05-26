@@ -20,19 +20,28 @@ var NumericVisualization = React.createClass({
             previousNumber: undefined
         };
     },
+    componentDidMount() {
+        var state = this._normalizeStateFromProps(this.props.data);
+        this.setState(state);
+    },
     componentWillReceiveProps(newProps) {
-        var result = newProps.data;
-        if (typeof result === 'object') {
-            var normalizedNowNumber = NumberUtils.normalizeNumber(result.now);
-            var normalizedPreviousNumber = NumberUtils.normalizeNumber(result.previous);
-            this.setState({
+        var state = this._normalizeStateFromProps(newProps.data);
+        this.setState(state);
+    },
+    _normalizeStateFromProps(props) {
+        var state = {};
+        if (typeof props === 'object') {
+            var normalizedNowNumber = NumberUtils.normalizeNumber(props.now);
+            var normalizedPreviousNumber = NumberUtils.normalizeNumber(props.previous);
+            state = {
                 currentNumber: normalizedNowNumber,
                 previousNumber: normalizedPreviousNumber,
                 percentage: this._calculatePercentage(normalizedNowNumber, normalizedPreviousNumber)
-            }, this._calculatePercentage);
+            };
         } else {
-            this.setState({currentNumber: result});
+            state = {currentNumber: props};
         }
+        return state;
     },
     _calculatePercentage(nowNumber, previousNumber) {
         var percentage;
