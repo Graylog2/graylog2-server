@@ -7,7 +7,14 @@ var Input = require('react-bootstrap').Input;
 
 var ChosenSelectInput = React.createClass({
     componentDidMount() {
-        $(this.refs.select.getInputDOMNode()).chosen({
+        var $selectDOMNode = $(this.refs.select.getInputDOMNode());
+
+        // We only want to apply the classes the parent component gave us, not those from react-bootstrap
+        $selectDOMNode.on('chosen:ready', (event, params) => {
+            params.chosen.container.addClass('input-sm');
+        });
+
+        $selectDOMNode.chosen({
             disable_search_threshold: 3,
             search_contains: true,
             inherit_select_classes: false,
