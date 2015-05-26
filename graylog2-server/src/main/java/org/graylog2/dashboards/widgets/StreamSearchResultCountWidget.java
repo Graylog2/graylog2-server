@@ -28,7 +28,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class StreamSearchResultCountWidget extends SearchResultCountWidget {
     private final String streamId;
 
-    public StreamSearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+    public StreamSearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
         this.streamId = (String) config.get("stream_id");
     }

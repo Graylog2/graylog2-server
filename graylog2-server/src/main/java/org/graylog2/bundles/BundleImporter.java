@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
@@ -78,6 +79,7 @@ public class BundleImporter {
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardRegistry dashboardRegistry;
+    private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
     private final Searches searches;
@@ -100,6 +102,7 @@ public class BundleImporter {
                           final OutputService outputService,
                           final DashboardService dashboardService,
                           final DashboardRegistry dashboardRegistry,
+                          final DashboardWidgetCreator dashboardWidgetCreator,
                           final ServerStatus serverStatus,
                           final MetricRegistry metricRegistry,
                           final Searches searches,
@@ -113,6 +116,7 @@ public class BundleImporter {
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardRegistry = dashboardRegistry;
+        this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
         this.searches = searches;
@@ -534,7 +538,7 @@ public class BundleImporter {
         }
 
         final String widgetId = UUID.randomUUID().toString();
-        return org.graylog2.dashboards.widgets.DashboardWidget.buildDashboardWidget(type, metricRegistry, searches,
+        return dashboardWidgetCreator.buildDashboardWidget(type, searches,
                 widgetId, dashboardWidget.getDescription(), dashboardWidget.getCacheTime(),
                 config, (String) config.get("query"), timeRange, userName);
     }

@@ -22,34 +22,19 @@ import com.codahale.metrics.Timer;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
-import com.mongodb.BasicDBObject;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
-import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 public abstract class DashboardWidget implements EmbeddedPersistable {
-    private static final String FIELD_ID = "id";
-    private static final String FIELD_TYPE = "type";
-    private static final String FIELD_DESCRIPTION = "description";
-    private static final String FIELD_CACHE_TIME = "cache_time";
-    private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
-    private static final String FIELD_CONFIG = "config";
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CACHE_TIME = "cache_time";
+    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    public static final String FIELD_CONFIG = "config";
 
     public enum Type {
         SEARCH_RESULT_COUNT,
@@ -60,8 +45,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         STATS_COUNT
     }
 
-    public static final int DEFAULT_CACHE_TIME = 10;
-
     private final MetricRegistry metricRegistry;
     private final Type type;
     private final String id;
@@ -71,168 +54,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     private String description;
     private Supplier<ComputationResult> cachedResult;
 
-    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
         this.metricRegistry = metricRegistry;
         this.type = type;
         this.id = id;
         this.config = config;
         this.creatorUserId = creatorUserId;
         this.description = description;
-        this.cacheTime = cacheTimeS < 1 ? DEFAULT_CACHE_TIME : cacheTimeS;
+        this.cacheTime = cacheTime.getCacheTime();
         this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
-    }
-
-    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        return DashboardWidget.fromRequest(metricRegistry, searches, null, awr, userId);
-    }
-
-    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, String widgetId, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        Type type;
-        try {
-            type = Type.valueOf(awr.type().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new NoSuchWidgetTypeException("No such widget type <" + awr.type() + ">");
-        }
-
-        String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
-
-        // Build timerange.
-        final String rangeType = (String) awr.config().get("range_type");
-        if (rangeType == null) {
-            throw new InvalidRangeParametersException("range_type not set");
-        }
-
-        final TimeRange timeRange;
-        switch (rangeType) {
-            case "relative":
-                timeRange = new RelativeRange(Integer.parseInt((String) awr.config().get("range")));
-                break;
-            case "keyword":
-                timeRange = new KeywordRange((String) awr.config().get("keyword"), true);
-                break;
-            case "absolute":
-                timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
-                break;
-            default:
-                throw new InvalidRangeParametersException("range_type not recognized");
-        }
-
-        return buildDashboardWidget(type, metricRegistry, searches, id, awr.description(), 0, awr.config(),
-                (String) awr.config().get("query"), timeRange, userId);
-    }
-
-    public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Searches searches, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        Type type;
-        try {
-            type = Type.valueOf(((String) fields.get(FIELD_TYPE)).toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new NoSuchWidgetTypeException();
-        }
-
-        BasicDBObject config = (BasicDBObject) fields.get(FIELD_CONFIG);
-
-        // Build timerange.
-        BasicDBObject timerangeConfig = (BasicDBObject) config.get("timerange");
-
-        final String rangeType = (String) timerangeConfig.get(FIELD_TYPE);
-        if (rangeType == null) {
-            throw new InvalidRangeParametersException("range type not set");
-        }
-
-        TimeRange timeRange;
-        switch (rangeType) {
-            case "relative":
-                timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
-                break;
-            case "keyword":
-                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"), true);
-                break;
-            case "absolute":
-                String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-                String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-
-                timeRange = new AbsoluteRange(from, to);
-                break;
-            default:
-                throw new InvalidRangeParametersException("range_type not recognized");
-        }
-
-        final String description = (String) fields.get(FIELD_DESCRIPTION);
-        final int cacheTime = (int) firstNonNull(fields.get(FIELD_CACHE_TIME), 0);
-
-        return buildDashboardWidget(type, metricRegistry, searches, (String) fields.get(FIELD_ID), description, cacheTime,
-                config, (String) config.get("query"), timeRange, (String) fields.get(FIELD_CREATOR_USER_ID));
-    }
-
-    public static DashboardWidget buildDashboardWidget(
-            final Type type,
-            final MetricRegistry metricRegistry,
-            final Searches searches,
-            final String widgetId,
-            final String description,
-            final int cacheTime,
-            final Map<String, Object> config,
-            final String query,
-            final TimeRange timeRange,
-            final String creatorUserId) throws NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
-        switch (type) {
-            case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case FIELD_CHART:
-                return new FieldChartWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case QUICKVALUES:
-                return new QuickvaluesWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case STATS_COUNT:
-                return new StatisticalCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            default:
-                throw new NoSuchWidgetTypeException();
-        }
     }
 
     public Type getType() {

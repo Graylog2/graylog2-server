@@ -36,7 +36,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String field;
     private final String streamId;
 
-    public StatisticalCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+    public StatisticalCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, Type.STATS_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
         this.field = (String) config.get("field");
         this.statsFunction = (String) config.get("stats_function");

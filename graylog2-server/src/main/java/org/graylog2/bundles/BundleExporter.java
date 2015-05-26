@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.streams.OutputService;
@@ -41,6 +42,7 @@ public class BundleExporter {
     private final StreamService streamService;
     private final OutputService outputService;
     private final DashboardService dashboardService;
+    private final DashboardWidgetCreator dashboardWidgetCreator;
 
     private Set<String> streamSet = new HashSet<>();
 
@@ -48,11 +50,13 @@ public class BundleExporter {
     public BundleExporter(final InputService inputService,
                           final StreamService streamService,
                           final OutputService outputService,
-                          final DashboardService dashboardService) {
+                          final DashboardService dashboardService,
+                          final DashboardWidgetCreator dashboardWidgetCreator) {
         this.inputService = inputService;
         this.streamService = streamService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
+        this.dashboardWidgetCreator = dashboardWidgetCreator;
     }
 
     public ConfigurationBundle export(final ExportBundle exportBundle) {
@@ -290,7 +294,7 @@ public class BundleExporter {
             for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
                 org.graylog2.dashboards.widgets.DashboardWidget widget;
                 try {
-                    widget = org.graylog2.dashboards.widgets.DashboardWidget.fromPersisted(null, null, widgetFields);
+                    widget = dashboardWidgetCreator.fromPersisted(null, widgetFields);
                 } catch (Exception e) {
                     LOG.warn("Error while exporting widgets of dashboard " + dashboard.getId(), e);
                     continue;

@@ -23,6 +23,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
+import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -43,14 +44,17 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
     private final MetricRegistry metricRegistry;
     private final Searches searches;
+    private final DashboardWidgetCreator dashboardWidgetCreator;
 
     @Inject
     public DashboardServiceImpl(MongoConnection mongoConnection,
                                 MetricRegistry metricRegistry,
-                                Searches searches) {
+                                Searches searches,
+                                DashboardWidgetCreator dashboardWidgetCreator) {
         super(mongoConnection);
         this.metricRegistry = metricRegistry;
         this.searches = searches;
+        this.dashboardWidgetCreator = dashboardWidgetCreator;
     }
 
     @Override
@@ -89,7 +93,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
                 for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
                     DashboardWidget widget = null;
                     try {
-                        widget = DashboardWidget.fromPersisted(metricRegistry, searches, widgetFields);
+                        widget = dashboardWidgetCreator.fromPersisted(searches, widgetFields);
                     } catch (DashboardWidget.NoSuchWidgetTypeException e) {
                         LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);
                         continue;

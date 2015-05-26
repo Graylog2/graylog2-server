@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.searches.Searches;
@@ -54,9 +55,12 @@ public class DashboardServiceImplTest {
     @Mock
     private Searches searches;
 
+    @Mock
+    private DashboardWidgetCreator dashboardWidgetCreator;
+
     @Before
     public void setUpService() throws Exception {
-        this.dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), metricRegistry, searches);
+        this.dashboardService = new DashboardServiceImpl(mongoRule.getMongoConnection(), metricRegistry, searches, dashboardWidgetCreator);
     }
 
     @Test
