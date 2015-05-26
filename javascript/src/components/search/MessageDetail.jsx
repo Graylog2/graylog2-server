@@ -73,7 +73,7 @@ var MessageDetail = React.createClass({
     },
     render() {
         // Short circuit when all messages are being expanded at the same time
-        if (this.props.expandingAll) {
+        if (this.props.expandAllRenderAsync) {
             return (
                 <Row>
                     <Col md={12}>

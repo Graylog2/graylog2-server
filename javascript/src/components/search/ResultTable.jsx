@@ -17,7 +17,7 @@ var ResultTable = React.createClass({
             expandedMessages: Immutable.Set(),
             allStreamsLoaded: false,
             allStreams: Immutable.List(),
-            expandingAll: false
+            expandAllRenderAsync: false
         };
     },
     componentDidMount() {
@@ -29,10 +29,10 @@ var ResultTable = React.createClass({
         promise.done((streams) => this._onStreamsLoaded(streams));
     },
     componentDidUpdate(oldProps, oldState) {
-        if (this.state.expandingAll) {
+        if (this.state.expandAllRenderAsync) {
             // This may take some time, so we ensure we display a loading indicator in the page
             // while all messages are being expanded
-            setTimeout(() => this.setState({expandingAll: false}), this.EXPAND_ALL_RENDER_ASYNC_DELAY);
+            setTimeout(() => this.setState({expandAllRenderAsync: false}), this.EXPAND_ALL_RENDER_ASYNC_DELAY);
         }
     },
     _onStreamsLoaded(streams) {
@@ -64,7 +64,7 @@ var ResultTable = React.createClass({
         var renderLoadingIndicator = expandedChangeRatio > 0.3;
 
         var newSet = Immutable.Set(this.props.messages.map((message) => message.id));
-        this.setState({expandedMessages: newSet, expandingAll: renderLoadingIndicator});
+        this.setState({expandedMessages: newSet, expandAllRenderAsync: renderLoadingIndicator});
     },
     collapseAll() {
         this.setState({expandedMessages: Immutable.Set()});
@@ -140,7 +140,7 @@ var ResultTable = React.createClass({
                                                                               allStreamsLoaded={this.state.allStreamsLoaded}
                                                                               nodes={this.props.nodes}
                                                                               highlight={this.props.highlight}
-                                                                              expandingAll={this.state.expandingAll}
+                                                                              expandAllRenderAsync={this.state.expandAllRenderAsync}
                         />) }
                 </table>
             </div>
