@@ -155,7 +155,7 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getInt(CK_PARALLEL_QUEUES),
                 configuration.getBoolean(CK_TLS),
                 configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES),
-                configuration.getInt(CK_HEARTBEAT_TIMEOUT),
+                configuration.intIsSet(CK_HEARTBEAT_TIMEOUT) ? configuration.getInt(CK_HEARTBEAT_TIMEOUT) : ConnectionFactory.DEFAULT_HEARTBEAT,
                 input,
                 scheduler,
                 this
