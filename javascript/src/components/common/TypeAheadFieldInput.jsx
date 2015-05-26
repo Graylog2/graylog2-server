@@ -27,6 +27,7 @@ var TypeAheadFieldInput = React.createClass({
 
                     if (typeof this.props.onTypeaheadLoaded === 'function') {
                         this.props.onTypeaheadLoaded();
+                        fieldInput.typeahead('close');
                     }
                 }
             });
@@ -44,7 +45,7 @@ var TypeAheadFieldInput = React.createClass({
             var fieldInput = $(this.refs.fieldInput.getInputDOMNode());
             fieldInput.typeahead('destroy');
             var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
-            $(fieldFormGroup).off('typeahead:change');
+            $(fieldFormGroup).off('typeahead:change typeahead:selected');
         }
     },
 
