@@ -26,10 +26,10 @@ pushd javascript
 
 # Install same npm version as we use in travis
 rm -rf ./node_modules
-npm install npm@latest
+npm install --no-spin npm@latest
 PATH="$(pwd)/node_modules/.bin/":$PATH
 
-npm install
+npm install --no-spin
 npm test
 gulp deploy-prod
 popd
@@ -43,7 +43,19 @@ echo
 ls -lt ./target/universal/graylog-web-interface-*.tgz
 
 echo
-echo "* MD5 hash"
-md5sum ./target/universal/graylog-web-interface-*.tgz
-echo "* SHA256 hash"
-sha256sum ./target/universal/graylog-web-interface-*.tgz
+echo '# Calculating artifact checksums'
+pushd ./target/universal
+for ARTIFACT in graylog-web-interface-*.tgz
+do
+  echo
+  echo -n "MD5:    "
+  md5sum "${ARTIFACT}" | tee "${ARTIFACT}.md5.txt"
+  echo -n "SHA1:   "
+  sha1sum "${ARTIFACT}" | tee "${ARTIFACT}.sha1.txt"
+  echo -n "SHA256: "
+  sha256sum "${ARTIFACT}" | tee "${ARTIFACT}.sha256.txt"
+done
+popd
+
+echo
+echo '# BUILD COMPLETE'
