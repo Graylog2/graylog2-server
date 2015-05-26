@@ -18,9 +18,7 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
 
 @helper.javascriptRouter("jsRoutes")(
     routes.javascript.Assets.at,
-    routes.javascript.SearchController.globalSearch,
-    routes.javascript.StreamSearchController.index,
-    routes.javascript.StreamsController.index,
+    routes.javascript.AlertsController.index,
     routes.javascript.BundlesController.index,
     routes.javascript.DashboardsController.index,
     routes.javascript.ExtractorsController.newExtractor,
@@ -35,14 +33,18 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     routes.javascript.OutputsController.index,
     routes.javascript.SavedSearchesController.execute,
     routes.javascript.SavedSearchesController.delete,
+    routes.javascript.SearchController.globalSearch,
     routes.javascript.SearchController.index,
     routes.javascript.SearchController.showMessage,
     routes.javascript.SearchController.exportAsCsv,
     routes.javascript.SessionsController.destroy,
+    routes.javascript.StartpageController.set,
+    routes.javascript.StreamOutputsController.index,
+    routes.javascript.StreamRulesController.index,
     routes.javascript.StreamsController.index,
+    routes.javascript.StreamsController.pause,
     routes.javascript.StreamSearchController.index,
     routes.javascript.StreamSearchController.exportAsCsv,
-    routes.javascript.StreamRulesController.index,
     routes.javascript.SourcesController.list,
     routes.javascript.SystemController.index,
     routes.javascript.UsersController.editUserForm,
@@ -60,6 +62,8 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     api.routes.javascript.DashboardsApiController.updateWidget,
     api.routes.javascript.DashboardsApiController.widget,
     api.routes.javascript.DashboardsApiController.widgetValue,
+    api.routes.javascript.InputsApiController.list,
+    api.routes.javascript.InputsApiController.globalRecentMessage,
     api.routes.javascript.OutputsApiController.available,
     api.routes.javascript.OutputsApiController.availableTypes,
     api.routes.javascript.OutputsApiController.delete,
@@ -74,7 +78,6 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     api.routes.javascript.StreamOutputsApiController.add,
     api.routes.javascript.StreamOutputsApiController.delete,
     api.routes.javascript.StreamOutputsApiController.index,
-    api.routes.javascript.UsersApiController.loadUser,
     api.routes.javascript.StreamsApiController.list,
     api.routes.javascript.StreamsApiController.get,
     api.routes.javascript.StreamsApiController.create,
@@ -89,14 +92,8 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     api.routes.javascript.StreamRulesApiController.types,
     api.routes.javascript.StreamRulesApiController.update,
     api.routes.javascript.StreamRulesApiController.delete,
-    api.routes.javascript.InputsApiController.list,
-    api.routes.javascript.InputsApiController.globalRecentMessage,
     api.routes.javascript.SystemApiController.fields,
-    routes.javascript.StreamsController.pause,
-    routes.javascript.StreamRulesController.index,
-    routes.javascript.StreamOutputsController.index,
-    routes.javascript.AlertsController.index,
-    routes.javascript.StartpageController.set
+    api.routes.javascript.UsersApiController.loadUser
 )
 
 <div id="navigation-bar"
