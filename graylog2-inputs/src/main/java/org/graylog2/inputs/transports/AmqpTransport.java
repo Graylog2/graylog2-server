@@ -142,6 +142,14 @@ public class AmqpTransport extends ThrottleableTransport {
 
     @Override
     public void doLaunch(MessageInput input) throws MisfireException {
+        int heartbeatTimeout = ConnectionFactory.DEFAULT_HEARTBEAT;
+        if (configuration.intIsSet(CK_HEARTBEAT_TIMEOUT)) {
+            heartbeatTimeout = configuration.getInt(CK_HEARTBEAT_TIMEOUT);
+            if (heartbeatTimeout < 0) {
+                LOG.warn("AMQP heartbeat timeout {} should not be negative, disabling timeout.", heartbeatTimeout);
+                heartbeatTimeout = ConnectionFactory.DEFAULT_HEARTBEAT;
+            }
+        }
         consumer = new AmqpConsumer(
                 configuration.getString(CK_HOSTNAME),
                 configuration.getInt(CK_PORT),
@@ -155,7 +163,7 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getInt(CK_PARALLEL_QUEUES),
                 configuration.getBoolean(CK_TLS),
                 configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES),
-                configuration.intIsSet(CK_HEARTBEAT_TIMEOUT) ? configuration.getInt(CK_HEARTBEAT_TIMEOUT) : ConnectionFactory.DEFAULT_HEARTBEAT,
+                heartbeatTimeout,
                 input,
                 scheduler,
                 this
