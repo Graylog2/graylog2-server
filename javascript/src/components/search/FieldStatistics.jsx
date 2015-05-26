@@ -44,6 +44,14 @@ var FieldStatistics = React.createClass({
                     fieldStatistics: this.state.fieldStatistics.set(field, statistics),
                     statsLoadPending: this.state.statsLoadPending.set(field, false)
                 });
+            }).fail((jqXHR) => {
+                // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
+                if (jqXHR.status === 400) {
+                    this.setState({
+                        fieldStatistics: this.state.fieldStatistics.delete(field),
+                        statsLoadPending: this.state.statsLoadPending.delete(field)
+                    });
+                }
             });
         }
     },
