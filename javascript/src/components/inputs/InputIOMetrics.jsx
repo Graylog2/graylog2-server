@@ -12,7 +12,9 @@ var InputIOMetrics = React.createClass({
         return {
             initialized: false,
             hasError: false,
-            global: this._newMetricState()
+            showDetails: false,
+            global: this._newMetricState(),
+            nodes: {}
         };
     },
 
@@ -56,6 +58,7 @@ var InputIOMetrics = React.createClass({
 
                 var newState = this.getInitialState();
                 newState.initialized = true;
+                newState.showDetails = this.state.showDetails;
 
                 if (this.props.nodeId) {
                     // input on a single node, don't need to aggregate the updated metrics
@@ -65,8 +68,11 @@ var InputIOMetrics = React.createClass({
                 } else {
                     // this is a global input, we need to aggregate the values for all nodes that are being returned
                     update.forEach((perNode) => {
+                        newState.nodes[perNode.node_id] = this._newMetricState();
+
                         perNode.values.forEach((namedMetric) => {
                             this._processNodeUpdate(namedMetric, newState.global);
+                            this._processNodeUpdate(namedMetric, newState.nodes[perNode.node_id]);
                         });
                     });
                 }
@@ -150,6 +156,33 @@ var InputIOMetrics = React.createClass({
         );
     },
 
+    _renderNodesDetails(nodesState) {
+        var nodes = [];
+
+        if (nodesState === null) {
+            return nodes;
+        }
+
+        nodes.push(<hr/>);
+
+        for (var nodeId in nodesState) {
+            nodes.push(<div key={"details-" + nodeId}><strong>{nodeId}</strong></div>);
+            nodes.push(this._renderNetworkMetrics(nodesState[nodeId]));
+        }
+
+        return nodes;
+    },
+
+    _toggleShowDetails(e) {
+        e.preventDefault();
+
+        if (this.state.showDetails) {
+            this.setState({showDetails: false});
+        } else {
+            this.setState({showDetails: true});
+        }
+    },
+
     render() {
         if (this.state.hasError) {
             return (<span>Input metrics unavailable</span>);
@@ -173,12 +206,25 @@ var InputIOMetrics = React.createClass({
             1 minute average rate: {numeral(this.state.global.incomingMessages).format('0,0')} msg/s
         </span>);
 
+        var showDetailsLink = null;
+        if (!this.props.nodeId) {
+            showDetailsLink = (<a href="" onClick={this._toggleShowDetails}>Show details</a>);
+        }
+
+        var nodes = [];
+        if (this.state.showDetails) {
+            nodes = this._renderNodesDetails(this.state.nodes);
+        }
+
         return (<span>
             {messages}
             {network ? <br/> : null}
             {network}
+            {' '}
+            {showDetailsLink}
             {connections ? <br/> : null}
             {connections}
+            {nodes}
         </span>);
     }
 });
