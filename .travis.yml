@@ -42,6 +42,7 @@ deploy:
     branch:
       - master
       - 1.0
+      - 1.1
 addons:
 notifications:
   slack:
