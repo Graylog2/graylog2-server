@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react/addons');
+var Immutable = require('immutable');
 var Input = require('react-bootstrap').Input;
 var $ = require('jquery'); // excluded and shimed
 
@@ -47,8 +48,21 @@ var TypeAheadFieldInput = React.createClass({
         }
     },
 
+    _getFilteredProps() {
+        var props = Immutable.fromJS(this.props);
+
+        if (props.has('valueLink')) {
+            props = props.delete('valueLink');
+        }
+
+        return props.toJS();
+    },
+
     render() {
-        return <Input ref="fieldInput" wrapperClassName="typeahead-wrapper" {...this.props}/>;
+        return <Input ref="fieldInput"
+                      wrapperClassName="typeahead-wrapper"
+                      defaultValue={this.props.valueLink.value}
+                      {...this._getFilteredProps()}/>;
     }
 });
 
