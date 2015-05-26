@@ -3,8 +3,10 @@
 var React = require('react');
 var Immutable = require('immutable');
 var MessageFieldDescription = require('./MessageFieldDescription');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var MessageFields = React.createClass({
+    mixins: [PureRenderMixin],
     render() {
         var fields = [];
         var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a, b) => a.localeCompare(b));
