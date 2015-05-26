@@ -33,7 +33,6 @@ import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 
