@@ -13,8 +13,7 @@ coverage
 build.xml
 nbactions.xml
 
-/data/elasticsearch
-/data/journal
+data/*
 
 .DS_Store
 
