@@ -5,9 +5,9 @@ import controllers.AuthenticatedController;
 import models.descriptions.NodeDescription;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
 import org.graylog2.restclient.models.Radio;
-import play.Logger;
 import play.libs.Json;
 import play.mvc.Result;
 
@@ -28,12 +28,8 @@ public class NodesApiController extends AuthenticatedController {
     public Result nodes() {
         final List<NodeDescription> nodes = Lists.newArrayList();
 
-        for (final String nodeId : serverNodes.asMap().keySet()) {
-            try {
-                nodes.add(new NodeDescription(nodeService.loadNode(nodeId)));
-            } catch (NodeService.NodeNotFoundException e) {
-                Logger.error("Could not load node information", e);
-            }
+        for (final Node node : serverNodes.all()) {
+            nodes.add(new NodeDescription(node));
         }
 
         try {
