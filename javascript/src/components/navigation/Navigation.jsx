@@ -26,7 +26,7 @@ var Navigation = React.createClass({
 
     render() {
         var logoUrl = jsRoutes.controllers.Assets.at("images/toplogo.png").url;
-        var homeUrl = jsRoutes.controllers.SearchController.index().url;
+        var homeUrl = jsRoutes.controllers.StartpageController.redirect().url;
         var brand = (<a href={homeUrl}>
             <img src={logoUrl}/>
         </a>);
