@@ -59,6 +59,7 @@ public class AmqpConsumer {
     private Connection connection;
     private Channel channel;
 
+    private final int heartbeatTimeout;
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
@@ -70,7 +71,7 @@ public class AmqpConsumer {
 
     public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
                         int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
-                        boolean tls, boolean requeueInvalid, MessageInput sourceInput,
+                        boolean tls, boolean requeueInvalid, int heartbeatTimeout, MessageInput sourceInput,
                         ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
         this.hostname = hostname;
         this.port = port;
@@ -82,6 +83,7 @@ public class AmqpConsumer {
         this.queue = queue;
         this.exchange = exchange;
         this.routingKey = routingKey;
+        this.heartbeatTimeout = heartbeatTimeout;
 
         this.sourceInput = sourceInput;
         this.parallelQueues = parallelQueues;
@@ -146,6 +148,7 @@ public class AmqpConsumer {
         factory.setHost(hostname);
         factory.setPort(port);
         factory.setVirtualHost(virtualHost);
+        factory.setRequestedHeartbeat(heartbeatTimeout);
 
         if (tls) {
             try {

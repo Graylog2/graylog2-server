@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.rabbitmq.client.ConnectionFactory;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -57,6 +58,7 @@ public class AmqpTransport extends ThrottleableTransport {
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
     public static final String CK_TLS = "tls";
     public static final String CK_REQUEUE_INVALID_MESSAGES = "requeue_invalid_messages";
+    public static final String CK_HEARTBEAT_TIMEOUT = "heartbeat";
 
     private static final Logger LOG = LoggerFactory.getLogger(AmqpTransport.class);
 
@@ -153,6 +155,7 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getInt(CK_PARALLEL_QUEUES),
                 configuration.getBoolean(CK_TLS),
                 configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES),
+                configuration.getInt(CK_HEARTBEAT_TIMEOUT),
                 input,
                 scheduler,
                 this
@@ -295,6 +298,16 @@ public class AmqpTransport extends ThrottleableTransport {
                             "Number of Queues",
                             1,
                             "Number of parallel Queues",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new NumberField(
+                            CK_HEARTBEAT_TIMEOUT,
+                            "Heartbeat timeout",
+                            ConnectionFactory.DEFAULT_HEARTBEAT,
+                            "Heartbeat timeout interval in seconds (use 0 for no heartbeat)",
                             ConfigurationField.Optional.NOT_OPTIONAL
                     )
             );
