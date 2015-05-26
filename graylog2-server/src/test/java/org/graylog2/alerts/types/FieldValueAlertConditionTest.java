@@ -23,7 +23,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -35,7 +34,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Ignore
 public class FieldValueAlertConditionTest extends AlertConditionTest {
     @Test
     public void testConstructor() throws Exception {

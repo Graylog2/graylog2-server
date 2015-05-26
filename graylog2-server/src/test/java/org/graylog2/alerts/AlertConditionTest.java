@@ -27,6 +27,9 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.Map;
 
@@ -35,7 +38,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
@@ -54,7 +60,7 @@ public abstract class AlertConditionTest {
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
         // TODO use injection please. this sucks so bad
-        alertService = new AlertServiceImpl(mongoConnection,
+        alertService = spy(new AlertServiceImpl(mongoConnection,
                 new FieldValueAlertCondition.Factory() {
                     @Override
                     public FieldValueAlertCondition createAlertCondition(Stream stream,
@@ -74,7 +80,7 @@ public abstract class AlertConditionTest {
                                                                            Map<String, Object> parameters) {
                         return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
                     }
-                });
+                }));
 
         when(stream.getId()).thenReturn(STREAM_ID);
     }
@@ -84,7 +90,7 @@ public abstract class AlertConditionTest {
         assertNotNull("Timestamp of returned check result should not be null!", result.getTriggeredAt());
         assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
         long difference = Tools.iso8601().getMillis() - result.getTriggeredAt().getMillis();
-        assertTrue("AlertCondition should be triggered about now", difference < 50);
+        assertTrue("AlertCondition should be triggered about now", difference < 1000);
         assertFalse("Alert was triggered, so we should not be in grace period!", alertService.inGracePeriod(alertCondition));
     }
 
@@ -103,15 +109,25 @@ public abstract class AlertConditionTest {
     }
 
     protected void alertLastTriggered(int seconds) {
-        //PowerMockito.mockStatic(AlertImpl.class);
-        //PowerMockito.when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
-        when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
+        // turn it around to avoid actually accessing the database
+        doReturn(seconds).when(alertService).triggeredSecondsAgo(STREAM_ID, CONDITION_ID);
+        // override the mocked object if the condition has not triggered, test code expects null not a mock
+        doAnswer(new Answer() {
+            @Override
+            public AlertCondition.CheckResult answer(InvocationOnMock invocation) throws Throwable {
+                final AlertCondition.CheckResult result = (AlertCondition.CheckResult) invocation.callRealMethod();
+                if (result.isTriggered()) {
+                    return result;
+                }
+                return new AbstractAlertCondition.CheckResult(false, null, result.getResultDescription(), result.getTriggeredAt(), result.getMatchingMessages());
+            }
+        }).when(alertService).triggered(Matchers.<AlertCondition>anyObject());
     }
 
     protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
         try {
-            return klazz.getConstructor(Stream.class, String.class, DateTime.class, String.class, Map.class)
-                    .newInstance(stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
+            return klazz.getConstructor(Searches.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
+                    .newInstance(searches, stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
