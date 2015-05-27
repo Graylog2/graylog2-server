@@ -108,8 +108,8 @@ var SourceDataTable = React.createClass({
               <div className="row sources-filtering">
                   <div className="col-md-6">
                       <div className="form-horizontal pull-left">
-                          <div className="control-group">
-                              <input type="search" className="input-medium" onChange={this._onFilterChanged} placeholder="Search"/>
+                          <div className="input-group input-group-sm">
+                              <input type="text" className="form-control" onChange={this._onFilterChanged} placeholder="Search"/>
                           </div>
                       </div>
                   </div>
