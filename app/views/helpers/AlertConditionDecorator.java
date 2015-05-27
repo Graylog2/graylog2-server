@@ -13,13 +13,16 @@ public abstract class AlertConditionDecorator {
     }
 
     public static Html loadTemplate(Stream stream, AlertCondition condition) {
-        if (condition.getType() == AlertCondition.Type.MESSAGE_COUNT) {
-            return MessageCountAlertConditionDecorator.loadTemplate(stream, condition);
-        } else if (condition.getType() == AlertCondition.Type.FIELD_VALUE) {
-            return FieldValueAlertConditionDecorator.loadTemplate(stream, condition);
+        switch (condition.getType()) {
+            case MESSAGE_COUNT:
+                return MessageCountAlertConditionDecorator.loadTemplate(stream, condition);
+            case FIELD_VALUE:
+                return FieldValueAlertConditionDecorator.loadTemplate(stream, condition);
+            case FIELD_CONTENT_VALUE:
+                return FieldContentValueAlertConditionDecorator.loadTemplate(stream, condition);
+            default:
+                return null;
         }
-
-        return null;
     }
 
     protected Object getParameter(String key, Object defaultValue) {

@@ -179,6 +179,39 @@ public class AlertsController extends AuthenticatedController {
     }
 
     @BodyParser.Of(BodyParser.FormUrlEncoded.class)
+    public Result addTypeFieldContentValue(String streamId) {
+        Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+
+        if(!checkParam("grace", form) || !checkParam("value", form)
+                || !checkParam("field", form)
+                || !checkParam("backlog", form)) {
+            flash("error", "Could not add alert condition: Missing parameters.");
+            return redirect(routes.AlertsController.index(streamId));
+        }
+
+        try {
+            Stream stream = streamService.get(streamId);
+
+            CreateAlertConditionRequest request = new CreateAlertConditionRequest();
+            request.type = "field_content_value";
+            request.parameters.put("grace", Integer.parseInt(form.get("grace")));
+            request.parameters.put("field", form.get("field"));
+            request.parameters.put("value", form.get("value"));
+            request.parameters.put("backlog", Integer.parseInt(form.get("backlog")));
+
+            stream.addAlertCondition(request);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not create alert condition. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        flash("success", "Added alert condition.");
+        return redirect(routes.AlertsController.index(streamId));
+    }
+
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result updateCondition(String streamId, String conditionId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 

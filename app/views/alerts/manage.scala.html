@@ -40,6 +40,7 @@
                         <select class="add-alert-type form-control">
                             <option value="message-count">Message count condition</option>
                             <option value="field-value">Field value condition</option>
+                            <option value="field-content-value">Field content condition</option>
                         </select>
 
                         <button class="btn btn-success form-control add-alert">Configure new alert condition</button>
@@ -48,6 +49,7 @@
 
                 @views.helpers.MessageCountAlertConditionDecorator.loadTemplate(stream, null)
                 @views.helpers.FieldValueAlertConditionDecorator.loadTemplate(stream, null)
+                @views.helpers.FieldContentValueAlertConditionDecorator.loadTemplate(stream, null)
             </div>
         </div>
     }
