@@ -14,9 +14,7 @@ var UserNotification = require('../../util/UserNotification');
 var StreamComponent = React.createClass({
     mixins: [PermissionsMixin],
     getInitialState() {
-        return {
-            streams: []
-        };
+        return {};
     },
     componentDidMount() {
         this.loadData();
