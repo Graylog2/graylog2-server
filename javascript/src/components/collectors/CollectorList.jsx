@@ -46,52 +46,59 @@ var CollectorList = React.createClass({
             return field1.localeCompare(field2);
         }
     },
+    _formatCollectorList(collectors) {
+        return (
+            <table className="table table-striped collectors-list">
+                <thead>
+                <tr>
+                    <th onClick={this.sortByNodeId}>Host Name</th>
+                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
+                    <th onClick={this.sortByLastSeen}>Last Seen</th>
+                    <th className="name" onClick={this.sortById}>
+                        Collector Id
+                    </th>
+                    <th onClick={this.sortByCollectorVersion}>Collector Version</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                {collectors}
+                </tbody>
+            </table>
+        );
+    },
+    _formatEmptyListAlert() {
+        var showInactiveHint = (this.state.showInactive ? null : " and/or click on \"Include inactive collectors\"");
+        return <Alert>There are no collectors to show. Try adjusting your search filter{showInactiveHint}.</Alert>;
+    },
     render() {
         if (this.state.collectors) {
-            if (this.state.collectors.length === 0) {
-                return <Alert>There are no collectors.</Alert>;
-            } else {
-                var collectors = this._getFilteredCollectors()
-                    .filter((collector) => {return (this.state.showInactive || collector.active);})
-                    .sort(this._bySortField)
-                    .map((collector) => {
-                        return <CollectorRow key={collector.id} collector={collector}/>;
-                    }
-                );
+            var collectors = this._getFilteredCollectors()
+                .filter((collector) => {return (this.state.showInactive || collector.active);})
+                .sort(this._bySortField)
+                .map((collector) => {
+                    return <CollectorRow key={collector.id} collector={collector}/>;
+                }
+            );
 
-                var showOrHideInactive = (this.state.showInactive ? "Hide" : "Include");
+            var showOrHideInactive = (this.state.showInactive ? "Hide" : "Include");
 
-                return (
-                    <Row>
-                        <Col md={12}>
-                            <a onClick={this.toggleShowInactive} className="btn btn-primary pull-right">{showOrHideInactive} inactive collectors</a>
+            var collectorList = (collectors.length > 0 ? this._formatCollectorList(collectors) : this._formatEmptyListAlert());
 
-                            <form className="form-inline collectors-filter-form" onSubmit={(e) => e.preventDefault() }>
-                                <label htmlFor="collectorsfilter">Filter collectors:</label>
-                                <input type="text" name="filter" id="collectorsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
-                            </form>
+            return (
+                <Row>
+                    <Col md={12}>
+                        <a onClick={this.toggleShowInactive} className="btn btn-primary pull-right">{showOrHideInactive} inactive collectors</a>
 
-                            <table className="table table-striped collectors-list">
-                                <thead>
-                                <tr>
-                                    <th onClick={this.sortByNodeId}>Host Name</th>
-                                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
-                                    <th onClick={this.sortByLastSeen}>Last Seen</th>
-                                    <th className="name" onClick={this.sortById}>
-                                        Collector Id
-                                    </th>
-                                    <th onClick={this.sortByCollectorVersion}>Collector Version</th>
-                                    <th>&nbsp;</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {collectors}
-                                </tbody>
-                            </table>
-                        </Col>
-                    </Row>
-                );
-            }
+                        <form className="form-inline collectors-filter-form" onSubmit={(e) => e.preventDefault() }>
+                            <label htmlFor="collectorsfilter">Filter collectors:</label>
+                            <input type="text" name="filter" id="collectorsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                        </form>
+
+                        {collectorList}
+                    </Col>
+                </Row>
+            );
         } else {
             return <Spinner />;
         }
