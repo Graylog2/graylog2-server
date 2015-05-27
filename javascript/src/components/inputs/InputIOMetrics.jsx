@@ -4,6 +4,7 @@ var React = require('react');
 //noinspection JSUnusedGlobalSymbols
 var MetricsStore = require('../../stores/metrics/MetricsStore');
 var NodesStore = require('../../stores/nodes/NodesStore');
+var Immutable = require('immutable');
 var numeral = require('numeral');
 
 var metricsStore = MetricsStore.instance;
@@ -16,7 +17,7 @@ var InputIOMetrics = React.createClass({
             hasError: false,
             showDetails: false,
             global: this._newMetricState(),
-            nodes: {}
+            nodes: Immutable.Map()
         };
     },
 
@@ -75,11 +76,11 @@ var InputIOMetrics = React.createClass({
                 } else {
                     // this is a global input, we need to aggregate the values for all nodes that are being returned
                     update.forEach((perNode) => {
-                        newState.nodes[perNode.node_id] = this._newMetricState();
+                        newState.nodes = newState.nodes.set(perNode.node_id, this._newMetricState());
 
                         perNode.values.forEach((namedMetric) => {
                             this._processNodeUpdate(namedMetric, newState.global);
-                            this._processNodeUpdate(namedMetric, newState.nodes[perNode.node_id]);
+                            this._processNodeUpdate(namedMetric, newState.nodes.get(perNode.node_id));
                         });
                     });
                 }
@@ -172,7 +173,7 @@ var InputIOMetrics = React.createClass({
 
         nodes.push(<hr key={'separator'}/>);
 
-        for (var nodeId in nodesState) {
+        nodesState.forEach((state, nodeId) => {
             var nodeName = nodeId;
             var nodeDetails = nodesStore.get(nodeId);
 
@@ -184,11 +185,11 @@ var InputIOMetrics = React.createClass({
                 <span key={this.props.inputId + nodeId}>
                     <strong>{nodeName}</strong>
                     <br/>
-                    {this._renderNetworkMetrics(nodesState[nodeId])}
+                    {this._renderNetworkMetrics(state)}
                     <br/>
                 </span>
             );
-        }
+        });
 
         return nodes;
     },
