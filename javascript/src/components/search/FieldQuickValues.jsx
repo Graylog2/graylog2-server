@@ -69,7 +69,7 @@ var FieldQuickValues = React.createClass({
                             <Button bsSize='small' onClick={() => this._resetStatus()}>Dismiss</Button>
                         </AddToDashboardMenu>
                     </div>
-                    <h1>Field Statistics {this.state.loadPending && <i className="fa fa-spin fa-spinner"></i>}</h1>
+                    <h1>Quick Values for {this.state.field} {this.state.loadPending && <i className="fa fa-spin fa-spinner"></i>}</h1>
 
                     <div>{inner}</div>
                 </div>
