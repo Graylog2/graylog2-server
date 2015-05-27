@@ -23,6 +23,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
+import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
@@ -46,12 +47,17 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     private final FieldValueAlertCondition.Factory fieldValueAlertFactory;
     private final MessageCountAlertCondition.Factory messageCountAlertFactory;
+    private final FieldContentValueAlertCondition.Factory fieldContentValueAlertFactory;
 
     @Inject
-    public AlertServiceImpl(MongoConnection mongoConnection, FieldValueAlertCondition.Factory fieldValueAlertFactory, MessageCountAlertCondition.Factory messageCountAlertFactory) {
+    public AlertServiceImpl(MongoConnection mongoConnection,
+                            FieldValueAlertCondition.Factory fieldValueAlertFactory,
+                            MessageCountAlertCondition.Factory messageCountAlertFactory,
+                            FieldContentValueAlertCondition.Factory fieldContentValueAlertFactory) {
         super(mongoConnection);
         this.fieldValueAlertFactory = fieldValueAlertFactory;
         this.messageCountAlertFactory = messageCountAlertFactory;
+        this.fieldContentValueAlertFactory = fieldContentValueAlertFactory;
     }
 
     @Override
@@ -147,6 +153,8 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
                 return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
             case FIELD_VALUE:
                 return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
+            case FIELD_CONTENT_VALUE:
+                return fieldContentValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
         }
 
         throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
