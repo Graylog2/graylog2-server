@@ -18,6 +18,7 @@ package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.alerts.types.FieldStringValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
@@ -57,6 +58,8 @@ public abstract class AlertConditionTest {
     @Before
     public void setUp() throws Exception {
         stream = mock(Stream.class);
+        when(stream.getId()).thenReturn(STREAM_ID);
+
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
         // TODO use injection please. this sucks so bad
@@ -80,9 +83,18 @@ public abstract class AlertConditionTest {
                                                                            Map<String, Object> parameters) {
                         return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
                     }
+                },
+                new FieldStringValueAlertCondition.Factory() {
+                    @Override
+                    public FieldStringValueAlertCondition createAlertCondition(Stream stream,
+                                                                           String id,
+                                                                           DateTime createdAt,
+                                                                           @Assisted("userid") String creatorUserId,
+                                                                           Map<String, Object> parameters) {
+                        return new FieldStringValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters);
+                    }
                 }));
 
-        when(stream.getId()).thenReturn(STREAM_ID);
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {
