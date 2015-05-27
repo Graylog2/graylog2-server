@@ -48,13 +48,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-public class FieldStringValueAlertConditionTest extends AlertConditionTest {
+public class FieldContentValueAlertConditionTest extends AlertConditionTest {
 
     @Test
     public void testConstructor() throws Exception {
         final Map<String, Object> parameters = getParametersMap(0, "field", "value");
 
-        final FieldStringValueAlertCondition condition = getCondition(parameters);
+        final FieldContentValueAlertCondition condition = getCondition(parameters);
 
         assertNotNull(condition);
         assertNotNull(condition.getDescription());
@@ -91,7 +91,7 @@ public class FieldStringValueAlertConditionTest extends AlertConditionTest {
                 anyInt(),
                 any(Sorting.class)))
             .thenReturn(searchResult);
-        final FieldStringValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
+        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
 
         alertLastTriggered(-1);
 
@@ -124,7 +124,7 @@ public class FieldStringValueAlertConditionTest extends AlertConditionTest {
                 anyInt(),
                 any(Sorting.class)))
                 .thenReturn(searchResult);
-        final FieldStringValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
+        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
 
         alertLastTriggered(-1);
 
@@ -133,8 +133,8 @@ public class FieldStringValueAlertConditionTest extends AlertConditionTest {
         assertNotTriggered(result);
     }
 
-    protected FieldStringValueAlertCondition getCondition(Map<String, Object> parameters) {
-        return new FieldStringValueAlertCondition(
+    protected FieldContentValueAlertCondition getCondition(Map<String, Object> parameters) {
+        return new FieldContentValueAlertCondition(
                 searches,
                 mock(Configuration.class),
                 stream,

@@ -41,8 +41,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class FieldStringValueAlertCondition extends AbstractAlertCondition {
-    private static final Logger LOG = LoggerFactory.getLogger(FieldStringValueAlertCondition.class);
+public class FieldContentValueAlertCondition extends AbstractAlertCondition {
+    private static final Logger LOG = LoggerFactory.getLogger(FieldContentValueAlertCondition.class);
 
     private final Searches searches;
     private final Configuration configuration;
@@ -50,12 +50,12 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
     private final String value;
 
     public interface Factory {
-        FieldStringValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
+        FieldContentValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
     }
 
     @AssistedInject
-    public FieldStringValueAlertCondition(Searches searches, Configuration configuration, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
-        super(stream, id, Type.FIELD_STRING_VALUE, createdAt, creatorUserId, parameters);
+    public FieldContentValueAlertCondition(Searches searches, Configuration configuration, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
+        super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters);
         this.searches = searches;
         this.configuration = configuration;
         this.field = (String) parameters.get("field");

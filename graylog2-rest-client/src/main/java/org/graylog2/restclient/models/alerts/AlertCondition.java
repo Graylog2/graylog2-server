@@ -26,19 +26,16 @@ import org.joda.time.DateTime;
 import java.text.DecimalFormat;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AlertCondition {
 
     public interface Factory {
-        public AlertCondition fromSummaryResponse(AlertConditionSummaryResponse acsr);
+        AlertCondition fromSummaryResponse(AlertConditionSummaryResponse acsr);
     }
 
     public enum Type {
         MESSAGE_COUNT,
         FIELD_VALUE,
-        FIELD_STRING_VALUE
+        FIELD_CONTENT_VALUE
     }
 
     private final String id;
@@ -88,8 +85,8 @@ public class AlertCondition {
                 return "Message count condition";
             case FIELD_VALUE:
                 return "Field value condition";
-            case FIELD_STRING_VALUE:
-                return "Field string value condition";
+            case FIELD_CONTENT_VALUE:
+                return "Field content value condition";
         }
 
         throw new RuntimeException("Cannot build summary for unknown alert condition type [" + type + "]");
@@ -109,8 +106,8 @@ public class AlertCondition {
             case FIELD_VALUE:
                 sb.append(buildFieldValueDescription());
                 break;
-            case FIELD_STRING_VALUE:
-                sb.append(buildFieldStringValueDescription());
+            case FIELD_CONTENT_VALUE:
+                sb.append(buildFieldContentValueDescription());
                 break;
             default:
                 throw new RuntimeException("Cannot build description for unknown alert condition type [" + type + "]");
@@ -122,7 +119,7 @@ public class AlertCondition {
         return sb.toString();
     }
 
-    private String buildFieldStringValueDescription() {
+    private String buildFieldContentValueDescription() {
         String query = String.valueOf(parameters.get("field")) + ":\"" + parameters.get("value") + "\"";
 
         return "Alert is triggered when messages matching <" + query + "> are received. ";

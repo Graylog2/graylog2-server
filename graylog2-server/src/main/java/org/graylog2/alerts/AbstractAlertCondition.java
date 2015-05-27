@@ -36,7 +36,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public enum Type {
         MESSAGE_COUNT,
         FIELD_VALUE,
-        FIELD_STRING_VALUE,
+        FIELD_CONTENT_VALUE,
         DUMMY
     }
 
