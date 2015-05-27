@@ -65,11 +65,7 @@ var MessageDetail = React.createClass({
         }
     },
     _getFormattedTime() {
-        if (this.formattedTimestamp === undefined) {
-            this.formattedTimestamp = momentHelper.toUserTimeZone(this.props.message.fields['timestamp']).format('YYYY-MM-DD HH:mm:ss.SSS');
-        }
-
-        return this.formattedTimestamp;
+        return momentHelper.toUserTimeZone(this.props.message.fields['timestamp']).format('YYYY-MM-DD HH:mm:ss.SSS');
     },
     render() {
         // Short circuit when all messages are being expanded at the same time
@@ -111,9 +107,12 @@ var MessageDetail = React.createClass({
         var timestamp = null;
         if (this.props.showTimestamp) {
             timestamp = [];
+            var rawTimestamp = this.props.message.fields['timestamp'];
 
-            timestamp.push(<dt key="0">Timestamp</dt>);
-            timestamp.push(<dd key="1"><time dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time> </dd>);
+            timestamp.push(<dt key={"dt-" + rawTimestamp}>Timestamp</dt>);
+            timestamp.push(<dd key={"dd-" + rawTimestamp}>
+                <time key={"time-" + rawTimestamp} dateTime={rawTimestamp}>{this._getFormattedTime()}</time>
+            </dd>);
         }
 
         var receivedBy;
