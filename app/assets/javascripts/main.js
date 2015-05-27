@@ -824,22 +824,6 @@ $(document).ready(function() {
         $("div.global-input-io-details[data-input-id="+inputId+"]").toggle();
     });
 
-    if ($.browser.safari) {
-        $("form").on("submit", function(e) {
-            $(this).find("input[required]").each(function(count, elem) {
-                if ($(elem).val() === "") {
-                    $(elem).addClass("required-input-highlight");
-                    e.preventDefault();
-                }
-            });
-            return true;
-        });
-
-        $("input[required]").on("keydown", function(e) {
-            $(this).removeClass("required-input-highlight");
-        });
-    }
-
     $('input, textarea').placeholder();
 
     $(".node-state").tooltip();
