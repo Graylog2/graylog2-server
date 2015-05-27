@@ -29,6 +29,24 @@ var AlarmCallback = React.createClass({
         var configurationWell = (this._typeNotAvailable() ? null : <ConfigurationWell configuration={alarmCallback.configuration}
                                                                                       typeDefinition={this.props.types[alarmCallback.type]} />);
         return (
+            <div className="col-md-3" style={{textAlign: "right"}}>
+                {' '}
+                {editAlarmCallbackButton}
+                {' '}
+                {deleteAlarmCallbackButton}
+            </div>
+        );
+    },
+    getDefaultProps() {
+        return {
+            hideButtons: false
+        };
+    },
+    render() {
+        var alarmCallback = this.props.alarmCallback;
+        var humanReadableType = this.props.types[alarmCallback.type].name;
+        var actionButtons = (this.props.hideButtons ? null : this._formatActionButtons());
+        return (
             <div className="alert-callback" data-destination-id={alarmCallback.id}>
                 <Row style={{marginBottom: 0}}>
                     <Col md={9}>

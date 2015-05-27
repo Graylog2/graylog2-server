@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var AlarmCallbackHistoryStore = require('../../stores/alarmcallbacks/AlarmCallbackHistoryStore');
+var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var Spinner = require('../common/Spinner');
 var AlarmCallbackHistory = require('./AlarmCallbackHistory');
 
@@ -16,12 +17,15 @@ var AlarmCallbackHistoryOverview = React.createClass({
         AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((result) => {
             this.setState({histories: result.histories});
         });
+        AlarmCallbacksStore.available(this.props.streamId, (types) => {
+            this.setState({types: types});
+        });
     },
     _formatHistory(history) {
-        return <li><AlarmCallbackHistory alarmCallbackHistory={history} /></li>;
+        return <li><AlarmCallbackHistory alarmCallbackHistory={history} types={this.state.types}/></li>;
     },
     render() {
-        if (this.state.histories) {
+        if (this.state.histories && this.state.types) {
             var histories = this.state.histories.map(this._formatHistory);
             return (
                 <div>
