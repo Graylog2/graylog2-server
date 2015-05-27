@@ -2213,30 +2213,30 @@ form.edit-dashboard-form {
   margin-left: 5px;
 }
 
+.alerts-container .dynatable-search {
+  float: right;
+  margin-top: -40px; // We want to display this outside of the container, aligned with the div's title
+  margin-bottom: 0;
+}
+
+.alerts-container .dynatable-search input {
+  top: 0;
+}
+
 .alerts {
-  position: relative;
-  top: -25px;
-  margin-bottom: -15px;
+  margin-top: 15px;
+}
+
+.alerts th {
+  background-color: #333;
 }
 
 .alerts th a {
-  color: #0088cc;
+  display: block;
 }
 
-.alerts th a:hover {
-  text-decoration: none;
-  color: #4DBCE9;
-  border-bottom: 1px dotted #4DBCE9;
-}
-
-.alerts tbody tr a {
-  color: #000;
-}
-
-.alerts tbody tr a:hover {
-  text-decoration: none;
-  color: #4DBCE9;
-  border-bottom: 1px dotted #4DBCE9;
+.alerts th a:focus {
+  color: #fff;
 }
 
 .alert-condition .in-grace {
@@ -3068,15 +3068,6 @@ div.alert-callback .well ul {
 
 div.alert-callbacks {
   margin-top: 10px;
-}
-
-div.alerts-container .dynatable-record-count {
-  margin-top: 10px;
-}
-
-div.alerts-container .dynatable-search {
-  position: relative;
-  top: -20px;
 }
 
 .collector-os {
