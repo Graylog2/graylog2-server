@@ -29,7 +29,7 @@ var InputsStore = {
                 "Could not retrieve recent message from input " + input.title + "!");
         };
 
-        $.getJSON(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.id, true).url, callback).fail(failCallback);
+        $.getJSON(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.id).url, callback).fail(failCallback);
     }
 };
 
