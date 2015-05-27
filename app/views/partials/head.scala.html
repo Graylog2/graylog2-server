@@ -24,6 +24,8 @@
 <script src="@routes.Assets.at("javascripts/jquery-ui.min.js")" type="text/javascript"></script>
 <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
 <script src="@routes.Assets.at("javascripts/typeahead.jquery.min.js")" type="text/javascript"></script>
+<script src="@routes.Assets.at("javascripts/polyfiller.js")" type="text/javascript"></script>
+<script type="text/javascript">webshim.polyfill('forms');</script> <!-- We need to load this asap -->
 <script src="@routes.Assets.at("javascripts/d3.v3.min.js")" type="text/javascript"></script>
 <script src="@routes.Assets.at("javascripts/graphHelper.js")" type="text/javascript"></script>
 <script src="@routes.Assets.at("javascripts/rickshaw.min.js")" type="text/javascript"></script>

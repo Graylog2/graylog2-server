@@ -405,68 +405,6 @@ $(document).ready(function() {
     });
     toggleSessionTimeoutEditableState($("#session-timeout-never").is(":checked"));
 
-    $("#create-user-form").on("submit", function() {
-        return validate("#create-user-form")}
-    );
-
-    $("#edit-user-form").on("submit", function() {
-            return validate("#edit-user-form")}
-    );
-
-    var createUsernameField = $("form#create-user-form #username");
-    if (createUsernameField.length) {
-        var domElement = createUsernameField[0];
-        delayedAjaxCallOnKeyup( domElement, function() {
-            var username =  createUsernameField.val();
-            $.ajax({
-                url: appPrefixed("/a/system/users/" + encodeURIComponent(username)),
-                type: "GET",
-                cache: false,
-                global: false,
-                statusCode: {
-                    204: function() {
-                        validationFailure( createUsernameField, "Username is already taken.");
-                        domElement.setCustomValidity('The entered user name is already taken.');
-                    },
-                    404: function() {
-                        createUsernameField.popover("destroy");
-                        domElement.setCustomValidity('');
-                    }
-                }
-            });
-        }, 150 );
-    }
-
-    var passwordField = $("form #password");
-    if (passwordField.length) {
-        var passwordDomElement = passwordField[0];
-        delayedAjaxCallOnKeyup(passwordDomElement, function() {
-            var password = passwordField.val();
-            if (password.length < 6) {
-                passwordDomElement.setCustomValidity("Password is too short!");
-                validationFailure(passwordField, "Password is too short!");
-            } else {
-                passwordDomElement.setCustomValidity('');
-                passwordField.popover("destroy");
-            }
-        }, 150);
-    }
-
-    var repeatPasswordField = $("form #password-repeat");
-    if (repeatPasswordField.length) {
-        var domElement1 = repeatPasswordField[0];
-        delayedAjaxCallOnKeyup(domElement1, function() {
-            var password = $("form #password").val();
-            if (password == repeatPasswordField.val()) {
-                domElement1.setCustomValidity('');
-                repeatPasswordField.popover("destroy");
-            } else {
-                domElement1.setCustomValidity("Passwords do not match!");
-                validationFailure(repeatPasswordField, "Passwords do not match!");
-            }
-        }, 150);
-    }
-
     // Universalsearch validation.
     $("#universalsearch").on("submit", function() {
         return validate("#universalsearch");
@@ -885,22 +823,6 @@ $(document).ready(function() {
 
         $("div.global-input-io-details[data-input-id="+inputId+"]").toggle();
     });
-
-    if ($.browser.safari) {
-        $("form").on("submit", function(e) {
-            $(this).find("input[required]").each(function(count, elem) {
-                if ($(elem).val() === "") {
-                    $(elem).addClass("required-input-highlight");
-                    e.preventDefault();
-                }
-            });
-            return true;
-        });
-
-        $("input[required]").on("keydown", function(e) {
-            $(this).removeClass("required-input-highlight");
-        });
-    }
 
     $('input, textarea').placeholder();
 

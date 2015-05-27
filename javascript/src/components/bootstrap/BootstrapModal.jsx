@@ -71,8 +71,16 @@ var BootstrapModal = React.createClass({
     },
     _submit(event) {
         var formDOMNode = React.findDOMNode(this.refs.form);
+        var $formDOMNode = $(formDOMNode);
 
-        if (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) {
+        if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
+            (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
+            event.preventDefault();
+            return;
+        }
+
+        // Check custom validation for plugin fields
+        if (!validate(formDOMNode)) {
             event.preventDefault();
             return;
         }
