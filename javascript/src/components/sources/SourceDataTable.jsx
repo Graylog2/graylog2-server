@@ -12,7 +12,7 @@ var numeral = require('numeral');
 
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 
-var othersThreshold = 5;
+var NUMBER_OF_TOP_VALUES = 5;
 var othersName = "Others";
 
 var SourceDataTable = React.createClass({
@@ -21,18 +21,31 @@ var SourceDataTable = React.createClass({
             numberOfSources: 100
         };
     },
-    renderDataTable(dimension, onDataFiltered) {
+    _getAddToSearchButton(term) {
+        var addToSearchButton = document.createElement('button');
+        addToSearchButton.className = 'btn btn-xs btn-default dc-search-button';
+        addToSearchButton.title = 'Add to search query';
+        addToSearchButton.setAttribute('data-term', term);
+        addToSearchButton.innerHTML = "<i class='fa fa-search-plus'></i>";
+
+        return addToSearchButton.outerHTML;
+    },
+    renderDataTable(dimension, group, onDataFiltered) {
         var dataTableDomNode = $("#dc-sources-result")[0];
         this._dataTable = dc.dataTable(dataTableDomNode);
         this._dataTable
             .dimension(dimension)
-            .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
+            .group((d) => {
+                var topValues = group.top(NUMBER_OF_TOP_VALUES);
+                var dInTopValues = topValues.some((value) => d.name.localeCompare(value.key) === 0);
+                return dInTopValues ? "Top sources" : "Others";
+            })
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='fa fa-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
-                (d) => numeral(d.message_count).format("0,0")
+                (d) => numeral(d.message_count).format("0,0"),
+                (d) => this._getAddToSearchButton()
             ])
             .sortBy((d) => d.message_count)
             .order(d3.descending)
@@ -89,21 +102,26 @@ var SourceDataTable = React.createClass({
         this.props.setSearchFilter(event.target.value);
     },
     render() {
-        var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed">
+        var resultTable = (<table id="dc-sources-result" className="sources table table-hover">
             <thead>
                 <tr>
-                    <th style={{width: "10px"}}></th>
-                    <th>Source name</th>
+                    <th>Name</th>
                     <th>Percentage</th>
                     <th>Message count</th>
+                    <th style={{width: "10px"}}></th>
                 </tr>
             </thead>
         </table>);
 
         return (
           <div>
-              <h3><i className="fa fa-th-list"></i> Selected sources&nbsp;
-                  <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-remove"></i> Reset filter</a></small>
+              <h3 className="sources-title">Selected sources
+                  <span style={{marginLeft: 20}}>
+                      <button id="dc-sources-result-reset" className="btn btn-info btn-xs"
+                              onClick={this.props.resetFilters} title="Reset filter" style={{display: "none"}}>
+                          Reset
+                      </button>
+                  </span>
               </h3>
               <div className="row sources-filtering">
                   <div className="col-md-6">
@@ -116,7 +134,7 @@ var SourceDataTable = React.createClass({
                   <div className="col-md-6">
                       <div className="form-inline text-right">
                           <div className="form-group">
-                              <label htmlFor="no-results">Results:</label>
+                              <label htmlFor="no-results">Show:</label>
                                   <select id="no-results" className="form-control input-sm" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
                                       <option value="10">10</option>
                                       <option value="50">50</option>

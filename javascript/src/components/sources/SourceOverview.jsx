@@ -79,7 +79,7 @@ var SourceOverview = React.createClass({
             }
         };
 
-        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, onDataTableFiltered);
+        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, this.nameMessageGroup, onDataTableFiltered);
         this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, onPieChartFiltered);
         this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
         this.applyRangeParameter();
@@ -293,10 +293,10 @@ var SourceOverview = React.createClass({
                         resetFilters={this.resetHistogramFilters}/>
                 </div>
                 <div className="row content">
-                    <div className="col-md-9">
+                    <div className="col-md-7">
                         <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-3 col-md-offset-1">
                         <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
                     </div>
                 </div>
