@@ -212,17 +212,14 @@ GET           /a/system/nodes                                                   
 
 # API: Inputs
 GET           /a/system/inputs                                                                   @controllers.api.InputsApiController.list()
-GET           /a/system/inputs/global/:input_id/recent_message                                   @controllers.api.InputsApiController.globalRecentMessage(input_id: String, filtered: Boolean ?= false)
-GET           /a/system/inputs/global/:input_id/recent_message/filtered                          @controllers.api.InputsApiController.globalRecentMessage(input_id: String, filtered: Boolean ?= true)
+GET           /a/system/inputs/global/:input_id/recent_message                                   @controllers.api.InputsApiController.globalRecentMessage(input_id: String)
 GET           /a/system/inputs/global/:input_id/io                                               @controllers.api.InputsApiController.globaIO(input_id: String)
-GET           /a/system/inputs/:node_id/:input_id/recent_message                                 @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
-GET           /a/system/inputs/:node_id/:input_id/recent_message/filtered                        @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= true)
+GET           /a/system/inputs/:node_id/:input_id/recent_message                                 @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String)
 GET           /a/system/inputs/:node_id/:input_id/io                                             @controllers.api.InputsApiController.io(node_id: String, input_id: String)
 GET           /a/system/inputs/:node_id/:input_id/connections                                    @controllers.api.InputsApiController.connections(node_id: String, input_id: String)
 
 # API: Messages
-GET           /a/messages/:index/:id                                                             @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= false)
-GET           /a/messages/:index/:id/filtered                                                    @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= true)
+GET           /a/messages/:index/:id                                                             @controllers.MessagesController.single(index: String, id: String)
 
 # API: Tools
 POST          /a/tools/regex_test                                                                @controllers.api.ToolsApiController.regexTest()
