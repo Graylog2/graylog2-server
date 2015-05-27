@@ -25,6 +25,7 @@ import org.graylog2.database.CollectionName;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackResult;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.joda.time.DateTime;
 import org.mongojack.ObjectId;
 
@@ -32,7 +33,7 @@ import org.mongojack.ObjectId;
 @JsonAutoDetect
 @CollectionName("alarmcallbackhistory")
 public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
-    public static final String FIELD_ALARMCALLBACKCONFIGURATIONID = "alarmcallbackconfiguration_id";
+    public static final String FIELD_ALARMCALLBACKCONFIGURATIONID = "alarmcallbackconfiguration";
 
     @JsonProperty("_id")
     @ObjectId
@@ -41,7 +42,7 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
 
     @JsonProperty(FIELD_ALARMCALLBACKCONFIGURATIONID)
     @Override
-    public abstract String alarmcallbackConfigurationId();
+    public abstract AlarmCallbackSummary alarmcallbackConfiguration();
 
     @JsonProperty("alert_id")
     @Override
@@ -61,12 +62,12 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
 
     @JsonCreator
     public static AlarmCallbackHistoryImpl create(@JsonProperty("_id") String id,
-                                              @JsonProperty("alarmcallbackconfiguration_id") String alarmcallbackConfigurationId,
+                                              @JsonProperty("alarmcallbackconfiguration") AlarmCallbackSummary alarmcallbackConfiguration,
                                               @JsonProperty("alert_id") String alertId,
                                               @JsonProperty("alertcondition_id") String alertConditionId,
                                               @JsonProperty("result") AlarmCallbackResult result,
                                               @JsonProperty("created_at") DateTime createdAt) {
-        return new AutoValue_AlarmCallbackHistoryImpl(id, alarmcallbackConfigurationId, alertId, alertConditionId, result, createdAt);
+        return new AutoValue_AlarmCallbackHistoryImpl(id, alarmcallbackConfiguration, alertId, alertConditionId, result, createdAt);
     }
 
     public static AlarmCallbackHistory create(String id,
@@ -75,7 +76,15 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
                                               AlertCondition alertCondition,
                                               AlarmCallbackResult result,
                                               DateTime createdAt) {
-        return new AutoValue_AlarmCallbackHistoryImpl(id, alarmCallbackConfiguration.getId(), alert.getId(), alertCondition.getId(), result, createdAt);
+        final AlarmCallbackSummary alarmCallbackSummary = AlarmCallbackSummary.create(
+                alarmCallbackConfiguration.getId(),
+                alarmCallbackConfiguration.getStreamId(),
+                alarmCallbackConfiguration.getType(),
+                alarmCallbackConfiguration.getConfiguration(),
+                alarmCallbackConfiguration.getCreatedAt(),
+                alarmCallbackConfiguration.getCreatorUserId()
+        );
+        return create(id, alarmCallbackSummary, alert.getId(), alertCondition.getId(), result, createdAt);
     }
 
     public static AlarmCallbackHistory create(String id,
@@ -83,6 +92,6 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
                                               Alert alert,
                                               AlertCondition alertCondition,
                                               AlarmCallbackResult result) {
-        return new AutoValue_AlarmCallbackHistoryImpl(id, alarmCallbackConfiguration.getId(), alert.getId(), alertCondition.getId(), result, Tools.iso8601());
+        return create(id, alarmCallbackConfiguration, alert, alertCondition, result, Tools.iso8601());
     }
 }

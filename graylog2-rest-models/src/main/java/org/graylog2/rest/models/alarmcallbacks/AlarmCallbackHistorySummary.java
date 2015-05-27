@@ -28,8 +28,8 @@ public abstract class AlarmCallbackHistorySummary {
     @JsonProperty("_id")
     public abstract String id();
 
-    @JsonProperty("alarmcallbackconfiguration_id")
-    public abstract String alarmcallbackConfigurationId();
+    @JsonProperty("alarmcallbackconfiguration")
+    public abstract AlarmCallbackSummary alarmcallbackConfiguration();
 
     @JsonProperty("alert_id")
     public abstract String alertId();
@@ -45,11 +45,11 @@ public abstract class AlarmCallbackHistorySummary {
 
     @JsonCreator
     public static AlarmCallbackHistorySummary create(@JsonProperty("_id") String id,
-                                                  @JsonProperty("alarmcallbackconfiguration_id") String alarmcallbackConfigurationId,
+                                                  @JsonProperty("alarmcallbackconfiguration") AlarmCallbackSummary alarmcallbackConfiguration,
                                                   @JsonProperty("alert_id") String alertId,
                                                   @JsonProperty("alertcondition_id") String alertConditionId,
                                                   @JsonProperty("result") AlarmCallbackResult result,
                                                   @JsonProperty("created_at") DateTime createdAt) {
-        return new AutoValue_AlarmCallbackHistorySummary(id, alarmcallbackConfigurationId, alertId, alertConditionId, result, createdAt);
+        return new AutoValue_AlarmCallbackHistorySummary(id, alarmcallbackConfiguration, alertId, alertConditionId, result, createdAt);
     }
 }

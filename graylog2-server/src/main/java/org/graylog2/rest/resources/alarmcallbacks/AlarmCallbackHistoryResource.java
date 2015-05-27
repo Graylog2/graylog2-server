@@ -73,7 +73,7 @@ public class AlarmCallbackHistoryResource extends RestResource {
         final List<AlarmCallbackHistorySummary> historySummaryList = new ArrayList<>(historyList.size());
         for (AlarmCallbackHistory alarmCallbackHistory : historyList) {
             historySummaryList.add(AlarmCallbackHistorySummary.create(alarmCallbackHistory.id(),
-                    alarmCallbackHistory.alarmcallbackConfigurationId(),
+                    alarmCallbackHistory.alarmcallbackConfiguration(),
                     alarmCallbackHistory.alertId(),
                     alarmCallbackHistory.alertConditionId(),
                     alarmCallbackHistory.result(),
