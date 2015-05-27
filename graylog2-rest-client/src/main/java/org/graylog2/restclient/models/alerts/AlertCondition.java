@@ -123,15 +123,9 @@ public class AlertCondition {
     }
 
     private String buildFieldStringValueDescription() {
-        String query = new StringBuilder()
-                .append(parameters.get("field")).append(":\"").append(parameters.get("value")).append("\"")
-                .toString();
+        String query = String.valueOf(parameters.get("field")) + ":\"" + parameters.get("value") + "\"";
 
-        StringBuilder sb = new StringBuilder()
-                .append("Alert is triggered when messages matching <")
-                .append(query).append("> are received. ");
-
-        return sb.toString();
+        return "Alert is triggered when messages matching <" + query + "> are received. ";
     }
 
     private String buildBacklogDescription(int backlog) {

@@ -65,9 +65,7 @@ public class FieldStringValueAlertCondition extends AbstractAlertCondition {
     @Override
     protected CheckResult runCheck() {
         String filter = "streams:" + stream.getId();
-        String query = new StringBuilder()
-                .append(field).append(":\"").append(value).append("\"")
-                .toString();
+        String query = field + ":\"" + value + "\"";
         Integer backlogSize = getBacklog();
         boolean backlogEnabled = false;
         int searchLimit = 1;
