@@ -43,6 +43,9 @@ var Paginator = React.createClass({
         }
     },
     _firstRightPage(size, currentPage, pages) {
+        if (size > pages) {
+            return pages;
+        }
         if (this._isInMiddle(currentPage, size, pages)) {
             return (pages-this._rightSize(size));
         } else {
@@ -64,17 +67,22 @@ var Paginator = React.createClass({
 
         buttons.push(<Button key="previous" onClick={this._onPrevious} disabled={currentPage == 1}>Previous</Button>);
 
-        for (var i = 1; i <= this._lastLeftPage(size, currentPage, pages); i++) {
-            buttons.push(this._button(i));
-        }
-        if (this._isInMiddle(currentPage, size, pages)) {
-            buttons.push(this._filler("filler-left"));
-            buttons.push(this._button(currentPage));
-        }
-        buttons.push(this._filler('filler-right'));
-
-        for (var n = this._firstRightPage(size, currentPage, pages); n <= pages; n++) {
-            buttons.push(this._button(n));
+        if (size < pages) {
+            for (var i = 1; i <= this._lastLeftPage(size, currentPage, pages); i++) {
+                buttons.push(this._button(i));
+            }
+            if (this._isInMiddle(currentPage, size, pages)) {
+                buttons.push(this._filler("filler-left"));
+                buttons.push(this._button(currentPage));
+            }
+            buttons.push(this._filler('filler-right'));
+            for (var n = this._firstRightPage(size, currentPage, pages); n <= pages; n++) {
+                buttons.push(this._button(n));
+            }
+        } else {
+            for (var i = 1; i <= pages; i++) {
+                buttons.push(this._button(i));
+            }
         }
         buttons.push(<Button key="next" onClick={this._onNext} disabled={currentPage == this.props.pages}>Next</Button>);
 
