@@ -159,7 +159,7 @@ var InputIOMetrics = React.createClass({
 
         return (
             <span>Active connections: <span className="active">{numeral(nodeState.open_connections).format("0,0")} </span>
-                    (<span className="total">{numeral(nodeState.open_connections).format("0,0")}</span> total)
+                    (<span className="total">{numeral(nodeState.total_connections).format("0,0")}</span> total)
             </span>
         );
     },
