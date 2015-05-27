@@ -107,24 +107,22 @@ var SourceDataTable = React.createClass({
               </h3>
               <div className="row sources-filtering">
                   <div className="col-md-6">
-                      <div className="form-horizontal pull-left">
-                          <div className="input-group input-group-sm">
-                              <input type="text" className="form-control" onChange={this._onFilterChanged} placeholder="Search"/>
+                      <div className="form-inline">
+                          <div className="form-group">
+                              <input type="text" className="form-control input-sm" onChange={this._onFilterChanged} placeholder="Search"/>
                           </div>
                       </div>
                   </div>
                   <div className="col-md-6">
-                      <div className="form-horizontal pull-right">
-                          <div className="control-group">
-                              <label className="control-label">Results:</label>
-                              <div className="controls">
-                                  <select className="input-small" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
+                      <div className="form-inline text-right">
+                          <div className="form-group">
+                              <label htmlFor="no-results">Results:</label>
+                                  <select id="no-results" className="form-control input-sm" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
                                       <option value="10">10</option>
                                       <option value="50">50</option>
                                       <option value="100">100</option>
                                       <option value="500">500</option>
                                   </select>
-                              </div>
                           </div>
                       </div>
                   </div>

@@ -308,14 +308,16 @@ var SourceOverview = React.createClass({
                 <div className="row content">
                     <div className="col-md-12">
                         <div>
-                            <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
-                                <option value={hoursToSeconds(1)}>Last Hour</option>
-                                <option value={daysToSeconds(1)}>Last Day</option>
-                                <option value={daysToSeconds(7)}>Last Week</option>
-                                <option value={daysToSeconds(31)}>Last Month</option>
-                                <option value={daysToSeconds(365)}>Last Year</option>
-                                <option value="0">All</option>
-                            </select>
+                            <div className="pull-right">
+                                <select ref="rangeSelector" className="sources-range form-control input-sm" value={this.state.range} onChange={this._onRangeChanged}>
+                                    <option value={hoursToSeconds(1)}>Last Hour</option>
+                                    <option value={daysToSeconds(1)}>Last Day</option>
+                                    <option value={daysToSeconds(7)}>Last Week</option>
+                                    <option value={daysToSeconds(31)}>Last Month</option>
+                                    <option value={daysToSeconds(365)}>Last Year</option>
+                                    <option value="0">All</option>
+                                </select>
+                            </div>
                             <h1><i className="fa fa-download"></i> Sources</h1>
                         </div>
                         <p style={{"marginTop": "15px"}}>
