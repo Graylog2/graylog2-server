@@ -146,24 +146,20 @@ public class InputsApiController extends AuthenticatedController {
         }
     }
 
-    public Result globalRecentMessage(String inputId, boolean filtered) throws InvalidRangeParametersException, IOException, APIException {
+    public Result globalRecentMessage(String inputId) throws InvalidRangeParametersException, IOException, APIException {
         final String query = "gl2_source_input:" + inputId;
 
         final UniversalSearch search = this.searchFactory.queryWithRange(query, new RelativeRange(86400));
 
         List<MessageResult> messages = search.search().getMessages();
         if (messages.size() > 0) {
-            return ok(Json.toJson(buildResultFromMessage(messages.get(0), filtered)));
+            return ok(Json.toJson(buildResultFromMessage(messages.get(0))));
         } else {
             return notFound();
         }
     }
 
     public Result recentMessage(String nodeId, String inputId) {
-        return recentMessage(nodeId, inputId, true);
-    }
-
-    public Result recentMessage(String nodeId, String inputId, Boolean filtered) {
         try {
             Node node = nodeService.loadNode(nodeId);
             MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
@@ -172,7 +168,7 @@ public class InputsApiController extends AuthenticatedController {
                 return notFound();
             }
 
-            return ok(Json.toJson(buildResultFromMessage(recentlyReceivedMessage, filtered)));
+            return ok(Json.toJson(buildResultFromMessage(recentlyReceivedMessage)));
         } catch (IOException e) {
             return status(500);
         } catch (APIException e) {
@@ -182,25 +178,25 @@ public class InputsApiController extends AuthenticatedController {
         }
     }
 
-    protected RecentMessageResult buildResultFromMessage(MessageResult message, boolean filtered) {
-        final Map<String, Object> fields;
-        if (filtered)
-            fields = message.getFilteredFields();
-        else
-            fields = message.getFields();
-
-        return new RecentMessageResult(message.getId(), message.getIndex(), fields);
+    protected RecentMessageResult buildResultFromMessage(MessageResult message) {
+        return new RecentMessageResult(message.getId(), message.getIndex(), message.getFields(), message.getFormattedFields(),
+                message.getFilteredFields());
     }
 
     public static class RecentMessageResult {
         public final String id;
         public final String index;
         public final Map<String, Object> fields;
+        public final Map<String, Object> formattedFields;
+        public final Map<String, Object> filteredFields;
 
-        public RecentMessageResult(String id, String index, Map<String, Object> fields) {
+        public RecentMessageResult(String id, String index, Map<String, Object> fields,
+                                   Map<String, Object> formattedFields, Map<String, Object> filteredFields) {
             this.id = id;
             this.index = index;
             this.fields = fields;
+            this.formattedFields = formattedFields;
+            this.filteredFields = filteredFields;
         }
     }
 }
