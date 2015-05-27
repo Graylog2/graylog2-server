@@ -55,7 +55,7 @@ function validate(formContainer) {
         // Do not check disabled form fields.
         if (!$(this).is(':disabled')) {
             var validatorTypes = $(this).attr("data-validate").split(" ");
-            for (var i = 0; i < validatorTypes.length; i++) {
+            for (var i = 0; (!errors && i < validatorTypes.length); i++) {
                 errors = dispatchRuleValidation($(this), validatorTypes[i]);
             }
         }
