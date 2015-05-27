@@ -94,21 +94,16 @@ public class MessagesController extends AuthenticatedController {
 
     // TODO move this to an API controller.
     public Result single(String index, String id) {
-        return single(index, id, false);
-    }
-
-    public Result single(String index, String id, Boolean filtered) {
         try {
 
-            MessageResult message = messagesService.getMessage(index, id);
+            final MessageResult message = messagesService.getMessage(index, id);
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", message.getId());
             result.put("index", message.getIndex());
-            if (filtered)
-                result.put("fields", message.getFilteredFields());
-            else
-                result.put("fields", message.getFields());
+            result.put("filtered_fields", message.getFilteredFields());
+            result.put("fields", message.getFields());
+            result.put("formatted_fields", message.getFormattedFields());
 
             return ok(Json.toJson(result));
         } catch (IOException e) {
