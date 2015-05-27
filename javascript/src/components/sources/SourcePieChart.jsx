@@ -52,7 +52,7 @@ var SourcePieChart = React.createClass({
         return (
             <div id="dc-sources-pie-chart" ref="sourcePieChart">
                 <h3><i className="fa fa-bar-chart"></i> Messages per source&nbsp;
-                    <small><a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-retweet"></i></a></small>
+                    <small><a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-remove"></i> Reset filter</a></small>
                 </h3>
             </div>
         );

@@ -103,7 +103,7 @@ var SourceDataTable = React.createClass({
         return (
           <div>
               <h3><i className="fa fa-th-list"></i> Selected sources&nbsp;
-                  <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-retweet"></i></a></small>
+                  <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-remove"></i> Reset filter</a></small>
               </h3>
               <div className="row sources-filtering">
                   <div className="col-md-6">

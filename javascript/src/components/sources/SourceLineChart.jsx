@@ -100,7 +100,7 @@ var SourceLineChart = React.createClass({
                     <i className="fa fa-calendar"></i> Messages per {this.props.resolution}&nbsp;
                     <small>
                         <a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}>
-                            <i className="fa fa-retweet"></i>
+                            <i className="fa fa-remove"></i> Reset filter
                         </a>
                     </small>
                 </h3>
