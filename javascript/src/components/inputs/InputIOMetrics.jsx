@@ -179,6 +179,9 @@ var InputIOMetrics = React.createClass({
 
             if (nodeDetails) {
                 nodeName = nodeDetails.short_node_id + " / " + nodeDetails.hostname;
+            } else {
+                // Trigger load to eventually get the node details.
+                nodesStore.load();
             }
 
             nodes.push(
