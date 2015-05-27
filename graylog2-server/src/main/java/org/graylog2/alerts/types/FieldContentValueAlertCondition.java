@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -85,12 +86,15 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                     new Sorting("timestamp", Sorting.Direction.DESC)
             );
 
-            final List<MessageSummary> summaries = Lists.newArrayList();
+            final List<MessageSummary> summaries;
             if (backlogEnabled) {
+                summaries = Lists.newArrayListWithCapacity(result.getResults().size());
                 for (ResultMessage resultMessage : result.getResults()) {
                     final Message msg = new Message(resultMessage.getMessage());
                     summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                 }
+            } else {
+                summaries = Collections.emptyList();
             }
 
             final long count = result.getTotalResults();
@@ -120,5 +124,4 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     public String getDescription() {
         return "field: " + field + ", value: " + value;
     }
-
 }
