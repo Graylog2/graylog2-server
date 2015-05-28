@@ -14,32 +14,21 @@ $(document).ready(function () {
 
     $(document).on('create.graylog.fieldgraph', function (event, data) {
         "use strict";
-        var graphOptions = createFieldChart(data['options'], data['container']);
-        $(document).trigger('created.graylog.fieldgraph', {graphOptions: graphOptions});
+        renderFieldChart(data['options'], data['container'], true);
     });
 
-    function sendUpdateGraphEvent(opts) {
+    function sendCreatedGraphEvent(opts) {
+        "use strict";
+        $(document).trigger('created.graylog.fieldgraph', {graphOptions: opts});
+    }
+
+    function sendUpdatedGraphEvent(opts) {
         "use strict";
         $(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
     }
 
     function sendFailureEvent(graphId, errorMessage) {
         $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
-    }
-
-    function createFieldChart(options, graphContainer) {
-        "use strict";
-
-        //var container = $(this).closest(".analyze-field");
-        //if (!!container.attr("data-stream-id")) {
-        //    opts.streamid = container.attr("data-stream-id");
-        //}
-        //
-        //renderFieldChart(opts, container);
-
-        renderFieldChart(options, graphContainer);
-
-        return options;
     }
 
     function getDefaultOptions(opts) {
@@ -143,7 +132,7 @@ $(document).ready(function () {
         return params;
     }
 
-    function renderFieldChart(opts, graphContainer) {
+    function renderFieldChart(opts, graphContainer, newGraph) {
         var field = opts.field;
         var $graphContainer = $(graphContainer);
 
@@ -250,7 +239,11 @@ $(document).ready(function () {
 
                 fieldGraphs[opts.chartid] = graph;
 
-                sendUpdateGraphEvent(opts);
+                if (newGraph) {
+                    sendCreatedGraphEvent(opts);
+                } else {
+                    sendUpdatedGraphEvent(opts);
+                }
 
                 // Make it draggable.
                 $graphContainer.draggable({
@@ -339,7 +332,7 @@ $(document).ready(function () {
 
         graph.render();
 
-        sendUpdateGraphEvent(chartOptionsFromContainer(graphContainer));
+        sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
@@ -360,7 +353,7 @@ $(document).ready(function () {
         graph.interpolation = interpolation;
         graph.render();
 
-        sendUpdateGraphEvent(chartOptionsFromContainer(graphContainer));
+        sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
@@ -377,7 +370,7 @@ $(document).ready(function () {
         opts.interval = interval;
         opts.field = field;
 
-        renderFieldChart(opts, graphContainer);
+        renderFieldChart(opts, graphContainer, false);
         changeGraphConfig(graphContainer, "interval", interval);
 
         $("a", $(this).closest("ul")).removeClass("selected");
@@ -395,7 +388,7 @@ $(document).ready(function () {
         opts.valuetype = valuetype;
         opts.field = field;
 
-        renderFieldChart(opts, graphContainer);
+        renderFieldChart(opts, graphContainer, false);
         changeGraphConfig(graphContainer, "valuetype", valuetype);
 
         $("a", $(this).closest("ul")).removeClass("selected");

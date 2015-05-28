@@ -9,23 +9,27 @@ var UIUtils = require('../../util/UIUtils');
 
 var FieldGraphs = React.createClass({
     getInitialState() {
-        this.newGraph = undefined;
+        this.notifyOnNewGraphs = false;
+        this.newGraphs = Immutable.Set();
 
         return {
-            fieldGraphs: Immutable.Map()
+            fieldGraphs: FieldGraphsStore.fieldGraphs
         };
     },
     componentDidMount() {
-        this.setState({fieldGraphs: FieldGraphsStore.fieldGraphs});
+        this.initialFieldGraphs = this.state.fieldGraphs;
+        this.notifyOnNewGraphs = true;
+
         FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
-        FieldGraphsStore.onNewFieldGraph = (graphId) => { this.newGraph = graphId };
+        FieldGraphsStore.onFieldGraphCreated = (graphId) => {
+            if (this.notifyOnNewGraphs && !this.initialFieldGraphs.has(graphId)) {
+                var element = React.findDOMNode(this.refs[graphId]);
+                UIUtils.scrollToHint(element);
+            }
+        };
     },
-    componentDidUpdate() {
-        if (this.newGraph !== undefined) {
-            var element = React.findDOMNode(this.refs[this.newGraph]);
-            UIUtils.scrollToHint(element);
-            this.newGraph = undefined;
-        }
+    _afterInitialGraphsLoaded() {
+        this.notifyOnNewGraphs = true;
     },
     addFieldGraph(field) {
         FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution});
