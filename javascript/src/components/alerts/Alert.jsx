@@ -4,7 +4,6 @@
 
 var React = require('react/addons');
 var AlarmCallbackHistoryOverview = require('../alarmcallbacks/AlarmCallbackHistoryOverview');
-var HideableElement = require('../common/HideableElement');
 
 var Alert = React.createClass({
     getInitialState() {
@@ -13,7 +12,7 @@ var Alert = React.createClass({
         };
     },
     _onClickConditionId(conditionId) {
-        var alertConditionElem = $(".alert-condition[data-condition-id=" + conditionId + "]")
+        var alertConditionElem = $(".alert-condition[data-condition-id=" + conditionId + "]");
         $("html, body").animate({ scrollTop: 0 }, "fast");
         alertConditionElem.effect(
             "highlight", { duration: 2000 }

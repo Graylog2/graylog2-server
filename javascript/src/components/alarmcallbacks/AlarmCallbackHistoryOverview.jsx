@@ -36,7 +36,7 @@ var AlarmCallbackHistoryOverview = React.createClass({
                 </div>
             );
         } else {
-            return <Spinner />
+            return <Spinner />;
         }
     }
 });

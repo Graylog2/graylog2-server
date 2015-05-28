@@ -13,8 +13,8 @@ var AlarmCallbackHistory = React.createClass({
         e.preventDefault();
         this.setState({showAlarmCallbackDetails: !this.state.showAlarmCallbackDetails});
     },
-    _greenTick() {return <i className="fa fa-check" style={{color: "green"}}></i>},
-    _redCross(errorMsg) {return <i className="fa fa-close" style={{color: "red"}}> ({errorMsg})</i>},
+    _greenTick() {return <i className="fa fa-check" style={{color: "green"}}></i>;},
+    _redCross(errorMsg) {return <i className="fa fa-close" style={{color: "red"}}> ({errorMsg})</i>;},
     _formatAlarmCallbackDetails(alarmCallback) {
         return <AlarmCallback alarmCallback={alarmCallback} hideButtons={true} types={this.props.types} />;
     },

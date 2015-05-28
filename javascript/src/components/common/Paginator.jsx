@@ -53,7 +53,7 @@ var Paginator = React.createClass({
         }
     },
     _button(i) {
-        return <Button key={"page-"+i} onClick={this._onClick.bind(this, i)} disabled={this.props.currentPage == i}>{i}</Button>;
+        return <Button key={"page-"+i} onClick={this._onClick.bind(this, i)} disabled={this.props.currentPage === i}>{i}</Button>;
     },
     _filler(key) {
         return <Button key={key} disabled={true}>..</Button>;
@@ -65,7 +65,7 @@ var Paginator = React.createClass({
 
         var currentPage = this.props.currentPage;
 
-        buttons.push(<Button key="previous" onClick={this._onPrevious} disabled={currentPage == 1}>Previous</Button>);
+        buttons.push(<Button key="previous" onClick={this._onPrevious} disabled={currentPage === 1}>Previous</Button>);
 
         if (size < pages) {
             for (var i = 1; i <= this._lastLeftPage(size, currentPage, pages); i++) {
@@ -80,11 +80,11 @@ var Paginator = React.createClass({
                 buttons.push(this._button(n));
             }
         } else {
-            for (var i = 1; i <= pages; i++) {
-                buttons.push(this._button(i));
+            for (var j = 1; j <= pages; j++) {
+                buttons.push(this._button(j));
             }
         }
-        buttons.push(<Button key="next" onClick={this._onNext} disabled={currentPage == this.props.pages}>Next</Button>);
+        buttons.push(<Button key="next" onClick={this._onNext} disabled={currentPage === this.props.pages}>Next</Button>);
 
         return (
             <ButtonGroup>
