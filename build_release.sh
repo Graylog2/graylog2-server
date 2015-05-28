@@ -10,7 +10,7 @@ if [[ -z "${SBT_BIN}" ]]; then
   if [[ ! -x "${SBT_BIN}" ]]; then
     echo "ERROR: Couldn't find SBT in \$PATH or \$SBT_PATH."
     echo
-    echo "Please download and install Typesafe Activator before running this script:"
+    echo "Please download and install SBT before running this script:"
     echo
     echo "  $ wget ${SBT_URL}"
     echo "  $ brew install sbt ## Homebrew (Third-party package)"
