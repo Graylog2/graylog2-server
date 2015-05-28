@@ -30,6 +30,7 @@ interface CreateFieldChartWidgetRequestParams {
 
 class FieldGraphsStore {
     private _fieldGraphs: Immutable.Map<string, Object>;
+    onNewFieldGraph: (graphId: string)=>void;
     onFieldGraphsUpdated: (query: Object)=>void;
 
     constructor() {
@@ -73,6 +74,9 @@ class FieldGraphsStore {
         var givenOptions = Immutable.Map<string, Object>(options);
         var defaultOptions = Immutable.Map<string, Object>({chartid: graphId, field: field});
         this.saveGraph(graphId, defaultOptions.merge(givenOptions).toJS());
+        if (typeof this.onNewFieldGraph === 'function') {
+            this.onNewFieldGraph(graphId);
+        }
     }
 
     renderFieldGraph(graphOptions: Object, graphContainer: Element) {

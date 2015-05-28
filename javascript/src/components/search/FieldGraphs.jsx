@@ -5,9 +5,12 @@ var Immutable = require('immutable');
 
 var LegacyFieldGraph = require('./LegacyFieldGraph');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
+var UIUtils = require('../../util/UIUtils');
 
 var FieldGraphs = React.createClass({
     getInitialState() {
+        this.newGraph = undefined;
+
         return {
             fieldGraphs: Immutable.Map()
         };
@@ -15,6 +18,14 @@ var FieldGraphs = React.createClass({
     componentDidMount() {
         this.setState({fieldGraphs: FieldGraphsStore.fieldGraphs});
         FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
+        FieldGraphsStore.onNewFieldGraph = (graphId) => { this.newGraph = graphId };
+    },
+    componentDidUpdate() {
+        if (this.newGraph !== undefined) {
+            var element = React.findDOMNode(this.refs[this.newGraph]);
+            UIUtils.scrollToHint(element);
+            this.newGraph = undefined;
+        }
     },
     addFieldGraph(field) {
         FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution});
@@ -30,6 +41,7 @@ var FieldGraphs = React.createClass({
             .forEach((graphOptions, graphId) => {
                 fieldGraphs.push(
                     <LegacyFieldGraph key={graphId}
+                                      ref={graphId}
                                       graphId={graphId}
                                       graphOptions={graphOptions}
                                       onDelete={() => this.deleteFieldGraph(graphId)}
