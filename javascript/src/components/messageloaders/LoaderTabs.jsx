@@ -17,7 +17,7 @@ var LoaderTabs = React.createClass({
         };
     },
     onMessageLoaded(message) {
-        message['formatted_fields'] = message.fields;
+        message['formatted_fields']['timestamp'] = message.fields.timestamp;
         message.fields["_id"] = message.id;
         this.setState({message: message});
         if (this.props.onMessageLoaded) {
