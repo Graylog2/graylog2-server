@@ -9,6 +9,7 @@ var Widget = require('../widgets/Widget');
 var Spinner = require('../common/Spinner');
 
 var FieldQuickValuesStore = require('../../stores/field-analyzers/FieldQuickValuesStore');
+var UIUtils = require('../../util/UIUtils');
 
 var FieldQuickValues = React.createClass({
     getInitialState() {
@@ -21,6 +22,12 @@ var FieldQuickValues = React.createClass({
 
     componentDidMount() {
         this.updateIntervalId = window.setInterval(() => this._loadQuickValuesData(), 3000);
+    },
+    componentDidUpdate(oldProps, oldState) {
+        if (this.state.field !== oldState.field) {
+            var element = React.findDOMNode(this);
+            UIUtils.scrollToHint(element);
+        }
     },
     componentWillUnmount() {
         window.clearInterval(this.updateIntervalId);
