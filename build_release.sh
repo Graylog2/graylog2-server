@@ -2,7 +2,7 @@
 SBT_VERISON='0.13.8'
 SBT_URL="https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT_VERSION}.tgz"
 
-SBT_BIN=$(which activator)
+SBT_BIN=$(which sbt)
 
 if [[ -z "${SBT_BIN}" ]]; then
   SBT_BIN="${SBT_PATH}/bin/sbt"
