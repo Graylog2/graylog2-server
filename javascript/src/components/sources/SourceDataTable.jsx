@@ -13,7 +13,6 @@ var numeral = require('numeral');
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 
 var NUMBER_OF_TOP_VALUES = 5;
-var othersName = "Others";
 
 var SourceDataTable = React.createClass({
     getInitialState() {
