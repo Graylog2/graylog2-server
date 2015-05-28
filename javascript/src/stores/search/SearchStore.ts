@@ -28,6 +28,7 @@ class SearchStore {
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
+    onAddQueryTerm: ()=>void;
     searchInStream: any;
 
     constructor() {
@@ -225,6 +226,10 @@ class SearchStore {
         }
         newQuery += term;
         this.query = newQuery;
+
+        if (this.onAddQueryTerm !== undefined) {
+            this.onAddQueryTerm();
+        }
     }
 
     getParams(): Object {
