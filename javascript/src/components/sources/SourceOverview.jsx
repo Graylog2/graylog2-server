@@ -79,7 +79,7 @@ var SourceOverview = React.createClass({
             }
         };
 
-        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, onDataTableFiltered);
+        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, this.nameMessageGroup, onDataTableFiltered);
         this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, onPieChartFiltered);
         this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
         this.applyRangeParameter();
@@ -293,10 +293,10 @@ var SourceOverview = React.createClass({
                         resetFilters={this.resetHistogramFilters}/>
                 </div>
                 <div className="row content">
-                    <div className="col-md-9">
+                    <div className="col-md-7">
                         <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-3 col-md-offset-1">
                         <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
                     </div>
                 </div>
@@ -308,14 +308,16 @@ var SourceOverview = React.createClass({
                 <div className="row content">
                     <div className="col-md-12">
                         <div>
-                            <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
-                                <option value={hoursToSeconds(1)}>Last Hour</option>
-                                <option value={daysToSeconds(1)}>Last Day</option>
-                                <option value={daysToSeconds(7)}>Last Week</option>
-                                <option value={daysToSeconds(31)}>Last Month</option>
-                                <option value={daysToSeconds(365)}>Last Year</option>
-                                <option value="0">All</option>
-                            </select>
+                            <div className="pull-right">
+                                <select ref="rangeSelector" className="sources-range form-control input-sm" value={this.state.range} onChange={this._onRangeChanged}>
+                                    <option value={hoursToSeconds(1)}>Last Hour</option>
+                                    <option value={daysToSeconds(1)}>Last Day</option>
+                                    <option value={daysToSeconds(7)}>Last Week</option>
+                                    <option value={daysToSeconds(31)}>Last Month</option>
+                                    <option value={daysToSeconds(365)}>Last Year</option>
+                                    <option value="0">All</option>
+                                </select>
+                            </div>
                             <h1><i className="fa fa-download"></i> Sources</h1>
                         </div>
                         <p style={{"marginTop": "15px"}}>

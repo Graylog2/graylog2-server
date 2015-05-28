@@ -60,6 +60,40 @@ var QuickValuesVisualization = React.createClass({
             }, this.drawData);
         }
     },
+    _getAddToSearchButton(term) {
+        var addToSearchButton = document.createElement('button');
+        addToSearchButton.className = 'btn btn-xs btn-default';
+        addToSearchButton.title = 'Add to search query';
+        addToSearchButton.setAttribute('data-term', term);
+        addToSearchButton.innerHTML = "<i class='fa fa-search-plus'></i>";
+
+        return addToSearchButton.outerHTML;
+    },
+    _getDataTableColumns() {
+        var columns = [
+            (d) => {
+                var colourBadge = "";
+
+                if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
+                    var colour = this.pieChart.colors()(d.term);
+                    colourBadge = "<span class=\"datatable-badge\" style=\"background-color: " + colour + "\"></span>";
+                }
+
+                return colourBadge + " " + d.term;
+            },
+            (d) => {
+                var total = this.state.total - this.state.missing;
+                return this._formatPercentage(d.count / total);
+            },
+            (d) => this._formatCount(d.count)
+        ];
+
+        if (this.props.displayAddToSearchButton) {
+            columns.push((d) => this._getAddToSearchButton(d.term));
+        }
+
+        return columns;
+    },
     _renderDataTable() {
         var tableDomNode = this.refs.table.getDOMNode();
 
@@ -72,27 +106,15 @@ var QuickValuesVisualization = React.createClass({
                 return dInTopValues ? "Top values" : "Others";
             })
             .size(50)
-            .columns([
-                (d) => {
-                    var colourBadge = "";
-
-                    if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
-                        var colour = this.pieChart.colors()(d.term);
-                        colourBadge = "<span class=\"datatable-badge\" style=\"background-color: " + colour + "\"></span>";
-                    }
-
-                    return colourBadge + " " + d.term;
-                },
-                (d) => {
-                    var total = this.state.total - this.state.missing;
-                    return this._formatPercentage(d.count / total);
-                },
-                (d) => this._formatCount(d.count)
-            ])
+            .columns(this._getDataTableColumns())
             .sortBy((d) => d.count)
             .order(d3.descending)
             .on('renderlet', (table) => {
                 table.selectAll(".dc-table-group").classed("info", true);
+                table.selectAll("td.dc-table-column button").on("click", () => {
+                    var term = $(d3.event.target).closest('button').data('term');
+                    $(document).trigger('add-search-term.graylog.search', {field: this.props.id, value: term});
+                });
             });
 
         this.dataTable.render();
@@ -178,9 +200,15 @@ var QuickValuesVisualization = React.createClass({
     },
     render() {
         var pieChartClassName;
+        var pieChartStyle = {};
 
         if (this.props.config.show_pie_chart) {
-            pieChartClassName = this.props.horizontal ? 'col-md-4' : 'col-md-12';
+            if (this.props.horizontal) {
+                pieChartClassName = 'col-md-4';
+                pieChartStyle['textAlign'] = 'center';
+            } else {
+                pieChartClassName = 'col-md-12';
+            }
         } else {
             pieChartClassName = 'hidden';
         }
@@ -197,7 +225,7 @@ var QuickValuesVisualization = React.createClass({
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className={pieChartClassName}>
+                        <div className={pieChartClassName} style={pieChartStyle}>
                             <div ref="graph" className="quickvalues-graph"/>
                         </div>
                         <div className={dataTableClassName}>
@@ -205,9 +233,12 @@ var QuickValuesVisualization = React.createClass({
                                 <table ref="table" className="table table-condensed table-striped table-hover">
                                     <thead>
                                     <tr>
-                                        <th style={{width: "225px"}}>Value</th>
-                                        <th style={{width: "50px"}}>%</th>
+                                        <th style={{minWidth: 225}}>Value</th>
+                                        <th>%</th>
                                         <th>Count</th>
+                                        {this.props.displayAddToSearchButton &&
+                                            <th style={{width: 30}}>&nbsp;</th>
+                                        }
                                     </tr>
                                     </thead>
                                 </table>

@@ -1003,6 +1003,10 @@ s
   margin-top: 8px;
 }
 
+.quickvalues-visualization .dc-chart {
+  float: none;
+}
+
 .quickvalues {
   height: 400px;
   width: 500px;
@@ -1663,7 +1667,7 @@ dl.metric-histogram dd {
 }
 
 .dashboard .widget .quickvalues-visualization {
-  height: 85%;
+  height: 80%;
   margin-top: 15px;
   overflow: auto;
 }
@@ -2059,32 +2063,17 @@ form.edit-dashboard-form {
   margin-top: 15px;
 }
 
-.sources th a {
-  color: #0088cc;
+.sources th,
+.quickvalues-table th {
+  background-color: #333;
+  color: #fff;
+  font-weight: normal;
 }
 
-.sources th a:hover {
-  text-decoration: none;
-  color: #4DBCE9;
-  border-bottom: 1px dotted #4DBCE9;
-}
-
-.sources tbody tr a {
-  color: #000;
-}
-
-.sources tbody tr a:hover {
-  text-decoration: none;
-  color: #4DBCE9;
-  border-bottom: 1px dotted #4DBCE9;
-}
-
-.sources tbody tr button.dc-search-button {
-  color: #0088cc;
-}
-
-.sources tbody tr a.dc-filter-link {
-  border-bottom: 1px dotted;
+.sources .dc-table-column._3,
+.quickvalues-table .dc-table-column._3 {
+  padding-right: 0;
+  text-align: right;
 }
 
 .dynatable-per-page-label {
@@ -2598,8 +2587,14 @@ textarea.textarea-xlarge {
   margin-left: 20px;
 }
 
+.sources-title {
+  height: 22px;
+  line-height: 22px;
+  vertical-align: top;
+}
+
 .sources-filtering {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .sources-filtering .control-group {

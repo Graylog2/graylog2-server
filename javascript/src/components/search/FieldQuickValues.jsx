@@ -50,9 +50,10 @@ var FieldQuickValues = React.createClass({
             inner = <Spinner />;
         } else {
             inner = <QuickValuesVisualization id={this.state.field}
-                                      horizontal={true}
-                                      config={{show_pie_chart: true, show_data_table: true}}
-                                      data={this.state.data}/>;
+                                              horizontal={true}
+                                              config={{show_pie_chart: true, show_data_table: true}}
+                                              data={this.state.data}
+                                              displayAddToSearchButton={true}/>;
         }
 
         if (this.state.field !== undefined) {
