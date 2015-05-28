@@ -14,19 +14,11 @@ env:
       7SvCgLvni0ewVVs8P2F9dGeG7HZ0WRJ3tcdZCcJG9IBk6xNcWAQveZ2goBKJ
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
-  - sbt update
   - nvm install 0.12
   - nvm use 0.12
-  - npm install -g npm@latest
   - node --version
-  - npm --version
-  - npm config set spin false
-  - pushd javascript ; npm install ; popd
 script:
-  - pushd javascript ; (npm test && node_modules/.bin/gulp deploy-prod) ; popd
-  - sbt test
-after_success:
-  - sbt universal:package-zip-tarball
+  - ./build_release.sh
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA

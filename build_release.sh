@@ -1,41 +1,55 @@
 #!/bin/bash -e
-ACTIVATOR_VERISON='1.2.10'
-ACTIVATOR_URL="http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERISON}/typesafe-activator-${ACTIVATOR_VERISON}-minimal.zip"
+SBT_VERISON='0.13.8'
+SBT_URL="https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT_VERSION}.tgz"
 
-ACTIVATOR_BIN=$(which activator)
+SBT_BIN=$(which sbt)
 
-if [[ -z "${ACTIVATOR_BIN}" ]]; then
-  ACTIVATOR_BIN="${ACTIVATOR_PATH}/activator"
+if [[ -z "${SBT_BIN}" ]]; then
+  SBT_BIN="${SBT_PATH}/bin/sbt"
 
-  if [[ ! -x "${ACTIVATOR_BIN}" ]]; then
-    echo "ERROR: Couldn't find Typesafe Activator in \$PATH or \$ACTIVATOR_PATH."
+  if [[ ! -x "${SBT_BIN}" ]]; then
+    echo "ERROR: Couldn't find SBT in \$PATH or \$SBT_PATH."
     echo
-    echo "Please download and install Typesafe Activator before running this script:"
+    echo "Please download and install SBT before running this script:"
     echo
-    echo "  wget ${ACTIVATOR_URL}"
+    echo "  $ wget ${SBT_URL}"
+    echo "  $ brew install sbt ## Homebrew (Third-party package)"
+    echo "  $ port install sbt ## Macports (Third-party package)"
     echo
     exit 1
   fi
 fi
 
 # Clean working directory
-"${ACTIVATOR_BIN}" clean
+"${SBT_BIN}" clean
 
-# Prepare JavaScript
+########################
+## Prepare JavaScript ##
+########################
 pushd javascript
 
 # Install same npm version as we use in travis
 rm -rf ./node_modules
 npm install --no-spin npm@latest
-PATH="$(pwd)/node_modules/.bin/":$PATH
 
-npm install --no-spin
-npm test
-gulp deploy-prod
+echo -n "Using npm "
+./node_modules/.bin/npm --version
+
+./node_modules/.bin/npm install --no-spin
+./node_modules/.bin/npm test
+./node_modules/.bin/gulp deploy-prod
 popd
 
+
+############################
+## Build Play application ##
+############################
+"${SBT_BIN}" update
+"${SBT_BIN}" compile
+"${SBT_BIN}" test
+
 # Build universal .tar.gz
-"${ACTIVATOR_BIN}" universal:package-zip-tarball
+"${SBT_BIN}" universal:package-zip-tarball
 
 date
 echo "Your package(s) are ready in 'target/universal':"
