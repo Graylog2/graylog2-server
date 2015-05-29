@@ -1,7 +1,6 @@
 'use strict';
 
 var React = require('react');
-var Immutable = require('immutable');
 
 var LegacyFieldGraph = require('./LegacyFieldGraph');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
@@ -10,7 +9,6 @@ var UIUtils = require('../../util/UIUtils');
 var FieldGraphs = React.createClass({
     getInitialState() {
         this.notifyOnNewGraphs = false;
-        this.newGraphs = Immutable.Set();
 
         return {
             fieldGraphs: FieldGraphsStore.fieldGraphs
@@ -27,9 +25,6 @@ var FieldGraphs = React.createClass({
                 UIUtils.scrollToHint(element);
             }
         };
-    },
-    _afterInitialGraphsLoaded() {
-        this.notifyOnNewGraphs = true;
     },
     addFieldGraph(field) {
         var streamId = this.props.searchInStream !== undefined ? this.props.searchInStream.id : undefined;
