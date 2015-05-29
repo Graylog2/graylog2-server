@@ -168,7 +168,7 @@ GET           /dashboards                                                       
 GET           /dashboards/new                                                                    @controllers.DashboardsController.newDashboard()
 GET           /dashboards/:id                                                                    @controllers.DashboardsController.show(id: String)
 POST          /dashboards/create                                                                 @controllers.DashboardsController.create()
-POST          /dashboards/:id/delete                                                             @controllers.DashboardsController.delete(id: String)
+GET           /dashboards/:id/delete                                                             @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)
 GET           /a/search/fieldstats                                                               @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
