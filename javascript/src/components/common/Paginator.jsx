@@ -65,26 +65,28 @@ var Paginator = React.createClass({
 
         var currentPage = this.props.currentPage;
 
-        buttons.push(<Button key="previous" onClick={this._onPrevious} disabled={currentPage === 1}>Previous</Button>);
+        if (pages > 0) {
+            buttons.push(<Button key="previous" onClick={this._onPrevious} disabled={currentPage === 1}>Previous</Button>);
 
-        if (size < pages) {
-            for (var i = 1; i <= this._lastLeftPage(size, currentPage, pages); i++) {
-                buttons.push(this._button(i));
+            if (size < pages) {
+                for (var i = 1; i <= this._lastLeftPage(size, currentPage, pages); i++) {
+                    buttons.push(this._button(i));
+                }
+                if (this._isInMiddle(currentPage, size, pages)) {
+                    buttons.push(this._filler("filler-left"));
+                    buttons.push(this._button(currentPage));
+                }
+                buttons.push(this._filler('filler-right'));
+                for (var n = this._firstRightPage(size, currentPage, pages); n <= pages; n++) {
+                    buttons.push(this._button(n));
+                }
+            } else {
+                for (var j = 1; j <= pages; j++) {
+                    buttons.push(this._button(j));
+                }
             }
-            if (this._isInMiddle(currentPage, size, pages)) {
-                buttons.push(this._filler("filler-left"));
-                buttons.push(this._button(currentPage));
-            }
-            buttons.push(this._filler('filler-right'));
-            for (var n = this._firstRightPage(size, currentPage, pages); n <= pages; n++) {
-                buttons.push(this._button(n));
-            }
-        } else {
-            for (var j = 1; j <= pages; j++) {
-                buttons.push(this._button(j));
-            }
+            buttons.push(<Button key="next" onClick={this._onNext} disabled={currentPage === this.props.pages}>Next</Button>);
         }
-        buttons.push(<Button key="next" onClick={this._onNext} disabled={currentPage === this.props.pages}>Next</Button>);
 
         return (
             <ButtonGroup>
