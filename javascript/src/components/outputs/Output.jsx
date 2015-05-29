@@ -5,21 +5,22 @@ var EditOutputButton = require('./EditOutputButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
 var Button = require('react-bootstrap').Button;
 var PermissionsMixin = require('../../util/PermissionsMixin');
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
 
 var Output = React.createClass({
     mixins: [PermissionsMixin],
     _deleteFromStreamButton(output) {
         return (
-            <Button className="btn btn-warning btn-xs"
-                    onClick={this.props.removeOutputFromStream.bind(null, output.id, this.props.streamId)}>
-                <i className="fa fa-remove"></i> Delete from stream
+            <Button bsStyle="info" onClick={this.props.removeOutputFromStream.bind(null, output.id, this.props.streamId)}>
+                Delete from stream
             </Button>
         );
     },
     _deleteGloballyButton(output) {
         return (
-            <Button className="btn btn-danger btn-xs" onClick={this.props.removeOutputGlobally.bind(null, output.id)}>
-                <i className="fa fa-remove"></i> Delete globally
+            <Button bsStyle="primary" onClick={this.props.removeOutputGlobally.bind(null, output.id)}>
+                Delete globally
             </Button>
         );
     },
@@ -35,21 +36,30 @@ var Output = React.createClass({
 
         return (
             <div key={output.id} className="row content node-row">
-                <div className="col-md-12">
-                    <span className="pull-right node-row-info">
-                        {editButton}
-                        {' '}
-                        {deleteButton}
-                        {' '}
-                        {terminateButton}
-                    </span>
-                    <h3>
-                        <i className="fa fa-ellipsis-v"></i> {output.title} ({output.type})
-                        {contentPack}
-                    </h3>
-                    &nbsp;
-                    <ConfigurationWell key={"configuration-well-output-" + output.id} id={output.id} configuration={output.configuration} />
-                </div>
+                <Col md={12}>
+                    <Row className="row-sm">
+                        <Col md={6}>
+                            <h3>
+                                <i className="fa fa-ellipsis-v"></i> {output.title} ({output.type})
+                                {contentPack}
+                            </h3>
+                        </Col>
+                        <Col md={6}>
+                            <span className="pull-right node-row-info">
+                                {editButton}
+                                {' '}
+                                {deleteButton}
+                                {' '}
+                                {terminateButton}
+                            </span>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={8}>
+                            <ConfigurationWell key={"configuration-well-output-" + output.id} id={output.id} configuration={output.configuration} />
+                        </Col>
+                    </Row>
+                </Col>
             </div>
         );
     }
