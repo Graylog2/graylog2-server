@@ -32,7 +32,8 @@ var FieldGraphs = React.createClass({
         this.notifyOnNewGraphs = true;
     },
     addFieldGraph(field) {
-        FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution});
+        var streamId = this.props.searchInStream !== undefined ? this.props.searchInStream.id : undefined;
+        FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution, streamid: streamId});
     },
     deleteFieldGraph(graphId) {
         FieldGraphsStore.deleteGraph(graphId);

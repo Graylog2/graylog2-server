@@ -197,7 +197,8 @@ var SearchResult = React.createClass({
                                  resolution={this.props.histogram['interval']}
                                  from={this.props.histogram['histogram_boundaries'].from}
                                  to={this.props.histogram['histogram_boundaries'].to}
-                                 permissions={this.props.permissions}/>
+                                 permissions={this.props.permissions}
+                                 searchInStream={this.props.searchInStream}/>
 
                     <ResultTable messages={this.props.result.messages}
                                  page={this.state.currentPage}
