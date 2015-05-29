@@ -31,6 +31,10 @@ $(document).ready(function () {
         $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
     }
 
+    function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
+        $(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
+    }
+
     function getDefaultOptions(opts) {
         var searchParams = {};
         $(document).trigger("get-original-search.graylog.search", {
@@ -451,6 +455,8 @@ $(document).ready(function () {
         }
 
         targetChart.renderer.unstack = true;
+
+        sendMergedGraphsEvent(targetId, draggedId);
 
         $(".hide-combined-chart", targetElem).hide();
 

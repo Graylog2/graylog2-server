@@ -95,8 +95,9 @@ var AddToDashboardMenu = React.createClass({
             <div style={{display: 'inline'}}>
                 <ButtonGroup>
                     {this.props.children}
-                    {this.state.dashboards.size > 0 ?
-                        this._renderDashboardMenu() : this._renderNoDashboardsMenu()}
+
+                    {!this.props.hidden && (this.state.dashboards.size > 0 ?
+                        this._renderDashboardMenu() : this._renderNoDashboardsMenu())}
                 </ButtonGroup>
                 <WidgetCreationModal ref="widgetModal"
                                      widgetType={this.props.widgetType}

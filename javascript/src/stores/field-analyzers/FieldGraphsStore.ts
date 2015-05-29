@@ -32,6 +32,7 @@ class FieldGraphsStore {
     private _fieldGraphs: Immutable.Map<string, Object>;
     onFieldGraphCreated: (graphId: string)=>void;
     onFieldGraphsUpdated: (query: Object)=>void;
+    onFieldGraphsMerged: (targetGraphId: string, draggedGraphId: string)=>void;
 
     constructor() {
         this._fieldGraphs = Immutable.Map<string, Object>(store.get("pinned-field-charts"));
@@ -48,6 +49,12 @@ class FieldGraphsStore {
         $(document).on('updated.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
         });
+
+        $(document).on('merged.graylog.fieldgraph', (event, data) => {
+            if (typeof this.onFieldGraphsMerged === 'function') {
+                this.onFieldGraphsMerged(data.targetGraphId, data.draggedGraphId);
+            }
+        })
     }
 
     get fieldGraphs(): Immutable.Map<string, Object> {

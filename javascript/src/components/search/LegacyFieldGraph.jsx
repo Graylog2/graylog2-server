@@ -24,8 +24,6 @@ var LegacyFieldGraph = React.createClass({
         return this.props.from;
     },
     render() {
-        // TODO: work with streams
-
         return (
             <div ref="fieldGraphContainer"
                  className="content-col field-graph-container"
@@ -34,6 +32,7 @@ var LegacyFieldGraph = React.createClass({
                  data-to={this.props.to}>
                 <div className="pull-right">
                     <AddToDashboardMenu title='Add to dashboard'
+                                        hidden={this.props.stacked}
                                         dashboards={this.props.dashboards}
                                         widgetType={Widget.Type.FIELD_CHART}
                                         configuration={FieldGraphsStore.getGraphOptionsAsCreateWidgetRequestParams(this.props.graphId)}
