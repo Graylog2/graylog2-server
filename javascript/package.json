@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-interface",
-  "version": "1.1.0-rc.1",
+  "version": "1.1.0-rc.2-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
   "license": "GPL",
