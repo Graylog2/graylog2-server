@@ -6,6 +6,7 @@
 
 // this is global in top.scala.html
 declare var gl2UserSessionId: string;
+declare var sockJsWebSocketsEnabled: boolean;
 
 var SockJS = require("sockjs-client");
 import UserNotification = require("../../util/UserNotification");
@@ -57,7 +58,14 @@ class MetricsStore {
     private queuedRequests: Array<ListenRequest> = [];
 
     connect() {
-        this.sock = new SockJS(this.METRICS_SOCKJS_URL);
+        if (sockJsWebSocketsEnabled) {
+            this.sock = new SockJS(this.METRICS_SOCKJS_URL);
+        } else {
+            // only allow a subset of transport types.
+            this.sock = new SockJS(this.METRICS_SOCKJS_URL,
+                null, /* reserved param */
+                { transports: ['xhr-polling', 'xdr-polling', 'iframe-xhr-polling', 'jsonp-polling']});
+        }
 
         this.sock.onopen = () => {
             this.isOpen = true;

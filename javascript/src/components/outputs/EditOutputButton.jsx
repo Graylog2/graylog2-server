@@ -34,8 +34,8 @@ var EditOutputButton = React.createClass({
         );
         return (
             <span>
-                <Button className="btn btn-success btn-xs" onClick={this.handleClick.bind(null, output)}>
-                    <i className="fa fa-edit"></i> Edit
+                <Button bsStyle="info" onClick={this.handleClick.bind(null, output)}>
+                    Edit
                 </Button>
                 {configurationForm}
             </span>

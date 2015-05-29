@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import controllers.AuthenticatedController;
+import lib.SockJSUtils;
 import lib.security.RedirectAuthenticator;
 import lib.sockjs.SockJsRouter;
 import models.sockjs.CreateSessionCommand;
@@ -177,7 +178,7 @@ public class MetricsController extends AuthenticatedController {
 
                 @Override
                 public boolean websocket() {
-                    return Boolean.valueOf(System.getProperty("websockets.enabled", "true"));
+                    return Boolean.valueOf(SockJSUtils.isWebsocketsEnabled());
                 }
 
                 @Override
