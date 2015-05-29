@@ -19,6 +19,8 @@ var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 var ToolsStore = require('../../stores/tools/ToolsStore');
 
+var UIUtils = require('../../util/UIUtils');
+
 var SearchBar = React.createClass({
     getInitialState() {
         this.initialSearchParams = SearchStore.getParams();
@@ -39,6 +41,7 @@ var SearchBar = React.createClass({
             this._prepareSearch();
             React.findDOMNode(this.refs.searchForm).submit();
         };
+        SearchStore.onAddQueryTerm = this._animateQueryChange;
         SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => this.setState({savedSearches: newSavedSearches}));
         this._initializeSearchQueryInput();
         this._initalizeDatepicker();
@@ -93,6 +96,10 @@ var SearchBar = React.createClass({
         });
 
         this.datepickerInitialized = true;
+    },
+    _animateQueryChange() {
+        UIUtils.scrollToHint(React.findDOMNode(this.refs.universalSearch));
+        $(React.findDOMNode(this.refs.query)).effect("bounce");
     },
     _queryChanged() {
         SearchStore.query = this.refs.query.getValue();

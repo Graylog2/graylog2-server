@@ -28,6 +28,7 @@ class SearchStore {
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
     onSubmitSearch: ()=>void;
+    onAddQueryTerm: ()=>void;
     searchInStream: any;
 
     constructor() {
@@ -178,7 +179,8 @@ class SearchStore {
     _addSearchTerm(event, data) {
         var term = data.hasOwnProperty('field') ? data.field + ":" : "";
         term += SearchStore.escape(data.value);
-        this.addQueryTerm(term, SearchStore.AND_OPERATOR);
+        var operator = data.operator || SearchStore.AND_OPERATOR;
+        this.addQueryTerm(term, operator);
     }
 
     _getOriginalSearchRequest(event, data) {
@@ -225,6 +227,10 @@ class SearchStore {
         }
         newQuery += term;
         this.query = newQuery;
+
+        if (this.onAddQueryTerm !== undefined) {
+            this.onAddQueryTerm();
+        }
     }
 
     getParams(): Object {
