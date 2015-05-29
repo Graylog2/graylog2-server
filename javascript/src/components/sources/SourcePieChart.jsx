@@ -8,6 +8,9 @@ var numeral = require('numeral');
 
 var React = require('react');
 
+var SourceTitle = require('./SourceTitle');
+var D3Utils = require('../../util/D3Utils');
+
 var SourcePieChart = React.createClass({
     renderPieChart(dimension, group, onDataFiltered) {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
@@ -17,6 +20,8 @@ var SourcePieChart = React.createClass({
             .renderLabel(false)
             .dimension(dimension)
             .group(group)
+            .colors(D3Utils.glColourPalette())
+            .slicesCap(this.props.numberOfTopValues)
             .title((d) => { return d.key + ": " + numeral(d.value).format("0,0"); })
             .on('renderlet', (chart) => {
                 chart.selectAll(".pie-slice").on("click", () => {
@@ -51,9 +56,7 @@ var SourcePieChart = React.createClass({
     render() {
         return (
             <div id="dc-sources-pie-chart" ref="sourcePieChart">
-                <h3><i className="fa fa-bar-chart"></i> Messages per source&nbsp;
-                    <small><a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-remove"></i> Reset filter</a></small>
-                </h3>
+                <SourceTitle className="reset" resetFilters={this.props.resetFilters}>Messages per source</SourceTitle>
             </div>
         );
     }

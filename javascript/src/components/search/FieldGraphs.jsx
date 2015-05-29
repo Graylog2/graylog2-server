@@ -10,10 +10,10 @@ var UIUtils = require('../../util/UIUtils');
 var FieldGraphs = React.createClass({
     getInitialState() {
         this.notifyOnNewGraphs = false;
-        this.newGraphs = Immutable.Set();
 
         return {
-            fieldGraphs: FieldGraphsStore.fieldGraphs
+            fieldGraphs: FieldGraphsStore.fieldGraphs,
+            stackedGraphs: Immutable.Map()
         };
     },
     componentDidMount() {
@@ -21,6 +21,25 @@ var FieldGraphs = React.createClass({
         this.notifyOnNewGraphs = true;
 
         FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
+        FieldGraphsStore.onFieldGraphsMerged = (targetGraphId, draggedGraphId) => {
+            var newStackedGraphs = this.state.stackedGraphs;
+
+            if (newStackedGraphs.has(targetGraphId)) {
+                // targetGraphId was a stacked graph
+                newStackedGraphs = newStackedGraphs.set(targetGraphId, newStackedGraphs.get(targetGraphId).add(draggedGraphId));
+            } else if (newStackedGraphs.has(draggedGraphId)) {
+                // draggedGraphId was a stacked graph
+                var draggedMergedGraphs = newStackedGraphs.get(draggedGraphId);
+
+                newStackedGraphs = newStackedGraphs.set(targetGraphId, draggedMergedGraphs.add(draggedGraphId));
+                newStackedGraphs = newStackedGraphs.delete(draggedGraphId);
+            } else {
+                // None of the graphs were merged
+                newStackedGraphs = newStackedGraphs.set(targetGraphId, Immutable.Set().add(draggedGraphId));
+            }
+
+            this.setState({stackedGraphs: newStackedGraphs});
+        };
         FieldGraphsStore.onFieldGraphCreated = (graphId) => {
             if (this.notifyOnNewGraphs && !this.initialFieldGraphs.has(graphId)) {
                 var element = React.findDOMNode(this.refs[graphId]);
@@ -28,15 +47,16 @@ var FieldGraphs = React.createClass({
             }
         };
     },
-    _afterInitialGraphsLoaded() {
-        this.notifyOnNewGraphs = true;
-    },
     addFieldGraph(field) {
         var streamId = this.props.searchInStream !== undefined ? this.props.searchInStream.id : undefined;
         FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution, streamid: streamId});
     },
     deleteFieldGraph(graphId) {
         FieldGraphsStore.deleteGraph(graphId);
+        if (this.state.stackedGraphs.has(graphId)) {
+            this.state.stackedGraphs.get(graphId).forEach((stackedGraphId) => FieldGraphsStore.deleteGraph(stackedGraphId));
+            this.setState({stackedGraphs: this.state.stackedGraphs.delete(graphId)});
+        }
     },
     render() {
         var fieldGraphs = [];
@@ -52,7 +72,8 @@ var FieldGraphs = React.createClass({
                                       onDelete={() => this.deleteFieldGraph(graphId)}
                                       from={this.props.from}
                                       to={this.props.to}
-                                      permissions={this.props.permissions}/>
+                                      permissions={this.props.permissions}
+                                      stacked={this.state.stackedGraphs.has(graphId)}/>
                 );
             });
 

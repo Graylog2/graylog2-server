@@ -22,6 +22,8 @@ var SourceLineChart = require('./SourceLineChart');
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 var moment = require('moment');
 
+var SupportLink = require('../support/SupportLink');
+
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 var hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');
 
@@ -33,6 +35,7 @@ var SCREEN_RESOLUTION = $(window).width();
 var resizeMutex;
 
 var SourceOverview = React.createClass({
+    NUMBER_OF_TOP_VALUES: 10,
     getInitialState() {
         this.sourcesData = crossfilter();
         this.filterDimension = this.sourcesData.dimension((d) => d.name);
@@ -294,10 +297,10 @@ var SourceOverview = React.createClass({
                 </div>
                 <div className="row content">
                     <div className="col-md-7">
-                        <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
+                        <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES}/>
                     </div>
                     <div className="col-md-3 col-md-offset-1">
-                        <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
+                        <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters} numberOfTopValues={this.NUMBER_OF_TOP_VALUES}/>
                     </div>
                 </div>
             </div>
@@ -318,14 +321,18 @@ var SourceOverview = React.createClass({
                                     <option value="0">All</option>
                                 </select>
                             </div>
-                            <h1><i className="fa fa-download"></i> Sources</h1>
+                            <h1>Sources</h1>
                         </div>
-                        <p style={{"marginTop": "15px"}}>
-                            This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact
-                            with the different sources and get a better understanding of them.
+                        <p className="description">
+                            This is a list of all sources that sent in messages to Graylog.
                             &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
                             appears.
                         </p>
+
+                        <SupportLink>
+                            Use your mouse to interact with the table and graphs on this page, and get a better
+                            overview of the sources sending data into Graylog.
+                        </SupportLink>
                     </div>
                 </div>
 
