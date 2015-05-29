@@ -20,11 +20,11 @@ var SourceDataTable = React.createClass({
             numberOfSources: 100
         };
     },
-    _getAddToSearchButton(term) {
+    _getAddToSearchButton(source) {
         var addToSearchButton = document.createElement('button');
         addToSearchButton.className = 'btn btn-xs btn-default dc-search-button';
         addToSearchButton.title = 'Add to search query';
-        addToSearchButton.setAttribute('data-term', term);
+        addToSearchButton.setAttribute('data-source', source);
         addToSearchButton.innerHTML = "<i class='fa fa-search-plus'></i>";
 
         return addToSearchButton.outerHTML;
@@ -44,7 +44,7 @@ var SourceDataTable = React.createClass({
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => numeral(d.message_count).format("0,0"),
-                (d) => this._getAddToSearchButton()
+                (d) => this._getAddToSearchButton(d.name)
             ])
             .sortBy((d) => d.message_count)
             .order(d3.descending)
@@ -55,16 +55,13 @@ var SourceDataTable = React.createClass({
             });
     },
     _addSourceToSearchBarListener(table) {
-        table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {
-            // d3 doesn't pass any data to the onclick event as the buttons do not
-            // have any. Instead, we need to get it from the table element.
-            var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
-            var datum = d3.selectAll(parentTdElement).datum();
-            var source = datum.name;
-            UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
-            if (d3.event.altKey) {
-                UniversalSearch.submit();
-            }
+        table.selectAll("td.dc-table-column .dc-search-button").on("click", () => {
+            var source = $(d3.event.target).closest('button').data('source');
+            $(document).trigger('add-search-term.graylog.search', {
+                field: 'source',
+                value: source,
+                operator: UniversalSearch.orOperator()
+            });
         });
     },
     _filterSourceListener(table, onDataFiltered) {

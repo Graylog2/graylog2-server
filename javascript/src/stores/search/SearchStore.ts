@@ -179,7 +179,8 @@ class SearchStore {
     _addSearchTerm(event, data) {
         var term = data.hasOwnProperty('field') ? data.field + ":" : "";
         term += SearchStore.escape(data.value);
-        this.addQueryTerm(term, SearchStore.AND_OPERATOR);
+        var operator = data.operator || SearchStore.AND_OPERATOR;
+        this.addQueryTerm(term, operator);
     }
 
     _getOriginalSearchRequest(event, data) {
