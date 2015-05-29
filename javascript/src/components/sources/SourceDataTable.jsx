@@ -10,9 +10,8 @@ var d3 = require('d3');
 var dc = require('dc');
 var numeral = require('numeral');
 
+var SourceTitle = require('./SourceTitle');
 var UniversalSearch = require('../../logic/search/UniversalSearch');
-
-var NUMBER_OF_TOP_VALUES = 5;
 
 var SourceDataTable = React.createClass({
     getInitialState() {
@@ -35,7 +34,7 @@ var SourceDataTable = React.createClass({
         this._dataTable
             .dimension(dimension)
             .group((d) => {
-                var topValues = group.top(NUMBER_OF_TOP_VALUES);
+                var topValues = group.top(this.props.numberOfTopValues);
                 var dInTopValues = topValues.some((value) => d.name.localeCompare(value.key) === 0);
                 return dInTopValues ? "Top sources" : "Others";
             })
@@ -65,8 +64,8 @@ var SourceDataTable = React.createClass({
         });
     },
     _filterSourceListener(table, onDataFiltered) {
-        table.selectAll("td.dc-table-column._1 a.dc-filter-link").on("click", () => {
-            var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
+        table.selectAll("td.dc-table-column a.dc-filter-link").on("click", () => {
+            var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
             var datum = d3.selectAll(parentTdElement).datum();
 
             onDataFiltered(datum.name);
@@ -111,14 +110,7 @@ var SourceDataTable = React.createClass({
 
         return (
           <div>
-              <h3 className="sources-title">Selected sources
-                  <span style={{marginLeft: 20}}>
-                      <button id="dc-sources-result-reset" className="btn btn-info btn-xs"
-                              onClick={this.props.resetFilters} title="Reset filter" style={{display: "none"}}>
-                          Reset
-                      </button>
-                  </span>
-              </h3>
+              <SourceTitle resetFilterId="dc-sources-result-reset" resetFilters={this.props.resetFilters}>Selected sources</SourceTitle>
               <div className="row sources-filtering">
                   <div className="col-md-6">
                       <div className="form-inline">

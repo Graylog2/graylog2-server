@@ -12,6 +12,9 @@ var d3 = require('d3');
 
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 
+var SourceTitle = require('./SourceTitle');
+var D3Utils = require('../../util/D3Utils');
+
 var SourceLineChart = React.createClass({
     getInitialState() {
         return {
@@ -43,6 +46,7 @@ var SourceLineChart = React.createClass({
             .elasticX(true)
             .elasticY(true)
             .transitionDuration(30)
+            .colors(D3Utils.glColourPalette())
             .on("filtered", (chart) => {
                 dc.events.trigger(() => {
                     var filter = chart.filter();
@@ -96,14 +100,7 @@ var SourceLineChart = React.createClass({
         );
         return (
             <div id="dc-sources-line-chart" className="col-md-12">
-                <h3>
-                    <i className="fa fa-calendar"></i> Messages per {this.props.resolution}&nbsp;
-                    <small>
-                        <a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}>
-                            <i className="fa fa-remove"></i> Reset filter
-                        </a>
-                    </small>
-                </h3>
+                <SourceTitle className="reset" resetFilters={this.props.resetFilters}>Messages per {this.props.resolution}</SourceTitle>
                 {loadingSpinner}
                 {noDataOverlay}
             </div>
