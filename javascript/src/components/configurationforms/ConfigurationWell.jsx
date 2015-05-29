@@ -18,7 +18,7 @@ var ConfigurationWell = React.createClass({
             return ("");
         }
         var formattedItems = $.map(config, (value, key) => {
-            return (<li key={id + "-" + key}>{key}: {value}</li>);
+            return (<li key={id + "-" + key}><div className='key'>{key}:</div> <div className='value'>{value}</div></li>);
         });
 
         if (formattedItems.length < 1) {
@@ -33,7 +33,7 @@ var ConfigurationWell = React.createClass({
     },
     render() {
         return (
-            <div className="well well-small">
+            <div className="well well-small configuration-well react-configuration-well">
                 {this._formatConfiguration(this.state.id, this.state.configuration)}
             </div>
         );
