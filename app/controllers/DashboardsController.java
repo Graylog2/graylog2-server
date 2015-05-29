@@ -17,27 +17,24 @@
 package controllers;
 
 import com.google.inject.Inject;
+import lib.BreadcrumbList;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import lib.BreadcrumbList;
 import org.graylog2.restclient.models.NodeService;
 import org.graylog2.restclient.models.Startpage;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.api.requests.dashboards.CreateDashboardRequest;
-import org.graylog2.restclient.models.api.requests.dashboards.UpdateDashboardRequest;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
-import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public class DashboardsController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(DashboardsController.class);
@@ -126,6 +123,7 @@ public class DashboardsController extends AuthenticatedController {
     public Result delete(String id) {
         try {
             dashboardService.delete(id);
+            flash("success", "Dashboard was deleted successfully");
             return redirect(routes.DashboardsController.index());
         } catch (APIException e) {
             String message = "Could not delete dashboard. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";

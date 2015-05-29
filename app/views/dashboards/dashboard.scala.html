@@ -21,11 +21,20 @@
                 data-dashboard-description="@dashboard.getDescription">
                 </span>
 
-                @helper.form(action = routes.DashboardsController.delete(dashboard.getId), args = 'class -> "action-form") {
-                    <button type="submit" class="btn btn-danger btn-delete last" data-confirm="Do you really want to delete the dashboard @dashboard.getTitle?">
-                        <i class="fa fa-trash"></i>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        More actions <span class="caret"></span>
                     </button>
-                }
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="@routes.StartpageController.set("dashboard", dashboard.getId)">Set as startpage</a></li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="@routes.DashboardsController.delete(dashboard.getId)" onclick="return confirm('Do you really want to delete the dashboard @dashboard.getTitle?');">
+                                Delete this dashboard
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             }
         </div>
 

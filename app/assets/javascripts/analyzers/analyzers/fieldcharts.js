@@ -166,7 +166,10 @@ $(document).ready(function () {
 
                 $(".type-description", $graphContainer).text("[" + opts.valuetype + "] " + opts.field + ", ");
 
-                rickshawHelper.processHistogramData(data.values, data.from, data.to, data.interval);
+                // Do not add from time when we search in all messages
+                var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
+
+                rickshawHelper.processHistogramData(data.values, from, data.to, data.interval);
 
                 var graph = new Rickshaw.Graph({
                     element: $graphElement[0],
