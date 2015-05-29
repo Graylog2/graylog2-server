@@ -14,6 +14,7 @@ gl2AppPathPrefix = "@Configuration.getApplicationContext";
 gl2UserTimeZone = "@DateTools.getUserTimeZone(currentUser)";
 gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(currentUser);
 gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
+sockJsWebSocketsEnabled = @lib.SockJSUtils.isWebsocketsEnabled;
 </script>
 
 @helper.javascriptRouter("jsRoutes")(
