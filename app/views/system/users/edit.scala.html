@@ -18,24 +18,25 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-12">
-            <div class="pull-right actions">
+        <div class="col-md-8">
+            <h1>Edit user &raquo;@username&laquo;</h1>
+            <p class="description">You can either change the details of a user here or set a new password.</p>
+        </div>
+
+        <div class="col-md-4" style="text-align: right; margin-top: 10px;">
             @if(!user.isReadonly) {
                 @if(user.getStartpage != null) {
-                    <form action="@routes.StartpageController.reset(user.getName)" method="POST">
+                    <form action="@routes.StartpageController.reset(user.getName)" method="POST" style="display: inline-block;">
                         <button type="submit" class="btn btn-info" data-confirm="Really reset startpage?">
                             Reset custom startpage
                         </button>
                     </form>
                 }
+
                 <span id="react-user-preferences-button" data-user-name="@username">
                     <button class="btn btn-success">User preferences</button>
                 </span>
-            }
-            </div>
-
-            <h1>Edit user &raquo;@username&laquo;</h1>
-            <p class="description">You can either change the details of a user here or set a new password.</p>
+        }
         </div>
 
         <div id="react-user-preferences-modal"></div>
@@ -229,7 +230,7 @@
                         </div>
                     </div>
                 } else {
-                    <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
+                    <form class="form-horizontal" style="margin-top: 10px;" action="@routes.UsersController.changePassword(username)" method="POST">
                         @if(requiresOldPassword) {
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" for="old-password">Old Password</label>
@@ -277,7 +278,7 @@
                         </div>
                     </div>
                 } else {
-                    <form class="form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
+                    <form class="form-horizontal" style="margin-top: 10px;" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">User Role</label>
 
