@@ -6,13 +6,7 @@
 @main("Dashboards", null, "", currentUser, false) {
 
     <div class="row content content-head">
-        <div class="col-md-12">
-            <div class="pull-right actions">
-                @if(isPermitted(DASHBOARDS_CREATE)) {
-                    <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success">Create dashboard</a>
-                }
-            </div>
-
+        <div class="col-md-10">
             <h1>Dashboards</h1>
 
             <p class="description">
@@ -20,10 +14,18 @@
                 graph or chart you create in other parts of Graylog with one click.
             </p>
 
-            @views.html.partials.support.list() {
+            @views.html.partials.support.list_small() {
                 Take a look at the
                 <a href="http://docs.graylog.org/en/1.0/pages/dashboards.html" target="_blank">Dashboard tutorial</a>
                 for lots of other useful tips.
+            }
+        </div>
+
+        <div class="col-md-2">
+            @if(isPermitted(DASHBOARDS_CREATE)) {
+                <a href="@routes.DashboardsController.newDashboard()" style="margin-top: 20px;" class="btn btn-lg btn-success">
+                    Create dashboard
+                </a>
             }
         </div>
     </div>
