@@ -601,27 +601,26 @@ $(document).ready(function() {
 
         var linkElem = $(this);
         var index = $(this).data('index-name');
-        
-        $.get(appPrefixed("/a/system/indices/index_info/" + index + "/partial"), function(data) {
-            var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
-            holderElem.html(data);
-            // Format numbers that were just loaded into the html document
-            $(".number-format", holderElem).each(formatNumberWithDataFormat);
-            $(".moment-humanize").each(momentHumanize);
+        var icon = linkElem.children().first();
+        var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
 
-            holderElem.toggle();
-            
-            var icon = linkElem.children().first();
+        if(icon.hasClass("fa-caret-right")) {
+            icon.removeClass("fa-caret-right");
+            icon.addClass("fa-caret-down");
 
-            if(icon.hasClass("fa-caret-right")) {
-                icon.removeClass("fa-caret-right");
-                icon.addClass("fa-caret-down");
-            } else {
-                icon.removeClass("fa-caret-down");
-                icon.addClass("fa-caret-right");
-            }
-        });
-
+            $.get(appPrefixed("/a/system/indices/index_info/" + index + "/partial"), function(data) {
+                holderElem.html(data);
+                // Format numbers that were just loaded into the html document
+                $(".number-format", holderElem).each(formatNumberWithDataFormat);
+                $(".moment-humanize").each(momentHumanize);
+            }).done(function() {
+                holderElem.show();
+            });
+        } else {
+            icon.removeClass("fa-caret-down");
+            icon.addClass("fa-caret-right");
+            holderElem.hide();
+        }
     });
 
     $(".nolink").on("live", function(e) {
