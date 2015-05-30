@@ -20,8 +20,7 @@
             <i class="fa fa-ambulance"></i> &nbsp;<strong>Elasticsearch cluster is red.</strong>
             }
 
-    <div class="pull-right">
-        <strong>Shards:</strong>
+        Shards:
         @clusterHealth.getActiveShards active,
         @clusterHealth.getInitializingShards initializing,
         @clusterHealth.getRelocatingShards relocating,
@@ -29,5 +28,4 @@
 
         &nbsp;@partials.support.bubble("general/elasticsearch-cluster-status-explained")
     </div>
-</div>
 }

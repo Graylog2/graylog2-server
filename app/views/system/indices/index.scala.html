@@ -15,48 +15,47 @@
 @main("Indices", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row content">
-        <div class="col-md-12">
-
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-                        Maintenance
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="@routes.IndicesController.reCalculateRanges()" data-confirm="This will trigger a background system job. Go on?">Recalculate index ranges</a></li>
-                        <li><a href="@routes.IndicesController.cycleDeflector()" data-confirm="Really manually cycle deflector? Follow the documentation link on this page to learn more.">Manually cycle deflector</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <h1><i class="fa fa-reorder"></i> Indices</h1>
-            <p class="description">This is an overview of all indices (message stores) Graylog is currently taking in account
-            for searches and analysis. You can learn more about the index model in the
-            <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
-            documentation</a>. Closed indices can be re-opened at any time.
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Indices</h1>
+            <p class="description">
+                This is an overview of all indices (message stores) Graylog is currently taking in account
+                for searches and analysis. You can learn more about the index model in the
+                <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
+                documentation</a>. Closed indices can be re-opened at any time.
             </p>
 
-            <br />
-            @if("size".equals(deflectorConfig.`type`)) {
-                <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxSizePerIndex</span>
-                    bytes per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+            @views.html.partials.support.list() {
+                @if("size".equals(deflectorConfig.`type`)) {
+                    <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxSizePerIndex</span>
+                        bytes per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+                }
+                @if("time".equals(deflectorConfig.`type`)) {
+                    <strong>Your current configuration rotates the indices every @{PeriodFormat.getDefault().print(deflectorConfig.maxTimePerIndex)}
+                        and keeps a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+                }
+                @if("count".equals(deflectorConfig.`type`)) {
+                    <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
+                        documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+                }
             }
-            @if("time".equals(deflectorConfig.`type`)) {
-                <strong>Your current configuration rotates the indices every @{PeriodFormat.getDefault().print(deflectorConfig.maxTimePerIndex)}
-                    and keeps a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
-            }
-            @if("count".equals(deflectorConfig.`type`)) {
-                <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
-                    documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
-            }
+        </div>
 
-
+        <div class="col-md-2" style="text-align: center; margin-top: 35px;">
+            <div class="btn-group">
+                <a class="btn btn-info btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+                    Maintenance
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="@routes.IndicesController.reCalculateRanges()" data-confirm="This will trigger a background system job. Go on?">Recalculate index ranges</a></li>
+                    <li><a href="@routes.IndicesController.cycleDeflector()" data-confirm="Really manually cycle deflector? Follow the documentation link on this page to learn more.">Manually cycle deflector</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <div class="row content">
+    <div class="row row-sm content">
         <div class="col-md-12">
             @if(!closedIndices.isEmpty) {
                 <div class="alert alert-info closed-indices">
@@ -84,8 +83,8 @@
             }
 
             <div class="alert alert-success" style="margin-top: 10px;">
-                <i class="fa fa-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management.
-                <span class="pull-right">Current write-active index is <i>@deflectorTarget</i>.</span>
+                <i class="fa fa-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management,
+                current write-active index is <i>@deflectorTarget</i>.
             </div>
 
             @views.html.partials.es_cluster_health.render(clusterHealth)
@@ -113,9 +112,7 @@
     @for(index <- indices.sortWith(_.getNumber > _.getNumber)) {
         <div class="row index-description content">
             <div class="col-md-12">
-                <h3>
-                    <i class="fa fa-ellipsis-v"></i>
-
+                <h2>
                     @if(index.getName.equals(deflectorTarget)) {
                         <i class="fa fa-bolt" title="Write-active index"></i>
                     }
@@ -126,7 +123,7 @@
                         <i class="fa fa-retweet" title="Reopened index"></i>
                     }
 
-                    <span class="starts">
+                    <small>
                         @if(index.getRange.getStarts.isEqual(0)) {
                             Contains no messages
                             @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
@@ -143,8 +140,8 @@
                         @if(!index.getName.equals(deflectorTarget)) {
                             <a href="#" class="index-details" data-index-name="@index.getName"><i class="fa fa-caret-right"></i>  Load Details / Actions</a>
                         }
-                    </span>
-                </h3>
+                    </small>
+                </h2>
 
                 <div class="index-info-holder"
                     @if(!index.getName.equals(deflectorTarget)) {
