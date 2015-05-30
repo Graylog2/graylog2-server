@@ -15,14 +15,14 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <h1>Nodes</h1>
 
             <p class="description">
                 This page provides a real-time overview of the nodes in your Graylog cluster.
             </p>
 
-            @views.html.partials.support.list_small() {
+            @views.html.partials.support.list() {
                 You can pause message processing at any time. The process buffers will not accept any new messages until you
                 resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be
                 persisted to disk, even when processing is disabled.
@@ -188,7 +188,7 @@
                 <h2>You are running @radios.size graylog-radio nodes</h2>
             }
 
-            <div class="alert alert-warning">
+            <div class="alert alert-warning" style="margin-top: 10px;">
                 The Graylog Radio components are deprecated and will not be supported in future versions. Read more about this
                 topic and how to adapt your infrastructure
                 <a href="http://docs.graylog.org/en/latest/pages/architecture.html#highly-available-setup-with-graylog-radio">

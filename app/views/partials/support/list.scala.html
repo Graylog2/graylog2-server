@@ -1,12 +1,14 @@
 @()(content: Html)
 
 <p class="description-tooltips">
-    <span class="fa-stack fa-lg">
-        <i class="fa fa-circle fa-stack-2x"></i>
-        <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
-    </span>
+    <div style="margin-right: 10px; float: left;">
+        <span class="fa-stack fa-lg">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
+        </span>
+    </div>
 
-    <strong>
+    <div style="font-weight: bold;">
         @content
-    </strong>
+    </div>
 </p>

@@ -25,7 +25,7 @@
                 documentation</a>. Closed indices can be re-opened at any time.
             </p>
 
-            @views.html.partials.support.list() {
+            @views.html.partials.support.list_small() {
                 @if("size".equals(deflectorConfig.`type`)) {
                     <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxSizePerIndex</span>
                         bytes per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
