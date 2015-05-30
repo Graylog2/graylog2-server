@@ -11,44 +11,41 @@
 
 @main("Node " + node.getNodeId, null, "", currentUser, false) {
 
-
-    <div class="row content">
-
-        <div class="col-md-12">
-
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
-                        Actions
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        @if(isPermitted(THREADS_DUMP)) {
-                            <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
-                        }
-                        <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
-                        @if(isPermitted(LOGGERS_READ)) {
-                            <li><a href="@routes.LoggingController.index()">Configure internal logging</a></li>
-                        }
-                        <li>
-                            <a href="@node.getTransportAddress/api-browser" target="_blank">
-                                API Browser
-                                <i class="fa fa-external-link" style="font-size: 11px;"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
+    <div class="row content content-head">
+        <div class="col-md-10">
             <h1>Node @node.getHostname / @node.getShortNodeId</h1>
 
             <p class="description">This page shows details of a Graylog server node that is active and reachable in your cluster.</p>
 
             @if(node.isMaster) {
-                <div class="alert alert-success">
-                    <i class="fa fa-star"></i> &nbsp;This is the master node.
-                </div>
+                @views.html.partials.support.list_small() {
+                    This is the master node.
+                }
             }
+        </div>
+
+        <div class="col-md-2" style="text-align: center; margin-top: 20px;">
+            <div class="btn-group">
+                <a class="btn btn-lg btn-info dropdown-toggle" data-toggle="dropdown" href="#">
+                    Actions
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    @if(isPermitted(THREADS_DUMP)) {
+                        <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
+                    }
+                    <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
+                    @if(isPermitted(LOGGERS_READ)) {
+                        <li><a href="@routes.LoggingController.index()">Configure internal logging</a></li>
+                    }
+                    <li>
+                        <a href="@node.getTransportAddress/api-browser" target="_blank">
+                            API Browser
+                            <i class="fa fa-external-link" style="font-size: 11px;"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
