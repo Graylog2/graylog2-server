@@ -5,16 +5,18 @@
     <div class="row content">
         <div class="col-md-12">
             <h1>
-                <i class="fa fa-film"></i>
-                Thread dump of @node.getShortNodeId
+                Thread dump of node @node.getShortNodeId
                 / @node.getHostname
+
+                <small>
+                    Taken at @views.helpers.DateHelper.current()
+                </small>
             </h1>
-            Taken at @views.helpers.DateHelper.current().
         </div>
     </div>
     <div class="row row-sm content">
         <div class="col-md-12">
-            <pre>@Html(views.helpers.StringHelper.simpleFormat(dump))</pre>
+            <pre class="threaddump">@Html(views.helpers.StringHelper.simpleFormat(dump))</pre>
         </div>
     </div>
 
