@@ -23,13 +23,13 @@ var CollapsableStreamRuleList = React.createClass({
         var text = this.isExpanded() ? 'Hide' : 'Show';
 
         return (
-            <div>
+            <span className="stream-rules-link">
                 <a href="#" onClick={this.onHandleToggle}>{text} stream rules</a>
                 <Alert ref='well' className={styles}>
                     <StreamRuleList stream={this.props.stream} streamRuleTypes={this.props.streamRuleTypes}
                                     permissions={this.props.permissions} />
                 </Alert>
-            </div>
+            </span>
         );
     }
 });
