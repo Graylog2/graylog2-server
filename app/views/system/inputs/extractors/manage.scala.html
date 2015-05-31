@@ -5,22 +5,8 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-12">
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-                        Actions
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="@routes.ExtractorsController.importExtractorsPage(node.getNodeId, input.getId)">Import extractors</a></li>
-                        <li><a href="@routes.ExtractorsController.exportExtractors(node.getNodeId, input.getId)">Export extractors</a></li>
-                    </ul>
-                </div>
-            </div>
-
+        <div class="col-md-10">
            <h1>
-                <i class="fa fa-flask"></i>
                 Extractors of <em>@input.getTitle</em>
            </h1>
 
@@ -31,13 +17,25 @@
                 as <em>http_response_code</em> to the message.
             </p>
         </div>
+
+        <div class="col-md-2" style="margin-top: 10px; text-align: right;">
+            <div class="btn-group">
+                <a class="btn btn-info btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+                    Actions
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="@routes.ExtractorsController.importExtractorsPage(node.getNodeId, input.getId)">Import extractors</a></li>
+                    <li><a href="@routes.ExtractorsController.exportExtractors(node.getNodeId, input.getId)">Export extractors</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     @*Add extractor wizard *@
     <div class="row content xtrc-select-message">
         <div class="col-md-12">
         <h2>
-            <i class="fa fa-sign-in"></i>
             Add extractor
         </h2>
 
@@ -45,7 +43,7 @@
             Start by loading a message so we have an example to work on.
 
             @if(!input.getGlobal) {
-            <div class="buttons">
+            <div class="buttons" style="margin-top: 10px;">
                 <button class="btn btn-success btn-sm xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                     Load a message recently received by this input
                 </button>
@@ -84,8 +82,8 @@
             <strong>Next step:</strong>
             Select a field you want to apply the extractor on by clicking on its name.
 
-            <div class="well well-small">
-                <h2>Message <span></span></h2>
+            <div class="well well-sm">
+                <h2 style="margin-bottom: 5px;">Message <span></span></h2>
                 <dl class="xtrc-message-fields">
                     <dt class="xtrc-message-field" data-field="{{field}}" data-value="{{raw-value}}" data-occurrence="repeat">{{field}}</dt><dd data-occurrence="repeat">{{value}}</dd>
                 </dl>
@@ -103,7 +101,7 @@
             <span class="xtrc-wizard-field"></span>
         </h2>
 
-        <div class="well well-small">
+        <div class="well well-sm">
             <strong>Example:</strong>
             <span class="xtrc-wizard-example"></span>
         </div>
@@ -134,7 +132,6 @@
         </span>
 
         <h2>
-            <i class="fa fa-cogs"></i>
             Configured extractors
         </h2>
 

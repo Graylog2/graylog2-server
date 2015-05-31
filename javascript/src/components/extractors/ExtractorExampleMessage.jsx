@@ -1,7 +1,6 @@
 'use strict';
 
 var React = require('react');
-var MessageLoader = require('./MessageLoader');
 
 var ExtractorExampleMessage = React.createClass({
     getInitialState() {
@@ -12,13 +11,6 @@ var ExtractorExampleMessage = React.createClass({
     },
     componentWillMount() {
         this.setState({example: this.props.example});
-    },
-    onExampleLoaded(message) {
-        var newExample = message.fields[this.props.field];
-
-        if (newExample !== null && newExample !== undefined && newExample !== "") {
-            this.setState({example: newExample});
-        }
     },
     render() {
         var originalMessage = <span id="xtrc-original-example" style={{display:"none"}}>{this.state.example}</span>;
@@ -33,7 +25,7 @@ var ExtractorExampleMessage = React.createClass({
             );
         } else {
             messagePreview = (
-                <div className="well well-small xtrc-new-example">
+                <div className="well well-sm xtrc-new-example">
                     <span id="xtrc-example">{this.state.example}</span>
                 </div>
             );
@@ -43,7 +35,6 @@ var ExtractorExampleMessage = React.createClass({
             <div>
                 {originalMessage}
                 {messagePreview}
-                <MessageLoader onMessageLoaded={this.onExampleLoaded}/>
             </div>
         );
     }

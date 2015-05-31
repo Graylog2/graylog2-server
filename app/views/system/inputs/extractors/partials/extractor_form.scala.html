@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row row-sm">
                 <div class="col-md-12">
                     <div class="radio">
                         <label>
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="row" id="condition-value-input" style="display:none;">
+            <div class="row row-sm" id="condition-value-input" style="display:none;">
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="condition_value"></label>
@@ -127,7 +127,7 @@
             </div>
 
             @if(!extractorType.equals(Extractor.Type.GROK)) {
-                <div class="row">
+                <div class="row row-sm">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="target_field">Store as field:</label>
@@ -145,7 +145,7 @@
                 </div>
             }
 
-            <div class="row">
+            <div class="row row-sm">
                 <div class="col-md-12">
                     <label class="radio-inline">
                         <input type="radio" name="cut_or_copy" value="copy" @if(is_cursor_strategy_checked(CursorStrategy.COPY)) { checked="checked" } />
@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row row-sm">
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="title">Extractor title:</label>
@@ -179,7 +179,7 @@
             </div>
 
             @if(!extractorType.equals(Extractor.Type.GROK)) {
-                <div class="row">
+                <div class="row row-sm">
                     <div class="col-md-12">
                         <div class="form-group">
                             <div id="add-converter-fields">
