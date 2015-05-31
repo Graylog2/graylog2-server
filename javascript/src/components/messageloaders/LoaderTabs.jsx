@@ -7,7 +7,6 @@ var RecentMessageLoader = require('./RecentMessageLoader');
 var MessageShow = require('../search/MessageShow');
 var InputsStore = require('../../stores/inputs/InputsStore');
 var Immutable = require('immutable');
-var MessageLoader = require('../extractors/MessageLoader');
 
 var LoaderTabs = React.createClass({
     getInitialState() {
