@@ -50,11 +50,10 @@ var MessageLoader = React.createClass({
                 <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
                     <input type="text" ref="messageId" className="input-xlarge" placeholder="Message ID" required/>
                     <input type="text" ref="index" className="input-medium" placeholder="Index" required/>
-                    <button ref="submitButton" type="submit" className="btn">
-                        Load a message
+                    <button ref="submitButton" type="submit" className="btn btn-xs btn-info">
+                        Load message
                     </button>
                 </form>
-                <hr/>
             </div>
         );
         return (
