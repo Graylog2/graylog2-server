@@ -74,7 +74,7 @@ var StreamRuleForm = React.createClass({
                         </p>
                     </Col>
                     <Col md={4}>
-                        <div className="well well-small matcher-github">
+                        <div className="well well-sm matcher-github">
                             The server will try to convert to strings or numbers based on the matcher type as good as it
                             can.
 
