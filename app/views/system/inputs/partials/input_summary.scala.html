@@ -15,7 +15,7 @@
     <div class="graylog-input">
         <div class="row row-sm">
             <div class="col-md-6">
-                <h2 class="graylog-input-title">
+                <h3 class="graylog-input-title">
                     @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
 
                     <small>
@@ -27,7 +27,7 @@
                             <span class="label label-info">global</span>
                         }
                     </small>
-                </h2>
+                </h3>
 
                 <p class="graylog-input-subtitle">
                     @if(!input.getGlobal) {
@@ -107,11 +107,11 @@
             <div class="col-md-8">
             @if(!input.getStaticFields.isEmpty) {
                 <div class="static-fields">
-                    <h4 style="display: inline;">Static fields</h4><br />
+                        <h3 style="margin-bottom: 5px;">Static fields</h3>
                     <ul>
                     @for((k,v) <- input.getStaticFields) {
                         <li>
-                            @k: @v
+                            <strong>@k:</strong> @v
                             @if(isPermitted(INPUTS_EDIT, input.getId)) {
                                 <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
                                 class="remove-static-field"
