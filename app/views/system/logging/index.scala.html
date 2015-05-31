@@ -4,9 +4,9 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row content">
+    <div class="row content content-head">
         <div class="col-md-12">
-            <h1><i class="fa fa-inbox"></i> Logging</h1>
+            <h1>Logging</h1>
             <p class="description">
                 This section controls logging of the Graylog architecture and allows you to change log
                 levels on the fly. Note that log levels are reset to their defaults after you restart
@@ -16,26 +16,28 @@
     </div>
 
     @for((node, nodeLoggers) <- loggers) {
-        <div class="row log-writing-node node-row content">
+        <div class="row row-sm log-writing-node content">"
             <div class="col-md-12">
-                <div class="pull-right">
-                    <a href="#" class="btn btn-default btn-xs trigger-log-level-metrics" data-node-id="@node.getNodeId">
-                        <i class="fa fa-dashboard"></i>
-                        Metrics
-                    </a>
+                <div style="margin-bottom: 20px;">
+                    <div class="pull-right">
+                        <a href="#" class="btn btn-sm btn-primary trigger-log-level-metrics" data-node-id="@node.getNodeId">
+                            <i class="fa fa-dashboard"></i>
+                            Show subsystem metrics
+                        </a>
+                    </div>
+
+                    <h2>
+                        @views.html.partials.node_title_link(node)
+
+                        <span style="font-size: 12px;">
+                            Has written a total of
+                            <strong>
+                                <span class="total-logs focuslimit" data-node-id="@node.getNodeId">?</span>
+                                internal log messages.
+                            </strong>
+                        </span>
+                    </h2>
                 </div>
-
-                <h2>
-                    @views.html.partials.node_title_link(node)
-
-                    <span style="font-size: 12px;">
-                        Has written a total of
-                        <strong>
-                            <span class="total-logs focuslimit" data-node-id="@node.getNodeId">?</span>
-                            internal log messages.
-                        </strong>
-                    </span>
-                </h2>
 
                 <div class="subsystems">
                     <div class="subsystems-row">
