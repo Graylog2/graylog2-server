@@ -9,16 +9,20 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-12">
-            <div class="pull-right actions">
-                @if(isPermitted(LDAP_EDIT)) {<a id="configure-ldap" class="btn btn-info" href="@routes.LdapController.index()">Configure LDAP</a>}
-                @if(isPermitted(USERS_CREATE)) { <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new user</a> }
-            </div>
-
+        <div class="col-md-8">
             <h1>User accounts</h1>
-            <p class="description">Create as many users as you want next to the default administrator user here. You can also configure
-            LDAP and make changes to already existing users.</p>
+            <p class="description">Create as many users as you want next to the default administrator user here. You can also configureLDAP and make changes to already existing users.
+            </p>
+        </div>
 
+        <div class="col-md-4" style="text-align: right; margin-top: 10px;">
+            @if(isPermitted(LDAP_EDIT)) {
+                <a id="configure-ldap" class="btn btn-info" href="@routes.LdapController.index()">Configure LDAP</a>
+            }
+
+            @if(isPermitted(USERS_CREATE)) {
+                <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Add new user</a>
+            }
         </div>
     </div>
 
