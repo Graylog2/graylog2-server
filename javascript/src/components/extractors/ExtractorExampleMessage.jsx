@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var MessageLoader = require('./MessageLoader');
 
 var ExtractorExampleMessage = React.createClass({
     getInitialState() {
@@ -35,6 +36,7 @@ var ExtractorExampleMessage = React.createClass({
             <div>
                 {originalMessage}
                 {messagePreview}
+                <MessageLoader onMessageLoaded={this.onExampleLoaded}/>
             </div>
         );
     }
