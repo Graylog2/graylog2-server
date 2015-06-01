@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.net.HostAndPort;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
@@ -33,19 +34,22 @@ public abstract class MongoStats {
     public abstract BuildInfo buildInfo();
 
     @JsonProperty
+    @Nullable
     public abstract HostInfo hostInfo();
 
     @JsonProperty
+    @Nullable
     public abstract ServerStatus serverStatus();
 
     @JsonProperty
+    @Nullable
     public abstract DatabaseStats databaseStats();
 
     public static MongoStats create(List<HostAndPort> servers,
                                     BuildInfo buildInfo,
-                                    HostInfo hostInfo,
-                                    ServerStatus serverStatus,
-                                    DatabaseStats databaseStats) {
+                                    @Nullable HostInfo hostInfo,
+                                    @Nullable ServerStatus serverStatus,
+                                    @Nullable DatabaseStats databaseStats) {
         return new AutoValue_MongoStats(servers, buildInfo, hostInfo, serverStatus, databaseStats);
     }
 }
