@@ -123,13 +123,16 @@ var SearchResult = React.createClass({
                     <div className="row content content-head">
                         <div className="col-md-12">
                             <h1>
-                                <span><i className="fa fa-search"></i> Nothing found {streamDescription}</span>
-                                <AddToDashboardMenu title="Add count to dashboard"
-                                                    widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                                    permissions={this.props.permissions}/>
+                                <span className="pull-right">
+                                    <AddToDashboardMenu title="Add count to dashboard"
+                                                        widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
+                                                        permissions={this.props.permissions}/>
+                                </span>
+
+                                <span>Nothing found {streamDescription}</span>
                             </h1>
 
-                            <p>
+                            <p className="description">
                                 Your search returned no results.&nbsp;
                                 <ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
                                     <a href="#" onClick={(e) => e.preventDefault()}>Show the Elasticsearch query.</a>
