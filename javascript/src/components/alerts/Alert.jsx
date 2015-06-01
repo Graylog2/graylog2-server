@@ -25,7 +25,7 @@ var Alert = React.createClass({
     render() {
         var alert = this.props.alert;
         var alarmCallbackHistory = (this.state.showAlarmCallbackHistory ? <div><br/><AlarmCallbackHistoryOverview alertId={alert.id} streamId={alert.stream_id} /></div>:null);
-        var historyIcon = (this.state.showAlarmCallbackHistory ? <i className="fa fa-minus-square-o" /> : <i className="fa fa-plus-square-o" />);
+        var historyIcon = (this.state.showAlarmCallbackHistory ? <i className="fa fa-caret-down" /> : <i className="fa fa-caret-right" />);
         return (
             <tr>
                 <td>

@@ -10,7 +10,7 @@ var AlertsTable = React.createClass({
                 return <Alert key={alert.id} alert={alert}/>;
             });
             return (
-                <table className="alerts table table-striped table-hover table-condensed">
+                <table className="alerts table table-hover table-condensed">
                     <thead>
                     <tr>
                         <th style={{width: "130px"}} data-dynatable-sorts="timestamp">Triggered</th>

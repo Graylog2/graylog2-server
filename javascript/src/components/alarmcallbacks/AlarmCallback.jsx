@@ -52,7 +52,8 @@ var AlarmCallback = React.createClass({
                     <Col md={9}>
                         <h3>
                             {' '}
-                            <span>{humanReadableType}</span>
+                            <span>{humanReadableType}</span><small>{this.props.titleAnnotation}</small>
+                            <small>{this.props.subtitle}</small>
                         </h3>
 
                         Executed once per triggered alert condition.
