@@ -95,7 +95,7 @@ public class ClusterEventPeriodical extends Periodical {
                 .asc("producer")
                 .asc("consumers"));
 
-        coll.setWriteConcern(WriteConcern.MAJORITY);
+        coll.setWriteConcern(WriteConcern.FSYNCED);
 
         return coll;
     }
@@ -180,7 +180,7 @@ public class ClusterEventPeriodical extends Periodical {
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
 
         try {
-            final String id = dbCollection.save(clusterEvent).getSavedId();
+            final String id = dbCollection.save(clusterEvent, WriteConcern.FSYNCED).getSavedId();
             LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
         } catch (MongoException e) {
             LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
