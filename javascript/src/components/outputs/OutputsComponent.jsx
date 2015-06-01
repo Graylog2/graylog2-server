@@ -36,7 +36,6 @@ var OutputComponent = React.createClass({
     },
     getInitialState() {
       return {
-          outputs: [],
           assignableOutputs: [],
           types: {}
       };
