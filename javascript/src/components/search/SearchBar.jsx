@@ -15,9 +15,12 @@ var Alert = require('react-bootstrap').Alert;
 
 var ChosenSelectInput = require('../common/ChosenSelectInput');
 var QueryInput = require('./QueryInput');
+var Bubble = require('../support/Bubble');
+
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 var ToolsStore = require('../../stores/tools/ToolsStore');
+
 
 var UIUtils = require('../../util/UIUtils');
 
@@ -341,7 +344,7 @@ var SearchBar = React.createClass({
                                         </div>
                                         <div className='col-md-3'>
                                             <div className="saved-searches-selector-container"
-                                                 style={{float: 'right', marginRight: 10, width: 270}}>
+                                                 style={{float: 'right', marginRight: 5, width: 270}}>
                                                 {this._getSavedSearchesSelector()}
                                             </div>
                                         </div>
@@ -349,6 +352,10 @@ var SearchBar = React.createClass({
                                 </div>
 
                                 <div id="search-container">
+                                    <div className="pull-right search-help">
+                                        <Bubble link="general/queries" title="Search query syntax documentation" />
+                                    </div>
+
                                     <Button type='submit' bsStyle='success' className='pull-left'>
                                         <i className="fa fa-search"></i>
                                     </Button>
