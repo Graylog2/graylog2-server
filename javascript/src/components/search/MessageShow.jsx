@@ -11,17 +11,15 @@ var MessageShow = React.createClass({
     },
     render() {
         return (
-            <div className="col-md-12" id="main-content">
-                <div className="row content">
-                    <div className="col-md-12">
-                        <MessageDetail {...this.props} message={this.props.message}
-                                                       inputs={this.props.inputs}
-                                                       streams={this.props.streams}
-                                                       nodes={this.props.nodes}
-                                                       possiblyHighlight={this.possiblyHighlight}
-                                                       showTimestamp={true}
-                                                       allStreams={Immutable.List()}/>
-                    </div>
+            <div className="row content">
+                <div className="col-md-12">
+                    <MessageDetail {...this.props} message={this.props.message}
+                                                   inputs={this.props.inputs}
+                                                   streams={this.props.streams}
+                                                   nodes={this.props.nodes}
+                                                   possiblyHighlight={this.possiblyHighlight}
+                                                   showTimestamp={true}
+                                                   allStreams={Immutable.List()}/>
                 </div>
             </div>
         );
