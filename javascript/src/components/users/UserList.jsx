@@ -64,7 +64,7 @@ var UserList = React.createClass({
         return formattedHeaderCell;
     },
     _userInfoFormatter(user) {
-        var rowClass = user.username === this.state.currentUsername ? "info" : null;
+        var rowClass = user.username === this.state.currentUsername ? "active" : null;
         var userBadge = null;
         if (user.read_only) {
             userBadge = <span><i title="System User" className="fa fa-lock"></i></span>;
@@ -83,16 +83,17 @@ var UserList = React.createClass({
         var actions = null;
         if (!user.read_only) {
             var deleteAction = (
-                <button id="delete-user" type="button" className="btn btn-xs btn-danger" title="Delete user"
+                <button id="delete-user" type="button" className="btn btn-xs btn-primary" title="Delete user"
                         onClick={this._deleteUserFunction(user.username)}>
-                    <i className="fa fa-remove"></i> Delete
+                    Delete
                 </button>
             );
 
             var editAction = (
                 <a id="edit-user" href={UsersStore.editUserFormUrl(user.username)}
-                   className="btn btn-default btn-xs" title={"Edit user " + user.username}>
-                    <i className="fa fa-edit"></i> Edit</a>
+                   className="btn btn-info btn-xs" title={"Edit user " + user.username}>
+                    Edit
+                </a>
             );
 
             actions = (
@@ -122,6 +123,7 @@ var UserList = React.createClass({
         return (
             <div>
                 <DataTable id="user-list"
+                           className="table-hover"
                            headers={headers}
                            headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}

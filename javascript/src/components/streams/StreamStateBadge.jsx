@@ -8,7 +8,7 @@ var StreamStateBadge = React.createClass({
     },
     render() {
         var stream = this.props.stream;
-        return (stream.disabled ? <span className="badge alert-danger stream-stopped" onClick={this._onClick}>stopped</span> : <div></div>);
+        return (stream.disabled ? <span className="badge alert-danger stream-stopped" onClick={this._onClick} style={{marginLeft: 5}}>stopped</span> : <div></div>);
     }
 });
 

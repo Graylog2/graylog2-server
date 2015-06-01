@@ -100,10 +100,10 @@ var SourceDataTable = React.createClass({
         var resultTable = (<table id="dc-sources-result" className="sources table table-hover">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th style={{width: '60%'}}>Name</th>
                     <th>Percentage</th>
                     <th>Message count</th>
-                    <th style={{width: "10px"}}></th>
+                    <th style={{width: 10}}></th>
                 </tr>
             </thead>
         </table>);

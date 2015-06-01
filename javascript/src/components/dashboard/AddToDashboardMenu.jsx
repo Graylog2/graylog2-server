@@ -92,7 +92,7 @@ var AddToDashboardMenu = React.createClass({
     },
     render() {
         return (
-            <div style={{display: 'inline'}}>
+            <div style={{display: 'inline-block'}}>
                 <ButtonGroup>
                     {this.props.children}
 

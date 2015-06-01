@@ -62,9 +62,9 @@ var GrokPatterns = React.createClass({
                 <td>{pattern.name}</td>
                 <td>{pattern.pattern}</td>
                 <td>
-                    <button style={{marginRight: 5}} className="btn btn-danger btn-xs"
+                    <button style={{marginRight: 5}} className="btn btn-primary btn-xs"
                             onClick={this.confirmedRemove.bind(this, pattern)}>
-                        <i className="fa fa-remove"></i> Delete
+                        Delete
                     </button>
                     <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false}
                                       reload={this.loadData} savePattern={this.savePattern}
@@ -101,6 +101,7 @@ var GrokPatterns = React.createClass({
                 <div className="row content">
                     <div className="col-md-12">
                         <DataTable id="grok-pattern-list"
+                                   className="table-striped table-hover"
                                    headers={headers}
                                    headerCellFormatter={this._headerCellFormatter}
                                    sortByKey={"name"}

@@ -73,7 +73,7 @@ var SavedSearchControls = React.createClass({
     },
     render() {
         return (
-            <div style={{display: 'inline'}}>
+            <div style={{display: 'inline-block'}}>
                 {this._isSearchSaved() ? this._getEditSavedSearchControls() : this._getNewSavedSearchButtons()}
                 <BootstrapModal ref="saveSearchModal"
                                 onCancel={this._hide}

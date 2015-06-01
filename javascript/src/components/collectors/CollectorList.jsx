@@ -91,8 +91,10 @@ var CollectorList = React.createClass({
                         <a onClick={this.toggleShowInactive} className="btn btn-primary pull-right">{showOrHideInactive} inactive collectors</a>
 
                         <form className="form-inline collectors-filter-form" onSubmit={(e) => e.preventDefault() }>
-                            <label htmlFor="collectorsfilter">Filter collectors:</label>
-                            <input type="text" name="filter" id="collectorsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                            <div className="form-group form-group-sm">
+                                <label htmlFor="collectorsfilter" className="control-label">Filter collectors:</label>
+                                <input type="text" name="filter" id="collectorsfilter" className="form-control" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                            </div>
                         </form>
 
                         {collectorList}

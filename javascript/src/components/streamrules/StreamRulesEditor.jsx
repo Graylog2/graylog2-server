@@ -9,6 +9,7 @@ var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 var Alert = require('react-bootstrap').Alert;
 var StreamRuleForm = require('./StreamRuleForm');
+var Spinner = require('../common/Spinner');
 
 var StreamRulesEditor = React.createClass({
     getInitialState() {
@@ -116,7 +117,7 @@ var StreamRulesEditor = React.createClass({
                 </div>
             );
         } else {
-            return (<div><i className="fa fa-spin fa-spinner"/> Loading</div>);
+            return (<div className="row content"><div style={{marginLeft: 10}}><Spinner/></div></div>);
         }
     }
 });
