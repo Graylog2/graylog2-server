@@ -219,7 +219,7 @@ var SearchSidebar = React.createClass({
 
                     <h3>Fields</h3>
 
-                    <div className="input-group input-group-sm" style={{marginTop: 5}}>
+                    <div className="input-group input-group-sm" style={{marginTop: 5, marginBottom: 5}}>
                         <span className="input-group-btn">
                             <button type="button" className="btn btn-default"
                                     onClick={() => this._updateFieldSelection('default')}>Default
