@@ -33,9 +33,13 @@ var ConfigurationForm = React.createClass({
 	componentWillReceiveProps(props) {
 		this.setState(this._copyStateFromProps(props));
 	},
+    _sortByOptionality(x1, x2) {
+        return (this.state.configFields[x1].is_optional - this.state.configFields[x2].is_optional);
+    },
     render() {
         var typeName = this.props.typeName;
-        var configFields = $.map(this.state.configFields, this._renderConfigField);
+        var configFieldKeys = $.map(this.state.configFields, (v,k) => {return k;}).sort(this._sortByOptionality);
+        var configFields = configFieldKeys.map((key) => { return this._renderConfigField(this.state.configFields[key], key);});
         var title = this.props.title;
         var helpBlock = this.props.helpBlock;
         var header = (
