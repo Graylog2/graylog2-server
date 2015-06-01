@@ -6,24 +6,26 @@
 
 @main("Outputs of stream \"" + stream.getTitle + "\"", null, "", currentUser, false) {
 
-    <div class="row content content-header">
-        <div class="col-md-12">
+    <div class="row content content-head">
+        <div class="col-md-10">
             <h1>
-                <i class="fa fa-download"></i>
                 Outputs for Stream &raquo;@stream.getTitle&laquo;
             </h1>
+
             <p class="description">
                 Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
                 You can also reuse outputs that are already running for other streams.
 
                 A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
                 You can find output plugins on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+            </p>
 
-                <br /><br />
+            @views.html.partials.support.list() {
                 <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
                 Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
-                You can see all defined outputs in details at the <a href="@routes.OutputsController.index()">global output list</a>.
-            </p>
+                You can see all defined outputs in details at the
+                <a href="@routes.OutputsController.index()">global output list</a>.
+            }
         </div>
     </div>
 

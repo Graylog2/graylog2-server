@@ -243,7 +243,7 @@ label {
   margin-top: 15px;
 }
 
-.content-head p.description-tooltips .fa-stack {
+.content-head .description-tooltips .fa-stack {
   margin-right: 3px;
 }
 
@@ -274,11 +274,26 @@ label {
 
 #sidebar {
   padding-left: 0;
+
+  @media (min-width: 480px) {
+    padding-right: 0;
+  }
+
+  @media (min-width: 992px) {
+    padding-right: 15px;
+  }
 }
 
 #sidebar .affix {
-  top: 45px;
-  z-index: 1000;
+  @media (min-width: 480px) {
+    position: relative;
+  }
+
+  @media (min-width: 992px) {
+    top: 45px;
+    z-index: 1000;
+    position: fixed;
+  }
 }
 
 #sidebar .actions {
@@ -1712,6 +1727,7 @@ dl.metric-histogram dd {
 /* End new widgets */
 
 .configuration-field-optional {
+  margin-left: 5px;
   font-size: 11px;
 }
 
@@ -3131,4 +3147,8 @@ table.collectors-list {
 
 .modal-body .form-group {
   margin-bottom: 5px;
+}
+
+h2.extractor-title {
+  margin-bottom: 2px;
 }

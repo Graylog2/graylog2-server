@@ -22,9 +22,8 @@ var AssignOutputDropdown = React.createClass({
     render() {
         var outputs = this.props.outputs;
         var outputList = (outputs.length > 0 ? outputs.map(this._formatOutput) : <option disabled>No outputs available</option>);
-        var style = {marginTop: '10px'};
         return (
-            <div className="output-add" style={style}>
+            <div className="output-add">
                 <div className="form-inline">
                     <select value={this.state.selectedOutput} name="outputId" className="form-control" onChange={this._handleUpdate}>
                         <option value={this.PLACEHOLDER} disabled>Select existing output</option>

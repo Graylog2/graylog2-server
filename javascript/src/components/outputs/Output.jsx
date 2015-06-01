@@ -39,10 +39,11 @@ var Output = React.createClass({
                 <Col md={12}>
                     <Row className="row-sm">
                         <Col md={6}>
-                            <h3>
-                                <i className="fa fa-ellipsis-v"></i> {output.title} ({output.type})
-                                {contentPack}
-                            </h3>
+                            <h2 className="extractor-title">
+                                {output.title} {contentPack}
+                                <small>ID: {output.id}</small>
+                            </h2>
+                            Type: {output.type}
                         </Col>
                         <Col md={6}>
                             <span className="pull-right node-row-info">

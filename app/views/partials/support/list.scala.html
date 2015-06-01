@@ -1,14 +1,22 @@
 @()(content: Html)
 
-<p class="description-tooltips">
-    <div style="margin-right: 10px; float: left;">
-        <span class="fa-stack fa-lg">
-            <i class="fa fa-circle fa-stack-2x"></i>
-            <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
-        </span>
-    </div>
+@** lol this is a table because HTML, CSS, vertical alignment and the web sucks **@
 
-    <div style="font-weight: bold;">
-        @content
-    </div>
-</p>
+<table class="description-tooltips" style="margin-bottom: 5px;">
+    <tbody>
+        <tr>
+
+            <td style="width: 40px;">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
+                </span>
+            </td>
+
+            <td style="font-weight: bold;">
+                @content
+            </td>
+
+        </tr>
+    </tbody>
+</table>
