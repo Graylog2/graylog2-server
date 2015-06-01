@@ -6,19 +6,22 @@
 @main("Outputs in cluster", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row content">
+    <div class="row content content-head">
         <div class="col-md-12">
             <h1>
-                <i class="fa fa-download"></i>
                 Outputs in Cluster
             </h1>
+
             <p class="description">
                 Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here
                 <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
 
-                <br />
-                You can find output plugins on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+                @views.html.partials.support.list() {
+                    You can find output plugins on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+                }
             </p>
+
+
         </div>
     </div>
 
