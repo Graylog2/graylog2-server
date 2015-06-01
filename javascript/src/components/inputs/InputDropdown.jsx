@@ -27,17 +27,14 @@ var InputDropdown = React.createClass({
         if (this.props.inputs) {
             var inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).map(this._formatInput));
             return (
-                <Col md={12}>
-                    <Col md={6}>
-                        <Input type='select' valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
-                            <option value={this.PLACEHOLDER}>--- Select an Input ---</option>
+                <div>
+                        <Input type='select' style={{float: "left", width: "400px", marginRight: "10px"}} valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
+                            <option value={this.PLACEHOLDER}>Select an input</option>
                             {inputs}
                         </Input>
-                    </Col>
-                    <Col md={6}>
+
                         <a className="btn btn-success" disabled={this.state.selectedInput === this.PLACEHOLDER} onClick={this._onClick}>{this.props.title}</a>
-                    </Col>
-                </Col>
+                </div>
             );
         } else {
             return <Spinner />;

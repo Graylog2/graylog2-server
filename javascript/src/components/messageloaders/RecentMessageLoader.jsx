@@ -19,7 +19,7 @@ var RecentMessageLoader = React.createClass({
     },
     render() {
         return (
-            <div>
+            <div style={{marginTop: "5px", marginBottom: "5px"}}>
                 Select an Input from the list below and click "Load Message" to load the most recent message from this input.
                 <InputDropdown inputs={this.props.inputs} onClick={this.onClick} title="Load Message"/>
             </div>
