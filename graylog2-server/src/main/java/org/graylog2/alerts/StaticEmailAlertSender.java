@@ -106,7 +106,7 @@ public class StaticEmailAlertSender implements AlertSender {
 
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
-        if (!Strings.isNullOrEmpty(pluginConfig.getString("sender"))) {
+        if (pluginConfig != null && !Strings.isNullOrEmpty(pluginConfig.getString("sender"))) {
             email.setFrom(pluginConfig.getString("sender"));
         } else {
             email.setFrom(configuration.getFromEmail());
