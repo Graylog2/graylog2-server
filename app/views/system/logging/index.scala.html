@@ -7,22 +7,24 @@
     <div class="row content content-head">
         <div class="col-md-12">
             <h1>Logging</h1>
+
             <p class="description">
                 This section controls logging of the Graylog architecture and allows you to change log
                 levels on the fly. Note that log levels are reset to their defaults after you restart
                 the affected service.
             </p>
+
         </div>
     </div>
 
     @for((node, nodeLoggers) <- loggers) {
-        <div class="row row-sm log-writing-node content">"
+        <div class="row row-sm log-writing-node content">
             <div class="col-md-12">
                 <div style="margin-bottom: 20px;">
                     <div class="pull-right">
                         <a href="#" class="btn btn-sm btn-primary trigger-log-level-metrics" data-node-id="@node.getNodeId">
                             <i class="fa fa-dashboard"></i>
-                            Show subsystem metrics
+                            Show log level metrics
                         </a>
                     </div>
 
