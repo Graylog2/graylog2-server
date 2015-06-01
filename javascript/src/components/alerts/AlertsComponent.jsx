@@ -15,6 +15,7 @@ var AlertsComponent = React.createClass({
         return {
             skip: 0,
             limit: 10,
+            paginatorSize: 10,
             currentPage: 1
         };
     },
@@ -63,7 +64,7 @@ var AlertsComponent = React.createClass({
                         </h2>
                         {' '}
                         <AlertsTable alerts={this.state.alerts.alerts} />
-                        <Paginator pages={Math.ceil(this.state.alerts.total/this.state.limit)} size={this.state.limit}
+                        <Paginator pages={Math.ceil(this.state.alerts.total/this.state.limit)} size={this.state.paginatorSize}
                                    currentPage={this.state.currentPage} onSelected={this._onSelected}/>
                     </Col>
                 </Row>
