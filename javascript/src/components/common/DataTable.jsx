@@ -71,7 +71,7 @@ var DataTable = React.createClass({
             data = <p>Filter does not match any data.</p>;
         } else {
             data = (
-                <table className="table table-striped table-hover">
+                <table className={"table " + this.props.className}>
                     <thead>
                         {this.getFormattedHeaders()}
                     </thead>

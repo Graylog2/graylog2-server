@@ -101,6 +101,7 @@ var GrokPatterns = React.createClass({
                 <div className="row content">
                     <div className="col-md-12">
                         <DataTable id="grok-pattern-list"
+                                   className="table-striped table-hover"
                                    headers={headers}
                                    headerCellFormatter={this._headerCellFormatter}
                                    sortByKey={"name"}
