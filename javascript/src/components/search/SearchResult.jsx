@@ -160,8 +160,8 @@ var SearchResult = React.createClass({
         }
         return (
             <div id='main-content-search' className='row'>
-                <div ref="opa" className="col-md-3" id="sidebar">
-                    <div data-spy="affix" data-offset-top="90" style={style} className="hidden-sm hidden-xs" id="sidebar-affix">
+                <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
+                    <div data-spy="affix" data-offset-top="90" style={style} id="sidebar-affix">
                         <SearchSidebar result={this.props.result}
                                        builtQuery={this.props.builtQuery}
                                        selectedFields={this.state.selectedFields}
@@ -182,7 +182,7 @@ var SearchResult = React.createClass({
                             />
                     </div>
                 </div>
-                <div className="col-md-9" id="main-content-sidebar">
+                <div className="col-md-9 col-sm-12" id="main-content-sidebar">
                     <FieldStatistics ref='fieldStatisticsComponent'
                                      permissions={this.props.permissions}/>
 
