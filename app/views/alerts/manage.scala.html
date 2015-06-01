@@ -1,10 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream,
         alertConditions: List[org.graylog2.restclient.models.alerts.AlertCondition],
-        totalAlerts: Long,
-        alerts: List[org.graylog2.restclient.models.alerts.Alert],
         users: String,
-        availableAlarmCallbacks: Map[String, org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse],
-        alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
 @import lib.json.Json

@@ -46,27 +46,25 @@ import java.util.Map;
  */
 public class AlertsController extends AuthenticatedController {
 
-    @Inject
-    private StreamService streamService;
+    private final StreamService streamService;
+    private final UserService userService;
+    private final AlertConditionService alertConditionService;
+    private final AlarmCallbackService alarmCallbackService;
+    private final NodeService nodeService;
 
     @Inject
-    private UserService userService;
-
-    @Inject
-    private AlertConditionService alertConditionService;
-
-    @Inject
-    private AlarmCallbackService alarmCallbackService;
-
-    @Inject
-    private NodeService nodeService;
+    public AlertsController(StreamService streamService, UserService userService, AlertConditionService alertConditionService, AlarmCallbackService alarmCallbackService, NodeService nodeService) {
+        this.streamService = streamService;
+        this.userService = userService;
+        this.alertConditionService = alertConditionService;
+        this.alarmCallbackService = alarmCallbackService;
+        this.nodeService = nodeService;
+    }
 
     public Result index(String streamId) {
         try {
             Stream stream = streamService.get(streamId);
             List<AlertCondition> alertConditions = alertConditionService.allOfStream(stream);
-            List<Alert> alerts = stream.getAlerts();
-            long totalAlerts = stream.getTotalAlerts();
 
             StringBuilder users = new StringBuilder();
             users.append("[");
@@ -82,18 +80,11 @@ public class AlertsController extends AuthenticatedController {
             }
             users.append("]");
 
-            Map<String, AvailableAlarmCallbackSummaryResponse> availableAlarmCallbacks = alarmCallbackService.available(streamId);
-            List<AlarmCallback> alarmCallbacks = alarmCallbackService.all(streamId);
-
             return ok(views.html.alerts.manage.render(
                     currentUser(),
                     stream,
                     alertConditions,
-                    totalAlerts,
-                    alerts,
                     users.toString(),
-                    availableAlarmCallbacks,
-                    alarmCallbacks,
                     nodeService.loadMasterNode()
             ));
         } catch (IOException e) {
