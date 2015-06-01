@@ -202,11 +202,11 @@ var SearchSidebar = React.createClass({
                         </ModalTrigger>.
                     </p>
 
-                    <div style={{marginTop: 10}}>
+                    <div className="actions">
                         <AddToDashboardMenu title="Add count to dashboard"
                                             widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
                                             permissions={this.props.permissions}/>
-                        &nbsp;
+
                         <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
                         <DropdownButton bsSize="small" title="More actions">
@@ -219,7 +219,7 @@ var SearchSidebar = React.createClass({
 
                     <h3>Fields</h3>
 
-                    <div className="input-group input-group-sm">
+                    <div className="input-group input-group-sm" style={{marginTop: 5}}>
                         <span className="input-group-btn">
                             <button type="button" className="btn btn-default"
                                     onClick={() => this._updateFieldSelection('default')}>Default
