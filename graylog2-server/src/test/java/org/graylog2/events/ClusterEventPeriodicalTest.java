@@ -304,7 +304,7 @@ public class ClusterEventPeriodicalTest {
         DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
     }
 
     @Test
@@ -315,7 +315,7 @@ public class ClusterEventPeriodicalTest {
 
         assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
     }
 
     public static class SimpleEventHandler {

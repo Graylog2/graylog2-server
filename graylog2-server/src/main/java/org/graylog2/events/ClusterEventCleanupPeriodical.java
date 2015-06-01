@@ -104,7 +104,7 @@ public class ClusterEventCleanupPeriodical extends Periodical {
 
             final long timestamp = DateTime.now(DateTimeZone.UTC).getMillis() - maxEventAge;
             final DBQuery.Query query = DBQuery.lessThan("timestamp", timestamp);
-            final WriteResult<ClusterEvent, String> writeResult = dbCollection.remove(query, WriteConcern.MAJORITY);
+            final WriteResult<ClusterEvent, String> writeResult = dbCollection.remove(query, WriteConcern.FSYNCED);
 
             LOG.debug("Removed {} stale events from \"{}\"", writeResult.getN(), COLLECTION_NAME);
         } catch (Exception e) {
