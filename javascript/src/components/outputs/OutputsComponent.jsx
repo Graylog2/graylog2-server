@@ -104,9 +104,11 @@ var OutputComponent = React.createClass({
         var assignOutputDropdown = (streamId ?
             <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId} outputs={this.state.assignableOutputs} onSubmit={this._handleAssignOutput}/> : "");
         return (<div className="outputs">
-                    <div className="row node-row input-new content">
-                        <div className="col-md-12">
+                    <div className="row content">
+                        <div className="col-md-4">
                             {createOutputDropdown}
+                        </div>
+                        <div className="col-md-8">
                             {assignOutputDropdown}
                         </div>
                     </div>

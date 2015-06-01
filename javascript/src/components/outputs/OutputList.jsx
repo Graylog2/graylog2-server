@@ -17,7 +17,7 @@ var OutputList = React.createClass({
     render() {
         var outputList;
         if (this.props.outputs.length === 0) {
-            outputList = (<div className="row content node-row"><div className="col-md-12"><div className="alert alert-info">There are no outputs.</div></div></div>);
+            outputList = (<div className="row content"><div className="col-md-12"><div className="alert alert-info">No outputs configured.</div></div></div>);
         } else {
             var outputs = this.props.outputs.sort(this._sortByTitle).map(this._formatOutput);
             outputList = (
