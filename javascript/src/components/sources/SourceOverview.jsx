@@ -23,6 +23,7 @@ var UniversalSearch = require('../../logic/search/UniversalSearch');
 var moment = require('moment');
 
 var SupportLink = require('../support/SupportLink');
+var Spinner = require('../common/Spinner');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 var hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');
@@ -52,7 +53,8 @@ var SourceOverview = React.createClass({
             range: null,
             resolution: 'minute',
             filter: '',
-            renderResultTable: false,
+            loading: false,
+            renderResultTable: true,
             histogramDataAvailable: true,
             reloadingHistogram: false
         };
@@ -107,7 +109,7 @@ var SourceOverview = React.createClass({
     loadSources() {
         var onLoaded = (sources) => {
             this._resetSources(sources);
-            this.setState({renderResultTable: this.sourcesData.size() !== 0});
+            this.setState({renderResultTable: this.sourcesData.size() !== 0, loading: false});
             this._updateWidth();
         };
 
@@ -257,7 +259,7 @@ var SourceOverview = React.createClass({
         this.refs.sourceLineChart.clearFilters();
         this.syncRangeWithQuery();
         window.location.hash = "#/" + range;
-        this.setState({range: range, histogramDataAvailable: true}, () => this.loadData());
+        this.setState({range: range, histogramDataAvailable: true, loading: true}, () => this.loadData());
     },
     _onRangeChanged(event) {
         var value = event.target.value;
@@ -295,7 +297,8 @@ var SourceOverview = React.createClass({
                         resolution={this.state.resolution}
                         resetFilters={this.resetHistogramFilters}/>
                 </div>
-                <div className="row content">
+                {this.state.loading ? <div className="row content"><div style={{marginLeft: 10}}><Spinner/></div></div> : null}
+                <div className="row content" style={{display: this.state.loading ? 'none' : 'block'}}>
                     <div className="col-md-7">
                         <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES}/>
                     </div>
