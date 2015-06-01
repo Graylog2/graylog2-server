@@ -26,15 +26,21 @@ var AlarmCallbackHistoryOverview = React.createClass({
     },
     render() {
         if (this.state.histories && this.state.types) {
-            var histories = this.state.histories.map(this._formatHistory);
-            return (
-                <div>
-                    <h4>Alarmcallback History</h4>
-                    <ul>
-                        {histories}
-                    </ul>
-                </div>
-            );
+            if (this.state.histories.length > 0) {
+                var histories = this.state.histories.map(this._formatHistory);
+                return (
+                    <div>
+                        <h4>Alarmcallback History</h4>
+                        <ul>
+                            {histories}
+                        </ul>
+                    </div>
+                );
+            } else {
+                return (
+                    <div><i>No history available.</i></div>
+                );
+            }
         } else {
             return <Spinner />;
         }
