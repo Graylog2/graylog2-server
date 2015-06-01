@@ -324,14 +324,13 @@ var SourceOverview = React.createClass({
                             <h1>Sources</h1>
                         </div>
                         <p className="description">
-                            This is a list of all sources that sent in messages to Graylog.
-                            &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
-                            appears.
+                            This is a list of all sources that sent in messages to Graylog. Note that the list is
+                            cached for a few seconds so you might have to wait a bit until a new source appears.
                         </p>
 
                         <SupportLink>
-                            Use your mouse to interact with the table and graphs on this page, and get a better
-                            overview of the sources sending data into Graylog.
+                            {' Use your mouse to interact with the table and graphs on this page, and get a better ' +
+                            'overview of the sources sending data into Graylog.'}
                         </SupportLink>
                     </div>
                 </div>
