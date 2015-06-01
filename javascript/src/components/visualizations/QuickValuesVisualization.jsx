@@ -230,10 +230,10 @@ var QuickValuesVisualization = React.createClass({
                         </div>
                         <div className={dataTableClassName}>
                             <div className="quickvalues-table">
-                                <table ref="table" className="table table-condensed table-striped table-hover">
+                                <table ref="table" className="table table-condensed table-hover">
                                     <thead>
                                     <tr>
-                                        <th style={{minWidth: 225}}>Value</th>
+                                        <th style={{width: '60%'}}>Value</th>
                                         <th>%</th>
                                         <th>Count</th>
                                         {this.props.displayAddToSearchButton &&
