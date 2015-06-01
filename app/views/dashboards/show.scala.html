@@ -62,13 +62,18 @@
         </div>
     </div>
 
-    <div class="row">
-        @if(dashboard.getWidgets.isEmpty) {
-            <div class="alert alert-info no-widgets">
-                This has dashboard has no widgets yet. Learn how to add widgets in the
-                <a href="https://www.graylog.org/documentation/general/dashboards/" target="_blank">documentation</a>.
+    @if(dashboard.getWidgets.isEmpty) {
+        <div class="row content">
+            <div class="col-md-12">
+                <div class="alert alert-info no-widgets">
+                    This has dashboard has no widgets yet. Learn how to add widgets in the
+                    <a href="https://www.graylog.org/documentation/general/dashboards/" target="_blank">
+                        documentation</a>.
+                </div>
             </div>
-        } else {
+        </div>
+    } else {
+        <div class="row">
             <div class="dashboard">
                 <div class="gridster" data-dashboard-id="@dashboard.getId">
                     <ul>
@@ -83,7 +88,7 @@
 
                 <br style="clear : both ;" />
             </div>
-        }
-    </div>
+        </div>
+    }
 
 }
