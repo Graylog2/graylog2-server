@@ -20,7 +20,7 @@
     @views.html.partials.es_cluster_health.render(clusterHealth)
 
     <div class="index-info">
-      <div class="alert alert-error">
+      <div class="alert alert-danger">
         <i class="fa fa-info-circle"></i> Indices information is not available at the moment.
         @if(clusterHealth == null) {Please check again once the cluster is available.}
       </div>
