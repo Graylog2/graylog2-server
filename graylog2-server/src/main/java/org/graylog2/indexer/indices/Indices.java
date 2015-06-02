@@ -19,6 +19,7 @@ package org.graylog2.indexer.indices;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -34,6 +35,8 @@ import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
+import org.elasticsearch.action.admin.indices.recovery.RecoveryRequest;
+import org.elasticsearch.action.admin.indices.recovery.RecoveryResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
@@ -70,6 +73,7 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
@@ -393,5 +397,18 @@ public class Indices implements IndexManagement {
         or.flush(true);
 
         c.admin().indices().optimize(or).actionGet();
+    }
+
+    public void waitForRecovery(String index) {
+        RecoveryResponse response;
+
+        do {
+            LOG.warn("Waiting for index recovery for index {}", index);
+
+            final ActionFuture<RecoveryResponse> request = c.admin().indices().recoveries(new RecoveryRequest(index));
+            response = request.actionGet();
+
+            Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+        } while (response.getSuccessfulShards() < response.getTotalShards());
     }
 }
