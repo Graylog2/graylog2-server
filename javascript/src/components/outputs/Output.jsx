@@ -26,7 +26,7 @@ var Output = React.createClass({
         );
     },
     _typeNotAvailable() {
-        return (this.props.types[this.props.output.type] == undefined);
+        return (this.props.types[this.props.output.type] === undefined);
     },
     render() {
         var output = this.props.output;
