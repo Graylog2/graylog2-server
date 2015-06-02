@@ -46,7 +46,7 @@
             $.ajax({
                 url: appPrefixed(url),
                 success: function(data) {
-                    showMessage(messageContainer, data.fields, data.id, data.index);
+                    showMessage(messageContainer, data.formatted_fields, data.id, data.index);
                     selector.hide();
                     messageContainer.show();
 
