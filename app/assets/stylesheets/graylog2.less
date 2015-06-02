@@ -1,3 +1,5 @@
+@screen-md-min: 991px;
+
 #editor {
   height: 256px;
 }
@@ -275,21 +277,21 @@ label {
 #sidebar {
   padding-left: 0;
 
-  @media (min-width: 480px) {
+  @media (max-height: @screen-md-min) {
     padding-right: 0;
   }
 
-  @media (min-width: 992px) {
+  @media (min-width: @screen-md-min) {
     padding-right: 15px;
   }
 }
 
 #sidebar .affix {
-  @media (min-width: 480px) {
+  @media (max-width: @screen-md-min) {
     position: relative;
   }
 
-  @media (min-width: 992px) {
+  @media (min-width: @screen-md-min) {
     top: 45px;
     z-index: 1000;
     position: fixed;
@@ -2848,15 +2850,20 @@ span.blob {
 
 #message-table-paginator-bottom nav {
   background-color: rgba(255,255,255,0.9);
+  border-top: 1px #ddd solid;
+  margin-left: -10px;
 }
 
 #message-table-paginator-bottom .affix {
-  border-top: 1px #ddd solid;
   bottom: 1px;
 }
 
 #message-table-paginator-bottom .affix-bottom {
   position: absolute;
+}
+
+#message-table-paginator-bottom .affix-bottom nav {
+  border: 0;
 }
 
 .pagination-search-result {
@@ -2925,7 +2932,7 @@ dl.message-details dd {
   padding-bottom: 5px;
 }
 
-dl.message-details-fields dd {
+dl.message-details-fields dd:not(:last-child) {
   border-bottom: 1px solid #ececec;
 }
 
@@ -2946,6 +2953,10 @@ table.messages {
 table.messages td, table.messages th {
   position: relative;
   left: 13px;
+}
+
+table.messages > thead th {
+  border: 0;
 }
 
 table.messages tr {

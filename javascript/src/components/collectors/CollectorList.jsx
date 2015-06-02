@@ -48,23 +48,25 @@ var CollectorList = React.createClass({
     },
     _formatCollectorList(collectors) {
         return (
-            <table className="table table-striped collectors-list">
-                <thead>
-                <tr>
-                    <th onClick={this.sortByNodeId}>Host Name</th>
-                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
-                    <th onClick={this.sortByLastSeen}>Last Seen</th>
-                    <th className="name" onClick={this.sortById}>
-                        Collector Id
-                    </th>
-                    <th onClick={this.sortByCollectorVersion}>Collector Version</th>
-                    <th>&nbsp;</th>
-                </tr>
-                </thead>
-                <tbody>
-                {collectors}
-                </tbody>
-            </table>
+            <div className="table-responsive">
+                <table className="table table-striped collectors-list">
+                    <thead>
+                    <tr>
+                        <th onClick={this.sortByNodeId}>Host Name</th>
+                        <th onClick={this.sortByOperatingSystem}>Operating System</th>
+                        <th onClick={this.sortByLastSeen}>Last Seen</th>
+                        <th className="name" onClick={this.sortById}>
+                            Collector Id
+                        </th>
+                        <th onClick={this.sortByCollectorVersion}>Collector Version</th>
+                        <th style={{margin: 170}}>&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {collectors}
+                    </tbody>
+                </table>
+            </div>
         );
     },
     _formatEmptyListAlert() {

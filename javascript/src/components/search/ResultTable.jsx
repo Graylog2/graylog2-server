@@ -146,7 +146,7 @@ var ResultTable = React.createClass({
             </div>
 
             <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}>
-                <ButtonGroup bsSize='small' className="pull-right" style={{marginTop: 20}}>
+                <ButtonGroup bsSize='small' className="pull-right" style={{position: 'absolute', marginTop: 20, right: 10}}>
                     <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"></i></Button>
                     <Button title="Collapse all messages"
                             onClick={this.collapseAll}
