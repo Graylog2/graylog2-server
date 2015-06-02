@@ -147,7 +147,7 @@ public class InputsApiController extends AuthenticatedController {
     }
 
     public Result globalRecentMessage(String inputId) throws InvalidRangeParametersException, IOException, APIException {
-        final String query = "gl2_source_input:" + inputId;
+        final String query = "gl2_source_input:" + inputId + " OR gl2_source_radio_input:" + inputId;
 
         final UniversalSearch search = this.searchFactory.queryWithRange(query, new RelativeRange(86400));
 
