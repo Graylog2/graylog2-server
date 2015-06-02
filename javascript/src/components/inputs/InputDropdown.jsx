@@ -32,7 +32,7 @@ var InputDropdown = React.createClass({
                             {inputs}
                         </Input>
 
-                        <a className="btn btn-success" disabled={this.state.selectedInput === this.PLACEHOLDER} onClick={this._onClick}>{this.props.title}</a>
+                        <a className="btn btn-info" disabled={this.state.selectedInput === this.PLACEHOLDER} onClick={this._onClick}>{this.props.title}</a>
                 </div>
             );
         } else {
