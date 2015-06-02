@@ -25,9 +25,11 @@ var Output = React.createClass({
             </Button>
         );
     },
+    /* jshint -W116 */
     _typeNotAvailable() {
         return (this.props.types[this.props.output.type] == undefined);
     },
+    /* jshint +W116 */
     render() {
         var output = this.props.output;
         var deleteButton = (this.props.streamId && this.isPermitted(this.props.permissions, ["stream_outputs:delete"]) ? this._deleteFromStreamButton(output) : null);
