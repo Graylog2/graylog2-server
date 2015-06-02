@@ -73,8 +73,8 @@ var FieldQuickValues = React.createClass({
                                             bsStyle='default'
                                             pullRight={true}
                                             permissions={this.props.permissions}>
-                            <Button bsSize='small' onClick={() => this._toggleAutoReload()}>{this.state.autoReload ? "Stop reloading" : "Reload automatically"} </Button>
                             <Button bsSize='small' onClick={() => this._resetStatus()}>Dismiss</Button>
+                            <Button bsSize='small' onClick={() => this._toggleAutoReload()}>{this.state.autoReload ? "Stop reloading" : "Reload automatically"} </Button>
                         </AddToDashboardMenu>
                     </div>
                     <h1>Quick Values for {this.state.field} {this.state.loadPending && <i className="fa fa-spin fa-spinner"></i>}</h1>

@@ -139,9 +139,9 @@ var MessageDetail = React.createClass({
 
         return (<div>
 
-            <Row>
+            <Row className="row-sm">
                 <Col md={12}>
-                    <ButtonGroup className="pull-right" bsSize="small" style={{marginRight: 15}}>
+                    <ButtonGroup className="pull-right" bsSize="small">
                         <Button href={messageUrl}>Permalink</Button>
 
                         <OverlayTrigger
