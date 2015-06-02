@@ -36,6 +36,8 @@ import java.util.Map;
 
 public class IndexRangeServiceImpl extends PersistedServiceImpl implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangeServiceImpl.class);
+    private static final Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
+
     private final ActivityWriter activityWriter;
 
     @Inject
@@ -65,12 +67,7 @@ public class IndexRangeServiceImpl extends PersistedServiceImpl implements Index
             ranges.add(new IndexRangeImpl((ObjectId) dbo.get("_id"), dbo.toMap()));
         }
 
-        Collections.sort(ranges, new Comparator<IndexRange>() {
-            @Override
-            public int compare(IndexRange o1, IndexRange o2) {
-                return o2.getStart().compareTo(o1.getStart());
-            }
-        });
+        Collections.sort(ranges, COMPARATOR);
 
         return ranges;
     }
