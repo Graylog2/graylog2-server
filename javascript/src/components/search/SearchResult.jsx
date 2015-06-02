@@ -89,11 +89,17 @@ var SearchResult = React.createClass({
 
     componentDidMount() {
         this._updateWidth();
+        this._initializeAffix();
         DashboardStore.updateDashboards();
         $(window).on('resize', this._resizeCallback);
     },
     componentWillUnmount() {
         $(window).off("resize", this._resizeCallback);
+    },
+    _initializeAffix() {
+        $(React.findDOMNode(this.refs.oma)).affix({
+            offset: { top: 111 }
+        });
     },
     _resizeCallback() {
         // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
@@ -164,7 +170,7 @@ var SearchResult = React.createClass({
         return (
             <div id='main-content-search' className='row'>
                 <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
-                    <div data-spy="affix" data-offset-top="90" style={style} id="sidebar-affix">
+                    <div ref="oma" id="sidebar-affix" style={style}>
                         <SearchSidebar result={this.props.result}
                                        builtQuery={this.props.builtQuery}
                                        selectedFields={this.state.selectedFields}
