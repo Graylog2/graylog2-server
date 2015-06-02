@@ -103,9 +103,9 @@ var MessageTablePaginator = React.createClass({
                 <div ref="paginatorAffix">
                     {this.props.children}
                     <nav className="text-center"
-                     style={{width: this.state.paginationWidth}}>
-                    {pagination}
-                </nav>
+                         style={{width: this.state.paginationWidth + 20}}>
+                        {pagination}
+                    </nav>
                 </div>
             );
         } else {
