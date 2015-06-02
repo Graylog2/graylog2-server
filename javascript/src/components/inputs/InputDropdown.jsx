@@ -3,7 +3,6 @@
 var React = require('react/addons');
 var Input = require('react-bootstrap').Input;
 var Spinner = require('../common/Spinner');
-var Col = require('react-bootstrap').Col;
 var Immutable = require('immutable');
 
 var InputDropdown = React.createClass({
