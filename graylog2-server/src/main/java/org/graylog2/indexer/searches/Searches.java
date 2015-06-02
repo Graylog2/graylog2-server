@@ -485,6 +485,10 @@ public class Searches {
     }
 
     public SearchHit firstOfIndex(String index) {
+        return oneOfIndex(index, matchAllQuery(), SortOrder.DESC);
+    }
+
+    public SearchHit lastOfIndex(String index) {
         return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
     }
 
