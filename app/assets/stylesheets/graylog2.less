@@ -2925,7 +2925,7 @@ dl.message-details dd {
   padding-bottom: 5px;
 }
 
-dl.message-details-fields dd {
+dl.message-details-fields dd:not(:last-child) {
   border-bottom: 1px solid #ececec;
 }
 
@@ -2946,6 +2946,10 @@ table.messages {
 table.messages td, table.messages th {
   position: relative;
   left: 13px;
+}
+
+table.messages > thead th {
+  border: 0;
 }
 
 table.messages tr {
