@@ -34,7 +34,7 @@ var EditOutputButton = React.createClass({
         );
         return (
             <span>
-                <Button bsStyle="info" onClick={this.handleClick.bind(null, output)}>
+                <Button disabled={this.props.disabled} bsStyle="info" onClick={this.handleClick.bind(null, output)}>
                     Edit
                 </Button>
                 {configurationForm}

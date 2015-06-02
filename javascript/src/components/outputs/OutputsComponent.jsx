@@ -8,6 +8,9 @@ var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var UserNotification = require("../../util/UserNotification");
 var PermissionsMixin = require('../../util/PermissionsMixin');
+var Spinner = require('../common/Spinner');
+var Row = require('react-bootstrap').Row;
+var Col = require('react-bootstrap').Col;
 
 var OutputComponent = React.createClass({
     mixins: [PermissionsMixin],
@@ -96,25 +99,34 @@ var OutputComponent = React.createClass({
         });
     },
     render() {
-        var permissions = this.props.permissions;
-        var streamId = this.props.streamId;
-        var createOutputDropdown = (this.isPermitted(permissions, ["outputs:create"]) ?
-            <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput} getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : "");
-        var assignOutputDropdown = (streamId ?
-            <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId} outputs={this.state.assignableOutputs} onSubmit={this._handleAssignOutput}/> : "");
-        return (<div className="outputs">
-                    <div className="row content">
-                        <div className="col-md-4">
-                            {createOutputDropdown}
-                        </div>
-                        <div className="col-md-8">
-                            {assignOutputDropdown}
-                        </div>
-                    </div>
+        if (this.state.outputs && this.state.types) {
+            var permissions = this.props.permissions;
+            var streamId = this.props.streamId;
+            var createOutputDropdown = (this.isPermitted(permissions, ["outputs:create"]) ?
+                <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
+                                      getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : "");
+            var assignOutputDropdown = (streamId ?
+                <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId}
+                                      outputs={this.state.assignableOutputs}
+                                      onSubmit={this._handleAssignOutput}/> : "");
+            return (<div className="outputs">
+                <Row className="content">
+                    <Col md={4}>
+                        {createOutputDropdown}
+                    </Col>
+                    <Col md={8}>
+                        {assignOutputDropdown}
+                    </Col>
+                </Row>
 
-                    <OutputList ref="outputList" streamId={streamId} outputs={this.state.outputs} permissions={permissions} getTypeDefinition={OutputsStore.loadAvailable}
-                        onRemove={this._removeOutputFromStream} onTerminate={this._removeOutputGlobally} onUpdate={this._handleOutputUpdate}/>
-                </div>);
+                <OutputList ref="outputList" streamId={streamId} outputs={this.state.outputs} permissions={permissions}
+                            getTypeDefinition={OutputsStore.loadAvailable} types={this.state.types}
+                            onRemove={this._removeOutputFromStream} onTerminate={this._removeOutputGlobally}
+                            onUpdate={this._handleOutputUpdate}/>
+            </div>);
+        } else {
+            return <Spinner />;
+        }
     }
 });
 module.exports = OutputComponent;

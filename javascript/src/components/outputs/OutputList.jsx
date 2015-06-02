@@ -14,7 +14,7 @@ var OutputList = React.createClass({
     _formatOutput(output) {
         return (<Output key={output.id} output={output} streamId={this.props.streamId} permissions={this.props.permissions}
                         removeOutputFromStream={this.props.onRemove} removeOutputGlobally={this.props.onTerminate}
-                        onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition} />);
+                        onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition} types={this.props.types} />);
     },
     render() {
         if (this.props.outputs) {
