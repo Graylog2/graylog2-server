@@ -205,4 +205,51 @@ public class FormattedEmailAlertSenderTest {
 
         assertThat(body).contains("Stream URL: Please configure 'transport_email_web_interface_url' in your Graylog configuration file.");
     }
+
+    @Test
+    public void defaultBodyTemplateDoesNotShowBacklogIfBacklogIsEmpty() throws Exception {
+        FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
+                mockUserService, mockNotificationService, mockNodeId);
+
+        Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("123456");
+        when(stream.getTitle()).thenReturn("Stream Title");
+
+        AlertCondition alertCondition = mock(AlertCondition.class);
+
+        AlertCondition.CheckResult checkResult = mock(AbstractAlertCondition.CheckResult.class);
+        when(checkResult.getTriggeredAt()).thenReturn(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
+        when(checkResult.getTriggeredCondition()).thenReturn(alertCondition);
+
+        String body = emailAlertSender.buildBody(stream, checkResult, Collections.<Message>emptyList());
+
+        assertThat(body)
+                .contains("<No backlog>\n")
+                .doesNotContain("Last messages accounting for this alert:\n");
+    }
+
+    @Test
+    public void defaultBodyTemplateShowsBacklogIfBacklogIsNotEmpty() throws Exception {
+        FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
+                mockUserService, mockNotificationService, mockNodeId);
+
+        Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("123456");
+        when(stream.getTitle()).thenReturn("Stream Title");
+
+        AlertCondition alertCondition = mock(AlertCondition.class);
+
+        AlertCondition.CheckResult checkResult = mock(AbstractAlertCondition.CheckResult.class);
+        when(checkResult.getTriggeredAt()).thenReturn(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
+        when(checkResult.getTriggeredCondition()).thenReturn(alertCondition);
+
+        Message message = new Message("Test", "source", new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
+        String body = emailAlertSender.buildBody(stream, checkResult, Collections.singletonList(message));
+
+        assertThat(body)
+                .doesNotContain("<No backlog>\n")
+                .containsSequence(
+                        "Last messages accounting for this alert:\n",
+                        message.toString());
+    }
 }
