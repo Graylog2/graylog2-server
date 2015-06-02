@@ -49,7 +49,7 @@ var EditDashboardModal = React.createClass({
         );
 
         return (
-            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+            <BootstrapModal ref="modal" onCancel={this.close} onConfirm={this._save} cancel="Cancel" confirm="Save">
                {header}
                {body}
             </BootstrapModal>

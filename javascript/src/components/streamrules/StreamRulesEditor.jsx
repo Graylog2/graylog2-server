@@ -76,7 +76,9 @@ var StreamRulesEditor = React.createClass({
                             1. Load a message to test rules
                         </h2>
 
-                        <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded}/>
+                        <div className="stream-loader">
+                            <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded}/>
+                        </div>
 
                         <div className="spinner" style={{display: "none"}}><h2><i
                             className='fa fa-spinner fa-spin'></i> &nbsp;Loading message</h2></div>
@@ -84,13 +86,13 @@ var StreamRulesEditor = React.createClass({
                         <div className="sample-message-display" style={{display: "none", marginTop: "5px"}}>
                             <strong>Next step:</strong>
                             Add/delete/modify stream rules in step 2 and see if the example message would have been
-                            routed into the stream or not.
+                            routed into the stream or not. Use the button on the right to add a stream rule.
                         </div>
 
                         <hr />
 
                         <div className="buttons pull-right">
-                            <button className="btn btn-success btn-sm show-stream-rule" onClick={this._onAddStreamRule}>
+                            <button className="btn btn-success show-stream-rule" onClick={this._onAddStreamRule}>
                                 Add stream rule
                             </button>
                             <StreamRuleForm ref="newStreamRuleForm" title="New Stream Rule"
@@ -98,7 +100,6 @@ var StreamRulesEditor = React.createClass({
                         </div>
 
                         <h2>
-                            <i className="fa fa-cogs"></i>
                             2. Manage stream rules
                         </h2>
 

@@ -5,12 +5,20 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
+
         <div class="col-md-12">
-            <h1><i class="fa fa-cloud"></i> Collectors in Cluster</h1>
+            <h1>Collectors in Cluster</h1>
+
             <p class="description">
-                Collectors deliver local resources to a remote Graylog cluster.
+                The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
             </p>
+
+            @views.html.partials.support.list() {
+                Read more about collectors and how to set them up in the
+                <a href="http://docs.graylog.org/en/latest/pages/collector.html" target="_blank">Graylog documentation</a>.
+            }
         </div>
+
     </div>
     <div class="row content">
         <div class="col-md-12" id="react-collector-list">

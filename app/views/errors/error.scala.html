@@ -1,57 +1,73 @@
 @(message: String, exception: Exception, request: Http.Request)
 
-@failure("Error") {
+@import org.graylog2.restclient.models.UserService
 
-<h1>
-	<i class="fa fa-medkit fa-lg" style="color: #d00;"></i>
-	Oh no, something went wrong!
-</h1>
+@main("Error", null, "", UserService.current, false) {
 
-<p class="failure-exception">
-	(You caused a @exception.getClass().getCanonicalName(). @exception.getMessage())
-</p>
+	<div class="row content content-head">
+		<div class="col-md-12">
+			<h1>
+				<i class="fa fa-medkit fa-lg error-icon" style="color: #d00;"></i>
+				Oh no, something went wrong!
+			</h1>
 
-<p class="failure-message">
-	<h3><strong>Reason:</strong> @message</h3>
-</p>
+			<p class="failure-exception">
+				(You caused a @exception.getClass().getCanonicalName(). @exception.getMessage())
+			</p>
 
-@partials.support_sources()
+			<p class="failure-message">
+				<h3><strong>Reason:</strong> @message</h3>
+			</p>
+		</div>
+	</div>
 
-<div class="well well-small crash-info">
-	<h2>Stacktrace</h2>
-	<ul>
-	@for(l <- exception.getStackTrace()) {
-		<li>
-			@l.getClassName()#@l.getMethodName()
-			(<em>@l.getFileName():@l.getLineNumber()</em>)
-		</li>
-	}
-	</ul>
-</div>
+	<div class="row content">
+		<div class="col-md-12">
+			@partials.support_sources()
+		</div>
+	</div>
 
-<div class="well well-small crash-info">
-	<h2>Request information</h2>
-	
-	<dl>
-		<dt>Method</dt>
-		<dd>@request.method()</dd>
-		
-		<dt>Query</dt>
-		<dd>
-			<ul>
-				@for((key, value) <- request.queryString()) {
-					<li>@key=@value</li>
-				}
-			</ul>
-		</dd>
-		
-		@for((key, value) <- request.headers()) {
-			@if(key != "Cookie") {
-				<dt>@key</dt>
-				<dd>@value</dd>
+	<div class="row content">
+		<div class="col-md-12">
+			<h2>Stacktrace</h2>
+
+			<ul class="failure-object well well-sm">
+			@for(l <- exception.getStackTrace()) {
+				<li>
+					@l.getClassName()#@l.getMethodName()
+					(<em>@l.getFileName():@l.getLineNumber()</em>)
+				</li>
 			}
-		}
-	</dl>
-</div>
+			</ul>
+		</div>
+	</div>
+
+
+	<div class="row content">
+		<div class="col-md-12">
+			<h2>Request information</h2>
+
+			<dl class="failure-object well well-sm">
+				<dt>Method</dt>
+				<dd>@request.method()</dd>
+
+				<dt>Query</dt>
+				<dd>
+					<ul>
+					@for((key, value) <- request.queryString()) {
+						<li>@key=@value</li>
+					}
+					</ul>
+				</dd>
+
+				@for((key, value) <- request.headers()) {
+					@if(key != "Cookie") {
+						<dt>@key</dt>
+						<dd>@value</dd>
+					}
+				}
+			</dl>
+		</div>
+	</div>
 
 }

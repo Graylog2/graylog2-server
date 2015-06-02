@@ -4,25 +4,26 @@
 @main("Content packs", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row content content-header">
-        <div class="col-md-12">
+    <div class="row content content-head">
 
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a class="btn btn-success btn-sm" href="@routes.BundlesController.export()">
-                        Create a content pack
-                    </a>
-                </div>
-            </div>
-
-            <h1><i class="fa fa-sitemap"></i> Content packs</h1>
+        <div class="col-md-8">
+            <h1>Content packs</h1>
 
             <p class="description">
                 Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
-                <i class="fa fa-lightbulb-o"></i>&nbsp;
-                <a href="https://www.graylog.org/resources/data-sources/" target="_blank">Find more content packs on graylog.org</a>.
             </p>
+
+            @views.html.partials.support.list() {
+                <a href="https://www.graylog.org/resources/data-sources/" target="_blank">Find more content packs on graylog.org</a>.
+            }
         </div>
+
+        <div class="col-md-4" style="margin-top: 20px; text-align: right;">
+            <a class="btn btn-success btn-lg" href="@routes.BundlesController.export()">
+                Create a content pack
+            </a>
+        </div>
+
     </div>
 
     <div class="row content">

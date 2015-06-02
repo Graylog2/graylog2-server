@@ -61,7 +61,10 @@ var LoaderTabs = React.createClass({
                         <RecentMessageLoader inputs={this.state.inputs} onMessageLoaded={this.onMessageLoaded}/>
                     </TabPane>
                     <TabPane eventKey={2} tab='Manual'>
-                        Please provide the id and index of the message that you want to load in this form:
+                        <div style={{marginTop: "5px", marginBottom: "5px"}}>
+                            Please provide the id and index of the message that you want to load in this form:
+                        </div>
+
                         <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText={true}/>
                     </TabPane>
                 </TabbedArea>
