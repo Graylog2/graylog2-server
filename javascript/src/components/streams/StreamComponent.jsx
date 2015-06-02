@@ -35,7 +35,7 @@ var StreamComponent = React.createClass({
     },
     _onSave(streamId, stream) {
         StreamsStore.save(stream, () => {
-            UserNotification.success("Stream has been successfully created!", "Success!");
+            UserNotification.success("Stream has been successfully created.", "Success");
         });
     },
     render() {

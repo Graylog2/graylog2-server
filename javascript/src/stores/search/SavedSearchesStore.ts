@@ -91,11 +91,11 @@ class SavedSearchesStore {
         var promise = this._createOrUpdate(title, stringId);
 
         promise.done(() => {
-            UserNotification.success("Saved search '" + title + "' was updated.");
+            UserNotification.success("Saved search \"" + title + "\" was updated.");
             this.updateSavedSearches();
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating saved search '" + title + "' failed with status: " + errorThrown,
+            UserNotification.error("Updating saved search \"" + title + "\" failed with status: " + errorThrown,
                 "Could not update saved search");
         });
 
@@ -139,7 +139,7 @@ class SavedSearchesStore {
             $(document).trigger('deleted.graylog.saved-search', {savedSearchId: searchId});
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Deleting saved search '" + this.savedSearches[searchId] + "' failed with status: " + errorThrown,
+            UserNotification.error("Deleting saved search \"" + this.savedSearches[searchId] + "\" failed with status: " + errorThrown,
                 "Could not delete saved search");
         });
 

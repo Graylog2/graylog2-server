@@ -1,7 +1,6 @@
 /// <reference path="../../../declarations/node/node.d.ts" />
 /// <reference path="../../../declarations/sockjs-client/sockjs-client.d.ts" />
 
-
 'use strict';
 
 // this is global in top.scala.html
@@ -9,7 +8,6 @@ declare var gl2UserSessionId: string;
 declare var sockJsWebSocketsEnabled: boolean;
 
 var SockJS = require("sockjs-client");
-import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
 
 

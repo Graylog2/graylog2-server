@@ -31,14 +31,14 @@ class StreamsStore {
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading streams failed with status: " + errorThrown,
-                "Could not load streams.");
+                "Could not load streams");
         });
         return promise;
     }
     load(callback: ((streams: Array<Stream>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Streams failed with status: " + errorThrown,
-                "Could not retrieve Streams!");
+                "Could not retrieve Streams");
         };
 
         this.listStreams().done(callback).fail(failCallback);
@@ -46,7 +46,7 @@ class StreamsStore {
     get(streamId: string, callback: ((stream: Stream) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading Stream failed with status: " + errorThrown,
-                "Could not retrieve Stream!");
+                "Could not retrieve Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
@@ -55,7 +55,7 @@ class StreamsStore {
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Removing Stream failed with status: " + errorThrown,
-                "Could not remove Stream!");
+                "Could not remove Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.delete(streamId).url;
@@ -67,7 +67,7 @@ class StreamsStore {
     pause(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Pausing Stream failed with status: " + errorThrown,
-                "Could not pause Stream!");
+                "Could not pause Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.pause(streamId).url;
@@ -79,7 +79,7 @@ class StreamsStore {
     resume(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Resuming Stream failed with status: " + errorThrown,
-                "Could not resume Stream!");
+                "Could not resume Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.resume(streamId).url;
@@ -91,7 +91,7 @@ class StreamsStore {
     save(stream: any, callback: ((streamId: string) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving Stream failed with status: " + errorThrown,
-                "Could not save Stream!");
+                "Could not save Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.create().url;
@@ -105,7 +105,7 @@ class StreamsStore {
     update(streamId: string, data: any, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating Stream failed with status: " + errorThrown,
-                "Could not update Stream!");
+                "Could not update Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.update(streamId).url;
@@ -119,7 +119,7 @@ class StreamsStore {
     cloneStream(streamId: string, data: any, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Cloning Stream failed with status: " + errorThrown,
-                "Could not clone Stream!");
+                "Could not clone Stream");
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.cloneStream(streamId).url;

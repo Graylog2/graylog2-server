@@ -20,7 +20,7 @@ var StreamRule = React.createClass({
                 if (this.props.onDelete) {
                     this.props.onDelete(this.props.streamRule.id);
                 }
-                UserNotification.success("Stream rule has been successfully deleted.", "Success!");
+                UserNotification.success("Stream rule has been successfully deleted.", "Success");
             });
         }
     },
@@ -29,7 +29,7 @@ var StreamRule = React.createClass({
             if (this.props.onSubmit) {
                 this.props.onSubmit(streamRuleId, data);
             }
-            UserNotification.success("Stream rule has been successfully updated.", "Success!");
+            UserNotification.success("Stream rule has been successfully updated.", "Success");
         });
     },
     _formatActionItems() {

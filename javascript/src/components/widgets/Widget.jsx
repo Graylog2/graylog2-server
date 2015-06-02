@@ -93,7 +93,7 @@ var Widget = React.createClass({
         var widgetPromise = WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId);
         widgetPromise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status === 404) {
-                UserNotification.warning("It looks like widget '" + this.state.title + "' does not exist anymore. " +
+                UserNotification.warning("It looks like widget \"" + this.state.title + "\" does not exist anymore. " +
                     "Please refresh the page to remove it from the dashboard.",
                     "Could not load widget information");
                 this.setState({deleted: true});
