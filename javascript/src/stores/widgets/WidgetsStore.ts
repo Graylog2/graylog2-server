@@ -93,7 +93,7 @@ var WidgetsStore = {
 
         promise.done(() => UserNotification.success("Widget updated successfully"));
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating widget '" + widget.title + "' failed with status: " + errorThrown,
+            UserNotification.error("Updating widget \"" + widget.title + "\" failed with status: " + errorThrown,
                 "Could not update widget");
         });
 

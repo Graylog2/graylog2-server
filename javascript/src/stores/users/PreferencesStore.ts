@@ -52,7 +52,7 @@ var PreferencesStore = {
             UserNotification.success("User preferences successfully saved");
             callback(preferences);
         }).fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Saving of preferences for " + this._userName + " failed with status: " + errorThrown,
+            UserNotification.error("Saving of preferences for \"" + this._userName + "\" failed with status: " + errorThrown,
                 "Could not save user preferences");
         });
     },
@@ -66,7 +66,7 @@ var PreferencesStore = {
         };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error(
-                "Loading of user preferences for " + userName + " failed with status: " + errorThrown + ". Try reloading the page",
+                "Loading of user preferences for \"" + userName + "\" failed with status: " + errorThrown + ". Try reloading the page",
                 "Could not retrieve user preferences from server");
         };
         $.getJSON(url, successCallback).fail(failCallback);

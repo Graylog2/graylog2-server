@@ -29,7 +29,7 @@ class StreamRulesStore {
     types(callback: ((streamRuleTypes: Array<StreamRuleType>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Stream Rule Types failed with status: " + errorThrown,
-                "Could not retrieve Stream Rule Types!");
+                "Could not retrieve Stream Rule Types");
         };
 
         $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);
@@ -37,7 +37,7 @@ class StreamRulesStore {
     list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Stream Rules failed with status: " + errorThrown,
-                "Could not retrieve Stream Rules!");
+                "Could not retrieve Stream Rules");
         };
 
         $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url, callback).fail(failCallback);
@@ -45,7 +45,7 @@ class StreamRulesStore {
     update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating Stream Rule failed with status: " + errorThrown,
-                "Could not update Stream Rule!");
+                "Could not update Stream Rule");
         };
 
         var url = jsRoutes.controllers.api.StreamRulesApiController.update(streamId, streamRuleId).url;
@@ -61,7 +61,7 @@ class StreamRulesStore {
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Deleting Stream Rule failed with status: " + errorThrown,
-                "Could not delete Stream Rule!");
+                "Could not delete Stream Rule");
         };
 
         var url = jsRoutes.controllers.api.StreamRulesApiController.delete(streamId, streamRuleId).url;
@@ -73,7 +73,7 @@ class StreamRulesStore {
     create(streamId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Creating Stream Rule failed with status: " + errorThrown,
-                "Could not create Stream Rule!");
+                "Could not create Stream Rule");
         };
 
         var url = jsRoutes.controllers.api.StreamRulesApiController.create(streamId).url;

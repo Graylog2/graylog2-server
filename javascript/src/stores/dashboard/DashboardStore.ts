@@ -74,8 +74,8 @@ class DashboardStore {
             this.updateDashboards();
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Creating dashboard '" + title + "' failed with status: " + errorThrown,
-                "Could not create dashboard '" + title + "'");
+            UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + errorThrown,
+                "Could not create dashboard");
         });
 
         return promise;
@@ -93,8 +93,8 @@ class DashboardStore {
 
         promise.done(() => UserNotification.success("Dashboard successfully updated"));
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Saving dashboard '" + dashboard.title + "' failed with status: " + errorThrown,
-                "Could not save dashboard '" + dashboard.title + "'");
+            UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
+                "Could not save dashboard");
         });
 
         return promise;

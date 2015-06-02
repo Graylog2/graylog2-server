@@ -80,7 +80,7 @@ var OutputComponent = React.createClass({
     _removeOutputGlobally(outputId) {
         if (window.confirm("Do you really want to terminate this output?")) {
             OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
-                UserNotification.success("Output was terminated.", "Success!");
+                UserNotification.success("Output was terminated.", "Success");
                 this._handleUpdate();
             });
         }
@@ -88,7 +88,7 @@ var OutputComponent = React.createClass({
     _removeOutputFromStream(outputId, streamId) {
         if (window.confirm("Do you really want to remove this output from the stream?")) {
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
-                UserNotification.success("Removed output from stream!", "Success!");
+                UserNotification.success("Output was removed output from stream.", "Success");
                 this._handleUpdate();
             });
         }

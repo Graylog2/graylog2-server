@@ -38,7 +38,7 @@ var UsersStore = {
         });
 
         promise.done(() => {
-            UserNotification.success("User '" + username + "' was deleted successfully");
+            UserNotification.success("User \"" + username + "\" was deleted successfully");
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
