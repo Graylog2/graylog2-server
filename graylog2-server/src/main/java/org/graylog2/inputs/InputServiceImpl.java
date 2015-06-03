@@ -42,7 +42,6 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.streams.OutputImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,6 +329,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         // Add all standard fields.
         input.setTitle(io.getTitle());
+        input.setNodeId(io.getNodeId());
         input.setCreatorUserId(io.getCreatorUserId());
         input.setPersistId(io.getId());
         input.setCreatedAt(io.getCreatedAt());
