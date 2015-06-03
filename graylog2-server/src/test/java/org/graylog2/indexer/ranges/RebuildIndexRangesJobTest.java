@@ -23,7 +23,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
@@ -79,7 +78,7 @@ public class RebuildIndexRangesJobTest {
         assertThat(range.get("start")).isEqualTo(Ints.saturatedCast(new DateTime(2015, 1, 1, 12, 0, DateTimeZone.UTC).getMillis() / 1000L));
     }
 
-    @Test(expected = IndexMissingException.class)
+    @Test(expected = EmptyIndexException.class)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
         rebuildIndexRangesJob.calculateRange("does-not-exist");
     }
