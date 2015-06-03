@@ -413,6 +413,31 @@ public class SearchesTest {
 
         assertThat(dateTime).isNull();
     }
+    
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndex() throws Exception {
+        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
+
+        assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+        assertThat(stats.avg()).isEqualTo(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
+        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
+
+        assertThat(stats).isNull();
+    }
+
+    @Test
+    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
+        TimestampStats stats = searches.timestampStatsOfIndex("does-not-exist");
+
+        assertThat(stats).isNull();
+    }
 
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
         private final LoadStrategyFactory loadStrategyFactory;

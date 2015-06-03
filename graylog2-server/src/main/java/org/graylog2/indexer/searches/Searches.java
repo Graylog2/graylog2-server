@@ -42,6 +42,7 @@ import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
+import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Configuration;
@@ -533,6 +534,46 @@ public class Searches {
         final DateTimeFormatter formatter = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
 
         return formatter.parseDateTime(minTimeStamp);
+    }
+
+    /**
+     * Calculate stats (min, max, avg) about the message timestamps in the given index.
+     *
+     * @param index Name of the index to query.
+     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
+     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
+     */
+    public TimestampStats timestampStatsOfIndex(String index) {
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
+                .filter(FilterBuilders.existsFilter("timestamp"))
+                .subAggregation(AggregationBuilders.stats("ts_stats").field("timestamp"));
+        final SearchRequestBuilder srb = c.prepareSearch()
+                .setIndices(index)
+                .setSearchType(SearchType.COUNT)
+                .addAggregation(builder);
+
+        final SearchResponse response;
+        try {
+            response = c.search(srb.request()).actionGet();
+        } catch (ElasticsearchException e) {
+            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
+            return null;
+        }
+        esRequestTimer.update(response.getTookInMillis(), TimeUnit.MILLISECONDS);
+
+        final Filter f = response.getAggregations().get("agg");
+        if (f.getDocCount() == 0L) {
+            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
+            return null;
+        }
+
+        final Stats stats = f.getAggregations().get("ts_stats");
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
+        final DateTime min = formatter.parseDateTime(stats.getMinAsString());
+        final DateTime max = formatter.parseDateTime(stats.getMaxAsString());
+        final DateTime avg = formatter.parseDateTime(stats.getAvgAsString());
+
+        return TimestampStats.create(min, max, avg);
     }
 
     /**
