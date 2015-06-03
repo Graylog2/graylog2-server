@@ -9,6 +9,9 @@ var MessageFields = React.createClass({
         var fields = [];
         var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a, b) => a.localeCompare(b));
         formattedFields.forEach((value, key) => {
+            if (key === 'full_message') {
+                value = this.props.message['fields'][key];
+            }
             fields.push(<dt key={key + "Title"}>{key}</dt>);
             fields.push(<MessageFieldDescription key={key + "Description"}
                                                  message={this.props.message}

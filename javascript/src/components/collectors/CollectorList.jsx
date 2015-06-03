@@ -59,7 +59,7 @@ var CollectorList = React.createClass({
                             Collector Id
                         </th>
                         <th onClick={this.sortByCollectorVersion}>Collector Version</th>
-                        <th style={{margin: 170}}>&nbsp;</th>
+                        <th style={{width: 170}}>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>

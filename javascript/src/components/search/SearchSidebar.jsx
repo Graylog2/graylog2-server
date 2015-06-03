@@ -209,9 +209,11 @@ var SearchSidebar = React.createClass({
 
                         <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
-                        <DropdownButton bsSize="small" title="More actions">
-                            {moreActions}
-                        </DropdownButton>
+                        <div style={{display: 'inline-block'}}>
+                            <DropdownButton bsSize="small" title="More actions">
+                                {moreActions}
+                            </DropdownButton>
+                        </div>
                     </div>
 
                     <hr />

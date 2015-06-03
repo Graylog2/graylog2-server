@@ -1,7 +1,7 @@
 @(clusterHealth: org.graylog2.restclient.models.ESClusterHealth)
 
 @if(clusterHealth == null) {
-    <div class="es-cluster-status alert alert-error">
+    <div class="es-cluster-status alert alert-danger">
         <i class="fa fa-ambulance"></i> <strong>Cluster information currently unavailable</strong>
     </div>
 } else {
@@ -16,7 +16,7 @@
             }
 
     @if(clusterHealth.isRed) {
-        <div class="es-cluster-status alert alert-error">
+        <div class="es-cluster-status alert alert-danger">
             <i class="fa fa-ambulance"></i> &nbsp;<strong>Elasticsearch cluster is red.</strong>
             }
 

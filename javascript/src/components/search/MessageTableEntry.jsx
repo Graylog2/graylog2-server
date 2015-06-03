@@ -23,6 +23,9 @@ var MessageTableEntry = React.createClass({
         if (this.props.allStreamsLoaded !== newProps.allStreamsLoaded) {
             return true;
         }
+        if (this.props.showMessageRow !== newProps.showMessageRow) {
+            return true;
+        }
         return false;
     },
     possiblyHighlight(fieldName) {

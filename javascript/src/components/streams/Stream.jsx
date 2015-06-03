@@ -11,6 +11,7 @@ var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 var StreamRuleForm = require('../streamrules/StreamRuleForm');
+var UserNotification = require('../../util/UserNotification');
 
 var Stream = React.createClass({
     mixins: [PermissionsMixin],
@@ -19,17 +20,17 @@ var Stream = React.createClass({
     },
     _onDelete(stream) {
         if (window.confirm("Do you really want to remove this stream?")) {
-            StreamsStore.remove(stream.id, () => {});
+            StreamsStore.remove(stream.id, () => UserNotification.success("Stream \"" + stream.title + "\" was deleted successfully.", "Success"));
         }
     },
     _onResume(evt) {
         StreamsStore.resume(this.props.stream.id, () => {});
     },
     _onUpdate(streamId, stream) {
-        StreamsStore.update(streamId, stream, () => {});
+        StreamsStore.update(streamId, stream, () => UserNotification.success("Stream \"" + stream.title + "\" was updated successfully.", "Success"));
     },
     _onClone(streamId, stream) {
-        StreamsStore.cloneStream(streamId, stream, () => {});
+        StreamsStore.cloneStream(streamId, stream, () => UserNotification.success("Stream was successfully cloned as \"" + stream.title + "\".", "Success"));
     },
     _onPause(evt) {
         if (window.confirm("Do you really want to pause stream \"" + this.props.stream.title + "\"?")) {
@@ -40,7 +41,7 @@ var Stream = React.createClass({
         this.refs.quickAddStreamRuleForm.open();
     },
     _onSaveStreamRule(streamRuleId, streamRule) {
-        StreamRulesStore.create(this.props.stream.id, streamRule, () => {});
+        StreamRulesStore.create(this.props.stream.id, streamRule, () => UserNotification.success("Stream rule was created successfully.", "Success"));
     },
     render() {
         var stream = this.props.stream;
