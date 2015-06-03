@@ -31,6 +31,7 @@ import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -384,11 +385,9 @@ public class SearchesTest {
         assertThat(dateTime).isNull();
     }
 
-    @Test
+    @Test(expected = IndexMissingException.class)
     public void testFindYoungestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
-        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("does-not-exist");
-
-        assertThat(dateTime).isNull();
+        searches.findYoungestMessageTimestampOfIndex("does-not-exist");
     }
 
     @Test
@@ -407,11 +406,9 @@ public class SearchesTest {
         assertThat(dateTime).isNull();
     }
 
-    @Test
+    @Test(expected = IndexMissingException.class)
     public void testFindOldestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
-        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("does-not-exist");
-
-        assertThat(dateTime).isNull();
+        searches.findOldestMessageTimestampOfIndex("does-not-exist");
     }
     
     @Test
@@ -432,11 +429,9 @@ public class SearchesTest {
         assertThat(stats).isNull();
     }
 
-    @Test
+    @Test(expected = IndexMissingException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
-        TimestampStats stats = searches.timestampStatsOfIndex("does-not-exist");
-
-        assertThat(stats).isNull();
+        searches.timestampStatsOfIndex("does-not-exist");
     }
 
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {

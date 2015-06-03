@@ -33,6 +33,7 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
@@ -517,6 +518,8 @@ public class Searches {
         final SearchResponse response;
         try {
             response = c.search(srb.request()).actionGet();
+        } catch (IndexMissingException e) {
+            throw e;
         } catch (ElasticsearchException e) {
             LOG.error("Error while calculating youngest timestamp in index <" + index + ">", e);
             return null;
@@ -555,6 +558,8 @@ public class Searches {
         final SearchResponse response;
         try {
             response = c.search(srb.request()).actionGet();
+        } catch (IndexMissingException e) {
+            throw e;
         } catch (ElasticsearchException e) {
             LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
             return null;
@@ -601,6 +606,8 @@ public class Searches {
         final SearchResponse response;
         try {
             response = c.search(srb.request()).actionGet();
+        } catch (IndexMissingException e) {
+            throw e;
         } catch (ElasticsearchException e) {
             LOG.error("Error while calculating oldest timestamp in index <" + index + ">", e);
             return null;

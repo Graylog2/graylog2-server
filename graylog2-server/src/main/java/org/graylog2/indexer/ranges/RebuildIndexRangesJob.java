@@ -19,12 +19,10 @@ package org.graylog2.indexer.ranges;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
@@ -37,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
@@ -109,18 +109,6 @@ public class RebuildIndexRangesJob extends SystemJob {
 
             try {
                 ranges.add(calculateRange(index));
-            } catch (EmptyIndexException e) {
-                LOG.info("Index [{}] is empty, inserting dummy index range.", index);
-                Map<String, Object> emptyIndexRange = getDeflectorIndexRange(index);
-
-                if (deflector.getCurrentActualTargetIndex().equals(index)) {
-                    LOG.info("Index [{}] is empty but it is the current deflector target. Inserting dummy index range.", index);
-                } else {
-                    emptyIndexRange.put("start", 0);
-                    emptyIndexRange.put("calculated_at", Tools.getUTCTimestamp());
-                }
-
-                ranges.add(emptyIndexRange);
             } catch (Exception e) {
                 LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
             } finally {
@@ -134,26 +122,13 @@ public class RebuildIndexRangesJob extends SystemJob {
         info("Done calculating index ranges for " + indices.length + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
     }
 
-    protected Map<String, Object> getDeflectorIndexRange(String index) {
-        Map<String, Object> deflectorIndexRange = Maps.newHashMap();
-        deflectorIndexRange.put("index", index);
-        deflectorIndexRange.put("start", Tools.getUTCTimestamp());
-        return deflectorIndexRange;
-    }
-
-    protected Map<String, Object> calculateRange(String index) throws EmptyIndexException {
+    protected Map<String, Object> calculateRange(String index) {
         final Stopwatch x = Stopwatch.createStarted();
-        final DateTime timestamp = searches.findOldestMessageTimestampOfIndex(index);
-        if (timestamp == null) {
-            x.stop();
-            throw new EmptyIndexException();
-        }
-
+        final DateTime timestamp = firstNonNull(searches.findOldestMessageTimestampOfIndex(index), Tools.iso8601());
         final int rangeEnd = Ints.saturatedCast(timestamp.getMillis() / 1000L);
         final int took = Ints.saturatedCast(x.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, took);
-
         return ImmutableMap.<String, Object>of(
                 "index", index,
                 "start", rangeEnd, // FIXME The name of the attribute is massively misleading and should be rectified some time

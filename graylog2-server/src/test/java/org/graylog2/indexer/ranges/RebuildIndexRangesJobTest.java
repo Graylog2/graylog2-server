@@ -23,13 +23,14 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesTest;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -85,7 +86,18 @@ public class RebuildIndexRangesJobTest {
         assertThat(range.get("start")).isEqualTo(Ints.saturatedCast(new DateTime(2015, 1, 1, 12, 0, DateTimeZone.UTC).getMillis() / 1000L));
     }
 
-    @Test(expected = EmptyIndexException.class)
+    @Test
+    @UsingDataSet(locations = "RebuildIndexRangesJobTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testCalculateRangeWithEmptyIndex() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(new DateTime(2014, 1, 1, 0, 0, DateTimeZone.UTC).getMillis());
+        final Map<String, Object> range = rebuildIndexRangesJob.calculateRange(INDEX_NAME);
+
+        assertThat(range).isNotNull();
+        assertThat(range.get("index")).isEqualTo(INDEX_NAME);
+        assertThat(range.get("start")).isEqualTo(Ints.saturatedCast(new DateTime(2014, 1, 1, 0, 0, DateTimeZone.UTC).getMillis() / 1000L));
+    }
+
+    @Test(expected = IndexMissingException.class)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
         rebuildIndexRangesJob.calculateRange("does-not-exist");
     }
