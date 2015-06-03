@@ -131,6 +131,7 @@ var SearchResult = React.createClass({
                             <h1>
                                 <span className="pull-right">
                                     <AddToDashboardMenu title="Add count to dashboard"
+                                                        pullRight
                                                         widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
                                                         permissions={this.props.permissions}/>
                                 </span>
