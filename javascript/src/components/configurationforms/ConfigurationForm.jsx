@@ -69,7 +69,7 @@ var ConfigurationForm = React.createClass({
             type: this.props.typeName,
             configuration: {}};
         $.map(this.state.configFields, function(field, name) {
-            data.configuration[name] = (values[name] || field.default_value);
+            data.configuration[name] = (values[name] === undefined  || values === null || String(values[name]).trim() === "" ? field.default_value : values[name]);
         });
         this.props.submitAction(data);
         this.refs.modal.close();
