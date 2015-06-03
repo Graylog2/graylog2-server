@@ -113,7 +113,7 @@ public class ElasticsearchConfiguration {
     private boolean disableIndexOptimization = false;
 
     @Parameter(value = "disable_index_range_calculation")
-    private boolean disableIndexRangeCalculation = false;
+    private boolean disableIndexRangeCalculation = true;
 
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;

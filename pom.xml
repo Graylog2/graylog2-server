@@ -25,7 +25,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>1.1.0-rc.2-SNAPSHOT</version>
+    <version>1.1.0-rc.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Graylog</name>
     <url>https://www.graylog.org/</url>
@@ -730,7 +730,7 @@
             <dependency>
                 <groupId>org.graylog.plugins</groupId>
                 <artifactId>usage-statistics</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

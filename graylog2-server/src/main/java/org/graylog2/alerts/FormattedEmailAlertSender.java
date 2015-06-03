@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class FormattedEmailAlertSender extends StaticEmailAlertSender implements AlertSender {
     public static final String bodyTemplate = "##########\n" +
             "Alert Description: ${check_result.resultDescription}\n" +
@@ -44,12 +46,14 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "\n" +
             "Triggered condition: ${check_result.triggeredCondition}\n" +
             "##########\n\n" +
-            "${if backlog_size > 0}" +
+            "${if backlog}" +
             "Last messages accounting for this alert:\n" +
-            "${foreach backlog message}\n" +
+            "${foreach backlog message}" +
             "${message}\n" +
-            "${end}\n" +
-            "${else}<No backlog.>${end}\n" +
+            "${end}" +
+            "${else}" +
+            "<No backlog>\n" +
+            "${end}" +
             "\n";
 
     private final Engine engine = new Engine();
@@ -104,13 +108,10 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
         model.put("check_result", checkResult);
         model.put("stream_url", buildStreamDetailsURL(configuration.getWebInterfaceUri(), checkResult, stream));
 
-        if (backlog != null) {
-            model.put("backlog", backlog);
-            model.put("backlog_size", backlog.size());
-        } else {
-            model.put("backlog", Collections.<Message>emptyList());
-            model.put("backlog_size", 0);
-        }
+        final List<Message> messages = firstNonNull(backlog, Collections.<Message>emptyList());
+        model.put("backlog", messages);
+        model.put("backlog_size", messages.size());
+
         return model;
     }
 }
