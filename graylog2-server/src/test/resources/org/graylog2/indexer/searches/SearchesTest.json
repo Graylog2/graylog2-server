@@ -13,7 +13,7 @@
           "data": {
             "source": "example.org",
             "message": "Hi",
-            "timestamp": "2015-01-01 00:01:00.004"
+            "timestamp": "2015-01-01 01:00:00.000"
           }
         }
       ]
@@ -31,7 +31,7 @@
           "data": {
             "source": "example.org",
             "message": "Ho",
-            "timestamp": "2015-01-01 00:02:01.001",
+            "timestamp": "2015-01-01 02:00:00.000",
             "n": 1
           }
         }
@@ -50,7 +50,7 @@
           "data": {
             "source": "example.org",
             "message": "Hi",
-            "timestamp": "2015-01-01 00:03:02.002",
+            "timestamp": "2015-01-01 03:00:00.000",
             "n": 1
           }
         }
@@ -69,7 +69,7 @@
           "data": {
             "source": "example.org",
             "message": "Ho",
-            "timestamp": "2015-01-01 00:04:03.003",
+            "timestamp": "2015-01-01 04:00:00.000",
             "n": 2
           }
         }
@@ -88,7 +88,7 @@
           "data": {
             "source": "example.org",
             "message": "Hi",
-            "timestamp": "2015-01-01 00:05:04.004",
+            "timestamp": "2015-01-01 05:00:00.000",
             "n": 2
           }
         }
@@ -107,7 +107,7 @@
           "data": {
             "source": "example.com",
             "message": "Ho",
-            "timestamp": "2015-01-01 00:01:05.004"
+            "timestamp": "2015-01-01 01:00:00.000"
           }
         }
       ]
@@ -125,7 +125,7 @@
           "data": {
             "source": "example.com",
             "message": "Hi",
-            "timestamp": "2015-01-01 00:02:06.001",
+            "timestamp": "2015-01-01 02:00:00.000",
             "n": 3
           }
         }
@@ -144,7 +144,7 @@
           "data": {
             "source": "example.com",
             "message": "Ho",
-            "timestamp": "2015-01-01 00:03:07.002",
+            "timestamp": "2015-01-01 03:00:00.000",
             "n": 3
           }
         }
@@ -163,7 +163,7 @@
           "data": {
             "source": "example.com",
             "message": "Hi",
-            "timestamp": "2015-01-01 00:04:08.003",
+            "timestamp": "2015-01-01 04:00:00.000",
             "n": 3
           }
         }
@@ -182,7 +182,7 @@
           "data": {
             "source": "example.com",
             "message": "Ho",
-            "timestamp": "2015-01-01 00:05:09.004",
+            "timestamp": "2015-01-01 05:00:00.000",
             "n": 4
           }
         }
