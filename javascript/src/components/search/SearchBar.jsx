@@ -32,7 +32,6 @@ var SearchBar = React.createClass({
             rangeType: this.initialSearchParams.rangeType,
             rangeParams: this.initialSearchParams.rangeParams,
             query: this.initialSearchParams.query,
-            streamId: null,
             savedSearch: SearchStore.savedSearch,
             savedSearches: Immutable.List(),
             keywordPreview: Immutable.Map()
@@ -182,7 +181,8 @@ var SearchBar = React.createClass({
     },
     _savedSearchSelected() {
         var selectedSavedSearch = this.refs['savedSearchesSelector'].getValue();
-        SavedSearchesStore.execute(selectedSavedSearch, undefined, $(window).width());
+        var streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : undefined;
+        SavedSearchesStore.execute(selectedSavedSearch, streamId, $(window).width());
     },
 
     _getRangeTypeSelector() {
