@@ -371,23 +371,23 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testFindYoungestMessageTimestampOfIndex() throws Exception {
-        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("graylog");
+    public void testFindNewestMessageTimestampOfIndex() throws Exception {
+        DateTime dateTime = searches.findNewestMessageTimestampOfIndex("graylog");
 
-        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
     }
 
     @Test
     @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testFindYoungestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
-        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("graylog");
+    public void testFindNewestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
+        DateTime dateTime = searches.findNewestMessageTimestampOfIndex("graylog");
 
         assertThat(dateTime).isNull();
     }
 
     @Test(expected = IndexMissingException.class)
-    public void testFindYoungestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
-        searches.findYoungestMessageTimestampOfIndex("does-not-exist");
+    public void testFindNewestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
+        searches.findNewestMessageTimestampOfIndex("does-not-exist");
     }
 
     @Test
@@ -395,7 +395,7 @@ public class SearchesTest {
     public void testFindOldestMessageTimestampOfIndex() throws Exception {
         DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
 
-        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
     }
 
     @Test

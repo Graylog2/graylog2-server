@@ -124,7 +124,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     protected Map<String, Object> calculateRange(String index) {
         final Stopwatch x = Stopwatch.createStarted();
-        final DateTime timestamp = firstNonNull(searches.findOldestMessageTimestampOfIndex(index), Tools.iso8601());
+        final DateTime timestamp = firstNonNull(searches.findNewestMessageTimestampOfIndex(index), Tools.iso8601());
         final int rangeEnd = Ints.saturatedCast(timestamp.getMillis() / 1000L);
         final int took = Ints.saturatedCast(x.stop().elapsed(TimeUnit.MILLISECONDS));
 
