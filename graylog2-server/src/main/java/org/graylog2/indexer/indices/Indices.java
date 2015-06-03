@@ -19,10 +19,11 @@ package org.graylog2.indexer.indices;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.Uninterruptibles;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
@@ -35,8 +36,6 @@ import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
-import org.elasticsearch.action.admin.indices.recovery.RecoveryRequest;
-import org.elasticsearch.action.admin.indices.recovery.RecoveryResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
@@ -73,7 +72,6 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
@@ -327,7 +325,7 @@ public class Indices implements IndexManagement {
         }
         return closedIndices;
     }
-    
+
     public Set<String> getReopenedIndices() {
         final Set<String> reopenedIndices = Sets.newHashSet();
 
@@ -400,15 +398,15 @@ public class Indices implements IndexManagement {
     }
 
     public void waitForRecovery(String index) {
-        RecoveryResponse response;
+        waitForStatus(index, ClusterHealthStatus.YELLOW);
+    }
 
-        do {
-            LOG.warn("Waiting for index recovery for index {}", index);
+    public void waitForStatus(String index, ClusterHealthStatus clusterHealthStatus) {
+        final ClusterHealthRequest request = c.admin().cluster().prepareHealth(index)
+                .setWaitForStatus(clusterHealthStatus)
+                .request();
 
-            final ActionFuture<RecoveryResponse> request = c.admin().indices().recoveries(new RecoveryRequest(index));
-            response = request.actionGet();
-
-            Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
-        } while (response.getSuccessfulShards() < response.getTotalShards());
+        LOG.debug("Waiting until index health status of index {} is {}", index, clusterHealthStatus);
+        c.admin().cluster().health(request).actionGet();
     }
 }
