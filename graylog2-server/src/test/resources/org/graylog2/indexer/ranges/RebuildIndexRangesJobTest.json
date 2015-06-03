@@ -1,0 +1,41 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Hi",
+            "timestamp": "2015-01-01 00:00:00.000"
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog",
+            "indexType": "message",
+            "indexId": "1"
+          }
+        },
+        {
+          "data": {
+            "source": "example.org",
+            "message": "Ho",
+            "timestamp": "2015-01-01 12:00:00.000",
+            "n": 1
+          }
+        }
+      ]
+    }
+  ]
+}
