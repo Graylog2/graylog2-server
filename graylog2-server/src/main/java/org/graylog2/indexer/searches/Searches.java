@@ -494,7 +494,7 @@ public class Searches {
     }
 
     /**
-     * <em>WARNING:</em> The name of that method is wrong and it returns the <em>oldest</em> message of an index!
+     * <em>WARNING:</em> The name of that method is wrong and it returns the <em>newest</em> message of an index!
      */
     public SearchHit firstOfIndex(String index) {
         return oneOfIndex(index, matchAllQuery(), SortOrder.DESC);
@@ -582,7 +582,7 @@ public class Searches {
     }
 
     /**
-     * <em>WARNING:</em> The name of that method is wrong and it returns the <em>youngest</em> message of an index!
+     * <em>WARNING:</em> The name of that method is wrong and it returns the <em>oldest</em> message of an index!
      */
     public SearchHit lastOfIndex(String index) {
         return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
