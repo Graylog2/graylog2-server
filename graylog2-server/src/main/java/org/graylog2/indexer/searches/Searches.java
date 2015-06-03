@@ -20,6 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Sets;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -39,6 +40,8 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.max.Max;
+import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Configuration;
@@ -57,7 +60,11 @@ import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -492,10 +499,84 @@ public class Searches {
     }
 
     /**
+     * Find the youngest message timestamp in the given index.
+     *
+     * @param index Name of the index to query.
+     * @return the youngest message timestamp in the given index, or {@code null} if it couldn't be found.
+     */
+    public DateTime findYoungestMessageTimestampOfIndex(String index) {
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
+                .filter(FilterBuilders.existsFilter("timestamp"))
+                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"));
+        final SearchRequestBuilder srb = c.prepareSearch()
+                .setIndices(index)
+                .setSearchType(SearchType.COUNT)
+                .addAggregation(builder);
+
+        final SearchResponse response;
+        try {
+            response = c.search(srb.request()).actionGet();
+        } catch (ElasticsearchException e) {
+            LOG.error("Error while calculating youngest timestamp in index <" + index + ">", e);
+            return null;
+        }
+        esRequestTimer.update(response.getTookInMillis(), TimeUnit.MILLISECONDS);
+
+        final Filter f = response.getAggregations().get("agg");
+        if (f.getDocCount() == 0L) {
+            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
+            return null;
+        }
+
+        final Min min = f.getAggregations().get("ts_min");
+        final String minTimeStamp = min.getValueAsString();
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
+
+        return formatter.parseDateTime(minTimeStamp);
+    }
+
+    /**
      * <em>WARNING:</em> The name of that method is wrong and it returns the <em>youngest</em> message of an index!
      */
     public SearchHit lastOfIndex(String index) {
         return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
+    }
+
+    /**
+     * Find the oldest message timestamp in the given index.
+     *
+     * @param index Name of the index to query.
+     * @return the oldest message timestamp in the given index, or {@code null} if it couldn't be found.
+     */
+    public DateTime findOldestMessageTimestampOfIndex(String index) {
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
+                .filter(FilterBuilders.existsFilter("timestamp"))
+                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
+        final SearchRequestBuilder srb = c.prepareSearch()
+                .setIndices(index)
+                .setSearchType(SearchType.COUNT)
+                .addAggregation(builder);
+
+        final SearchResponse response;
+        try {
+            response = c.search(srb.request()).actionGet();
+        } catch (ElasticsearchException e) {
+            LOG.error("Error while calculating oldest timestamp in index <" + index + ">", e);
+            return null;
+        }
+        esRequestTimer.update(response.getTookInMillis(), TimeUnit.MILLISECONDS);
+
+        final Filter f = response.getAggregations().get("agg");
+        if (f.getDocCount() == 0L) {
+            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
+            return null;
+        }
+
+        final Max max = f.getAggregations().get("ts_max");
+        final String maxTimeStamp = max.getValueAsString();
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
+
+        return formatter.parseDateTime(maxTimeStamp);
     }
 
     private SearchRequestBuilder searchRequest(SearchesConfig config, Set<String> indices) {

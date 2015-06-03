@@ -368,6 +368,52 @@ public class SearchesTest {
         assertThat(searchHit.getSource().get("timestamp")).isEqualTo("2015-01-01 01:00:00.000");
     }
 
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindYoungestMessageTimestampOfIndex() throws Exception {
+        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindYoungestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
+        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isNull();
+    }
+
+    @Test
+    public void testFindYoungestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
+        DateTime dateTime = searches.findYoungestMessageTimestampOfIndex("does-not-exist");
+
+        assertThat(dateTime).isNull();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindOldestMessageTimestampOfIndex() throws Exception {
+        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindOldestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
+        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isNull();
+    }
+
+    @Test
+    public void testFindOldestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
+        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("does-not-exist");
+
+        assertThat(dateTime).isNull();
+    }
+
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
         private final LoadStrategyFactory loadStrategyFactory;
         private final Set<String> indexNames;
