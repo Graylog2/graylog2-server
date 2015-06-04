@@ -39,7 +39,9 @@ var StreamComponent = React.createClass({
         });
     },
     render() {
-        var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ? <CreateStreamButton ref='createStreamButton' onSave={this._onSave} /> : "");
+        var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ?
+            <CreateStreamButton ref='createStreamButton' bsSize="large" bsStyle="success" onSave={this._onSave} /> :
+            "");
         var pageHeader = (
             <div className="row content content-head">
                 <Col md={10}>
@@ -65,7 +67,8 @@ var StreamComponent = React.createClass({
                         for wall-mounted displays or other integrations.
                     </SupportLink>
                 </Col>
-                {this.state.streams && this.state.streamRuleTypes && createStreamButton}
+                {this.state.streams && this.state.streamRuleTypes &&
+                    <Col md={2} style={{textAlign: 'center', marginTop: '35px'}}>{createStreamButton}</Col>}
             </div>
         );
 
@@ -77,7 +80,8 @@ var StreamComponent = React.createClass({
                     <div className="row content">
                         <Col md={12}>
                             <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
-                                        permissions={this.props.permissions} user={this.state.user}/>
+                                        permissions={this.props.permissions} user={this.state.user}
+                                        onStreamCreated={this._onSave}/>
                         </Col>
                     </div>
                 </div>

@@ -3,7 +3,6 @@
 var React = require('react/addons');
 var Button = require('react-bootstrap').Button;
 var StreamForm = require('./StreamForm');
-var Col = require('react-bootstrap').Col;
 
 var CreateStreamButton = React.createClass({
     onClick(evt) {
@@ -11,10 +10,12 @@ var CreateStreamButton = React.createClass({
     },
     render() {
         return (
-            <Col md={2} style={{textAlign: 'center', marginTop: '35px'}}>
-                <Button bsSize='large' bsStyle='success' onClick={this.onClick}>Create Stream</Button>
+            <span>
+                <Button bsSize={this.props.bsSize} bsStyle={this.props.bsStyle} className={this.props.className} onClick={this.onClick}>
+                    {this.props.buttonText || "Create Stream"}
+                </Button>
                 <StreamForm ref='streamForm' title='Creating Stream' onSubmit={this.props.onSave} />
-            </Col>
+            </span>
         );
     }
 });
