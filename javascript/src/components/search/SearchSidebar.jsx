@@ -84,6 +84,7 @@ var SearchSidebar = React.createClass({
         });
         $sidebarAffix.on('affixed-top.bs.affix', () => {
             $(window).on('scroll', this._updateHeight);
+            this._updateHeight();
         });
     },
     componentWillUnmount() {
@@ -111,8 +112,8 @@ var SearchSidebar = React.createClass({
         var sidebar = React.findDOMNode(this.refs.sidebar);
         var sidebarTop = sidebar.getBoundingClientRect().top;
         var sidebarCss = window.getComputedStyle(React.findDOMNode(this.refs.sidebar));
-        var sidebarPaddingTop = parseFloat(sidebarCss['padding-top']);
-        var sidebarPaddingBottom = parseFloat(sidebarCss['padding-bottom']);
+        var sidebarPaddingTop = parseFloat(sidebarCss.getPropertyValue('padding-top'));
+        var sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
         var viewPortHeight = window.innerHeight;
         var maxHeight =
