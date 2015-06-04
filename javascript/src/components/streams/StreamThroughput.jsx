@@ -20,6 +20,10 @@ var StreamThroughput = React.createClass({
             nodeId: null, // across all nodes
             metricNames: [metricName],
             callback: (update, hasError) => {
+                if (!this.isMounted()) {
+                    return;
+                }
+
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
                 if (hasError) {
