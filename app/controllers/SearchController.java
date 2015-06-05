@@ -221,19 +221,23 @@ public class SearchController extends AuthenticatedController {
             // resolve all used inputs and nodes from the result set
             final Map<String, Node> nodeMap = serverNodes.asMap();
             for (final String nodeId : usedInputIds.keySet()) {
-                final HashSet<Input> allInputs = Sets.newHashSet(nodeMap.get(nodeId).getInputs());
-                inputs = Sets.newHashSet(Collections2.transform(Sets.filter(allInputs, new Predicate<Input>() {
-                    @Override
-                    public boolean apply(Input input) {
-                        return usedInputIds.get(nodeId).contains(input.getId());
-                    }
-                }), new Function<Input, InputDescription>() {
-                    @Nullable
-                    @Override
-                    public InputDescription apply(Input input) {
-                        return new InputDescription(input);
-                    }
-                }));
+                final Node node = nodeMap.get(nodeId);
+                if(node != null) {
+                    final HashSet<Input> allInputs = Sets.newHashSet(node.getInputs());
+                    inputs = Sets.newHashSet(Collections2.transform(Sets.filter(allInputs, new Predicate<Input>() {
+                        @Override
+                        public boolean apply(Input input) {
+                            final Set<String> inputIds = usedInputIds.get(nodeId);
+                            return inputIds != null && inputIds.contains(input.getId());
+                        }
+                    }), new Function<Input, InputDescription>() {
+                        @Nullable
+                        @Override
+                        public InputDescription apply(Input input) {
+                            return new InputDescription(input);
+                        }
+                    }));
+                }
             }
 
             // resolve radio inputs
