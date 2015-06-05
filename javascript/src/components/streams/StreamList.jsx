@@ -4,6 +4,7 @@ var React = require('react/addons');
 var Stream = require('./Stream');
 var Alert = require('react-bootstrap').Alert;
 var PermissionsMixin = require('../../util/PermissionsMixin');
+var CreateStreamButton = require('./CreateStreamButton');
 
 var StreamList = React.createClass({
     mixins: [PermissionsMixin],
@@ -29,11 +30,19 @@ var StreamList = React.createClass({
                 </ul>
             );
         } else {
-            var createLink = (this.isPermitted(this.props.permissions, ['streams:create']) ? <a onClick={this.props.onCreate}>Create one now</a> : "");
+            var createStreamButton;
+            if (this.isPermitted(this.props.permissions, ["streams:create"])) {
+                createStreamButton = (
+                    <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
+                                        buttonText="Create one now" ref='createStreamButton'
+                                        onSave={this.props.onStreamCreated} />
+                );
+            }
+
             return (
                 <Alert bsStyle='warning'>
                     <i className="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. {createLink}
+                    No streams configured. {createStreamButton}.
                 </Alert>
             );
         }

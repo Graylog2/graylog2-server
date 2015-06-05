@@ -52,7 +52,7 @@
                 <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
             </p>
 
-            @if(!dashboard.getWidgets.isEmpty) {
+            @if(!dashboard.getWidgets.isEmpty && isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
                 @views.html.partials.support.list_small() {
                     Drag widgets to any position you like in <a id="unlock-dashboard" href="#" role="button">
                         unlock / edit</a>
