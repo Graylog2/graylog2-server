@@ -60,18 +60,10 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public void execute() {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
-            final Map<String, Object> range;
-            if (deflector.getCurrentActualTargetIndex().equals(indexName))
-                range = calculateRange(indexName);
-            else
-                range = getDeflectorIndexRange(indexName);
-
-            final IndexRange indexRange = indexRangeService.create(range);
+            final IndexRange indexRange = indexRangeService.create(calculateRange(indexName));
             indexRangeService.destroy(indexName);
             indexRangeService.save(indexRange);
             LOG.info("Created ranges for index {}.", indexName);
-        } catch (EmptyIndexException e) {
-            LOG.error("Unable to calculate ranges for index {}: {}", indexName, e);
         } catch (ValidationException e) {
             LOG.error("Unable to save index range for index {}: {}", indexName, e);
         } catch (Exception e) {

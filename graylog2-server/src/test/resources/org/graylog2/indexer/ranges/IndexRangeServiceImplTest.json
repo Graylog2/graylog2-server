@@ -1,0 +1,22 @@
+{
+  "index_ranges": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "took_ms": 23,
+      "start": 1420070400,
+      "index": "graylog_1",
+      "calculated_at": 1420070400
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "took_ms": 42,
+      "start": 1420156800,
+      "index": "graylog_2",
+      "calculated_at": 1420156800
+    }
+  ]
+}

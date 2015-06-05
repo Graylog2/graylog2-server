@@ -22,6 +22,9 @@ import com.google.common.collect.Sets;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
@@ -323,7 +326,7 @@ public class Indices implements IndexManagement {
         }
         return closedIndices;
     }
-    
+
     public Set<String> getReopenedIndices() {
         final Set<String> reopenedIndices = Sets.newHashSet();
 
@@ -393,5 +396,20 @@ public class Indices implements IndexManagement {
         or.flush(true);
 
         c.admin().indices().optimize(or).actionGet();
+    }
+
+    public ClusterHealthStatus waitForRecovery(String index) {
+        return waitForStatus(index, ClusterHealthStatus.YELLOW);
+    }
+
+    public ClusterHealthStatus waitForStatus(String index, ClusterHealthStatus clusterHealthStatus) {
+        final ClusterHealthRequest request = c.admin().cluster().prepareHealth(index)
+                .setWaitForStatus(clusterHealthStatus)
+                .request();
+
+        LOG.debug("Waiting until index health status of index {} is {}", index, clusterHealthStatus);
+
+        final ClusterHealthResponse response = c.admin().cluster().health(request).actionGet();
+        return response.getStatus();
     }
 }

@@ -14,14 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.radio.system.activities;
+package org.graylog2.shared.system.activities;
 
-import org.graylog2.shared.system.activities.Activity;
-import org.graylog2.shared.system.activities.ActivityWriter;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class NullActivityWriter implements ActivityWriter {
     @Override
     public void write(Activity activity) {

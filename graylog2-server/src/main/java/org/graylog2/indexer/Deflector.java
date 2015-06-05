@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -138,6 +139,10 @@ public class Deflector { // extends Ablenkblech
         if (!indices.create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
+
+        LOG.info("Waiting for index allocation of <{}>", newTarget);
+        ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         LOG.info("Done!");
 

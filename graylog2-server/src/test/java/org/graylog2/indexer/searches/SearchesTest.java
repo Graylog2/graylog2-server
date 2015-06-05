@@ -31,6 +31,8 @@ import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.indices.IndexMissingException;
+import org.elasticsearch.search.SearchHit;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
@@ -287,11 +289,11 @@ public class SearchesTest {
         assertThat(h.getHistogramBoundaries()).isEqualTo(range);
         assertThat(h.getResults())
                 .hasSize(5)
-                .containsEntry(new DateTime(2015, 1, 1, 0, 1, DateTimeZone.UTC).getMillis() / 1000L, 2L)
-                .containsEntry(new DateTime(2015, 1, 1, 0, 2, DateTimeZone.UTC).getMillis() / 1000L, 2L)
-                .containsEntry(new DateTime(2015, 1, 1, 0, 3, DateTimeZone.UTC).getMillis() / 1000L, 2L)
-                .containsEntry(new DateTime(2015, 1, 1, 0, 4, DateTimeZone.UTC).getMillis() / 1000L, 2L)
-                .containsEntry(new DateTime(2015, 1, 1, 0, 5, DateTimeZone.UTC).getMillis() / 1000L, 2L);
+                .containsEntry(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 2, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 4, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L);
     }
 
     @Test
@@ -322,10 +324,10 @@ public class SearchesTest {
         assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.MINUTE);
         assertThat(h.getHistogramBoundaries()).isEqualTo(range);
         assertThat(h.getResults()).hasSize(5);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 1, DateTimeZone.UTC).getMillis() / 1000L))
+        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC).getMillis() / 1000L))
                 .containsEntry("total_count", 2L)
                 .containsEntry("total", 0.0);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 2, DateTimeZone.UTC).getMillis() / 1000L))
+        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 2, 0, DateTimeZone.UTC).getMillis() / 1000L))
                 .containsEntry("total_count", 2L)
                 .containsEntry("total", 4.0)
                 .containsEntry("mean", 2.0);
@@ -347,6 +349,89 @@ public class SearchesTest {
         Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
         assertThat(histogram.getCount()).isEqualTo(1L);
         assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFirstOfIndex() throws Exception {
+        SearchHit searchHit = searches.firstOfIndex("graylog");
+
+        assertThat(searchHit.getSource()).containsKey("timestamp");
+        assertThat(searchHit.getSource().get("timestamp")).isEqualTo("2015-01-01 05:00:00.000");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testLastOfIndex() throws Exception {
+        SearchHit searchHit = searches.lastOfIndex("graylog");
+
+        assertThat(searchHit.getSource()).containsKey("timestamp");
+        assertThat(searchHit.getSource().get("timestamp")).isEqualTo("2015-01-01 01:00:00.000");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindNewestMessageTimestampOfIndex() throws Exception {
+        DateTime dateTime = searches.findNewestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindNewestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
+        DateTime dateTime = searches.findNewestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isNull();
+    }
+
+    @Test(expected = IndexMissingException.class)
+    public void testFindNewestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
+        searches.findNewestMessageTimestampOfIndex("does-not-exist");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindOldestMessageTimestampOfIndex() throws Exception {
+        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testFindOldestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
+        DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
+
+        assertThat(dateTime).isNull();
+    }
+
+    @Test(expected = IndexMissingException.class)
+    public void testFindOldestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
+        searches.findOldestMessageTimestampOfIndex("does-not-exist");
+    }
+    
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndex() throws Exception {
+        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
+
+        assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+        assertThat(stats.avg()).isEqualTo(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
+        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
+
+        assertThat(stats).isNull();
+    }
+
+    @Test(expected = IndexMissingException.class)
+    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
+        searches.timestampStatsOfIndex("does-not-exist");
     }
 
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
