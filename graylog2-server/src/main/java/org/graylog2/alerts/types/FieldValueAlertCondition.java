@@ -62,6 +62,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private final String field;
     private final DecimalFormat decimalFormat;
     private final Searches searches;
+    private List<Message> searchHits = Lists.newArrayList();
 
     @AssistedInject
     public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
@@ -86,6 +87,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                 + ", threshold: " + decimalFormat.format(threshold)
                 + ", grace: " + grace;
     }
+
 
     @Override
     protected CheckResult runCheck() {
@@ -148,10 +150,11 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
                 final List<MessageSummary> summaries;
                 if (getBacklog() > 0) {
-                    final List<ResultMessage> searchHits = fieldStatsResult.getSearchHits();
-                    summaries = Lists.newArrayListWithCapacity(searchHits.size());
-                    for (ResultMessage resultMessage : searchHits) {
+                    final List<ResultMessage> searchResult = fieldStatsResult.getSearchHits();
+                    summaries = Lists.newArrayListWithCapacity(searchResult.size());
+                    for (ResultMessage resultMessage : searchResult) {
                         final Message msg = new Message(resultMessage.getMessage());
+                        this.searchHits.add(msg);
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }
                 } else {
@@ -174,5 +177,10 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
             return new NegativeCheckResult(this);
         }
+    }
+
+    @Override
+    public List<Message> getSearchHits() {
+        return searchHits;
     }
 }
