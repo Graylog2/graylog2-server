@@ -80,6 +80,11 @@ public class Configuration {
         if (m != null) {
             for(Map.Entry<String, Object> e : m.entrySet()) {
                 try {
+                    if (e.getValue() == null) {
+                        LOG.debug("NULL value in configuration key <{}>", e.getKey());
+                        continue;
+                    }
+
                     if (e.getValue() instanceof String) {
                         strings.put(e.getKey(), (String) e.getValue());
                     } else if (e.getValue() instanceof Integer) {
