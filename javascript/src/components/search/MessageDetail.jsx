@@ -48,14 +48,22 @@ var MessageDetail = React.createClass({
     },
     _nodeName(nodeId) {
         var node = this.props.nodes.get(nodeId);
-        return node ?
-            <a href={jsRoutes.controllers.NodesController.node(nodeId).url}>
-                <i className="fa fa-code-fork"></i>
-                &nbsp;
-                <span style={{wordBreak: 'break-word'}}>{node['short_node_id']}</span>&nbsp;/&nbsp;<span style={{wordBreak: 'break-word'}}>{node['hostname']}</span>
-            </a>
-            :
-            <span style={{wordBreak: 'break-word'}}>stopped node</span>;
+        var nodeInformation;
+
+        if (node) {
+            var nodeURL = node.radio ? jsRoutes.controllers.RadiosController.show(nodeId).url : jsRoutes.controllers.NodesController.node(nodeId).url;
+            nodeInformation = (
+                <a href={nodeURL}>
+                    <i className="fa fa-code-fork"></i>
+                    &nbsp;
+                    <span style={{wordBreak: 'break-word'}}>{node['short_node_id']}</span>&nbsp;/&nbsp;<span style={{wordBreak: 'break-word'}}>{node['hostname']}</span>
+                </a>
+            );
+        } else {
+            nodeInformation = <span style={{wordBreak: 'break-word'}}>stopped node</span>;
+        }
+        return nodeInformation;
+
     },
     _getAllStreams() {
         if (this.props.allStreams) {
