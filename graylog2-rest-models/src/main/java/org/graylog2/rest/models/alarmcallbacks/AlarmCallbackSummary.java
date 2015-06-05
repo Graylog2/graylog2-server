@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.joda.time.DateTime;
 
+import java.util.Date;
 import java.util.Map;
 
 @AutoValue
@@ -36,7 +36,7 @@ public abstract class AlarmCallbackSummary {
     @JsonProperty
     public abstract Map<String, Object> configuration();
     @JsonProperty("created_at")
-    public abstract DateTime createdAt();
+    public abstract Date createdAt();
     @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
 
@@ -45,7 +45,7 @@ public abstract class AlarmCallbackSummary {
                                               @JsonProperty("stream_id") String streamId,
                                               @JsonProperty("type") String type,
                                               @JsonProperty("configuration") Map<String, Object> configuration,
-                                              @JsonProperty("created_at") DateTime createdAt,
+                                              @JsonProperty("created_at") Date createdAt,
                                               @JsonProperty("creator_user_id") String creatorUserId) {
         return new AutoValue_AlarmCallbackSummary(id, streamId, type, configuration, createdAt, creatorUserId);
     }

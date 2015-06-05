@@ -16,8 +16,7 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import org.joda.time.DateTime;
-
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -28,6 +27,6 @@ public interface AlarmCallbackConfiguration {
     String getStreamId();
     String getType();
     Map<String, Object> getConfiguration();
-    DateTime getCreatedAt();
+    Date getCreatedAt();
     String getCreatorUserId();
 }
