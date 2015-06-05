@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -41,7 +42,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -203,5 +206,15 @@ public class AlarmCallbackConfigurationServiceMJImplTest {
         alarmCallbackConfigurationService.destroy(alarmCallback);
 
         assertEquals("After deletion, there should be only one document left in the collection", 1, alarmCallbackConfigurationService.count());
+    }
+
+    @Test
+    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "alarmCallbackConfigurationsSingleDocumentAfterUpdate.json")
+    public void testDocumentUpdate() throws Exception {
+        final Map<String, Object> configuration = new HashMap<String, Object>() {{ put("foo", "bar"); }};
+        final Map<String, Object> deltas = new HashMap<String, Object>() {{ put("configuration", configuration); }};
+
+        alarmCallbackConfigurationService.update("5400deadbeefdeadbeefaffe", "54e3deadbeefdeadbeefaffe", deltas);
     }
 }
