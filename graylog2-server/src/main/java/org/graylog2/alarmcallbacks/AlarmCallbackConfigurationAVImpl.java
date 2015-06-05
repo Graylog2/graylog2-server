@@ -24,11 +24,13 @@ import org.graylog2.database.CollectionName;
 import org.joda.time.DateTime;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
-@CollectionName("alarmcallbackconfiguration")
+@CollectionName("alarmcallbackconfigurations")
 public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackConfiguration {
     @JsonProperty("_id")
     @ObjectId
@@ -60,8 +62,18 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
                                                           @JsonProperty("stream_id") String streamId,
                                                           @JsonProperty("type") String type,
                                                           @JsonProperty("configuration") Map<String, Object> configuration,
-                                                          @JsonProperty("created_at") DateTime createdAt,
-                                                          @JsonProperty("creator_user_id") String creatorUserId) {
+                                                          @JsonProperty("created_at") Date createdAt,
+                                                          @JsonProperty("creator_user_id") String creatorUserId,
+                                                          @Nullable @JsonProperty("id") String redundantId) {
+        return new AutoValue_AlarmCallbackConfigurationAVImpl(id, streamId, type, configuration, new DateTime(createdAt), creatorUserId);
+    }
+
+    public static AlarmCallbackConfigurationAVImpl create(String id,
+                                                          String streamId,
+                                                          String type,
+                                                          Map<String, Object> configuration,
+                                                          DateTime createdAt,
+                                                          String creatorUserId) {
         return new AutoValue_AlarmCallbackConfigurationAVImpl(id, streamId, type, configuration, createdAt, creatorUserId);
     }
 }
