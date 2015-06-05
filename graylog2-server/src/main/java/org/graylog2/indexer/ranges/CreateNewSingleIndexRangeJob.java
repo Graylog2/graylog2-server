@@ -28,12 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     private static final Logger LOG = LoggerFactory.getLogger(CreateNewSingleIndexRangeJob.class);
     private final String indexName;
 
     public interface Factory {
-        public CreateNewSingleIndexRangeJob create(Deflector deflector, String indexName);
+        CreateNewSingleIndexRangeJob create(Deflector deflector, String indexName);
     }
 
     @AssistedInject
@@ -43,7 +45,7 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
         super(deflector, searches, activityWriter, indexRangeService);
-        this.indexName = indexName;
+        this.indexName = checkNotNull(indexName);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
             final Map<String, Object> range;
-            if (deflector.getCurrentActualTargetIndex().equals(indexName)) {
+            if (indexName.equals(deflector.getCurrentActualTargetIndex())) {
                 range = getDeflectorIndexRange(indexName);
             } else {
                 range = calculateRange(indexName);

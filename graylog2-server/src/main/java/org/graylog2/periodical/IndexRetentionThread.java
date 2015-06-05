@@ -117,7 +117,7 @@ public class IndexRetentionThread extends Periodical {
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> deflectorIndices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (deflector.getCurrentActualTargetIndex().equals(indexName)) {
+            if (indexName.equals(deflector.getCurrentActualTargetIndex())) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }

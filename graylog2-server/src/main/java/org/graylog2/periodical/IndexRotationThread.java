@@ -118,7 +118,7 @@ public class IndexRotationThread extends Periodical {
                 String currentTarget = deflector.getCurrentActualTargetIndex();
                 String shouldBeTarget = deflector.getNewestTargetName();
 
-                if (!currentTarget.equals(shouldBeTarget)) {
+                if (!shouldBeTarget.equals(currentTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
                     LOG.warn(msg);
                     activityWriter.write(new Activity(msg, IndexRotationThread.class));

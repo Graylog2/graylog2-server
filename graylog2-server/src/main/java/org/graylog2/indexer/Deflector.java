@@ -32,6 +32,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
@@ -281,6 +282,7 @@ public class Deflector { // extends Ablenkblech
         }
     }
 
+    @Nullable
     public String getCurrentActualTargetIndex() {
         return indices.aliasTarget(getName());
     }

@@ -115,7 +115,7 @@ public class RebuildIndexRangesJob extends SystemJob {
                 LOG.info("Index [{}] is empty, inserting dummy index range.", index);
                 Map<String, Object> emptyIndexRange = getDeflectorIndexRange(index);
 
-                if (deflector.getCurrentActualTargetIndex().equals(index)) {
+                if (index.equals(deflector.getCurrentActualTargetIndex())) {
                     LOG.info("Index [{}] is empty but it is the current deflector target. Inserting dummy index range.", index);
                 } else {
                     emptyIndexRange.put("start", 0);
