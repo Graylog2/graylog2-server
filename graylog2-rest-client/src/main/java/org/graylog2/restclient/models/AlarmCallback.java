@@ -26,9 +26,6 @@ import org.joda.time.DateTime;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AlarmCallback extends ConfigurableEntity {
     public interface Factory {
         AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummary response);
@@ -79,7 +76,7 @@ public class AlarmCallback extends ConfigurableEntity {
     }
 
     public DateTime getCreatedAt() {
-        return new DateTime(createdAt);
+        return createdAt == null ? null : new DateTime(createdAt);
     }
 
     public String getCreatorUserId() {
