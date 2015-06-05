@@ -61,10 +61,11 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
             final Map<String, Object> range;
-            if (deflector.getCurrentActualTargetIndex().equals(indexName))
-                range = calculateRange(indexName);
-            else
+            if (deflector.getCurrentActualTargetIndex().equals(indexName)) {
                 range = getDeflectorIndexRange(indexName);
+            } else {
+                range = calculateRange(indexName);
+            }
 
             final IndexRange indexRange = indexRangeService.create(range);
             indexRangeService.destroy(indexName);
