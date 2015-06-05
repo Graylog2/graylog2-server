@@ -24,7 +24,7 @@ var SearchResult = React.createClass({
     getInitialState() {
         var initialFields = SearchStore.fields;
         return {
-            selectedFields: initialFields,
+            selectedFields: this.sortFields(initialFields),
             sortField: SearchStore.sortField,
             sortOrder: SearchStore.sortOrder,
             showAllFields: false,
