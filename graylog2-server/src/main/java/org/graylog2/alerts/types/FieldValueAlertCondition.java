@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts.types;
 
+import autovalue.shaded.com.google.common.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +183,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
     @Override
     public List<Message> getSearchHits() {
-        return searchHits;
+        return Lists.newArrayList(searchHits);
     }
 }
