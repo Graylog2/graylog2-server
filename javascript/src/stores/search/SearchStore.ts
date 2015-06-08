@@ -213,14 +213,19 @@ class SearchStore {
     }
 
     static escape(searchTerm) {
-        var escapedTerm;
+        var escapedTerm = searchTerm;
 
-        if (this.isPhrase(searchTerm)) {
-            escapedTerm = String(searchTerm).replace(/\"/g, '\\"');
+        // Replace newlines.
+        escapedTerm = escapedTerm.replace(/\r\n/g, " ");
+        escapedTerm = escapedTerm.replace(/\n/g, " ");
+        escapedTerm = escapedTerm.replace(/<br>/g, " ");
+
+        if (this.isPhrase(escapedTerm)) {
+            escapedTerm = String(escapedTerm).replace(/\"/g, '\\"');
             escapedTerm = '"' + escapedTerm + '"';
         } else {
             // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-            escapedTerm = String(searchTerm).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+            escapedTerm = String(escapedTerm).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
         }
 
         return escapedTerm;

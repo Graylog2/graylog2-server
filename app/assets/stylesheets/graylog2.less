@@ -2920,8 +2920,6 @@ table.messages tr.message-row {
 
 table.messages tr.message-row .message-wrapper {
   line-height: 1.5em;
-  text-indent: -2em; /* As we remove extra empty spaces with pre-line, we want to make clear that this is the first line */
-  padding-left: 2em;
   white-space: pre-line;
   max-height: 6em; /* show 4 lines: line-height * 4 */
   overflow: hidden;
@@ -2931,8 +2929,8 @@ table.messages tr.message-row .message-wrapper:after {
   content: "";
   text-align: right;
   position: absolute;
-  left: 13px;
   width: 99%;
+  left: 5px;
   top: 4.5em;
   height: 1.5em;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
