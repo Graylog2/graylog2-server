@@ -2881,7 +2881,7 @@ span.blob {
 }
 
 .pagination-search-result ul {
-  margin: 0px;
+  margin: 0;
   margin-left: 100px;
 }
 
@@ -2907,7 +2907,7 @@ table.messages tr.fields-row td {
 
 table.messages tr.message-row td {
   border-top: 0;
-  padding-top: 0px;
+  padding-top: 0;
   padding-bottom: 5px;
   font-family: monospace;
   color: #16ace3;
@@ -2929,16 +2929,18 @@ table.messages tr.message-detail-row td {
 
 dl.message-details {
   margin-top: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 dl.message-details dt {
   font-weight: bold;
+  margin-left: 1px;
 }
 
 dl.message-details dd {
   margin-bottom: 5px;
   padding-bottom: 5px;
+  margin-left: 1px; /* Ensures that italic text is not cut */
 }
 
 dl.message-details-fields dd:not(:last-child) {

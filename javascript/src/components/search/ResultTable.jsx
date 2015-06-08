@@ -124,8 +124,8 @@ var ResultTable = React.createClass({
                     <thead>
                     <tr>
                         <th style={{width: 180}}>Timestamp {this._sortIcons("timestamp")}</th>
-                        { selectedColumns.map(selectedFieldName => <th key={selectedFieldName}
-                                                                       style={this._columnStyle(selectedFieldName)}>{selectedFieldName} {this._sortIcons(selectedFieldName) }</th>) }
+                        { selectedColumns.toSeq().map(selectedFieldName => <th key={selectedFieldName}
+                                                                               style={this._columnStyle(selectedFieldName)}>{selectedFieldName} {this._sortIcons(selectedFieldName) }</th>) }
                     </tr>
                     </thead>
                     { this.props.messages.map((message) => <MessageTableEntry key={message.id}

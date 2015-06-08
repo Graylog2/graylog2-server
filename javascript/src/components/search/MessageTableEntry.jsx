@@ -84,7 +84,7 @@ var MessageTableEntry = React.createClass({
                 <td><strong>
                     <time dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time>
                 </strong></td>
-                { this.props.selectedFields.map(selectedFieldName => <td
+                { this.props.selectedFields.toSeq().map(selectedFieldName => <td
                     key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }
             </tr>
 
