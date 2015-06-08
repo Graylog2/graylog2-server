@@ -98,4 +98,9 @@ public class NullUserServiceImpl implements UserService {
     public long count() {
         return 0;
     }
+
+    @Override
+    public int delete(String username) {
+        return 0;
+    }
 }

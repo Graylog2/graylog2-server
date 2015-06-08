@@ -35,12 +35,12 @@ import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
-import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.rest.models.users.responses.UserList;
+import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -99,7 +99,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
-                    @PathParam("username") String username) {
+                           @PathParam("username") String username) {
         final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
@@ -158,7 +158,7 @@ public class UsersResource extends RestResource {
         }
 
         final Startpage startpage = cr.startpage();
-        if(startpage != null) {
+        if (startpage != null) {
             user.setStartpage(startpage.type(), startpage.id());
         }
 
@@ -242,16 +242,9 @@ public class UsersResource extends RestResource {
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
-        if (user == null) {
+        if (userService.delete(username) == 0) {
             throw new NotFoundException();
         }
-
-        if (user.isReadOnly()) {
-            throw new BadRequestException("Cannot delete readonly user " + username);
-        }
-
-        userService.destroy(user);
     }
 
     @PUT
