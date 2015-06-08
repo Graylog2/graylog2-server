@@ -14,13 +14,14 @@ var WidgetHeader = React.createClass({
 
         return (
             <div>
-                <div className="widget-title">
-                    {this.props.title}
-                </div>
                 <div className="widget-update-info">
                     {loadErrorElement}
                     <span title={this.props.calculatedAt}>{moment(this.props.calculatedAt).fromNow()}</span>
                 </div>
+                <div className="widget-title">
+                    {this.props.title}
+                </div>
+                <div className="clearfix"></div>
             </div>
         );
     }
