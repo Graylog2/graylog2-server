@@ -21,7 +21,7 @@ var FieldQuickValues = React.createClass({
     },
 
     componentDidMount() {
-        this.updateIntervalId = window.setInterval(() => this._loadQuickValuesData(), 3000);
+        this.updateIntervalId = window.setInterval(() => this._loadQuickValuesData(true), 3000);
     },
     componentDidUpdate(oldProps, oldState) {
         if (this.state.field !== oldState.field) {
@@ -37,10 +37,14 @@ var FieldQuickValues = React.createClass({
         this.setState({autoReload: shouldAutoReload});
     },
     addFieldQuickValues(field) {
-        this.setState({field: field}, this._loadQuickValuesData);
+        this.setState({field: field}, () => this._loadQuickValuesData(false));
     },
-    _loadQuickValuesData() {
-        if (this.state.field !== undefined && this.state.autoReload) {
+    _loadQuickValuesData(autoReload) {
+        if (autoReload && !this.state.autoReload) {
+            return;
+        }
+
+        if (this.state.field !== undefined) {
             this.setState({loadPending: true});
             var promise = FieldQuickValuesStore.getQuickValues(this.state.field);
             promise.done((data) => this.setState({data: data, loadPending: false}));
