@@ -208,9 +208,22 @@ class SearchStore {
         }
     }
 
-    static escape(source) {
-        // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-        return String(source).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+    static isPhrase(searchTerm) {
+        return String(searchTerm).indexOf(" ") !== -1;
+    }
+
+    static escape(searchTerm) {
+        var escapedTerm;
+
+        if (this.isPhrase(searchTerm)) {
+            escapedTerm = String(searchTerm).replace(/\"/g, '\\"');
+            escapedTerm = '"' + escapedTerm + '"';
+        } else {
+            // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
+            escapedTerm = String(searchTerm).replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+        }
+
+        return escapedTerm;
     }
 
     queryContainsTerm(termInQuestion: string): boolean {
