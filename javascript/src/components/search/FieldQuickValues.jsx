@@ -83,7 +83,7 @@ var FieldQuickValues = React.createClass({
                     </div>
                     <h1>Quick Values for {this.state.field} {this.state.loadPending && <i className="fa fa-spin fa-spinner"></i>}</h1>
 
-                    <div>{inner}</div>
+                    <div style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
                 </div>
             );
         }
