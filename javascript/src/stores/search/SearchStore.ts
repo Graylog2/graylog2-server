@@ -295,13 +295,13 @@ class SearchStore {
     _reloadSearchWithNewParam(param: string, value: any) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set(param, value);
-        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
+        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
     }
 
     _reloadSearchWithNewParams(newParams: Immutable.Map<string, any>) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.merge(newParams);
-        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
+        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
     }
 
     getCsvExportURL(): string {
