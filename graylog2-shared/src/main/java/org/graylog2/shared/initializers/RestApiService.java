@@ -33,6 +33,7 @@ import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
@@ -281,7 +282,8 @@ public class RestApiService extends AbstractIdleService {
                     }
                 })
                 .registerFinder(new PackageNamesScanner(restControllerPackages, true))
-                .registerResources(additionalResources);
+                .registerResources(additionalResources)
+                .register(NodeIdResponseFilter.class);
 
         for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers) {
             rc.registerClasses(exceptionMapper);
