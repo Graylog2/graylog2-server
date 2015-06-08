@@ -69,10 +69,12 @@ var MessageFieldDescription = React.createClass({
             </SplitButton>
         </div>);
 
+        var className = this.props.fieldName === 'message' || this.props.fieldName === 'full_message' ? 'message-field' : '';
+
         return (
-            <dd key={this.props.fieldName + "dd"}>
+            <dd className={className} key={this.props.fieldName + "dd"}>
                 {fieldActions}
-                {this.props.possiblyHighlight(this.props.fieldName)}
+                <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
                 {this._shouldShowTerms() && <br />}
                 {this._shouldShowTerms() && <Alert bsStyle='info' onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>Field terms: {this._getFormattedTerms()}</Alert>}
             </dd>

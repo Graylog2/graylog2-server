@@ -90,7 +90,7 @@ var MessageTableEntry = React.createClass({
 
             {this.props.showMessageRow &&
             <tr className="message-row" onClick={this._toggleDetail}>
-                <td colSpan={colSpanFixup}>{this.possiblyHighlight('message')}</td>
+                <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message')}</div></td>
             </tr>
             }
             {this.props.expanded &&
