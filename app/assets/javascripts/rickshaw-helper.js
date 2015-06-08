@@ -51,9 +51,7 @@ rickshawHelper = {
     _normalizeHistogramNumber: function (number) {
         switch (number) {
             case "NaN":
-                return NaN;
             case "Infinity":
-                return 0;
             case "-Infinity":
                 return 0;
             default:
