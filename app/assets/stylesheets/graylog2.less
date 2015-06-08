@@ -1631,10 +1631,13 @@ dl.metric-histogram dd {
 }
 
 .dashboard .widget .widget-title {
-  display: inline-block;
   font-size: 18px;
-  text-align: left;
+  height: 25px;
+  margin-right: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .dashboard .widget .load-error {
@@ -1643,9 +1646,12 @@ dl.metric-histogram dd {
 }
 
 .dashboard .widget .widget-update-info {
+  text-align: right;
   float: right;
   font-size: 11px;
-  line-height: 20px;
+  height: 25px;
+  line-height: 25px;
+  width: 130px;
 }
 
 .dashboard .widget .configuration dt {
@@ -1661,11 +1667,10 @@ dl.metric-histogram dd {
 }
 
 .dashboard .widget .number .value {
-  line-height: 70px;
+  line-height: 90px;
   text-align: center;
   font-size: 70px;
   position: relative;
-  top: 20px;
 }
 
 .dashboard .widget .number .trend-indicators {
@@ -1697,7 +1702,6 @@ dl.metric-histogram dd {
 
 .dashboard .widget .quickvalues-visualization {
   height: 80%;
-  margin-top: 15px;
   overflow: auto;
 }
 
