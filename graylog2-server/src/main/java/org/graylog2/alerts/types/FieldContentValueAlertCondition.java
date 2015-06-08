@@ -17,7 +17,6 @@
 
 package org.graylog2.alerts.types;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;

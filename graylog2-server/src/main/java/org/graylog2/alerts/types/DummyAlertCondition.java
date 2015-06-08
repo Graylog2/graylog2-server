@@ -26,9 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class DummyAlertCondition extends AbstractAlertCondition {
     final String description = "Dummy alert to test notifications";
 
@@ -48,7 +45,7 @@ public class DummyAlertCondition extends AbstractAlertCondition {
 
     @Override
     public List<Message> getSearchHits() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
 }
