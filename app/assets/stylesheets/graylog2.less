@@ -2918,6 +2918,24 @@ table.messages tr.message-row {
   cursor: pointer;
 }
 
+table.messages tr.message-row .message-wrapper {
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em; /* show 4 lines: line-height * 4 */
+  overflow: hidden;
+}
+
+table.messages tr.message-row .message-wrapper:after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  width: 99%;
+  left: 5px;
+  top: 4.5em;
+  height: 1.5em;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
+}
+
 table.messages tr.message-detail-row {
   display: none;
 }
@@ -2925,6 +2943,11 @@ table.messages tr.message-detail-row {
 table.messages tr.message-detail-row td {
   padding-top: 5px;
   border-top: 0;
+}
+
+table.messages dl.message-details {
+  max-height: 800px;
+  overflow: auto;
 }
 
 dl.message-details {
@@ -2945,6 +2968,15 @@ dl.message-details dd {
 
 dl.message-details-fields dd:not(:last-child) {
   border-bottom: 1px solid #ececec;
+}
+
+dl.message-details-fields dd {
+  white-space: pre-wrap;
+}
+
+dl.message-details-fields dd.message-field .field-value {
+  max-height: 500px;
+  overflow: auto;
 }
 
 dl.message-details dd.stream-list ul {

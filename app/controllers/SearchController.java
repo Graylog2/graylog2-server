@@ -508,11 +508,15 @@ public class SearchController extends AuthenticatedController {
             final Input sourceInput = getSourceInput(sourceNode, message);
             final Input sourceRadioInput = getSourceInput(sourceRadio, message);
 
-            nodes.add(new NodeDescription(sourceNode));
+            if (sourceNode != null) {
+                nodes.add(new NodeDescription(sourceNode));
+            }
             if (sourceRadio != null) {
                 nodes.add(new NodeDescription(sourceRadio));
             }
-            inputs.add(new InputDescription(sourceInput));
+            if (sourceInput != null) {
+                inputs.add(new InputDescription(sourceInput));
+            }
             if (sourceRadioInput != null) {
                 inputs.add(new InputDescription(sourceRadioInput));
             }
@@ -560,6 +564,7 @@ public class SearchController extends AuthenticatedController {
         }
     }
 
+    @Nullable
     private Node getSourceNode(MessageResult m) {
         try {
             return nodeService.loadNode(m.getSourceNodeId());
@@ -570,6 +575,7 @@ public class SearchController extends AuthenticatedController {
         return null;
     }
 
+    @Nullable
     private Radio getSourceRadio(MessageResult m) {
         if (m.viaRadio()) {
             try {
@@ -582,6 +588,7 @@ public class SearchController extends AuthenticatedController {
         return null;
     }
 
+    @Nullable
     private static Input getSourceInput(Node node, MessageResult m) {
         if (node != null && isPermitted(RestPermissions.INPUTS_READ, m.getSourceInputId())) {
             try {
@@ -594,6 +601,7 @@ public class SearchController extends AuthenticatedController {
         return null;
     }
 
+    @Nullable
     private static Input getSourceInput(Radio radio, MessageResult m) {
         if (radio != null) {
             try {
