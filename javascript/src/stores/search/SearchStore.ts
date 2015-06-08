@@ -240,7 +240,7 @@ class SearchStore {
             return;
         }
         var newQuery = "";
-        if (typeof operator !== 'undefined' && this.query !== "") {
+        if (typeof operator !== 'undefined' && this.query !== "" && this.query !== "*") {
             newQuery = this.query + " " + operator + " ";
         }
         newQuery += term;
