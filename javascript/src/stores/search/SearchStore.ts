@@ -213,7 +213,7 @@ class SearchStore {
     }
 
     static escape(searchTerm) {
-        var escapedTerm = searchTerm;
+        var escapedTerm = String(searchTerm);
 
         // Replace newlines.
         escapedTerm = escapedTerm.replace(/\r\n/g, " ");
@@ -240,7 +240,7 @@ class SearchStore {
             return;
         }
         var newQuery = "";
-        if (typeof operator !== 'undefined' && this.query !== "") {
+        if (typeof operator !== 'undefined' && this.query !== "" && this.query !== "*") {
             newQuery = this.query + " " + operator + " ";
         }
         newQuery += term;
