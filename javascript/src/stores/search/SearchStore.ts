@@ -213,7 +213,7 @@ class SearchStore {
     }
 
     static escape(searchTerm) {
-        var escapedTerm = searchTerm;
+        var escapedTerm = String(searchTerm);
 
         // Replace newlines.
         escapedTerm = escapedTerm.replace(/\r\n/g, " ");
