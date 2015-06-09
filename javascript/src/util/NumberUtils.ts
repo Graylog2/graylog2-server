@@ -23,7 +23,14 @@ var NumberUtils = {
         } catch(e) {
             return number;
         }
-    }
+    },
+    formatPercentage(percentage) {
+        try {
+            return numeral(NumberUtils.normalizeNumber(percentage)).format("0.00%");
+        } catch (e) {
+            return percentage;
+        }
+    },
 };
 
 export = NumberUtils;

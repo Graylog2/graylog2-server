@@ -4,6 +4,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
+import StringUtils = require("../../util/StringUtils");
 
 interface Source {
     name: string;
@@ -15,6 +16,7 @@ var processSourcesData = (sources: Array<Source>): Array<Source> => {
     var total = 0;
     sources.forEach((d) => total += d.message_count);
     sources.forEach((d) => {
+        d.name = StringUtils.escapeHTML(d.name);
         d.percentage = d.message_count / total * 100;
     });
     return sources;

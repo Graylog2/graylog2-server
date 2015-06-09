@@ -1,14 +1,18 @@
 'use strict';
 
 var React = require('react');
+var Panel = require('react-bootstrap').Panel;
+var ListGroup = require('react-bootstrap').ListGroup;
+var ListGroupItem = require('react-bootstrap').ListGroupItem;
 
-var numeral = require('numeral');
 var crossfilter = require('crossfilter');
 var dc = require('dc');
 var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
+var StringUtils = require('../../util/StringUtils');
+var NumberUtils = require('../../util/NumberUtils');
 
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
@@ -47,7 +51,7 @@ var QuickValuesVisualization = React.createClass({
             var formattedTerms = terms.map((term) => {
                 var count = quickValues.terms[term];
                 return {
-                    term: term,
+                    term: StringUtils.escapeHTML(term),
                     count: count
                 };
             });
@@ -83,9 +87,9 @@ var QuickValuesVisualization = React.createClass({
             },
             (d) => {
                 var total = this.state.total - this.state.missing;
-                return this._formatPercentage(d.count / total);
+                return NumberUtils.formatPercentage(d.count / total);
             },
-            (d) => this._formatCount(d.count)
+            (d) => NumberUtils.formatNumber(d.count)
         ];
 
         if (this.props.displayAddToSearchButton) {
@@ -126,13 +130,13 @@ var QuickValuesVisualization = React.createClass({
         this.pieChart
             .dimension(this.dimension)
             .group(this.group)
-            .height(this.DEFAULT_PIE_CHART_SIZE)
-            .width(this.DEFAULT_PIE_CHART_SIZE)
             .renderLabel(false)
             .renderTitle(false)
             .slicesCap(this.NUMBER_OF_TOP_VALUES)
             .ordering((d) => d.value)
             .colors(D3Utils.glColourPalette());
+
+        this._setPieChartSize(this.DEFAULT_PIE_CHART_SIZE);
 
         D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
@@ -147,23 +151,15 @@ var QuickValuesVisualization = React.createClass({
         this.pieChart.render();
     },
     _formatGraphTooltip(d) {
-        var valueText = d.data.key + ": " + this._formatCount(d.value) + "<br>";
+        var valueText = d.data.key + ": " + NumberUtils.formatNumber(d.value) + "<br>";
 
         return "<div class=\"datapoint-info\">" + valueText + "</div>";
     },
-    _formatPercentage(percentage) {
-        try {
-            return numeral(percentage).format("0.00%");
-        } catch (e) {
-            return percentage;
-        }
-    },
-    _formatCount(count) {
-        try {
-            return numeral(count).format("0,0");
-        } catch (e) {
-            return count;
-        }
+    _setPieChartSize(newSize) {
+        this.pieChart
+            .width(newSize)
+            .height(newSize)
+            .radius(newSize / 2 - 5);
     },
     _resizeVisualization(width, height, showDataTable) {
         var computedSize;
@@ -176,10 +172,7 @@ var QuickValuesVisualization = React.createClass({
             }
 
             if (this.pieChart !== undefined && this.pieChart.width() !== computedSize) {
-                this.pieChart
-                    .width(computedSize)
-                    .height(computedSize)
-                    .radius(computedSize / 2);
+                this._setPieChartSize(computedSize);
                 this.triggerRender = true;
             }
         }
@@ -197,6 +190,23 @@ var QuickValuesVisualization = React.createClass({
                 this.pieChart.redraw();
             }
         }
+    },
+    _getTotalMessagesWithField() {
+        return this.state.total - this.state.missing;
+    },
+    _getAnalysisInformation() {
+        var analysisInformation = ["Found <em>" + NumberUtils.formatNumber(this._getTotalMessagesWithField()) + "</em> messages with this field"];
+
+        if (this.state.missing !== 0) {
+            var missingMessage = this.state.others === 0 ? " and" : "";
+            missingMessage += " <em>" + NumberUtils.formatNumber(this.state.missing) + "</em> messages without it";
+            analysisInformation.push(missingMessage);
+        }
+        if (this.state.others !== 0) {
+            analysisInformation.push(" and <em>" + NumberUtils.formatNumber(this.state.others) + "</em> other values");
+        }
+
+        return <span dangerouslySetInnerHTML={{__html: analysisInformation.join(",") + "."}}/>;
     },
     render() {
         var pieChartClassName;
@@ -221,12 +231,30 @@ var QuickValuesVisualization = React.createClass({
             dataTableClassName = 'hidden';
         }
 
+        var pieChart;
+        if (this.props.displayAnalysisInformation) {
+            pieChart = (
+                <Panel>
+                    <ListGroup fill>
+                        <ListGroupItem>
+                            <div ref="graph" className="quickvalues-graph"/>
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            {this._getAnalysisInformation()}
+                        </ListGroupItem>
+                    </ListGroup>
+                </Panel>
+            );
+        } else {
+            pieChart = <div ref="graph" className="quickvalues-graph"/>;
+        }
+
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
                 <div className="container-fluid">
                     <div className="row">
                         <div className={pieChartClassName} style={pieChartStyle}>
-                            <div ref="graph" className="quickvalues-graph"/>
+                            {pieChart}
                         </div>
                         <div className={dataTableClassName}>
                             <div className="quickvalues-table">

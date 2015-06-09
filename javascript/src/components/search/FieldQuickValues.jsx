@@ -64,7 +64,8 @@ var FieldQuickValues = React.createClass({
                                               horizontal={true}
                                               config={{show_pie_chart: true, show_data_table: true}}
                                               data={this.state.data}
-                                              displayAddToSearchButton={true}/>;
+                                              displayAddToSearchButton={true}
+                                              displayAnalysisInformation={true}/>;
         }
 
         if (this.state.field !== undefined) {
