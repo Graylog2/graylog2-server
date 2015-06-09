@@ -566,14 +566,17 @@
                 <version>2.3</version>
             </dependency>
 
-            <!--
-            This is required because natty currently doesn't work with
-            newer antlr-runtime versions, see https://github.com/joestelmach/natty/issues/60
-            -->
             <dependency>
-                <groupId>org.graylog2.repackaged</groupId>
+                <groupId>com.joestelmach</groupId>
                 <artifactId>natty</artifactId>
-                <version>0.8-1</version>
+                <version>0.11</version>
+                <exclusions>
+                    <!-- Getting rid of commons-logging in a transitive dependency of com.joestelmach:natty -->
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

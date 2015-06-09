@@ -215,7 +215,7 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog2.repackaged</groupId>
+            <groupId>com.joestelmach</groupId>
             <artifactId>natty</artifactId>
         </dependency>
 
@@ -312,23 +312,6 @@
             <artifactId>jukito</artifactId>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Getting rid of commons-logging in a transitive dependency of com.joestelmach:natty -->
-            <dependency>
-                <groupId>org.mnode.ical4j</groupId>
-                <artifactId>ical4j</artifactId>
-                <version>1.0.2</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
