@@ -23,7 +23,7 @@ var OutputComponent = React.createClass({
                 outputs: outputs
             });
             if (this.props.streamId) {
-                this._fetchAssignableOutputs();
+                this._fetchAssignableOutputs(outputs);
             }
         };
         if (this.props.streamId) {
@@ -35,12 +35,12 @@ var OutputComponent = React.createClass({
         OutputsStore.loadAvailableTypes((types) => {
             this.setState({types:types});
         });
-        this._fetchAssignableOutputs();
     },
     getInitialState() {
       return {
-          assignableOutputs: [],
-          types: {}
+          assignableOutputs: undefined,
+          types: undefined,
+          outputs: undefined
       };
     },
     _handleUpdate() {
@@ -58,10 +58,10 @@ var OutputComponent = React.createClass({
             }
         });
     },
-    _fetchAssignableOutputs() {
+    _fetchAssignableOutputs(outputs) {
         OutputsStore.load((allOutputs) => {
-            var streamOutputIds = this.state.outputs.map((output) => {return output.id;});
-            var outputs = allOutputs.filter((output) => {
+            var streamOutputIds = outputs.map((output) => {return output.id;});
+            var assignableOutputs = allOutputs.filter((output) => {
                 for (var i in streamOutputIds) {
                     if (output.id === streamOutputIds[i]) {
                         return false;
@@ -69,7 +69,7 @@ var OutputComponent = React.createClass({
                 }
                 return true;
             }).sort((output1, output2) => { return output1.title.localeCompare(output2.title);});
-            this.setState({assignableOutputs: outputs});
+            this.setState({assignableOutputs: assignableOutputs});
         });
     },
     _handleAssignOutput(outputId) {
