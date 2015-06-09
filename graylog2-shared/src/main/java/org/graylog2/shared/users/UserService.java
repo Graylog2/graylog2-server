@@ -26,6 +26,8 @@ import java.util.List;
 public interface UserService extends PersistedService {
     User load(String username);
 
+    int delete(String username);
+
     User create();
 
     List<User> loadAll();
