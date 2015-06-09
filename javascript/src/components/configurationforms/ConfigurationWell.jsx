@@ -20,8 +20,7 @@ var ConfigurationWell = React.createClass({
         var formattedItems = $.map(config, (value, key) => {
             value = (value === null || value === undefined || value === "" ? <i>{"<empty>"}</i> : String(value));
             return (<li key={id + "-" + key}>
-                <div className='key'>{key}:</div>
-                <div className='value'>{value}</div>
+                <div className='key'>{key}:</div> <div className='value'>{value}</div>
             </li>);
         });
 
