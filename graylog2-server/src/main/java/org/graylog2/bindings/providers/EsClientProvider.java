@@ -16,24 +16,29 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
+import org.graylog2.indexer.elasticsearch.GlobalTimeoutClient;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
 public class EsClientProvider implements Provider<Client> {
     private final Node node;
+    private final Duration requestTimeout;
 
     @Inject
-    public EsClientProvider(Node node) {
+    public EsClientProvider(Node node, @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.node = node;
+        this.requestTimeout = requestTimeout;
     }
 
     @Override
     public Client get() {
-        return node.client();
+        return new GlobalTimeoutClient(node.client(), requestTimeout.getQuantity(), requestTimeout.getUnit());
     }
 }
