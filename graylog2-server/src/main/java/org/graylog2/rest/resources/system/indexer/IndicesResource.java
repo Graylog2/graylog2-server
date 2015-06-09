@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
@@ -182,7 +183,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
-    public void close(@ApiParam(name = "index") @PathParam("index") String index) {
+    public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if (!deflector.isGraylog2Index(index)) {
@@ -190,7 +191,7 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException();
         }
 
-        if (deflector.getCurrentActualTargetIndex().equals(index)) {
+        if (index.equals(deflector.getCurrentActualTargetIndex())) {
             throw new ForbiddenException();
         }
 
@@ -216,7 +217,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
-    public void delete(@ApiParam(name = "index") @PathParam("index") String index) {
+    public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
         if (!deflector.isGraylog2Index(index)) {
@@ -225,7 +226,7 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException(msg);
         }
 
-        if (deflector.getCurrentActualTargetIndex().equals(index)) {
+        if (index.equals(deflector.getCurrentActualTargetIndex())) {
             throw new ForbiddenException();
         }
 
