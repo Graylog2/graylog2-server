@@ -146,15 +146,16 @@ $(document).ready(function () {
         insertSpinner($graphContainer);
 
         // Delete a possibly already existing graph to manage updates.
-        $('.field-graph-y-axis', $graphContainer).html("");
-        $('.field-graph', $graphContainer).html("");
+        var $graphElement = $('.field-graph', $graphContainer);
+        var $graphYAxis = $('.field-graph-y-axis', $graphContainer);
+        $graphElement.html("");
+        $graphYAxis.html("");
 
         $.ajax({
             url: appPrefixed('/a/search/fieldhistogram'),
             data: params,
             success: function (data) {
-                var $graphElement = $('.field-graph', $graphContainer);
-                var $graphYAxis = $('.field-graph-y-axis', $graphContainer);
+                $graphYAxis.show();
 
                 $("ul", $graphContainer).attr("data-field", field);
 
@@ -299,6 +300,9 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
+                    $graphYAxis.hide();
+                    var alert = $('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
+                    $graphElement.append(alert);
                     showError("Loading field graph for '" + opts.field + "' failed with status: " + data.status);
                 }
             },
@@ -403,7 +407,11 @@ $(document).ready(function () {
     });
 
     function chartOptionsFromContainer(cc) {
-        return JSON.parse(cc.attr("data-lines"));
+        try {
+            return JSON.parse(cc.attr("data-lines"));
+        } catch (e) {
+            return getDefaultOptions();
+        }
     }
 
     function changeGraphConfig(graphContainer, key, value) {

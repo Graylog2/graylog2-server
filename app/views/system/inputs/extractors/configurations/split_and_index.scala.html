@@ -10,7 +10,7 @@
 
 @index_value = @{
     if(extractor == null) {
-        0
+        1
     } else {
         extractor.getExtractorConfig.get("index")
     }
@@ -35,7 +35,7 @@
     <label for="index">Target index:</label>
     <div class="row">
         <div class="col-md-5">
-            <input name="index" id="index" type="number" class="form-control" value="@index_value" required />
+            <input name="index" id="index" type="number" class="form-control" value="@index_value" min="1" required />
         </div>
     </div>
     <span class="help-block">
