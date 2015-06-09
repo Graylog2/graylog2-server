@@ -9,6 +9,7 @@ var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
+var StringUtils = require('../../util/StringUtils');
 
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
@@ -47,7 +48,7 @@ var QuickValuesVisualization = React.createClass({
             var formattedTerms = terms.map((term) => {
                 var count = quickValues.terms[term];
                 return {
-                    term: term,
+                    term: StringUtils.escapeHTML(term),
                     count: count
                 };
             });
