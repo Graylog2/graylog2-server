@@ -21,7 +21,7 @@ package lib.notifications;
 
 import org.graylog2.restclient.models.Notification;
 import org.graylog2.restclient.models.SystemJob;
-import views.helpers.NotificationHelper;
+import views.helpers.DocsHelper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class EsOpenFilesNotification implements NotificationType {
             "open file limit (current limit: <em>%d</em> on <em>%s</em>; should be at least 64000) This will " +
             "be causing problems that can be hard to diagnose. " +
             "Read how to raise the maximum number of open files in " +
-            NotificationHelper.linkToKnowledgeBase("setup/elasticsearch", "the Elasticsearch setup documentation.");
+            DocsHelper.linkToDocs("setup/elasticsearch", "the Elasticsearch setup documentation.");
 
     private final Notification notification;
 

@@ -3,7 +3,7 @@ package lib.notifications;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.Notification;
 import org.graylog2.restclient.models.SystemJob;
-import views.helpers.NotificationHelper;
+import views.helpers.DocsHelper;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class StreamProcessingDisabledNotification implements NotificationType {
                 + "</em> has taken too long for " + faultCount + " times. "
                 + "To protect the stability of message processing, this stream has been disabled. "
                 + "Please correct the stream rules and reenable the stream."
-                + " Check " + NotificationHelper.linkToKnowledgeBase("general/streams", "this article")
+                + " Check " + DocsHelper.linkToDocs("streams.html#stream-processing-runtime-limits", "the documentation.")
                 + " for more details.";
 
     }

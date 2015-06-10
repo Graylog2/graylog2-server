@@ -36,7 +36,8 @@
             <div class="alert alert-info">
                 <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
                 <strong>@radio.getLifecycle</strong>
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                <span class="pull-right">@views.html.partials.links.docs.render("load_balancers.html", "What does this mean?")</span>
             </div>
         </div>
 
@@ -44,12 +45,14 @@
         @if(radio.lbAlive()) {
             <div class="alert alert-success">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                <span class="pull-right">@views.html.partials.links.docs.render("load_balancers.html", "What does this mean?")</span>
             </div>
         } else {
             <div class="alert alert-danger">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                <span class="pull-right">@views.html.partials.links.docs.render("load_balancers.html", "What does this mean?")</span>
             </div>
         }
         </div>

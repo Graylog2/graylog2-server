@@ -26,6 +26,6 @@
         @clusterHealth.getRelocatingShards relocating,
         @clusterHealth.getUnassignedShards unassigned
 
-        &nbsp;@partials.support.bubble("general/elasticsearch-cluster-status-explained")
+        @views.html.partials.links.docs.render("configuring_es.html#cluster-status-explained", "What does this mean?")
     </div>
 }
