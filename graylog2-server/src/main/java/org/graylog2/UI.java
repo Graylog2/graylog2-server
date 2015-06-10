@@ -16,14 +16,11 @@
  */
 package org.graylog2;
 
+import org.graylog2.plugin.DocsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UI {
-
-    private static final String HELP_DOCS = "http://docs.graylog.org/";
-    private static final String HELP_COMMUNITY = "https://www.graylog.org/community-support/";
-    private static final String HELP_COMMERCIAL = "https://www.graylog.com/support/";
 
     private static final Logger LOG = LoggerFactory.getLogger(UI.class);
 
@@ -44,9 +41,9 @@ public class UI {
         sb.append("ERROR: ").append(msg).append("\n\n");
 
         sb.append("Need help?").append("\n\n");
-        sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
-        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
-        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
+        sb.append("* Official documentation: ").append(DocsHelper.HELP_DOCS).append("\n");
+        sb.append("* Community support: ").append(DocsHelper.HELP_COMMUNITY).append("\n");
+        sb.append("* Commercial support: ").append(DocsHelper.HELP_COMMERCIAL).append("\n");
 
         if (docLinks != null && docLinks.length > 0) {
             sb.append("\n").append("But we also got some specific help " +
