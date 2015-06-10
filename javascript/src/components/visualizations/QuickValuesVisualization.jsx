@@ -18,6 +18,7 @@ var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
     DEFAULT_PIE_CHART_SIZE: 200,
     getInitialState() {
+        this.filters = [];
         this.triggerRender = true;
         this.dcGroupName = "quickvalue-" + this.props.id;
         this.quickValuesData = crossfilter();
@@ -178,9 +179,23 @@ var QuickValuesVisualization = React.createClass({
             }
         }
     },
+    _clearDataFilters() {
+        if (this.pieChart !== undefined) {
+            this.filters = this.pieChart.filters();
+            this.pieChart.filterAll();
+        }
+    },
+    _restoreDataFilters() {
+        if (this.pieChart !== undefined) {
+            this.filters.forEach((filter) => this.pieChart.filter(filter));
+            this.filters = [];
+        }
+    },
     drawData() {
+        this._clearDataFilters();
         this.quickValuesData.remove();
         this.quickValuesData.add(this.state.terms);
+        this._restoreDataFilters();
         this.dataTable.redraw();
 
         if (this.props.config['show_pie_chart']) {
