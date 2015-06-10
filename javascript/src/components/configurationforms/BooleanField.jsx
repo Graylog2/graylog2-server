@@ -9,7 +9,7 @@ var BooleanField = React.createClass({
             typeName: this.props.typeName,
             field: this.props.field,
             title: this.props.title,
-            value: (this.props.value === undefined ? this.props.default_value : this.props.value)
+            value: (this.props.value === undefined ? this.props.field.default_value : this.props.value)
         };
     },
     componentWillReceiveProps(props) {
