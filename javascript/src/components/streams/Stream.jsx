@@ -58,7 +58,7 @@ var Stream = React.createClass({
         }
 
         var toggleStreamLink = null;
-        if (this.isPermitted(permissions, ["streams:changestate:" + stream.id])) {
+        if (this.isAnyPermitted(permissions, ["streams:changestate:" + stream.id, "streams:edit:" + stream.id])) {
             if (stream.disabled) {
                 toggleStreamLink = (<a className="btn btn-success toggle-stream-button" onClick={this._onResume}>Start stream</a>);
             } else {
