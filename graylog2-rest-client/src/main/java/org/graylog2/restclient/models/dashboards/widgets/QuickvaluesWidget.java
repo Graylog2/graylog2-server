@@ -25,7 +25,8 @@ import java.util.Map;
 public class QuickvaluesWidget extends DashboardWidget {
 
     private static final int DEFAULT_WIDTH = 1;
-    private static final int DEFAULT_HEIGHT = 2;
+    private static final int DEFAULT_HEIGHT_SINGLE_REPRESENTATION = 2;
+    private static final int DEFAULT_HEIGHT_MULTIPLE_REPRESENTATIONS = 3;
 
     private final String field;
     private final String streamId;
@@ -64,6 +65,10 @@ public class QuickvaluesWidget extends DashboardWidget {
         return config;
     }
 
+    private int getDefaultHeight() {
+        return (showDataTable && showPieChart) ? DEFAULT_HEIGHT_MULTIPLE_REPRESENTATIONS : DEFAULT_HEIGHT_SINGLE_REPRESENTATION;
+    }
+
     @Override
     public int getWidth() {
         int storedWidth = super.getWidth();
@@ -73,7 +78,7 @@ public class QuickvaluesWidget extends DashboardWidget {
     @Override
     public int getHeight() {
         int storedHeight = super.getHeight();
-        return storedHeight == 0 ? DEFAULT_HEIGHT : storedHeight;
+        return storedHeight == 0 ? this.getDefaultHeight() : storedHeight;
     }
 
     @Override
