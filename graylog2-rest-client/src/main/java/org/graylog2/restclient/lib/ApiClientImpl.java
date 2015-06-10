@@ -603,6 +603,11 @@ class ApiClientImpl implements ApiClient {
                 final ListenableFuture<Response> future = context.listenableFuture;
                 try {
                     final Response response = future.get(timeoutValue, timeoutUnit);
+                    if(response == null) {
+                        LOG.error("Didn't receive response from node {}", node);
+                        node.markFailure();
+                        continue;
+                    }
                     node.touch();
                     final T result = handleResponse(context.request, response);
                     results.put(node, result);
