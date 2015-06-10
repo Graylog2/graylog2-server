@@ -17,7 +17,7 @@ var AlarmCallback = React.createClass({
     },
     render() {
         var alarmCallback = this.props.alarmCallback;
-        var humanReadableType = (this._typeNotAvailable() ? <i>Unknown alarm callback</i> : this.props.types[alarmCallback.type].name);
+        var humanReadableType = (this._typeNotAvailable() ? <i>Unknown alarm callback ({alarmCallback.type})</i> : this.props.types[alarmCallback.type].name);
         var editAlarmCallbackButton = (this.isPermitted(this.props.permissions, ["streams:edit:"+this.props.streamId]) ?
             <EditAlarmCallbackButton disabled={this._typeNotAvailable()} alarmCallback={alarmCallback} types={this.props.types}
                                      streamId={this.props.streamId} onUpdate={this.props.updateAlarmCallback} /> : null);
@@ -26,6 +26,8 @@ var AlarmCallback = React.createClass({
         var alert = (this._typeNotAvailable() ? <Alert bsStyle="danger">
                 The plugin required for this alarm callback is not loaded. Editing it is not possible. Please load the plugin or delete the alarm callback.
             </Alert> : null);
+        var configurationWell = (this._typeNotAvailable() ? null : <ConfigurationWell configuration={alarmCallback.configuration}
+                                                                                      typeDefinition={this.props.types[alarmCallback.type]} />);
         return (
             <div className="alert-callback" data-destination-id={alarmCallback.id}>
                 <Row style={{marginBottom: 0}}>
@@ -49,7 +51,7 @@ var AlarmCallback = React.createClass({
                 <Row style={{marginBottom: 0}}>
                     <Col md={12}>
                         {alert}
-                        <ConfigurationWell configuration={alarmCallback.configuration}/>
+                        {configurationWell}
                     </Col>
                 </Row>
 
