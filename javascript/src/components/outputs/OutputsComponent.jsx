@@ -23,7 +23,7 @@ var OutputComponent = React.createClass({
                 outputs: outputs
             });
             if (this.props.streamId) {
-                this._fetchAssignableOutputs();
+                this._fetchAssignableOutputs(outputs);
             }
         };
         if (this.props.streamId) {
@@ -35,12 +35,9 @@ var OutputComponent = React.createClass({
         OutputsStore.loadAvailableTypes((types) => {
             this.setState({types:types});
         });
-        this._fetchAssignableOutputs();
     },
     getInitialState() {
       return {
-          assignableOutputs: [],
-          types: {}
       };
     },
     _handleUpdate() {
@@ -58,18 +55,13 @@ var OutputComponent = React.createClass({
             }
         });
     },
-    _fetchAssignableOutputs() {
+    _fetchAssignableOutputs(outputs) {
         OutputsStore.load((allOutputs) => {
-            var streamOutputIds = this.state.outputs.map((output) => {return output.id;});
-            var outputs = allOutputs.filter((output) => {
-                for (var i in streamOutputIds) {
-                    if (output.id === streamOutputIds[i]) {
-                        return false;
-                    }
-                }
-                return true;
-            }).sort((output1, output2) => { return output1.title.localeCompare(output2.title);});
-            this.setState({assignableOutputs: outputs});
+            var streamOutputIds = outputs.map((output) => {return output.id;});
+            var assignableOutputs = allOutputs
+                .filter((output) => { return streamOutputIds.indexOf(output.id) === -1; })
+                .sort((output1, output2) => { return output1.title.localeCompare(output2.title);});
+            this.setState({assignableOutputs: assignableOutputs});
         });
     },
     _handleAssignOutput(outputId) {
@@ -88,7 +80,7 @@ var OutputComponent = React.createClass({
     _removeOutputFromStream(outputId, streamId) {
         if (window.confirm("Do you really want to remove this output from the stream?")) {
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
-                UserNotification.success("Output was removed output from stream.", "Success");
+                UserNotification.success("Output was removed from stream.", "Success");
                 this._handleUpdate();
             });
         }
@@ -99,16 +91,16 @@ var OutputComponent = React.createClass({
         });
     },
     render() {
-        if (this.state.outputs && this.state.types) {
+        if (this.state.outputs && this.state.types && (!this.props.streamId || this.state.assignableOutputs)) {
             var permissions = this.props.permissions;
             var streamId = this.props.streamId;
             var createOutputDropdown = (this.isPermitted(permissions, ["outputs:create"]) ?
                 <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
-                                      getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : "");
+                                      getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : null);
             var assignOutputDropdown = (streamId ?
                 <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId}
                                       outputs={this.state.assignableOutputs}
-                                      onSubmit={this._handleAssignOutput}/> : "");
+                                      onSubmit={this._handleAssignOutput}/> : null);
             return (<div className="outputs">
                 <Row className="content">
                     <Col md={4}>
