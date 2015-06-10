@@ -136,7 +136,7 @@ var QuickValuesVisualization = React.createClass({
             .ordering((d) => d.value)
             .colors(D3Utils.glColourPalette());
 
-        this._setPieChartSize(this.DEFAULT_PIE_CHART_SIZE);
+        this._resizeVisualization(this.props.width, this.props.height, this.props.config['show_data_table']);
 
         D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
@@ -159,7 +159,9 @@ var QuickValuesVisualization = React.createClass({
         this.pieChart
             .width(newSize)
             .height(newSize)
-            .radius(newSize / 2 - 5);
+            .radius(newSize / 2 - 10);
+
+        this.triggerRender = true;
     },
     _resizeVisualization(width, height, showDataTable) {
         var computedSize;
@@ -173,7 +175,6 @@ var QuickValuesVisualization = React.createClass({
 
             if (this.pieChart !== undefined && this.pieChart.width() !== computedSize) {
                 this._setPieChartSize(computedSize);
-                this.triggerRender = true;
             }
         }
     },
