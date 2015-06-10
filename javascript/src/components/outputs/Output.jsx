@@ -30,6 +30,7 @@ var Output = React.createClass({
     _typeNotAvailable() {
         return (this.props.types[this.props.output.type] == undefined);
     },
+    /* jshint +W116 */
     getInitialState() {
         return {};
     },
@@ -38,7 +39,6 @@ var Output = React.createClass({
             this.setState({typeDefinition: typeDefinition});
         });
     },
-    /* jshint +W116 */
     render() {
         if (this.state.typeDefinition) {
             var output = this.props.output;
