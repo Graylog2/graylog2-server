@@ -102,7 +102,9 @@ var MessageDetail = React.createClass({
         var streamIds = Immutable.Set(this.props.message['stream_ids']);
         var streams = streamIds.map((id) => {
             var stream = this.props.streams.get(id);
-            return <li key={stream.id}><StreamLink stream={stream}/></li>;
+            if (stream !== undefined) {
+                return <li key={stream.id}><StreamLink stream={stream}/></li>;
+            }
         });
 
         var viaRadio = this.props.message['source_radio_id'];
