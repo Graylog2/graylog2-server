@@ -6,7 +6,7 @@ var React = require('react/addons');
 var StreamThroughput = require('./StreamThroughput');
 var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');
-var CollapsableStreamRuleList = require('../streamrules/CollapsableStreamRuleList');
+var CollapsibleStreamRuleList = require('../streamrules/CollapsibleStreamRuleList');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
@@ -96,7 +96,7 @@ var Stream = React.createClass({
 
                         , {this._formatNumberOfStreamRules(stream)}
 
-                        <CollapsableStreamRuleList key={'streamRules-'+stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+                        <CollapsibleStreamRuleList key={'streamRules-'+stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
                                                    permissions={this.props.permissions}/>
                     </div>
                 </div>

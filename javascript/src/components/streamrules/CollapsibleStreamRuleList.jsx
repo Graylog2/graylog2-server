@@ -2,16 +2,16 @@
 
 var React = require('react/addons');
 var StreamRuleList = require('./StreamRuleList');
-var CollapsableMixin = require('react-bootstrap').CollapsableMixin;
+var CollapsibleMixin = require('react-bootstrap').CollapsibleMixin;
 var Alert = require('react-bootstrap').Alert;
 
-var CollapsableStreamRuleList = React.createClass({
-    mixins: [CollapsableMixin],
-    getCollapsableDOMNode: function(){
+var CollapsibleStreamRuleList = React.createClass({
+    mixins: [CollapsibleMixin],
+    getCollapsibleDOMNode: function(){
         return React.findDOMNode(this.refs.well);
     },
 
-    getCollapsableDimensionValue: function(){
+    getCollapsibleDimensionValue: function(){
         return React.findDOMNode(this.refs.well).scrollHeight;
     },
     onHandleToggle: function(e){
@@ -19,7 +19,7 @@ var CollapsableStreamRuleList = React.createClass({
         this.setState({expanded:!this.state.expanded});
     },
     render() {
-        var styles = this.getCollapsableClassSet();
+        var styles = this.getCollapsibleClassSet();
         var text = this.isExpanded() ? 'Hide' : 'Show';
 
         return (
@@ -34,4 +34,4 @@ var CollapsableStreamRuleList = React.createClass({
     }
 });
 
-module.exports = CollapsableStreamRuleList;
+module.exports = CollapsibleStreamRuleList;

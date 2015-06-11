@@ -4,7 +4,7 @@
 
 var React = require('react');
 var Navbar = require('react-bootstrap').Navbar;
-var CollapsableNav = require('react-bootstrap').CollapsableNav;
+var CollapsibleNav = require('react-bootstrap').CollapsibleNav;
 var Nav = require('react-bootstrap').Nav;
 var NavItem = require('react-bootstrap').NavItem;
 var DropdownButton = require('react-bootstrap').DropdownButton;
@@ -32,7 +32,7 @@ var Navigation = React.createClass({
         </a>);
         return (
             <Navbar brand={brand} inverse fluid fixedTop toggleNavKey={0}>
-                <CollapsableNav eventKey={0}>
+                <CollapsibleNav eventKey={0}>
                     <Nav navbar>
                         {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
                             <NavItem href={jsRoutes.controllers.SearchController.index().url}
@@ -74,7 +74,7 @@ var Navigation = React.createClass({
                         </NavItem>
                         <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
                     </Nav>
-                </CollapsableNav>
+                </CollapsibleNav>
             </Navbar>
         );
     },
