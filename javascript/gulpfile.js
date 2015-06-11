@@ -9,8 +9,8 @@ var watchify = require('watchify');
 var react = require('gulp-react');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
-var rm = require('gulp-rimraf');
-var rimraf = require('rimraf');
+var del = require('del');
+var vinylPaths = require('vinyl-paths');
 var rev = require('gulp-rev');
 var handlebars = require('gulp-compile-handlebars');
 var runSequence = require('run-sequence');
@@ -64,11 +64,11 @@ gulp.task('replace-rev-prod', function() {
 
 gulp.task('clean', function () {
     return gulp.src('dist/*')
-        .pipe(rm());
+        .pipe(vinylPaths(del));
 });
 
 gulp.task('clean-target', function (callback) {
-    rimraf(config.deployDirJs, callback);
+    del(config.deployDirJs, {force: true}, callback);
 });
 
 gulp.task('prepare-lint', ['clean'], function () {
