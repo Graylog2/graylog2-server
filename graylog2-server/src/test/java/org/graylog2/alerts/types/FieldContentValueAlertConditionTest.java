@@ -23,14 +23,17 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.graylog2.Configuration;
+import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertConditionTest;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeImpl;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -41,9 +44,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -131,6 +132,30 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final AlertCondition.CheckResult result = alertService.triggered(condition);
 
         assertNotTriggered(result);
+    }
+
+    @Test
+    public void testCorrectUsageOfRelativeRange() throws Exception {
+        final Stream stream = mock(Stream.class);
+        final Searches searches = mock(Searches.class);
+        final Configuration configuration = mock(Configuration.class);
+        final SearchResult searchResult = mock(SearchResult.class);
+        final int alertCheckInterval = 42;
+        final RelativeRange relativeRange = new RelativeRange(alertCheckInterval);
+
+        when(configuration.getAlertCheckInterval()).thenReturn(alertCheckInterval);
+
+        when(searches.search(anyString(),
+                anyString(),
+                eq(relativeRange),
+                anyInt(),
+                anyInt(),
+                any(Sorting.class))).thenReturn(searchResult);
+
+        final FieldContentValueAlertCondition alertCondition = new FieldContentValueAlertCondition(searches, configuration, stream,
+                null, DateTime.now(), "mockuser", Collections.<String,Object>emptyMap());
+
+        final AbstractAlertCondition.CheckResult result = alertCondition.runCheck();
     }
 
     protected FieldContentValueAlertCondition getCondition(Map<String, Object> parameters) {
