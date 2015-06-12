@@ -17,6 +17,16 @@ var NumberUtils = {
                 return number;
         }
     },
+    normalizeGraphNumber(number) {
+        switch (number) {
+            case "NaN":
+            case "Infinity":
+            case "-Infinity":
+                return 0;
+            default:
+                return number;
+        }
+    },
     formatNumber(number) {
         try {
             return numeral(NumberUtils.normalizeNumber(number)).format('0,0.[00]');

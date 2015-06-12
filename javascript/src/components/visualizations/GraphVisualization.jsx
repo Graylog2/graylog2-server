@@ -11,6 +11,7 @@ var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
 var StringUtils = require('../../util/StringUtils');
+var NumberUtils = require('../../util/NumberUtils');
 
 var GraphFactory = {
     create(config, domNode, tooltipTitleFormatter) {
@@ -67,14 +68,23 @@ var GraphVisualization = React.createClass({
     },
     componentDidMount() {
         this.renderGraph();
-        this.setState({dataPoints: this.props.data}, this.drawData);
+        this.setState({dataPoints: this._normalizeData(this.props.data)}, this.drawData);
 
     },
     componentWillReceiveProps(nextProps) {
         if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
             this._resizeVisualization(nextProps.width, nextProps.height);
         }
-        this.setState({dataPoints: nextProps.data}, this.drawData);
+        this.setState({dataPoints: this._normalizeData(nextProps.data)}, this.drawData);
+    },
+    _normalizeData(data) {
+        if (data === null || data === undefined || !Array.isArray(data)) {
+            return;
+        }
+        return data.map((dataPoint) => {
+            dataPoint.y = NumberUtils.normalizeGraphNumber(dataPoint.y);
+            return dataPoint;
+        });
     },
     renderGraph() {
         var graphDomNode = React.findDOMNode(this);
