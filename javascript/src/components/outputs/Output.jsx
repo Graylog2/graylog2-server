@@ -35,12 +35,14 @@ var Output = React.createClass({
         return {};
     },
     componentDidMount() {
-        this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
-            this.setState({typeDefinition: typeDefinition});
-        });
+        if (!this._typeNotAvailable()) {
+            this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
+                this.setState({typeDefinition: typeDefinition});
+            });
+        }
     },
     render() {
-        if (this.state.typeDefinition) {
+        if (this._typeNotAvailable() || this.state.typeDefinition) {
             var output = this.props.output;
             var deleteButton = (this.props.streamId && this.isPermitted(this.props.permissions, ["stream_outputs:delete"]) ? this._deleteFromStreamButton(output) : null);
 
