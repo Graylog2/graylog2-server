@@ -97,6 +97,8 @@ public class AlertScannerThread extends Periodical {
                         alertService.save(alert);
 
                         final List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
+
+                        // Checking if alarm callbacks have been defined
                         if (callConfigurations.size() > 0)
                             for (AlarmCallbackConfiguration configuration : callConfigurations) {
                                 final AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
@@ -107,6 +109,10 @@ public class AlertScannerThread extends Periodical {
                                 }
                             }
                         else {
+                            /* Using e-mail alarm callback per default if there are no alarm callbacks configured explicitly.
+                               This way we are supporting users who have upgraded from an old version where alarm callbacks
+                               were non-existent. It also helps for users who forgot to set up alarm callbacks for newly
+                               created alert conditions. */
                             emailAlarmCallback.call(stream, result);
                         }
                     } else {
