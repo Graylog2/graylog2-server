@@ -37,8 +37,13 @@ public class OutputsApiController extends AuthenticatedController {
     }
 
     public Result available(String outputType) throws APIException, IOException {
-        final AvailableOutputSummary result = outputService.available().types.get(outputType);
-        return ok(Json.toJson(result));
+        final Map<String, AvailableOutputSummary> types = outputService.available().types;
+        final AvailableOutputSummary result = types.get(outputType);
+        if (result != null) {
+            return ok(Json.toJson(result));
+        } else {
+            return notFound();
+        }
     }
 
     public Result availableTypes() throws APIException, IOException {
