@@ -4,6 +4,8 @@ var React = require('react/addons');
 var FieldHelpers = require('./FieldHelpers');
 
 var NumberField = React.createClass({
+    MAX_SAFE_INTEGER: (Number.MAX_SAFE_INTEGER !== undefined ? Number.MAX_SAFE_INTEGER : Math.pow(2,53)-1),
+    MIN_SAFE_INTEGER: (Number.MIN_SAFE_INTEGER !== undefined ? Number.MIN_SAFE_INTEGER : -1*(Math.pow(2,53)-1)),
     getInitialState() {
         return {
             typeName: this.props.typeName,
@@ -17,8 +19,8 @@ var NumberField = React.createClass({
     },
     mapValidationAttribute(attribute) {
         switch(attribute.toLocaleUpperCase()) {
-            case "ONLY_NEGATIVE": return {min: Number.MIN_SAFE_INTEGER, max: -1};
-            case "ONLY_POSITIVE": return {min: 0, max: Number.MAX_SAFE_INTEGER};
+            case "ONLY_NEGATIVE": return {min: this.MIN_SAFE_INTEGER, max: -1};
+            case "ONLY_POSITIVE": return {min: 0, max: this.MAX_SAFE_INTEGER};
             case "IS_PORT_NUMBER": return {min: 0, max: 65535};
             default: return {};
         }
