@@ -52,6 +52,7 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
+import org.jboss.netty.channel.socket.DefaultDatagramChannelConfig;
 import org.jboss.netty.channel.socket.ServerSocketChannelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,23 +133,28 @@ public abstract class NettyTransport implements Transport {
 
         try {
             bootstrap = getBootstrap();
-
             bootstrap.setPipelineFactory(getPipelineFactory(handlerList));
 
             // sigh, bindable bootstraps do not share a common interface
+            int receiveBufferSize;
             if (bootstrap instanceof ConnectionlessBootstrap) {
                 acceptChannel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
+
+                final DefaultDatagramChannelConfig channelConfig = (DefaultDatagramChannelConfig) acceptChannel.getConfig();
+                receiveBufferSize = channelConfig.getReceiveBufferSize();
             } else if (bootstrap instanceof ServerBootstrap) {
                 acceptChannel = ((ServerBootstrap) bootstrap).bind(socketAddress);
 
-
                 final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) acceptChannel.getConfig();
-                if (channelConfig.getReceiveBufferSize() != getRecvBufferSize()) {
-                    log.warn("receiveBufferSize (SO_RCVBUF) for {} should be {} but is {}.", acceptChannel, getRecvBufferSize(), channelConfig.getReceiveBufferSize());
-                }
+                receiveBufferSize = channelConfig.getReceiveBufferSize();
             } else {
-                log.error("Unknown netty bootstrap class returned: {}. Cannot safely bind.", bootstrap);
+                log.error("Unknown Netty bootstrap class returned: {}. Cannot safely bind.", bootstrap);
                 throw new IllegalStateException("Unknown netty bootstrap class returned: " + bootstrap + ". Cannot safely bind.");
+            }
+
+            if (receiveBufferSize != getRecvBufferSize()) {
+                log.warn("receiveBufferSize (SO_RCVBUF) for input {} should be {} but is {}.",
+                        input, getRecvBufferSize(), receiveBufferSize);
             }
         } catch (Exception e) {
             throw new MisfireException(e);
