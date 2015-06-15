@@ -12,6 +12,7 @@ var numeral = require('numeral');
 
 var SourceTitle = require('./SourceTitle');
 var UniversalSearch = require('../../logic/search/UniversalSearch');
+var StringUtils = require('../../util/StringUtils');
 
 var SourceDataTable = React.createClass({
     getInitialState() {
@@ -23,7 +24,7 @@ var SourceDataTable = React.createClass({
         var addToSearchButton = document.createElement('button');
         addToSearchButton.className = 'btn btn-xs btn-default dc-search-button';
         addToSearchButton.title = 'Add to search query';
-        addToSearchButton.setAttribute('data-source', source);
+        addToSearchButton.setAttribute('data-source', StringUtils.unescapeHTML(source));
         addToSearchButton.innerHTML = "<i class='fa fa-search-plus'></i>";
 
         return addToSearchButton.outerHTML;

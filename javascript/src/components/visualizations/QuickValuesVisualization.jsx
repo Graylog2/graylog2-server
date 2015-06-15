@@ -69,7 +69,7 @@ var QuickValuesVisualization = React.createClass({
         var addToSearchButton = document.createElement('button');
         addToSearchButton.className = 'btn btn-xs btn-default';
         addToSearchButton.title = 'Add to search query';
-        addToSearchButton.setAttribute('data-term', term);
+        addToSearchButton.setAttribute('data-term', StringUtils.unescapeHTML(term));
         addToSearchButton.innerHTML = "<i class='fa fa-search-plus'></i>";
 
         return addToSearchButton.outerHTML;
