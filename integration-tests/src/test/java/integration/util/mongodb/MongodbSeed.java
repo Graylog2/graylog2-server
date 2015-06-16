@@ -137,7 +137,7 @@ public class MongodbSeed {
 
         MongoClient mongoClient = new MongoClient(
                 URI.create(System.getProperty("gl2.baseuri", "http://localhost")).getHost(),
-                27017 );
+                Integer.parseInt(System.getProperty("mongodb.port", "27017")));
 
         mongoClient.dropDatabase(dbName);
         MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
