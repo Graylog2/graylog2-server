@@ -13,6 +13,13 @@ var ExtractorExampleMessage = React.createClass({
     componentWillMount() {
         this.setState({example: this.props.example});
     },
+    onExampleLoaded(message) {
+        var newExample = message.fields[this.props.field];
+
+        if (newExample !== null && newExample !== undefined && newExample !== "") {
+            this.setState({example: newExample});
+        }
+    },
     render() {
         var originalMessage = <span id="xtrc-original-example" style={{display:"none"}}>{this.state.example}</span>;
         var messagePreview;
