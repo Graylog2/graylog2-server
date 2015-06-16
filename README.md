@@ -24,8 +24,11 @@ $ activator run
 
 * Install [node.js](http://nodejs.org/) and npm.
 * `cd javascript/`
-* `npm install`
-* `node_modules/.bin/gulp watch`
+* `npm run watch`
+
+The `npm run watch` command will do a `npm install` if needed, and run the `gulp watch` task immediately afterwards.
+In order to make switching between different branches faster, we use a script to store all `node_modules` folders
+into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
 
 When using IntelliJ or WebStorm, be sure to enable `JSX harmony` (available in IntelliJ 14 and WebStorm 9)
 as JavaScript language version to properly support react templates.

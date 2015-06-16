@@ -6,7 +6,9 @@
   "license": "GPL",
   "scripts": {
     "build": "./node_modules/.bin/gulp deploy-prod",
-    "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js"
+    "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js",
+    "prepare-dev": "./tools/prepare-dev",
+    "watch": "./tools/prepare-dev && ./node_modules/.bin/gulp watch"
   },
   "dependencies": {
     "crossfilter": "1.3.x",
