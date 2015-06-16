@@ -1,5 +1,4 @@
 {
-  "id" : "collectorId",
   "node_id" : "nodeId",
   "node_details" : {
     "operating_system" : "Integration Test OS"
