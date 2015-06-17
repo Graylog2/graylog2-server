@@ -21,177 +21,6 @@ $(document).ready(function() {
             .tooltip('show');
     });
 
-    Mousetrap.bind('>', function() {
-        if ($(".messages").size() == 0) {
-            return;
-        }
-        if (e.preventDefault) {
-            e.preventDefault();
-        } else {
-            // internet explorer
-            e.returnValue = false;
-        }
-
-        var row = $(".messages tbody > tr.message-highlighted");
-        var nextRow;
-        if (row != undefined && row.size() > 0) {
-            nextRow = row.closest('tr').next();
-        } else {
-            nextRow = $(".messages tbody tr").first();
-        }
-
-
-        $('html,body').animate({ scrollTop: nextRow.offset().top - ( $(window).height() - nextRow.outerHeight(true) ) / 2  }, 200);
-
-        messageId = nextRow.attr("data-message-id");
-        index = nextRow.attr("data-source-index");
-    });
-
-    Mousetrap.bind('<', function() {
-        if ($(".messages").size() == 0) {
-            return;
-        }
-        if (e.preventDefault) {
-            e.preventDefault();
-        } else {
-            // internet explorer
-            e.returnValue = false;
-        }
-
-        var row = $(".messages tbody > tr.message-highlighted");
-        var prevRow = row.closest('tr').prev();
-
-        $('html,body').animate({ scrollTop: prevRow.offset().top - ( $(window).height() - prevRow.outerHeight(true) ) / 2  }, 200);
-
-        messageId = prevRow.attr("data-message-id");
-        index = prevRow.attr("data-source-index");
-    });
-
-
-	// Adding more fields to the message result table.
-	$(".field-selector").bind("change", function() {
-		hash = $(this).attr("data-field-hash");
-		td = $(".result-td-" + hash);
-		th = $("#result-th-" + hash);
-        var fieldname = $(this).data("field-name");
-
-        var details = $("table.messages tr.message-detail-row td");
-        var message = $("table.messages tr.message-row td");
-        var colspan = parseInt(details.attr("colspan"));
-
-        if ($(this).is(':checked')) {
-            // show field
-            searchViewState.addField(fieldname);
-			th.show();
-			td.show();
-
-            details.attr("colspan", colspan+1);
-            message.attr("colspan", colspan+1);
-		} else {
-            // hide field
-            searchViewState.removeField(fieldname);
-            th.hide();
-			td.hide();
-
-            details.attr("colspan", colspan-1);
-            message.attr("colspan", colspan-1);
-        }
-	});
-
-
-    // initialize searchViewState from query fragment if present (for bookmarks and link sharing of a current page)
-    (function(){
-        var uri = new URI();
-        var fragment = uri.fragment(true);
-        if (fragment["fields"] !== undefined) {
-            if (fragment["fields"].length > 0) {
-                var fields = fragment["fields"].split(",");
-
-                var activeFields = 0;
-                for (var i = 0; i < fields.length; i++) {
-                    $(".field-selector[data-field-name="+fields[i]+"]").each(function(){
-                        if (!$(this).is(":checked")) {
-                            $(this).trigger("click"); // tick the checkbox if it wasn't checked before
-                            activeFields+=1;
-                        }
-                    });
-                }
-            }
-        }
-    })();
-
-    // turn on all pre-selected fields
-    $(".field-selector[checked]").each(function() {
-        searchViewState.addField($(this).data("field-name"));
-    });
-
-    $(".search-view-state").click(function(e) {
-        var fields = searchViewState.getFieldsString();
-        if (fields === undefined || fields.length === 0) {
-            // don't add the fields parameter if nothing is field in
-            return true;
-        }
-        // replace the href with our version containing the selected fields
-        var href = $(this).attr("href");
-        var uri = new URI(href);
-        uri.removeQuery("fields");
-        uri.addQuery("fields", fields);
-        $(this).attr("href", uri.toString());
-    });
-
-    $(".fields-set-chooser").click(function(e) {
-        e.preventDefault();
-        var setName = $(this).data('fields-set');
-        var fields = searchViewState.getFields();
-        var i = 0;
-        var field;
-
-        switch (setName) {
-            case "none":
-                for (i = 0; i < fields.length; i++) {
-                    field = fields[i];
-                    $(".field-selector[data-field-name="+field+"]").each(function(){
-                        if ($(this).is(":checked")) {
-                            $(this).trigger("click");
-                        }
-                    });
-                }
-                break;
-            case "default":
-                // iterate over all selected fields, and turn them off, except if it's source or message
-                for (i = 0; i < fields.length; i++) {
-                    field = fields[i];
-                    if (field === "source" || field === "message") {
-                        // leave source and message turned on
-                        continue;
-                    }
-                    $(".field-selector[data-field-name="+field+"]").each(function(){
-                        if ($(this).is(":checked")) {
-                            $(this).trigger("click");
-                        }
-                    });
-                }
-                // make sure source and message are on
-                $("#field-selector-36cd38f49b9afa08222c0dc9ebfe35eb, #field-selector-78e731027d8fd50ed642340b7c9a63b3").each(function(){
-                    if (!$(this).is(":checked")) {
-                        $(this).trigger("click");
-                    }
-                });
-                break;
-            case "all":
-                // for 'all' only toggle the page we are on, we don't need to toggle _all_ fields
-                var selectedPage = $(".search-result-fields").attr("data-selected");
-                $("." + selectedPage + " > .field-selector").each(function() {
-                    // turn those fields on that aren't checked.
-                    if (!$(this).is(":checked")) {
-                        $(this).trigger("click");
-                    }
-                });
-                break;
-            default: console.log("Error, unknown fields set " + setName);
-        }
-    });
-
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
     $(window).resize(function() {
@@ -405,19 +234,9 @@ $(document).ready(function() {
     });
     toggleSessionTimeoutEditableState($("#session-timeout-never").is(":checked"));
 
-    // Universalsearch validation.
-    $("#universalsearch").on("submit", function() {
-        return validate("#universalsearch");
-    });
-
     // Submit button confirmation.
     $('input[data-confirm], button[data-confirm], a[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));
-    });
-
-    // Paginator disabled links should not trigger anything.
-    $(".pagination .disabled a").on("click", function() {
-       return false;
     });
 
     // Show log level metrics.
@@ -452,105 +271,6 @@ $(document).ready(function() {
         });
     });
 
-    // Show configured stream rules in streams list.
-    $("ul.streams li.stream .trigger-stream-rules").on("click", function(e) {
-        e.preventDefault();
-
-        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest("ul.streams li.stream").attr("data-stream-id") + '"]').find("div.streamrules-details");
-
-        if (rules.is(":visible")) {
-            rules.hide();
-            $(".fa", this).removeClass("fa-caret-up");
-            $(".fa", this).addClass("fa-caret-down");
-            $("span", this).text("show rules");
-        } else {
-            rules.show();
-            $(".fa", this).removeClass("fa-caret-down");
-            $(".fa", this).addClass("fa-caret-up");
-            $("span", this).text("hide rules");
-        }
-    });
-
-    // Create a search on the fly.
-    $(document).on("click", ".search-link", function(e) {
-        e.preventDefault();
-
-        var field = $(this).attr("data-field");
-        var value = $(this).attr("data-value");
-        var operator = $(this).attr("data-search-link-operator") || "AND";
-
-        // Check if both required fields are properly set.
-        if (field == undefined || value == undefined || field == "" || value == "") {
-            return;
-        }
-
-        // Replace newlines.
-        value = value.replace(/\n/g, " ");
-        value = value.replace(/<br>/g, " ");
-
-        // If its a search phase we need to wrap it really good.
-        if (value.indexOf(" ") >= 0) {
-            value = "\"" + value + "\"";
-        } else {
-            // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-            value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
-            value = value.replace(/\//g, "\\/");
-            value = value.replace(/\+/g, "\\+");
-            value = value.replace(/-/g, "\\-");
-            value = value.replace(/!/g, "\\!");
-            value = value.replace(/\\^/g, "\\^");
-            value = value.replace(/"/g, "\\\"");
-            value = value.replace(/~/g, "\\~");
-            value = value.replace(/\*/g, "\\*");
-            value = value.replace(/\?/g, "\\?");
-            value = value.replace(/:/g, "\\:");
-            value = value.replace(/\|\|/g, "\\|\\|");
-            value = value.replace(/&&/g, "\\&\\&");
-            value = value.replace(/\[/g, "\\[");
-            value = value.replace(/\]/g, "\\]");
-            value = value.replace(/\(/g, "\\(");
-            value = value.replace(/\)/g, "\\)");
-            value = value.replace(/\{/g, "\\{");
-            value = value.replace(/\}/g, "\\}");
-        }
-
-        var ourQuery = field + ":" + value;
-        var query = $("#universalsearch-query");
-
-        if (e.shiftKey) {
-            // Shift key was pressed. Negate!
-            ourQuery = "NOT " + ourQuery;
-        }
-
-        if (e.altKey) {
-            // CTRL key was pressed. Search immediately!
-            query.val(ourQuery);
-            query.effect("bounce", { complete: function() {
-                $("#universalsearch form").submit();
-            }});
-        } else {
-            scrollToSearchbarHint();
-            query.effect("bounce");
-            var originalQuery = query.val();
-
-            // if query already includes this one, do not add it!
-            if (originalQuery.indexOf(ourQuery) >= 0) {
-                return;
-            }
-
-            // If the query is "*", replace it fully. Makes no sense to generate "* AND foo:bar". (even though it would work)
-            if ($.trim(originalQuery) == "*" || $.trim(originalQuery) == "") {
-                query.val(ourQuery);
-            } else {
-                query.val(originalQuery + " " + operator + " " + ourQuery)
-            }
-        }
-    });
-
-    $("#scroll-to-search-hint, #scroll-to-search-hint i").on("click", function() {
-        $("html, body").animate({ scrollTop: 0 }, "fast");
-    });
-
     $(".metrics-filter").on("keyup", function() {
         var val = $(this).val();
 
@@ -565,10 +285,6 @@ $(document).ready(function() {
     $(".metric-list li .name .open").on("click", function(e) {
         e.preventDefault();
         $('.metric-list li .metric[data-metricname="' + $(this).attr("data-metricname") + '"]').toggle();
-    });
-
-    $("#global-throughput").on("click", function() {
-        window.location.href = appPrefixed("/system");
     });
 
     $(".toggle-fullscreen").on("click", function(e) {
@@ -623,74 +339,11 @@ $(document).ready(function() {
         }
     });
 
-    $(".nolink").on("live", function(e) {
-        e.preventDefault();
-    });
-
-    $(".message-result-fields-range .page").on("click", function(e) {
-        e.preventDefault();
-
-        $(".search-result-fields li.search-result-field-type").hide();
-        $(".search-result-fields li.page").show();
-
-        $(".message-result-fields-search input").val("");
-
-        $(".message-result-fields-range a").css("font-weight", "normal");
-        $(".search-result-fields").attr("data-selected", "page");
-        $(this).css("font-weight", "bold");
-    });
-
-    $(".message-result-fields-range .all").on("click", function(e) {
-        e.preventDefault();
-
-        $(".search-result-fields li.search-result-field-type").hide();
-        $(".search-result-fields li.all").show();
-
-        $(".message-result-fields-search input").val("");
-
-        $(".message-result-fields-range a").css("font-weight", "normal");
-        $(".search-result-fields").attr("data-selected", "all");
-        $(this).css("font-weight", "bold");
-    });
-
-    $(".message-result-fields-search input").on("keyup", function(e) {
-        var val = $(this).val();
-        $(".search-result-fields li.search-result-field-type").hide();
-
-        $(".search-result-fields li.search-result-field-type").each(function(i) {
-            if ($(".field-name", $(this)).text().match(new RegExp("^" + val + ".*", "g"))) {
-                if ($(this).hasClass($(".search-result-fields").attr("data-selected"))) {
-                    $(this).show();
-                }
-            }
-        });
-    });
-
     $(".closed-indices").on("click", function() {
         $("ul", $(this)).show();
         $(".show-indices", $(this)).hide();
         $(this).off("click");
         $(this).css("cursor", "auto");
-    });
-
-    $(".sources-range").on("change", function() {
-        var loc = new URI(window.location);
-        loc.setQuery("range", $(this).val());
-        window.location.href = loc.href();
-    });
-
-    $(".sources").dynatable({
-        readers: {
-            'messageCount': function(el, record) {
-                return Number(el.innerHTML) || 0;
-            }
-        },
-        inputs: {
-            perPageText: "Per page: "
-        },
-        dataset: {
-            perPageDefault: 50
-        }
     });
 
     $('table.indexer-failures').dynatable({
@@ -750,51 +403,9 @@ $(document).ready(function() {
         return false;
     });
 
-    function scrollToSearchbarHint() {
-        if ($(document).scrollTop() > 50) {
-            $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
-        }
-    }
-
-	function addParameterToCurrentUrl(key, value) {
-	    key = escape(key);
-	    value = escape(value);
-
-	    var kvp = document.location.search.substr(1).split('&');
-
-	    var i = kvp.length;
-	    var x;
-	    while (i--)  {
-	    	x = kvp[i].split('=');
-
-	    	if (x[0]==key) {
-	    		x[1] = value;
-	    		kvp[i] = x.join('=');
-	    		break;
-	    	}
-	    }
-
-	    if (i<0) {
-	    	kvp[kvp.length] = [key,value].join('=');
-	    }
-
-	    return kvp.join('&');
-	}
-
     function onResizedWindow(){
         redrawGraphs();
     }
-
-    $(".remove-stream").on("click", function(event) {
-        var result = confirm("Really delete stream?");
-        if (result) {
-            var elem = $(this).closest(".stream-row");
-            var url = event.currentTarget.attributes["data-removeUrl"].value; // url already prefixed in template
-            $.post(url, {}, function() {
-                elem.fadeOut();
-            });
-        }
-    });
 
     $("input.input-global-checkbox").on("click", function(event) {
         var form = $(this).closest("form");
@@ -844,14 +455,6 @@ $(document).ready(function() {
             $(element).prop("checked", true);
         });
     });
-
-    $("table.messages tr.fields-row, table.messages tr.message-row").on("click", function() {
-        var messageId = $(this).attr("data-message-id");
-        $("table.messages tr.message-detail-row[data-message-id=" + messageId + "]").toggle();
-
-        $("table.messages tbody[data-message-id=" + messageId + "]").toggleClass("message-group-toggled");
-    });
-
 });
 
 function showError(message) {
@@ -928,32 +531,6 @@ function redrawGraphs() {
         fieldGraphs[field].configure({ width: $(".field-graph-components > div.field-graph.rickshaw_graph:first").width() });
         fieldGraphs[field].render();
     }
-}
-
-function originalUniversalSearchSettings(searchViewState) {
-    var result = {};
-
-    result.query =  $("#universalsearch-query-permanent").text().trim();
-    result.rangeType = $("#universalsearch-rangetype-permanent").text().trim();
-
-    switch(result.rangeType) {
-        case "relative":
-            result.relative = $("#universalsearch-relative-permanent").text().trim();
-            break;
-        case "absolute":
-            result.from = $("#universalsearch-from-permanent").text().trim();
-            result.to = $("#universalsearch-to-permanent").text().trim();
-            break;
-        case "keyword":
-            result.keyword = $("#universalsearch-keyword-permanent").text().trim();
-            break;
-    }
-
-    if (searchViewState) {
-        result.fields = searchViewState.getFieldsString();
-    }
-
-    return result;
 }
 
 function isNumber(n) {
@@ -1035,57 +612,6 @@ fieldGraphs = {};
 
 // All dashboards.
 globalDashboards = {};
-
-// contains selected fields etc
-searchViewState = {
-    fields: {},
-
-    addField: function(name) {
-        this.fields[name] = true;
-        this.updateFragment();
-    },
-    removeField: function(name) {
-        delete this.fields[name];
-        this.updateFragment();
-    },
-    setSelectedFields: function(fieldsArray) {
-        // reset the fields first
-        this.fields = {};
-        for (var idx = 0; idx < fieldsArray.length; idx++) {
-            this.fields[fieldsArray[idx]] = true;
-        }
-        this.updateFragment();
-    },
-    getFields: function() {
-        return Object.keys(this.fields);
-    },
-    getOrderedFields: function() {
-        // order the fields as shown on the messages table
-        var fields = this.getFields().sort(function(a, b){
-            var tableHeaders = $("table.messages th[id^=result-th]:visible");
-            for (i=0; i < tableHeaders.length; i++) {
-                var content = $(tableHeaders[i]).text();
-                var cleanContent = content.trim().toLowerCase();
-                if (cleanContent == a) {
-                    return -1;
-                }
-                if (cleanContent == b) {
-                    return 1;
-                }
-            }
-            return 0;
-        });
-        return fields;
-    },
-    getFieldsString: function() {
-        return this.getOrderedFields().join(",");
-    },
-    updateFragment: function() {
-        var uri = new URI();
-        uri.fragment({fields: this.getFieldsString()});
-        document.location.href = uri.toString();
-    }
-};
 
 function appPrefixed(url) {
     return gl2AppPathPrefix + url;
