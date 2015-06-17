@@ -25,7 +25,6 @@ import org.bson.BSONDecoder;
 import org.bson.BSONObject;
 import org.bson.BasicBSONDecoder;
 import org.bson.Document;
-import org.testng.TestException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -60,10 +59,10 @@ public class MongodbSeed {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            throw new TestException("Can not open BSON input file.", e);
+            throw new RuntimeException("Can not open BSON input file.", e);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            throw new TestException("Can not parse BSON data.", e);
+            throw new RuntimeException("Can not parse BSON data.", e);
         } catch (IOException e) {
             //EOF
         }

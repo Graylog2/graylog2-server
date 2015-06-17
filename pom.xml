@@ -47,6 +47,7 @@
         <module>graylog2-rest-client</module>
         <module>graylog2-bootstrap</module>
         <module>graylog2-rest-models</module>
+        <module>integration-tests</module>
     </modules>
 
     <organization>
@@ -1190,17 +1191,6 @@
                     </plugin>
                 </plugins>
             </reporting>
-        </profile>
-        <profile>
-            <id>integration-tests</id>
-            <activation>
-                <property>
-                    <name>gl2.integration.tests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>integration-tests</module>
-            </modules>
         </profile>
     </profiles>
 </project>

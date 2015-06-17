@@ -19,7 +19,7 @@ package integration.system.inputs;
 import integration.BaseRestTest;
 import integration.MongoDbSeed;
 import integration.RequiresVersion;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -37,8 +37,9 @@ public class InputsTest extends BaseRestTest {
                     .statusCode(400).statusLine(notNullValue());
     }
 
-    @Test(dependsOnMethods = "createInputTest")
+    @Test
     public void listInput() {
+        createInputTest();
         given().when().get("/system/inputs").then().statusCode(200);
     }
 }

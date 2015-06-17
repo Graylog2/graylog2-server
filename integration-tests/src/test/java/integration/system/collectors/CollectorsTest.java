@@ -19,7 +19,7 @@ package integration.system.collectors;
 import integration.BaseRestTest;
 import integration.RequiresVersion;
 import org.joda.time.DateTime;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.assertj.jodatime.api.Assertions.assertThat;
 
 @RequiresVersion(">=1.1.0")
 public class CollectorsTest extends BaseRestTest {

@@ -17,7 +17,7 @@
 package integration.counts;
 
 import integration.BaseRestTest;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 

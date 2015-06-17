@@ -18,7 +18,7 @@ package integration.system.grok;
 
 import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -44,8 +44,9 @@ public class GrokTests extends BaseRestTest {
             ));
     }
     
-    @Test(dependsOnMethods = "createGrokPattern")
+    @Test
     public void listPatterns() {
+        createGrokPattern();
         // we have just created one pattern, so we should find it again.
         given().when()
                 .get("/system/grok/{patternid}", id)
@@ -59,8 +60,9 @@ public class GrokTests extends BaseRestTest {
             ));
     }
     
-    @Test(dependsOnMethods = "listPatterns")
+    @Test
     public void deletePattern() {
+        createGrokPattern();
         given()
             .when()
                 .delete("/system/grok/{patternid}", id)
