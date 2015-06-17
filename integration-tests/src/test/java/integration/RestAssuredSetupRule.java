@@ -36,11 +36,6 @@ public class RestAssuredSetupRule extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
-        if (System.getProperty("gl2.integration.tests") == null) {
-            // TODO: properly skip execution
-            throw new RuntimeException("Not running REST API integration tests. Add -Dgl2.integration.tests to run them.");
-        }
-
         final GraylogControl graylogController = new GraylogControl();
         final URL url = graylogController.getUrl();
         RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();

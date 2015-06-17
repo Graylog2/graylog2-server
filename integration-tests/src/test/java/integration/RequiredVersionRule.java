@@ -62,17 +62,4 @@ public class RequiredVersionRule implements MethodRule {
             return base;
         }
     }
-
-    class IgnoreStatement extends Statement {
-        private final String message;
-
-        public IgnoreStatement(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void evaluate() throws Throwable {
-            Assume.assumeTrue(this.message, false);
-        }
-    }
 }
