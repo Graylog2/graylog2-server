@@ -40,7 +40,7 @@ GET           /streams/:stream_id/edit                                          
 POST          /streams/:stream_id/update                                                         @controllers.StreamsController.update(stream_id: String)
 GET           /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStreamForm(stream_id: String)
 POST          /streams/:stream_id/clone                                                          @controllers.StreamsController.cloneStream(stream_id: String)
-GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
+GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Int ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
 GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)
