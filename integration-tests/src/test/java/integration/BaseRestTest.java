@@ -22,6 +22,7 @@ import org.junit.Rule;
 public class BaseRestTest extends BaseRestTestHelper {
     @ClassRule public static RunIfProperty runIfProperty = new RunIfProperty("gl2.integration.tests");
     @ClassRule public static RestAssuredSetupRule restAssuredSetupRule = new RestAssuredSetupRule();
+    @Rule public RequiresAuthenticationRule requiresAuthenticationRule = new RequiresAuthenticationRule(restAssuredSetupRule);
     @Rule public RequiredVersionRule requiredVersionRule = new RequiredVersionRule(restAssuredSetupRule);
     @Rule public MongoDbSeedRule mongoDbSeedRule = new MongoDbSeedRule();
 }

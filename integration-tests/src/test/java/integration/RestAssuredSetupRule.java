@@ -18,6 +18,7 @@ package integration;
 
 import com.github.zafarkhaja.semver.Version;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.authentication.AuthenticationScheme;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.config.MatcherConfig;
 import integration.util.graylog.GraylogControl;
@@ -33,6 +34,7 @@ import static com.jayway.restassured.http.ContentType.JSON;
 
 public class RestAssuredSetupRule extends ExternalResource {
     private static Version serverUnderTestVersion;
+    private AuthenticationScheme authenticationScheme;
 
     @Override
     protected void before() throws Throwable {
@@ -41,7 +43,7 @@ public class RestAssuredSetupRule extends ExternalResource {
         RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();
         RestAssured.port = url.getPort();
         String[] userInfo = url.getUserInfo().split(":");
-        RestAssured.authentication = preemptive().basic(userInfo[0], userInfo[1]);
+        authenticationScheme = preemptive().basic(userInfo[0], userInfo[1]);
 
         // we want all the details for failed tests
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
@@ -55,6 +57,7 @@ public class RestAssuredSetupRule extends ExternalResource {
 
         // immediately query the server for its version number, we need it to be able to process the RequireVersion annotations.
         given().when()
+                    .authentication().preemptive().basic(userInfo[0], userInfo[1])
                     .get("/system")
                 .then()
                     .body("version", new BaseMatcher<Object>() {
@@ -83,5 +86,9 @@ public class RestAssuredSetupRule extends ExternalResource {
 
     public Version getServerUnderTestVersion() {
         return serverUnderTestVersion;
+    }
+
+    public AuthenticationScheme getAuthenticationScheme() {
+        return authenticationScheme;
     }
 }

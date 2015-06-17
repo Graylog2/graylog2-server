@@ -17,7 +17,6 @@
 package integration;
 
 import com.github.zafarkhaja.semver.Version;
-import org.junit.Assume;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;

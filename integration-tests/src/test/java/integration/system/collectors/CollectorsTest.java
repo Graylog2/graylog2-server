@@ -17,6 +17,7 @@
 package integration.system.collectors;
 
 import integration.BaseRestTest;
+import integration.RequiresAuthentication;
 import integration.RequiresVersion;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -56,6 +57,7 @@ public class CollectorsTest extends BaseRestTest {
     }
 
     @Test
+    @RequiresAuthentication
     public void testListCollectors() throws Exception {
         given().when()
                     .get(resourcePrefix)
@@ -65,8 +67,10 @@ public class CollectorsTest extends BaseRestTest {
     }
 
     @Test
+    @RequiresAuthentication
     public void testGetCollector() throws Exception {
         given().when()
+                    .auth().none()
                     .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
                     .put(getResourceEndpoint("getCollectorTest"))
@@ -84,10 +88,13 @@ public class CollectorsTest extends BaseRestTest {
     }
 
     @Test
+    @RequiresAuthentication
     public void testTouchCollector() throws Exception {
         final String collectorId = "testTouchCollectorId";
+        final String collectorId2 = "testTouchCollectorId2";
 
         given().when()
+                    .auth().none()
                     .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
                     .put(getResourceEndpoint(collectorId))
@@ -97,15 +104,17 @@ public class CollectorsTest extends BaseRestTest {
         final DateTime lastSeenBefore = getLastSeenForCollectorId(collectorId);
 
         given().when()
+                    .auth().none()
                     .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResource("test-register-collector.json"))
-                    .put(getResourceEndpoint(collectorId))
+                    .put(getResourceEndpoint(collectorId2))
                 .then()
                     .statusCode(202);
 
         final DateTime lastSeenAfterOtherRegistration = getLastSeenForCollectorId(collectorId);
 
         given().when()
+                    .auth().none()
                     .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
                     .put(getResourceEndpoint(collectorId))

@@ -18,6 +18,7 @@ package integration.system.inputs;
 
 import integration.BaseRestTest;
 import integration.MongoDbSeed;
+import integration.RequiresAuthentication;
 import integration.RequiresVersion;
 import org.junit.Test;
 
@@ -25,6 +26,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @RequiresVersion(">=0.90.0")
+@RequiresAuthentication
 public class InputsTest extends BaseRestTest {
 
     @Test
