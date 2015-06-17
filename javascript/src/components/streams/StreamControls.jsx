@@ -14,20 +14,24 @@ var StreamControls = React.createClass({
     getInitialState() {
         return {};
     },
-    _onDelete(evt) {
+    _onDelete(event) {
+        event.preventDefault();
         this.props.onDelete(this.props.stream);
         this.refs.dropdownButton.setDropdownState(false);
     },
-    _onEdit(evt) {
+    _onEdit(event) {
+        event.preventDefault();
         this.refs.streamForm.open();
     },
-    _onClone(evt) {
+    _onClone(event) {
+        event.preventDefault();
         this.refs.cloneForm.open();
     },
     _onCloneSubmit(streamId, stream) {
         this.props.onClone(this.props.stream.id, stream);
     },
-    _onQuickAdd() {
+    _onQuickAdd(event) {
+        event.preventDefault();
         this.props.onQuickAdd(this.props.stream.id);
     },
     render() {
