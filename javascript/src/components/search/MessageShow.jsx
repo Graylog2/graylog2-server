@@ -1,7 +1,6 @@
 'use strict';
 
 var React = require('react');
-var Immutable = require('immutable');
 var MessageDetail = require('./MessageDetail');
 
 var MessageShow = React.createClass({
@@ -18,8 +17,7 @@ var MessageShow = React.createClass({
                                                    streams={this.props.streams}
                                                    nodes={this.props.nodes}
                                                    possiblyHighlight={this.possiblyHighlight}
-                                                   showTimestamp={true}
-                                                   allStreams={Immutable.List()}/>
+                                                   showTimestamp={true}/>
                 </div>
             </div>
         );

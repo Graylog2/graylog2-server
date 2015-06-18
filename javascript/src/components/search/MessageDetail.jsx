@@ -31,7 +31,7 @@ var MessageDetail = React.createClass({
             // our parent does not provide allStreams for the test against stream menu, we have to load it ourselves
             // this can happen if the component is used outside the regular search result
             // only load the streams per page
-            if (this.state.allStreamsLoaded) {
+            if (this.state.allStreamsLoaded || this.props.disableTestAgainstStream) {
                 return;
             }
             var promise = StreamsStore.listStreams();
