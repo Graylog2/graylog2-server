@@ -52,8 +52,7 @@
     "karma-html2js-preprocessor": "*",
     "karma-phantomjs-launcher": "*",
     "phantomjs": ">=1.9",
-    "gulp-react": "^3.0.0",
-    "react-tools": "0.13.x",
-    "reactify": "1.1.x"
+    "gulp-babel": "*",
+    "babelify": "*"
   }
 }

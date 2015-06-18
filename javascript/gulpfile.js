@@ -4,9 +4,9 @@ var fs = require('fs');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var browserify = require('browserify');
-var reactify = require('reactify');
+var babelify = require('babelify');
 var watchify = require('watchify');
-var react = require('gulp-react');
+var babel = require("gulp-babel");
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var del = require('del');
@@ -26,13 +26,6 @@ var handlebarOpts = {
             return [config.assetDir, context.data.root[path]].join('/');
         }
     }
-};
-
-var reactOpts = {
-    harmony: true,
-    es6: true,
-    target: 'es5',
-    stripTypes: true
 };
 
 var replaceRev = function (debug, noSync) {
@@ -73,7 +66,7 @@ gulp.task('clean-target', function (callback) {
 
 gulp.task('prepare-lint', ['clean'], function () {
     return gulp.src('src/**/*.jsx')
-        .pipe(react(reactOpts))
+        .pipe(babel())
         .on('error', function (err) {
             gutil.log(err);
             this.emit('end');
@@ -100,8 +93,8 @@ function browserifyCall(debug) {
     var browserifyConfig = {
         entries: config.entryPoints,
         extensions: ['.jsx', '.js'],
-        "transform": [
-            ["reactify", reactOpts]
+        transform: [
+            ["babelify"]
         ],
         debug: debug
     };
@@ -137,8 +130,8 @@ gulp.task('bundle-tests', function () {
     var b = browserify({
         entries: config.testEntryPoints,
         extensions: ['.jsx', '.js'],
-        "transform": [
-            ["reactify", reactOpts]
+        transform: [
+            ["babelify"]
         ],
         debug: true
     });
