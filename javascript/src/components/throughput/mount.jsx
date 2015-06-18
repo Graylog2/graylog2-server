@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var NodeThroughput = require('./NodeThroughput');
 
 var throughput = document.getElementsByClassName('react-node-throughput');

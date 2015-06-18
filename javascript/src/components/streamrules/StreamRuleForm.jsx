@@ -1,6 +1,7 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Input = require('react-bootstrap').Input;
 var Bubble = require('../support/Bubble');
@@ -9,7 +10,7 @@ var Col = require('react-bootstrap').Col;
 var TypeAheadFieldInput = require('../common/TypeAheadFieldInput');
 
 var StreamRuleForm = React.createClass({
-    mixins: [React.addons.LinkedStateMixin],
+    mixins: [LinkedStateMixin],
     FIELD_PRESENCE_RULE_TYPE: 5,
     getInitialState() {
         return this.props.streamRule;

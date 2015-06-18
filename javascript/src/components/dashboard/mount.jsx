@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var TrendConfigurationModal = require('./TrendConfigurationModal');
 
 var dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');

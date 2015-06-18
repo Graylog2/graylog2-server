@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var StreamRulesEditor = require('./StreamRulesEditor');
 var $ = require('jquery'); // excluded and shimed
 

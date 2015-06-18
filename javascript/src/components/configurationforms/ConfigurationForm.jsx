@@ -2,7 +2,7 @@
 
 var $ = require('jquery'); // excluded and shimed
 
-var React = require('react/addons');
+var React = require('react');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var TextField = require('./TextField');
 var NumberField = require('./NumberField');

@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 var StreamForm = require('./StreamForm');

@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var InputIOMetrics = require('./InputIOMetrics');
 
 var inputMetrics = document.getElementsByClassName('react-input-metrics');

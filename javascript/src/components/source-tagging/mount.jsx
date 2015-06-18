@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var ConfigurationBundles = require('./ConfigurationBundles');
 
 var configurationBundles = document.getElementById('react-configuration-bundles');

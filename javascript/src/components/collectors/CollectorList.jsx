@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var CollectorsStore = require('../../stores/collectors/CollectorsStore');
 var CollectorRow = require('./CollectorRow');
 var Spinner = require('../common/Spinner');

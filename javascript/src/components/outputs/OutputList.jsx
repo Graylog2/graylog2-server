@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Output = require('./Output');
 var Alert = require('react-bootstrap').Alert;
 var Spinner = require('../common/Spinner');

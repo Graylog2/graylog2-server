@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var StreamRuleForm = require('./StreamRuleForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');

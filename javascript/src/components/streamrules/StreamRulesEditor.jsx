@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var LoaderTabs = require('../messageloaders/LoaderTabs');
 var StreamRuleList = require('./StreamRuleList');
 var StreamsStore = require('../../stores/streams/StreamsStore');

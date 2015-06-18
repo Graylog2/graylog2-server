@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationWell = React.createClass({

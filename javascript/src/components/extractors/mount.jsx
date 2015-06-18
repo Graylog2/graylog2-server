@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var ExtractorExampleMessage = require('./ExtractorExampleMessage');
 
 var extractorExampleMessage = document.getElementById('react-extractor-example-message');

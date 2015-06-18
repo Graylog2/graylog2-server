@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var OutputsComponent = require('./OutputsComponent');
 var $ = require('jquery'); // excluded and shimed
 

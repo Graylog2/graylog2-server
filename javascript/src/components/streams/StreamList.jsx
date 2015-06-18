@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Stream = require('./Stream');
 var Alert = require('react-bootstrap').Alert;
 var PermissionsMixin = require('../../util/PermissionsMixin');

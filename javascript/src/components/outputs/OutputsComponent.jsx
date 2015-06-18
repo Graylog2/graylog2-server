@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var OutputList = require('./OutputList');
 var CreateOutputDropdown = require('./CreateOutputDropdown');
 var AssignOutputDropdown = require('./AssignOutputDropdown');

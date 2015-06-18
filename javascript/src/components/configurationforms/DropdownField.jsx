@@ -2,7 +2,7 @@
 
 var $ = require('jquery'); // excluded and shimed
 
-var React = require('react/addons');
+var React = require('react');
 var FieldHelpers = require('./FieldHelpers');
 
 var DropdownField = React.createClass({

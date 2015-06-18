@@ -1,11 +1,12 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Input = require('react-bootstrap').Input;
 
 var StreamForm = React.createClass({
-    mixins: [React.addons.LinkedStateMixin],
+    mixins: [LinkedStateMixin],
     getInitialState() {
         return this._getValuesFromProps(this.props);
     },

@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var StreamRuleList = require('./StreamRuleList');
 var CollapsibleMixin = require('react-bootstrap').CollapsibleMixin;
 var Alert = require('react-bootstrap').Alert;

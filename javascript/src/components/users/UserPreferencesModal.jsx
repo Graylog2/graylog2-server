@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var PreferencesStore = require('../../stores/users/PreferencesStore');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 

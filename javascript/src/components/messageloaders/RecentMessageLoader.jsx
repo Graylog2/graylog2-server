@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var InputDropdown = require('../inputs/InputDropdown');
 var InputsStore = require('../../stores/inputs/InputsStore');
 var UserNotification = require("../../util/UserNotification");

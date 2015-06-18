@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var StreamList = require('./StreamList');
 var CreateStreamButton = require('./CreateStreamButton');

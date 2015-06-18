@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var StreamThroughput = require('./StreamThroughput');
 var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');

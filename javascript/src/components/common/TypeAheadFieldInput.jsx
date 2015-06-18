@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Immutable = require('immutable');
 var Input = require('react-bootstrap').Input;
 var $ = require('jquery'); // excluded and shimed

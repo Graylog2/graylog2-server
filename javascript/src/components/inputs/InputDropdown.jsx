@@ -1,12 +1,13 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
 var Input = require('react-bootstrap').Input;
 var Spinner = require('../common/Spinner');
 var Immutable = require('immutable');
 
 var InputDropdown = React.createClass({
-    mixins: [React.addons.LinkedStateMixin],
+    mixins: [LinkedStateMixin],
     PLACEHOLDER: "placeholder",
     getInitialState() {
         return {

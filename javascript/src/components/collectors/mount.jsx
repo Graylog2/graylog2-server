@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var CollectorList = require('./CollectorList');
 
 var collectorList = document.getElementById('react-collector-list');

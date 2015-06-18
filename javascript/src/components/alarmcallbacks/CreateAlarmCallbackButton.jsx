@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
 var $ = require('jquery'); // excluded and shimed
 

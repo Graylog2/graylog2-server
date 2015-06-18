@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Modal = require('react-bootstrap').Modal;
 var OverlayMixin = require('react-bootstrap').OverlayMixin;
 

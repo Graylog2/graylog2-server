@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var JvmHeapUsage = require('./JvmHeapUsage');
 var BufferUsage = require('./BufferUsage');
 var JournalDetails = require('./JournalDetails');

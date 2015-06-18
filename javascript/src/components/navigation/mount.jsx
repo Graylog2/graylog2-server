@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 //var UserMenu = require('./UserMenu');
 var Navigation = require('./Navigation');
 

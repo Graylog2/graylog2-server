@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var DeleteAlarmCallbackButton = require('./DeleteAlarmCallbackButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');

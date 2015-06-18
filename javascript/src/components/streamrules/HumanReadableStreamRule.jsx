@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 
 var HumanReadableStreamRule = React.createClass({
     FIELD_PRESENCE_RULE_TYPE: 5,
