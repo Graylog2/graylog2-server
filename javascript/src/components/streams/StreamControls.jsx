@@ -5,7 +5,6 @@
 var React = require('react/addons');
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
-var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var StreamForm = require('./StreamForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
@@ -62,13 +61,13 @@ var StreamControls = React.createClass({
         }
 
         return (
-            <ButtonGroup>
+            <span>
                 <DropdownButton title='More actions' ref='dropdownButton' pullRight={true}>
                     {menuItems}
                 </DropdownButton>
                 <StreamForm ref='streamForm' title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream}/>
                 <StreamForm ref='cloneForm' title="Cloning Stream" onSubmit={this._onCloneSubmit}/>
-            </ButtonGroup>
+            </span>
         );
     }
 });
