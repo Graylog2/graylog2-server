@@ -6,7 +6,7 @@ var BootstrapAccordionGroup = require('../bootstrap/BootstrapAccordionGroup');
 var SourceType = require('./SourceType');
 var ConfigurationBundlePreview = require('./ConfigurationBundlePreview');
 var URLUtils = require("../../util/URLUtils");
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var ConfigurationBundles = React.createClass({
     getInitialState() {

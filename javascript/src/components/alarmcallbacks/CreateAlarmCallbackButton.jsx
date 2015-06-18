@@ -2,7 +2,7 @@
 
 var React = require('react');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var CreateAlarmCallbackButton = React.createClass({
     PLACEHOLDER: "placeholder",

@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var ConfigurationWell = React.createClass({
     PASSWORD_PLACEHOLDER: '********',

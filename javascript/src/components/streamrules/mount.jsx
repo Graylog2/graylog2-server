@@ -2,7 +2,7 @@
 
 var React = require('react');
 var StreamRulesEditor = require('./StreamRulesEditor');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 $(".react-streamrules-editor").each(function() {
     var permissions = JSON.parse(this.getAttribute('data-permissions'));

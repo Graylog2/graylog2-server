@@ -1,6 +1,6 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 $(document).ready(() => {
     // must come first because it registers a global (ahem) singleton.

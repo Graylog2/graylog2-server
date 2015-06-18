@@ -2,7 +2,7 @@
 
 var React = require('react');
 var OutputsComponent = require('./OutputsComponent');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 $(".react-output-component").each(function() {
     var streamId = this.getAttribute('data-stream-id');

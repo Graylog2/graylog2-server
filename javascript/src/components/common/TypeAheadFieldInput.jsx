@@ -5,7 +5,7 @@
 var React = require('react');
 var Immutable = require('immutable');
 var Input = require('react-bootstrap').Input;
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var TypeAheadFieldInput = React.createClass({
     componentDidMount() {

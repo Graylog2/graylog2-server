@@ -6,7 +6,7 @@ var React = require('react');
 var Modal = require('react-bootstrap').Modal;
 var OverlayMixin = require('react-bootstrap').OverlayMixin;
 
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var BootstrapModalTrigger = React.createClass({
     mixins: [OverlayMixin],

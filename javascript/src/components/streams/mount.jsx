@@ -3,7 +3,7 @@
 var React = require('react');
 var StreamThroughput = require('./StreamThroughput');
 var StreamComponent = require('./StreamComponent');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var streamThroughput = document.getElementsByClassName('react-stream-throughput');
 if (streamThroughput) {

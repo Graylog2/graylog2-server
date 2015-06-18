@@ -2,7 +2,7 @@
 
 var React = require('react');
 var LoaderTabs = require('./LoaderTabs');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 $('.react-message-loader-tabs').each(function() {
     React.render(<LoaderTabs/>, this);

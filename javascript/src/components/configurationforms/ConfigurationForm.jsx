@@ -1,6 +1,6 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 var React = require('react');
 var BootstrapModal = require('../bootstrap/BootstrapModal');

@@ -2,7 +2,7 @@
 
 var React = require('react');
 var AlarmCallbackComponent = require('./AlarmCallbackComponent');
-var $ = require('jquery'); // excluded and shimed
+var $ = require('jquery');
 
 $(".react-alarmcallback-component").each(function() {
     var streamId = this.getAttribute('data-stream-id');
