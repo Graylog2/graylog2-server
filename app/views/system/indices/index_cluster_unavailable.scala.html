@@ -2,7 +2,7 @@
         breadcrumbs: lib.BreadcrumbList,
         clusterHealth: org.graylog2.restclient.models.ESClusterHealth)
 
-@main("Indices", views.html.system.sidebar(), "", currentUser) {
+@main("Indices", null, "", currentUser) {
 
   @views.html.partials.breadcrumbs(breadcrumbs)
 

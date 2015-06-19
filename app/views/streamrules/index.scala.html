@@ -1,10 +1,8 @@
-@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule], breadcrumbs: lib.BreadcrumbList)
+@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule])
 
 @import play.libs.Json
 
 @main("Rules of stream \"" + stream.getTitle + "\"" , null, "", currentUser, false) {
-
-    @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
         <div class="col-md-10">

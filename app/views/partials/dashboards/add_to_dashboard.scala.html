@@ -1,9 +1,0 @@
-@(widgetType: String, text: String, params: Array[String])
-
-<div class="btn-group">
-    <a data-toggle="dropdown" href="#" class="btn btn-sm btn-info add-to-dashboard dropdown-toggle" data-widget-type="@widgetType">
-        @Html(text)
-    </a>
-
-    @views.html.partials.dashboards.add_to_dashboard_base_selector.render(widgetType, params)
-</div>

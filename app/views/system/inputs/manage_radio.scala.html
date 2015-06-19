@@ -6,7 +6,7 @@
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
         masterNode: org.graylog2.restclient.models.Node)
 
-@main("Inputs of radio", views.html.system.sidebar(), "", currentUser) {
+@main("Inputs of radio", null, "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row">
