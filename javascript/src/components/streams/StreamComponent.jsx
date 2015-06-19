@@ -12,6 +12,9 @@ var Col = require('react-bootstrap').Col;
 var UserNotification = require('../../util/UserNotification');
 var Spinner = require('../common/Spinner');
 
+var DocsHelper = require('../../util/DocsHelper');
+var DocumentationLink = require('../support/DocumentationLink');
+
 var StreamComponent = React.createClass({
     mixins: [PermissionsMixin],
     getInitialState() {
@@ -55,15 +58,12 @@ var StreamComponent = React.createClass({
                         streams. You can for example create a stream that contains all SSH logins and configure
                         to be alerted whenever there are more logins than usual.
 
-                        Read more about streams in <a
-                        href="http://docs.graylog.org/en/latest/pages/streams.html" target="_blank">the
-                        documentation</a>.
+                        Read more about streams in the <DocumentationLink page={DocsHelper.PAGES.STREAMS} text="documentation"/>.
                     </p>
 
                     <SupportLink>
                         Take a look at the
-                        {' '}<a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html"
-                                target="_blank">Graylog stream dashboards</a>{' '}
+                        {' '}<DocumentationLink page={DocsHelper.PAGES.EXTERNAL_DASHBOARDS} text="Graylog stream dashboards"/>{' '}
                         for wall-mounted displays or other integrations.
                     </SupportLink>
                 </Col>

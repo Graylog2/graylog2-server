@@ -15,7 +15,8 @@ var Alert = require('react-bootstrap').Alert;
 
 var ChosenSelectInput = require('../common/ChosenSelectInput');
 var QueryInput = require('./QueryInput');
-var Bubble = require('../support/Bubble');
+var DocumentationLink = require('../support/DocumentationLink');
+var DocsHelper = require('../../util/DocsHelper');
 
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
@@ -353,7 +354,9 @@ var SearchBar = React.createClass({
 
                                 <div id="search-container">
                                     <div className="pull-right search-help">
-                                        <Bubble link="general/queries" title="Search query syntax documentation" />
+                                        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                                           title="Search query syntax documentation"
+                                                           text={<i className="fa fa-lightbulb-o"></i>}/>
                                     </div>
 
                                     <Button type='submit' bsStyle='success' className='pull-left'>
