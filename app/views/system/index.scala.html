@@ -11,6 +11,7 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import views.helpers.DateHelper
+@import views.helpers.DocsHelper
 
 @main("System", null, "", currentUser, false) {
 
@@ -108,7 +109,7 @@
 
                 @views.html.partials.support.list_small() {
                     The possible Elasticsearch cluster states and more related information is available in the
-                    <a href='http://docs.graylog.org/en/latest/pages/configuring_es.html' target='_blank'>Graylog documentation</a>.
+                    @views.html.partials.links.docs(DocsHelper.PAGE_CONFIGURING_ES, "Graylog documentation").
                 }
 
                 @views.html.partials.es_cluster_health.render(clusterHealth)
@@ -124,7 +125,7 @@
 
                 @views.html.partials.support.list_small() {
                     Every message that was not successfully indexed will be logged as an indexer failure. You can learn more about this feature in the
-                    <a href='http://docs.graylog.org/en/latest/pages/indexer_failures.html' target='_blank'>Graylog documentation</a>.
+                    @views.html.partials.links.docs(DocsHelper.PAGE_INDEXER_FAILURES, "Graylog documentation").
                 }
 
                 @views.html.partials.indexer_failures.render(indexFailureCount)

@@ -1,5 +1,3 @@
-@(page: String, title: String)
+@(docsHelper: views.helpers.DocsHelper, title: String)
 
-@import views.helpers.DocsHelper
-
-@Html(DocsHelper.linkToDocs(page, title))
+@Html(docsHelper.toLink(title))

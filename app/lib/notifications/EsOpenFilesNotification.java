@@ -32,7 +32,7 @@ public class EsOpenFilesNotification implements NotificationType {
             "open file limit (current limit: <em>%d</em> on <em>%s</em>; should be at least 64000) This will " +
             "be causing problems that can be hard to diagnose. " +
             "Read how to raise the maximum number of open files in " +
-            DocsHelper.linkToDocs("setup/elasticsearch", "the Elasticsearch setup documentation.");
+            DocsHelper.PAGE_ES_OPEN_FILE_LIMITS.toLink("the Elasticsearch setup documentation.");
 
     private final Notification notification;
 
