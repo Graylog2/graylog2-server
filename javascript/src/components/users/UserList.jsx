@@ -5,14 +5,15 @@ var React = require('react');
 var UsersStore = require('../../stores/users/UsersStore');
 var DataTable = require('../common/DataTable');
 
-var Permissions = require('../../logic/permissions/Permissions');
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var UserList = React.createClass({
+    mixins: [PermissionsMixin],
+
     getInitialState() {
         return {
             currentUsername: this.props.currentUsername,
             currentUser: null,
-            permissions: null,
             users: []
         };
     },
@@ -25,13 +26,12 @@ var UserList = React.createClass({
             var currentUser = users.filter((user) => user.username === this.state.currentUsername)[0];
             this.setState({
                 currentUser: currentUser,
-                permissions: new Permissions(currentUser.permissions),
                 users: users
             });
         });
     },
     _hasAdminRole(user) {
-        return user.permissions.some((permission) => permission === "*");
+        return this.isPermitted(user.permissions, ["*"]);
     },
     deleteUser(username) {
         var promise = UsersStore.deleteUser(username);
@@ -98,9 +98,9 @@ var UserList = React.createClass({
 
             actions = (
                 <div>
-                    {this.state.permissions.isPermitted(["users:edit"]) ? deleteAction : null}
+                    {this.isPermitted(this.state.currentUser.permissions, ["users:edit"]) ? deleteAction : null}
                     &nbsp;
-                    {editAction}
+                    {this.isPermitted(this.state.currentUser.permissions, ["users:edit:" + user.username]) ? editAction : null}
                 </div>
             );
         }
