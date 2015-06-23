@@ -22,11 +22,9 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.bindings.InstantiationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
@@ -36,8 +34,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageOutputFactoryTest {
-    @Mock
-    private InstantiationService instantiationService;
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
 
     private MessageOutputFactory messageOutputFactory;
@@ -48,7 +44,7 @@ public class MessageOutputFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        this.messageOutputFactory = new MessageOutputFactory(instantiationService, availableOutputs);
+        this.messageOutputFactory = new MessageOutputFactory(availableOutputs);
     }
 
     @Test(expected = IllegalArgumentException.class)
