@@ -168,6 +168,179 @@ public class StreamsTest extends BaseRestTest {
         assertThat(streamCount()).isEqualTo(1);
     }
 
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void updatingTitleOfSingleStream() {
+        // id of stream to be updated
+        final String streamId = "552b92b2e4b0c055e41ffb8d";
+        // id of stream that is supposed to be left untampered
+        final String otherStreamId = "552b92b2e4b0c055e41ffb8e";
+
+        assertThat(streamCount()).isEqualTo(2);
+
+        final JsonPath response = given()
+                .when()
+                .body(jsonResourceForMethod())
+                .put("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().jsonPath();
+
+        assertThat(response.getString("title")).isEqualTo("Updated Title");
+        assertThat(response.getString("description")).isEqualTo("This is yet another stream");
+
+        final JsonPath getResponse = given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(getResponse.getString("title")).isEqualTo("Updated Title");
+        assertThat(getResponse.getString("description")).isEqualTo("This is yet another stream");
+
+        final JsonPath otherStreamResponse = given()
+                .when()
+                .get("/streams/" + otherStreamId)
+                .then()
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(otherStreamResponse.getString("title")).isEqualTo("Just a stream");
+        assertThat(otherStreamResponse.getString("description")).isEqualTo("This is just a stream");
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void updatingNonexistendStreamShouldFail() {
+        // id of nonexistent stream to be updated
+        final String streamId = "55affeaffeaffeaffeaffeaf";
+        // id of stream that is supposed to be left untampered
+        final String otherStreamId = "552b92b2e4b0c055e41ffb8e";
+
+        given()
+                .when()
+                .body("{\"title\":\"foo\", \"description\":\"bar\"}")
+                .put("/streams/" + streamId)
+                .then()
+                .statusCode(404);
+
+        final JsonPath otherStreamResponse = given()
+                .when()
+                .get("/streams/" + otherStreamId)
+                .then()
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(otherStreamResponse.getString("title")).isEqualTo("Just a stream");
+        assertThat(otherStreamResponse.getString("description")).isEqualTo("This is just a stream");
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void pausingStream() {
+        final String streamId = "552b92b2e4b0c055e41ffb8d";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/pause")
+                .then()
+                .statusCode(204);
+
+        given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("disabled", equalTo(true));
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void pausingAlreadyPausedStreamShouldNotChangeIt() {
+        final String streamId = "552b92b2e4b0c055e41ffb8e";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/pause")
+                .then()
+                .statusCode(204);
+
+        given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("disabled", equalTo(true));
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void pausingNonexistentStreamShouldFail() {
+        final String streamId = "55affeaffeaffeaffeaffeaf";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/pause")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void resumingStream() {
+        final String streamId = "552b92b2e4b0c055e41ffb8e";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/resume")
+                .then()
+                .statusCode(204);
+
+        given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("disabled", equalTo(false));
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void resumingRunningStreamShouldNotChangeIt() {
+        final String streamId = "552b92b2e4b0c055e41ffb8d";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/resume")
+                .then()
+                .statusCode(204);
+
+        given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("disabled", equalTo(false));
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void resumingNonexistentStreamShouldFail() {
+        final String streamId = "55affeaffeaffeaffeaffeaf";
+
+        given()
+                .when()
+                .post("/streams/"+streamId+"/resume")
+                .then()
+                .statusCode(404);
+    }
+
     protected ValidatableResponse createStreamFromRequest(byte[] request) {
         return given()
             .when()
