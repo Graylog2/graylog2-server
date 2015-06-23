@@ -1,17 +1,31 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package integration.streams;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
+import integration.MongoDbSeed;
 import integration.RequiresAuthentication;
 import integration.RequiresVersion;
 import org.junit.Test;
 
-import javax.annotation.Nullable;
+import java.nio.charset.Charset;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,45 +33,29 @@ import static org.hamcrest.Matchers.equalTo;
 
 @RequiresAuthentication
 @RequiresVersion(">=0.90.0")
+@MongoDbSeed(locations = {})
 public class StreamsTest extends BaseRestTest {
-    @AutoValue
-    @JsonAutoDetect
-    abstract static class SimpleCreateStreamRequest {
-        @JsonProperty @Nullable public abstract String title();
-
-        public static SimpleCreateStreamRequest create(String title) {
-            return new AutoValue_StreamsTest_SimpleCreateStreamRequest(title);
-        }
-    }
-
-    @AutoValue
-    @JsonAutoDetect
-    abstract static class CreateStreamRequest {
-        @JsonProperty public abstract String title();
-        @JsonProperty public abstract String description();
-
-        public static CreateStreamRequest create(String title, String description) {
-            return new AutoValue_StreamsTest_CreateStreamRequest(title, description);
-        }
-    }
-
     @Test
-    public void testListStreams() throws Exception {
-        given()
+    @MongoDbSeed(locations = {})
+    public void testListStreamsWhenNoStreamsArePresent() throws Exception {
+        final JsonPath response = given()
             .when()
                 .get("/streams")
             .then()
                 .statusCode(200)
                 .assertThat()
-                .body(".", containsAllKeys("total", "streams"));
+                .body(".", containsAllKeys("total", "streams"))
+                .extract().jsonPath();
+
+        assertThat(response.getInt("total")).isEqualTo(0);
+        assertThat(response.getList("streams")).isEmpty();
     }
 
     @Test
-    public void testSimpleCreateStream() throws Exception {
+    public void testCreateStreamByTitleOnly() throws Exception {
         final int beforeCount = streamCount();
-        final String streamTitle = "TestStream";
 
-        final JsonPath response = createStreamFromRequest(SimpleCreateStreamRequest.create(streamTitle))
+        final JsonPath response = createStreamFromRequest(jsonResourceForMethod())
                 .statusCode(201)
                 .body(".", containsAllKeys("stream_id"))
                 .extract().jsonPath();
@@ -76,18 +74,18 @@ public class StreamsTest extends BaseRestTest {
             .then()
                 .statusCode(200)
                 .assertThat()
-                .body("title", equalTo(streamTitle))
+                .body("title", equalTo("TestStream"))
                 .body("disabled", equalTo(true))
                 .body("description", equalTo(null));
     }
 
     @Test
-    public void testCreateStream() throws Exception {
+    public void testCreateStreamWithTitleAndDescription() throws Exception {
         final int beforeCount = streamCount();
         final String streamTitle = "Another Test Stream";
         final String description = "This is a test stream.";
 
-        final JsonPath response = createStreamFromRequest(CreateStreamRequest.create(streamTitle, description))
+        final JsonPath response = createStreamFromRequest(jsonResourceForMethod())
                 .statusCode(201)
                 .body(".", containsAllKeys("stream_id"))
                 .extract().jsonPath();
@@ -115,7 +113,7 @@ public class StreamsTest extends BaseRestTest {
     public void testIncompleteStream() throws Exception {
         final int beforeCount = streamCount();
 
-        final ValidatableResponse response = createStreamFromRequest(SimpleCreateStreamRequest.create(null));
+        final ValidatableResponse response = createStreamFromRequest(jsonResourceForMethod());
         response.statusCode(400);
 
         final int afterCount = streamCount();
@@ -133,7 +131,7 @@ public class StreamsTest extends BaseRestTest {
         assertThat(afterCount).isEqualTo(beforeCount);
     }
 
-    protected ValidatableResponse createStreamFromRequest(Object request) {
+    protected ValidatableResponse createStreamFromRequest(byte[] request) {
         return given()
             .when()
                 .body(request)
@@ -141,6 +139,10 @@ public class StreamsTest extends BaseRestTest {
                 .then()
                 .contentType(ContentType.JSON)
                 .assertThat();
+    }
+
+    protected ValidatableResponse createStreamFromRequest(String request) {
+        return createStreamFromRequest(request.getBytes(Charset.defaultCharset()));
     }
 
     protected int streamCount() {
