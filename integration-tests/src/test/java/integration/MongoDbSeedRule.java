@@ -16,7 +16,7 @@
  */
 package integration;
 
-import integration.util.graylog.GraylogControl;
+import integration.util.graylog.ServerHelper;
 import integration.util.mongodb.MongodbSeed;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -24,7 +24,6 @@ import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -41,7 +40,7 @@ public class MongoDbSeedRule implements MethodRule {
                 method.getDeclaringClass().getAnnotation(MongoDbSeed.class));
         if (annotation != null) {
             final MongodbSeed mongodbSeed = new MongodbSeed(annotation.database());
-            final GraylogControl graylogController = new GraylogControl();
+            final ServerHelper graylogController = new ServerHelper();
             final String nodeId = graylogController.getNodeId();
 
             if (annotation.locations().length > 0) {
