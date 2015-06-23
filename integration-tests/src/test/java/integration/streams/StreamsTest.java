@@ -36,8 +36,8 @@ import static org.hamcrest.Matchers.equalTo;
 @MongoDbSeed(locations = {})
 public class StreamsTest extends BaseRestTest {
     @Test
-    @MongoDbSeed(locations = {})
-    public void testListStreamsWhenNoStreamsArePresent() throws Exception {
+    @MongoDbSeed
+    public void listStreamsWhenNoStreamsArePresent() throws Exception {
         final JsonPath response = given()
             .when()
                 .get("/streams")
@@ -52,7 +52,7 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void testCreateStreamByTitleOnly() throws Exception {
+    public void createStreamByTitleOnly() throws Exception {
         final int beforeCount = streamCount();
 
         final JsonPath response = createStreamFromRequest(jsonResourceForMethod())
@@ -80,7 +80,7 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void testCreateStreamWithTitleAndDescription() throws Exception {
+    public void createStreamWithTitleAndDescription() throws Exception {
         final int beforeCount = streamCount();
         final String streamTitle = "Another Test Stream";
         final String description = "This is a test stream.";
@@ -110,7 +110,7 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void testIncompleteStream() throws Exception {
+    public void incompleteStream() throws Exception {
         final int beforeCount = streamCount();
 
         final ValidatableResponse response = createStreamFromRequest(jsonResourceForMethod());
@@ -121,7 +121,7 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void testInvalidStream() throws Exception {
+    public void invalidStream() throws Exception {
         final int beforeCount = streamCount();
 
         final ValidatableResponse response = createStreamFromRequest("{}");

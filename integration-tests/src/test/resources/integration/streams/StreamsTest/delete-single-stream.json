@@ -1,0 +1,5 @@
+{
+  "streams" : [
+    {"_id" : {"$oid" : "552b92b2e4b0c055e41ffb8e"}, "title" : "Stream to be deleted", "description" : "This stream will soon be deleted"}
+  ]
+}
