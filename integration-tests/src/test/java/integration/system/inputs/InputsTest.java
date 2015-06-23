@@ -30,7 +30,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 public class InputsTest extends BaseRestTest {
 
     @Test
-    @MongoDbSeed(location = "graylog", database = "graylog2")
+    @MongoDbSeed(locations = "graylog")
     public void createInputTest() {
 
         given().when()
