@@ -40,6 +40,7 @@ public class RestAssuredSetupRule extends ExternalResource {
     protected void before() throws Throwable {
         final GraylogControl graylogController = new GraylogControl();
         final URL url = graylogController.getUrl();
+        graylogController.startServer();
         RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();
         RestAssured.port = url.getPort();
         String[] userInfo = url.getUserInfo().split(":");
