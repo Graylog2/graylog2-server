@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class GraylogControl {
+    private static final Logger log = LoggerFactory.getLogger(GraylogControl.class);
     private URL url;
     private static final int HTTP_TIMEOUT = 1000;
 
@@ -41,7 +44,7 @@ public class GraylogControl {
     }
 
     public void startServer() {
-        System.out.println("Starting Graylog server...");
+        log.debug("Starting Graylog server...");
         try {
             URL startupUrl = new URL("http", url.getHost(), 5000, "/sv/up/graylog-server");
 
@@ -53,7 +56,7 @@ public class GraylogControl {
     }
 
     public void stopServer() {
-        System.out.println("Stoping Graylog server...");
+        log.debug("Stopping Graylog server...");
         try {
             URL shutdownUrl = new URL("http", url.getHost(), 5000, "/sv/down/graylog-server");
 
@@ -65,7 +68,7 @@ public class GraylogControl {
 
     }
     public void restartServer() {
-        System.out.println("Reestarting Graylog server...");
+        log.debug("Reestarting Graylog server...");
         stopServer();
         startServer();
     }
