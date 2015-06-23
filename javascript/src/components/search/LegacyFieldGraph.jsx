@@ -11,7 +11,10 @@ var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+
 var LegacyFieldGraph = React.createClass({
+    mixins: [PureRenderMixin],
     componentDidMount() {
         var graphContainer = React.findDOMNode(this.refs.fieldGraphContainer);
         FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
@@ -23,9 +26,13 @@ var LegacyFieldGraph = React.createClass({
 
         return this.props.from;
     },
+    _getGraphTitle() {
+        return this.props.stacked ? "Combined graph" : this.props.graphOptions['field'] + " graph";
+    },
     render() {
         return (
             <div ref="fieldGraphContainer"
+                 style={{display: this.props.hidden ? "none" : "block"}}
                  className="content-col field-graph-container"
                  data-chart-id={this.props.graphId}
                  data-from={this._getFirstGraphValue()}
@@ -105,7 +112,7 @@ var LegacyFieldGraph = React.createClass({
                         </Button>
                     </div>
                 </div>
-                <h1>{this.props.graphOptions['field']} graph</h1>
+                <h1>{this._getGraphTitle()}</h1>
 
                 <ul className="field-graph-query-container">
                     <li>
@@ -117,7 +124,7 @@ var LegacyFieldGraph = React.createClass({
                 </ul>
 
                 <div className="field-graph-components">
-                    <div className="field-graph-y-axis"></div>
+                    <div className="field-graph-y-axis" style={{display: 'none'}}></div>
                     <div className="field-graph"></div>
                 </div>
 

@@ -14,7 +14,14 @@ $(document).ready(function () {
 
     $(document).on('create.graylog.fieldgraph', function (event, data) {
         "use strict";
-        renderFieldChart(data['options'], data['container'], true);
+        renderFieldChart(data['options'], data['container'], {newGraph: true, stacked: data['isStacked']});
+    });
+
+    $(document).on('merge.graylog.fieldgraph', function (event, data) {
+        "use strict";
+        mergeCharts(data.targetGraphId, data.sourceGraphId);
+        var sourceGraphElement = $('.field-graph-container[data-chart-id="' + data.sourceGraphId + '"]');
+        sourceGraphElement.hide();
     });
 
     function sendCreatedGraphEvent(opts) {
@@ -136,7 +143,7 @@ $(document).ready(function () {
         return params;
     }
 
-    function renderFieldChart(opts, graphContainer, newGraph) {
+    function renderFieldChart(opts, graphContainer, renderingOptions) {
         var field = opts.field;
         var $graphContainer = $(graphContainer);
 
@@ -150,13 +157,12 @@ $(document).ready(function () {
         var $graphYAxis = $('.field-graph-y-axis', $graphContainer);
         $graphElement.html("");
         $graphYAxis.html("");
+        $graphYAxis.hide();
 
         $.ajax({
             url: appPrefixed('/a/search/fieldhistogram'),
             data: params,
             success: function (data) {
-                $graphYAxis.show();
-
                 $("ul", $graphContainer).attr("data-field", field);
 
                 if (opts.query.trim().length > 0) {
@@ -247,7 +253,7 @@ $(document).ready(function () {
 
                 fieldGraphs[opts.chartid] = graph;
 
-                if (newGraph) {
+                if (renderingOptions.newGraph) {
                     sendCreatedGraphEvent(opts);
                 } else {
                     sendUpdatedGraphEvent(opts);
@@ -300,7 +306,6 @@ $(document).ready(function () {
             },
             error: function (data) {
                 if (data.status != 400) {
-                    $graphYAxis.hide();
                     var alert = $('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
                     $graphElement.append(alert);
                     showError("Loading field graph for '" + opts.field + "' failed with status: " + data.status);
@@ -312,6 +317,7 @@ $(document).ready(function () {
                 }
             },
             complete: function () {
+                $graphYAxis.show();
                 deleteSpinner($graphContainer);
             }
         });
@@ -381,7 +387,7 @@ $(document).ready(function () {
         opts.interval = interval;
         opts.field = field;
 
-        renderFieldChart(opts, graphContainer, false);
+        renderFieldChart(opts, graphContainer, {newGraph: false});
         changeGraphConfig(graphContainer, "interval", interval);
 
         $("a", $(this).closest("ul")).removeClass("selected");
@@ -399,7 +405,7 @@ $(document).ready(function () {
         opts.valuetype = valuetype;
         opts.field = field;
 
-        renderFieldChart(opts, graphContainer, false);
+        renderFieldChart(opts, graphContainer, {newGraph: false});
         changeGraphConfig(graphContainer, "valuetype", valuetype);
 
         $("a", $(this).closest("ul")).removeClass("selected");
@@ -429,9 +435,6 @@ $(document).ready(function () {
         var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
 
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
-
-        // Update title and description.
-        $("h1", targetElem).text("Combined graph");
 
         for (var i = 0; i < draggedChart.series.length; i++) {
             var lineColor = palette.color();

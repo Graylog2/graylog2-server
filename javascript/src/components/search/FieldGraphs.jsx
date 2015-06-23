@@ -50,7 +50,8 @@ var FieldGraphs = React.createClass({
                                       from={this.props.from}
                                       to={this.props.to}
                                       permissions={this.props.permissions}
-                                      stacked={this.state.stackedGraphs.has(graphId)}/>
+                                      stacked={this.state.stackedGraphs.has(graphId)}
+                                      hidden={this.state.stackedGraphs.some((stackedGraphs, _) => stackedGraphs.has(graphId))}/>
                 );
             });
 

@@ -29,6 +29,7 @@ interface CreateFieldChartWidgetRequestParams {
 }
 
 class FieldGraphsStore {
+    private renderedGraphs: Immutable.Set<string>;
     private _fieldGraphs: Immutable.Map<string, Object>;
     private _stackedGraphs: Immutable.Map<string, Immutable.Set<string>>;
     onFieldGraphCreated: (graphId: string)=>void;
@@ -36,11 +37,18 @@ class FieldGraphsStore {
     onFieldGraphsMerged: (targetGraphId: Object)=>void;
 
     constructor() {
+        this.renderedGraphs = Immutable.Set<string>();
         this._fieldGraphs = Immutable.Map<string, Object>(store.get("pinned-field-charts"));
-        this._stackedGraphs = Immutable.Map<string, Immutable.Set<string>>();
+        // We need a custom function to deserialize the array in the localStorage as a Set
+        this._stackedGraphs = Immutable.fromJS(store.get("stacked-graphs") || {}, (key, value) => {
+            var isIndexed = Immutable.Iterable.isIndexed(value);
+            return isIndexed ? value.toSet() : value.toMap();
+        });
 
         $(document).on('created.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
+            this.combineStackedGraphs(data.graphOptions['chartid']);
+            this.renderedGraphs.add(data.graphOptions['chartid']);
             if (typeof this.onFieldGraphCreated === 'function') {
                 this.onFieldGraphCreated(data.graphOptions['chartid']);
             }
@@ -56,7 +64,7 @@ class FieldGraphsStore {
         });
 
         $(document).on('merged.graylog.fieldgraph', (event, data) => {
-            this.stackGraphs(data.targetGraphId, data.draggedGraphId);
+            this.updateStackedGraphs(data.targetGraphId, data.draggedGraphId);
         });
     }
 
@@ -78,8 +86,27 @@ class FieldGraphsStore {
 
     set stackedGraphs(newStackedGraphs: Immutable.Map<string, Immutable.Set<string>>) {
         this._stackedGraphs = newStackedGraphs;
+        store.set("stacked-graphs", newStackedGraphs.toJS());
         if (typeof this.onFieldGraphsMerged === 'function') {
             this.onFieldGraphsMerged(newStackedGraphs);
+        }
+    }
+
+    combineStackedGraphs(graphId: string) {
+        this.renderedGraphs = this.renderedGraphs.add(graphId);
+        if (this.stackedGraphs.has(graphId)) {
+            var stackedGraphs = this.stackedGraphs.get(graphId);
+            stackedGraphs.forEach((stackedGraphId) => {
+                if (this.renderedGraphs.has(stackedGraphId)) {
+                    this.stackGraphs(graphId, stackedGraphId);
+                }
+            });
+        } else {
+            this.stackedGraphs.forEach((stackedGraphs, targetGraphId) => {
+                if (stackedGraphs.has(graphId) && this.renderedGraphs.has(targetGraphId)) {
+                    this.stackGraphs(targetGraphId, graphId);
+                }
+            });
         }
     }
 
@@ -96,7 +123,7 @@ class FieldGraphsStore {
         }
     }
 
-    stackGraphs(targetGraphId: string, sourceGraphId: string) {
+    updateStackedGraphs(targetGraphId: string, sourceGraphId: string) {
         var newStackedGraphs: Immutable.Map<string, Immutable.Set<string>> = this.stackedGraphs;
 
         if (newStackedGraphs.has(targetGraphId)) {
@@ -133,6 +160,13 @@ class FieldGraphsStore {
         $(document).trigger("create.graylog.fieldgraph", {
             options: graphOptions,
             container: graphContainer
+        });
+    }
+
+    stackGraphs(targetGraphId: string, sourceGraphId: string) {
+        $(document).trigger('merge.graylog.fieldgraph', {
+            targetGraphId: targetGraphId,
+            sourceGraphId: sourceGraphId
         });
     }
 
