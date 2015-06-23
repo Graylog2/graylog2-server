@@ -27,7 +27,7 @@ GET           /messages/:index/:id                                              
 GET           /streams                                                                           @controllers.StreamsController.index()
 GET           /streams/:stream_id/messages                                                       @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "", width:Integer ?= -1)
 GET           /streams/:stream_id/rules                                                          @controllers.StreamRulesController.index(stream_id: String)
-GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Int ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
+GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(stream_id: String, q ?= "", rangetype ?= "", relative:Int ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
 GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)

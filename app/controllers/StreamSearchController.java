@@ -55,7 +55,7 @@ public class StreamSearchController extends SearchController {
     }
 
     @Override
-    public Result exportAsCsv(String q, String streamId, String rangeType, int relative, String from, String to, String keyword, String fields) {
+    public Result exportAsCsv(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String fields) {
         return super.exportAsCsv(q, "streams:" + streamId, rangeType, relative, from, to, keyword, fields);
     }
 }
