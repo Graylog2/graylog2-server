@@ -52,7 +52,7 @@ public class MongoDbSeedRule implements MethodRule {
                     }
 
                     try {
-                        log.warn("Using seed data from " + seedUrl.getPath());
+                        log.debug("Using seed data from " + seedUrl.getPath());
                         mongodbSeed.loadDataset(seedUrl, nodeId);
                     } catch (IOException e) {
                         throw new RuntimeException("Unable to read seed data: ", e);
@@ -62,7 +62,7 @@ public class MongoDbSeedRule implements MethodRule {
                 final URL seedUrl = findFirstInSearchPath(method.getName(), method.getDeclaringClass());
                 try {
                     if (seedUrl != null) {
-                        log.warn("Using seed data from " + seedUrl.getPath());
+                        log.debug("Using seed data from " + seedUrl.getPath());
                         mongodbSeed.loadDataset(seedUrl, nodeId);
                     }
                 } catch (IOException e) {
