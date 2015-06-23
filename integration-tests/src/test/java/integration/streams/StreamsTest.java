@@ -110,7 +110,7 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void incompleteStream() throws Exception {
+    public void creatingIncompleteStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
 
         final ValidatableResponse response = createStreamFromRequest(jsonResourceForMethod());
@@ -121,7 +121,8 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    public void invalidStream() throws Exception {
+    @MongoDbSeed
+    public void creatingInvalidStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
 
         final ValidatableResponse response = createStreamFromRequest("{}");
@@ -129,6 +130,42 @@ public class StreamsTest extends BaseRestTest {
 
         final int afterCount = streamCount();
         assertThat(afterCount).isEqualTo(beforeCount);
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream"})
+    public void deletingSingleStream() {
+        final String streamId = "552b92b2e4b0c055e41ffb8e";
+        assertThat(streamCount()).isEqualTo(1);
+
+        given()
+                .when()
+                .delete("/streams/"+streamId)
+                .then()
+                .statusCode(204);
+
+        assertThat(streamCount()).isEqualTo(0);
+
+        given()
+                .when()
+                .get("/streams/"+streamId)
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream"})
+    public void deletingNonexistentStreamShouldFail() {
+        final String streamId = "552b92b2e4b0c055e41ffb8f";
+        assertThat(streamCount()).isEqualTo(1);
+
+        given()
+                .when()
+                .delete("/streams/"+streamId)
+                .then()
+                .statusCode(404);
+
+        assertThat(streamCount()).isEqualTo(1);
     }
 
     protected ValidatableResponse createStreamFromRequest(byte[] request) {
