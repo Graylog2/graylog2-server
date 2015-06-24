@@ -4,10 +4,13 @@ var React = require('react');
 var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var Input = require('react-bootstrap').Input;
-var Bubble = require('../support/Bubble');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 var Col = require('react-bootstrap').Col;
 var TypeAheadFieldInput = require('../common/TypeAheadFieldInput');
+
+var DocumentationLink = require('../support/DocumentationLink');
+var DocsHelper = require('../../util/DocsHelper');
+var Version = require('../../util/Version');
 
 var StreamRuleForm = React.createClass({
     mixins: [LinkedStateMixin],
@@ -81,12 +84,13 @@ var StreamRuleForm = React.createClass({
 
                             <br /><br />
                             <i className="fa fa-github"></i>
-                            <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers"
-                               target="_blank">
-                                Take a look at the matcher code on GitHub
+                            <a href={"https://github.com/Graylog2/graylog2-server/tree/" + Version.getMajorAndMinorVersion() + "/graylog2-server/src/main/java/org/graylog2/streams/matchers"}
+                               target="_blank"> Take a look at the matcher code on GitHub
                             </a>
                             <br /><br />
-                            Regular expressions use Java syntax. <Bubble link="general/streams"/>
+                            Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
+                                                                                    title="More information"
+                                                                                    text={<i className="fa fa-lightbulb-o"></i>}/>
                         </div>
                     </Col>
                 </div>

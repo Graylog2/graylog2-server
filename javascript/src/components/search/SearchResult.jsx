@@ -18,6 +18,9 @@ var Immutable = require('immutable');
 var DashboardStore = require('../../stores/dashboard/DashboardStore');
 var SearchStore = require('../../stores/search/SearchStore');
 
+var DocumentationLink = require('../support/DocumentationLink');
+var DocsHelper = require('../../util/DocsHelper');
+
 var resizeMutex;
 
 var SearchResult = React.createClass({
@@ -144,8 +147,7 @@ var SearchResult = React.createClass({
                                 <ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
                                     <a href="#" onClick={(e) => e.preventDefault()}>Show the Elasticsearch query.</a>
                                 </ModalTrigger>
-                                <strong>&nbsp;Take a look at the&nbsp;<a
-                                    href="https://www.graylog.org/documentation/general/queries/" target="_blank">documentation</a>
+                                <strong>&nbsp;Take a look at the&nbsp;<DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE} text="documentation"/>
                                     &nbsp;if you need help with the search syntax.</strong>
                             </p>
                         </div>
@@ -155,7 +157,7 @@ var SearchResult = React.createClass({
                             <div className="support-sources">
                                 <h2>Need help?</h2>
                                 Do not hesitate to consult the Graylog community if your questions are not answered in the&nbsp;
-                                <a href="https://www.graylog.org/documentation/" target="_blank">documentation</a>.
+                                <DocumentationLink page={DocsHelper.PAGES.WELCOME} text="documentation"/>.
 
                                 <ul>
                                     <li><i className="fa fa-group"></i> <a href="https://www.graylog.org/community-support/" target="_blank">Forum / Mailing list</a></li>
