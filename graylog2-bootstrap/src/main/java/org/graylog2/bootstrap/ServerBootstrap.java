@@ -31,6 +31,7 @@ import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.PluginRestResourceBindings;
 import org.graylog2.shared.bindings.SchedulerBindings;
+import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.graylog2.shared.initializers.ServiceManagerListener;
@@ -156,6 +157,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules(instantiationService);
 
         result.add(new GenericBindings(instantiationService));
+        result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
         result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());

@@ -58,10 +58,12 @@ public class Radio extends ServerBootstrap {
 
     @Override
     protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(new RadioBindings(configuration, capabilities()),
+        return Arrays.<Module>asList(
+                new RadioBindings(configuration),
                 new RadioInitializerBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule());
+                new ObjectMapperModule()
+        );
     }
 
     @Override

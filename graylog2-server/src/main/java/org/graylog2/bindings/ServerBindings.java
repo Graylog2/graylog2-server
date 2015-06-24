@@ -64,7 +64,6 @@ import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.NotFoundExceptionMapper;
@@ -97,17 +96,14 @@ import org.graylog2.system.stats.ClusterStatsModule;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
-import java.util.Set;
 
 import static com.google.inject.name.Names.named;
 
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
-    private final Set<ServerStatus.Capability> capabilities;
 
-    public ServerBindings(Configuration configuration, Set<ServerStatus.Capability> capabilities) {
+    public ServerBindings(Configuration configuration) {
         this.configuration = configuration;
-        this.capabilities = capabilities;
     }
 
     @Override
@@ -148,13 +144,6 @@ public class ServerBindings extends AbstractModule {
         bind(BaseConfiguration.class).toInstance(configuration);
 
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-
-        Multibinder<ServerStatus.Capability> capabilityBinder = Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
-        for (ServerStatus.Capability capability : capabilities) {
-            capabilityBinder.addBinding().toInstance(capability);
-        }
-
-        bind(ServerStatus.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageJournalEnabled()) {
             install(new KafkaJournalModule());

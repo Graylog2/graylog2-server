@@ -24,7 +24,6 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.shared.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -46,6 +45,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.UI;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -98,7 +98,8 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(new ServerBindings(configuration, capabilities()),
+        return Arrays.<Module>asList(
+                new ServerBindings(configuration),
                 new PersistenceServicesBindings(),
                 new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
@@ -107,7 +108,8 @@ public class Server extends ServerBootstrap {
                 new MessageOutputBindings(configuration),
                 new RotationStrategyBindings(),
                 new PeriodicalBindings(),
-                new ServerObjectMapperModule());
+                new ServerObjectMapperModule()
+        );
     }
 
     @Override
