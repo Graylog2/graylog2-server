@@ -70,6 +70,7 @@ import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
@@ -386,12 +387,12 @@ public class Indices implements IndexManagement {
 
     public void optimizeIndex(String index) {
         // http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
-        OptimizeRequest or = new OptimizeRequest(index);
+        final OptimizeRequest or = new OptimizeRequest(index)
+                .maxNumSegments(configuration.getIndexOptimizationMaxNumSegments())
+                .onlyExpungeDeletes(false)
+                .flush(true);
 
-        or.maxNumSegments(configuration.getIndexOptimizationMaxNumSegments());
-        or.onlyExpungeDeletes(false);
-        or.flush(true);
-
-        c.admin().indices().optimize(or).actionGet();
+        // Using a specific timeout to override the global Elasticsearch request timeout
+        c.admin().indices().optimize(or).actionGet(1L, TimeUnit.HOURS);
     }
 }
