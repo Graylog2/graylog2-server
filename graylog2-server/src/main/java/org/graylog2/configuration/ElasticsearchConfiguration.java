@@ -124,7 +124,7 @@ public class ElasticsearchConfiguration {
     private boolean storeTimestampsAsDocValues = true;
 
     @Parameter(value = "elasticsearch_request_timeout", validator = PositiveDurationValidator.class)
-    private Duration requestTimeout = Duration.seconds(30L);
+    private Duration requestTimeout = Duration.minutes(1L);
 
     public String getClusterName() {
         return clusterName;
