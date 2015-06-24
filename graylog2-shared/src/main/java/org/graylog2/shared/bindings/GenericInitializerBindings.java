@@ -21,9 +21,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.shared.initializers.*;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
@@ -31,6 +28,5 @@ public class GenericInitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(RestApiService.class);
-        serviceBinder.addBinding().to(GroovyShellSetupService.class);
     }
 }
