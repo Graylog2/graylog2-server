@@ -25,6 +25,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.junit.Assert.*;
 
 @RequiresVersion(">=1.1.0")
+@RequiresAuthentication
 public class StatsTest extends BaseRestTest {
     private static final String resourcePrefix = "/system/stats";
 
