@@ -14,21 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2;
+package org.graylog2.bootstrap;
 
-import org.graylog2.shared.UI;
-
-public class StartupException extends RuntimeException {
-    private final String description;
-    private final String[] docLinks;
-
-    public StartupException(String description, String[] docLinks) {
-        this.description = description;
-        this.docLinks = docLinks;
-    }
-
-    @Override
-    public String getMessage() {
-        return UI.wallString(description, docLinks);
-    }
+public interface CliCommand extends Runnable {
 }

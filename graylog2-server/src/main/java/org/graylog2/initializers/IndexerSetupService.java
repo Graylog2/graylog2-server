@@ -36,7 +36,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.graylog2.plugin.DocsHelper;
-import org.graylog2.UI;
+import org.graylog2.shared.UI;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;

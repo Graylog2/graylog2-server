@@ -175,6 +175,10 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-json</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-log4j</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.stephenc.high-scale-lib</groupId>

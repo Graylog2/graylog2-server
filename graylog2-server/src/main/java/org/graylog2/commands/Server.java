@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bootstrap.commands;
+package org.graylog2.commands;
 
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
@@ -24,7 +24,7 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.UI;
+import org.graylog2.shared.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -61,7 +61,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "server", description = "Start the Graylog server")
-public class Server extends ServerBootstrap implements Runnable {
+public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     private static final Configuration configuration = new Configuration();

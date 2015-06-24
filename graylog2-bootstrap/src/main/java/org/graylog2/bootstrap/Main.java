@@ -19,42 +19,30 @@ package org.graylog2.bootstrap;
 import com.google.common.collect.ImmutableSet;
 import io.airlift.airline.Cli;
 import io.airlift.airline.Cli.CliBuilder;
-import io.airlift.airline.Help;
-import org.graylog2.bootstrap.commands.Radio;
-import org.graylog2.bootstrap.commands.Server;
+import org.graylog2.bootstrap.commands.Help;
 import org.graylog2.bootstrap.commands.ShowVersion;
-import org.graylog2.bootstrap.commands.journal.JournalDecode;
-import org.graylog2.bootstrap.commands.journal.JournalShow;
-import org.graylog2.bootstrap.commands.journal.JournalTruncate;
 
-import java.util.Set;
+import java.util.ServiceLoader;
 
 public class Main {
     public static void main(String[] args) {
-        final Set<Class<? extends Runnable>> commands = ImmutableSet.of(
-                Server.class,
-                Radio.class,
-                ShowVersion.class,
-                Help.class);
-
-        final Set<Class<? extends Runnable>> journalCommands = ImmutableSet.<Class<? extends Runnable>>of(
-                JournalShow.class,
-                JournalTruncate.class,
-                JournalDecode.class
-        );
-
-        final CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog")
+        final CliBuilder<CliCommand> builder = Cli.<CliCommand>builder("graylog")
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(Help.class)
-                .withCommands(commands);
+                .withCommands(ImmutableSet.of(
+                        ShowVersion.class,
+                        Help.class));
 
-        builder.withGroup("journal")
-                .withDescription("Manage the persisted message journal")
-                .withDefaultCommand(JournalShow.class)
-                .withCommands(journalCommands);
+        // add rest from classpath
+        final ServiceLoader<CliCommandsProvider> commandsProviders = ServiceLoader.load(CliCommandsProvider.class);
+        for (CliCommandsProvider provider : commandsProviders) {
+            provider.addTopLevelCommandsOrGroups(builder);
+        }
 
-        final Cli<Runnable> cli = builder.build();
+        final Cli<CliCommand> cli = builder.build();
         final Runnable command = cli.parse(args);
         command.run();
     }
+
+
 }

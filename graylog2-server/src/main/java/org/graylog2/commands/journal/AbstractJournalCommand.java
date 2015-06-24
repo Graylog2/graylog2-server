@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bootstrap.commands.journal;
+package org.graylog2.commands.journal;
 
 import com.google.inject.Module;
 import org.graylog2.Configuration;

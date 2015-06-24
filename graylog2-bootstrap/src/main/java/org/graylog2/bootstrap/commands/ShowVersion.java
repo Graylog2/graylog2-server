@@ -17,14 +17,12 @@
 package org.graylog2.bootstrap.commands;
 
 import io.airlift.airline.Command;
+import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Command(name = "version", description = "Show the Graylog and JVM versions")
-public class ShowVersion implements Runnable {
+public class ShowVersion implements CliCommand {
     private final Version version = Version.CURRENT_CLASSPATH;
 
     @Override

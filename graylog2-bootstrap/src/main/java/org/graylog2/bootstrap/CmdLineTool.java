@@ -43,7 +43,7 @@ import com.google.inject.spi.Message;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.apache.log4j.Level;
-import org.graylog2.UI;
+import org.graylog2.shared.UI;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
@@ -79,7 +79,7 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements Runnable {
+public abstract class CmdLineTool implements CliCommand {
     private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
 
     protected static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";

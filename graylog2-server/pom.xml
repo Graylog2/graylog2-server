@@ -17,7 +17,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Graylog.  If not, see <http://www.gnu.org/licenses />.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <prerequisites>
         <maven>3.0.1</maven>
@@ -41,10 +42,22 @@
         <version>1.2.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <mainClass>org.graylog2.bootstrap.Main</mainClass>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-bootstrap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-radio</artifactId>
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
@@ -316,9 +329,76 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <attach>false</attach>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/graylog2.xml</descriptor>
+                    </descriptors>
+                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                    <outputDirectory>${project.parent.build.directory}/assembly</outputDirectory>
+                    <finalName>graylog-${project.version}-${maven.build.timestamp}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>${mainClass}</mainClass>
+                        </transformer>
+                    </transformers>
+                    <minimizeJar>false</minimizeJar>
+                    <filters>
+                        <filter>
+                            <artifact>log4j:apache-log4j-extras</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>log4j:log4j</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <finalName>graylog-${project.version}</finalName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

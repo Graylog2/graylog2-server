@@ -14,21 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2;
+package org.graylog2.radio.commands;
 
-import org.graylog2.shared.UI;
+import io.airlift.airline.Cli;
+import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.bootstrap.CliCommandsProvider;
 
-public class StartupException extends RuntimeException {
-    private final String description;
-    private final String[] docLinks;
-
-    public StartupException(String description, String[] docLinks) {
-        this.description = description;
-        this.docLinks = docLinks;
-    }
-
+public class RadioCommandsProvider implements CliCommandsProvider {
     @Override
-    public String getMessage() {
-        return UI.wallString(description, docLinks);
+    public void addTopLevelCommandsOrGroups(Cli.CliBuilder<CliCommand> builder) {
+        builder.withCommand(Radio.class);
     }
 }

@@ -163,6 +163,11 @@
             </dependency>
             <dependency>
                 <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-bootstrap</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-inputs</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -928,6 +933,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- for some reason Intellij marks two attributes as invalid without the version -->
+                <version>${surefire.version}</version>
                 <configuration>
                     <!-- Use ALL the cores! -->
                     <forkCount>1C</forkCount>
