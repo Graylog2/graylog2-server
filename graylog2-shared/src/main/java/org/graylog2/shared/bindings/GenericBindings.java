@@ -50,11 +50,6 @@ import org.msgpack.MessagePack;
 import java.util.concurrent.Semaphore;
 
 public class GenericBindings extends AbstractModule {
-    private final InstantiationService instantiationService;
-
-    public GenericBindings(InstantiationService instantiationService) {
-        this.instantiationService = instantiationService;
-    }
 
     @Override
     protected void configure() {
@@ -62,8 +57,6 @@ public class GenericBindings extends AbstractModule {
         bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class).asEagerSingleton();
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE); // must not be a singleton!
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
-
-        bind(InstantiationService.class).toInstance(instantiationService);
 
         install(new FactoryModuleBuilder().build(DecodingProcessor.Factory.class));
 

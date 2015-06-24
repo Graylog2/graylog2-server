@@ -18,9 +18,9 @@ package org.graylog2.shared.initializers;
 
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.inject.Injector;
 import me.bazhenov.groovysh.GroovyShellService;
 import org.graylog2.plugin.BaseConfiguration;
-import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,13 +32,13 @@ public class GroovyShellSetupService extends AbstractIdleService {
     private final BaseConfiguration configuration;
 
     @Inject
-    public GroovyShellSetupService(InstantiationService instantiationService,
+    public GroovyShellSetupService(Injector injector,
                                    BaseConfiguration configuration) {
         this.configuration = configuration;
         groovyShellService.setPort(configuration.getGroovyShellPort());
 
         Map<String, Object> binding = Maps.newHashMap();
-        binding.put("instantiationService", instantiationService);
+        binding.put("instantiationService", injector);
         groovyShellService.setBindings(binding);
     }
 

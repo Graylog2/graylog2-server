@@ -16,8 +16,8 @@
  */
 package org.graylog2.alarmcallbacks;
 
+import com.google.inject.Injector;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.shared.bindings.InstantiationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 public class AlarmCallbackFactoryTest {
     private AlarmCallbackFactory alarmCallbackFactory;
     @Mock
-    private InstantiationService instantiationService;
+    private Injector injector;
     @Mock
     private DummyAlarmCallback dummyAlarmCallback;
 
@@ -46,11 +46,11 @@ public class AlarmCallbackFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        when(instantiationService.getInstance(DummyAlarmCallback.class)).thenReturn(dummyAlarmCallback);
+        when(injector.getInstance(DummyAlarmCallback.class)).thenReturn(dummyAlarmCallback);
         Set<Class<? extends AlarmCallback>> availableAlarmCallbacks = new HashSet<Class<? extends AlarmCallback>>();
         availableAlarmCallbacks.add(DummyAlarmCallback.class);
 
-        this.alarmCallbackFactory = new AlarmCallbackFactory(instantiationService, availableAlarmCallbacks);
+        this.alarmCallbackFactory = new AlarmCallbackFactory(injector, availableAlarmCallbacks);
     }
 
     @Test
