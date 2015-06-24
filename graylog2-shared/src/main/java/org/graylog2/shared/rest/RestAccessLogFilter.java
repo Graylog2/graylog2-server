@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest;
+package org.graylog2.shared.rest;
 
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.shared.security.ShiroSecurityContext;

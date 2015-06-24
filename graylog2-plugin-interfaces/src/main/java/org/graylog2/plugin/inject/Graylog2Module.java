@@ -27,16 +27,22 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ExceptionMapper;
 import java.lang.annotation.Annotation;
 
 public abstract class Graylog2Module extends AbstractModule {
@@ -228,4 +234,30 @@ public abstract class Graylog2Module extends AbstractModule {
 
         installOutput(outputMapBinder, target, factoryClass);
     }
+
+    @NotNull
+    protected Multibinder<Class<? extends DynamicFeature>> jerseyDynamicFeatureBinder() {
+        return Multibinder.newSetBinder(binder(), new DynamicFeatureType());
+    }
+
+    @NotNull
+    protected Multibinder<Class<? extends ContainerResponseFilter>> jerseyContainerResponseFilterBinder() {
+        return Multibinder.newSetBinder(binder(), new ContainerResponseFilterType());
+    }
+
+    @NotNull
+    protected Multibinder<Class<? extends ExceptionMapper>> jerseyExceptionMapperBinder() {
+        return Multibinder.newSetBinder(binder(), new ExceptionMapperType());
+    }
+
+    @NotNull
+    protected Multibinder<Class> jerseyAdditionalComponentsBinder() {
+        return Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
+    }
+
+    private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
+
+    private static class ContainerResponseFilterType extends TypeLiteral<Class<? extends ContainerResponseFilter>> {}
+
+    private static class ExceptionMapperType extends TypeLiteral<Class<? extends ExceptionMapper>> {}
 }

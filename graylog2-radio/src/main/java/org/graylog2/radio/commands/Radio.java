@@ -29,6 +29,7 @@ import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.bindings.ObjectMapperModule;
+import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -62,7 +63,8 @@ public class Radio extends ServerBootstrap {
                 new RadioBindings(configuration),
                 new RadioInitializerBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule()
+                new ObjectMapperModule(),
+                new RestApiBindings()
         );
     }
 
