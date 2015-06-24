@@ -15,7 +15,7 @@
 
             @views.html.partials.support.list() {
                 Read more about collectors and how to set them up in the
-                <a href="http://docs.graylog.org/en/latest/pages/collector.html" target="_blank">Graylog documentation</a>.
+                @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_COLLECTOR, "Graylog documentation").
             }
         </div>
 

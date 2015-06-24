@@ -3,13 +3,10 @@ package lib.notifications;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.Notification;
 import org.graylog2.restclient.models.SystemJob;
-import views.helpers.NotificationHelper;
+import views.helpers.DocsHelper;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class StreamProcessingDisabledNotification implements NotificationType {
     private final Notification notification;
     private final String streamTitle;
@@ -37,7 +34,7 @@ public class StreamProcessingDisabledNotification implements NotificationType {
                 + "</em> has taken too long for " + faultCount + " times. "
                 + "To protect the stability of message processing, this stream has been disabled. "
                 + "Please correct the stream rules and reenable the stream."
-                + " Check " + NotificationHelper.linkToKnowledgeBase("general/streams", "this article")
+                + " Check " + DocsHelper.PAGE_STREAM_PROCESSING_RUNTIME_LIMITS.toLink("the documentation.")
                 + " for more details.";
 
     }

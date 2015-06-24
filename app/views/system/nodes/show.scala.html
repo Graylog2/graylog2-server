@@ -1,15 +1,15 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
-@import org.graylog2.restclient.models.api.responses.JournalInfo
 @import views.helpers.StringHelper._
-@import views.helpers.NumberHelper
 @import views.helpers.DateHelper
 @import controllers.routes;
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions._
 @import org.joda.time.DateTime
 @import org.joda.time.DateTimeZone
+@import views.helpers.DocsHelper
 
-@main("Node " + node.getNodeId, null, "", currentUser, false) {
+
+    @main("Node " + node.getNodeId, null, "", currentUser, false) {
 
     <div class="row content content-head">
         <div class="col-md-10">
@@ -54,7 +54,8 @@
             <div class="alert alert-info">
                 <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
                 <strong>@node.getLifecycle</strong>
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                <span class="pull-right">@views.html.partials.links.docs(DocsHelper.PAGE_LOAD_BALANCERS, "What does this mean?")</span>
             </div>
         </div>
 
@@ -62,12 +63,14 @@
             @if(node.lbAlive()) {
                 <div class="alert alert-success">
                     <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
-                    <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                    <span class="pull-right">@views.html.partials.links.docs(DocsHelper.PAGE_LOAD_BALANCERS, "What does this mean?")</span>
                 </div>
             } else {
                 <div class="alert alert-danger">
                     <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
-                    <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+
+                    <span class="pull-right">@views.html.partials.links.docs(DocsHelper.PAGE_LOAD_BALANCERS, "What does this mean?")</span>
                 </div>
             }
         </div>
