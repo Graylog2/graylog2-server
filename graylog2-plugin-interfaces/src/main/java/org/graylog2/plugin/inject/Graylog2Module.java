@@ -35,10 +35,10 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
@@ -235,22 +235,22 @@ public abstract class Graylog2Module extends AbstractModule {
         installOutput(outputMapBinder, target, factoryClass);
     }
 
-    @NotNull
+    @Nonnull
     protected Multibinder<Class<? extends DynamicFeature>> jerseyDynamicFeatureBinder() {
         return Multibinder.newSetBinder(binder(), new DynamicFeatureType());
     }
 
-    @NotNull
+    @Nonnull
     protected Multibinder<Class<? extends ContainerResponseFilter>> jerseyContainerResponseFilterBinder() {
         return Multibinder.newSetBinder(binder(), new ContainerResponseFilterType());
     }
 
-    @NotNull
+    @Nonnull
     protected Multibinder<Class<? extends ExceptionMapper>> jerseyExceptionMapperBinder() {
         return Multibinder.newSetBinder(binder(), new ExceptionMapperType());
     }
 
-    @NotNull
+    @Nonnull
     protected Multibinder<Class> jerseyAdditionalComponentsBinder() {
         return Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
     }
