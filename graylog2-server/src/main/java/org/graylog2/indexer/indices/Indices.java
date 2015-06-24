@@ -419,7 +419,7 @@ public class Indices implements IndexManagement {
 
         LOG.debug("Waiting until index health status of index {} is {}", index, clusterHealthStatus);
 
-        final ClusterHealthResponse response = c.admin().cluster().health(request).actionGet();
+        final ClusterHealthResponse response = c.admin().cluster().health(request).actionGet(5L, TimeUnit.MINUTES);
         return response.getStatus();
     }
 }
