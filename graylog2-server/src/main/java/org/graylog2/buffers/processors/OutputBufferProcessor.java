@@ -28,12 +28,11 @@ import com.lmax.disruptor.WorkHandler;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.OutputRouter;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.GlobalMetricNames;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +58,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     private final ExecutorService executor;
 
     private final Configuration configuration;
-    private final ThroughputStats throughputStats;
     private final ServerStatus serverStatus;
-
-    //private List<Message> buffer = Lists.newArrayList();
 
     private final Meter incomingMessages;
     private final Counter outputThroughput;
@@ -74,12 +70,10 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     @Inject
     public OutputBufferProcessor(Configuration configuration,
                                  MetricRegistry metricRegistry,
-                                 ThroughputStats throughputStats,
                                  ServerStatus serverStatus,
                                  OutputRouter outputRouter,
                                  @DefaultMessageOutput MessageOutput defaultMessageOutput) {
         this.configuration = configuration;
-        this.throughputStats = throughputStats;
         this.serverStatus = serverStatus;
         this.outputRouter = outputRouter;
         this.defaultMessageOutput = defaultMessageOutput;
@@ -163,7 +157,6 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
             LOG.debug("Message event trace: {}", msg.recordingsAsString());
         }
 
-        throughputStats.getThroughputCounter().increment();
         outputThroughput.inc();
 
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());

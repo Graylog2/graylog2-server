@@ -96,8 +96,9 @@ public class IndexHelper {
         }
 
         // Always include the most recent index in some cases.
-        if (indices.isEmpty() || range instanceof RelativeRange) {
-            indices.add(deflector.getCurrentActualTargetIndex());
+        final String targetIndex = deflector.getCurrentActualTargetIndex();
+        if (targetIndex != null && (indices.isEmpty() || range instanceof RelativeRange)) {
+            indices.add(targetIndex);
         }
 
         return indices;
@@ -118,9 +119,10 @@ public class IndexHelper {
         }
 
         // Always include the most recent index in some cases.
-        if (indices.isEmpty() || range instanceof RelativeRange) {
+        final String targetIndex = deflector.getCurrentActualTargetIndex();
+        if (targetIndex != null && (indices.isEmpty() || range instanceof RelativeRange)) {
             try {
-                final IndexRange deflectorIndexRange = indexRangeService.get(deflector.getCurrentActualTargetIndex());
+                final IndexRange deflectorIndexRange = indexRangeService.get(targetIndex);
                 indices.add(deflectorIndexRange);
             } catch (NotFoundException e) {
                 LOG.warn("Couldn't find latest deflector target index", e);

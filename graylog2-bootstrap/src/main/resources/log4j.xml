@@ -33,6 +33,17 @@
     <logger name="org.drools.compiler.kie.builder.impl.KieRepositoryImpl">
         <level value="warn"/>
     </logger>
+    <!-- Silence chatty natty -->
+    <logger name="com.joestelmach.natty.Parser">
+        <level value="warn"/>
+    </logger>
+    <!-- Silence Kafka log chatter -->
+    <logger name="kafka.log.Log">
+        <level value="warn"/>
+    </logger>
+    <logger name="kafka.log.OffsetIndex">
+        <level value="warn"/>
+    </logger>
     <!-- Root Logger -->
     <root>
         <priority value="warn"/>

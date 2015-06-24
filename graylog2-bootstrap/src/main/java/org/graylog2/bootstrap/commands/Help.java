@@ -14,22 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings;
+package org.graylog2.bootstrap.commands;
 
-import com.google.inject.Injector;
+import org.graylog2.bootstrap.CliCommand;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class GuiceInstantiationService implements InstantiationService {
-    private Injector injector;
-
-    public void setInjector(Injector injector) {
-        this.injector = injector;
-    }
-
-    @Override
-    public <T> T getInstance(Class<T> requiredClass) {
-        return injector.getInstance(requiredClass);
-    }
+/* shallow subclass to make it implement CliCommand */
+public class Help extends io.airlift.airline.Help implements CliCommand {
 }

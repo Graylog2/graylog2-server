@@ -43,7 +43,6 @@ import com.google.inject.spi.Message;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.apache.log4j.Level;
-import org.graylog2.UI;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
@@ -54,9 +53,8 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.system.NodeIdPersistenceException;
+import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.bindings.GuiceInstantiationService;
-import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -79,7 +77,7 @@ import java.util.Set;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements Runnable {
+public abstract class CmdLineTool implements CliCommand {
     private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
 
     protected static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
@@ -330,17 +328,15 @@ public abstract class CmdLineTool implements Runnable {
         return new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
     }
 
-    protected List<Module> getSharedBindingsModules(InstantiationService instantiationService) {
+    protected List<Module> getSharedBindingsModules() {
         return Lists.newArrayList();
     }
 
     protected Injector setupInjector(NamedConfigParametersModule configModule, Module... otherModules) {
         try {
-            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-
             final ImmutableList.Builder<Module> modules = ImmutableList.builder();
             modules.add(configModule);
-            modules.addAll(getSharedBindingsModules(instantiationService));
+            modules.addAll(getSharedBindingsModules());
             modules.addAll(getCommandBindings());
             modules.addAll(Arrays.asList(otherModules));
             modules.add(new Module() {
@@ -350,10 +346,7 @@ public abstract class CmdLineTool implements Runnable {
                 }
             });
 
-            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
-            instantiationService.setInjector(injector);
-
-            return injector;
+            return GuiceInjectorHolder.createInjector(modules.build());
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;

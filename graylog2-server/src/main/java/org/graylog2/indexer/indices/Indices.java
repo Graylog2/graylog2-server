@@ -27,6 +27,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -51,6 +52,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
@@ -68,6 +70,7 @@ import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collections;
@@ -184,9 +187,15 @@ public class Indices implements IndexManagement {
         return c.admin().indices().aliasesExist(new GetAliasesRequest(alias)).actionGet().exists();
     }
 
+    @Nullable
     public String aliasTarget(String alias) {
+        final IndicesAdminClient indicesAdminClient = c.admin().indices();
+
+        final GetAliasesRequest request = indicesAdminClient.prepareGetAliases(alias).request();
+        final GetAliasesResponse response = indicesAdminClient.getAliases(request).actionGet();
+
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        return c.admin().indices().getAliases(new GetAliasesRequest(alias)).actionGet().getAliases().keysIt().next();
+        return response.getAliases().isEmpty() ? null : response.getAliases().keysIt().next();
     }
 
     public boolean create(String indexName) {

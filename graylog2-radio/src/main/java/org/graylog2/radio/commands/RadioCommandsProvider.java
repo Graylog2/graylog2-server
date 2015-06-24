@@ -14,11 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings;
+package org.graylog2.radio.commands;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface InstantiationService {
-    public <T> T getInstance(Class<T> requiredClass);
+import io.airlift.airline.Cli;
+import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.bootstrap.CliCommandsProvider;
+
+public class RadioCommandsProvider implements CliCommandsProvider {
+    @Override
+    public void addTopLevelCommandsOrGroups(Cli.CliBuilder<CliCommand> builder) {
+        builder.withCommand(Radio.class);
+    }
 }

@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bootstrap.commands.journal;
+package org.graylog2.commands.journal;
 
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import kafka.log.LogSegment;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.joda.time.DateTime;
-
-import java.io.File;
 
 @SuppressWarnings("LocalCanBeFinal")
 @Command(name = "show", description = "Shows information about the persisted message journal")

@@ -124,4 +124,10 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             return null;
         }
     }
+
+    @Override
+    public List<Message> getSearchHits() {
+        return Lists.newArrayList(searchHits);
+    }
+
 }

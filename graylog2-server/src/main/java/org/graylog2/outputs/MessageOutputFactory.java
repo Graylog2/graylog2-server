@@ -23,20 +23,16 @@ import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
-import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessageOutputFactory {
-    private final InstantiationService instantiationService;
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
 
     @Inject
-    public MessageOutputFactory(InstantiationService instantiationService,
-                                Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs) {
-        this.instantiationService = instantiationService;
+    public MessageOutputFactory(Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs) {
         this.availableOutputs = availableOutputs;
     }
 

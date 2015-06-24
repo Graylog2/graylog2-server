@@ -35,7 +35,8 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
-import org.graylog2.UI;
+import org.graylog2.plugin.DocsHelper;
+import org.graylog2.shared.UI;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -136,7 +137,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 if (ClusterHealthStatus.RED.equals(health.getStatus())) {
                     UI.exitHardWithWall("The Elasticsearch cluster state is RED which means shards are unassigned. "
                                     + "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.",
-                            "http://docs.graylog.org/en/1.0/pages/configuring_es.html");
+                            DocsHelper.PAGE_ES_CONFIGURATION.toString());
 
                 }
             } catch (ElasticsearchTimeoutException e) {
@@ -185,7 +186,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 UI.exitHardWithWall(
                         "Could not successfully connect to Elasticsearch, if you use multicast check that it is working in your network" +
                                 " and that Elasticsearch is running properly and is reachable. Also check that the cluster.name setting is correct.",
-                        "http://docs.graylog.org/en/1.0/pages/configuring_es.html");
+                        DocsHelper.PAGE_ES_CONFIGURATION.toString());
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();

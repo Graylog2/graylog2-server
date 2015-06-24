@@ -22,14 +22,18 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.plugin.BaseConfiguration;
-import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.QueryParam;
@@ -39,6 +43,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.security.Principal;
+import java.util.Arrays;
 
 public abstract class RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
@@ -103,6 +108,34 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
+            throw new ForbiddenException("Not authorized to access resource id " + instanceId);
+        }
+    }
+
+    protected boolean isAnyPermitted(String[] permissions, final String instanceId) {
+        final Iterable<String> instancePermissions = Iterables.transform(Arrays.asList(permissions),
+                                                               new Function<String, String>() {
+                                                                   @Nullable
+                                                                   @Override
+                                                                   public String apply(String permission) {
+                                                                       return permission + ":" + instanceId;
+                                                                   }
+                                                               });
+        return isAnyPermitted(FluentIterable.from(instancePermissions).toArray(String.class));
+    }
+
+    protected boolean isAnyPermitted(String... permissions) {
+        final boolean[] permitted = getSubject().isPermitted(permissions);
+        for (boolean p : permitted) {
+            if (p) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void checkAnyPermission(String permissions[], String instanceId) {
+        if (!isAnyPermitted(permissions, instanceId)) {
             throw new ForbiddenException("Not authorized to access resource id " + instanceId);
         }
     }

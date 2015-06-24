@@ -49,7 +49,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "${if backlog}" +
             "Last messages accounting for this alert:\n" +
             "${foreach backlog message}" +
-            "${message}\n" +
+            "${message}\n\n" +
             "${end}" +
             "${else}" +
             "<No backlog>\n" +

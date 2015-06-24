@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
 
-@CollectionName("users")
+@CollectionName(UserImpl.COLLECTION_NAME)
 public class UserImpl extends PersistedImpl implements User {
     private static final Logger LOG = LoggerFactory.getLogger(UserImpl.class);
 
@@ -51,6 +51,7 @@ public class UserImpl extends PersistedImpl implements User {
             .put("enableSmartSearch", true)
             .build();
 
+    public static final String COLLECTION_NAME = "users";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";

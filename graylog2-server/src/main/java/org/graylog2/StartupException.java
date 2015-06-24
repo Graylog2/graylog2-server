@@ -16,6 +16,8 @@
  */
 package org.graylog2;
 
+import org.graylog2.shared.UI;
+
 public class StartupException extends RuntimeException {
     private final String description;
     private final String[] docLinks;

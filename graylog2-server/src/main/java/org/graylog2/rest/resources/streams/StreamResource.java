@@ -230,7 +230,7 @@ public class StreamResource extends RestResource {
     })
     public void pause(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
-        checkPermission(RestPermissions.STREAMS_CHANGESTATE, streamId);
+        checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
@@ -246,7 +246,7 @@ public class StreamResource extends RestResource {
     })
     public void resume(@ApiParam(name = "streamId", required = true)
                        @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
-        checkPermission(RestPermissions.STREAMS_CHANGESTATE, streamId);
+        checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);

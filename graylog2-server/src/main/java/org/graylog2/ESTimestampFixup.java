@@ -52,7 +52,6 @@ import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -169,11 +168,7 @@ public class ESTimestampFixup {
         final JadConfig jadConfig = new JadConfig();
         final Configuration configuration = readConfiguration(jadConfig, commandLineOptions);
 
-        final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         final Injector injector = Guice.createInjector(Stage.PRODUCTION, new Bindings(configuration));
-
-        instantiationService.setInjector(injector);
-
         injector.getInstance(ESTimestampFixup.class).run(commandLineOptions, args);
     }
 

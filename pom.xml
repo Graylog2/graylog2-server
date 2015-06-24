@@ -25,7 +25,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>1.1.0-rc.4-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Graylog</name>
     <url>https://www.graylog.org/</url>
@@ -159,6 +159,11 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -359,7 +364,7 @@
             <dependency>
                 <groupId>com.github.joschi</groupId>
                 <artifactId>jadconfig</artifactId>
-                <version>0.10.1</version>
+                <version>0.11.0</version>
             </dependency>
 
             <!-- Jersey and Glassfish -->
@@ -417,7 +422,7 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>jersey-netty</artifactId>
-                <version>1.5.1</version>
+                <version>1.5.2</version>
             </dependency>
 
             <dependency>
@@ -566,14 +571,17 @@
                 <version>2.3</version>
             </dependency>
 
-            <!--
-            This is required because natty currently doesn't work with
-            newer antlr-runtime versions, see https://github.com/joestelmach/natty/issues/60
-            -->
             <dependency>
-                <groupId>org.graylog2.repackaged</groupId>
+                <groupId>com.joestelmach</groupId>
                 <artifactId>natty</artifactId>
-                <version>0.8-1</version>
+                <version>0.11</version>
+                <exclusions>
+                    <!-- Getting rid of commons-logging in a transitive dependency of com.joestelmach:natty -->
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -730,7 +738,7 @@
             <dependency>
                 <groupId>org.graylog.plugins</groupId>
                 <artifactId>usage-statistics</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.7</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
@@ -925,6 +933,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!-- for some reason Intellij marks two attributes as invalid without the version -->
+                <version>${surefire.version}</version>
                 <configuration>
                     <!-- Use ALL the cores! -->
                     <forkCount>1C</forkCount>

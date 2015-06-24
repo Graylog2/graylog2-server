@@ -24,18 +24,23 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.net.UnknownHostException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * MongoDB connection singleton
  */
 @Singleton
 public class MongoConnectionImpl implements MongoConnection {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoConnectionImpl.class);
+        
     private final MongoClientURI mongoClientURI;
 
     private MongoClient m = null;
@@ -56,9 +61,15 @@ public class MongoConnectionImpl implements MongoConnection {
     @Override
     public synchronized Mongo connect() {
         if (m == null) {
+            final String dbName = mongoClientURI.getDatabase();
+            if (isNullOrEmpty(dbName)) {
+                LOG.error("The MongoDB database name must not be null or empty (mongodb_uri was: {})", mongoClientURI);
+                throw new RuntimeException("MongoDB database name is missing.");
+            }
+
             try {
                 m = new MongoClient(mongoClientURI);
-                db = m.getDB(mongoClientURI.getDatabase());
+                db = m.getDB(dbName);
                 db.setWriteConcern(WriteConcern.SAFE);
             } catch (UnknownHostException e) {
                 throw new RuntimeException("Cannot resolve host name for MongoDB", e);

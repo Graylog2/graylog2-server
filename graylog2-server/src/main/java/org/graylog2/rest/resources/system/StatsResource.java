@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.SystemStats;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 @Api(value = "System/Stats", description = "Node system stats")
 @Path("/system/stats")
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class StatsResource extends RestResource {
     private final StatsService statsService;
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bootstrap.commands;
+package org.graylog2.radio.commands;
 
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 @Command(name = "radio", description = "Start the Graylog radio")
-public class Radio extends ServerBootstrap implements Runnable {
+public class Radio extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
     private static final Configuration configuration = new Configuration();
 
@@ -58,10 +58,12 @@ public class Radio extends ServerBootstrap implements Runnable {
 
     @Override
     protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(new RadioBindings(configuration, capabilities()),
+        return Arrays.<Module>asList(
+                new RadioBindings(configuration),
                 new RadioInitializerBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule());
+                new ObjectMapperModule()
+        );
     }
 
     @Override

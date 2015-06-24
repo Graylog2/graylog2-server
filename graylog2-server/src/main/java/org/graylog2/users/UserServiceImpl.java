@@ -19,6 +19,7 @@ package org.graylog2.users;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
@@ -80,6 +81,18 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
         return new UserImpl((ObjectId) userId, userObject.toMap());
+    }
+
+    public int delete(final String username) {
+        LOG.debug("Deleting user(s) with username \"{}\"", username);
+        final DBObject query = BasicDBObjectBuilder.start(UserImpl.USERNAME, username).get();
+        final int result = destroy(query, UserImpl.COLLECTION_NAME);
+
+        if (result > 1) {
+            LOG.warn("Removed {} users matching username \"{}\".", result, username);
+        }
+
+        return result;
     }
 
     @Override

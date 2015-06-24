@@ -28,31 +28,13 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Deprecated
 public class ThroughputStats {
-    private long currentThroughput;
-    private final Counter throughputCounter;
     private final AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput;
     private final AtomicReference<HashMap<String, Counter>> currentStreamThroughput;
 
 
     public ThroughputStats() {
-        this.currentThroughput = 0;
-        this.throughputCounter = new Counter();
         this.streamThroughput = new AtomicReference<>(new ConcurrentHashMap<String, Counter>());
         this.currentStreamThroughput =  new AtomicReference<>();
-    }
-
-    @Deprecated
-    public long getCurrentThroughput() {
-        return currentThroughput;
-    }
-
-    @Deprecated
-    public Counter getThroughputCounter() {
-        return throughputCounter;
-    }
-
-    public void setCurrentThroughput(long currentThroughput) {
-        this.currentThroughput = currentThroughput;
     }
 
     public Map<String, Counter> cycleStreamThroughput() {

@@ -1,0 +1,5 @@
+{
+  "alarmcallbackconfigurations": [
+    {"_id": {"$oid" : "5401deadbeefdeadbeefaffe"}, "stream_id" : "5402deadbeefdeadbeefaffe", "type" : "dummy.type", "configuration" : {}, "created_at" : "2015-03-14T15:09:26.540Z", "creator_user_id" : "someuser"}
+  ]
+}
