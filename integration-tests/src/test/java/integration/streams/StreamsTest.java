@@ -29,14 +29,15 @@ import java.nio.charset.Charset;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 
 @RequiresAuthentication
 @RequiresVersion(">=0.90.0")
-@MongoDbSeed(locations = {})
+@MongoDbSeed
 public class StreamsTest extends BaseRestTest {
     @Test
-    @MongoDbSeed
     public void listStreamsWhenNoStreamsArePresent() throws Exception {
         final JsonPath response = given()
             .when()
@@ -110,6 +111,53 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
+    public void createFullStreamIncludingStreamrules() {
+        final int beforeCount = streamCount();
+        final String streamTitle = "A full Test Stream";
+        final String description = "This is a full test stream including stream rules.";
+
+        final JsonPath response = createStreamFromRequest(jsonResourceForMethod())
+                .statusCode(201)
+                .body(".", containsAllKeys("stream_id"))
+                .extract().jsonPath();
+
+        final String streamId = response.getString("stream_id");
+
+        assertThat(streamId).isNotNull().isNotEmpty();
+
+        final int afterCount = streamCount();
+
+        assertThat(afterCount).isEqualTo(beforeCount+1);
+
+        final JsonPath getResponse = given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .assertThat()
+                .body("title", equalTo(streamTitle))
+                .body("disabled", equalTo(true))
+                .body("description", equalTo(description))
+                .extract().jsonPath();
+
+        assertThat(getResponse.getList("rules")).isNotNull();
+        assertThat(getResponse.getList("rules").size()).isEqualTo(2);
+    }
+
+    @Test
+    public void createFullStreamIncludingInvalidStreamrulesShouldFail() {
+        final int beforeCount = streamCount();
+
+        createStreamFromRequest(jsonResourceForMethod())
+                .statusCode(400);
+
+        final int afterCount = streamCount();
+
+        assertThat(afterCount).isEqualTo(beforeCount);
+    }
+
+    @Test
     public void creatingIncompleteStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
 
@@ -121,7 +169,6 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
-    @MongoDbSeed
     public void creatingInvalidStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
 
@@ -352,7 +399,13 @@ public class StreamsTest extends BaseRestTest {
     }
 
     protected ValidatableResponse createStreamFromRequest(String request) {
-        return createStreamFromRequest(request.getBytes(Charset.defaultCharset()));
+        return given()
+                .when()
+                .body(request)
+                .post("/streams")
+                .then()
+                .contentType(ContentType.JSON)
+                .assertThat();
     }
 
     protected int streamCount() {
