@@ -201,11 +201,6 @@
         </dependency>
 
         <dependency>
-            <groupId>me.bazhenov.groovy-shell</groupId>
-            <artifactId>groovy-shell-server</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>

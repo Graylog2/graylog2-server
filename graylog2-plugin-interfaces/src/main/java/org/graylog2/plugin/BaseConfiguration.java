@@ -98,12 +98,6 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_worker_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int restWorkerThreadsMaxPoolSize = 16;
 
-    @Parameter(value = "groovy_shell_enable")
-    private boolean groovyShellEnable = false;
-
-    @Parameter(value = "groovy_shell_port", validator = InetPortValidator.class)
-    private int groovyShellPort = 6789;
-
     @Parameter(value = "plugin_dir")
     private String pluginDir = "plugin";
 
@@ -254,14 +248,6 @@ public abstract class BaseConfiguration {
 
     public int getRestWorkerThreadsMaxPoolSize() {
         return restWorkerThreadsMaxPoolSize;
-    }
-
-    public boolean isGroovyShellEnable() {
-        return groovyShellEnable;
-    }
-
-    public int getGroovyShellPort() {
-        return groovyShellPort;
     }
 
     public String getPluginDir() {
