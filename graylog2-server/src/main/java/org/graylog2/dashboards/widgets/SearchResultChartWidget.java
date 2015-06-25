@@ -22,18 +22,15 @@ import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class SearchResultChartWidget extends DashboardWidget {
+public class SearchResultChartWidget extends ChartWidget {
 
     private final String query;
     private final TimeRange timeRange;
-    private final Searches.DateHistogramInterval interval;
-    @Nullable
-    private final String streamId;
+
     private final Searches searches;
 
     public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
@@ -42,14 +39,6 @@ public class SearchResultChartWidget extends DashboardWidget {
 
         this.query = getNonEmptyQuery(query);
         this.timeRange = timeRange;
-
-        this.streamId = (String) config.get("stream_id");
-
-        if (config.containsKey("interval")) {
-            this.interval = Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase());
-        } else {
-            this.interval = Searches.DateHistogramInterval.MINUTE;
-        }
     }
 
     // We need to ensure query is not empty, or the histogram calculation will fail
@@ -72,12 +61,8 @@ public class SearchResultChartWidget extends DashboardWidget {
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .put("query", query)
-                .put("interval", interval.toString().toLowerCase())
-                .put("timerange", timeRange.getPersistedConfig());
-
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
+                .put("timerange", timeRange.getPersistedConfig())
+                .putAll(super.getPersistedConfig());
 
         return persistedConfig.build();
     }
