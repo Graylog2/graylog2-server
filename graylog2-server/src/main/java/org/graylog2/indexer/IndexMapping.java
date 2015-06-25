@@ -32,13 +32,15 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * Representing the message type mapping in ElasticSearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  */
 @Singleton
 public class IndexMapping {
+    public static final String TYPE_MESSAGE = "message";
+    public static final String TYPE_META = "graylog_meta";
+
     private final Client client;
 
     @Inject
@@ -55,6 +57,36 @@ public class IndexMapping {
                 .setType(type)
                 .setSource(ImmutableMap.of(type, mapping))
                 .request();
+    }
+
+    public Map<String, Object> metaMapping() {
+        final ImmutableMap<String, ? extends Serializable> stringProperty = ImmutableMap.of(
+                "type", "string",
+                "index", "not_analyzed",
+                "doc_values", true);
+        final ImmutableMap<String, ? extends Serializable> dateProperty = ImmutableMap.of(
+                "type", "date",
+                "format", "date_time",
+                "index", "not_analyzed",
+                "doc_values", true);
+        final ImmutableMap<String, ? extends Serializable> intProperty = ImmutableMap.of(
+                "type", "integer",
+                "index", "no",
+                "doc_values", true);
+        final Map<String, ? extends Serializable> properties = ImmutableMap.of(
+                "index_name", stringProperty,
+                "begin", dateProperty,
+                "end", dateProperty,
+                "calculated_at", dateProperty,
+                "took_ms", intProperty
+        );
+
+        return ImmutableMap.<String, Object>of(
+                "properties", properties,
+                "_source", enabled(),
+                "_timestamp", ImmutableMap.of(
+                        "enabled", true,
+                        "format", "date_time"));
     }
 
     public Map<String, Object> messageMapping(final String analyzer, boolean storeTimestampsAsDocValues) {

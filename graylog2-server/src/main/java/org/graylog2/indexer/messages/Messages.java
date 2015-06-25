@@ -35,6 +35,7 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.DeadLetter;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -48,7 +49,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
 public class Messages {
-    public static final String TYPE = "message";
     private static final Logger log = LoggerFactory.getLogger(Messages.class);
 
     private final Client c;
@@ -147,7 +147,7 @@ public class Messages {
         b.setIndex(index);
         b.setContentType(XContentType.JSON);
         b.setOpType(IndexRequest.OpType.INDEX);
-        b.setType(TYPE);
+        b.setType(IndexMapping.TYPE_MESSAGE);
         b.setConsistencyLevel(WriteConsistencyLevel.ONE);
 
         return b;

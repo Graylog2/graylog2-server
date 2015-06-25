@@ -30,11 +30,11 @@ import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -64,7 +64,6 @@ import org.elasticsearch.search.SearchHit;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -216,8 +215,13 @@ public class Indices implements IndexManagement {
 
         final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer(),
                 configuration.isStoreTimestampsAsDocValues());
+        final PutMappingResponse messageMappingResponse =
+                indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
+        final Map<String, Object> metaMapping = indexMapping.metaMapping();
+        final PutMappingResponse metaMappingResponse =
+                indexMapping.createMapping(indexName, IndexMapping.TYPE_META, metaMapping).actionGet();
 
-        return indexMapping.createMapping(indexName, Messages.TYPE, messageMapping).actionGet().isAcknowledged();
+        return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
     }
 
     public ImmutableMap<String, IndexMetaData> getMetadata() {
@@ -238,7 +242,7 @@ public class Indices implements IndexManagement {
 
         for (ObjectObjectCursor<String, IndexMetaData> m : cs.getMetaData().indices()) {
             try {
-                MappingMetaData mmd = m.value.mapping(Messages.TYPE);
+                MappingMetaData mmd = m.value.mapping(IndexMapping.TYPE_MESSAGE);
                 if (mmd == null) {
                     // There is no mapping if there are no messages in the index.
                     continue;
@@ -261,7 +265,7 @@ public class Indices implements IndexManagement {
         b.setId(id);
         b.setSource(doc);
         b.setOpType(IndexRequest.OpType.INDEX);
-        b.setType(Messages.TYPE);
+        b.setType(IndexMapping.TYPE_MESSAGE);
         b.setConsistencyLevel(WriteConsistencyLevel.ONE);
 
         return b;
