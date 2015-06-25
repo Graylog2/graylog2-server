@@ -46,6 +46,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.UI;
+import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -108,7 +109,8 @@ public class Server extends ServerBootstrap {
                 new MessageOutputBindings(configuration),
                 new RotationStrategyBindings(),
                 new PeriodicalBindings(),
-                new ServerObjectMapperModule()
+                new ServerObjectMapperModule(),
+                new RestApiBindings()
         );
     }
 
