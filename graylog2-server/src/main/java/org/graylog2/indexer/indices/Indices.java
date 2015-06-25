@@ -35,7 +35,6 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -63,8 +62,8 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.Mapping;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
@@ -87,11 +86,13 @@ public class Indices implements IndexManagement {
 
     private final Client c;
     private final ElasticsearchConfiguration configuration;
+    private final IndexMapping indexMapping;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping) {
         this.c = client;
         this.configuration = configuration;
+        this.indexMapping = indexMapping;
     }
 
     public void move(String source, String target) {
@@ -200,25 +201,23 @@ public class Indices implements IndexManagement {
     }
 
     public boolean create(String indexName) {
-        Map<String, Object> settings = Maps.newHashMap();
-        settings.put("number_of_shards", configuration.getShards());
-        settings.put("number_of_replicas", configuration.getReplicas());
-        Map<String, String> keywordLowercase = Maps.newHashMap();
-        keywordLowercase.put("tokenizer", "keyword");
-        keywordLowercase.put("filter", "lowercase");
-        settings.put("index.analysis.analyzer.analyzer_keyword", keywordLowercase);
+        final Map<String, String> keywordLowercase = ImmutableMap.of(
+                "tokenizer", "keyword",
+                "filter", "lowercase");
+        final Map<String, Object> settings = ImmutableMap.of(
+                "number_of_shards", configuration.getShards(),
+                "number_of_replicas", configuration.getReplicas(),
+                "index.analysis.analyzer.analyzer_keyword", keywordLowercase);
 
-        CreateIndexRequest cir = new CreateIndexRequest(indexName);
-        cir.settings(settings);
-
-        final ActionFuture<CreateIndexResponse> createFuture = c.admin().indices().create(cir);
-        final boolean acknowledged = createFuture.actionGet().isAcknowledged();
-        if (!acknowledged) {
+        final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName).setSettings(settings).request();
+        if (!c.admin().indices().create(cir).actionGet().isAcknowledged()) {
             return false;
         }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(c, indexName, configuration.getAnalyzer(),
+
+        final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer(),
                 configuration.isStoreTimestampsAsDocValues());
-        return c.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
+
+        return indexMapping.createMapping(indexName, Messages.TYPE, messageMapping).actionGet().isAcknowledged();
     }
 
     public ImmutableMap<String, IndexMetaData> getMetadata() {

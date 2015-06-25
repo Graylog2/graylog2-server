@@ -31,6 +31,7 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRespon
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.searches.SearchesTest;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -74,7 +75,7 @@ public class IndicesTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG);
+        indices = new Indices(client, CONFIG, new IndexMapping(client));
     }
 
     @Test

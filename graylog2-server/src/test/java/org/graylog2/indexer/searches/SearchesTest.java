@@ -36,6 +36,7 @@ import org.elasticsearch.search.SearchHit;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -474,7 +475,7 @@ public class SearchesTest {
                 client.admin().indices().prepareDelete(indexNames).execute().actionGet();
             }
 
-            Indices indices = new Indices(client, new ElasticsearchConfiguration());
+            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping(client));
             for (String index : indexes) {
                 if (!indices.create(index)) {
                     throw new IllegalStateException("Couldn't create index " + index);
