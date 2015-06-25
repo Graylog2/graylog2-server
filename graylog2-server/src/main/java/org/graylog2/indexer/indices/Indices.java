@@ -161,20 +161,6 @@ public class Indices implements IndexManagement {
         return isr.actionGet().getIndices();
     }
 
-    public long getTotalNumberOfMessages() {
-        return c.count(new CountRequest(allIndicesAlias())).actionGet().getCount();
-    }
-
-    public long getTotalSize() {
-        return c.admin().indices().stats(
-                new IndicesStatsRequest().indices(allIndicesAlias()))
-                .actionGet()
-                .getTotal()
-                .getStore()
-                .getSize()
-                .getMb();
-    }
-
     public String allIndicesAlias() {
         return configuration.getIndexPrefix() + "_*";
     }
@@ -222,16 +208,6 @@ public class Indices implements IndexManagement {
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_META, metaMapping).actionGet();
 
         return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
-    }
-
-    public ImmutableMap<String, IndexMetaData> getMetadata() {
-        Map<String, IndexMetaData> metaData = Maps.newHashMap();
-
-        for (ObjectObjectCursor<String, IndexMetaData> next : c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices()) {
-            metaData.put(next.key, next.value);
-        }
-
-        return ImmutableMap.copyOf(metaData);
     }
 
     public Set<String> getAllMessageFields() {
