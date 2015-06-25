@@ -16,11 +16,11 @@
  */
 package integration.util.mongodb;
 
-import org.bson.Document;
+import com.mongodb.DBObject;
 
 import java.util.List;
 import java.util.Map;
 
 public interface DumpReader {
-    Map<String, List<Document>> toMap();
+    Map<String, List<DBObject>> toMap();
 }

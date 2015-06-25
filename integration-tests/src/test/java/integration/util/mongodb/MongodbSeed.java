@@ -16,15 +16,16 @@
  */
 package integration.util.mongodb;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class MongodbSeed {
     private final MongoClient mongoClient;
     private final String dbName;
 
-    public MongodbSeed(String dbName) {
+    public MongodbSeed(String dbName) throws UnknownHostException {
         this.dbName = dbName;
         mongoClient = new MongoClient(
                 URI.create(System.getProperty("gl2.baseuri", "http://localhost")).getHost(),
@@ -40,7 +41,7 @@ public class MongodbSeed {
         mongoClient.dropDatabase(dbName);
     }
 
-    private Map<String, List<Document>> parseDatabaseDump(URL seedUrl) throws IOException {
+    private Map<String, List<DBObject>> parseDatabaseDump(URL seedUrl) throws IOException {
         final DumpReader dumpReader;
         if (seedUrl.getPath().endsWith(".json")) {
             dumpReader = new JsonReader(seedUrl);
@@ -50,13 +51,13 @@ public class MongodbSeed {
         return dumpReader.toMap();
     }
 
-    private Map<String, List<Document>> updateNodeIdFirstNode(Map<String, List<Document>> collections, String nodeId) {
-        final List<Document> nodes = collections.get("nodes");
+    private Map<String, List<DBObject>> updateNodeIdFirstNode(Map<String, List<DBObject>> collections, String nodeId) {
+        final List<DBObject> nodes = collections.get("nodes");
 
         if (nodes == null || nodes.isEmpty())
             return collections;
 
-        Document firstNode = nodes.get(0);
+        final DBObject firstNode = nodes.get(0);
         firstNode.put("node_id", nodeId);
         nodes.set(0, firstNode);
 
@@ -66,14 +67,14 @@ public class MongodbSeed {
         return collections;
     }
 
-    private Map<String, List<Document>> updateNodeIdInputs(Map<String, List<Document>> collections, String nodeId) {
-        List<Document> inputs = collections.get("inputs");
+    private Map<String, List<DBObject>> updateNodeIdInputs(Map<String, List<DBObject>> collections, String nodeId) {
+        List<DBObject> inputs = collections.get("inputs");
 
         if (inputs == null) {
             return collections;
         }
 
-        for (Document input : inputs){
+        for (DBObject input : inputs){
             input.put("node_id", nodeId);
         }
 
@@ -84,21 +85,21 @@ public class MongodbSeed {
     }
 
     public void loadDataset(URL dbPath, String nodeId) throws IOException {
-        Map<String, List<Document>> collections = parseDatabaseDump(dbPath);
+        Map<String, List<DBObject>> collections = parseDatabaseDump(dbPath);
         collections = updateNodeIdFirstNode(collections, nodeId);
         collections = updateNodeIdInputs(collections, nodeId);
 
-        final MongoDatabase mongoDatabase = mongoClient.getDatabase(dbName);
+        final DB mongoDatabase = mongoClient.getDB(dbName);
 
-        for (Map.Entry<String, List<Document>> collection : collections.entrySet()) {
+        for (Map.Entry<String, List<DBObject>> collection : collections.entrySet()) {
             final String collectionName = collection.getKey();
             if (mongoDatabase.getCollection(collectionName) == null) {
-                mongoDatabase.createCollection(collectionName);
+                mongoDatabase.createCollection(collectionName, new BasicDBObject());
             }
-            final MongoCollection<Document> mongoCollection = mongoDatabase.getCollection(collectionName);
+            final DBCollection mongoCollection = mongoDatabase.getCollection(collectionName);
 
             if (!collection.getValue().isEmpty()) {
-                mongoCollection.insertMany(collection.getValue());
+                mongoCollection.insert(collection.getValue());
             }
         }
     }

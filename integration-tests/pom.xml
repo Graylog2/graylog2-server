@@ -45,6 +45,7 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <skip.integration.tests>true</skip.integration.tests>
     </properties>
 
     <dependencies>
@@ -114,7 +115,6 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
 	        <scope>test</scope>
-	        <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -129,6 +129,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <skipTests>${skip.integration.tests}</skipTests>
                     <forkCount>1</forkCount>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>

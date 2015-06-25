@@ -17,11 +17,12 @@
 package integration.util.mongodb;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.apache.commons.io.FilenameUtils;
 import org.bson.BSONDecoder;
 import org.bson.BSONObject;
 import org.bson.BasicBSONDecoder;
-import org.bson.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -38,16 +39,16 @@ import java.util.List;
 import java.util.Map;
 
 public class BsonReader implements DumpReader {
-    private final Map<String, List<Document>> collectionMap;
+    private final Map<String, List<DBObject>> collectionMap;
 
     public BsonReader(URL location) {
         final File dir = new File(location.getPath());
         collectionMap = readBsonDirectory(dir);
     }
 
-    protected List<Document> readBsonFile(String filename){
+    protected List<DBObject> readBsonFile(String filename){
         Path filePath = Paths.get(filename);
-        List<Document> dataset = new ArrayList<>();
+        List<DBObject> dataset = new ArrayList<>();
 
         try {
             ByteArrayInputStream fileBytes = new ByteArrayInputStream(Files.readAllBytes(filePath));
@@ -55,11 +56,9 @@ public class BsonReader implements DumpReader {
             BSONObject obj;
 
             while((obj = decoder.readObject(fileBytes)) != null) {
-                if(!obj.toString().trim().isEmpty()) {
-                    Document mongoDocument = new Document();
-                    mongoDocument.putAll(obj.toMap());
-                    dataset.add(mongoDocument);
-                }
+                System.out.println("Real class: " + obj.getClass());
+                final DBObject mongoDocument = new BasicDBObject(obj.toMap());
+                dataset.add(mongoDocument);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -74,8 +73,8 @@ public class BsonReader implements DumpReader {
         return dataset;
     }
 
-    protected Map<String, List<Document>> readBsonDirectory(File directory) {
-        final Map<String, List<Document>> collections = new HashMap<>();
+    protected Map<String, List<DBObject>> readBsonDirectory(File directory) {
+        final Map<String, List<DBObject>> collections = new HashMap<>();
 
         File[] collectionListing = directory.listFiles(new FilenameFilter() {
             @Override
@@ -86,7 +85,7 @@ public class BsonReader implements DumpReader {
 
         if (collectionListing != null) {
             for (File collection : collectionListing) {
-                List<Document> collectionData = readBsonFile(collection.getAbsolutePath());
+                List<DBObject> collectionData = readBsonFile(collection.getAbsolutePath());
                 collections.put(FilenameUtils.removeExtension(collection.getName()), collectionData);
             }
         }
@@ -94,7 +93,7 @@ public class BsonReader implements DumpReader {
         return collections;
     }
 
-    public Map<String, List<Document>> toMap() {
+    public Map<String, List<DBObject>> toMap() {
         return collectionMap;
     }
 }
