@@ -17,6 +17,7 @@
 package integration.system.collectors;
 
 import integration.BaseRestTest;
+import integration.RequiresAuthentication;
 import integration.RequiresVersion;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -27,20 +28,20 @@ import static com.jayway.restassured.RestAssured.get;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.assertj.jodatime.api.Assertions.assertThat;
 
 @RequiresVersion(">=1.1.0")
 public class CollectorsTest extends BaseRestTest {
     private final String resourcePrefix = "/system/collectors";
-    private final String resourceEndpoint = resourcePrefix + "/register";
 
     @Test
     public void testRegisterCollector() throws Exception {
         given().when()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
-                    .post(resourceEndpoint)
+                    .put(getResourceEndpoint("collectorId"))
                 .then()
                     .statusCode(202);
     }
@@ -48,13 +49,15 @@ public class CollectorsTest extends BaseRestTest {
     @Test
     public void testRegisterInvalidCollector() throws Exception {
         given().when()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
-                    .post(resourceEndpoint)
+                    .put(getResourceEndpoint("invalidCollector"))
                 .then()
                     .statusCode(400);
     }
 
     @Test
+    @RequiresAuthentication
     public void testListCollectors() throws Exception {
         given().when()
                     .get(resourcePrefix)
@@ -64,15 +67,18 @@ public class CollectorsTest extends BaseRestTest {
     }
 
     @Test
+    @RequiresAuthentication
     public void testGetCollector() throws Exception {
         given().when()
+                    .auth().none()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
                     .body(jsonResourceForMethod())
-                    .post(resourceEndpoint)
+                    .put(getResourceEndpoint("getCollectorTest"))
                 .then()
                     .statusCode(202);
 
         given().when()
-                .get(resourcePrefix + "/getCollectorTest")
+                    .get(resourcePrefix + "/getCollectorTest")
                 .then()
                     .statusCode(200)
                     .assertThat()
@@ -82,30 +88,38 @@ public class CollectorsTest extends BaseRestTest {
     }
 
     @Test
+    @RequiresAuthentication
     public void testTouchCollector() throws Exception {
         final String collectorId = "testTouchCollectorId";
+        final String collectorId2 = "testTouchCollectorId2";
 
         given().when()
-                .body(jsonResourceForMethod())
-                    .post(resourceEndpoint)
+                    .auth().none()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
+                    .body(jsonResourceForMethod())
+                    .put(getResourceEndpoint(collectorId))
                 .then()
                     .statusCode(202);
 
         final DateTime lastSeenBefore = getLastSeenForCollectorId(collectorId);
 
         given().when()
-                .body(jsonResource("test-register-collector.json"))
-                .post(resourceEndpoint)
+                    .auth().none()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
+                    .body(jsonResource("test-register-collector.json"))
+                    .put(getResourceEndpoint(collectorId2))
                 .then()
-                .statusCode(202);
+                    .statusCode(202);
 
         final DateTime lastSeenAfterOtherRegistration = getLastSeenForCollectorId(collectorId);
 
         given().when()
-                .body(jsonResourceForMethod())
-                .post(resourceEndpoint)
+                    .auth().none()
+                    .header("X-Graylog-Collector-Version", "0.0.0")
+                    .body(jsonResourceForMethod())
+                    .put(getResourceEndpoint(collectorId))
                 .then()
-                .statusCode(202);
+                    .statusCode(202);
 
         final DateTime lastSeenAfter = getLastSeenForCollectorId(collectorId);
 
@@ -121,5 +135,9 @@ public class CollectorsTest extends BaseRestTest {
         assertThat(lastSeenStringsBefore).isNotEmpty().hasSize(1);
 
         return DateTime.parse(lastSeenStringsBefore.get(0));
+    }
+
+    private String getResourceEndpoint(String collectorId) {
+        return resourcePrefix + "/" + collectorId;
     }
 }

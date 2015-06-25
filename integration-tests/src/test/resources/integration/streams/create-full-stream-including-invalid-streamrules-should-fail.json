@@ -1,0 +1,8 @@
+{
+  "title": "A full Test Stream",
+  "description" : "This is a full test stream including stream rules.",
+  "rules" : [
+    {"type" : 1, "field" : "action", "inverted" : false},
+    {"type" : 5, "value": "", "field" : "controller", "inverted" : false}
+  ]
+}

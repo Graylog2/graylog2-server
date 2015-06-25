@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package integration;
+package integration.util.mongodb;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
+import com.mongodb.DBObject;
 
-public class BaseRestTest extends BaseRestTestHelper {
-    @ClassRule public static RestAssuredSetupRule restAssuredSetupRule = new RestAssuredSetupRule();
-    @Rule public RequiresAuthenticationRule requiresAuthenticationRule = new RequiresAuthenticationRule(restAssuredSetupRule);
-    @Rule public RequiredVersionRule requiredVersionRule = new RequiredVersionRule(restAssuredSetupRule);
-    @Rule public MongoDbSeedRule mongoDbSeedRule = new MongoDbSeedRule();
+import java.util.List;
+import java.util.Map;
+
+public interface DumpReader {
+    Map<String, List<DBObject>> toMap();
 }

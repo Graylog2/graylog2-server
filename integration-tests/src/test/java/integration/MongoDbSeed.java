@@ -16,12 +16,14 @@
  */
 package integration;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class BaseRestTest extends BaseRestTestHelper {
-    @ClassRule public static RestAssuredSetupRule restAssuredSetupRule = new RestAssuredSetupRule();
-    @Rule public RequiresAuthenticationRule requiresAuthenticationRule = new RequiresAuthenticationRule(restAssuredSetupRule);
-    @Rule public RequiredVersionRule requiredVersionRule = new RequiredVersionRule(restAssuredSetupRule);
-    @Rule public MongoDbSeedRule mongoDbSeedRule = new MongoDbSeedRule();
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MongoDbSeed {
+    String[] locations() default {};
+    String database() default "graylog2";
 }

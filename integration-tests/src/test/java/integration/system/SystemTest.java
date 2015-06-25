@@ -17,10 +17,12 @@
 package integration.system;
 
 import integration.BaseRestTest;
-import org.testng.annotations.Test;
+import integration.RequiresAuthentication;
+import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 
+@RequiresAuthentication
 public class SystemTest extends BaseRestTest {
 
     @Test

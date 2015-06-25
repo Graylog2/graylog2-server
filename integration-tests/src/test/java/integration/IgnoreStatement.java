@@ -16,12 +16,18 @@
  */
 package integration;
 
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Assume;
+import org.junit.runners.model.Statement;
 
-public class BaseRestTest extends BaseRestTestHelper {
-    @ClassRule public static RestAssuredSetupRule restAssuredSetupRule = new RestAssuredSetupRule();
-    @Rule public RequiresAuthenticationRule requiresAuthenticationRule = new RequiresAuthenticationRule(restAssuredSetupRule);
-    @Rule public RequiredVersionRule requiredVersionRule = new RequiredVersionRule(restAssuredSetupRule);
-    @Rule public MongoDbSeedRule mongoDbSeedRule = new MongoDbSeedRule();
+class IgnoreStatement extends Statement {
+    private final String message;
+
+    public IgnoreStatement(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+        Assume.assumeTrue(this.message, false);
+    }
 }
