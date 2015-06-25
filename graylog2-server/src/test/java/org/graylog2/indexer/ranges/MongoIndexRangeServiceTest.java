@@ -36,18 +36,18 @@ import java.util.List;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IndexRangeServiceImplTest {
+public class MongoIndexRangeServiceTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
-    private IndexRangeServiceImpl indexRangeService;
+    private MongoIndexRangeService indexRangeService;
 
     @Before
     public void setUp() throws Exception {
-        indexRangeService = new IndexRangeServiceImpl(mongoRule.getMongoConnection(), new NullActivityWriter());
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), new NullActivityWriter());
     }
 
     @Test

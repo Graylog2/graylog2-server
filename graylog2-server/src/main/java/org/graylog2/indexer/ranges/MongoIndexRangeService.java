@@ -34,14 +34,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class IndexRangeServiceImpl extends PersistedServiceImpl implements IndexRangeService {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexRangeServiceImpl.class);
+public class MongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
     private static final Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
 
     private final ActivityWriter activityWriter;
 
     @Inject
-    public IndexRangeServiceImpl(MongoConnection mongoConnection, ActivityWriter activityWriter) {
+    public MongoIndexRangeService(MongoConnection mongoConnection, ActivityWriter activityWriter) {
         super(mongoConnection);
         this.activityWriter = activityWriter;
     }
