@@ -116,6 +116,11 @@
             <artifactId>mongo-java-driver</artifactId>
 	        <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.lordofthejars</groupId>
+            <artifactId>nosqlunit-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
