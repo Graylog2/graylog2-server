@@ -186,7 +186,7 @@ public class ElasticsearchConfiguration {
     }
 
     public String getIndexPrefix() {
-        return indexPrefix;
+        return indexPrefix.toLowerCase();
     }
 
     public int getMaxNumberOfIndices() {
