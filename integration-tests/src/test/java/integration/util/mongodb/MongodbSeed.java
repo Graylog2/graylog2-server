@@ -21,6 +21,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import integration.IntegrationTestsConfig;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,14 +32,14 @@ import java.util.Map;
 
 public class MongodbSeed {
     private final MongoClient mongoClient;
-    private final String dbName;
+    private final DB mongoDatabase;
 
     public MongodbSeed(String dbName) throws UnknownHostException {
-        this.dbName = dbName;
         mongoClient = new MongoClient(
-                URI.create(System.getProperty("gl2.baseuri", "http://localhost")).getHost(),
-                Integer.parseInt(System.getProperty("mongodb.port", "27017")));
-        mongoClient.dropDatabase(dbName);
+                IntegrationTestsConfig.getMongodbHost(),
+                IntegrationTestsConfig.getMongodbPort());
+        mongoDatabase = mongoClient.getDB(dbName);
+        mongoDatabase.dropDatabase();
     }
 
     private Map<String, List<DBObject>> parseDatabaseDump(URL seedUrl) throws IOException {
@@ -88,8 +89,6 @@ public class MongodbSeed {
         Map<String, List<DBObject>> collections = parseDatabaseDump(dbPath);
         collections = updateNodeIdFirstNode(collections, nodeId);
         collections = updateNodeIdInputs(collections, nodeId);
-
-        final DB mongoDatabase = mongoClient.getDB(dbName);
 
         for (Map.Entry<String, List<DBObject>> collection : collections.entrySet()) {
             final String collectionName = collection.getKey();

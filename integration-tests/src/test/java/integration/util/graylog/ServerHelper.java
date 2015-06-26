@@ -18,6 +18,7 @@ package integration.util.graylog;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import integration.IntegrationTestsConfig;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -31,14 +32,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ServerHelper {
-    private URL url;
     private static final int HTTP_TIMEOUT = 1000;
 
-    public ServerHelper() {
-        this.url = getDefaultServerUrl();
-    }
-
-    public String getNodeId() {
+    public String getNodeId() throws MalformedURLException, URISyntaxException {
+        final URL url = IntegrationTestsConfig.getGlServerURL();
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -59,20 +56,5 @@ public class ServerHelper {
             e.printStackTrace();
         }
         return "00000000-0000-0000-0000-000000000000";
-    }
-
-    public URL getUrl() {
-        return url;
-    }
-
-    private URL getDefaultServerUrl() {
-        try {
-            final URIBuilder uriBuilder = new URIBuilder(System.getProperty("gl2.baseuri", "http://localhost"));
-            uriBuilder.setPort(Integer.parseInt(System.getProperty("gl2.port", "12900")));
-            uriBuilder.setUserInfo(System.getProperty("gl2.admin_user", "admin"), System.getProperty("gl2.admin_password", "admin"));
-            return uriBuilder.build().toURL();
-        } catch (URISyntaxException | MalformedURLException e) {
-            throw new RuntimeException("Invalid URI given. Skipping integration tests.");
-        }
     }
 }

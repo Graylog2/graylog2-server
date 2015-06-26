@@ -39,7 +39,7 @@ public class RestAssuredSetupRule extends ExternalResource {
     @Override
     protected void before() throws Throwable {
         final ServerHelper serverHelper = new ServerHelper();
-        final URL url = serverHelper.getUrl();
+        final URL url = IntegrationTestsConfig.getGlServerURL();
         RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();
         RestAssured.port = url.getPort();
         String[] userInfo = url.getUserInfo().split(":");
