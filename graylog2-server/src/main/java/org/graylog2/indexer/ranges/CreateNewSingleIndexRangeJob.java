@@ -62,7 +62,7 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public void execute() {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
-            final IndexRange indexRange = indexRangeService.create(calculateRange(indexName));
+            final IndexRange indexRange = indexRangeService.calculateRange(indexName);
             indexRangeService.destroy(indexName);
             indexRangeService.save(indexRange);
             LOG.info("Created ranges for index {}.", indexName);

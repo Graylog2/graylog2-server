@@ -89,7 +89,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     @Override
     public void execute() {
-        List<Map<String, Object>> ranges = Lists.newArrayList();
+        List<IndexRange> ranges = Lists.newArrayList();
         info("Re-calculating index ranges.");
 
         String[] indices = deflector.getAllDeflectorIndexNames();
@@ -108,7 +108,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             }
 
             try {
-                ranges.add(calculateRange(index));
+                ranges.add(indexRangeService.calculateRange(index));
             } catch (Exception e) {
                 LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
             } finally {
@@ -122,24 +122,9 @@ public class RebuildIndexRangesJob extends SystemJob {
         info("Done calculating index ranges for " + indices.length + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
     }
 
-    protected Map<String, Object> calculateRange(String index) {
-        final Stopwatch x = Stopwatch.createStarted();
-        final DateTime timestamp = firstNonNull(searches.findNewestMessageTimestampOfIndex(index), Tools.iso8601());
-        final int rangeEnd = Ints.saturatedCast(timestamp.getMillis() / 1000L);
-        final int took = Ints.saturatedCast(x.stop().elapsed(TimeUnit.MILLISECONDS));
-
-        LOG.info("Calculated range of [{}] in [{}ms].", index, took);
-        return ImmutableMap.<String, Object>of(
-                "index", index,
-                "start", rangeEnd, // FIXME The name of the attribute is massively misleading and should be rectified some time
-                "calculated_at", Tools.getUTCTimestamp(),
-                "took_ms", took);
-    }
-
-    private void updateCollection(List<Map<String, Object>> ranges) {
+    private void updateCollection(List<IndexRange> ranges) {
         indexRangeService.destroyAll();
-        for (Map<String, Object> range : ranges) {
-            IndexRange indexRange = indexRangeService.create(range);
+        for (IndexRange indexRange : ranges) {
             indexRangeService.saveWithoutValidation(indexRange);
         }
     }

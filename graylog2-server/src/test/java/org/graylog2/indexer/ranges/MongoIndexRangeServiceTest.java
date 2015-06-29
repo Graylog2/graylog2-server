@@ -21,8 +21,11 @@ import com.google.common.primitives.Ints;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.assertj.jodatime.api.Assertions;
+import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,12 +33,17 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MongoIndexRangeServiceTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
@@ -43,11 +51,13 @@ public class MongoIndexRangeServiceTest {
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
+    @Mock
+    private Searches searches;
     private MongoIndexRangeService indexRangeService;
 
     @Before
     public void setUp() throws Exception {
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), new NullActivityWriter());
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), new NullActivityWriter(), searches);
     }
 
     @Test
@@ -124,6 +134,36 @@ public class MongoIndexRangeServiceTest {
         assertThat(indexRange.getStart()).isEqualTo(dateTime);
         assertThat(indexRange.getCalculatedAt()).isEqualTo(dateTime);
         assertThat(indexRange.getCalculationTookMs()).isEqualTo(42);
+    }
+
+    @Test
+    public void calculateRangeReturnsIndexRange() throws Exception {
+        final String index = "graylog_test";
+        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        when(searches.findNewestMessageTimestampOfIndex(index)).thenReturn(dateTime);
+
+        final IndexRange indexRange = indexRangeService.calculateRange(index);
+
+        assertThat(indexRange.getIndexName()).isEqualTo(index);
+        assertThat(indexRange.getStart()).isEqualTo(dateTime);
+        Assertions.assertThat(indexRange.getCalculatedAt()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
+    }
+
+    @Test
+    public void testCalculateRangeWithEmptyIndex() throws Exception {
+        final String index = "graylog_test";
+        when(searches.findNewestMessageTimestampOfIndex(index)).thenReturn(null);
+        final IndexRange range = indexRangeService.calculateRange(index);
+
+        assertThat(range).isNotNull();
+        assertThat(range.getIndexName()).isEqualTo(index);
+        Assertions.assertThat(range.getStart()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
+    }
+
+    @Test(expected = IndexMissingException.class)
+    public void testCalculateRangeWithNonExistingIndex() throws Exception {
+        when(searches.findNewestMessageTimestampOfIndex("does-not-exist")).thenThrow(IndexMissingException.class);
+        indexRangeService.calculateRange("does-not-exist");
     }
 
     @Test

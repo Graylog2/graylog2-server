@@ -22,9 +22,6 @@ import org.graylog2.plugin.database.PersistedService;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface IndexRangeService extends PersistedService {
     IndexRange get(String index) throws NotFoundException;
 
@@ -35,4 +32,6 @@ public interface IndexRangeService extends PersistedService {
     IndexRange create(Map<String, Object> range);
 
     void destroyAll();
+
+    IndexRange calculateRange(String index);
 }
