@@ -19,7 +19,6 @@ package integration.search;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.ValidatableResponse;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import integration.BaseRestTest;
 import integration.RequiresAuthentication;
 import integration.RestTestIncludingElasticsearch;
 import org.junit.Test;
@@ -65,6 +64,32 @@ public class AbsoluteSearchResourceTest extends RestTestIncludingElasticsearch {
 
         assertThat(response.getInt("total_results")).isEqualTo(0);
         assertThat(response.getList("messages")).isEmpty();
+        assertThat(response.getList("used_indices")).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "searchForExistingKeyword.json")
+    public void searchForExistingKeywordOutsideOfTimeRange() {
+        final ValidatableResponse result = doSearchFor("Testmessage", "2015-06-14T11:32:16.827Z", "2015-06-15T11:32:16.827Z");
+        final JsonPath response = result
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(response.getInt("total_results")).isEqualTo(0);
+        assertThat(response.getList("messages")).isEmpty();
+        assertThat(response.getList("used_indices")).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "searchForExistingKeyword.json")
+    public void searchForExistingKeywordInsideOfVeryNarrowTimeRange() {
+        final ValidatableResponse result = doSearchFor("Testmessage", "2015-06-16T11:32:16.827Z", "2015-06-16T11:32:16.827Z");
+        final JsonPath response = result
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(response.getInt("total_results")).isEqualTo(1);
+        assertThat(response.getList("messages")).isNotEmpty();
         assertThat(response.getList("used_indices")).hasSize(1);
     }
 
