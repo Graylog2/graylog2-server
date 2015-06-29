@@ -18,7 +18,7 @@ package org.graylog2.indexer.ranges;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -36,11 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -70,19 +68,19 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
     }
 
     @Override
-    public List<IndexRange> getFrom(int timestamp) {
-        List<IndexRange> ranges = Lists.newArrayList();
-
-        BasicDBObject query = new BasicDBObject();
-        query.put("start", new BasicDBObject("$gte", timestamp));
-
+    public SortedSet<IndexRange> getFrom(int timestamp) {
+        final ImmutableSortedSet.Builder<IndexRange> ranges = ImmutableSortedSet.orderedBy(COMPARATOR);
+        final BasicDBObject query = new BasicDBObject("start", new BasicDBObject("$gte", timestamp));
         for (DBObject dbo : query(IndexRangeImpl.class, query)) {
             ranges.add(new IndexRangeImpl((ObjectId) dbo.get("_id"), dbo.toMap()));
         }
 
-        Collections.sort(ranges, COMPARATOR);
+        return ranges.build();
+    }
 
-        return ranges;
+    @Override
+    public SortedSet<IndexRange> getFrom(DateTime dateTime) {
+        return getFrom(Ints.saturatedCast(dateTime.getMillis() / 1000L));
     }
 
     @Override

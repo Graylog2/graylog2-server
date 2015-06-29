@@ -40,7 +40,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,18 +84,34 @@ public class MongoIndexRangeServiceTest {
     @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void getFromReturnsIndexRangesAfterTimestamp() throws Exception {
         final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        List<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
+        SortedSet<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
 
-        assertThat(indexRanges)
-                .hasSize(2)
-                .isSortedAccordingTo(new IndexRangeComparator());
+        assertThat(indexRanges).hasSize(2);
     }
 
     @Test
     @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void getFromReturnsNothingBeforeTimestamp() throws Exception {
         final long millis = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        List<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
+        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
+
+        assertThat(indexRanges).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void getFromWithDateTimeReturnsIndexRangesAfterTimestamp() throws Exception {
+        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        SortedSet<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
+
+        assertThat(indexRanges).hasSize(2);
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void getFromWithDateTimeReturnsNothingBeforeTimestamp() throws Exception {
+        final DateTime dateTime = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
+        Set<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
 
         assertThat(indexRanges).isEmpty();
     }
@@ -104,10 +121,10 @@ public class MongoIndexRangeServiceTest {
     public void destroyRemovesIndexRange() throws Exception {
         indexRangeService.destroy("graylog_1");
 
-        List<IndexRange> indexRanges = indexRangeService.getFrom(0);
+        Set<IndexRange> indexRanges = indexRangeService.getFrom(0);
 
         assertThat(indexRanges).hasSize(1);
-        assertThat(indexRanges.get(0).getIndexName()).isEqualTo("graylog_2");
+        assertThat(indexRanges.iterator().next().getIndexName()).isEqualTo("graylog_2");
     }
 
     @Test
@@ -116,7 +133,7 @@ public class MongoIndexRangeServiceTest {
         indexRangeService.destroy("does-not-exist");
 
         final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        List<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
+        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
 
         assertThat(indexRanges).hasSize(2);
     }

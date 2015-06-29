@@ -20,6 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -39,6 +40,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeComparator;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
@@ -59,9 +61,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -81,52 +83,54 @@ public class SearchesTest {
     public ElasticsearchRule elasticsearchRule;
 
     private static final String INDEX_NAME = "graylog";
-    private static final List<IndexRange> INDEX_RANGES = Collections.<IndexRange>singletonList(new IndexRange() {
-        @Override
-        public String getIndexName() {
-            return INDEX_NAME;
-        }
+    private static final SortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet
+            .orderedBy(new IndexRangeComparator())
+            .add(new IndexRange() {
+                @Override
+                public String getIndexName() {
+                    return INDEX_NAME;
+                }
 
-        @Override
-        public DateTime getCalculatedAt() {
-            return DateTime.now();
-        }
+                @Override
+                public DateTime getCalculatedAt() {
+                    return DateTime.now();
+                }
 
-        @Override
-        public DateTime getStart() {
-            return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        }
+                @Override
+                public DateTime getStart() {
+                    return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+                }
 
-        @Override
-        public int getCalculationTookMs() {
-            return 0;
-        }
+                @Override
+                public int getCalculationTookMs() {
+                    return 0;
+                }
 
-        @Override
-        public String getId() {
-            return "id";
-        }
+                @Override
+                public String getId() {
+                    return "id";
+                }
 
-        @Override
-        public Map<String, Object> getFields() {
-            return Collections.emptyMap();
-        }
+                @Override
+                public Map<String, Object> getFields() {
+                    return Collections.emptyMap();
+                }
 
-        @Override
-        public Map<String, Validator> getValidations() {
-            return Collections.emptyMap();
-        }
+                @Override
+                public Map<String, Validator> getValidations() {
+                    return Collections.emptyMap();
+                }
 
-        @Override
-        public Map<String, Validator> getEmbeddedValidations(String key) {
-            return Collections.emptyMap();
-        }
+                @Override
+                public Map<String, Validator> getEmbeddedValidations(String key) {
+                    return Collections.emptyMap();
+                }
 
-        @Override
-        public Map<String, Object> asMap() {
-            return Collections.emptyMap();
-        }
-    });
+                @Override
+                public Map<String, Object> asMap() {
+                    return Collections.emptyMap();
+                }
+            }).build();
 
     private final Deflector deflector = mock(Deflector.class);
     private final IndexRangeService indexRangeService = mock(IndexRangeService.class);
