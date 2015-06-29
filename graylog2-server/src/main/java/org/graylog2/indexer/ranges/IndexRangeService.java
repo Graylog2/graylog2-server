@@ -18,7 +18,9 @@ package org.graylog2.indexer.ranges;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ public interface IndexRangeService extends PersistedService {
     void destroy(String index);
 
     IndexRange create(Map<String, Object> range);
+
+    void save(IndexRange indexRange) throws ValidationException;
 
     void destroyAll();
 

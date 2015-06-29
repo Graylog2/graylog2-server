@@ -21,6 +21,9 @@ import com.google.common.primitives.Ints;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import org.assertj.jodatime.api.Assertions;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.database.MongoConnectionRule;
@@ -172,5 +175,29 @@ public class MongoIndexRangeServiceTest {
         indexRangeService.destroyAll();
 
         assertThat(indexRangeService.getFrom(0)).isEmpty();
+    }
+
+    @Test
+    public void savePersistsIndexRange() throws Exception {
+        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final int timestamp = Ints.saturatedCast(dateTime.getMillis() / 1000L);
+        final IndexRange indexRange = indexRangeService.create(ImmutableMap.<String, Object>of(
+                        "index", "graylog_test",
+                        "start", timestamp,
+                        "calculated_at", timestamp,
+                        "took_ms", 42
+                )
+        );
+
+        indexRangeService.save(indexRange);
+
+        final DBCollection collection = mongoRule.getMongoConnection().getDatabase().getCollection("index_ranges");
+        final DBObject query = new BasicDBObject("index", "graylog_test");
+        final DBObject result = collection.findOne(query);
+
+        assertThat(result.get("index")).isEqualTo("graylog_test");
+        assertThat(result.get("start")).isEqualTo(timestamp);
+        assertThat(result.get("calculated_at")).isEqualTo(timestamp);
+        assertThat(result.get("took_ms")).isEqualTo(42);
     }
 }

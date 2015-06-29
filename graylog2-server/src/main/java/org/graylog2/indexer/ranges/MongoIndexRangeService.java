@@ -28,6 +28,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -121,5 +123,10 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
                 "start", rangeEnd, // FIXME The name of the attribute is massively misleading and should be rectified some time
                 "calculated_at", Tools.getUTCTimestamp(),
                 "took_ms", took));
+    }
+
+    @Override
+    public void save(IndexRange indexRange) throws ValidationException {
+        super.save(indexRange);
     }
 }
