@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings;
+package org.graylog2.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.AbstractModule;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
-public class ObjectMapperModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+@Singleton
+public class ServerObjectMapperProvider extends ObjectMapperProvider implements Provider<ObjectMapper> {
+    public ServerObjectMapperProvider() {
+        super();
+        this.objectMapper.registerModule(new SimpleModule().addSerializer(new ObjectIdSerializer()));
     }
 }
