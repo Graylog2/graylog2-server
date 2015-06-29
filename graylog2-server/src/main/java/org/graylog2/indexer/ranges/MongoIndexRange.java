@@ -32,15 +32,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @CollectionName("index_ranges")
-public class IndexRangeImpl extends PersistedImpl implements IndexRange {
+public class MongoIndexRange extends PersistedImpl implements IndexRange {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IndexRangeImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRange.class);
 
-    public IndexRangeImpl(Map<String, Object> fields) {
+    public MongoIndexRange(Map<String, Object> fields) {
         super(fields);
     }
 
-    protected IndexRangeImpl(ObjectId id, Map<String, Object> fields) {
+    protected MongoIndexRange(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
     }
 

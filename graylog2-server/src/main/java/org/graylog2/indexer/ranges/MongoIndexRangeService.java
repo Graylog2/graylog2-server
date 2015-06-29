@@ -59,20 +59,20 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
-        DBObject dbo = findOne(IndexRangeImpl.class, new BasicDBObject("index", index));
+        DBObject dbo = findOne(MongoIndexRange.class, new BasicDBObject("index", index));
 
         if (dbo == null)
             throw new NotFoundException("Index " + index + " not found.");
 
-        return new IndexRangeImpl((ObjectId) dbo.get("_id"), dbo.toMap());
+        return new MongoIndexRange((ObjectId) dbo.get("_id"), dbo.toMap());
     }
 
     @Override
     public SortedSet<IndexRange> getFrom(int timestamp) {
         final ImmutableSortedSet.Builder<IndexRange> ranges = ImmutableSortedSet.orderedBy(COMPARATOR);
         final BasicDBObject query = new BasicDBObject("start", new BasicDBObject("$gte", timestamp));
-        for (DBObject dbo : query(IndexRangeImpl.class, query)) {
-            ranges.add(new IndexRangeImpl((ObjectId) dbo.get("_id"), dbo.toMap()));
+        for (DBObject dbo : query(MongoIndexRange.class, query)) {
+            ranges.add(new MongoIndexRange((ObjectId) dbo.get("_id"), dbo.toMap()));
         }
 
         return ranges.build();
@@ -94,17 +94,17 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
 
         String x = "Removed range meta-information of [" + index + "]";
         LOG.info(x);
-        activityWriter.write(new Activity(x, IndexRangeImpl.class));
+        activityWriter.write(new Activity(x, MongoIndexRange.class));
     }
 
     @Override
     public IndexRange create(Map<String, Object> range) {
-        return new IndexRangeImpl(range);
+        return new MongoIndexRange(range);
     }
 
     @Override
     public void destroyAll() {
-        destroyAll(IndexRangeImpl.class);
+        destroyAll(MongoIndexRange.class);
     }
 
     @Override

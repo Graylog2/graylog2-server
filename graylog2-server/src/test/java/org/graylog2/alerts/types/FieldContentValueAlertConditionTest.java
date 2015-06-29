@@ -26,7 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertConditionTest;
 import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.indexer.ranges.IndexRangeImpl;
+import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
@@ -77,7 +77,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         fields.put("index", "graylog_test");
         fields.put("started_at", DateTime.now().minusDays(1).getMillis());
 
-        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new IndexRangeImpl(fields));
+        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new MongoIndexRange(fields));
         final SearchResult searchResult = spy(new SearchResult(searchHits,
                                                            indexRanges,
                                                            "message:something",
@@ -111,7 +111,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         fields.put("index", "graylog_test");
         fields.put("started_at", DateTime.now().minusDays(1).getMillis());
 
-        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new IndexRangeImpl(fields));
+        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new MongoIndexRange(fields));
         final SearchResult searchResult = spy(new SearchResult(searchHits,
                                                                indexRanges,
                                                                "message:something",
