@@ -45,7 +45,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class MongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
-    private static final Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
 
     private final Searches searches;
     private final ActivityWriter activityWriter;
@@ -69,7 +68,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
 
     @Override
     public SortedSet<IndexRange> getFrom(int timestamp) {
-        final ImmutableSortedSet.Builder<IndexRange> ranges = ImmutableSortedSet.orderedBy(COMPARATOR);
+        final ImmutableSortedSet.Builder<IndexRange> ranges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         final BasicDBObject query = new BasicDBObject("start", new BasicDBObject("$gte", timestamp));
         for (DBObject dbo : query(MongoIndexRange.class, query)) {
             ranges.add(new MongoIndexRange((ObjectId) dbo.get("_id"), dbo.toMap()));

@@ -107,12 +107,7 @@ public class IndexHelper {
     public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
                                                                      Deflector deflector,
                                                                      TimeRange range) {
-        Set<IndexRange> indices = Sets.newTreeSet(new Comparator<IndexRange>() {
-            @Override
-            public int compare(IndexRange o1, IndexRange o2) {
-                return o2.getStart().compareTo(o1.getStart());
-            }
-        });
+        Set<IndexRange> indices = Sets.newTreeSet(IndexRange.COMPARATOR);
 
         for (IndexRange indexRange : indexRangeService.getFrom((int) (range.getFrom().getMillis() / 1000))) {
             indices.add(indexRange);
