@@ -28,7 +28,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.system.activities.NullActivityWriter;
@@ -39,7 +38,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
@@ -49,15 +47,11 @@ import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.Elasti
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EsIndexRangeServiceTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
-    private static final String INDEX_NAME = "graylog";
     private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2");
 
     @Rule
@@ -66,9 +60,7 @@ public class EsIndexRangeServiceTest {
     @Inject
     private Client client;
 
-    @Mock
-    private Searches searches;
-    private IndexRangeService indexRangeService;
+    private EsIndexRangeService indexRangeService;
 
     public EsIndexRangeServiceTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
@@ -77,7 +69,7 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        indexRangeService = new EsIndexRangeService(client, new NullActivityWriter(), searches, new ObjectMapperProvider().get());
+        indexRangeService = new EsIndexRangeService(client, new NullActivityWriter(), new ObjectMapperProvider().get());
     }
 
     @Test
@@ -143,15 +135,11 @@ public class EsIndexRangeServiceTest {
     }
 
     @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void calculateRangeReturnsIndexRange() throws Exception {
-        final String index = "graylog_test";
-        final DateTime min = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        final DateTime max = new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC);
-        final DateTime avg = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
-        final TimestampStats stats = TimestampStats.create(min, max, avg);
-
-        when(searches.timestampStatsOfIndex(index)).thenReturn(stats);
-
+        final String index = "graylog";
+        final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
+        final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
         final IndexRange indexRange = indexRangeService.calculateRange(index);
 
         assertThat(indexRange.indexName()).isEqualTo(index);
@@ -161,9 +149,9 @@ public class EsIndexRangeServiceTest {
     }
 
     @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCalculateRangeWithEmptyIndex() throws Exception {
-        final String index = "graylog_test";
-        when(searches.findNewestMessageTimestampOfIndex(index)).thenReturn(null);
+        final String index = "graylog";
         final IndexRange range = indexRangeService.calculateRange(index);
 
         assertThat(range).isNotNull();
@@ -172,8 +160,8 @@ public class EsIndexRangeServiceTest {
     }
 
     @Test(expected = IndexMissingException.class)
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
-        doThrow(IndexMissingException.class).when(searches).timestampStatsOfIndex(anyString());
         indexRangeService.calculateRange("does-not-exist");
     }
 
@@ -227,5 +215,30 @@ public class EsIndexRangeServiceTest {
 
         final IndexRange after = indexRangeService.get(indexName);
         assertThat(after.calculationDuration()).isEqualTo(2);
+    }
+
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndex() throws Exception {
+        TimestampStats stats = indexRangeService.timestampStatsOfIndex("graylog");
+
+        assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+        assertThat(stats.avg()).isEqualTo(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
+        TimestampStats stats = indexRangeService.timestampStatsOfIndex("graylog");
+
+        assertThat(stats).isNull();
+    }
+
+    @Test(expected = IndexMissingException.class)
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
+        indexRangeService.timestampStatsOfIndex("does-not-exist");
     }
 }

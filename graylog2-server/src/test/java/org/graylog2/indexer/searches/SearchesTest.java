@@ -353,7 +353,7 @@ public class SearchesTest {
     }
 
     @Test
-    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "EsIndexRangeServiceTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testFindNewestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
         DateTime dateTime = searches.findNewestMessageTimestampOfIndex("graylog");
 
@@ -374,7 +374,7 @@ public class SearchesTest {
     }
 
     @Test
-    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "EsIndexRangeServiceTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testFindOldestMessageTimestampOfIndexWithEmptyIndex() throws Exception {
         DateTime dateTime = searches.findOldestMessageTimestampOfIndex("graylog");
 
@@ -385,28 +385,4 @@ public class SearchesTest {
     public void testFindOldestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
         searches.findOldestMessageTimestampOfIndex("does-not-exist");
     }
-
-    @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testTimestampStatsOfIndex() throws Exception {
-        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
-
-        assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
-        assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
-        assertThat(stats.avg()).isEqualTo(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC));
-    }
-
-    @Test
-    @UsingDataSet(locations = "SearchesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
-        TimestampStats stats = searches.timestampStatsOfIndex("graylog");
-
-        assertThat(stats).isNull();
-    }
-
-    @Test(expected = IndexMissingException.class)
-    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
-        searches.timestampStatsOfIndex("does-not-exist");
-    }
-
 }
