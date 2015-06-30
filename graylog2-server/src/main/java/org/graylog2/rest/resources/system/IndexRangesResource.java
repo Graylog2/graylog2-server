@@ -76,7 +76,7 @@ public class IndexRangesResource extends RestResource {
     public IndexRangesResponse list() {
         final List<IndexRange> ranges = Lists.newArrayList();
         for (IndexRange range : indexRangeService.getFrom(0)) {
-            if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.getIndexName())) {
+            if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.indexName())) {
                 continue;
             }
             ranges.add(range);

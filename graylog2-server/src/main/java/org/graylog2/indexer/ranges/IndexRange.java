@@ -16,19 +16,20 @@
  */
 package org.graylog2.indexer.ranges;
 
-import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import java.util.Comparator;
 
-public interface IndexRange extends Persisted {
+public interface IndexRange {
     Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
 
-    String getIndexName();
+    String indexName();
 
-    DateTime getCalculatedAt();
+    DateTime begin();
 
-    DateTime getStart();
+    DateTime end();
 
-    int getCalculationTookMs();
+    DateTime calculatedAt();
+
+    int calculationDuration();
 }

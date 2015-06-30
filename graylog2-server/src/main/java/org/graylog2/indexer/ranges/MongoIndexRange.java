@@ -33,9 +33,6 @@ import java.util.Map;
 
 @CollectionName("index_ranges")
 public class MongoIndexRange extends PersistedImpl implements IndexRange {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRange.class);
-
     public MongoIndexRange(Map<String, Object> fields) {
         super(fields);
     }
@@ -45,12 +42,12 @@ public class MongoIndexRange extends PersistedImpl implements IndexRange {
     }
 
     @Override
-    public String getIndexName() {
+    public String indexName() {
         return (String) fields.get("index");
     }
 
     @Override
-    public DateTime getCalculatedAt() {
+    public DateTime calculatedAt() {
         if (fields.containsKey("calculated_at")) {
             int ts = (Integer) fields.get("calculated_at");
             long unixMs = ts * 1000L;
@@ -61,14 +58,14 @@ public class MongoIndexRange extends PersistedImpl implements IndexRange {
     }
 
     @Override
-    public DateTime getStart() {
+    public DateTime end() {
         int ts = (Integer) fields.get("start");
         long unixMs = ts * 1000L;
         return new DateTime(unixMs, DateTimeZone.UTC);
     }
 
     @Override
-    public int getCalculationTookMs() {
+    public int calculationDuration() {
         if (fields.containsKey("took_ms")) {
             return (Integer) fields.get("took_ms");
         } else {
@@ -89,19 +86,23 @@ public class MongoIndexRange extends PersistedImpl implements IndexRange {
     @JsonValue
     public Map<String, Object> asMap() {
         HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put("index", getIndexName());
-        fields.put("starts", getStart());
+        fields.put("index", indexName());
+        fields.put("starts", end());
         // Calculated at and the calculation time in ms are not always set, depending on how/why the entry was created.
-        DateTime calculatedAt = getCalculatedAt();
+        DateTime calculatedAt = calculatedAt();
         if (calculatedAt != null) {
             fields.put("calculated_at", calculatedAt);
         }
 
-        int calculationTookMs = getCalculationTookMs();
+        int calculationTookMs = calculationDuration();
         if (calculationTookMs >= 0) {
             fields.put("calculation_took_ms", calculationTookMs);
         }
         return fields;
     }
 
+    @Override
+    public DateTime begin() {
+        return new DateTime(0L, DateTimeZone.UTC);
+    }
 }

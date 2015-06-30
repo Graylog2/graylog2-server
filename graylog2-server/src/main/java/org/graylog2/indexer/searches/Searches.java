@@ -246,7 +246,7 @@ public class Searches {
 
         Set<String> indexNames = Sets.newHashSet();
         for (IndexRange index : indices) {
-            indexNames.add(index.getIndexName());
+            indexNames.add(index.indexName());
         }
 
         SearchRequest request = searchRequest(config, indexNames).request();

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-public interface IndexRangeService extends PersistedService {
+public interface IndexRangeService {
     IndexRange get(String index) throws NotFoundException;
 
     SortedSet<IndexRange> getFrom(int timestamp);
@@ -37,7 +37,7 @@ public interface IndexRangeService extends PersistedService {
 
     IndexRange create(Map<String, Object> range);
 
-    void save(IndexRange indexRange) throws ValidationException;
+    void save(IndexRange indexRange);
 
     void destroyAll();
 

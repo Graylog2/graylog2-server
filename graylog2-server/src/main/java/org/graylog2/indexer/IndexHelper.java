@@ -92,7 +92,7 @@ public class IndexHelper {
         Set<String> indices = Sets.newHashSet();
 
         for (IndexRange indexRange : indexRangeService.getFrom((int) (range.getFrom().getMillis() / 1000))) {
-            indices.add(indexRange.getIndexName());
+            indices.add(indexRange.indexName());
         }
 
         // Always include the most recent index in some cases.

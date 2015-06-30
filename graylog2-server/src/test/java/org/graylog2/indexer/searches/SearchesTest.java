@@ -46,20 +46,18 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -77,53 +75,35 @@ public class SearchesTest {
             .orderedBy(new IndexRangeComparator())
             .add(new IndexRange() {
                 @Override
-                public String getIndexName() {
+                public String indexName() {
                     return INDEX_NAME;
                 }
 
                 @Override
-                public DateTime getCalculatedAt() {
+                public DateTime calculatedAt() {
                     return DateTime.now();
                 }
 
                 @Override
-                public DateTime getStart() {
+                public DateTime end() {
                     return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
                 }
 
                 @Override
-                public int getCalculationTookMs() {
+                public int calculationDuration() {
                     return 0;
                 }
 
                 @Override
-                public String getId() {
-                    return "id";
-                }
-
-                @Override
-                public Map<String, Object> getFields() {
-                    return Collections.emptyMap();
-                }
-
-                @Override
-                public Map<String, Validator> getValidations() {
-                    return Collections.emptyMap();
-                }
-
-                @Override
-                public Map<String, Validator> getEmbeddedValidations(String key) {
-                    return Collections.emptyMap();
-                }
-
-                @Override
-                public Map<String, Object> asMap() {
-                    return Collections.emptyMap();
+                public DateTime begin() {
+                    return new DateTime(0L, DateTimeZone.UTC);
                 }
             }).build();
 
-    private final Deflector deflector = mock(Deflector.class);
-    private final IndexRangeService indexRangeService = mock(IndexRangeService.class);
+    @Mock
+    private Deflector deflector;
+    @Mock
+    private IndexRangeService indexRangeService;
 
     private MetricRegistry metricRegistry;
     private Searches searches;
@@ -405,7 +385,7 @@ public class SearchesTest {
     public void testFindOldestMessageTimestampOfIndexWithNonExistingIndex() throws Exception {
         searches.findOldestMessageTimestampOfIndex("does-not-exist");
     }
-    
+
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndex() throws Exception {

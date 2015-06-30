@@ -125,7 +125,7 @@ public class RebuildIndexRangesJob extends SystemJob {
     private void updateCollection(List<IndexRange> ranges) {
         indexRangeService.destroyAll();
         for (IndexRange indexRange : ranges) {
-            indexRangeService.saveWithoutValidation(indexRange);
+            indexRangeService.save(indexRange);
         }
     }
 

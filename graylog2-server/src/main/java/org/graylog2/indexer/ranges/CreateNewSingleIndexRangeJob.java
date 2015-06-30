@@ -66,8 +66,6 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
             indexRangeService.destroy(indexName);
             indexRangeService.save(indexRange);
             LOG.info("Created ranges for index {}.", indexName);
-        } catch (ValidationException e) {
-            LOG.error("Unable to save index range for index {}: {}", indexName, e);
         } catch (Exception e) {
             LOG.error("Exception during index range calculation for index {}: ", indexName, e);
         }

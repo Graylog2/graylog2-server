@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -86,7 +85,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
     public void destroy(String index) {
         try {
             final IndexRange range = get(index);
-            destroy(range);
+            destroy((MongoIndexRange) range);
         } catch (NotFoundException e) {
             return;
         }
@@ -123,7 +122,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
     }
 
     @Override
-    public void save(IndexRange indexRange) throws ValidationException {
-        super.save(indexRange);
+    public void save(IndexRange indexRange) {
+        saveWithoutValidation((MongoIndexRange) indexRange);
     }
 }
