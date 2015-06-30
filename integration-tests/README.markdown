@@ -10,7 +10,7 @@ reasonable defaults. These are:
 |:-----------------------|:--------|:------------|
 | skip.integration.tests | ``false``   | Enables the integration tests. (Disabled per default) |
 | gl2.port | ``12900`` | Tcp port of the graylog server. |
-| gl2.baseuri | ``"http://localhost"`` | Uri base of the graylog server. Port is overriden by gl2.port if specified. |
+| gl2.baseuri | ``"http://localhost:12900"`` | Uri base of the graylog server. Port is overriden by gl2.port if specified. |
 | gl2.admin_user | ``admin`` | Username used for authenticating against server for authenticated requests. |
 | gl2.admin_password | ``admin`` | Password used for authenticating against server for authenticated requests. |
 | mongodb.host | ``"localhost"`` | Hostname of MongoDB server used for seeding tests that require a preseeded database. |
