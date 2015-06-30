@@ -96,11 +96,6 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
     }
 
     @Override
-    public IndexRange create(Map<String, Object> range) {
-        return new MongoIndexRange(range);
-    }
-
-    @Override
     public void destroyAll() {
         destroyAll(MongoIndexRange.class);
     }
@@ -114,7 +109,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, took);
 
-        return create(ImmutableMap.<String, Object>of(
+        return new MongoIndexRange(ImmutableMap.<String, Object>of(
                 "index", index,
                 "start", rangeEnd, // FIXME The name of the attribute is massively misleading and should be rectified some time
                 "calculated_at", Tools.getUTCTimestamp(),

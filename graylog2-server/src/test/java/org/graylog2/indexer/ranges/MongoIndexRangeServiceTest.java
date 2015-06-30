@@ -139,24 +139,6 @@ public class MongoIndexRangeServiceTest {
     }
 
     @Test
-    public void createReturnsIndexRange() throws Exception {
-        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        final int timestamp = Ints.saturatedCast(dateTime.getMillis() / 1000L);
-        IndexRange indexRange = indexRangeService.create(ImmutableMap.<String, Object>of(
-                        "index", "graylog_3",
-                        "start", timestamp,
-                        "calculated_at", timestamp,
-                        "took_ms", 42
-                )
-        );
-
-        assertThat(indexRange.indexName()).isEqualTo("graylog_3");
-        assertThat(indexRange.end()).isEqualTo(dateTime);
-        assertThat(indexRange.calculatedAt()).isEqualTo(dateTime);
-        assertThat(indexRange.calculationDuration()).isEqualTo(42);
-    }
-
-    @Test
     public void calculateRangeReturnsIndexRange() throws Exception {
         final String index = "graylog_test";
         final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
@@ -198,7 +180,7 @@ public class MongoIndexRangeServiceTest {
     public void savePersistsIndexRange() throws Exception {
         final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final int timestamp = Ints.saturatedCast(dateTime.getMillis() / 1000L);
-        final IndexRange indexRange = indexRangeService.create(ImmutableMap.<String, Object>of(
+        final IndexRange indexRange = new MongoIndexRange(ImmutableMap.<String, Object>of(
                         "index", "graylog_test",
                         "start", timestamp,
                         "calculated_at", timestamp,

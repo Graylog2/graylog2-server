@@ -167,11 +167,6 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public IndexRange create(Map<String, Object> range) {
-        return new MongoIndexRange(range);
-    }
-
-    @Override
     public void destroyAll() {
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         final SearchRequest searchRequest = client.prepareSearch()

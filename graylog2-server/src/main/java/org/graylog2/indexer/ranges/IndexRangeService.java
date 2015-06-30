@@ -35,8 +35,6 @@ public interface IndexRangeService {
 
     void destroy(String index);
 
-    IndexRange create(Map<String, Object> range);
-
     void save(IndexRange indexRange);
 
     void destroyAll();
