@@ -19,14 +19,17 @@ package integration;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+
 public class IntegrationTestsConfig {
     private static final String GL_BASE_URI = System.getProperty("gl.baseuri", "http://localhost:12900");
-    private static final String GL_PORT = System.getProperty("gl.port", "12900");
-    private static final String GL_ADMIN_USER = System.getProperty("gl.admin_user", "admin");
-    private static final String GL_ADMIN_PASSWORD = System.getProperty("gl.admin_password", "admin");
+    private static final String GL_PORT = System.getProperty("gl.port");
+    private static final String GL_ADMIN_USER = System.getProperty("gl.admin_user");
+    private static final String GL_ADMIN_PASSWORD = System.getProperty("gl.admin_password");
     private static final String MONGODB_HOST = System.getProperty("mongodb.host", "localhost");
     private static final String MONGODB_PORT = System.getProperty("mongodb.port", "27017");
     private static final String MONGODB_DATABASE = System.getProperty("mongodb.database", "graylog_test");
@@ -34,19 +37,26 @@ public class IntegrationTestsConfig {
     private static final String ES_CLUSTER_NAME = System.getProperty("es.cluster.name", "graylog_test");
     private static final String ES_PORT = System.getProperty("es.port", "9300");
 
-    public static URL getGlServerURL() throws MalformedURLException, URISyntaxException {
-        final URIBuilder result = new URIBuilder(GL_BASE_URI)
-                .setPort(Integer.parseInt(GL_PORT))
-                .setUserInfo(getGlAdminUser(), getGlAdminPassword());
-        return result.build().toURL();
-    }
+    public static URI getGlServerURL() throws MalformedURLException, URISyntaxException {
+        URIBuilder result = new URIBuilder(GL_BASE_URI);
+        if (GL_PORT != null) {
+            result.setPort(Integer.parseInt(GL_PORT));
+        }
 
-    public static String getGlAdminUser() {
-        return GL_ADMIN_USER;
-    }
+        final String username;
+        final String password;
+        if (result.getUserInfo() == null) {
+            username = GL_ADMIN_USER;
+            password = GL_ADMIN_PASSWORD;
+        } else {
+            final String[] userInfo = result.getUserInfo().split(":");
+            username = (GL_ADMIN_USER != null ? GL_ADMIN_USER : userInfo[0]);
+            password = (GL_ADMIN_PASSWORD != null ? GL_ADMIN_PASSWORD : userInfo[1]);
+        }
 
-    public static String getGlAdminPassword() {
-        return GL_ADMIN_PASSWORD;
+        result.setUserInfo(firstNonNull(username, "admin"), firstNonNull(password, "admin"));
+
+        return result.build();
     }
 
     public static String getMongodbHost() {

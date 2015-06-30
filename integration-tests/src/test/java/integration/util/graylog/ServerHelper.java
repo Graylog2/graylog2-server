@@ -20,14 +20,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import integration.IntegrationTestsConfig;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -35,17 +33,17 @@ public class ServerHelper {
     private static final int HTTP_TIMEOUT = 1000;
 
     public String getNodeId() throws MalformedURLException, URISyntaxException {
-        final URL url = IntegrationTestsConfig.getGlServerURL();
+        final URI uri = IntegrationTestsConfig.getGlServerURL();
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url, "/system").openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(uri.toURL(), "/system").openConnection();
             connection.setConnectTimeout(HTTP_TIMEOUT);
             connection.setReadTimeout(HTTP_TIMEOUT);
             connection.setRequestMethod("GET");
 
-            if (url.getUserInfo() != null) {
-                String encodedUserInfo = Base64.encodeBase64String(url.getUserInfo().getBytes());
+            if (uri.getUserInfo() != null) {
+                String encodedUserInfo = Base64.encodeBase64String(uri.getUserInfo().getBytes());
                 connection.setRequestProperty("Authorization", "Basic " + encodedUserInfo);
             }
 
