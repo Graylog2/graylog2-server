@@ -390,7 +390,7 @@ public class StreamsTest extends BaseRestTest {
 
     @Test
     public void sampleTestThatFails() throws Exception {
-        assertThat(false).isTrue();
+         assertThat(false).isTrue();
     }
 
     protected ValidatableResponse createStreamFromRequest(byte[] request) {
