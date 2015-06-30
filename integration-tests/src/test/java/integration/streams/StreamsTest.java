@@ -25,12 +25,8 @@ import integration.RequiresAuthentication;
 import integration.RequiresVersion;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 
 @RequiresAuthentication
@@ -386,16 +382,6 @@ public class StreamsTest extends BaseRestTest {
                 .post("/streams/"+streamId+"/resume")
                 .then()
                 .statusCode(404);
-    }
-
-    protected ValidatableResponse createStreamFromRequest(byte[] request) {
-        return given()
-            .when()
-                .body(request)
-                .post("/streams")
-                .then()
-                .contentType(ContentType.JSON)
-                .assertThat();
     }
 
     protected ValidatableResponse createStreamFromRequest(String request) {
