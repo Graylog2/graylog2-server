@@ -74,7 +74,7 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addInitializer(Class<? extends Service> initializerClass) {
-        Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        Multibinder<Service> serviceBinder = serviceBinder();
         serviceBinder.addBinding().to(initializerClass);
     }
 

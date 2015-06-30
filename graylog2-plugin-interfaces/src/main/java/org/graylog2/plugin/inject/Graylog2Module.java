@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.inject;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -253,6 +254,10 @@ public abstract class Graylog2Module extends AbstractModule {
     @Nonnull
     protected Multibinder<Class> jerseyAdditionalComponentsBinder() {
         return Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
+    }
+
+    protected Multibinder<Service> serviceBinder() {
+        return Multibinder.newSetBinder(binder(), Service.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

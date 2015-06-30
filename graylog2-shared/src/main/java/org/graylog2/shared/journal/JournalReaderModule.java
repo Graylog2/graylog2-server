@@ -25,9 +25,10 @@ public class JournalReaderModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        final Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        final Multibinder<Service> serviceBinder = serviceBinder();
         serviceBinder.addBinding().to(JournalReader.class).in(Scopes.SINGLETON);
         serviceBinder.addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
 
     }
+
 }

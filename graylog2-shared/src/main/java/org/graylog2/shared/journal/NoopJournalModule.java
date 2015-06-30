@@ -16,16 +16,13 @@
  */
 package org.graylog2.shared.journal;
 
-import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
-import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.inject.Graylog2Module;
 
 public class NoopJournalModule extends Graylog2Module {
     @Override
     protected void configure() {
-        final Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-        serviceBinder.addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(NoopJournal.class).in(Scopes.SINGLETON);
         binder().bind(Journal.class).to(NoopJournal.class).in(Scopes.SINGLETON);
 
     }
