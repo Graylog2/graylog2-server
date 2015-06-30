@@ -82,42 +82,6 @@ public class MongoIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromReturnsIndexRangesAfterTimestamp() throws Exception {
-        final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        SortedSet<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).hasSize(2);
-    }
-
-    @Test
-    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromReturnsNothingBeforeTimestamp() throws Exception {
-        final long millis = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).isEmpty();
-    }
-
-    @Test
-    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromWithDateTimeReturnsIndexRangesAfterTimestamp() throws Exception {
-        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        SortedSet<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
-
-        assertThat(indexRanges).hasSize(2);
-    }
-
-    @Test
-    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromWithDateTimeReturnsNothingBeforeTimestamp() throws Exception {
-        final DateTime dateTime = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
-
-        assertThat(indexRanges).isEmpty();
-    }
-
-    @Test
-    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findReturnsIndexRangesAfterTimestamp() throws Exception {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
@@ -158,10 +122,7 @@ public class MongoIndexRangeServiceTest {
     public void destroyRemovesIgnoresNonExistingIndexRange() throws Exception {
         indexRangeService.destroy("does-not-exist");
 
-        final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).hasSize(2);
+        assertThat(indexRangeService.findAll()).hasSize(2);
     }
 
     @Test
@@ -207,11 +168,11 @@ public class MongoIndexRangeServiceTest {
         final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final int timestamp = Ints.saturatedCast(dateTime.getMillis() / 1000L);
         final IndexRange indexRange = new MongoIndexRange(ImmutableMap.<String, Object>of(
-                        "index", "graylog_test",
-                        "start", timestamp,
-                        "calculated_at", timestamp,
-                        "took_ms", 42
-                )
+                "index", "graylog_test",
+                "start", timestamp,
+                "calculated_at", timestamp,
+                "took_ms", 42
+        )
         );
 
         indexRangeService.save(indexRange);

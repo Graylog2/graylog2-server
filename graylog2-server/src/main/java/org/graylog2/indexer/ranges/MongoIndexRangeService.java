@@ -65,8 +65,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
         return new MongoIndexRange((ObjectId) dbo.get("_id"), dbo.toMap());
     }
 
-    @Override
-    public SortedSet<IndexRange> getFrom(int timestamp) {
+    private SortedSet<IndexRange> getFrom(int timestamp) {
         final ImmutableSortedSet.Builder<IndexRange> ranges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         final BasicDBObject query = new BasicDBObject("start", new BasicDBObject("$gte", timestamp));
         for (DBObject dbo : query(MongoIndexRange.class, query)) {
@@ -76,8 +75,7 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
         return ranges.build();
     }
 
-    @Override
-    public SortedSet<IndexRange> getFrom(DateTime dateTime) {
+    private SortedSet<IndexRange> getFrom(DateTime dateTime) {
         return getFrom(Ints.saturatedCast(dateTime.getMillis() / 1000L));
     }
 

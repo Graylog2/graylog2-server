@@ -120,31 +120,6 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public SortedSet<IndexRange> getFrom(int timestamp) {
-        return getFrom(new DateTime(timestamp * 1000L, DateTimeZone.UTC));
-    }
-
-    @Override
-    public SortedSet<IndexRange> getFrom(DateTime dateTime) {
-        final RangeQueryBuilder q = QueryBuilders.rangeQuery("begin").gte(dateTime.getMillis());
-        final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_META)
-                .setQuery(q)
-                .request();
-
-        final SearchResponse response = client.search(request).actionGet();
-        final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
-            if (indexRange != null) {
-                indexRanges.add(indexRange);
-            }
-        }
-
-        return indexRanges.build();
-    }
-
-    @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
         final RangeQueryBuilder beginRangeQuery = QueryBuilders.rangeQuery("begin").gte(begin.getMillis());
         final RangeQueryBuilder endRangeQuery = QueryBuilders.rangeQuery("end").lte(end.getMillis());

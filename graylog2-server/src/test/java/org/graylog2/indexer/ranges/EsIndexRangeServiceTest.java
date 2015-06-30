@@ -16,9 +16,7 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Ints;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
@@ -101,42 +99,6 @@ public class EsIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromReturnsIndexRangesAfterTimestamp() throws Exception {
-        final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).hasSize(2);
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromReturnsNothingBeforeTimestamp() throws Exception {
-        final long millis = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).isEmpty();
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromWithDateTimeReturnsIndexRangesAfterTimestamp() throws Exception {
-        final DateTime dateTime = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
-
-        assertThat(indexRanges).hasSize(2);
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void getFromWithDateTimeReturnsNothingBeforeTimestamp() throws Exception {
-        final DateTime dateTime = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(dateTime);
-
-        assertThat(indexRanges).isEmpty();
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findReturnsIndexRangesWithinGivenRange() throws Exception {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
@@ -177,10 +139,7 @@ public class EsIndexRangeServiceTest {
     public void destroyRemovesIgnoresNonExistingIndexRange() throws Exception {
         indexRangeService.destroy("does-not-exist");
 
-        final long millis = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).getMillis();
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(Ints.saturatedCast(millis / 1000L));
-
-        assertThat(indexRanges).hasSize(2);
+        assertThat(indexRangeService.findAll()).hasSize(2);
     }
 
     @Test
