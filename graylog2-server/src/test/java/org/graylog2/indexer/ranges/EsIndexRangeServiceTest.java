@@ -22,9 +22,15 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.assertj.jodatime.api.Assertions;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
@@ -51,7 +57,9 @@ import static org.junit.Assume.assumeTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class EsIndexRangeServiceTest {
     @ClassRule
-    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule()
+            .settings(ImmutableSettings.settingsBuilder().put("action.auto_create_index", false).build())
+            .build();
     private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2");
 
     @Rule
@@ -160,7 +168,6 @@ public class EsIndexRangeServiceTest {
     }
 
     @Test(expected = IndexMissingException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
         indexRangeService.calculateRange("does-not-exist");
     }
@@ -237,7 +244,6 @@ public class EsIndexRangeServiceTest {
     }
 
     @Test(expected = IndexMissingException.class)
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
         indexRangeService.timestampStatsOfIndex("does-not-exist");
     }

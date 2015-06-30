@@ -56,7 +56,6 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
@@ -101,7 +100,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final GetResponse r;
         try {
             r = client.get(request).actionGet();
-        } catch (NoShardAvailableActionException e) {
+        } catch (IndexMissingException | NoShardAvailableActionException e) {
             throw new NotFoundException(e);
         }
 
@@ -182,14 +181,19 @@ public class EsIndexRangeService implements IndexRangeService {
                 .setType(IndexMapping.TYPE_META)
                 .setRefresh(true)
                 .request();
-        final DeleteResponse response = client.delete(request).actionGet();
 
-        if (response.isFound()) {
-            String msg = "Removed range meta-information of [" + index + "]";
-            LOG.info(msg);
-            activityWriter.write(new Activity(msg, IndexRange.class));
-        } else {
-            LOG.warn("Couldn't find meta-information of index [{}]", index);
+        try {
+            final DeleteResponse response = client.delete(request).actionGet();
+
+            if (response.isFound()) {
+                String msg = "Removed range meta-information of [" + index + "]";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, IndexRange.class));
+            } else {
+                LOG.warn("Couldn't find meta-information of index [{}]", index);
+            }
+        } catch (IndexMissingException e) {
+            LOG.debug("Couldn't find index", e);
         }
     }
 
