@@ -80,6 +80,7 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    @Nullable
     public IndexRange get(String index) throws NotFoundException {
         final GetRequest request = new GetRequestBuilder(client, index)
                 .setType(IndexMapping.TYPE_META)
@@ -103,7 +104,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Nullable
     private IndexRange parseSource(String index, Map<String, Object> fields) {
         try {
-            return IndexRangeImpl.create(
+            return IndexRange.create(
                     index,
                     parseFromDateString((String) fields.get("begin")),
                     parseFromDateString((String) fields.get("end")),
@@ -227,7 +228,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
-        return IndexRangeImpl.create(index, stats.min(), stats.max(), now, duration);
+        return IndexRange.create(index, stats.min(), stats.max(), now, duration);
     }
 
     @Override

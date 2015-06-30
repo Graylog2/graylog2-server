@@ -196,7 +196,7 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final IndexRange indexRange = IndexRangeImpl.create(indexName, begin, end, now, 42);
+        final IndexRange indexRange = IndexRange.create(indexName, begin, end, now, 42);
 
         indexRangeService.save(indexRange);
 
@@ -215,8 +215,8 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final IndexRange indexRangeBefore = IndexRangeImpl.create(indexName, begin, end, now, 1);
-        final IndexRange indexRangeAfter = IndexRangeImpl.create(indexName, begin, end, now, 2);
+        final IndexRange indexRangeBefore = IndexRange.create(indexName, begin, end, now, 1);
+        final IndexRange indexRangeAfter = IndexRange.create(indexName, begin, end, now, 2);
 
         indexRangeService.save(indexRangeBefore);
 
