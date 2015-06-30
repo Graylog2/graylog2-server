@@ -324,9 +324,9 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         if (response.isCreated()) {
-            LOG.debug("Successfully saved index range {}", indexRange);
+            LOG.debug("Successfully saved index range: {}", indexRange);
         } else {
-            LOG.warn("Couldn't save index range for index [{}]: {}", indexName, indexRange);
+            LOG.debug("Successfully updated index range: {}", indexRange);
         }
     }
 }
