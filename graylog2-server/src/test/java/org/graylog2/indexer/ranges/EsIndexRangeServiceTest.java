@@ -22,17 +22,15 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.assertj.jodatime.api.Assertions;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
-import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.indices.IndexMissingException;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -67,6 +65,7 @@ public class EsIndexRangeServiceTest {
 
     @Inject
     private Client client;
+    private Indices indices;
 
     private EsIndexRangeService indexRangeService;
 
@@ -77,7 +76,9 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        indexRangeService = new EsIndexRangeService(client, new NullActivityWriter(), new ObjectMapperProvider().get());
+        final NullActivityWriter activityWriter = new NullActivityWriter();
+        indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping(client));
+        indexRangeService = new EsIndexRangeService(client, activityWriter, new ObjectMapperProvider().get(), indices);
     }
 
     @Test
@@ -201,6 +202,34 @@ public class EsIndexRangeServiceTest {
         assertThat(result.end()).isEqualTo(end);
         assertThat(result.calculatedAt()).isEqualTo(now);
         assertThat(result.calculationDuration()).isEqualTo(42);
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void savePersistsIndexRangeInReadOnlyIndex() throws Exception {
+        final String indexName = "graylog_read_only";
+        final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final IndexRange indexRange = IndexRange.create(indexName, begin, end, now, 42);
+
+        try {
+            indices.create(indexName);
+            indices.setReadOnly(indexName);
+            assumeTrue(indices.isReadOnly(indexName));
+            indexRangeService.save(indexRange);
+
+            assertThat(indices.isReadOnly(indexName)).isTrue();
+
+            final IndexRange result = indexRangeService.get(indexName);
+            assertThat(result.indexName()).isEqualTo(indexName);
+            assertThat(result.begin()).isEqualTo(begin);
+            assertThat(result.end()).isEqualTo(end);
+            assertThat(result.calculatedAt()).isEqualTo(now);
+            assertThat(result.calculationDuration()).isEqualTo(42);
+        } finally {
+            indices.delete(indexName);
+        }
     }
 
     @Test

@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -41,6 +42,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -56,6 +58,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
@@ -81,12 +84,14 @@ public class EsIndexRangeService implements IndexRangeService {
     private final Client client;
     private final ActivityWriter activityWriter;
     private final ObjectMapper objectMapper;
+    private final Indices indices;
 
     @Inject
-    public EsIndexRangeService(Client client, ActivityWriter activityWriter, ObjectMapper objectMapper) {
+    public EsIndexRangeService(Client client, ActivityWriter activityWriter, ObjectMapper objectMapper, Indices indices) {
         this.client = client;
         this.activityWriter = activityWriter;
         this.objectMapper = objectMapper;
+        this.indices = indices;
     }
 
     @Override
@@ -298,18 +303,30 @@ public class EsIndexRangeService implements IndexRangeService {
             throw Throwables.propagate(e);
         }
 
+        final String indexName = indexRange.indexName();
+        final boolean readOnly = indices.isReadOnly(indexName);
+
+        if(readOnly) {
+            indices.setReadWrite(indexName);
+        }
+
         final IndexRequest request = client.prepareIndex()
-                .setIndex(indexRange.indexName())
+                .setIndex(indexName)
                 .setType(IndexMapping.TYPE_META)
-                .setId(indexRange.indexName())
+                .setId(indexName)
                 .setRefresh(true)
                 .setSource(source)
                 .request();
         final IndexResponse response = client.index(request).actionGet();
+
+        if(readOnly) {
+            indices.setReadOnly(indexName);
+        }
+
         if (response.isCreated()) {
             LOG.debug("Successfully saved index range {}", indexRange);
         } else {
-            LOG.warn("Couldn't save index range for index [{}]: {}", indexRange.indexName(), indexRange);
+            LOG.warn("Couldn't save index range for index [{}]: {}", indexName, indexRange);
         }
     }
 }

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indices;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
@@ -37,6 +36,8 @@ import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
@@ -44,7 +45,6 @@ import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -58,6 +58,7 @@ import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.UnmodifiableIterator;
 import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -256,6 +257,26 @@ public class Indices implements IndexManagement {
         sb.put("index.blocks.metadata", false); // Allow getting metadata.
 
         c.admin().indices().updateSettings(new UpdateSettingsRequest(index).settings(sb.build())).actionGet();
+    }
+
+    public boolean isReadOnly(String index) {
+        final GetSettingsRequest request = c.admin().indices().prepareGetSettings(index).request();
+        final GetSettingsResponse response = c.admin().indices().getSettings(request).actionGet();
+
+        return response.getIndexToSettings().get(index).getAsBoolean("index.blocks.write", false);
+    }
+
+    public void setReadWrite(String index) {
+        Settings settings = ImmutableSettings.builder()
+                .put("index.blocks.write", false)
+                .put("index.blocks.read", false)
+                .put("index.blocks.metadata", false)
+                .build();
+
+        final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
+                .setSettings(settings)
+                .request();
+        c.admin().indices().updateSettings(request).actionGet();
     }
 
     public void flush(String index) {
