@@ -21,12 +21,11 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.authentication.AuthenticationScheme;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.config.MatcherConfig;
-import integration.util.graylog.ServerHelper;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.rules.ExternalResource;
 
-import java.net.URL;
+import java.net.URI;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.preemptive;
@@ -38,11 +37,10 @@ public class RestAssuredSetupRule extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
-        final ServerHelper serverHelper = new ServerHelper();
-        final URL url = serverHelper.getUrl();
-        RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();
-        RestAssured.port = url.getPort();
-        String[] userInfo = url.getUserInfo().split(":");
+        final URI uri = IntegrationTestsConfig.getGlServerURL();
+        RestAssured.baseURI = uri.getScheme() + "://" + uri.getHost();
+        RestAssured.port = uri.getPort();
+        String[] userInfo = uri.getUserInfo().split(":");
         authenticationScheme = preemptive().basic(userInfo[0], userInfo[1]);
 
         // we want all the details for failed tests

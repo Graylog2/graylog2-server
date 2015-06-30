@@ -56,7 +56,6 @@ public class BsonReader implements DumpReader {
             BSONObject obj;
 
             while((obj = decoder.readObject(fileBytes)) != null) {
-                System.out.println("Real class: " + obj.getClass());
                 final DBObject mongoDocument = new BasicDBObject(obj.toMap());
                 dataset.add(mongoDocument);
             }
