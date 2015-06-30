@@ -20,8 +20,6 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -32,7 +30,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.searches.SearchesTest;
+import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -70,7 +68,7 @@ public class IndicesTest {
 
     public IndicesTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new SearchesTest.IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
     }
 
     @Before
