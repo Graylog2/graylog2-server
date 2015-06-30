@@ -17,26 +17,16 @@
 package org.graylog2.indexer.ranges;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
@@ -44,25 +34,21 @@ public class RebuildIndexRangesJob extends SystemJob {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
+    private static final int MAX_CONCURRENCY = 1;
 
-    public static final int MAX_CONCURRENCY = 1;
-
-    private boolean cancelRequested = false;
-    private int indicesToCalculate = 0;
-    private int indicesCalculated = 0;
+    private volatile boolean cancelRequested = false;
+    private volatile int indicesToCalculate = 0;
+    private volatile int indicesCalculated = 0;
 
     protected final Deflector deflector;
-    private final Searches searches;
     private final ActivityWriter activityWriter;
     protected final IndexRangeService indexRangeService;
 
     @AssistedInject
     public RebuildIndexRangesJob(@Assisted Deflector deflector,
-                                 Searches searches,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
         this.deflector = deflector;
-        this.searches = searches;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
     }
@@ -89,7 +75,6 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     @Override
     public void execute() {
-        List<IndexRange> ranges = Lists.newArrayList();
         info("Re-calculating index ranges.");
 
         String[] indices = deflector.getAllDeflectorIndexNames();
@@ -108,7 +93,9 @@ public class RebuildIndexRangesJob extends SystemJob {
             }
 
             try {
-                ranges.add(indexRangeService.calculateRange(index));
+                final IndexRange indexRange = indexRangeService.calculateRange(index);
+                indexRangeService.save(indexRange);
+                LOG.debug("Created ranges for index {}: {}", index, indexRange);
             } catch (Exception e) {
                 LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
             } finally {
@@ -116,17 +103,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             }
         }
 
-        // Now that all is calculated we can replace the whole collection at once.
-        updateCollection(ranges);
-
         info("Done calculating index ranges for " + indices.length + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
-    }
-
-    private void updateCollection(List<IndexRange> ranges) {
-        indexRangeService.destroyAll();
-        for (IndexRange indexRange : ranges) {
-            indexRangeService.save(indexRange);
-        }
     }
 
     protected void info(String what) {
