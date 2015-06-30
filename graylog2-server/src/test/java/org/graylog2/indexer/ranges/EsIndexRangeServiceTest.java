@@ -70,7 +70,7 @@ public class EsIndexRangeServiceTest {
 
     @Mock
     private Searches searches;
-    private EsIndexRangeService indexRangeService;
+    private IndexRangeService indexRangeService;
 
     public EsIndexRangeServiceTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
@@ -137,10 +137,36 @@ public class EsIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findReturnsIndexRangesWithinGivenRange() throws Exception {
+        final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
+        Set<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findReturnsNothingBeforeBegin() throws Exception {
+        final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2016, 1, 2, 0, 0, DateTimeZone.UTC);
+        Set<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findAllReturnsAllIndexRanges() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void destroyRemovesIndexRange() throws Exception {
         indexRangeService.destroy("graylog_1");
 
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(0);
+        Set<IndexRange> indexRanges = indexRangeService.findAll();
 
         assertThat(indexRanges).hasSize(1);
         assertThat(indexRanges.iterator().next().indexName()).isEqualTo("graylog_2");
@@ -201,7 +227,7 @@ public class EsIndexRangeServiceTest {
         final RefreshResponse refreshResponse = client.admin().indices().refresh(refreshRequest).actionGet();
         assumeTrue(refreshResponse.getFailedShards() == 0);
 
-        assertThat(indexRangeService.getFrom(0)).isEmpty();
+        assertThat(indexRangeService.findAll()).isEmpty();
     }
 
     @Test

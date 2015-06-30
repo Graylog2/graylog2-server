@@ -29,7 +29,6 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -91,7 +90,7 @@ public class IndexHelper {
                                                        TimeRange range) {
         Set<String> indices = Sets.newHashSet();
 
-        for (IndexRange indexRange : indexRangeService.getFrom((int) (range.getFrom().getMillis() / 1000))) {
+        for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
             indices.add(indexRange.indexName());
         }
 
@@ -109,7 +108,7 @@ public class IndexHelper {
                                                                      TimeRange range) {
         Set<IndexRange> indices = Sets.newTreeSet(IndexRange.COMPARATOR);
 
-        for (IndexRange indexRange : indexRangeService.getFrom((int) (range.getFrom().getMillis() / 1000))) {
+        for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
             indices.add(indexRange);
         }
 

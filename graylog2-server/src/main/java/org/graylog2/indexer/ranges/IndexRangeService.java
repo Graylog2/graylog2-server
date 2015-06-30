@@ -29,9 +29,15 @@ import java.util.SortedSet;
 public interface IndexRangeService {
     IndexRange get(String index) throws NotFoundException;
 
+    @Deprecated
     SortedSet<IndexRange> getFrom(int timestamp);
 
+    @Deprecated
     SortedSet<IndexRange> getFrom(DateTime dateTime);
+
+    SortedSet<IndexRange> find(DateTime begin, DateTime end);
+
+    SortedSet<IndexRange> findAll();
 
     void destroy(String index);
 

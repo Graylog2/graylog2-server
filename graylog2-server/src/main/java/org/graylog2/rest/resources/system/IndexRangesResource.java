@@ -75,7 +75,7 @@ public class IndexRangesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public IndexRangesResponse list() {
         final List<IndexRange> ranges = Lists.newArrayList();
-        for (IndexRange range : indexRangeService.getFrom(0)) {
+        for (IndexRange range : indexRangeService.findAll()) {
             if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.indexName())) {
                 continue;
             }

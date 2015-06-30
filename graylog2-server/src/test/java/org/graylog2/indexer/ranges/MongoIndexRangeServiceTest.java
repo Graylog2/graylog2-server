@@ -118,10 +118,36 @@ public class MongoIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findReturnsIndexRangesAfterTimestamp() throws Exception {
+        final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
+        SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findReturnsNothingBeforeTimestamp() throws Exception {
+        final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2016, 1, 2, 0, 0, DateTimeZone.UTC);
+        Set<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findAllReturnsAllIndexRanges() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndexRangeServiceImplTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void destroyRemovesIndexRange() throws Exception {
         indexRangeService.destroy("graylog_1");
 
-        Set<IndexRange> indexRanges = indexRangeService.getFrom(0);
+        Set<IndexRange> indexRanges = indexRangeService.findAll();
 
         assertThat(indexRanges).hasSize(1);
         assertThat(indexRanges.iterator().next().indexName()).isEqualTo("graylog_2");
@@ -173,7 +199,7 @@ public class MongoIndexRangeServiceTest {
     public void destroyAllKillsAllIndexRanges() throws Exception {
         indexRangeService.destroyAll();
 
-        assertThat(indexRangeService.getFrom(0)).isEmpty();
+        assertThat(indexRangeService.findAll()).isEmpty();
     }
 
     @Test

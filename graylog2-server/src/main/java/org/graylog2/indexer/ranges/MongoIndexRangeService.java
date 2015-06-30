@@ -82,6 +82,16 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
     }
 
     @Override
+    public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
+        return getFrom(end);
+    }
+
+    @Override
+    public SortedSet<IndexRange> findAll() {
+        return getFrom(0);
+    }
+
+    @Override
     public void destroy(String index) {
         try {
             final IndexRange range = get(index);

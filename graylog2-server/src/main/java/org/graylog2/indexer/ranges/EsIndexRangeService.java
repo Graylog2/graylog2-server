@@ -23,14 +23,11 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.action.NoShardAvailableActionException;
-import org.elasticsearch.action.bulk.BulkAction;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.deletebyquery.DeleteByQueryRequest;
-import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
@@ -42,6 +39,7 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
@@ -50,7 +48,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.TimestampStats;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
@@ -148,6 +145,49 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
+        final RangeQueryBuilder beginRangeQuery = QueryBuilders.rangeQuery("begin").gte(begin.getMillis());
+        final RangeQueryBuilder endRangeQuery = QueryBuilders.rangeQuery("end").lte(end.getMillis());
+        final BoolQueryBuilder completeRangeQuery = QueryBuilders.boolQuery()
+                .must(beginRangeQuery)
+                .must(endRangeQuery);
+        final SearchRequest request = client.prepareSearch()
+                .setTypes(IndexMapping.TYPE_META)
+                .setQuery(completeRangeQuery)
+                .request();
+
+        final SearchResponse response = client.search(request).actionGet();
+        final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
+        for (SearchHit searchHit : response.getHits()) {
+            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
+            if (indexRange != null) {
+                indexRanges.add(indexRange);
+            }
+        }
+
+        return indexRanges.build();
+    }
+
+    @Override
+    public SortedSet<IndexRange> findAll() {
+        final SearchRequest request = client.prepareSearch()
+                .setTypes(IndexMapping.TYPE_META)
+                .setQuery(QueryBuilders.matchAllQuery())
+                .request();
+
+        final SearchResponse response = client.search(request).actionGet();
+        final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
+        for (SearchHit searchHit : response.getHits()) {
+            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
+            if (indexRange != null) {
+                indexRanges.add(indexRange);
+            }
+        }
+
+        return indexRanges.build();
+    }
+
+    @Override
     public void destroy(String index) {
         final DeleteRequest request = client.prepareDelete()
                 .setIndex(index)
@@ -183,7 +223,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final SearchResponse scrollResponse = client.searchScroll(scrollRequest).actionGet();
 
         final BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-        for(SearchHit hit : scrollResponse.getHits().hits()) {
+        for (SearchHit hit : scrollResponse.getHits().hits()) {
             final DeleteRequest deleteRequest = client.prepareDelete(hit.index(), hit.type(), hit.id()).request();
             bulkRequestBuilder.add(deleteRequest);
         }

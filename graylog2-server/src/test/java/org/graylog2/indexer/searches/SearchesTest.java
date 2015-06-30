@@ -57,7 +57,7 @@ import java.util.SortedSet;
 import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -118,7 +118,7 @@ public class SearchesTest {
 
     @Before
     public void setUp() throws Exception {
-        when(indexRangeService.getFrom(anyInt())).thenReturn(INDEX_RANGES);
+        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
         searches = new Searches(new Configuration(), deflector, indexRangeService, client, metricRegistry);
     }
