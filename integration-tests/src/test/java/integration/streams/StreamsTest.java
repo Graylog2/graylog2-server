@@ -388,6 +388,11 @@ public class StreamsTest extends BaseRestTest {
                 .statusCode(404);
     }
 
+    @Test
+    public void sampleTestThatFails() throws Exception {
+        assertThat(false).isTrue();
+    }
+
     protected ValidatableResponse createStreamFromRequest(byte[] request) {
         return given()
             .when()
