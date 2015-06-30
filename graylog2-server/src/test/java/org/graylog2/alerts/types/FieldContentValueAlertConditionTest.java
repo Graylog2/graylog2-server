@@ -26,7 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertConditionTest;
 import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.indexer.ranges.MongoIndexRange;
+import org.graylog2.indexer.ranges.IndexRangeImpl;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
@@ -35,6 +35,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -44,7 +45,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -73,11 +77,9 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         when(searchHit.getIndex()).thenReturn("graylog_test");
         when(searchHits.iterator()).thenReturn(Iterators.singletonIterator(searchHit));
 
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put("index", "graylog_test");
-        fields.put("started_at", DateTime.now().minusDays(1).getMillis());
-
-        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new MongoIndexRange(fields));
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final IndexRange indexRange = IndexRangeImpl.create("graylog_test", now.minusDays(1), now, now, 0);
+        final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(searchHits,
                                                            indexRanges,
                                                            "message:something",
@@ -107,11 +109,9 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final SearchHits searchHits = mock(SearchHits.class);
         when(searchHits.iterator()).thenReturn(Collections.<SearchHit>emptyIterator());
 
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put("index", "graylog_test");
-        fields.put("started_at", DateTime.now().minusDays(1).getMillis());
-
-        final Set<IndexRange> indexRanges = Sets.<IndexRange>newHashSet(new MongoIndexRange(fields));
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final IndexRange indexRange = IndexRangeImpl.create("graylog_test", now.minusDays(1), now, now, 0);
+        final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(searchHits,
                                                                indexRanges,
                                                                "message:something",

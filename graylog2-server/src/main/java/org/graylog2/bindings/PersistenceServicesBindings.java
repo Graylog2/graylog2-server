@@ -17,20 +17,20 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
-import org.graylog2.collectors.CollectorService;
-import org.graylog2.collectors.CollectorServiceImpl;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.collectors.CollectorService;
+import org.graylog2.collectors.CollectorServiceImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.PersistedDeadLetterService;
 import org.graylog2.indexer.PersistedDeadLetterServiceImpl;
+import org.graylog2.indexer.ranges.EsIndexRangeService;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.notifications.NotificationService;
@@ -52,9 +52,6 @@ import org.graylog2.system.activities.SystemMessageService;
 import org.graylog2.system.activities.SystemMessageServiceImpl;
 import org.graylog2.users.UserServiceImpl;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
@@ -65,7 +62,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(PersistedDeadLetterService.class).to(PersistedDeadLetterServiceImpl.class);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
-        bind(IndexRangeService.class).to(MongoIndexRangeService.class);
+        bind(IndexRangeService.class).to(EsIndexRangeService.class);
         bind(InputService.class).to(InputServiceImpl.class);
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class);
