@@ -150,7 +150,7 @@ var SearchSidebar = React.createClass({
                     <h4>Indices used for this search:</h4>
 
                     <ul className="index-list">
-                        {this.props.result['used_indices'].map((index) => <li key={index.index}> {index.index}</li>)}
+                        {this.props.result['used_indices'].map((index) => <li key={index.index_name}> {index.index_name}</li>)}
                     </ul>
                 </div>
             </Modal>;
