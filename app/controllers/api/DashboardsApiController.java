@@ -35,11 +35,13 @@ import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPosit
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
+import org.graylog2.restclient.models.dashboards.widgets.ChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.DashboardWidget;
 import org.graylog2.restclient.models.dashboards.widgets.FieldChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.QuickvaluesWidget;
 import org.graylog2.restclient.models.dashboards.widgets.SearchResultChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.SearchResultCountWidget;
+import org.graylog2.restclient.models.dashboards.widgets.StackedChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.StatisticalCountWidget;
 import org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCountWidget;
 import org.joda.time.DateTime;
@@ -226,7 +228,7 @@ public class DashboardsApiController extends AuthenticatedController {
             DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
             Object resultValue;
-            if (widget instanceof SearchResultChartWidget || widget instanceof FieldChartWidget) {
+            if (widget instanceof ChartWidget) {
                 resultValue = formatWidgetValueResults(resolution, widget, widgetValue);
             } else {
                 resultValue = widgetValue.result;
@@ -254,12 +256,36 @@ public class DashboardsApiController extends AuthenticatedController {
         final String interval = widgetConfig.containsKey("interval") ? (String) widgetConfig.get("interval") : "minute";
         final boolean allQuery = widgetConfig.get("range_type").equals("relative") && widgetConfig.get("range").equals("0");
 
-        return formatWidgetValueResults(maxDataPoints,
-                widgetValue.result,
-                (String) widgetConfig.get("valuetype"),
-                interval,
-                widgetValue.computationTimeRange,
-                allQuery);
+        if (widget instanceof StackedChartWidget) {
+            final List widgetResults = (List) widgetValue.result;
+            final List<Map<String, String>> series = (List<Map<String, String>>) widget.getConfig().get("series");
+            final ImmutableList.Builder<Map<String, Object>> formattedWidgetResults = ImmutableList.builder();
+            int i = 0;
+
+            for (Object widgetResult : widgetResults) {
+                final Map<String, String> currentSeries = series.get(i);
+
+                formattedWidgetResults.addAll(formatWidgetValueResults(maxDataPoints,
+                        widgetResult,
+                        currentSeries.get("statistical_function"),
+                        interval,
+                        widgetValue.computationTimeRange,
+                        allQuery,
+                        i + 1));
+
+                i++;
+            }
+
+            return formattedWidgetResults.build();
+        } else {
+            return formatWidgetValueResults(maxDataPoints,
+                    widgetValue.result,
+                    (String) widgetConfig.get("valuetype"),
+                    interval,
+                    widgetValue.computationTimeRange,
+                    allQuery,
+                    null);
+        }
     }
 
     // TODO: Extract common parts of this and the similar method on SearchApiController
@@ -268,7 +294,8 @@ public class DashboardsApiController extends AuthenticatedController {
                                                                  final String functionType,
                                                                  final String interval,
                                                                  final Map<String, Object> timeRange,
-                                                                 final boolean allQuery) {
+                                                                 final boolean allQuery,
+                                                                 final Integer seriesNo) {
         final ImmutableList.Builder<Map<String, Object>> pointListBuilder = ImmutableList.builder();
 
         if (resultValue instanceof Map) {
@@ -300,8 +327,15 @@ public class DashboardsApiController extends AuthenticatedController {
                         value = ((Map) value).get(functionType);
                     }
                     Object result = value == null ? 0 : value;
-                    final Map<String, Object> point = ImmutableMap.of("x", Long.parseLong(timestamp), "y", result);
-                    pointListBuilder.add(point);
+                    final ImmutableMap.Builder<String, Object> pointBuilder = ImmutableMap.<String, Object>builder()
+                            .put("x", Long.parseLong(timestamp))
+                            .put("y", result);
+
+                    if (seriesNo != null) {
+                        pointBuilder.put("series", seriesNo);
+                    }
+
+                    pointListBuilder.add(pointBuilder.build());
                 }
                 index++;
                 nextStep(interval, currentTime);
