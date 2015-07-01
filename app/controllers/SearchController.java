@@ -337,11 +337,11 @@ public class SearchController extends AuthenticatedController {
             Collections.sort(usedIndices, new Comparator<IndexRangeSummary>() {
                 @Override
                 public int compare(IndexRangeSummary o1, IndexRangeSummary o2) {
-                    return o1.start().compareTo(o2.start());
+                    return o1.begin().compareTo(o2.begin());
                 }
             });
             IndexRangeSummary oldestIndex = usedIndices.get(0);
-            queryRangeInMinutes = Minutes.minutesBetween(oldestIndex.start(),
+            queryRangeInMinutes = Minutes.minutesBetween(oldestIndex.begin(),
                     searchResult.getToDateTime()).getMinutes();
         } else {
             queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(),
