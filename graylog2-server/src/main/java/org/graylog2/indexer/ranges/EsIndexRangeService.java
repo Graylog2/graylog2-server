@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -42,7 +41,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -75,8 +73,6 @@ import javax.inject.Inject;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
@@ -241,10 +237,7 @@ public class EsIndexRangeService implements IndexRangeService {
     public IndexRange calculateRange(String index) {
         final Stopwatch sw = Stopwatch.createStarted();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final TimestampStats stats = firstNonNull(
-                timestampStatsOfIndex(index),
-                TimestampStats.create(new DateTime(0L, DateTimeZone.UTC), now, new DateTime(0L, DateTimeZone.UTC))
-        );
+        final TimestampStats stats = timestampStatsOfIndex(index);
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
@@ -259,7 +252,6 @@ public class EsIndexRangeService implements IndexRangeService {
      * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
      */
     @VisibleForTesting
-    @Nullable
     protected TimestampStats timestampStatsOfIndex(String index) {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
                 .filter(FilterBuilders.existsFilter("timestamp"))
@@ -282,7 +274,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final Filter f = response.getAggregations().get("agg");
         if (f.getDocCount() == 0L) {
             LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
-            return null;
+            return TimestampStats.EMPTY;
         }
 
         final Stats stats = f.getAggregations().get("ts_stats");
@@ -306,7 +298,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final String indexName = indexRange.indexName();
         final boolean readOnly = indices.isReadOnly(indexName);
 
-        if(readOnly) {
+        if (readOnly) {
             indices.setReadWrite(indexName);
         }
 
@@ -319,7 +311,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .request();
         final IndexResponse response = client.index(request).actionGet();
 
-        if(readOnly) {
+        if (readOnly) {
             indices.setReadOnly(indexName);
         }
 
