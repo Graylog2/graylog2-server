@@ -35,6 +35,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -160,15 +161,20 @@ public class AmqpConsumer {
         }
 
         // Authenticate?
-        if(!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
+        if (!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
             factory.setUsername(username);
             factory.setPassword(password);
         }
 
-        connection = factory.newConnection();
+        try {
+            connection = factory.newConnection();
+        } catch (TimeoutException e) {
+            throw new IOException("Timeout while opening new AMQP connection", e);
+        }
+
         channel = connection.createChannel();
 
-        if(null == channel) {
+        if (null == channel) {
             LOG.error("No channel descriptor available!");
         }
 
@@ -199,7 +205,7 @@ public class AmqpConsumer {
 
                         LOG.info("Consumer running.");
                         break;
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         LOG.error("Could not re-connect to AMQP broker.", e);
                     }
                 }
@@ -210,7 +216,12 @@ public class AmqpConsumer {
 
     public void stop() throws IOException {
         if (channel != null && channel.isOpen()) {
-            channel.close();
+            try {
+                channel.close();
+            } catch (TimeoutException e) {
+                LOG.error("Timeout when closing AMQP channel", e);
+                channel.abort();
+            }
         }
 
         if (connection != null && connection.isOpen()) {

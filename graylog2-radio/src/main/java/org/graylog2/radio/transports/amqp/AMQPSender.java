@@ -24,17 +24,18 @@ import org.graylog2.plugin.RadioMessage;
 import org.graylog2.radio.Configuration;
 import org.joda.time.Duration;
 import org.msgpack.MessagePack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import static com.rabbitmq.client.MessageProperties.MINIMAL_BASIC;
 import static com.rabbitmq.client.MessageProperties.MINIMAL_PERSISTENT_BASIC;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AMQPSender {
+    private static final Logger LOG = LoggerFactory.getLogger(AMQPSender.class);
 
     // Not threadsafe!
 
@@ -64,7 +65,7 @@ public class AMQPSender {
                       String queueType,
                       String exchangeName,
                       String routingKey,
-                      boolean amqpPersistentMessagesEnabled, 
+                      boolean amqpPersistentMessagesEnabled,
                       Duration amqpConnectTimeout) {
         this.queueName = queueName;
         this.queueType = queueType;
@@ -77,7 +78,8 @@ public class AMQPSender {
         // Use a separate class loader for msgpack to avoid generation of duplicate class names.
         // The JavaassistTemplateBuilder used by MessagePack uses a sequence number for class naming
         // and is not thread-safe.
-        pack.setClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {});
+        pack.setClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {
+        });
 
         this.hostname = hostname;
         this.port = port;
@@ -109,10 +111,10 @@ public class AMQPSender {
         final byte[] body = RadioMessage.serialize(pack, msg);
 
         channel.basicPublish(exchangeName,
-                             routingKey,
-                             true, // mandatory
-                             amqpPersistentMessagesEnabled ? MINIMAL_PERSISTENT_BASIC : MINIMAL_BASIC,
-                             body);
+                routingKey,
+                true, // mandatory
+                amqpPersistentMessagesEnabled ? MINIMAL_PERSISTENT_BASIC : MINIMAL_BASIC,
+                body);
     }
 
     public void connect() throws IOException {
@@ -123,14 +125,19 @@ public class AMQPSender {
         factory.setVirtualHost(vHost);
 
         // Authenticate?
-        if(username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
             factory.setUsername(username);
             factory.setPassword(password);
         }
-        
+
         factory.setConnectionTimeout((int) connectTimeout.getMillis());
 
-        connection = factory.newConnection();
+        try {
+            connection = factory.newConnection();
+        } catch (TimeoutException e) {
+            throw new IOException("Timeout while opening new AMQP connection", e);
+        }
+
         channel = connection.createChannel();
 
         // It's ok if the queue or exchange already exist.
@@ -149,7 +156,12 @@ public class AMQPSender {
 
     public void close() throws IOException {
         if (channel != null && channel.isOpen()) {
-            channel.close();
+            try {
+                channel.close();
+            } catch (TimeoutException e) {
+                LOG.error("Timeout when closing AMQP channel", e);
+                channel.abort();
+            }
         }
 
         if (connection != null && connection.isOpen()) {
