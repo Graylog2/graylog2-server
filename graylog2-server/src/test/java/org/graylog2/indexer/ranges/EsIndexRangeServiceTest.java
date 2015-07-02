@@ -56,7 +56,13 @@ public class EsIndexRangeServiceTest {
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule()
             .settings(ImmutableSettings.settingsBuilder().put("action.auto_create_index", false).build())
             .build();
-    private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2");
+    private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2", "ignored");
+    private static final ElasticsearchConfiguration ELASTICSEARCH_CONFIGURATION = new ElasticsearchConfiguration() {
+        @Override
+        public String getIndexPrefix() {
+            return "graylog";
+        }
+    };
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -75,7 +81,7 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         final NullActivityWriter activityWriter = new NullActivityWriter();
-        indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping(client));
+        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
         indexRangeService = new EsIndexRangeService(client, activityWriter, new ObjectMapperProvider().get(), indices);
     }
 

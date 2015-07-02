@@ -227,6 +227,26 @@
           }
         }
       ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "ignored",
+            "indexType": "index_range",
+            "indexId": "ignored"
+          }
+        },
+        {
+          "data": {
+            "_id": "ignored",
+            "calculated_at": "2015-01-01T00:00:00.000Z",
+            "begin": "2015-01-01T00:00:00.000Z",
+            "end": "2015-01-02T00:00:00.000Z",
+            "took_ms": 23
+          }
+        }
+      ]
     }
   ]
 }

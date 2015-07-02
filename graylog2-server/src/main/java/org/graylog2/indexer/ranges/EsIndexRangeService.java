@@ -131,6 +131,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .must(endRangeQuery);
         final SearchRequest request = client.prepareSearch()
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
+                .setIndices(indices.allIndicesAlias())
                 .setQuery(completeRangeQuery)
                 .request();
 
@@ -150,6 +151,7 @@ public class EsIndexRangeService implements IndexRangeService {
     public SortedSet<IndexRange> findAll() {
         final SearchRequest request = client.prepareSearch()
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
+                .setIndices(indices.allIndicesAlias())
                 .setQuery(QueryBuilders.matchAllQuery())
                 .request();
 
