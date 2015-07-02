@@ -30,7 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerNodesTest extends BaseApiTest {
 
@@ -62,7 +65,7 @@ public class ServerNodesTest extends BaseApiTest {
 
     @Test
     public void testFailureCountParallelExecute() throws Exception {
-        setupNodes(AddressNodeId.create("http://localhost:65535"),AddressNodeId.create("http://localhost:65534"));
+        setupNodes(AddressNodeId.create("http://localhost:65535"), AddressNodeId.create("http://localhost:65534"));
         api.setHttpClient(client);
 
         final Map<Node, EmptyResponse> emptyResponses = api.put().path("/").executeOnAll();
@@ -71,7 +74,7 @@ public class ServerNodesTest extends BaseApiTest {
         final List<Node> nodes = serverNodes.all(true);
         Node failedNode = nodes.get(0);
         Node failedNode2 = nodes.get(1);
-        assertFalse("Node should be inactive" , failedNode.isActive());
+        assertFalse("Node should be inactive", failedNode.isActive());
         assertFalse("Node should be inactive", failedNode2.isActive());
         assertEquals(1, failedNode.getFailureCount());
         assertEquals(1, failedNode2.getFailureCount());
@@ -119,7 +122,7 @@ public class ServerNodesTest extends BaseApiTest {
     @Before
     public void setUp() throws Exception {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
+        builder.setAllowPoolingConnections(false);
         client = new AsyncHttpClient(builder.build());
     }
 

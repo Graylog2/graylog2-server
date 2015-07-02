@@ -62,7 +62,7 @@ public class APIException extends Exception {
             sb.append(request.getMethod());
             sb.append(' ');
             try {
-                final URI uri = request.getURI();
+                final URI uri = request.getUri().toJavaNetURI();
                 final String userInfo = uri.getUserInfo();
                 String username = "";
                 if (userInfo != null) {

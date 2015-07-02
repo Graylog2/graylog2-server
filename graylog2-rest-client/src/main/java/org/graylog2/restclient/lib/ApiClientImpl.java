@@ -37,7 +37,6 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
@@ -92,12 +91,12 @@ class ApiClientImpl implements ApiClient {
     @Inject
     private ApiClientImpl(ServerNodes serverNodes, @Named("Default Timeout") Long defaultTimeout) {
         this(serverNodes, defaultTimeout,
-             new ObjectMapper()
-                     .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
-                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                     .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                     .registerModule(new GuavaModule())
-                     .registerModule(new JodaModule()));
+                new ObjectMapper()
+                        .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+                        .registerModule(new GuavaModule())
+                        .registerModule(new JodaModule()));
     }
 
     private ApiClientImpl(ServerNodes serverNodes, Long defaultTimeout, ObjectMapper objectMapper) {
@@ -109,7 +108,7 @@ class ApiClientImpl implements ApiClient {
     @Override
     public void start() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
+        builder.setAllowPoolingConnections(false);
         builder.setUserAgent("graylog2-web/" + Version.VERSION);
         client = new AsyncHttpClient(builder.build());
 
@@ -603,7 +602,7 @@ class ApiClientImpl implements ApiClient {
                 final ListenableFuture<Response> future = context.listenableFuture;
                 try {
                     final Response response = future.get(timeoutValue, timeoutUnit);
-                    if(response == null) {
+                    if (response == null) {
                         LOG.error("Didn't receive response from node {}", node);
                         node.markFailure();
                         continue;
@@ -662,7 +661,7 @@ class ApiClientImpl implements ApiClient {
             }
 
             applyBasicAuthentication(requestBuilder, userInfo);
-            requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int) timeoutUnit.toMillis(timeoutValue)));
+            requestBuilder.setRequestTimeout((int) timeoutUnit.toMillis(timeoutValue));
 
             if (body != null) {
                 if (method != Method.PUT && method != Method.POST) {
@@ -779,13 +778,12 @@ class ApiClientImpl implements ApiClient {
                     }
 
                     @Override
-                    public void onBytesReceived(ByteBuffer buffer) throws IOException {
-                        stream.putBuffer(buffer);
+                    public void onBytesSent(long amount, long current, long total) {
                     }
 
                     @Override
-                    public void onBytesSent(ByteBuffer buffer) {
-
+                    public void onBytesReceived(byte[] bytes) throws IOException {
+                        stream.putBuffer(ByteBuffer.wrap(bytes));
                     }
 
                     @Override
@@ -799,10 +797,7 @@ class ApiClientImpl implements ApiClient {
                     }
                 }));
                 return stream;
-            } catch (MalformedURLException e) {
-                LOG.error("Malformed URL", e);
-                throw new RuntimeException("Malformed URL.", e);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOG.error("unhandled IOException", rootCause(e));
                 target.markFailure();
                 throw e;
