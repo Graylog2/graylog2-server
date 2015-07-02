@@ -25,11 +25,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
@@ -38,17 +33,14 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
@@ -59,7 +51,6 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -172,65 +163,6 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         return indexRanges.build();
-    }
-
-    @Override
-    public void destroy(String index) {
-        final DeleteRequest request = client.prepareDelete()
-                .setIndex(index)
-                .setId(index)
-                .setType(IndexMapping.TYPE_INDEX_RANGE)
-                .setRefresh(true)
-                .request();
-
-        try {
-            final DeleteResponse response = client.delete(request).actionGet();
-
-            if (response.isFound()) {
-                String msg = "Removed range meta-information of [" + index + "]";
-                LOG.info(msg);
-                activityWriter.write(new Activity(msg, IndexRange.class));
-            } else {
-                LOG.warn("Couldn't find meta-information of index [{}]", index);
-            }
-        } catch (IndexMissingException e) {
-            LOG.debug("Couldn't find index", e);
-        }
-    }
-
-    @Override
-    public void destroyAll() {
-        final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
-        final SearchRequest searchRequest = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setSearchType(SearchType.SCAN)
-                .setScroll(scroll)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .request();
-        final SearchResponse searchResponse = client.search(searchRequest).actionGet();
-
-        final SearchScrollRequest scrollRequest = client.prepareSearchScroll(searchResponse.getScrollId())
-                .setScroll(scroll)
-                .request();
-        final SearchResponse scrollResponse = client.searchScroll(scrollRequest).actionGet();
-
-        final BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-        for (SearchHit hit : scrollResponse.getHits().hits()) {
-            final DeleteRequest deleteRequest = client.prepareDelete(hit.index(), hit.type(), hit.id()).request();
-            bulkRequestBuilder.add(deleteRequest);
-        }
-
-        final BulkRequest bulkRequest = bulkRequestBuilder.request();
-        final BulkResponse bulkResponse = client.bulk(bulkRequest).actionGet();
-
-        if (bulkResponse.hasFailures()) {
-            LOG.warn("Couldn't remove meta-information of all indices");
-            LOG.debug("Bulk delete error details: {}", bulkResponse.buildFailureMessage());
-        } else {
-            String msg = "Removed range meta-information of all indices";
-            LOG.info(msg);
-            activityWriter.write(new Activity(msg, IndexRange.class));
-        }
     }
 
     @Override

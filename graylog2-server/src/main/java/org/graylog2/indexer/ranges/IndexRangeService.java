@@ -17,13 +17,8 @@
 package org.graylog2.indexer.ranges;
 
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
-import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 
 public interface IndexRangeService {
@@ -33,11 +28,7 @@ public interface IndexRangeService {
 
     SortedSet<IndexRange> findAll();
 
-    void destroy(String index);
-
     void save(IndexRange indexRange);
-
-    void destroyAll();
 
     IndexRange calculateRange(String index);
 }

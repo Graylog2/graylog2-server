@@ -22,8 +22,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.assertj.jodatime.api.Assertions;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.indices.IndexMissingException;
@@ -126,25 +124,6 @@ public class EsIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void destroyRemovesIndexRange() throws Exception {
-        indexRangeService.destroy("graylog_1");
-
-        Set<IndexRange> indexRanges = indexRangeService.findAll();
-
-        assertThat(indexRanges).hasSize(1);
-        assertThat(indexRanges.iterator().next().indexName()).isEqualTo("graylog_2");
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void destroyRemovesIgnoresNonExistingIndexRange() throws Exception {
-        indexRangeService.destroy("does-not-exist");
-
-        assertThat(indexRangeService.findAll()).hasSize(2);
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void calculateRangeReturnsIndexRange() throws Exception {
         final String index = "graylog";
         final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
@@ -172,18 +151,6 @@ public class EsIndexRangeServiceTest {
     @Test(expected = IndexMissingException.class)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
         indexRangeService.calculateRange("does-not-exist");
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void destroyAllKillsAllIndexRanges() throws Exception {
-        indexRangeService.destroyAll();
-        // Refresh indices
-        final RefreshRequest refreshRequest = client.admin().indices().prepareRefresh().request();
-        final RefreshResponse refreshResponse = client.admin().indices().refresh(refreshRequest).actionGet();
-        assumeTrue(refreshResponse.getFailedShards() == 0);
-
-        assertThat(indexRangeService.findAll()).isEmpty();
     }
 
     @Test
@@ -270,9 +237,9 @@ public class EsIndexRangeServiceTest {
     public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
         TimestampStats stats = indexRangeService.timestampStatsOfIndex("graylog");
 
-        assertThat(stats.min()).isEqualTo(new DateTime(0L ,DateTimeZone.UTC));
-        assertThat(stats.max()).isEqualTo(new DateTime(0L ,DateTimeZone.UTC));
-        assertThat(stats.avg()).isEqualTo(new DateTime(0L ,DateTimeZone.UTC));
+        assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+        assertThat(stats.avg()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 
     @Test(expected = IndexMissingException.class)
