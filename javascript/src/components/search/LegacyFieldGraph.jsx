@@ -29,6 +29,13 @@ var LegacyFieldGraph = React.createClass({
     _getGraphTitle() {
         return this.props.stacked ? "Combined graph" : this.props.graphOptions['field'] + " graph";
     },
+    _getWidgetType() {
+        return this.props.stacked ? Widget.Type.STACKED_CHART : Widget.Type.FIELD_CHART;
+    },
+    _getWidgetConfiguration() {
+        return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId) :
+            FieldGraphsStore.getFieldGraphAsCreateWidgetRequestParams(this.props.graphId);
+    },
     render() {
         return (
             <div ref="fieldGraphContainer"
@@ -39,10 +46,9 @@ var LegacyFieldGraph = React.createClass({
                  data-to={this.props.to}>
                 <div className="pull-right">
                     <AddToDashboardMenu title='Add to dashboard'
-                                        hidden={this.props.stacked}
                                         dashboards={this.props.dashboards}
-                                        widgetType={Widget.Type.FIELD_CHART}
-                                        configuration={FieldGraphsStore.getGraphOptionsAsCreateWidgetRequestParams(this.props.graphId)}
+                                        widgetType={this._getWidgetType()}
+                                        configuration={this._getWidgetConfiguration()}
                                         bsStyle='default'
                                         pullRight={true}
                                         permissions={this.props.permissions}>

@@ -88,6 +88,9 @@ var WidgetCreationModal = React.createClass({
             case Widget.Type.SEARCH_RESULT_CHART:
                 title = "search histogram";
                 break;
+            case Widget.Type.STACKED_CHART:
+                title = "combined graph";
+                break;
             default:
                 throw("Unsupported widget type " + this.props.widgetType);
         }
@@ -157,9 +160,6 @@ var WidgetCreationModal = React.createClass({
                     );
                 }
                 break;
-            case Widget.Type.SEARCH_RESULT_CHART:
-            case Widget.Type.FIELD_CHART:
-                break;
             case Widget.Type.QUICKVALUES:
                 controls.push(
                     <Input key="showPieChart"
@@ -180,8 +180,6 @@ var WidgetCreationModal = React.createClass({
                            help="Include a table with quantitative information."/>
                 );
                 break;
-            default:
-                throw("Unsupported widget type " + this.props.widgetType);
         }
 
         return controls;

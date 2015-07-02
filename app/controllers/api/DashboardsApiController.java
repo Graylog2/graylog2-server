@@ -474,9 +474,11 @@ public class DashboardsApiController extends AuthenticatedController {
             final DashboardWidget widget;
             try {
                 final DashboardWidget.Type widgetType = DashboardWidget.Type.valueOf(request.type());
+                final Map<String, Boolean> trendInformation;
+
                 switch (widgetType) {
-                    case SEARCH_RESULT_COUNT: {
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                    case SEARCH_RESULT_COUNT:
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add search count widget with trend on a non relative time range");
@@ -487,10 +489,9 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         }
                         break;
-                    }
-                    case STREAM_SEARCH_RESULT_COUNT: {
+                    case STREAM_SEARCH_RESULT_COUNT:
                         if (!canReadStream(streamId)) return unauthorized();
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add search result count widget with trend on a non relative time range");
@@ -501,9 +502,8 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
                         }
                         break;
-                    }
                     case FIELD_CHART:
-                        Map<String, Object> config = new HashMap<String, Object>() {{
+                        final Map<String, Object> config = new HashMap<String, Object>() {{
                             put("field", request.config().get("field"));
                             put("valuetype", request.config().get("valuetype"));
                             put("renderer", request.config().get("renderer"));
@@ -524,10 +524,10 @@ public class DashboardsApiController extends AuthenticatedController {
                         if (!canReadStream(streamId)) return unauthorized();
                         widget = new SearchResultChartWidget(dashboard, query, timerange, description, streamId, (String) request.config().get("interval"));
                         break;
-                    case STATS_COUNT: {
+                    case STATS_COUNT:
                         final String field = (String) request.config().get("field");
                         final String statsFunction = (String) request.config().get("statsFunction");
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add statistical count widget with trend on a non relative time range");
@@ -538,7 +538,17 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new StatisticalCountWidget(dashboard, query, timerange, description, field, statsFunction, streamId);
                         }
                         break;
-                    }
+                    case STACKED_CHART:
+                        Map<String, Object> requestConfig = request.config();
+                        String renderer = (String) requestConfig.get("renderer");
+                        String interpolation = (String) requestConfig.get("interpolation");
+                        String interval = (String) requestConfig.get("interval");
+                        List<Map<String, Object>> series = (List<Map<String, Object>>) requestConfig.get("series");
+
+                        if (!canReadStream(streamId)) return unauthorized();
+
+                        widget = new StackedChartWidget(dashboard, timerange, description, streamId, renderer, interpolation, interval, series);
+                        break;
                     default:
                         throw new IllegalArgumentException();
                 }
