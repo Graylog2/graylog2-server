@@ -29,7 +29,7 @@ interface CreateFieldChartWidgetRequestParams {
 }
 
 interface StackedChartSeries {
-    statistical_field: string;
+    statistical_function: string;
     field: string;
     query: string;
 }
@@ -223,11 +223,13 @@ class FieldGraphsStore {
     }
 
     private getSeriesInformation(graphOptions: Object): StackedChartSeries {
-        return <StackedChartSeries> {
+        var series = {
             query: graphOptions['query'],
             field: graphOptions['field'],
             statistical_function: graphOptions['valuetype'],
         };
+
+        return <StackedChartSeries> series;
     }
 
     getStackedGraphAsCreateWidgetRequestParams(graphId: string, widgetType: string): CreateStackedChartWidgetRequestParams {
