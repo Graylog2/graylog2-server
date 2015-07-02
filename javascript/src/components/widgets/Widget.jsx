@@ -296,6 +296,7 @@ var Widget = React.createClass({
 
         var editConfigModal = (
             <WidgetEditConfigModal ref="editModal"
+                                   widgetTypes={this.constructor.Type}
                                    widget={this._getWidgetData()}
                                    onUpdate={this.updateWidget}
                                    onModalHidden={this._enableGridster}/>
