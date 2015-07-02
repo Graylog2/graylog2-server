@@ -61,8 +61,6 @@ var GraphVisualization = React.createClass({
         this.group = this.dimension.group().reduceSum((d) => d.y);
 
         return {
-            valueType: undefined,
-            interpolation: undefined,
             dataPoints: []
         };
     },
