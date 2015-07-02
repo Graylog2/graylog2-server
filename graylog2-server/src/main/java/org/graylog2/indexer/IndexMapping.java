@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
-    public static final String TYPE_META = "graylog_meta";
+    public static final String TYPE_INDEX_RANGE = "index_range";
 
     private final Client client;
 

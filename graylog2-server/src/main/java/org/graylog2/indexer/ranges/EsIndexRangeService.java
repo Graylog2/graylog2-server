@@ -94,7 +94,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Nullable
     public IndexRange get(String index) throws NotFoundException {
         final GetRequest request = new GetRequestBuilder(client, index)
-                .setType(IndexMapping.TYPE_META)
+                .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(index)
                 .request();
 
@@ -139,7 +139,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .must(beginRangeQuery)
                 .must(endRangeQuery);
         final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_META)
+                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
                 .setQuery(completeRangeQuery)
                 .request();
 
@@ -158,7 +158,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Override
     public SortedSet<IndexRange> findAll() {
         final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_META)
+                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
                 .setQuery(QueryBuilders.matchAllQuery())
                 .request();
 
@@ -179,7 +179,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final DeleteRequest request = client.prepareDelete()
                 .setIndex(index)
                 .setId(index)
-                .setType(IndexMapping.TYPE_META)
+                .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setRefresh(true)
                 .request();
 
@@ -202,7 +202,7 @@ public class EsIndexRangeService implements IndexRangeService {
     public void destroyAll() {
         final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
         final SearchRequest searchRequest = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_META)
+                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
                 .setSearchType(SearchType.SCAN)
                 .setScroll(scroll)
                 .setQuery(QueryBuilders.matchAllQuery())
@@ -304,7 +304,7 @@ public class EsIndexRangeService implements IndexRangeService {
 
         final IndexRequest request = client.prepareIndex()
                 .setIndex(indexName)
-                .setType(IndexMapping.TYPE_META)
+                .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(indexName)
                 .setRefresh(true)
                 .setSource(source)

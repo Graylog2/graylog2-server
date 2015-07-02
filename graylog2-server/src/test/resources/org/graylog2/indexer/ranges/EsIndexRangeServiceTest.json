@@ -193,7 +193,7 @@
         {
           "index": {
             "indexName": "graylog_1",
-            "indexType": "graylog_meta",
+            "indexType": "index_range",
             "indexId": "graylog_1"
           }
         },
@@ -213,7 +213,7 @@
         {
           "index": {
             "indexName": "graylog_2",
-            "indexType": "graylog_meta",
+            "indexType": "index_range",
             "indexId": "graylog_2"
           }
         },

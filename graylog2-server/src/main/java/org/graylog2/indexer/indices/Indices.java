@@ -206,7 +206,7 @@ public class Indices implements IndexManagement {
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
         final Map<String, Object> metaMapping = indexMapping.metaMapping();
         final PutMappingResponse metaMappingResponse =
-                indexMapping.createMapping(indexName, IndexMapping.TYPE_META, metaMapping).actionGet();
+                indexMapping.createMapping(indexName, IndexMapping.TYPE_INDEX_RANGE, metaMapping).actionGet();
 
         return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
     }

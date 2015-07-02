@@ -5,7 +5,7 @@
         {
           "index" : {
             "indexName": "graylog_0",
-            "indexType": "graylog_meta",
+            "indexType": "index_range",
             "indexId": "graylog_0"
           }
         },
