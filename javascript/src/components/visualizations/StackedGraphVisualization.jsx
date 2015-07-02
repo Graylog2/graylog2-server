@@ -15,10 +15,9 @@ var StackedGraphVisualization = React.createClass({
     getInitialState() {
         this.normalizedData = false;
         this.series = Immutable.List();
+        this.barWidthScale = d3.scale.linear().domain(d3.range(0, 10000)).range(d3.range(0.6, 0, -0.01));
 
         return {
-            valueType: undefined,
-            interpolation: undefined,
             dataPoints: Immutable.Set()
         };
     },
@@ -90,7 +89,6 @@ var StackedGraphVisualization = React.createClass({
                 height: this.props.height,
                 width: this.props.width
             },
-            type: 'bar',
             data: {
                 columns: [],
                 names: names.toJS(),
@@ -160,6 +158,12 @@ var StackedGraphVisualization = React.createClass({
             this.state.dataPoints.first().get('timestamp') - 1000,
             this.state.dataPoints.last().get('timestamp') + 1000
         );
+
+        if (this.props.config.renderer === 'bar') {
+            // Automatically resize bar width
+            var numberDataPoints = this.state.dataPoints.size;
+            this.graph.internal.config.bar_width_ratio = Math.max(0.01, this.barWidthScale(numberDataPoints));
+        }
 
         this.graph.load({
             json: this.state.dataPoints.toJS(),
