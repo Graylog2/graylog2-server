@@ -149,10 +149,10 @@ var StackedGraphVisualization = React.createClass({
         return formattedValue;
     },
     _resizeVisualization(width, height) {
-        this.graph
-            .width(width)
-            .height(height);
-        this.triggerRender = true;
+        this.graph.resize({
+            width: width,
+            height: height
+        });
     },
     drawData() {
         // Generate custom tick values for the time axis
