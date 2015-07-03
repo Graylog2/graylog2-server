@@ -120,7 +120,7 @@ public class StackedChartWidget extends ChartWidget {
             } catch (Searches.FieldTypeException e) {
                 String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Not a numeric field? The field was [" + series.field + "]";
                 LOG.error(msg, e);
-                throw new RuntimeException(msg);
+                throw new RuntimeException(msg, e);
             }
         }
 
