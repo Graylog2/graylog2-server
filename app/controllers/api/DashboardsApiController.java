@@ -60,6 +60,7 @@ import play.mvc.Result;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -538,15 +539,24 @@ public class DashboardsApiController extends AuthenticatedController {
                         }
                         break;
                     case STACKED_CHART:
-                        Map<String, Object> requestConfig = request.config();
-                        String renderer = (String) requestConfig.get("renderer");
-                        String interpolation = (String) requestConfig.get("interpolation");
-                        String interval = (String) requestConfig.get("interval");
-                        List<Map<String, Object>> series = (List<Map<String, Object>>) requestConfig.get("series");
+                        final Map<String, Object> requestConfig = request.config();
+                        final String renderer = (String) requestConfig.get("renderer");
+                        final String interpolation = (String) requestConfig.get("interpolation");
+                        final String interval = (String) requestConfig.get("interval");
 
                         if (!canReadStream(streamId)) return unauthorized();
 
-                        widget = new StackedChartWidget(dashboard, timerange, description, streamId, renderer, interpolation, interval, series);
+                        widget = new StackedChartWidget(dashboard, timerange, description, streamId, renderer, interpolation, interval);
+
+                        if (requestConfig.containsKey("series") && requestConfig.get("series") instanceof List) {
+                            final List requestSeries = (List) requestConfig.get("series");
+                            for (Object seriesObject : requestSeries) {
+                                if (seriesObject instanceof Map) {
+                                    widget.addSeries((Map<String, Object>) seriesObject);
+                                }
+                            }
+                        }
+
                         break;
                     default:
                         throw new IllegalArgumentException();
