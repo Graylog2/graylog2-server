@@ -33,12 +33,12 @@
  */
 package org.graylog2.restclient.models.dashboards.widgets;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class StackedChartWidget extends ChartWidget {
         this.renderer = renderer;
         this.interpolation = interpolation;
 
-        this.chartSeries = Lists.newArrayList();
+        this.chartSeries = new ArrayList<>(series.size());
         for (Map<String, Object> aSeries : series) {
             this.chartSeries.add(Series.fromMap(aSeries));
         }
@@ -73,7 +73,7 @@ public class StackedChartWidget extends ChartWidget {
         config.put("renderer", renderer);
         config.put("interpolation", interpolation);
 
-        List<Map<String, String>> series = Lists.newArrayList();
+        List<Map<String, String>> series = new ArrayList<>(chartSeries.size());
         for (Series aSeries : this.chartSeries) {
             series.add(aSeries.toMap());
         }

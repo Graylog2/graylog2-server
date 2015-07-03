@@ -20,7 +20,6 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
@@ -29,6 +28,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,11 +56,11 @@ public class StackedChartWidget extends ChartWidget {
         this.renderer = (String) config.get("renderer");
         this.interpolation = (String) config.get("interpolation");
 
-        this.chartSeries = Lists.newArrayList();
         final Object persistedSeries = config.get("series");
 
         if (persistedSeries instanceof List) {
             final List chartSeries = (List) persistedSeries;
+            this.chartSeries = new ArrayList<>(chartSeries.size());
 
             for (final Object series : chartSeries) {
                 this.chartSeries.add(Series.fromMap((Map<String, Object>) series));
@@ -94,7 +94,7 @@ public class StackedChartWidget extends ChartWidget {
             filter = "streams:" + streamId;
         }
 
-        final List<Map> results = Lists.newArrayList();
+        final List<Map> results = new ArrayList<>(chartSeries.size());
         DateTime from = null;
         DateTime to = null;
         long tookMs = 0;
