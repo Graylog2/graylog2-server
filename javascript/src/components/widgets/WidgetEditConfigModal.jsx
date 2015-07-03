@@ -5,7 +5,6 @@
 var React = require('react');
 var Input = require('react-bootstrap').Input;
 
-var Widget = require('./Widget');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 
 var WidgetEditConfigModal = React.createClass({
