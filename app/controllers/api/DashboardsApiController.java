@@ -60,7 +60,6 @@ import play.mvc.Result;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -503,13 +502,13 @@ public class DashboardsApiController extends AuthenticatedController {
                         }
                         break;
                     case FIELD_CHART:
-                        final Map<String, Object> config = new HashMap<String, Object>() {{
-                            put("field", request.config().get("field"));
-                            put("valuetype", request.config().get("valuetype"));
-                            put("renderer", request.config().get("renderer"));
-                            put("interpolation", request.config().get("interpolation"));
-                            put("interval", request.config().get("interval"));
-                        }};
+                        final Map<String, Object> config = ImmutableMap.of(
+                                "field", request.config().get("field"),
+                                "valuetype", request.config().get("valuetype"),
+                                "renderer", request.config().get("renderer"),
+                                "interpolation", request.config().get("interpolation"),
+                                "interval", request.config().get("interval")
+                        );
                         if (!canReadStream(streamId)) return unauthorized();
 
                         widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
