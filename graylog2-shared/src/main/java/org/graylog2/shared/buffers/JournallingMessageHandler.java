@@ -33,18 +33,19 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Lists.transform;
 
 public class JournallingMessageHandler implements EventHandler<RawMessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(JournallingMessageHandler.class);
 
+    private static final Set<Journal.Entry> NULL_SINGLETON = Collections.singleton(null);
     private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
             .retryIfException(new Predicate<Throwable>() {
                 @Override
@@ -79,8 +80,10 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
 
             final Converter converter = new Converter();
             // copy to avoid re-running this all the time
+            final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
+
             // Remove all null values returned from the converter (might happen if the Converter throws an exception)
-            final List<Journal.Entry> entries = Lists.newArrayList(filter(transform(batch, converter), notNull()));
+            entries.removeAll(NULL_SINGLETON);
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
