@@ -17,11 +17,13 @@
 
 package org.graylog2.restclient.models.dashboards.widgets;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 
 import java.util.Map;
+
+import static com.google.common.base.Strings.emptyToNull;
 
 public abstract class ChartWidget extends DashboardWidget {
     protected static final int DEFAULT_WIDTH = 2;
@@ -38,20 +40,19 @@ public abstract class ChartWidget extends DashboardWidget {
         super(type, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
 
         this.interval = interval;
-        if (streamId != null && !streamId.isEmpty()) {
-            this.streamId = streamId;
-        } else {
-            this.streamId = null;
-        }
+        this.streamId = emptyToNull(streamId);
     }
 
     @Override
     public Map<String, Object> getConfig() {
-        Map<String, Object> config = Maps.newHashMap();
-        config.put("stream_id", streamId);
-        config.put("interval", interval);
+        final ImmutableMap.Builder<String, Object> configBuilder = ImmutableMap.<String, Object>builder()
+                .put("interval", interval);
 
-        return config;
+        if (streamId != null) {
+            configBuilder.put("stream_id", streamId);
+        }
+
+        return configBuilder.build();
     }
 
     @Override
