@@ -64,13 +64,13 @@ public class FieldChartWidget extends ChartWidget {
     @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
+                .putAll(super.getPersistedConfig())
                 .put("query", query)
                 .put("timerange", timeRange.getPersistedConfig())
                 .put("field", field)
                 .put("valuetype", statisticalFunction)
                 .put("renderer", renderer)
-                .put("interpolation", interpolation)
-                .putAll(super.getPersistedConfig());
+                .put("interpolation", interpolation);
 
         return persistedConfig.build();
     }

@@ -67,9 +67,8 @@ public class StackedChartWidget extends ChartWidget {
     @Override
     public Map<String, Object> getConfig() {
         Map<String, Object> config = Maps.newHashMap();
-        config.putAll(getTimerange().getQueryParams());
         config.putAll(super.getConfig());
-
+        config.putAll(getTimerange().getQueryParams());
         config.put("renderer", renderer);
         config.put("interpolation", interpolation);
 

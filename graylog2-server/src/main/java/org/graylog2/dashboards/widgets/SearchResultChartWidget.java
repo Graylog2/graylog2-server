@@ -60,9 +60,9 @@ public class SearchResultChartWidget extends ChartWidget {
     @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
+                .putAll(super.getPersistedConfig())
                 .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig())
-                .putAll(super.getPersistedConfig());
+                .put("timerange", timeRange.getPersistedConfig());
 
         return persistedConfig.build();
     }
