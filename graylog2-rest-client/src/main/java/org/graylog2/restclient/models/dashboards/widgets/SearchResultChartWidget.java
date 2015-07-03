@@ -23,32 +23,22 @@ import org.graylog2.restclient.models.dashboards.Dashboard;
 
 import java.util.Map;
 
-public class SearchResultChartWidget extends DashboardWidget {
-
-    private static final int DEFAULT_WIDTH = 2;
-    private static final int DEFAULT_HEIGHT = 1;
-
-    private final String streamId;
-    private final String interval;
+public class SearchResultChartWidget extends ChartWidget {
 
     public SearchResultChartWidget(Dashboard dashboard, String query, TimeRange timerange, String description, String streamId, String interval) {
         this(dashboard, null, description, streamId, 0, query, timerange, null, interval);
     }
 
     public SearchResultChartWidget(Dashboard dashboard, String id, String description, String streamId, int cacheTime, String query, TimeRange timerange, String creatorUserId, String interval) {
-        super(Type.SEARCH_RESULT_CHART, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
-
-        this.streamId = streamId;
-        this.interval = interval;
+        super(Type.SEARCH_RESULT_CHART, id, description, cacheTime, dashboard, creatorUserId, query, timerange, streamId, interval);
     }
 
     @Override
     public Map<String, Object> getConfig() {
         Map<String, Object> config = Maps.newHashMap();
+        config.putAll(super.getConfig());
         config.putAll(getTimerange().getQueryParams());
         config.put("query", getQuery());
-        config.put("stream_id", streamId);
-        config.put("interval", interval);
 
         return config;
     }
@@ -63,11 +53,6 @@ public class SearchResultChartWidget extends DashboardWidget {
     public int getHeight() {
         int storedHeight = super.getHeight();
         return storedHeight == 0 ? DEFAULT_HEIGHT : storedHeight;
-    }
-
-    @Override
-    public String getStreamId() {
-        return streamId;
     }
 
     @Override

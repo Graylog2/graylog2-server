@@ -197,6 +197,14 @@ public class DashboardWidgetCreator {
                         query,
                         timeRange,
                         creatorUserId);
+            case STACKED_CHART:
+                return new StackedChartWidget(metricRegistry, searches,
+                        widgetId,
+                        description,
+                        cacheTime,
+                        config,
+                        timeRange,
+                        creatorUserId);
             default:
                 throw new DashboardWidget.NoSuchWidgetTypeException();
         }

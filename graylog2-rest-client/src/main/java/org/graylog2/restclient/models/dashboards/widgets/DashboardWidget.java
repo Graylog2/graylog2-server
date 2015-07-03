@@ -28,6 +28,7 @@ import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public abstract class DashboardWidget {
@@ -38,7 +39,8 @@ public abstract class DashboardWidget {
         FIELD_CHART,
         QUICKVALUES,
         SEARCH_RESULT_CHART,
-        STATS_COUNT
+        STATS_COUNT,
+        STACKED_CHART
     }
 
     private final Type type;
@@ -187,7 +189,7 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
-                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        (String) w.config.get("stream_id"),
                         w.config,
                         w.creatorUserId
                 );
@@ -197,7 +199,7 @@ public abstract class DashboardWidget {
                         dashboard,
                         w.id,
                         w.description,
-                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        (String) w.config.get("stream_id"),
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
@@ -212,7 +214,7 @@ public abstract class DashboardWidget {
                         dashboard,
                         w.id,
                         w.description,
-                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        (String) w.config.get("stream_id"),
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
@@ -233,6 +235,21 @@ public abstract class DashboardWidget {
                         (String) w.config.get("field"),
                         (String) w.config.get("stats_function"),
                         (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        w.creatorUserId
+                );
+                break;
+            case STACKED_CHART:
+                widget = new StackedChartWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        w.cacheTime,
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        (String) w.config.get("stream_id"),
+                        (String) w.config.get("renderer"),
+                        (String) w.config.get("interpolation"),
+                        (String) w.config.get("interval"),
+                        (List<Map<String, Object>>) w.config.get("series"),
                         w.creatorUserId
                 );
                 break;
