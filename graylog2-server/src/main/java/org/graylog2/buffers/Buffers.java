@@ -66,7 +66,7 @@ public class Buffers {
         final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
                 .retryIfResult(Predicates.not(Predicates.equalTo(Boolean.TRUE)))
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterDelay(timeUnit.toMillis(maxWait)))
+                .withStopStrategy(StopStrategies.stopAfterDelay(maxWait, timeUnit))
                 .build();
 
         try {

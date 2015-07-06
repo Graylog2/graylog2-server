@@ -27,19 +27,19 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.models.system.ldap.responses.LdapSettingsResponse;
 import org.graylog2.rest.models.system.ldap.responses.LdapTestConfigResponse;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.ldap.LdapEntry;
+import org.graylog2.shared.security.ldap.LdapSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @RequiresAuthentication
