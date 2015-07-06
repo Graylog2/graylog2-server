@@ -98,6 +98,8 @@ import static org.graylog2.plugin.Tools.bytesToHex;
 @Singleton
 public class KafkaJournal extends AbstractIdleService implements Journal {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaJournal.class);
+    private static final int NUM_IO_THREADS = 1;
+
     public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
     public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
 
@@ -253,7 +255,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     Map$.MODULE$.<String, LogConfig>empty(),
                     defaultConfig,
                     cleanerConfig,
-                    4, // I/O threads
+                    NUM_IO_THREADS,
                     SECONDS.toMillis(60l),
                     SECONDS.toMillis(60l),
                     SECONDS.toMillis(60l),
