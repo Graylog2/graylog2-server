@@ -44,14 +44,12 @@ public class BufferSynchronizerService extends AbstractIdleService {
     private final Configuration configuration;
     private final MetricRegistry metricRegistry;
 
-    private volatile boolean indexerAvailable = true;
-
     @Inject
-    public BufferSynchronizerService(final Buffers bufferSynchronizer,
+    public BufferSynchronizerService(final Buffers buffers,
                                      final Cluster cluster,
                                      final Configuration configuration,
                                      final MetricRegistry metricRegistry) {
-        this.bufferSynchronizer = bufferSynchronizer;
+        this.bufferSynchronizer = buffers;
         this.cluster = cluster;
         this.configuration = configuration;
         this.metricRegistry = metricRegistry;
@@ -64,7 +62,7 @@ public class BufferSynchronizerService extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
-        if (indexerAvailable && cluster.isConnectedAndHealthy()) {
+        if (cluster.isConnectedAndHealthy()) {
             final ExecutorService executorService = executorService(metricRegistry);
 
             executorService.submit(new Runnable() {
@@ -83,14 +81,10 @@ public class BufferSynchronizerService extends AbstractIdleService {
     }
 
     private ExecutorService executorService(MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("buffer-synchronizer-service-%d").build();
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("buffer-synchronizer-%d").build();
         return new InstrumentedExecutorService(
-                Executors.newFixedThreadPool(2, threadFactory),
+                Executors.newSingleThreadExecutor(threadFactory),
                 metricRegistry,
                 name(this.getClass(), "executor-service"));
-    }
-
-    public void setIndexerUnavailable() {
-        indexerAvailable = false;
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.cluster;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Lists;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -40,6 +41,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
@@ -48,14 +50,19 @@ public class Cluster {
 
     private final Client c;
     private final Deflector deflector;
+    private final ScheduledExecutorService scheduler;
+    private final Duration requestTimeout;
     private final AtomicReference<Map<String, DiscoveryNode>> nodes = new AtomicReference<>();
-    private ScheduledExecutorService scheduler;
 
     @Inject
-    public Cluster(Client client, Deflector deflector, @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+    public Cluster(Client client,
+                   Deflector deflector,
+                   @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                   @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.scheduler = scheduler;
         this.c = client;
         this.deflector = deflector;
+        this.requestTimeout = requestTimeout;
         // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
         // get to the instance to bridge.
         ClusterStateMonitor.setCluster(this);
@@ -140,7 +147,7 @@ public class Cluster {
         }
     }
 
-    public void waitForConnectedAndHealthy() throws InterruptedException {
+    public void waitForConnectedAndHealthy(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
         LOG.debug("Waiting until cluster connection comes back and cluster is healthy, checking once per second.");
 
         final CountDownLatch latch = new CountDownLatch(1);
@@ -156,8 +163,16 @@ public class Cluster {
             }
         }, 0, 1, TimeUnit.SECONDS); // TODO should this be configurable?
 
-        latch.await();
+        final boolean waitSuccess = latch.await(timeout, unit);
         scheduledFuture.cancel(true); // Make sure to cancel the task to avoid task leaks!
+
+        if(!waitSuccess) {
+            throw new TimeoutException("Elasticsearch cluster didn't get healthy within timeout");
+        }
+    }
+
+    public void waitForConnectedAndHealthy() throws InterruptedException, TimeoutException {
+        waitForConnectedAndHealthy(requestTimeout.getQuantity(), requestTimeout.getUnit());
     }
 
     public void updateDataNodeList(Map<String, DiscoveryNode> nodes) {
