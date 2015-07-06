@@ -26,17 +26,23 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class NotificationServiceImpl extends PersistedServiceImpl implements NotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
+    private final NodeId nodeId;
+
     @Inject
-    public NotificationServiceImpl(MongoConnection mongoConnection) {
+    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection) {
         super(mongoConnection);
+        this.nodeId = checkNotNull(nodeId);
     }
 
     @Override
@@ -61,8 +67,10 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     public boolean fixed(NotificationImpl.Type type, Node node) {
         BasicDBObject qry = new BasicDBObject();
         qry.put("type", type.toString().toLowerCase());
-        if (node != null)
+        if (node != null) {
             qry.put("node_id", node.getNodeId());
+        }
+
         return destroyAll(NotificationImpl.class, qry) > 0;
     }
 
@@ -73,14 +81,13 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public List<Notification> all() {
-        List<Notification> notifications = Lists.newArrayList();
-
-        for (DBObject obj : query(NotificationImpl.class, new BasicDBObject(), new BasicDBObject("timestamp", -1))) {
+        final List<DBObject> dbObjects = query(NotificationImpl.class, new BasicDBObject(), new BasicDBObject("timestamp", -1));
+        final List<Notification> notifications = Lists.newArrayListWithCapacity(dbObjects.size());
+        for (DBObject obj : dbObjects) {
             try {
                 notifications.add(new NotificationImpl(new ObjectId(obj.get("_id").toString()), obj.toMap()));
             } catch (IllegalArgumentException e) {
-                LOG.warn("There is a notification type we can't handle: [" + obj.get("type") + "]");
-                continue;
+                LOG.warn("There is a notification type we can't handle: [{}]", obj.get("type"));
             }
         }
 
@@ -91,7 +98,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     public boolean publishIfFirst(Notification notification) {
         // node id should never be empty
         if (notification.getNodeId() == null) {
-            addThisNode(notification);
+            notification.addNode(nodeId.toString());
         }
 
         // also the timestamp should never be empty
@@ -112,10 +119,6 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
 
         return true;
-    }
-
-    private Notification addThisNode(Notification notification) {
-        return notification;
     }
 
     @Override
