@@ -44,6 +44,8 @@ import kafka.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
 import kafka.message.MessageSet;
+import kafka.server.BrokerState;
+import kafka.server.RunningAsBroker;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.Time;
 import kafka.utils.Utils;
@@ -96,6 +98,8 @@ import static org.graylog2.plugin.Tools.bytesToHex;
 @Singleton
 public class KafkaJournal extends AbstractIdleService implements Journal {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaJournal.class);
+    private static final int NUM_IO_THREADS = 1;
+
     public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
     public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
 
@@ -172,6 +176,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         Ints.saturatedCast(segmentSize.toBytes()),
                         // segmentMs: The soft maximum on the amount of time before a new log segment is rolled
                         segmentAge.getMillis(),
+                        // segmentJitterMs The maximum random jitter subtracted from segmentMs to avoid thundering herds of segment rolling
+                        0,
                         // flushInterval: The number of messages that can be written to the log before a flush is forced
                         flushInterval,
                         // flushMs: The amount of time the log can have dirty data before a flush is forced
@@ -193,7 +199,12 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         // minCleanableRatio: The ratio of bytes that are available for cleaning to the bytes already cleaned
                         0.5,
                         // compact: Should old segments in this log be deleted or de-duplicated?
-                        false
+                        false,
+                        // uncleanLeaderElectionEnable Indicates whether unclean leader election is enabled; actually a controller-level property
+                        //                             but included here for topic-specific configuration validation purposes
+                        true,
+                        // minInSyncReplicas If number of insync replicas drops below this number, we stop accepting writes with -1 (or all) required acks
+                        0
                 );
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -235,6 +246,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                                                            e.getMessage()));
         }
         try {
+            final BrokerState brokerState = new BrokerState();
+            brokerState.newState(RunningAsBroker.state());
             kafkaScheduler = new KafkaScheduler(2, "kafka-journal-scheduler-", false); // TODO make thread count configurable
             kafkaScheduler.startup();
             logManager = new LogManager(
@@ -242,10 +255,12 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     Map$.MODULE$.<String, LogConfig>empty(),
                     defaultConfig,
                     cleanerConfig,
+                    NUM_IO_THREADS,
                     SECONDS.toMillis(60l),
                     SECONDS.toMillis(60l),
                     SECONDS.toMillis(60l),
-                    kafkaScheduler,
+                    kafkaScheduler, // Broker state
+                    brokerState,
                     JODA_TIME);
 
             final TopicAndPartition topicAndPartition = new TopicAndPartition("messagejournal", 0);
@@ -378,7 +393,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         try (Timer.Context ignored = writeTime.time()) {
             long payloadSize = 0L;
 
-            final List<Message> messages = Lists.newArrayList();
+            final List<Message> messages = Lists.newArrayListWithCapacity(entries.size());
             for (final Entry entry : entries) {
                 final byte[] messageBytes = entry.getMessageBytes();
                 final byte[] idBytes = entry.getIdBytes();
@@ -446,7 +461,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             // TODO benchmark and make read-ahead strategy configurable for performance tuning
             final MessageSet messageSet = kafkaLog.read(readOffset,
                     5 * 1024 * 1024,
-                    Option.<Object>apply(maxOffset));
+                    Option.<Object>apply(maxOffset)).messageSet();
 
             final Iterator<MessageAndOffset> iterator = messageSet.iterator();
             long firstOffset = Long.MIN_VALUE;
