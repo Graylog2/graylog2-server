@@ -120,7 +120,6 @@ public class Indices implements IndexManagement {
             }
 
             request.setConsistencyLevel(WriteConsistencyLevel.ONE);
-            request.setReplicationType(ReplicationType.ASYNC);
 
             if (request.numberOfActions() > 0) {
                 BulkResponse response = c.bulk(request.request()).actionGet();
