@@ -17,6 +17,7 @@
 package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.InstrumentedExecutorService;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
@@ -67,7 +68,7 @@ public class UdpTransport extends NettyTransport {
     public Bootstrap getBootstrap() {
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerExecutor));
 
-        final int recvBufferSize = Math.min(Ints.saturatedCast(getRecvBufferSize()), 65536);
+        final int recvBufferSize = Ints.saturatedCast(getRecvBufferSize());
         LOG.debug("Setting receive buffer size to {} bytes", recvBufferSize);
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(recvBufferSize));
         bootstrap.setOption("receiveBufferSize", recvBufferSize);
@@ -90,7 +91,8 @@ public class UdpTransport extends NettyTransport {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = super.getRequestedConfiguration();
 
-            r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 16384));
+            final int recvBufferSize = Ints.saturatedCast(Size.kilobytes(256L).toBytes());
+            r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, recvBufferSize));
 
             return r;
         }
