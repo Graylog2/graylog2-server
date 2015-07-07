@@ -95,20 +95,18 @@ public class Deflector { // extends Ablenkblech
         } else {
             LOG.info("Did not find an deflector alias. Setting one up now.");
 
+            // Do we have a target index to point to?
             try {
-                // Do we have a target index to point to?
-                try {
-                    String currentTarget = getNewestTargetName();
-                    LOG.info("Pointing to already existing index target <{}>", currentTarget);
+                final String currentTarget = getNewestTargetName();
+                LOG.info("Pointing to already existing index target <{}>", currentTarget);
 
-                    pointTo(currentTarget);
-                } catch(NoTargetIndexException ex) {
-                    final String msg = "There is no index target to point to. Creating one now.";
-                    LOG.info(msg);
-                    activityWriter.write(new Activity(msg, Deflector.class));
+                pointTo(currentTarget);
+            } catch (NoTargetIndexException ex) {
+                final String msg = "There is no index target to point to. Creating one now.";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, Deflector.class));
 
-                    cycle(); // No index, so automatically cycling to a new one.
-            }
+                cycle(); // No index, so automatically cycling to a new one.
             } catch (InvalidAliasNameException e) {
                 LOG.error("Seems like there already is an index called [{}]", getName());
             }
