@@ -10,6 +10,8 @@ public enum DocsHelper {
     PAGE_CONFIGURING_ES("configuring_es.html"),
     PAGE_DASHBOARDS("dashboards.html"),
     PAGE_ES_OPEN_FILE_LIMITS("configuring_es.html#open-file-limits"),
+    PAGE_ES_CLUSTER_STATUS_RED("configuring_es.html#cluster-status-explained"),
+    PAGE_ES_CLUSTER_UNAVAILABLE("configuring_es.html#configuration"),
     PAGE_EXTRACTORS("extractors.html"),
     PAGE_FLEXIBLE_DATE_CONVERTER("extractors.html#the-flexible-date-converter"),
     PAGE_RADIO_ARCHITECTURE("architecture.html#highly-available-setup-with-graylog-radio"),
