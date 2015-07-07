@@ -337,7 +337,7 @@ public class SearchController extends AuthenticatedController {
             Collections.sort(usedIndices, new Comparator<IndexRangeSummary>() {
                 @Override
                 public int compare(IndexRangeSummary o1, IndexRangeSummary o2) {
-                    return o1.begin().compareTo(o2.begin());
+                    return o1.end().compareTo(o2.end());
                 }
             });
             IndexRangeSummary oldestIndex = usedIndices.get(0);
