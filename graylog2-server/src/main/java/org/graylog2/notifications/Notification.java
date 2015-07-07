@@ -47,11 +47,13 @@ public interface Notification extends Persisted {
 
     Notification addNode(String nodeId);
 
-    public enum Type {
+    enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
         MULTI_MASTER,
         NO_MASTER,
         ES_OPEN_FILES,
+        ES_CLUSTER_RED,
+        ES_UNAVAILABLE,
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
         CHECK_SERVER_CLOCKS,
@@ -66,7 +68,7 @@ public interface Notification extends Persisted {
         GENERIC
     }
 
-    public enum Severity {
+    enum Severity {
         NORMAL, URGENT
     }
 }

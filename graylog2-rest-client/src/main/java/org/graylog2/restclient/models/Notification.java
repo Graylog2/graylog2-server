@@ -28,6 +28,8 @@ public class Notification {
         MULTI_MASTER,
         NO_MASTER,
         ES_OPEN_FILES,
+        ES_CLUSTER_RED,
+        ES_UNAVAILABLE,
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
         CHECK_SERVER_CLOCKS,

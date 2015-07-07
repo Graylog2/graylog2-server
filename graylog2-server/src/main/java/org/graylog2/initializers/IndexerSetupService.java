@@ -35,9 +35,10 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
-import org.graylog2.plugin.DocsHelper;
-import org.graylog2.shared.UI;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -60,11 +62,11 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
     private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
-    private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.5.99");
+    private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.6.99");
 
     private final Node node;
     private final ElasticsearchConfiguration configuration;
-    private final BufferSynchronizerService bufferSynchronizerService;
+    private final NotificationService notificationService;
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
 
@@ -72,33 +74,28 @@ public class IndexerSetupService extends AbstractIdleService {
     public IndexerSetupService(final Node node,
                                final ElasticsearchConfiguration configuration,
                                final BufferSynchronizerService bufferSynchronizerService,
+                               final NotificationService notificationService,
                                @Named("systemHttpClient") final OkHttpClient httpClient,
                                final MetricRegistry metricRegistry) {
-        this(node, configuration, bufferSynchronizerService, httpClient, new ObjectMapper(), metricRegistry);
+        this(node, configuration, bufferSynchronizerService, notificationService, httpClient, new ObjectMapper(), metricRegistry);
     }
 
     @VisibleForTesting
     IndexerSetupService(final Node node,
                         final ElasticsearchConfiguration configuration,
                         final BufferSynchronizerService bufferSynchronizerService,
+                        final NotificationService notificationService,
                         final OkHttpClient httpClient,
                         final ObjectMapper objectMapper,
                         final MetricRegistry metricRegistry) {
         this.node = node;
         this.configuration = configuration;
-        this.bufferSynchronizerService = bufferSynchronizerService;
+        this.notificationService = notificationService;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
 
-        // Shutdown after the BufferSynchronizerServer has stopped to avoid shutting down ES too early.
-        bufferSynchronizerService.addListener(new Listener() {
-            @Override
-            public void terminated(State from) {
-                LOG.debug("Shutting down ES client after buffer synchronizer has terminated.");
-                // Properly close ElasticSearch node.
-                IndexerSetupService.this.node.close();
-            }
-        }, executorService(metricRegistry));
+        // Shutdown after the BufferSynchronizerService has stopped to avoid shutting down ES too early.
+        bufferSynchronizerService.addListener(new ShutdownListener(this.node), executorService(metricRegistry));
     }
 
     private ExecutorService executorService(MetricRegistry metricRegistry) {
@@ -114,11 +111,10 @@ public class IndexerSetupService extends AbstractIdleService {
         Tools.silenceUncaughtExceptionsInThisThread();
 
         LOG.debug("Starting indexer");
-        try {
-            node.start();
+        node.start();
 
-            final Client client = node.client();
-            try {
+        final Client client = node.client();
+        try {
                 /* try to determine the cluster health. if this times out we could not connect and try to determine if there's
                    anything listening at all. if that happens this usually has these reasons:
                     1. cluster.name is different
@@ -128,69 +124,74 @@ public class IndexerSetupService extends AbstractIdleService {
                    we handle a red cluster state differently because if we can get that result it means the cluster itself
                    is reachable, which is a completely different problem from not being able to join at all.
                  */
-                final ClusterHealthRequest atLeastRed = new ClusterHealthRequest().waitForStatus(ClusterHealthStatus.RED);
-                final ClusterHealthResponse health = client.admin()
-                        .cluster()
-                        .health(atLeastRed)
-                        .actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
-                // we don't get here if we couldn't join the cluster. just check for red cluster state
-                if (ClusterHealthStatus.RED.equals(health.getStatus())) {
-                    UI.exitHardWithWall("The Elasticsearch cluster state is RED which means shards are unassigned. "
-                                    + "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.",
-                            DocsHelper.PAGE_ES_CONFIGURATION.toString());
+            final ClusterHealthRequest atLeastRed = client.admin().cluster().prepareHealth()
+                    .setWaitForStatus(ClusterHealthStatus.RED)
+                    .request();
+            final ClusterHealthResponse health = client.admin().cluster().health(atLeastRed)
+                    .actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
 
-                }
-            } catch (ElasticsearchTimeoutException e) {
-                final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
+            // we don't get here if we couldn't join the cluster. just check for red cluster state
+            if (ClusterHealthStatus.RED.equals(health.getStatus())) {
+                final Notification notification = notificationService.buildNow()
+                        .addSeverity(Notification.Severity.URGENT)
+                        .addType(Notification.Type.ES_CLUSTER_RED);
+                notificationService.publishIfFirst(notification);
 
-                if (!isNullOrEmpty(hosts)) {
-                    final Iterable<String> hostList = Splitter.on(',').omitEmptyStrings().trimResults().split(hosts);
+                LOG.warn("The Elasticsearch cluster state is RED which means shards are unassigned.");
+                LOG.info("This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will write into the local disk journal.");
+                LOG.info("See {} for details.", DocsHelper.PAGE_ES_CONFIGURATION);
+            }
+        } catch (ElasticsearchTimeoutException e) {
+            final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
-                    for (String host : hostList) {
-                        final URI esUri = URI.create("http://" + HostAndPort.fromString(host).getHostText() + ":9200/");
+            if (!isNullOrEmpty(hosts)) {
+                final Iterable<String> hostList = Splitter.on(',').omitEmptyStrings().trimResults().split(hosts);
 
-                        LOG.info("Checking Elasticsearch HTTP API at {}", esUri);
-                        try {
-                            // Try the HTTP API endpoint
-                            final Request request = new Request.Builder()
-                                    .get()
-                                    .url(esUri.resolve("/_nodes").toString())
-                                    .build();
-                            final Response response = httpClient.newCall(request).execute();
+                for (String host : hostList) {
+                    final URI esUri = URI.create("http://" + HostAndPort.fromString(host).getHostText() + ":9200/");
 
-                            if (response.isSuccessful()) {
-                                final JsonNode resultTree = objectMapper.readTree(response.body().byteStream());
-                                final JsonNode nodesList = resultTree.get("nodes");
+                    LOG.info("Checking Elasticsearch HTTP API at {}", esUri);
+                    try {
+                        // Try the HTTP API endpoint
+                        final Request request = new Request.Builder()
+                                .get()
+                                .url(esUri.resolve("/_nodes").toString())
+                                .build();
+                        final Response response = httpClient.newCall(request).execute();
 
-                                if (!configuration.isDisableVersionCheck()) {
-                                    final Iterator<String> nodes = nodesList.fieldNames();
-                                    while (nodes.hasNext()) {
-                                        final String id = nodes.next();
-                                        final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
+                        if (response.isSuccessful()) {
+                            final JsonNode resultTree = objectMapper.readTree(response.body().byteStream());
+                            final JsonNode nodesList = resultTree.get("nodes");
 
-                                        checkClusterVersion(clusterVersion);
-                                    }
+                            if (!configuration.isDisableVersionCheck()) {
+                                final Iterator<String> nodes = nodesList.fieldNames();
+                                while (nodes.hasNext()) {
+                                    final String id = nodes.next();
+                                    final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
+
+                                    checkClusterVersion(clusterVersion);
                                 }
-
-                                final String clusterName = resultTree.get("cluster_name").textValue();
-                                checkClusterName(clusterName);
-                            } else {
-                                LOG.error("Could not connect to Elasticsearch at " + esUri + ". Is it running?");
                             }
-                        } catch (IOException ioException) {
-                            LOG.error("Could not connect to Elasticsearch.", ioException);
+
+                            final String clusterName = resultTree.get("cluster_name").textValue();
+                            checkClusterName(clusterName);
+                        } else {
+                            LOG.error("Could not connect to Elasticsearch at " + esUri + ". Is it running?");
                         }
+                    } catch (IOException ioException) {
+                        LOG.error("Could not connect to Elasticsearch: {}", ioException.getMessage());
                     }
                 }
-
-                UI.exitHardWithWall(
-                        "Could not successfully connect to Elasticsearch, if you use multicast check that it is working in your network" +
-                                " and that Elasticsearch is running properly and is reachable. Also check that the cluster.name setting is correct.",
-                        DocsHelper.PAGE_ES_CONFIGURATION.toString());
             }
-        } catch (Exception e) {
-            bufferSynchronizerService.setIndexerUnavailable();
-            throw e;
+
+            final Notification notification = notificationService.buildNow()
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addType(Notification.Type.ES_UNAVAILABLE);
+            notificationService.publishIfFirst(notification);
+
+            LOG.warn("Could not connect to Elasticsearch");
+            LOG.info("If you're using multicast, check that it is working in your network and that Elasticsearch is accessible. Also check that the cluster name setting is correct.");
+            LOG.info("See {} for details.", DocsHelper.PAGE_ES_CONFIGURATION);
         }
     }
 
@@ -203,16 +204,34 @@ public class IndexerSetupService extends AbstractIdleService {
     }
 
     private void checkClusterName(String clusterName) {
-        if (!node.settings().get("cluster.name").equals(clusterName)) {
+        final String esClusterName = node.settings().get("cluster.name");
+        if (!esClusterName.equals(clusterName)) {
             LOG.error("Elasticsearch cluster name is different, Graylog uses `{}`, Elasticsearch cluster uses `{}`. "
                             + "Please check the `cluster.name` setting of both Graylog and Elasticsearch.",
-                    node.settings().get("cluster.name"),
-                    clusterName);
+                    esClusterName, clusterName);
         }
     }
 
     @Override
     protected void shutDown() throws Exception {
-        // See constructor. Actual shutdown happens after BufferSynchronizerServer has stopped.
+        // See constructor. Actual shutdown happens after BufferSynchronizerService has stopped.
+    }
+
+    public static class ShutdownListener extends Listener {
+        private final Node node;
+
+        public ShutdownListener(Node node) {
+            this.node = checkNotNull(node);
+        }
+
+        @Override
+        public void terminated(State from) {
+            super.terminated(from);
+
+            LOG.debug("Shutting down Elasticsearch node after buffer synchronizer has terminated.");
+            if (!node.isClosed()) {
+                node.close();
+            }
+        }
     }
 }
