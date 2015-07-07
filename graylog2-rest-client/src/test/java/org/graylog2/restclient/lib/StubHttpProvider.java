@@ -19,6 +19,7 @@ package org.graylog2.restclient.lib;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.AsyncHttpProvider;
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.HttpResponseBodyPart;
@@ -29,14 +30,12 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.ning.http.client.listenable.AbstractListenableFuture;
+import com.ning.http.client.uri.Uri;
 import play.mvc.Http;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -50,11 +49,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class StubHttpProvider implements AsyncHttpProvider {
-
-    private Map<URL, Expectation> expectations = Maps.newHashMap();
+    private Map<Uri, Expectation> expectations = Maps.newHashMap();
     private Set<Expectation> fulfilledExpectations = Sets.newHashSet();
 
-    public StubHttpProvider expectResponse(URL url, int statusCode, String payload) {
+    public StubHttpProvider expectResponse(Uri url, int statusCode, String payload) {
         expectations.put(url, new Expectation(url, statusCode, payload));
         return this;
     }
@@ -76,16 +74,17 @@ public class StubHttpProvider implements AsyncHttpProvider {
     }
 
     @Override
-    public <T> ListenableFuture<T> execute(Request request, AsyncHandler<T> handler) throws IOException {
-        final Expectation expectation = expectations.get(new URL(request.getUrl()));
+    public <T> ListenableFuture<T> execute(Request request, AsyncHandler<T> handler) {
+        final Expectation expectation = expectations.get(request.getUri());
         if (expectation == null) {
             throw new RuntimeException("Unknown URL requested, failing test: " + request.getUrl());
         }
         fulfilledExpectations.add(expectation);
         T t = null;
         try {
-            final URI uri = expectation.getUrl().toURI();
-            handler.onStatusReceived(new HttpResponseStatus(uri, this) {
+            final Uri uri = expectation.getUrl();
+            final AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+            handler.onStatusReceived(new HttpResponseStatus(uri, asyncHttpClientConfig) {
                 @Override
                 public int getStatusCode() {
                     return expectation.getStatusCode();
@@ -98,7 +97,7 @@ public class StubHttpProvider implements AsyncHttpProvider {
 
                 @Override
                 public String getProtocolName() {
-                    return expectation.getUrl().getProtocol();
+                    return expectation.getUrl().getScheme();
                 }
 
                 @Override
@@ -115,14 +114,116 @@ public class StubHttpProvider implements AsyncHttpProvider {
                 public String getProtocolText() {
                     return ""; // TODO
                 }
+
+                @Override
+                public Response prepareResponse(final HttpResponseHeaders headers, List<HttpResponseBodyPart> bodyParts) {
+                    final HttpResponseStatus httpResponseStatus = this;
+                    final HttpResponseBodyPart bodyPart = bodyParts.get(0);
+                    return new Response() {
+                        @Override
+                        public int getStatusCode() {
+                            return httpResponseStatus.getStatusCode();
+                        }
+
+                        @Override
+                        public String getStatusText() {
+                            return httpResponseStatus.getStatusText();
+                        }
+
+                        @Override
+                        public byte[] getResponseBodyAsBytes() throws IOException {
+                            return bodyPart.getBodyPartBytes();
+                        }
+
+                        @Override
+                        public ByteBuffer getResponseBodyAsByteBuffer() throws IOException {
+                            return bodyPart.getBodyByteBuffer();
+                        }
+
+                        @Override
+                        public InputStream getResponseBodyAsStream() throws IOException {
+                            return null; // TODO
+                        }
+
+                        @Override
+                        public String getResponseBodyExcerpt(int maxLength, String charset) throws IOException {
+                            return ""; // TODO
+                        }
+
+                        @Override
+                        public String getResponseBody(String charset) throws IOException {
+                            return new String(bodyPart.getBodyPartBytes(), charset);
+                        }
+
+                        @Override
+                        public String getResponseBodyExcerpt(int maxLength) throws IOException {
+                            return null; // TODO
+                        }
+
+                        @Override
+                        public String getResponseBody() throws IOException {
+                            return new String(bodyPart.getBodyPartBytes());
+                        }
+
+                        @Override
+                        public Uri getUri() {
+                            return getUri();
+                        }
+
+                        @Override
+                        public String getContentType() {
+                            return Http.MimeTypes.JSON;
+                        }
+
+                        @Override
+                        public String getHeader(String name) {
+                            return getHeaders().get(name).get(0);
+                        }
+
+                        @Override
+                        public List<String> getHeaders(String name) {
+                            return getHeaders().get(name);
+                        }
+
+                        @Override
+                        public FluentCaseInsensitiveStringsMap getHeaders() {
+                            return getHeaders();
+                        }
+
+                        @Override
+                        public boolean isRedirected() {
+                            return false;
+                        }
+
+                        @Override
+                        public List<Cookie> getCookies() {
+                            return null;
+                        }
+
+                        @Override
+                        public boolean hasResponseStatus() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean hasResponseHeaders() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean hasResponseBody() {
+                            return false;
+                        }
+                    };
+                }
             });
-            handler.onHeadersReceived(new HttpResponseHeaders(uri, this) {
+            handler.onHeadersReceived(new HttpResponseHeaders(false) {
                 @Override
                 public FluentCaseInsensitiveStringsMap getHeaders() {
                     return new FluentCaseInsensitiveStringsMap();
                 }
             });
-            handler.onBodyPartReceived(new HttpResponseBodyPart(uri, this) {
+            handler.onBodyPartReceived(new HttpResponseBodyPart(false) {
                 @Override
                 public byte[] getBodyPartBytes() {
                     return expectation.getPayload().getBytes(Charset.forName("UTF-8"));
@@ -142,15 +243,6 @@ public class StubHttpProvider implements AsyncHttpProvider {
 
                 @Override
                 public boolean isLast() {
-                    return true;
-                }
-
-                @Override
-                public void markUnderlyingConnectionAsClosed() {
-                }
-
-                @Override
-                public boolean closeUnderlyingConnection() {
                     return true;
                 }
 
@@ -177,120 +269,19 @@ public class StubHttpProvider implements AsyncHttpProvider {
     public void close() {
     }
 
-    @Override
-    public Response prepareResponse(final HttpResponseStatus status, final HttpResponseHeaders headers, final List<HttpResponseBodyPart> bodyParts) {
-        final HttpResponseBodyPart bodyPart = bodyParts.get(0);
-        return new Response() {
-            @Override
-            public int getStatusCode() {
-                return status.getStatusCode();
-            }
-
-            @Override
-            public String getStatusText() {
-                return status.getStatusText();
-            }
-
-            @Override
-            public byte[] getResponseBodyAsBytes() throws IOException {
-                return bodyPart.getBodyPartBytes();
-            }
-
-            @Override
-            public ByteBuffer getResponseBodyAsByteBuffer() throws IOException {
-                return bodyPart.getBodyByteBuffer();
-            }
-
-            @Override
-            public InputStream getResponseBodyAsStream() throws IOException {
-                return null; // TODO
-            }
-
-            @Override
-            public String getResponseBodyExcerpt(int maxLength, String charset) throws IOException {
-                return ""; // TODO
-            }
-
-            @Override
-            public String getResponseBody(String charset) throws IOException {
-                return new String(bodyPart.getBodyPartBytes(), charset);
-            }
-
-            @Override
-            public String getResponseBodyExcerpt(int maxLength) throws IOException {
-                return null; // TODO
-            }
-
-            @Override
-            public String getResponseBody() throws IOException {
-                return new String(bodyPart.getBodyPartBytes());
-            }
-
-            @Override
-            public URI getUri() throws MalformedURLException {
-                return status.getUrl();
-            }
-
-            @Override
-            public String getContentType() {
-                return Http.MimeTypes.JSON;
-            }
-
-            @Override
-            public String getHeader(String name) {
-                return headers.getHeaders().get(name).get(0);
-            }
-
-            @Override
-            public List<String> getHeaders(String name) {
-                return headers.getHeaders().get(name);
-            }
-
-            @Override
-            public FluentCaseInsensitiveStringsMap getHeaders() {
-                return headers.getHeaders();
-            }
-
-            @Override
-            public boolean isRedirected() {
-                return false;
-            }
-
-            @Override
-            public List<Cookie> getCookies() {
-                return null;
-            }
-
-            @Override
-            public boolean hasResponseStatus() {
-                return false;
-            }
-
-            @Override
-            public boolean hasResponseHeaders() {
-                return false;
-            }
-
-            @Override
-            public boolean hasResponseBody() {
-                return false;
-            }
-        };
-    }
-
     private class Expectation {
 
-        private final URL url;
+        private final Uri url;
         private final int statusCode;
         private final String payload;
 
-        public Expectation(URL url, int statusCode, String payload) {
+        public Expectation(Uri url, int statusCode, String payload) {
             this.url = url;
             this.statusCode = statusCode;
             this.payload = payload;
         }
 
-        private URL getUrl() {
+        private Uri getUrl() {
             return url;
         }
 
@@ -342,21 +333,7 @@ public class StubHttpProvider implements AsyncHttpProvider {
         }
 
         @Override
-        public void content(V v) {
-        }
-
-        @Override
         public void touch() {
-        }
-
-        @Override
-        public boolean getAndSetWriteHeaders(boolean writeHeader) {
-            return false;
-        }
-
-        @Override
-        public boolean getAndSetWriteBody(boolean writeBody) {
-            return false;
         }
 
         @Override
