@@ -18,10 +18,12 @@ package org.graylog2.periodical;
 
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,12 @@ import static org.mockito.Mockito.when;
 public class IndexRotationThreadTest {
     @Mock
     private Deflector deflector;
+    @Mock
+    private NotificationService notificationService;
+    @Mock
+    private Indices indices;
+    @Mock
+    private Cluster cluster;
 
     @Test
     public void testFailedRotation() {
@@ -58,11 +66,11 @@ public class IndexRotationThreadTest {
         };
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
-                mock(NotificationService.class),
-                mock(Indices.class),
+                notificationService,
+                indices,
                 deflector,
-                mock(SystemMessageActivityWriter.class),
-                mock(IndexerSetupService.class),
+                cluster,
+                new NullActivityWriter(),
                 provider
         );
 
@@ -97,11 +105,11 @@ public class IndexRotationThreadTest {
         };
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
-                mock(NotificationService.class),
-                mock(Indices.class),
+                notificationService,
+                indices,
                 deflector,
-                mock(SystemMessageActivityWriter.class),
-                mock(IndexerSetupService.class),
+                cluster,
+                new NullActivityWriter(),
                 provider
         );
 
@@ -139,11 +147,11 @@ public class IndexRotationThreadTest {
         };
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
-                mock(NotificationService.class),
-                mock(Indices.class),
+                notificationService,
+                indices,
                 deflector,
-                mock(SystemMessageActivityWriter.class),
-                mock(IndexerSetupService.class),
+                cluster,
+                new NullActivityWriter(),
                 provider
         );
 
@@ -153,5 +161,26 @@ public class IndexRotationThreadTest {
 
         verify(deflector, never()).cycle();
         verify(deflector, times(1)).getNewestTargetName();
+    }
+
+    @Test
+    public void testDontPerformRotationIfClusterIsDown() throws NoTargetIndexException {
+        final Provider<RotationStrategy> provider = mock(Provider.class);
+
+        when(cluster.isConnectedAndHealthy()).thenReturn(false);
+
+        final IndexRotationThread rotationThread = new IndexRotationThread(
+                notificationService,
+                indices,
+                deflector,
+                cluster,
+                new NullActivityWriter(),
+                provider
+        );
+
+        rotationThread.doRun();
+
+        verify(deflector, never()).cycle();
+        verify(provider, never()).get();
     }
 }
