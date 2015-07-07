@@ -5,6 +5,27 @@
         {
           "index" : {
             "indexName": "graylog_0",
+            "indexType": "index_range",
+            "indexId": "graylog_0"
+          }
+        },
+        {
+          "data" : {
+            "_id": "graylog_0",
+            "index_name": "graylog_0",
+            "begin": "2015-01-01T00:00:00.000Z",
+            "end": "2015-12-31T23:59:59.999Z",
+            "calculated_at": "2015-06-16T11:32:16.827Z",
+            "took_ms": 42
+          }
+        }
+      ]
+    },
+    {
+      "document" : [
+        {
+          "index" : {
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "576f90b1-141b-11e5-bf34-e62d59a65072"
           }

@@ -18,9 +18,13 @@ package org.graylog2.indexer.searches;
 
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 @AutoValue
 public abstract class TimestampStats {
+    public static final TimestampStats EMPTY =
+            create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC));
+
     public abstract DateTime min();
 
     public abstract DateTime max();

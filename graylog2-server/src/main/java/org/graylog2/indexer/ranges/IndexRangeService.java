@@ -17,22 +17,18 @@
 package org.graylog2.indexer.ranges;
 
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
+import org.joda.time.DateTime;
 
-import java.util.List;
-import java.util.Map;
+import java.util.SortedSet;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface IndexRangeService extends PersistedService {
+public interface IndexRangeService {
     IndexRange get(String index) throws NotFoundException;
 
-    List<IndexRange> getFrom(int timestamp);
+    SortedSet<IndexRange> find(DateTime begin, DateTime end);
 
-    void destroy(String index);
+    SortedSet<IndexRange> findAll();
 
-    IndexRange create(Map<String, Object> range);
+    void save(IndexRange indexRange);
 
-    void destroyAll();
+    IndexRange calculateRange(String index);
 }

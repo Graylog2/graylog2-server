@@ -19,14 +19,9 @@ package org.graylog2.indexer.ranges;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.EmptyIndexException;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -41,10 +36,9 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     @AssistedInject
     public CreateNewSingleIndexRangeJob(@Assisted Deflector deflector,
                                         @Assisted String indexName,
-                                        Searches searches,
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
-        super(deflector, searches, activityWriter, indexRangeService);
+        super(deflector, activityWriter, indexRangeService);
         this.indexName = checkNotNull(indexName);
     }
 
@@ -62,14 +56,11 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public void execute() {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
-            final IndexRange indexRange = indexRangeService.create(calculateRange(indexName));
-            indexRangeService.destroy(indexName);
+            final IndexRange indexRange = indexRangeService.calculateRange(indexName);
             indexRangeService.save(indexRange);
             LOG.info("Created ranges for index {}.", indexName);
-        } catch (ValidationException e) {
-            LOG.error("Unable to save index range for index {}: {}", indexName, e);
         } catch (Exception e) {
-            LOG.error("Exception during index range calculation for index {}: ", indexName, e);
+            LOG.error("Exception during index range calculation for index " + indexName, e);
         }
     }
 

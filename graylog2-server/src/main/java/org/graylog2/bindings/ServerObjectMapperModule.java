@@ -17,18 +17,12 @@
 package org.graylog2.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.bindings.providers.ServerObjectMapperProvider;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 
 public class ServerObjectMapperModule extends ObjectMapperModule {
-
     @Override
-    protected ObjectMapper makeObjectMapper() {
-        final ObjectMapper objectMapper = super.makeObjectMapper();
-        
-        objectMapper.registerModule(new SimpleModule().addSerializer(new ObjectIdSerializer()));
-
-        return objectMapper;
+    protected void configure() {
+        bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class).asEagerSingleton();
     }
 }

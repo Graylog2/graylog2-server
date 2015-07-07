@@ -24,6 +24,6 @@ public class IndexRangeComparator implements Comparator<IndexRange> {
      */
     @Override
     public int compare(IndexRange o1, IndexRange o2) {
-        return o2.getStart().compareTo(o1.getStart());
+        return o2.end().compareTo(o1.end());
     }
 }
