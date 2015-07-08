@@ -95,6 +95,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack());
+        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, Stream.MatchingType.valueOf(cr.matchingType()));
 
         return create(streamData);
     }

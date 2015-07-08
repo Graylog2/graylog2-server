@@ -54,6 +54,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_DISABLED = "disabled";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    public static final String FIELD_MATCHING_TYPE = "matching_type";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
@@ -193,4 +194,14 @@ public class StreamImpl extends PersistedImpl implements Stream {
         return (Map<String, List<String>>) fields.get(FIELD_ALERT_RECEIVERS);
     }
 
+    @Override
+    public MatchingType getMatchingType() {
+        final String matchingTypeString = (String)fields.get(FIELD_MATCHING_TYPE);
+
+        if (matchingTypeString == null) {
+            return MatchingType.AND;
+        } else {
+            return MatchingType.valueOf(matchingTypeString);
+        }
+    }
 }
