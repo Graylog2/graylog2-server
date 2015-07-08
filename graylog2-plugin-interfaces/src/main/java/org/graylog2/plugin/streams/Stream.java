@@ -22,7 +22,6 @@
  */
 package org.graylog2.plugin.streams;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;

@@ -54,7 +54,7 @@ public abstract class CreateStreamRequest {
                                              @JsonProperty("description") @Nullable String description,
                                              @JsonProperty("rules") @Nullable List<CreateStreamRuleRequest> rules,
                                              @JsonProperty("content_pack") @Nullable String contentPack,
-                                             @JsonProperty("matching_type") @Nullable Stream.MatchingType matchingType) {
-        return new AutoValue_CreateStreamRequest(title, description, rules, contentPack, matchingType);
+                                             @JsonProperty("matching_type") @Nullable String matchingType) {
+        return new AutoValue_CreateStreamRequest(title, description, rules, contentPack, Stream.MatchingType.valueOfOrDefault(matchingType));
     }
 }
