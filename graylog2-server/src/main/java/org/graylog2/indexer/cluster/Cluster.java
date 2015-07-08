@@ -126,21 +126,25 @@ public class Cluster {
     }
 
     /**
-     * Check if the Elasticsearch {@link org.elasticsearch.node.Node} is connected and that the cluster health status
-     * is not {@link ClusterHealthStatus#RED} and that the {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
+     * Check if the Elasticsearch {@link org.elasticsearch.node.Node} is connected and that there are other nodes
+     * in the cluster.
      *
-     * @return {@code true} if the Elasticsearch client is up and the cluster is healthy and the deflector is up, {@code false} otherwise
+     * @return {@code true} if the Elasticsearch client is up and the cluster contains other nodes, {@code false} otherwise
      */
-    public boolean isConnectedAndHealthy() {
+    public boolean isConnected() {
         Map<String, DiscoveryNode> nodeMap = nodes.get();
-        if (nodeMap == null || nodeMap.isEmpty()) {
-            return false;
-        }
-        if (!deflector.isUp()) {
-            return false;
-        }
+        return nodeMap != null && !nodeMap.isEmpty();
+    }
+
+    /**
+     * Check if the cluster health status is not {@link ClusterHealthStatus#RED} and that the
+     * {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
+     *
+     * @return {@code true} if the the cluster is healthy and the deflector is up, {@code false} otherwise
+     */
+    public boolean isHealthy() {
         try {
-            return health().getStatus() != ClusterHealthStatus.RED;
+            return health().getStatus() != ClusterHealthStatus.RED && deflector.isUp();
         } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
@@ -155,7 +159,7 @@ public class Cluster {
             @Override
             public void run() {
                 try {
-                    if (isConnectedAndHealthy()) {
+                    if (isConnected() && isHealthy()) {
                         LOG.debug("Cluster is healthy again, unblocking waiting threads.");
                         latch.countDown();
                     }

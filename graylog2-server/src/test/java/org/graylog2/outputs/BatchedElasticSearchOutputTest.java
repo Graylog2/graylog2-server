@@ -64,7 +64,8 @@ public class BatchedElasticSearchOutputTest {
                 return 10;
             }
         };
-        when(cluster.isConnectedAndHealthy()).thenReturn(true);
+        when(cluster.isConnected()).thenReturn(true);
+        when(cluster.isHealthy()).thenReturn(true);
 
         Messages messages = mock(Messages.class);
         final List<Message> messageList = buildMessages(3);
@@ -90,7 +91,8 @@ public class BatchedElasticSearchOutputTest {
                 return 10;
             }
         };
-        when(cluster.isConnectedAndHealthy()).thenReturn(false);
+        when(cluster.isConnected()).thenReturn(false);
+        when(cluster.isHealthy()).thenReturn(false);
 
         final List<Message> messageList = buildMessages(3);
         BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
@@ -113,7 +115,8 @@ public class BatchedElasticSearchOutputTest {
                 return batchSize;
             }
         };
-        when(cluster.isConnectedAndHealthy()).thenReturn(true);
+        when(cluster.isConnected()).thenReturn(true);
+        when(cluster.isHealthy()).thenReturn(true);
 
         final List<Message> messageList = buildMessages(batchSize + 1);
         final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
@@ -138,7 +141,8 @@ public class BatchedElasticSearchOutputTest {
                 return 10;
             }
         };
-        when(cluster.isConnectedAndHealthy()).thenReturn(true);
+        when(cluster.isConnected()).thenReturn(true);
+        when(cluster.isHealthy()).thenReturn(true);
 
         final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 

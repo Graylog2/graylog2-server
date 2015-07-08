@@ -40,9 +40,6 @@ import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class IndexRetentionThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
@@ -74,7 +71,7 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public void doRun() {
-        if (!cluster.isConnectedAndHealthy()) {
+        if (!cluster.isConnected() || !cluster.isHealthy()) {
             LOG.info("Elasticsearch cluster not available, skipping index retention checks.");
             return;
         }

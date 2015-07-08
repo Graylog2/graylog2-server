@@ -166,8 +166,8 @@ public class IndexRotationThreadTest {
     @Test
     public void testDontPerformRotationIfClusterIsDown() throws NoTargetIndexException {
         final Provider<RotationStrategy> provider = mock(Provider.class);
-
-        when(cluster.isConnectedAndHealthy()).thenReturn(false);
+        when(cluster.isConnected()).thenReturn(false);
+        when(cluster.isHealthy()).thenReturn(false);
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,

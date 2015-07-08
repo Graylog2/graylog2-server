@@ -61,7 +61,7 @@ public class IndexRotationThread extends Periodical {
     @Override
     public void doRun() {
         // Point deflector to a new index if required.
-        if (cluster.isConnectedAndHealthy()) {
+        if (cluster.isConnected()) {
             try {
                 checkAndRepair();
                 checkForRotation();
