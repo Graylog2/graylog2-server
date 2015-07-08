@@ -31,7 +31,13 @@ import java.util.Set;
 public interface Stream extends Persisted {
     enum MatchingType {
         AND,
-        OR
+        OR;
+
+        public static final MatchingType DEFAULT = AND;
+
+        public static MatchingType valueOfOrDefault(String name) {
+            return (name == null ? DEFAULT : valueOf(name));
+        }
     }
 
     String getId();
