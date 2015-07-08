@@ -213,12 +213,9 @@ public class StreamsTest extends BaseRestTest {
     @Test
     public void creatingInvalidMatchingStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
-        final String streamTitle = "Another Test Stream";
-        final String description = "This is a test stream.";
-        final String matchingType = "OR";
 
-        final ValidatableResponse response = createStreamFromRequest(jsonResourceForMethod());
-        response.statusCode(400);
+        createStreamFromRequest(jsonResourceForMethod())
+            .statusCode(400);
 
         final int afterCount = streamCount();
         assertThat(afterCount).isEqualTo(beforeCount);
