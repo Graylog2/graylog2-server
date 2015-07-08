@@ -20,6 +20,7 @@ package org.graylog2.streams;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -37,10 +38,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -441,6 +445,40 @@ public class StreamRouterEngineTest {
 
         assertEquals(engine1.getFingerprint(), engine2.getFingerprint());
         assertNotEquals(engine1.getFingerprint(), engine3.getFingerprint());
+    }
+
+    @Test
+    public void testOrMatching() {
+        final String dummyField = "dummyField";
+        final String dummyValue = "dummyValue";
+
+        final Stream stream = mock(Stream.class);
+        when(stream.getMatchingType()).thenReturn(Stream.MatchingType.OR);
+        final StreamRule streamRule1 = mock(StreamRule.class);
+        when(streamRule1.getId()).thenReturn("StreamRule1Id");
+        when(streamRule1.getType()).thenReturn(StreamRuleType.EXACT);
+        when(streamRule1.getField()).thenReturn(dummyField);
+        when(streamRule1.getValue()).thenReturn(dummyValue);
+
+        final StreamRule streamRule2 = mock(StreamRule.class);
+        when(streamRule2.getId()).thenReturn("StreamRule2Id");
+        when(streamRule2.getType()).thenReturn(StreamRuleType.EXACT);
+        when(streamRule2.getField()).thenReturn(dummyField);
+        when(streamRule2.getValue()).thenReturn("not" + dummyValue);
+
+        when(stream.getStreamRules()).thenReturn(Lists.<StreamRule>newArrayList(streamRule1, streamRule2));
+
+        final Message message = mock(Message.class);
+        when(message.hasField(eq(dummyField))).thenReturn(true);
+        when(message.getField(eq(dummyField))).thenReturn(dummyValue);
+        when(message.getFieldNames()).thenReturn(Sets.<String>newHashSet(dummyField));
+
+        final StreamRouterEngine engine = newEngine(Lists.<Stream>newArrayList(stream));
+
+        final List<Stream> result = engine.match(message);
+
+        assertThat(result).hasSize(1);
+        assertThat(result).contains(stream);
     }
 
     private StreamMock getStreamMock(String title) {

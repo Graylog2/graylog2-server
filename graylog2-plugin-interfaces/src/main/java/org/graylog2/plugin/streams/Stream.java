@@ -22,11 +22,14 @@
  */
 package org.graylog2.plugin.streams;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.base.Strings.emptyToNull;
 
 public interface Stream extends Persisted {
     enum MatchingType {
@@ -36,7 +39,7 @@ public interface Stream extends Persisted {
         public static final MatchingType DEFAULT = AND;
 
         public static MatchingType valueOfOrDefault(String name) {
-            return (name == null ? DEFAULT : valueOf(name));
+            return (emptyToNull(name) == null ? DEFAULT : valueOf(name));
         }
     }
 
