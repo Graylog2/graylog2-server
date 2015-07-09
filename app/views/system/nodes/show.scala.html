@@ -1,12 +1,10 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
-@import views.helpers.StringHelper._
-@import views.helpers.DateHelper
-@import controllers.routes;
-@import views.helpers.Permissions.isPermitted
+@import controllers.routes
 @import lib.security.RestPermissions._
-@import org.joda.time.DateTime
-@import org.joda.time.DateTimeZone
-@import views.helpers.DocsHelper
+@import org.joda.time.{DateTime, DateTimeZone}
+@import views.helpers.Permissions.isPermitted
+@import views.helpers.StringHelper._
+@import views.helpers.{DateHelper, DocsHelper}
 
 
     @main("Node " + node.getNodeId, null, "", currentUser, false) {
@@ -141,19 +139,24 @@
         </div>
     </div>
 
-
-
     <div class="row content">
         <div class="col-md-12">
+        @if(node.getJournalInfo.enabled) {
             <div id="react-journal-info"
-                data-node-id="@node.getNodeId"
-                data-journal-enabled="@node.getJournalInfo.enabled"
-                data-journal-dir="@node.getJournalInfo.journalConfig.directory"
-                data-journal-max-size="@node.getJournalInfo.journalConfig.maxSize"
-                data-journal-maxage="@node.getJournalInfo.journalConfig.maxAge"
-                data-journal-flush-interval="@node.getJournalInfo.journalConfig.flushInterval"
-                data-journal-flush-age="@node.getJournalInfo.journalConfig.flushAge">
+            data-node-id="@node.getNodeId"
+            data-journal-enabled="@node.getJournalInfo.enabled"
+            data-journal-dir="@node.getJournalInfo.journalConfig.directory"
+            data-journal-max-size="@node.getJournalInfo.journalConfig.maxSize"
+            data-journal-maxage="@node.getJournalInfo.journalConfig.maxAge"
+            data-journal-flush-interval="@node.getJournalInfo.journalConfig.flushInterval"
+            data-journal-flush-age="@node.getJournalInfo.journalConfig.flushAge">
             </div>
+        } else {
+            <div id="react-journal-info"
+            data-node-id="@node.getNodeId"
+            data-journal-enabled="@node.getJournalInfo.enabled">
+            </div>
+        }
         </div>
     </div>
 

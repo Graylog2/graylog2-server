@@ -74,7 +74,7 @@ var JournalDetails = React.createClass({
 
     render() {
         var content = null;
-        if (this.props.enabled) {
+        if (this.props.enabled === "true") {
             var oldestSegment = moment(this.state.oldestSegment);
             var overcommittedWarning = null;
             if (this.state.initialized && (this.state.utilizationRatio >= 1)) {
