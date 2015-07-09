@@ -143,8 +143,9 @@ public class GelfOutput implements MessageOutput {
 
     protected GelfMessage toGELFMessage(final Message message) {
         final DateTime timestamp;
-        if (message.getField(Message.FIELD_TIMESTAMP) != null || message.getField(Message.FIELD_TIMESTAMP) instanceof DateTime) {
-            timestamp = (DateTime) message.getField(Message.FIELD_TIMESTAMP);
+        final Object fieldTimeStamp = message.getField(Message.FIELD_TIMESTAMP);
+        if (fieldTimeStamp instanceof DateTime) {
+            timestamp = (DateTime) fieldTimeStamp;
         } else {
             timestamp = Tools.iso8601();
         }
