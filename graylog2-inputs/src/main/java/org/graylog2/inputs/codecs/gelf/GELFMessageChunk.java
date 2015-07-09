@@ -60,7 +60,7 @@ public final class GELFMessageChunk {
     private byte[] data = new byte[1];
     private int sequenceNumber = -1;
     private int sequenceCount = -1;
-    private long arrival = -1l;
+    private long arrival = -1L;
 
     private final byte[] payload;
     private final MessageInput sourceInput;

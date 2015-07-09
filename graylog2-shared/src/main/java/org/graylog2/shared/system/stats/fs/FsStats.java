@@ -123,7 +123,7 @@ public abstract class FsStats {
                                         long used,
                                         short usedPercent) {
             return create(path, null, null, total, free, available, used, usedPercent,
-                    -1l, -1l, -1l, (short) -1, -1l, -1l, -1l, -1l, -1l, -1l);
+                    -1L, -1L, -1L, (short) -1, -1L, -1L, -1L, -1L, -1L, -1L);
         }
     }
 }

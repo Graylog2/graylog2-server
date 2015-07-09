@@ -50,7 +50,7 @@ public class SigarOsProbe implements OsProbe {
         try {
             uptime = (long) sigar.getUptime().getUptime();
         } catch (SigarException e) {
-            uptime = -1l;
+            uptime = -1L;
         }
 
         Processor processor;
@@ -63,7 +63,7 @@ public class SigarOsProbe implements OsProbe {
             final int totalCores = cpuInfos[0].getTotalCores();
             final int totalSockets = cpuInfos[0].getTotalSockets();
             final int coresPerSocket = cpuInfos[0].getCoresPerSocket();
-            long cacheSize = -1l;
+            long cacheSize = -1L;
             if (cpuInfos[0].getCacheSize() != Sigar.FIELD_NOTIMPL) {
                 cacheSize = cpuInfos[0].getCacheSize();
             }
@@ -77,7 +77,7 @@ public class SigarOsProbe implements OsProbe {
             processor = Processor.create(model, vendor, mhz, totalCores, totalSockets, coresPerSocket, cacheSize,
                     sys, user, idle, stolen);
         } catch (SigarException e) {
-            processor = Processor.create("Unknown", "Unknown", -1, -1, -1, -1, -1l,
+            processor = Processor.create("Unknown", "Unknown", -1, -1, -1, -1, -1L,
                     (short) -1, (short) -1, (short) -1, (short) -1);
         }
 
@@ -94,7 +94,7 @@ public class SigarOsProbe implements OsProbe {
 
             memory = Memory.create(total, free, freePercent, used, usedPercent, actualFree, actualUsed);
         } catch (SigarException e) {
-            memory = Memory.create(-1l, -1l, (short) -1, -1l, (short) -1, -1l, -1l);
+            memory = Memory.create(-1L, -1L, (short) -1, -1L, (short) -1, -1L, -1L);
         }
 
         Swap swap;
@@ -106,7 +106,7 @@ public class SigarOsProbe implements OsProbe {
 
             swap = Swap.create(total, free, used);
         } catch (SigarException e) {
-            swap = Swap.create(-1l, -1l, -1l);
+            swap = Swap.create(-1L, -1L, -1L);
         }
 
         return OsStats.create(loadAverage, uptime, processor, memory, swap);

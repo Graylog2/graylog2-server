@@ -86,7 +86,7 @@ public class Hk2GuiceBridgeJitInjector implements InvocationHandler {
     /**
      * {@inheritDoc}
      */
-    public Object invoke(final Object proxy, final Method method, final Object... args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         final Object result = method.invoke(injector, args);
         if (result == null && method.equals(getExistingBindingMethod)) {
             if (isInsideTargettedPackage((Class<?>) getRawTypeMethod.invoke(getTypeLiteralMethod.invoke(args[0])))) {

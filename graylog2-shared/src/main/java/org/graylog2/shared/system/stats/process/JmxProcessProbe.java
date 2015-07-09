@@ -45,7 +45,7 @@ public class JmxProcessProbe implements ProcessProbe {
             final String processId = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
             return Long.parseLong(processId);
         } catch (Exception e) {
-            return -1l;
+            return -1L;
         }
     }
 
@@ -59,11 +59,11 @@ public class JmxProcessProbe implements ProcessProbe {
     }
 
     static long getOpenFileDescriptorCount() {
-        return invokeMethod(openFileDescriptorCountMethod, operatingSystemMXBean, -1l);
+        return invokeMethod(openFileDescriptorCountMethod, operatingSystemMXBean, -1L);
     }
 
     static long getMaxFileDescriptorCount() {
-        return invokeMethod(maxFileDescriptorCountMethod, operatingSystemMXBean, -1l);
+        return invokeMethod(maxFileDescriptorCountMethod, operatingSystemMXBean, -1L);
     }
 
     @Override
