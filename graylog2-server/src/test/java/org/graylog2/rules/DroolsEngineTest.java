@@ -16,12 +16,12 @@
  */
 package org.graylog2.rules;
 
-import com.google.common.collect.Sets;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.junit.Test;
 
-import java.net.URL;
+import java.net.URI;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,7 +31,7 @@ public class DroolsEngineTest {
 
     @Test
     public void runWithoutRules() {
-        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
+        final DroolsEngine engine = new DroolsEngine(Collections.<URI>emptySet());
 
         final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", Tools.iso8601()));
 
@@ -42,7 +42,7 @@ public class DroolsEngineTest {
 
     @Test
     public void addedRuleIsVisibleInSession() {
-        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
+        final DroolsEngine engine = new DroolsEngine(Collections.<URI>emptySet());
 
         String rule1 =
                 "declare Message\n" +
@@ -85,7 +85,7 @@ public class DroolsEngineTest {
 
     @Test
     public void incorrectRuleIsNotApplied() {
-        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
+        final DroolsEngine engine = new DroolsEngine(Collections.<URI>emptySet());
 
         String invalidRule = "rule \"this will not compile\"\n" +
                 "when\n" +

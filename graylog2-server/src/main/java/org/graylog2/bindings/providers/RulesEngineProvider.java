@@ -22,28 +22,30 @@ import org.graylog2.rules.DroolsEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Singleton
 public class RulesEngineProvider implements Provider<RulesEngine> {
     private static final Logger LOG = LoggerFactory.getLogger(RulesEngineProvider.class);
-    private static RulesEngine rulesEngine = null;
+    private final RulesEngine rulesEngine;
 
     @Inject
-    public RulesEngineProvider(Configuration configuration, DroolsEngine droolsEngine) {
-        rulesEngine = droolsEngine;
-        String rulesFilePath = configuration.getDroolsRulesFile();
+    public RulesEngineProvider(Configuration configuration, DroolsEngine droolsEngine,
+                               @Named("rules_file") @Nullable String rulesFilePath) {
+        this.rulesEngine = checkNotNull(droolsEngine);
 
-        if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
+        if (!isNullOrEmpty(rulesFilePath)) {
             if (rulesEngine.addRulesFromFile(rulesFilePath)) {
                 LOG.info("Using rules: {}", rulesFilePath);
             } else {
-                LOG.info("Unable to load rules due to load error: {}", rulesFilePath);
+                LOG.warn("Unable to load rules due to load error: {}", rulesFilePath);
             }
         } else {
             LOG.info("No static rules file loaded.");
