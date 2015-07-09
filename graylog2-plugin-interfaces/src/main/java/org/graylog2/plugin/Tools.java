@@ -396,7 +396,7 @@ public final class Tools {
 
     /**
      * Try to get the primary {@link java.net.InetAddress} of the primary network interface with
-     * fallback to the local loopback address (usually {@code 127.0.0.1} or {@link ::1}.
+     * fallback to the local loopback address (usually {@code 127.0.0.1} or {@code ::1}.
      *
      * @return The primary {@link java.net.InetAddress} of the primary network interface
      * or the loopback address as fallback.
