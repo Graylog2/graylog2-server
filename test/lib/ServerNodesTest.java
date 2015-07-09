@@ -122,7 +122,7 @@ public class ServerNodesTest extends BaseApiTest {
     @Before
     public void setUp() throws Exception {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
+        builder.setAllowPoolingConnections(false);
         client = new AsyncHttpClient(builder.build());
     }
 
