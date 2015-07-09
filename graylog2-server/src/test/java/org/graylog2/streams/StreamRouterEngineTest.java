@@ -505,10 +505,12 @@ public class StreamRouterEngineTest {
         final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
 
         final Stream stream1 = mock(Stream.class);
+        when(stream1.getId()).thenReturn("Stream1Id");
         when(stream1.getMatchingType()).thenReturn(Stream.MatchingType.OR);
         when(stream1.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
 
         final Stream stream2 = mock(Stream.class);
+        when(stream2.getId()).thenReturn("Stream2Id");
         when(stream2.getMatchingType()).thenReturn(Stream.MatchingType.AND);
         when(stream2.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
 

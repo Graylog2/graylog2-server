@@ -68,7 +68,7 @@ public class StreamRouterEngine {
     private final Set<String> regexFields = Sets.newHashSet();
 
     public interface Factory {
-        public StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
+        StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
     }
 
     @Inject
