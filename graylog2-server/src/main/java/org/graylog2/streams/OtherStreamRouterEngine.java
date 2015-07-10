@@ -18,19 +18,17 @@ package org.graylog2.streams;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 
 import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 public class OtherStreamRouterEngine extends StreamRouterEngine {
@@ -74,11 +72,21 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
                 }
                 //fieldRules.put()
                 switch (streamRule.getType()) {
-                    case PRESENCE: presenceRules.add(otherRule);
-                    case EXACT: exactRules.add(otherRule);
-                    case GREATER: greaterRules.add(otherRule);
-                    case SMALLER: smallerRules.add(otherRule);
-                    case REGEX: regexRules.add(otherRule);
+                    case PRESENCE:
+                        presenceRules.add(otherRule);
+                        break;
+                    case EXACT:
+                        exactRules.add(otherRule);
+                        break;
+                    case GREATER:
+                        greaterRules.add(otherRule);
+                        break;
+                    case SMALLER:
+                        smallerRules.add(otherRule);
+                        break;
+                    case REGEX:
+                        regexRules.add(otherRule);
+                        break;
                 }
             }
         }
@@ -92,12 +100,13 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
 
     @Override
     public List<Stream> match(Message message) {
-        final List<Stream> result = Lists.newArrayList();
-        final List<Stream> blacklist = Lists.newArrayList();
+        final Set<Stream> result = Sets.newHashSet();
+        final Map<Stream, Boolean> blackList = Maps.newHashMap();
 
         for (OtherRule otherRule : rulesList) {
-            if (blacklist.contains(otherRule.getStream()))
+            if (blackList.get(otherRule.getStream()) != null) {
                 continue;
+            }
 
             final Stream stream = otherRule.match(message);
 
@@ -105,17 +114,17 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
                 if (!otherRule.isSufficient()) {
                     result.remove(otherRule.getStream());
                     // remove all rules related to this stream because stream can't match anymore
-                    blacklist.add(otherRule.getStream());
+                    blackList.put(otherRule.getStream(), true);
                 }
             } else {
                 result.add(stream);
                 if (otherRule.isSufficient()) {
                     // remove all rules related to this stream because stream is already matched
-                    blacklist.add(stream);
+                    blackList.put(otherRule.getStream(), true);
                 }
             }
         }
 
-        return result;
+        return Lists.newArrayList(result);
     }
 }

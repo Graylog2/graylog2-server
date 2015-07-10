@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -58,7 +59,7 @@ public class StreamRouterEngineTest {
         when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
-    private StreamRouterEngine newEngine(List<Stream> streams) {
+    protected StreamRouterEngine newEngine(List<Stream> streams) {
         return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
     }
 
@@ -526,6 +527,55 @@ public class StreamRouterEngineTest {
         assertThat(result).hasSize(1);
         assertThat(result).contains(stream1);
         assertThat(result).doesNotContain(stream2);
+    }
+
+    @Test
+    public void testAndStreamWithMultipleRules() {
+        final String dummyField = "dummyField";
+        final String dummyValue = "dummyValue";
+
+        final StreamRule streamRule1 = getStreamRuleMock("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
+        final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, dummyValue);
+
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("Stream1Id");
+        when(stream.getMatchingType()).thenReturn(Stream.MatchingType.OR);
+        when(stream.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
+
+        final Message message = mock(Message.class);
+        when(message.hasField(eq(dummyField))).thenReturn(true);
+        when(message.getField(eq(dummyField))).thenReturn(dummyValue);
+        when(message.getFieldNames()).thenReturn(Sets.newHashSet(dummyField));
+
+        final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
+
+        final List<Stream> result = engine.match(message);
+
+        assertThat(result).hasSize(1);
+        assertThat(result).contains(stream);
+    }
+
+    @Test
+    public void testEmptyStreamRulesNonMatch() {
+        final String dummyField = "dummyField";
+        final String dummyValue = "dummyValue";
+
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("Stream1Id");
+        when(stream.getMatchingType()).thenReturn(Stream.MatchingType.OR);
+        when(stream.getStreamRules()).thenReturn(Collections.<StreamRule>emptyList());
+
+        final Message message = mock(Message.class);
+        when(message.hasField(eq(dummyField))).thenReturn(true);
+        when(message.getField(eq(dummyField))).thenReturn(dummyValue);
+        when(message.getFieldNames()).thenReturn(Sets.newHashSet(dummyField));
+
+        final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
+
+        final List<Stream> result = engine.match(message);
+
+        assertThat(result).isEmpty();
+        assertThat(result).doesNotContain(stream);
     }
 
     private StreamMock getStreamMock(String title) {

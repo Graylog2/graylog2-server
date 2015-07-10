@@ -16,8 +16,14 @@
  */
 package org.graylog2.streams;
 
-import static org.junit.Assert.*;
+import org.graylog2.plugin.streams.Stream;
+
+import java.util.List;
+import java.util.concurrent.Executors;
 
 public class OtherStreamRouterEngineTest extends StreamRouterEngineTest {
-
+    @Override
+    protected StreamRouterEngine newEngine(List<Stream> streams) {
+        return new OtherStreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
+    }
 }
