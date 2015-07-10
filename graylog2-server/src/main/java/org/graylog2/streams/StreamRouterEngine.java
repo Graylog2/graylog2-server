@@ -268,7 +268,7 @@ public class StreamRouterEngine {
         }
     }
 
-    private class Rule {
+    protected class Rule {
         private final Stream stream;
         private final StreamRule rule;
         private final StreamRuleMatcher matcher;
