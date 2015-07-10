@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Buffers {
     private static final Logger LOG = LoggerFactory.getLogger(Buffers.class);
-    private static final long DEFAULT_MAX_WAIT = 30l;
+    private static final long DEFAULT_MAX_WAIT = 30L;
 
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;

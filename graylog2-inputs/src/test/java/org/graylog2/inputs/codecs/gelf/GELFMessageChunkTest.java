@@ -43,7 +43,7 @@ public class GELFMessageChunkTest {
         final GELFMessageChunk chunk = buildChunk();
         final long l = Tools.iso8601().getMillis();
         final long arrival = chunk.getArrival();
-        assertTrue(l - arrival < 5000l); // delta shmelta
+        assertTrue(l - arrival < 5000L); // delta shmelta
     }
 
     @Test

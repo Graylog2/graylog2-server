@@ -84,7 +84,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
                                                            "message:something",
                                                            null,
                                                            new TimeValue(100, TimeUnit.MILLISECONDS)));
-        when(searchResult.getTotalResults()).thenReturn(1l);
+        when(searchResult.getTotalResults()).thenReturn(1L);
         when(searches.search(
                 anyString(),
                 anyString(),

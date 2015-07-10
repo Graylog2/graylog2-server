@@ -66,7 +66,7 @@ public class MessageResultTest {
     public void testTimestampAsLong() {
         final ImmutableMap<String, Object> message = ImmutableMap.of(
                 "_id", "dead-beef-cafe-babe",
-                "timestamp", NOW.getMillis() / 1000l,
+                "timestamp", NOW.getMillis() / 1000L,
                 "gl2_source_node", "localhost",
                 "gl2_source_input", "Test",
                 "streams", Collections.<String>emptyList()

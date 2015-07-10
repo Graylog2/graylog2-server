@@ -108,7 +108,7 @@ public class MessageResult {
         if (timestamp instanceof Double) {
             return new DateTime(Math.round((double) timestamp * 1000.0d), DateTimeZone.UTC);
         } else if (timestamp instanceof Long || timestamp instanceof Integer) {
-            return new DateTime((long) timestamp * 1000l, DateTimeZone.UTC);
+            return new DateTime((long) timestamp * 1000L, DateTimeZone.UTC);
         } else {
             return new DateTime(timestamp, DateTimeZone.UTC);
         }

@@ -123,13 +123,13 @@ public abstract class BaseConfiguration {
     private URI httpProxyUri;
 
     @Parameter(value = "http_connect_timeout", validator = PositiveDurationValidator.class)
-    private Duration httpConnectTimeout = Duration.seconds(5l);
+    private Duration httpConnectTimeout = Duration.seconds(5L);
 
     @Parameter(value = "http_write_timeout", validator = PositiveDurationValidator.class)
-    private Duration httpWriteTimeout = Duration.seconds(10l);
+    private Duration httpWriteTimeout = Duration.seconds(10L);
 
     @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
-    private Duration httpReadTimeout = Duration.seconds(10l);
+    private Duration httpReadTimeout = Duration.seconds(10L);
 
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";

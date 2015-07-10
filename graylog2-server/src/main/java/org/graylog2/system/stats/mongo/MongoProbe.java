@@ -94,9 +94,9 @@ public class MongoProbe {
                     extraMap.getString("cpuFrequencyMHz"),
                     extraMap.getString("cpuFeatures"),
                     extraMap.getString("scheduler"),
-                    extraMap.getLong("pageSize", -1l),
-                    extraMap.getLong("numPages", -1l),
-                    extraMap.getLong("maxOpenFiles", -1l)
+                    extraMap.getLong("pageSize", -1L),
+                    extraMap.getLong("numPages", -1L),
+                    extraMap.getLong("maxOpenFiles", -1L)
             );
 
             hostInfo = HostInfo.create(system, os, extra);

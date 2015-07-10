@@ -27,9 +27,9 @@ import javax.inject.Singleton;
 public class SystemOkHttpClientProvider extends OkHttpClientProvider {
     public SystemOkHttpClientProvider() {
         super(
-                Duration.seconds(2l),
-                Duration.seconds(5l),
-                Duration.seconds(5l),
+                Duration.seconds(2L),
+                Duration.seconds(5L),
+                Duration.seconds(5L),
                 null);
     }
 }

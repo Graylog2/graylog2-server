@@ -86,7 +86,7 @@ public class Generator {
         this.mapper = mapper;
 
         if (reflections == null) {
-            reflections = new Reflections(packageNames);
+            reflections = new Reflections((Object[]) packageNames);
         }
     }
 
