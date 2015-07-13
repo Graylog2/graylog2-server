@@ -35,11 +35,13 @@ import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPosit
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
+import org.graylog2.restclient.models.dashboards.widgets.ChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.DashboardWidget;
 import org.graylog2.restclient.models.dashboards.widgets.FieldChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.QuickvaluesWidget;
 import org.graylog2.restclient.models.dashboards.widgets.SearchResultChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.SearchResultCountWidget;
+import org.graylog2.restclient.models.dashboards.widgets.StackedChartWidget;
 import org.graylog2.restclient.models.dashboards.widgets.StatisticalCountWidget;
 import org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCountWidget;
 import org.joda.time.DateTime;
@@ -58,7 +60,6 @@ import play.mvc.Result;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -226,7 +227,7 @@ public class DashboardsApiController extends AuthenticatedController {
             DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
             Object resultValue;
-            if (widget instanceof SearchResultChartWidget || widget instanceof FieldChartWidget) {
+            if (widget instanceof ChartWidget) {
                 resultValue = formatWidgetValueResults(resolution, widget, widgetValue);
             } else {
                 resultValue = widgetValue.result;
@@ -254,12 +255,36 @@ public class DashboardsApiController extends AuthenticatedController {
         final String interval = widgetConfig.containsKey("interval") ? (String) widgetConfig.get("interval") : "minute";
         final boolean allQuery = widgetConfig.get("range_type").equals("relative") && widgetConfig.get("range").equals("0");
 
-        return formatWidgetValueResults(maxDataPoints,
-                widgetValue.result,
-                (String) widgetConfig.get("valuetype"),
-                interval,
-                widgetValue.computationTimeRange,
-                allQuery);
+        if (widget instanceof StackedChartWidget) {
+            final List widgetResults = (List) widgetValue.result;
+            final List<Map<String, String>> series = (List<Map<String, String>>) widget.getConfig().get("series");
+            final ImmutableList.Builder<Map<String, Object>> formattedWidgetResults = ImmutableList.builder();
+            int i = 0;
+
+            for (Object widgetResult : widgetResults) {
+                final Map<String, String> currentSeries = series.get(i);
+
+                formattedWidgetResults.addAll(formatWidgetValueResults(maxDataPoints,
+                        widgetResult,
+                        currentSeries.get("statistical_function"),
+                        interval,
+                        widgetValue.computationTimeRange,
+                        allQuery,
+                        i + 1));
+
+                i++;
+            }
+
+            return formattedWidgetResults.build();
+        } else {
+            return formatWidgetValueResults(maxDataPoints,
+                    widgetValue.result,
+                    (String) widgetConfig.get("valuetype"),
+                    interval,
+                    widgetValue.computationTimeRange,
+                    allQuery,
+                    null);
+        }
     }
 
     // TODO: Extract common parts of this and the similar method on SearchApiController
@@ -268,7 +293,8 @@ public class DashboardsApiController extends AuthenticatedController {
                                                                  final String functionType,
                                                                  final String interval,
                                                                  final Map<String, Object> timeRange,
-                                                                 final boolean allQuery) {
+                                                                 final boolean allQuery,
+                                                                 final Integer seriesNo) {
         final ImmutableList.Builder<Map<String, Object>> pointListBuilder = ImmutableList.builder();
 
         if (resultValue instanceof Map) {
@@ -300,8 +326,15 @@ public class DashboardsApiController extends AuthenticatedController {
                         value = ((Map) value).get(functionType);
                     }
                     Object result = value == null ? 0 : value;
-                    final Map<String, Object> point = ImmutableMap.of("x", Long.parseLong(timestamp), "y", result);
-                    pointListBuilder.add(point);
+                    final ImmutableMap.Builder<String, Object> pointBuilder = ImmutableMap.<String, Object>builder()
+                            .put("x", Long.parseLong(timestamp))
+                            .put("y", result);
+
+                    if (seriesNo != null) {
+                        pointBuilder.put("series", seriesNo);
+                    }
+
+                    pointListBuilder.add(pointBuilder.build());
                 }
                 index++;
                 nextStep(interval, currentTime);
@@ -440,9 +473,11 @@ public class DashboardsApiController extends AuthenticatedController {
             final DashboardWidget widget;
             try {
                 final DashboardWidget.Type widgetType = DashboardWidget.Type.valueOf(request.type());
+                final Map<String, Boolean> trendInformation;
+
                 switch (widgetType) {
-                    case SEARCH_RESULT_COUNT: {
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                    case SEARCH_RESULT_COUNT:
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add search count widget with trend on a non relative time range");
@@ -453,10 +488,9 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         }
                         break;
-                    }
-                    case STREAM_SEARCH_RESULT_COUNT: {
+                    case STREAM_SEARCH_RESULT_COUNT:
                         if (!canReadStream(streamId)) return unauthorized();
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add search result count widget with trend on a non relative time range");
@@ -467,15 +501,14 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
                         }
                         break;
-                    }
                     case FIELD_CHART:
-                        Map<String, Object> config = new HashMap<String, Object>() {{
-                            put("field", request.config().get("field"));
-                            put("valuetype", request.config().get("valuetype"));
-                            put("renderer", request.config().get("renderer"));
-                            put("interpolation", request.config().get("interpolation"));
-                            put("interval", request.config().get("interval"));
-                        }};
+                        final Map<String, Object> config = ImmutableMap.of(
+                                "field", request.config().get("field"),
+                                "valuetype", request.config().get("valuetype"),
+                                "renderer", request.config().get("renderer"),
+                                "interpolation", request.config().get("interpolation"),
+                                "interval", request.config().get("interval")
+                        );
                         if (!canReadStream(streamId)) return unauthorized();
 
                         widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
@@ -490,10 +523,10 @@ public class DashboardsApiController extends AuthenticatedController {
                         if (!canReadStream(streamId)) return unauthorized();
                         widget = new SearchResultChartWidget(dashboard, query, timerange, description, streamId, (String) request.config().get("interval"));
                         break;
-                    case STATS_COUNT: {
+                    case STATS_COUNT:
                         final String field = (String) request.config().get("field");
                         final String statsFunction = (String) request.config().get("statsFunction");
-                        final Map<String, Boolean> trendInformation = this.extractCountTrendInformation(request.config());
+                        trendInformation = this.extractCountTrendInformation(request.config());
                         if (trendInformation.get("trend")) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add statistical count widget with trend on a non relative time range");
@@ -504,7 +537,26 @@ public class DashboardsApiController extends AuthenticatedController {
                             widget = new StatisticalCountWidget(dashboard, query, timerange, description, field, statsFunction, streamId);
                         }
                         break;
-                    }
+                    case STACKED_CHART:
+                        final Map<String, Object> requestConfig = request.config();
+                        final String renderer = (String) requestConfig.get("renderer");
+                        final String interpolation = (String) requestConfig.get("interpolation");
+                        final String interval = (String) requestConfig.get("interval");
+
+                        if (!canReadStream(streamId)) return unauthorized();
+
+                        widget = new StackedChartWidget(dashboard, timerange, description, streamId, renderer, interpolation, interval);
+
+                        if (requestConfig.containsKey("series") && requestConfig.get("series") instanceof List) {
+                            final List requestSeries = (List) requestConfig.get("series");
+                            for (Object seriesObject : requestSeries) {
+                                if (seriesObject instanceof Map) {
+                                    ((StackedChartWidget) widget).addSeries((Map<String, Object>) seriesObject);
+                                }
+                            }
+                        }
+
+                        break;
                     default:
                         throw new IllegalArgumentException();
                 }

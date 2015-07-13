@@ -43,7 +43,7 @@ $(document).ready(function() {
 
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
-            widget_base_dimensions: [410, 170],
+            widget_base_dimensions: [410, 200],
             resize: {
                 enabled: true,
                 stop: function() {

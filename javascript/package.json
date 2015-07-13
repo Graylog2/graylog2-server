@@ -11,6 +11,7 @@
     "watch": "./tools/prepare-dev && ./node_modules/.bin/gulp watch"
   },
   "dependencies": {
+    "c3": "^0.4.10",
     "crossfilter": "1.3.x",
     "d3": "3.5.x",
     "dc": "2.0.0-beta.12",

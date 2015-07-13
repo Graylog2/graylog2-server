@@ -19,6 +19,7 @@ var NumericVisualization = require('../visualizations/NumericVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
 var QuickValuesVisualization = require('../visualizations/QuickValuesVisualization');
 var GraphVisualization = require('../visualizations/GraphVisualization');
+var StackedGraphVisualization = require('../visualizations/StackedGraphVisualization');
 
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 
@@ -33,7 +34,8 @@ var Widget = React.createClass({
             STATS_COUNT: "STATS_COUNT",
             SEARCH_RESULT_CHART: "SEARCH_RESULT_CHART",
             QUICKVALUES: "QUICKVALUES",
-            FIELD_CHART: "FIELD_CHART"
+            FIELD_CHART: "FIELD_CHART",
+            STACKED_CHART: "STACKED_CHART"
         }
     },
 
@@ -190,6 +192,13 @@ var Widget = React.createClass({
                                                     height={this.state.height}
                                                     width={this.state.width}/>;
                 break;
+            case this.constructor.Type.STACKED_CHART:
+                visualization = <StackedGraphVisualization id={this.props.widgetId}
+                                                           data={this.state.result}
+                                                           config={this.state.config}
+                                                           height={this.state.height}
+                                                           width={this.state.width}/>;
+                break;
             default:
                 throw("Error: Widget type '" + this.state.type + "' not supported");
         }
@@ -287,6 +296,7 @@ var Widget = React.createClass({
 
         var editConfigModal = (
             <WidgetEditConfigModal ref="editModal"
+                                   widgetTypes={this.constructor.Type}
                                    widget={this._getWidgetData()}
                                    onUpdate={this.updateWidget}
                                    onModalHidden={this._enableGridster}/>

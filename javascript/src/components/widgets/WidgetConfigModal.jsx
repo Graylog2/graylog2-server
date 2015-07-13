@@ -3,6 +3,7 @@
 var React = require('react');
 
 var BootstrapModal = require('../bootstrap/BootstrapModal');
+var StringUtils = require('../../util/StringUtils');
 
 var WidgetConfigModal = React.createClass({
     open() {
@@ -32,10 +33,22 @@ var WidgetConfigModal = React.createClass({
         return basicConfigurationMessage;
     },
     _formatConfigurationKey(key) {
-        return key.replace(/_/g, " ");
+        return StringUtils.capitalizeFirstLetter(key.replace(/_/g, " "));
     },
     _formatConfigurationValue(key, value) {
-        return key === "query" && value === "" ? "*" : String(value);
+        if (key === "query" && value === "") {
+            return "*";
+        }
+
+        if (typeof value === "string") {
+            return String(value);
+        }
+
+        if (typeof value === "object") {
+            return JSON.stringify(value, null, 1);
+        }
+
+        return value;
     },
     _getConfigAsDescriptionList() {
         var configKeys = Object.keys(this.props.widget.config);

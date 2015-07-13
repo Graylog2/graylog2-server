@@ -25,7 +25,26 @@ interface CreateFieldChartWidgetRequestParams {
     relative?: number;
     from?: string;
     to?: string;
-    keyword: string;
+    keyword?: string;
+}
+
+interface StackedChartSeries {
+    statistical_function: string;
+    field: string;
+    query: string;
+}
+
+interface CreateStackedChartWidgetRequestParams {
+    widgetType: string;
+    renderer: string;
+    interpolation: string;
+    interval: string;
+    rangeType: string;
+    relative?: number;
+    from?: string;
+    to?: string;
+    keyword?: string;
+    series: Array<StackedChartSeries>;
 }
 
 class FieldGraphsStore {
@@ -170,7 +189,7 @@ class FieldGraphsStore {
         });
     }
 
-    getGraphOptionsAsCreateWidgetRequestParams(graphId: string, widgetType: string): CreateFieldChartWidgetRequestParams {
+    getFieldGraphAsCreateWidgetRequestParams(graphId: string, widgetType: string): CreateFieldChartWidgetRequestParams {
         var graphOptions = this.fieldGraphs.get(graphId);
 
         if (graphOptions === undefined) {
@@ -201,6 +220,57 @@ class FieldGraphsStore {
         }
 
         return <CreateFieldChartWidgetRequestParams> requestParams;
+    }
+
+    private getSeriesInformation(graphOptions: Object): StackedChartSeries {
+        var series = {
+            query: graphOptions['query'],
+            field: graphOptions['field'],
+            statistical_function: graphOptions['valuetype'],
+        };
+
+        return <StackedChartSeries> series;
+    }
+
+    getStackedGraphAsCreateWidgetRequestParams(graphId: string, widgetType: string): CreateStackedChartWidgetRequestParams {
+        var graphOptions = this.fieldGraphs.get(graphId);
+
+        if (graphOptions === undefined) {
+            throw('Invalid graph ID "' + graphId + '"');
+        }
+
+        var requestParams = {
+            renderer: graphOptions['renderer'],
+            interpolation: graphOptions['interpolation'],
+            interval: graphOptions['interval'],
+            rangeType: graphOptions['rangetype']
+        };
+
+        var series = [this.getSeriesInformation(graphOptions)];
+
+        var stackedGraphs = this.stackedGraphs.get(graphId);
+
+        stackedGraphs.forEach((stackedGraphId) => {
+            var stackedGraph = this.fieldGraphs.get(stackedGraphId);
+            series.push(this.getSeriesInformation(stackedGraph));
+        }, this);
+
+        requestParams['series'] = series;
+
+        switch (graphOptions['rangetype']) {
+            case "relative":
+                requestParams['relative'] = graphOptions['range']['relative'];
+                break;
+            case "absolute":
+                requestParams['from'] = graphOptions['range']['from'];
+                requestParams['to'] = graphOptions['range']['to'];
+                break;
+            case "keyword":
+                requestParams['keyword'] = graphOptions['range']['keyword'];
+                break;
+        }
+
+        return <CreateStackedChartWidgetRequestParams> requestParams;
     }
 }
 

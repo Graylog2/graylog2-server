@@ -157,6 +157,17 @@ var WidgetEditConfigModal = React.createClass({
     _getSpecificConfigurationControls() {
         var controls = [];
 
+        if (this.state.type !== this.props.widgetTypes.STACKED_CHART) {
+            controls.push(
+                <Input type="text"
+                       key="query"
+                       label="Search query"
+                       defaultValue={this.state.config.query}
+                       onChange={this._onQueryChange}
+                       help="Search query that will be executed to get the widget value."/>
+            );
+        }
+
         if (this.state.config.hasOwnProperty("trend")) {
             controls.push(
                 <Input key="trend"
@@ -217,11 +228,6 @@ var WidgetEditConfigModal = React.createClass({
                        defaultValue={this.state.cacheTime}
                        onChange={this._onCacheTimeChange}
                        help="Number of seconds the widget value will be cached."/>
-                <Input type="text"
-                       label="Search query"
-                       defaultValue={this.state.config.query}
-                       onChange={this._onQueryChange}
-                       help="Search query that will be executed to get the widget value."/>
                 {this._getTimeRangeFormControls()}
                 {this._getSpecificConfigurationControls()}
             </fieldset>
