@@ -50,4 +50,6 @@ public class ConfigurationBundle {
     @JsonProperty
     private List<Dashboard> dashboards = Lists.newArrayList();
 
+    @JsonProperty
+    private List<GrokPattern> grokPatterns = Lists.newArrayList();
 }

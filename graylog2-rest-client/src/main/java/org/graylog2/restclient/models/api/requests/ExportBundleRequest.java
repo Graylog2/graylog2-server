@@ -55,6 +55,8 @@ public class ExportBundleRequest extends ApiRequest {
 
     public List<String> dashboards = Lists.newArrayList();
 
+    public List<String> grokPatterns = Lists.newArrayList();
+
     public String getName() {
         return name;
     }
@@ -109,5 +111,13 @@ public class ExportBundleRequest extends ApiRequest {
 
     public void setDashboards(List<String> dashboards) {
         this.dashboards = dashboards;
+    }
+
+    public List<String> getGrokPatterns() {
+        return grokPatterns;
+    }
+
+    public void setGrokPatterns(List<String> grokPatterns) {
+        this.grokPatterns = grokPatterns;
     }
 }

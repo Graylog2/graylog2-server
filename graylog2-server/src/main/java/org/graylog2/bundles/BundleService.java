@@ -28,8 +28,6 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,7 +36,6 @@ import java.util.Set;
 
 @Singleton
 public class BundleService {
-    private static final Logger LOG = LoggerFactory.getLogger(BundleService.class);
     private static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection;
@@ -76,9 +73,7 @@ public class BundleService {
 
     public ConfigurationBundle findByNameAndCategory(final String name, final String category) {
         final DBQuery.Query query = DBQuery.is("name", name).is("category", category);
-        final ConfigurationBundle bundle = dbCollection.findOne(query);
-
-        return bundle;
+        return dbCollection.findOne(query);
     }
 
     public Set<ConfigurationBundle> loadAll() {

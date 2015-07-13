@@ -16,7 +16,6 @@
  */
 package org.graylog2.bundles;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -27,7 +26,7 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -42,6 +41,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.shared.inputs.InputLauncher;
@@ -81,11 +81,12 @@ public class BundleImporter {
     private final DashboardRegistry dashboardRegistry;
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
-    private final MetricRegistry metricRegistry;
     private final Searches searches;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
+    private final GrokPatternService grokPatternService;
 
+    private final Map<String, org.graylog2.grok.GrokPattern> createdGrokPatterns = new HashMap<>();
     private final Map<String, MessageInput> createdInputs = new HashMap<>();
     private final Map<String, org.graylog2.plugin.streams.Output> createdOutputs = new HashMap<>();
     private final Map<String, org.graylog2.plugin.streams.Stream> createdStreams = new HashMap<>();
@@ -104,10 +105,10 @@ public class BundleImporter {
                           final DashboardRegistry dashboardRegistry,
                           final DashboardWidgetCreator dashboardWidgetCreator,
                           final ServerStatus serverStatus,
-                          final MetricRegistry metricRegistry,
                           final Searches searches,
                           final MessageInputFactory messageInputFactory,
-                          final InputLauncher inputLauncher) {
+                          final InputLauncher inputLauncher,
+                          final GrokPatternService grokPatternService) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -118,16 +119,17 @@ public class BundleImporter {
         this.dashboardRegistry = dashboardRegistry;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
-        this.metricRegistry = metricRegistry;
         this.searches = searches;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
+        this.grokPatternService = grokPatternService;
     }
 
     public void runImport(final ConfigurationBundle bundle, final String userName) {
         final String bundleId = bundle.getId();
 
         try {
+            createGrokPatterns(bundleId, bundle.getGrokPatterns());
             createInputs(bundleId, bundle.getInputs(), userName);
             createOutputs(bundleId, bundle.getOutputs(), userName);
             createStreams(bundleId, bundle.getStreams(), userName);
@@ -165,6 +167,13 @@ public class BundleImporter {
         }
 
         try {
+            deleteCreatedGrokPatterns();
+        } catch (Exception e) {
+            LOG.error("Error while removing grok patterns during rollback.", e);
+            success = false;
+        }
+
+        try {
             deleteCreatedInputs();
         } catch (Exception e) {
             LOG.error("Error while removing inputs during rollback.", e);
@@ -172,6 +181,19 @@ public class BundleImporter {
         }
 
         return success;
+    }
+
+    private void deleteCreatedGrokPatterns() throws NotFoundException {
+        for (String grokPatternName : createdGrokPatterns.keySet()) {
+            final org.graylog2.grok.GrokPattern grokPattern = grokPatternService.load(grokPatternName);
+
+            if(grokPattern.id != null) {
+                LOG.debug("Deleting grok pattern \"{}\" from database", grokPatternName);
+                grokPatternService.delete(grokPattern.id.toHexString());
+            } else {
+                LOG.debug("Couldn't find grok pattern \"{}\" in database", grokPatternName);
+            }
+        }
     }
 
     private void deleteCreatedInputs() throws NotFoundException {
@@ -211,6 +233,22 @@ public class BundleImporter {
         }
     }
 
+    private void createGrokPatterns(final String bundleId, final Set<GrokPattern> grokPatterns) throws ValidationException {
+        for (final GrokPattern grokPattern : grokPatterns) {
+            final org.graylog2.grok.GrokPattern createdGrokPattern = createGrokPattern(bundleId, grokPattern);
+            createdGrokPatterns.put(grokPattern.name(), createdGrokPattern);
+        }
+    }
+
+    private org.graylog2.grok.GrokPattern createGrokPattern(String bundleId, GrokPattern grokPattern) throws ValidationException {
+        final org.graylog2.grok.GrokPattern pattern = new org.graylog2.grok.GrokPattern();
+        pattern.name = grokPattern.name();
+        pattern.pattern = grokPattern.pattern();
+        pattern.contentPack = bundleId;
+
+        return grokPatternService.save(pattern);
+    }
+
     private void createInputs(final String bundleId, final Set<Input> inputs, final String userName)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException, NoSuchInputTypeException, ValidationException, ExtractorFactory.NoSuchExtractorException, NotFoundException, ConfigurationException {
         for (final Input input : inputs) {
@@ -245,7 +283,7 @@ public class BundleImporter {
         }
 
         org.graylog2.inputs.Input mongoInput = inputService.create(
-                buildMongoDbInput(UUID.randomUUID(), inputDescription, userName, createdAt, bundleId));
+                buildMongoDbInput(inputDescription, userName, createdAt, bundleId));
 
         // Persist input.
         final String persistId = inputService.save(mongoInput);
@@ -348,7 +386,6 @@ public class BundleImporter {
     }
 
     private Map<String, Object> buildMongoDbInput(
-            final UUID inputId,
             final Input input,
             final String userName,
             final DateTime createdAt,

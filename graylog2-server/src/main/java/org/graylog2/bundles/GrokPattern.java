@@ -14,15 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.bundles;
 
-public class GrokPatternSummary {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotBlank;
 
-    public String id;
+@JsonAutoDetect
+@AutoValue
+public abstract class GrokPattern {
+    @JsonProperty
+    public abstract String name();
 
-    public String name;
+    @JsonProperty
+    public abstract String pattern();
 
-    public String pattern;
-
-    public String contentPack;
+    public static GrokPattern create(@JsonProperty("name") @NotBlank String name,
+                                     @JsonProperty("pattern") @NotBlank String pattern) {
+        return new AutoValue_GrokPattern(name, pattern);
+    }
 }

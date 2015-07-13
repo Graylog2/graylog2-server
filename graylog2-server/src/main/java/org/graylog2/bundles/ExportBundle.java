@@ -48,6 +48,9 @@ public class ExportBundle {
     @JsonProperty
     @NotNull
     private Set<String> dashboards = Collections.emptySet();
+    @JsonProperty
+    @NotNull
+    private Set<String> grokPatterns = Collections.emptySet();
 
     public String getName() {
         return name;
@@ -103,5 +106,13 @@ public class ExportBundle {
 
     public void setDashboards(Set<String> dashboards) {
         this.dashboards = dashboards;
+    }
+
+    public Set<String> getGrokPatterns() {
+        return grokPatterns;
+    }
+
+    public void setGrokPatterns(Set<String> grokPatterns) {
+        this.grokPatterns = grokPatterns;
     }
 }

@@ -14,15 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.restclient.models.bundles;
 
-public class GrokPatternSummary {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public String id;
+@JsonAutoDetect
+public class GrokPattern {
+    @JsonProperty
+    private String name;
 
-    public String name;
+    @JsonProperty
+    private String pattern;
 
-    public String pattern;
+    public String getName() {
+        return name;
+    }
 
-    public String contentPack;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
 }

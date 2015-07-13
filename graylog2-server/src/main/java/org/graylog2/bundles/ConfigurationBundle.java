@@ -54,6 +54,9 @@ public class ConfigurationBundle {
     @JsonProperty
     @NotNull
     private Set<Dashboard> dashboards = Collections.emptySet();
+    @JsonProperty
+    @NotNull
+    private Set<GrokPattern> grokPatterns = Collections.emptySet();
 
     public String getId() {
         return id;
@@ -117,5 +120,13 @@ public class ConfigurationBundle {
 
     public void setDashboards(Set<Dashboard> dashboards) {
         this.dashboards = dashboards;
+    }
+
+    public Set<GrokPattern> getGrokPatterns() {
+        return grokPatterns;
+    }
+
+    public void setGrokPatterns(Set<GrokPattern> grokPatterns) {
+        this.grokPatterns = grokPatterns;
     }
 }
