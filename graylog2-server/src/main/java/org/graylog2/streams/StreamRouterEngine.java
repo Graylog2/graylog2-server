@@ -49,10 +49,10 @@ public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
 
     private final List<Stream> streams;
-    private final StreamFaultManager streamFaultManager;
+    protected final StreamFaultManager streamFaultManager;
     private final StreamMetrics streamMetrics;
-    private final TimeLimiter timeLimiter;
-    private final long streamProcessingTimeout;
+    protected final TimeLimiter timeLimiter;
+    protected final long streamProcessingTimeout;
     private final String fingerprint;
 
     private final Map<String, List<Rule>> presenceRules = Maps.newHashMap();

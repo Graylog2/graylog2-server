@@ -17,19 +17,20 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 
 import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class OtherStreamRouterEngine extends StreamRouterEngine {
     private class OtherRule extends Rule {
@@ -101,30 +102,56 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
     @Override
     public List<Stream> match(Message message) {
         final Set<Stream> result = Sets.newHashSet();
-        final Map<Stream, Boolean> blackList = Maps.newHashMap();
+        final Set<Stream> blackList = Sets.newHashSet();
 
-        for (OtherRule otherRule : rulesList) {
-            if (blackList.get(otherRule.getStream()) != null) {
+        for (final OtherRule otherRule : rulesList) {
+            if (blackList.contains(otherRule.getStream())) {
                 continue;
             }
 
-            final Stream stream = otherRule.match(message);
+            final StreamRule streamRule = otherRule.getStreamRule();
+            if (streamRule.getType() != StreamRuleType.PRESENCE && !message.hasField(streamRule.getField())) {
+                continue;
+            }
+
+            final Stream stream;
+            if (streamRule.getType() != StreamRuleType.REGEX) {
+                stream = otherRule.match(message);
+            } else {
+                stream = matchWithTimeOut(message, otherRule);
+            }
 
             if (stream == null) {
                 if (!otherRule.isSufficient()) {
                     result.remove(otherRule.getStream());
-                    // remove all rules related to this stream because stream can't match anymore
-                    blackList.put(otherRule.getStream(), true);
+                    // blacklist stream because it can't match anymore
+                    blackList.add(otherRule.getStream());
                 }
             } else {
                 result.add(stream);
                 if (otherRule.isSufficient()) {
-                    // remove all rules related to this stream because stream is already matched
-                    blackList.put(otherRule.getStream(), true);
+                    // blacklist stream because it is already matched
+                    blackList.add(otherRule.getStream());
                 }
             }
         }
 
         return Lists.newArrayList(result);
+    }
+
+    private Stream matchWithTimeOut(final Message message, final OtherRule otherRule) {
+        Stream matchedStream = null;
+        try {
+            matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
+                @Override
+                public Stream call() throws Exception {
+                    return otherRule.match(message);
+                }
+            }, streamProcessingTimeout, TimeUnit.MILLISECONDS, true);
+        } catch (Exception e) {
+            streamFaultManager.registerFailure(otherRule.getStream());
+        }
+
+        return matchedStream;
     }
 }
