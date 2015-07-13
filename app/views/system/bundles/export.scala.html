@@ -1,14 +1,16 @@
+@import org.graylog2.restclient.models.Input
+@import org.graylog2.rest.models.system.responses.GrokPatternSummary
 @(form: Form[org.graylog2.restclient.models.api.requests.ExportBundleRequest],
         currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList,
         inputs: List[org.graylog2.restclient.models.Input],
         outputs: List[org.graylog2.restclient.models.Output],
         streams: List[org.graylog2.restclient.models.Stream],
-        dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
-@import org.graylog2.restclient.models.Input
+        dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard],
+        grokPatterns: List[GrokPatternSummary])
 
 @values(field: Field) = @{
-    if(field.indexes.size == 0) {
+    if(field.indexes.isEmpty) {
         Seq(field.value)
     } else {
         field.indexes.map { v => field("[" + v + "]").value}
@@ -79,6 +81,25 @@
                                     <div class="checkbox">
                                         <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
                                         <span class="help-inline">(@inputDetails(i))</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+                @defining(values(form("grokPatterns"))) { listValues =>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="grokPatterns">Grok Patterns</label>
+                        <div class="col-sm-10">
+                            @if(grokPatterns.isEmpty) {
+                                <span class="help-block help-standalone">There are no grok patterns to export.</span>
+                            } else {
+                                <button type="button" class="btn btn-sm btn-link select-all" data-target="grokPatterns">Select all</button>
+                                @for(i <- grokPatterns.sortBy(_.name)) {
+                                    <div class="checkbox">
+                                        <label class="checkbox"><input type="checkbox" name="grokPatterns" id="grokPattern_@i.id" value="@i.id" @if(listValues.contains(Some(i.id))) {checked=""}>@i.name</label>
+                                        <span class="help-inline">Pattern: <tt>@i.pattern</tt></span>
                                     </div>
                                 }
                             }
