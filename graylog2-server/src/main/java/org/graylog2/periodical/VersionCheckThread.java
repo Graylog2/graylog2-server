@@ -179,7 +179,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 0;
+        return (int) MINUTES.toSeconds(5);
     }
 
     @Override
