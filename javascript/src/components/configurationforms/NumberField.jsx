@@ -28,7 +28,9 @@ var NumberField = React.createClass({
     validationSpec(field) {
         var validationAttributes = field.attributes.map(this.mapValidationAttribute);
         if (validationAttributes.length > 0) {
-            return validationAttributes.reduce((x, y) => { return x.extend(y); });
+            // The server may return more than one validation attribute, but it doesn't make sense to use more
+            // than one validation for a number field, so we return the first one
+            return validationAttributes[0];
         } else {
             return {};
         }
