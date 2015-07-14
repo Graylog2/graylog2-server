@@ -88,6 +88,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("variance", stats.variance);
             result.put("sum_of_squares", stats.sumOfSquares);
             result.put("std_deviation", stats.stdDeviation);
+            result.put("cardinality", stats.cardinality);
 
             return ok(Json.toJson(result));
         } catch (IOException e) {

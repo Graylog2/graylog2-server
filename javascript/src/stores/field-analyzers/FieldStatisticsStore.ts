@@ -20,6 +20,7 @@ var FieldStatisticsStore = {
         std_deviation: 'Std. deviation',
         variance: 'Variance',
         sum: 'Sum',
+        cardinality: 'Cardinality',
     }),
     getFieldStatistics(field: string): JQueryPromise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
