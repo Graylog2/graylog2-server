@@ -136,10 +136,10 @@ public class StreamRouterEngine {
      * @param message the message
      * @return the list of matching streams
      */
-    public Set<Stream> match(Message message) {
+    public List<Stream> match(Message message) {
         final Map<Stream, StreamMatch> matches = Maps.newHashMap();
         final Set<Stream> timeouts = Sets.newHashSet();
-        final Set<Stream> result = Sets.newHashSet();
+        final List<Stream> result = Lists.newArrayList();
         final Set<String> fieldNames = message.getFieldNames();
 
         // Execute the rules ordered by complexity. (fast rules first)

@@ -59,6 +59,8 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
         final List<OtherRule> smallerRules = Lists.newArrayList();
         final List<OtherRule> regexRules = Lists.newArrayList();
 
+        //final SetMultimap<String, OtherRule> fieldRules = Multimaps.newSetMultimap();
+
         for (Stream stream : streams) {
             final Boolean sufficient = stream.getMatchingType() == Stream.MatchingType.OR;
             for (StreamRule streamRule : stream.getStreamRules()) {
@@ -69,6 +71,7 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
                     e.printStackTrace();
                     continue;
                 }
+                //fieldRules.put()
                 switch (streamRule.getType()) {
                     case PRESENCE:
                         presenceRules.add(otherRule);
@@ -97,7 +100,7 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
     }
 
     @Override
-    public Set<Stream> match(Message message) {
+    public List<Stream> match(Message message) {
         final Set<Stream> result = Sets.newHashSet();
         final Set<Stream> blackList = Sets.newHashSet();
 
@@ -133,7 +136,7 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
             }
         }
 
-        return result;
+        return Lists.newArrayList(result);
     }
 
     private Stream matchWithTimeOut(final Message message, final OtherRule otherRule) {
