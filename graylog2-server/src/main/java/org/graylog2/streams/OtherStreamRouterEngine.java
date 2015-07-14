@@ -133,6 +133,11 @@ public class OtherStreamRouterEngine extends StreamRouterEngine {
             }
         }
 
+
+        for (Stream stream : result) {
+            streamMetrics.markIncomingMeter(stream.getId());
+        }
+
         return Lists.newArrayList(result);
     }
 

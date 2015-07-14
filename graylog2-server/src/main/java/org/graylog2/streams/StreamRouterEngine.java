@@ -50,7 +50,7 @@ public class StreamRouterEngine {
 
     private final List<Stream> streams;
     protected final StreamFaultManager streamFaultManager;
-    private final StreamMetrics streamMetrics;
+    protected final StreamMetrics streamMetrics;
     protected final TimeLimiter timeLimiter;
     protected final long streamProcessingTimeout;
     private final String fingerprint;
