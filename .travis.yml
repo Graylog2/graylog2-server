@@ -1,8 +1,12 @@
-language:
-  - java
+sudo: false
+language: java
 jdk:
   - oraclejdk7
   - oraclejdk8
+cache:
+  directories:
+    - $HOME/.ivy2
+    - $HOME/.m2
 env:
   global:
   - secure: |-
@@ -35,7 +39,6 @@ deploy:
       - master
       - 1.0
       - 1.1
-addons:
 notifications:
   slack:
     on_success: change
