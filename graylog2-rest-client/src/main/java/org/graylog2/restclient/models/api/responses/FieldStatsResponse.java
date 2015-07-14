@@ -18,9 +18,6 @@ package org.graylog2.restclient.models.api.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FieldStatsResponse {
 
     public long count;
@@ -35,5 +32,7 @@ public class FieldStatsResponse {
 
     @JsonProperty("std_deviation")
     public double stdDeviation;
+
+    public long cardinality;
 
 }

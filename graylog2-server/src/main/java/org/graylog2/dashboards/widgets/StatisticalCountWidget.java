@@ -36,8 +36,25 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String field;
     private final String streamId;
 
-    public StatisticalCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.STATS_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
+    public StatisticalCountWidget(MetricRegistry metricRegistry,
+                                  Searches searches,
+                                  String id,
+                                  String description,
+                                  WidgetCacheTime cacheTime,
+                                  Map<String, Object> config,
+                                  String query,
+                                  TimeRange timeRange,
+                                  String creatorUserId) {
+        super(metricRegistry,
+              Type.STATS_COUNT,
+              searches,
+              id,
+              description,
+              cacheTime,
+              config,
+              query,
+              timeRange,
+              creatorUserId);
         this.field = (String) config.get("field");
         this.statsFunction = (String) config.get("stats_function");
         this.streamId = (String) config.get("stream_id");
@@ -58,38 +75,28 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     }
 
     private Number getStatisticalValue(FieldStatsResult fieldStatsResult) {
-        final Number statisticalValue;
-
         switch (statsFunction) {
             case "count":
-                statisticalValue = fieldStatsResult.getCount();
-                break;
+                return fieldStatsResult.getCount();
             case "mean":
-                statisticalValue = fieldStatsResult.getMean();
-                break;
+                return fieldStatsResult.getMean();
             case "stddev":
-                statisticalValue = fieldStatsResult.getStdDeviation();
-                break;
+                return fieldStatsResult.getStdDeviation();
             case "min":
-                statisticalValue = fieldStatsResult.getMin();
-                break;
+                return fieldStatsResult.getMin();
             case "max":
-                statisticalValue = fieldStatsResult.getMax();
-                break;
+                return fieldStatsResult.getMax();
             case "sum":
-                statisticalValue = fieldStatsResult.getSum();
-                break;
+                return fieldStatsResult.getSum();
             case "variance":
-                statisticalValue = fieldStatsResult.getVariance();
-                break;
+                return fieldStatsResult.getVariance();
             case "squares":
-                statisticalValue = fieldStatsResult.getSumOfSquares();
-                break;
+                return fieldStatsResult.getSumOfSquares();
+            case "cardinality":
+                return fieldStatsResult.getCardinality();
             default:
                 throw new IllegalArgumentException("Statistic function " + statsFunction + " is not supported");
         }
-
-        return statisticalValue;
     }
 
     @Override
@@ -101,13 +108,27 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
             } else {
                 filter = null;
             }
-            FieldStatsResult fieldStatsResult = getSearches().fieldStats(field, query, filter, timeRange);
+            // if we only need the cardinality, we can skip calculating the extended stats and vice versa
+            boolean isCardinalityFunction = "cardinality".equals(statsFunction);
+            final FieldStatsResult fieldStatsResult =
+                    getSearches().fieldStats(field,
+                                             query,
+                                             filter,
+                                             timeRange,
+                                             isCardinalityFunction,
+                                             isCardinalityFunction);
             if (trend && timeRange instanceof RelativeRange) {
                 DateTime toPrevious = timeRange.getFrom();
                 DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
                 TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
-                FieldStatsResult previousFieldStatsResult = getSearches().fieldStats(field, query, filter, previousTimeRange);
 
+                final FieldStatsResult previousFieldStatsResult =
+                        getSearches().fieldStats(field,
+                                                 query,
+                                                 filter,
+                                                 previousTimeRange,
+                                                 isCardinalityFunction,
+                                                 isCardinalityFunction);
                 Map<String, Object> results = Maps.newHashMap();
                 results.put("now", getStatisticalValue(fieldStatsResult));
                 results.put("previous", getStatisticalValue(previousFieldStatsResult));
