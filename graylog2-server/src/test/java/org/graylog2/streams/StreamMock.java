@@ -152,4 +152,9 @@ public class StreamMock implements Stream {
                 ", title='" + title + '\'' +
                 '}';
     }
+
+    @Override
+    public MatchingType getMatchingType() {
+        return MatchingType.AND;
+    }
 }

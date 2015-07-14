@@ -73,6 +73,7 @@ public class StreamsTest extends BaseRestTest {
                 .assertThat()
                 .body("title", equalTo("TestStream"))
                 .body("disabled", equalTo(true))
+                .body("matching_type", equalTo("AND"))
                 .body("description", equalTo(null));
     }
 
@@ -96,13 +97,46 @@ public class StreamsTest extends BaseRestTest {
         assertThat(afterCount).isEqualTo(beforeCount+1);
 
         given()
-            .when()
+                .when()
                 .get("/streams/" + streamId)
-            .then()
+                .then()
                 .statusCode(200)
                 .assertThat()
                 .body("title", equalTo(streamTitle))
                 .body("disabled", equalTo(true))
+                .body("matching_type", equalTo("AND"))
+                .body("description", equalTo(description));
+    }
+
+    @Test
+    public void createOrMatchingStreamWithTitleAndDescription() throws Exception {
+        final int beforeCount = streamCount();
+        final String streamTitle = "Another Test Stream";
+        final String description = "This is a test stream.";
+        final String matchingType = "OR";
+
+        final JsonPath response = createStreamFromRequest(jsonResourceForMethod())
+                .statusCode(201)
+                .body(".", containsAllKeys("stream_id"))
+                .extract().jsonPath();
+
+        final String streamId = response.getString("stream_id");
+
+        assertThat(streamId).isNotNull().isNotEmpty();
+
+        final int afterCount = streamCount();
+
+        assertThat(afterCount).isEqualTo(beforeCount+1);
+
+        given()
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body("title", equalTo(streamTitle))
+                .body("disabled", equalTo(true))
+                .body("matching_type", equalTo(matchingType))
                 .body("description", equalTo(description));
     }
 
@@ -123,7 +157,7 @@ public class StreamsTest extends BaseRestTest {
 
         final int afterCount = streamCount();
 
-        assertThat(afterCount).isEqualTo(beforeCount+1);
+        assertThat(afterCount).isEqualTo(beforeCount + 1);
 
         final JsonPath getResponse = given()
                 .when()
@@ -134,6 +168,7 @@ public class StreamsTest extends BaseRestTest {
                 .assertThat()
                 .body("title", equalTo(streamTitle))
                 .body("disabled", equalTo(true))
+                .body("matching_type", equalTo("AND"))
                 .body("description", equalTo(description))
                 .extract().jsonPath();
 
@@ -170,6 +205,17 @@ public class StreamsTest extends BaseRestTest {
 
         final ValidatableResponse response = createStreamFromRequest("{}");
         response.statusCode(400);
+
+        final int afterCount = streamCount();
+        assertThat(afterCount).isEqualTo(beforeCount);
+    }
+
+    @Test
+    public void creatingInvalidMatchingStreamShouldFail() throws Exception {
+        final int beforeCount = streamCount();
+
+        createStreamFromRequest(jsonResourceForMethod())
+            .statusCode(400);
 
         final int afterCount = streamCount();
         assertThat(afterCount).isEqualTo(beforeCount);

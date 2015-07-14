@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -44,11 +45,15 @@ public abstract class CreateStreamRequest {
     @Nullable
     public abstract String contentPack();
 
+    @JsonProperty
+    public abstract Stream.MatchingType matchingType();
+
     @JsonCreator
     public static CreateStreamRequest create(@JsonProperty("title") @NotEmpty String title,
                                              @JsonProperty("description") @Nullable String description,
                                              @JsonProperty("rules") @Nullable List<CreateStreamRuleRequest> rules,
-                                             @JsonProperty("content_pack") @Nullable String contentPack) {
-        return new AutoValue_CreateStreamRequest(title, description, rules, contentPack);
+                                             @JsonProperty("content_pack") @Nullable String contentPack,
+                                             @JsonProperty("matching_type") @Nullable String matchingType) {
+        return new AutoValue_CreateStreamRequest(title, description, rules, contentPack, Stream.MatchingType.valueOfOrDefault(matchingType));
     }
 }

@@ -22,55 +22,22 @@
  */
 package org.graylog2.plugin.streams;
 
-import org.graylog2.plugin.database.Persisted;
+import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.junit.Assert.*;
 
-import static com.google.common.base.Strings.emptyToNull;
+public class MatchingTypeTest {
 
-public interface Stream extends Persisted {
-    enum MatchingType {
-        AND,
-        OR;
-
-        public static final MatchingType DEFAULT = AND;
-
-        public static MatchingType valueOfOrDefault(String name) {
-            return (emptyToNull(name) == null ? DEFAULT : valueOf(name));
-        }
+    @Test
+    public void testValueOfOrDefault() throws Exception {
+        assertEquals(Stream.MatchingType.valueOfOrDefault("AND"), Stream.MatchingType.AND);
+        assertEquals(Stream.MatchingType.valueOfOrDefault("OR"), Stream.MatchingType.OR);
+        assertEquals(Stream.MatchingType.valueOfOrDefault(null), Stream.MatchingType.DEFAULT);
+        assertEquals(Stream.MatchingType.valueOfOrDefault(""), Stream.MatchingType.DEFAULT);
     }
 
-    String getId();
-
-    String getTitle();
-
-    String getDescription();
-
-    Boolean getDisabled();
-
-    String getContentPack();
-
-    void setTitle(String title);
-
-    void setDescription(String description);
-
-    void setDisabled(Boolean disabled);
-
-    void setContentPack(String contentPack);
-
-    Boolean isPaused();
-
-    Map<String, List<String>> getAlertReceivers();
-
-    Map<String, Object> asMap(List<StreamRule> streamRules);
-
-    String toString();
-
-    List<StreamRule> getStreamRules();
-
-    Set<Output> getOutputs();
-
-    MatchingType getMatchingType();
+    @Test(expected = IllegalArgumentException.class)
+    public void testValueOfOrDefaultThrowsExceptionForUnknownEnumName() {
+        Stream.MatchingType.valueOfOrDefault("FOO");
+    }
 }
