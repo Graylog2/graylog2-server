@@ -54,9 +54,12 @@ function validate(formContainer) {
     $(".validatable", formContainer).each(function () {
         // Do not check disabled form fields.
         if (!$(this).is(':disabled')) {
-            var validatorTypes = $(this).attr("data-validate").split(" ");
-            for (var i = 0; (!errors && i < validatorTypes.length); i++) {
-                errors = dispatchRuleValidation($(this), validatorTypes[i]);
+            var dataValidations = $(this).attr("data-validate");
+            if (dataValidations !== undefined) {
+                var validatorTypes = dataValidations.split(" ");
+                for (var i = 0; (!errors && i < validatorTypes.length); i++) {
+                    errors = dispatchRuleValidation($(this), validatorTypes[i]);
+                }
             }
         }
     });
