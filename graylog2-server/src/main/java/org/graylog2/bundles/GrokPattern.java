@@ -17,6 +17,7 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.hibernate.validator.constraints.NotBlank;
@@ -30,6 +31,7 @@ public abstract class GrokPattern {
     @JsonProperty
     public abstract String pattern();
 
+    @JsonCreator
     public static GrokPattern create(@JsonProperty("name") @NotBlank String name,
                                      @JsonProperty("pattern") @NotBlank String pattern) {
         return new AutoValue_GrokPattern(name, pattern);
