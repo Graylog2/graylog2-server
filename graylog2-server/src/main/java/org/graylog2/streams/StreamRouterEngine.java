@@ -312,11 +312,13 @@ public class StreamRouterEngine {
     public static class StreamTestMatch {
         private final Stream stream;
         private final List<Rule> rules = Lists.newArrayList();
+        private final Stream.MatchingType matchingType;
 
         private final Map<StreamRule, Boolean> matches = Maps.newHashMap();
 
         public StreamTestMatch(Stream stream) {
             this.stream = stream;
+            this.matchingType = stream.getMatchingType();
         }
 
         public void addRule(Rule rule) {
@@ -331,7 +333,13 @@ public class StreamRouterEngine {
         }
 
         public boolean isMatched() {
-            return !matches.isEmpty() && !matches.values().contains(false);
+            switch (matchingType) {
+                case OR:
+                    return matches.values().contains(false);
+                case AND:
+                default:
+                    return !matches.values().contains(false);
+            }
         }
 
         public Stream getStream() {
