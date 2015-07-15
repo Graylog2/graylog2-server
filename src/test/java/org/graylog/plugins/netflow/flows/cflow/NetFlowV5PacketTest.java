@@ -36,5 +36,18 @@ public class NetFlowV5PacketTest {
         assertEquals(new DateTime("2015-05-02T18:38:07.196Z"), flow1.stop.get());
         assertEquals(230, flow1.bytes);
         assertEquals(5, flow1.pkts);
+
+        assertEquals(0, flow2.tos);
+        assertEquals("/10.0.2.15", flow2.srcAddress.toString());
+        assertEquals("/10.0.2.2", flow2.dstAddress.toString());
+        assertEquals("/0.0.0.0", flow2.nextHop.get().toString());
+        assertEquals(22, flow2.srcPort);
+        assertEquals(54435, flow2.dstPort);
+        assertEquals(6, flow2.proto);
+        assertEquals(24, flow2.tcpflags);
+        assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00"), flow2.start.get());
+        assertEquals(new DateTime("2015-05-02T18:38:07.196Z"), flow2.stop.get());
+        assertEquals(304, flow2.bytes);
+        assertEquals(4, flow2.pkts);
     }
 }
