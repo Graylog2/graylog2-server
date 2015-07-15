@@ -21,10 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonAutoDetect
 public class GrokPattern {
-    @JsonProperty
+    @JsonProperty("name")
     private String name;
 
-    @JsonProperty
+    @JsonProperty("pattern")
     private String pattern;
 
     public String getName() {
