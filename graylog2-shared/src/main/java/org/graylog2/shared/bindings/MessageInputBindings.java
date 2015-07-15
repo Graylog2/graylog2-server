@@ -27,11 +27,9 @@ import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.raw.amqp.RawAMQPInput;
 import org.graylog2.inputs.raw.kafka.RawKafkaInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
-import org.graylog2.inputs.syslog.amqp.SyslogAMQPInput;
 import org.graylog2.inputs.syslog.kafka.SyslogKafkaInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
@@ -49,11 +47,9 @@ public class MessageInputBindings extends Graylog2Module {
         // new style inputs, using transports and codecs
         installInput(inputMapBinder, RawTCPInput.class, RawTCPInput.Factory.class);
         installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
-        installInput(inputMapBinder, RawAMQPInput.class, RawAMQPInput.Factory.class);
         installInput(inputMapBinder, RawKafkaInput.class, RawKafkaInput.Factory.class);
         installInput(inputMapBinder, SyslogTCPInput.class, SyslogTCPInput.Factory.class);
         installInput(inputMapBinder, SyslogUDPInput.class, SyslogUDPInput.Factory.class);
-        installInput(inputMapBinder, SyslogAMQPInput.class, SyslogAMQPInput.Factory.class);
         installInput(inputMapBinder, SyslogKafkaInput.class, SyslogKafkaInput.Factory.class);
         installInput(inputMapBinder, FakeHttpMessageInput.class, FakeHttpMessageInput.Factory.class);
         installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
