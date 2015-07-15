@@ -1,0 +1,145 @@
+package org.graylog.plugins.netflow.flows.cflow;
+
+import com.google.common.collect.Lists;
+import io.netty.buffer.ByteBuf;
+import org.graylog.plugins.netflow.flows.CorruptFlowPacketException;
+import org.graylog.plugins.netflow.flows.FlowException;
+import org.graylog.plugins.netflow.flows.InvalidFlowVersionException;
+import org.graylog.plugins.netflow.utils.UUIDs;
+import org.joda.time.DateTime;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.UUID;
+
+import static org.graylog.plugins.netflow.utils.ByteBufUtils.getUnsignedInteger;
+
+/**
+ * NetFlow Version 5
+ *
+ * *-------*---------------*------------------------------------------------------*
+ * | Bytes | Contents      | Description                                          |
+ * *-------*---------------*------------------------------------------------------*
+ * | 0-1   | version       | The version of NetFlow records exported 005          |
+ * *-------*---------------*------------------------------------------------------*
+ * | 2-3   | count         | Number of flows exported in this packet (1-30)       |
+ * *-------*---------------*------------------------------------------------------*
+ * | 4-7   | SysUptime     | Current time in milli since the export device booted |
+ * *-------*---------------*------------------------------------------------------*
+ * | 8-11  | unix_secs     | Current count of seconds since 0000 UTC 1970         |
+ * *-------*---------------*------------------------------------------------------*
+ * | 12-15 | unix_nsecs    | Residual nanoseconds since 0000 UTC 1970             |
+ * *-------*---------------*------------------------------------------------------*
+ * | 16-19 | flow_sequence | Sequence counter of total flows seen                 |
+ * *-------*---------------*------------------------------------------------------*
+ * | 20    | engine_type   | Type of flow-switching engine                        |
+ * *-------*---------------*------------------------------------------------------*
+ * | 21    | engine_id     | Slot number of the flow-switching engine             |
+ * *-------*---------------*------------------------------------------------------*
+ * | 22-23 | sampling_int  | First two bits hold the sampling mode                |
+ * |       |               | remaining 14 bits hold value of sampling interval    |
+ * *-------*---------------*------------------------------------------------------*
+ */
+public class NetFlowV5Packet {
+    private static final int HEADER_SIZE = 24;
+    private static final int FLOW_SIZE = 48;
+
+    private static final String VERSION = "NetFlowV5 Packet";
+
+    public final UUID id;
+    public final InetSocketAddress sender;
+    public final int length;
+    public final long uptime;
+    public final DateTime timestamp;
+    public final List<NetFlowV5> flows;
+    public final long flowSequence;
+    public final int engineType;
+    public final int engineId;
+    public final int samplingInterval;
+    public final int samplingMode;
+
+    public NetFlowV5Packet(UUID id,
+                           InetSocketAddress sender,
+                           int length,
+                           long uptime,
+                           DateTime timestamp,
+                           List<NetFlowV5> flows,
+                           long flowSequence,
+                           int engineType,
+                           int engineId,
+                           int samplingInterval,
+                           int samplingMode) {
+
+        this.id = id;
+        this.sender = sender;
+        this.length = length;
+        this.uptime = uptime;
+        this.timestamp = timestamp;
+        this.flows = flows;
+        this.flowSequence = flowSequence;
+        this.engineType = engineType;
+        this.engineId = engineId;
+        this.samplingInterval = samplingInterval;
+        this.samplingMode = samplingMode;
+    }
+
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("NetFlowV5Packet{");
+        sb.append("id=").append(id);
+        sb.append(", sender=").append(sender);
+        sb.append(", length=").append(length);
+        sb.append(", uptime=").append(uptime);
+        sb.append(", timestamp=").append(timestamp);
+        sb.append(", flows=").append(flows);
+        sb.append(", flowSequence=").append(flowSequence);
+        sb.append(", engineType=").append(engineType);
+        sb.append(", engineId=").append(engineId);
+        sb.append(", samplingInterval=").append(samplingInterval);
+        sb.append(", samplingMode=").append(samplingMode);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public int getCount() {
+        return flows.size();
+    }
+
+    public static NetFlowV5Packet parse(InetSocketAddress sender, ByteBuf buf) throws FlowException {
+        final int version = (int) getUnsignedInteger(buf, 0, 2);
+        if (version != 5) {
+            throw new InvalidFlowVersionException(version);
+        }
+
+        final int count = (int) getUnsignedInteger(buf, 2, 2);
+        if (count <= 0 || buf.readableBytes() < HEADER_SIZE + count * FLOW_SIZE) {
+            throw new CorruptFlowPacketException();
+        }
+
+        final long uptime = getUnsignedInteger(buf, 4, 4);
+        final DateTime timestamp = new DateTime(getUnsignedInteger(buf, 8, 4) * 1000);
+        final UUID id = UUIDs.startOf(timestamp.getMillis());
+        final long flowSequence = getUnsignedInteger(buf, 16, 4);
+        final int engineType = (int) getUnsignedInteger(buf, 20, 1);
+        final int engineId = (int) getUnsignedInteger(buf, 21, 1);
+        // the first 2 bits are the sampling mode, the remaining 14 the interval
+        final int sampling = (int) getUnsignedInteger(buf, 22, 2);
+        final int samplingInterval = sampling & 0x3FFF;
+        final int samplingMode = sampling >> 14;
+
+        final List<NetFlowV5> flows = Lists.newArrayList();
+        for (int i = 0; i <= (count - 1); i++) {
+            final NetFlowV5 flowV5 = NetFlowV5.parse(sender,
+                    buf.slice(HEADER_SIZE + (i * FLOW_SIZE), FLOW_SIZE),
+                    id,
+                    uptime,
+                    timestamp,
+                    samplingInterval,
+                    true);
+            flows.add(flowV5);
+        }
+
+        return new NetFlowV5Packet(id, sender, buf.readableBytes(), uptime, timestamp, flows, flowSequence, engineType, engineId, samplingInterval, samplingMode);
+    }
+}
