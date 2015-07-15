@@ -16,6 +16,7 @@
  */
 package controllers.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import controllers.AuthenticatedController;
@@ -36,10 +37,12 @@ import java.nio.charset.StandardCharsets;
 
 public class BundlesApiController extends AuthenticatedController {
     private final BundleService bundleService;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public BundlesApiController(BundleService bundleService) {
+    public BundlesApiController(BundleService bundleService, ObjectMapper objectMapper) {
         this.bundleService = bundleService;
+        this.objectMapper = objectMapper;
     }
 
     public Result index() {
@@ -56,9 +59,7 @@ public class BundlesApiController extends AuthenticatedController {
         if (bundle != null) {
             CreateBundleRequest cbr;
             try {
-                File file = bundle.getFile();
-                String bundleContents = Files.toString(file, StandardCharsets.UTF_8);
-                cbr = Json.fromJson(Json.parse(bundleContents), CreateBundleRequest.class);
+                cbr = objectMapper.readValue(bundle.getFile(), CreateBundleRequest.class);
             } catch (IOException e) {
                 Logger.error("Could not parse uploaded bundle: " + e);
                 flash("error", "The uploaded bundle could not be applied: does it have the right format?");
