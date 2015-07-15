@@ -18,15 +18,15 @@ public class NetFlowV5 {
 
     public final UUID uuid;
     public final InetSocketAddress sender;
-    public final int i;
+    public final int length;
     public final long uptime;
     public final DateTime timestamp;
     public final int srcPort;
     public final int dstPort;
     public final Optional<Integer> srcAS;
     public final Optional<Integer> dstAS;
-    public final long l;
-    public final long l1;
+    public final long pkts;
+    public final long bytes;
     public final int proto;
     public final int tos;
     public final int tcpflags;
@@ -43,15 +43,15 @@ public class NetFlowV5 {
 
     public NetFlowV5(UUID uuid,
                      InetSocketAddress sender,
-                     int i,
+                     int length,
                      long uptime,
                      DateTime timestamp,
                      int srcPort,
                      int dstPort,
                      Optional<Integer> srcAS,
                      Optional<Integer> dstAS,
-                     long l,
-                     long l1,
+                     long pkts,
+                     long bytes,
                      int proto,
                      int tos,
                      int tcpflags,
@@ -68,15 +68,15 @@ public class NetFlowV5 {
 
         this.uuid = uuid;
         this.sender = sender;
-        this.i = i;
+        this.length = length;
         this.uptime = uptime;
         this.timestamp = timestamp;
         this.srcPort = srcPort;
         this.dstPort = dstPort;
         this.srcAS = srcAS;
         this.dstAS = dstAS;
-        this.l = l;
-        this.l1 = l1;
+        this.pkts = pkts;
+        this.bytes = bytes;
         this.proto = proto;
         this.tos = tos;
         this.tcpflags = tcpflags;
@@ -168,15 +168,15 @@ public class NetFlowV5 {
         final StringBuffer sb = new StringBuffer("NetFlowV5{");
         sb.append("uuid=").append(uuid);
         sb.append(", sender=").append(sender);
-        sb.append(", i=").append(i);
+        sb.append(", length=").append(length);
         sb.append(", uptime=").append(uptime);
         sb.append(", timestamp=").append(timestamp);
         sb.append(", srcPort=").append(srcPort);
         sb.append(", dstPort=").append(dstPort);
         sb.append(", srcAS=").append(srcAS);
         sb.append(", dstAS=").append(dstAS);
-        sb.append(", l=").append(l);
-        sb.append(", l1=").append(l1);
+        sb.append(", pkts=").append(pkts);
+        sb.append(", bytes=").append(bytes);
         sb.append(", proto=").append(proto);
         sb.append(", tos=").append(tos);
         sb.append(", tcpflags=").append(tcpflags);
