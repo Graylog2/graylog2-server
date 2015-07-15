@@ -160,7 +160,7 @@ public class NetFlowV5 {
     }
 
     public String toMessageString() {
-        return "ADD FLOW [" + srcAddress.toString() + "]:" + srcPort + " <> [" + dstAddress.toString() + "]:" + dstPort + " proto:" + proto;
+        return "ADD FLOW [" + srcAddress.toString() + "]:" + srcPort + " <> [" + dstAddress.toString() + "]:" + dstPort + " proto:" + proto + " pkts:" + pkts + " bytes:" + bytes;
     }
 
     @Override

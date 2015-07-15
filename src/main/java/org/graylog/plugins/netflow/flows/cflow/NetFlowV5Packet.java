@@ -136,7 +136,7 @@ public class NetFlowV5Packet {
                     uptime,
                     timestamp,
                     samplingInterval,
-                    true);
+                    samplingInterval > 0);
             flows.add(flowV5);
         }
 
