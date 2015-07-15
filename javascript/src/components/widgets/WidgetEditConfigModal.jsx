@@ -99,6 +99,11 @@ var WidgetEditConfigModal = React.createClass({
             this._onConfigurationChange("series", newSeries);
         };
     },
+    _onStatisticalFunctionChange(field) {
+        return (event) => {
+            this._onConfigurationChange(field, event.target.value);
+        };
+    },
     _formatDateTime(dateTime) {
         return momentHelper.toUserTimeZone(dateTime).format(momentHelper.DATE_FORMAT_NO_MS);
     },
@@ -179,9 +184,26 @@ var WidgetEditConfigModal = React.createClass({
         }
 
         switch (this.state.type) {
+            case this.props.widgetTypes.STATS_COUNT:
+                controls.push(
+                    <Input key="statsCountStatisticalFunction"
+                           type="select"
+                           label="Statistical function"
+                           defaultValue={this.state.config["stats_function"]}
+                           onChange={this._onStatisticalFunctionChange("stats_function")}
+                           help="Statistical function applied to the data.">
+                        {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                            return (
+                                <option key={statFunction} value={statFunction}>
+                                    {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                </option>
+                            );
+                        })}
+                    </Input>
+                );
+                /* falls through */
             case this.props.widgetTypes.SEARCH_RESULT_COUNT:
             case this.props.widgetTypes.STREAM_SEARCH_RESULT_COUNT:
-            case this.props.widgetTypes.STATS_COUNT:
                 controls.push(
                     <Input key="trend"
                            type="checkbox"
@@ -218,6 +240,24 @@ var WidgetEditConfigModal = React.createClass({
                            defaultChecked={this.state.config.show_data_table}
                            onChange={this._onConfigurationCheckboxChange("show_data_table")}
                            help="Include a table with quantitative information."/>
+                );
+                break;
+            case this.props.widgetTypes.FIELD_CHART:
+                controls.push(
+                    <Input key="fieldChartStatisticalFunction"
+                           type="select"
+                           label="Statistical function"
+                           defaultValue={this.state.config["valuetype"]}
+                           onChange={this._onStatisticalFunctionChange("valuetype")}
+                           help="Statistical function applied to the data.">
+                        {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                            return (
+                                <option key={statFunction} value={statFunction}>
+                                    {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                </option>
+                            );
+                        })}
+                    </Input>
                 );
                 break;
             case this.props.widgetTypes.STACKED_CHART:
