@@ -5,6 +5,7 @@
 var React = require('react');
 var Input = require('react-bootstrap').Input;
 
+var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 
 var WidgetEditConfigModal = React.createClass({
@@ -89,6 +90,15 @@ var WidgetEditConfigModal = React.createClass({
     _onKeywordTimeRangeChange(event) {
         this._onConfigurationChange("keyword", event.target.value);
     },
+    _onSeriesChange(seriesNo, field) {
+        return (event) => {
+            var newSeries = this.state.config.series;
+            newSeries[seriesNo][field] = event.target.value;
+            console.log(newSeries);
+
+            this._onConfigurationChange("series", newSeries);
+        };
+    },
     _formatDateTime(dateTime) {
         return momentHelper.toUserTimeZone(dateTime).format(momentHelper.DATE_FORMAT_NO_MS);
     },
@@ -168,45 +178,82 @@ var WidgetEditConfigModal = React.createClass({
             );
         }
 
-        if (this.state.config.hasOwnProperty("trend")) {
-            controls.push(
-                <Input key="trend"
-                       type="checkbox"
-                       label="Display trend"
-                       defaultChecked={this.state.config.trend}
-                       onChange={this._onConfigurationCheckboxChange("trend")}
-                       help="Show trend information for this number."/>
-            );
+        switch (this.state.type) {
+            case this.props.widgetTypes.SEARCH_RESULT_COUNT:
+            case this.props.widgetTypes.STREAM_SEARCH_RESULT_COUNT:
+            case this.props.widgetTypes.STATS_COUNT:
+                controls.push(
+                    <Input key="trend"
+                           type="checkbox"
+                           label="Display trend"
+                           defaultChecked={this.state.config.trend}
+                           onChange={this._onConfigurationCheckboxChange("trend")}
+                           help="Show trend information for this number."/>
+                );
 
-            controls.push(
-                <Input key="lowerIsBetter"
-                       type="checkbox"
-                       label="Lower is better"
-                       disabled={this.state.config.trend === false}
-                       defaultChecked={this.state.config.lower_is_better}
-                       onChange={this._onConfigurationCheckboxChange("lower_is_better")}
-                       help="Use green colour when trend goes down."/>
-            );
-        }
+                controls.push(
+                    <Input key="lowerIsBetter"
+                           type="checkbox"
+                           label="Lower is better"
+                           disabled={this.state.config.trend === false}
+                           defaultChecked={this.state.config.lower_is_better}
+                           onChange={this._onConfigurationCheckboxChange("lower_is_better")}
+                           help="Use green colour when trend goes down."/>
+                );
+                break;
+            case this.props.widgetTypes.QUICKVALUES:
+                controls.push(
+                    <Input key="showPieChart"
+                           type="checkbox"
+                           label="Show pie chart"
+                           defaultChecked={this.state.config.show_pie_chart}
+                           onChange={this._onConfigurationCheckboxChange("show_pie_chart")}
+                           help="Represent data in a pie chart"/>
+                );
 
-        if (this.state.config.hasOwnProperty("show_pie_chart")) {
-            controls.push(
-                <Input key="showPieChart"
-                       type="checkbox"
-                       label="Show pie chart"
-                       defaultChecked={this.state.config.show_pie_chart}
-                       onChange={this._onConfigurationCheckboxChange("show_pie_chart")}
-                       help="Represent data in a pie chart"/>
-            );
-
-            controls.push(
-                <Input key="showDataTable"
-                       type="checkbox"
-                       label="Show data table"
-                       defaultChecked={this.state.config.show_data_table}
-                       onChange={this._onConfigurationCheckboxChange("show_data_table")}
-                       help="Include a table with quantitative information."/>
-            );
+                controls.push(
+                    <Input key="showDataTable"
+                           type="checkbox"
+                           label="Show data table"
+                           defaultChecked={this.state.config.show_data_table}
+                           onChange={this._onConfigurationCheckboxChange("show_data_table")}
+                           help="Include a table with quantitative information."/>
+                );
+                break;
+            case this.props.widgetTypes.STACKED_CHART:
+                this.state.config.series.forEach((series) => {
+                    var seriesNo = this.state.config.series.indexOf(series);
+                    controls.push(
+                        <fieldset key={"series" + seriesNo}>
+                            <legend>Series #{seriesNo + 1}</legend>
+                            <Input type="text"
+                                   label="Field"
+                                   defaultValue={series["field"]}
+                                   onChange={this._onSeriesChange(seriesNo, "field")}
+                                   help="Field used to get the series value."
+                                   required/>
+                            <Input type="text"
+                                   label="Search query"
+                                   defaultValue={series["query"]}
+                                   onChange={this._onSeriesChange(seriesNo, "query")}
+                                   help="Search query that will be executed to get the series value."/>
+                            <Input type="select"
+                                   label="Statistical function"
+                                   defaultValue={series["statistical_function"]}
+                                   onChange={this._onSeriesChange(seriesNo, "statistical_function")}
+                                   help="Statistical function applied to the series.">
+                                {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                                    return (
+                                        <option key={statFunction} value={statFunction}>
+                                            {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                        </option>
+                                    );
+                                })}
+                            </Input>
+                        </fieldset>
+                    );
+                }, this);
+                break;
         }
 
         return controls;

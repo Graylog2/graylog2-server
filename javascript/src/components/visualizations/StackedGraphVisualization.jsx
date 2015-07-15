@@ -15,6 +15,7 @@ var StackedGraphVisualization = React.createClass({
     getInitialState() {
         this.normalizedData = false;
         this.series = Immutable.List();
+        this.seriesNames = Immutable.Map();
         this.barWidthScale = d3.scale.linear().domain(d3.range(0, 10000)).range(d3.range(0.6, 0, -0.01));
 
         return {
@@ -31,6 +32,7 @@ var StackedGraphVisualization = React.createClass({
         if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
             this._resizeVisualization(nextProps.width, nextProps.height);
         }
+        this._updateSeriesNames();
         this.setState({dataPoints: this._formatData(nextProps.data)}, this.drawData);
     },
     _normalizeData(data) {
@@ -68,14 +70,13 @@ var StackedGraphVisualization = React.createClass({
         var colourPalette = D3Utils.glColourPalette();
 
         var i = 0;
-        var names = Immutable.Map();
         var colours = Immutable.Map();
 
         this.props.config.series.forEach((seriesConfig) => {
             i++;
             var seriesName = "series" + i;
             this.series = this.series.push(seriesName);
-            names = names.set(seriesName, seriesConfig['statistical_function'] + " " + seriesConfig['field'] + ", \"" + seriesConfig['query'] + "\"");
+            this.seriesNames = this.seriesNames.set(seriesName, seriesConfig['statistical_function'] + " " + seriesConfig['field'] + ", \"" + seriesConfig['query'] + "\"");
             colours = colours.set(seriesName, colourPalette(seriesName));
         });
 
@@ -91,7 +92,7 @@ var StackedGraphVisualization = React.createClass({
             },
             data: {
                 columns: [],
-                names: names.toJS(),
+                names: this.seriesNames.toJS(),
                 colors: colours.toJS()
             },
             axis: {
@@ -152,6 +153,20 @@ var StackedGraphVisualization = React.createClass({
             height: height
         });
     },
+    _updateSeriesNames() {
+        var i = 0;
+        var newSeriesNames = Immutable.Map();
+        this.props.config.series.forEach((seriesConfig) => {
+            i++;
+            var seriesName = "series" + i;
+            newSeriesNames = newSeriesNames.set(seriesName, seriesConfig['statistical_function'] + " " + seriesConfig['field'] + ", \"" + seriesConfig['query'] + "\"");
+        }, this);
+
+        if (!Immutable.is(this.seriesNames, newSeriesNames)) {
+            this.seriesNames = newSeriesNames;
+            this.graph.data.names(this.seriesNames.toJS());
+        }
+    },
     drawData() {
         // Generate custom tick values for the time axis
         this.graph.internal.config.axis_x_tick_values = graphHelper.customTickInterval()(
@@ -162,7 +177,7 @@ var StackedGraphVisualization = React.createClass({
         if (this.props.config.renderer === 'bar') {
             // Automatically resize bar width
             var numberDataPoints = this.state.dataPoints.size;
-            this.graph.internal.config.bar_width_ratio = Math.max(0.01, this.barWidthScale(numberDataPoints));
+            this.graph.internal.config.bar_width_ratio = Math.max(0.015, this.barWidthScale(numberDataPoints));
         }
 
         this.graph.load({
