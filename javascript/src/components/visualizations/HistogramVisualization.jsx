@@ -10,7 +10,6 @@ var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
-var StringUtils = require('../../util/StringUtils');
 
 var HistogramVisualization = React.createClass({
     getInitialState() {
@@ -49,7 +48,7 @@ var HistogramVisualization = React.createClass({
             .centerBar(true)
             .renderHorizontalGridLines(true)
             .brushOn(false)
-            .xAxisLabel(this._formatInterval())
+            .xAxisLabel("Time")
             .yAxisLabel("Messages")
             .renderTitle(false)
             .colors(D3Utils.glColourPalette())
@@ -83,9 +82,6 @@ var HistogramVisualization = React.createClass({
                 return value % 1 === 0 ? d3.format("s")(value) : null;
             });
         this.histogram.render();
-    },
-    _formatInterval() {
-        return StringUtils.capitalizeFirstLetter(this.props.interval) + "s";
     },
     _resizeVisualization(width, height) {
         this.histogram

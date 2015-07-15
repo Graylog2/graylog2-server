@@ -10,7 +10,6 @@ var d3 = require('d3');
 var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
-var StringUtils = require('../../util/StringUtils');
 var NumberUtils = require('../../util/NumberUtils');
 
 var GraphFactory = {
@@ -99,7 +98,7 @@ var GraphVisualization = React.createClass({
             .elasticY(true)
             .renderHorizontalGridLines(true)
             .brushOn(false)
-            .xAxisLabel(this._formatInterval())
+            .xAxisLabel("Time")
             .yAxisLabel(this.props.config.field)
             .renderTitle(false)
             .colors(D3Utils.glColourPalette());
@@ -136,9 +135,6 @@ var GraphVisualization = React.createClass({
         var keyText = "<span class=\"date\">" + formattedKey + "</span>";
 
         return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
-    },
-    _formatInterval() {
-        return StringUtils.capitalizeFirstLetter(this.props.config.interval) + "s";
     },
     _resizeVisualization(width, height) {
         this.graph
