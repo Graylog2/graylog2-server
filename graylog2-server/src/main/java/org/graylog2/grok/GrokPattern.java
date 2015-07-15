@@ -36,8 +36,8 @@ public class GrokPattern {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
-                .add("name='", name)
-                .add("pattern='", pattern)
+                .add("name", name)
+                .add("pattern", pattern)
                 .add("contentPack", contentPack)
                 .toString();
     }
