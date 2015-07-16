@@ -83,7 +83,6 @@ public class StreamRouterEngine {
         final List<Rule> regexRules = Lists.newArrayList();
 
         for (Stream stream : streams) {
-            final boolean sufficient = stream.getMatchingType() == Stream.MatchingType.OR;
             for (StreamRule streamRule : stream.getStreamRules()) {
                 final Rule rule;
                 try {
@@ -182,7 +181,6 @@ public class StreamRouterEngine {
             }
         }
 
-
         for (Stream stream : result) {
             streamMetrics.markIncomingMeter(stream.getId());
         }
@@ -243,7 +241,6 @@ public class StreamRouterEngine {
         private final StreamRule rule;
         private final StreamRuleMatcher matcher;
         private final Stream.MatchingType matchingType;
-
 
         public Rule(Stream stream, StreamRule rule, Stream.MatchingType matchingType) throws InvalidStreamRuleTypeException {
             this.stream = stream;
