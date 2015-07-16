@@ -59,7 +59,7 @@ public class StreamRouterEngineTest {
         when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
-    protected StreamRouterEngine newEngine(List<Stream> streams) {
+    private StreamRouterEngine newEngine(List<Stream> streams) {
         return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
     }
 

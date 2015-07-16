@@ -18,6 +18,7 @@
 package org.graylog2.streams;
 
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -49,10 +50,10 @@ public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
 
     private final List<Stream> streams;
-    protected final StreamFaultManager streamFaultManager;
-    protected final StreamMetrics streamMetrics;
-    protected final TimeLimiter timeLimiter;
-    protected final long streamProcessingTimeout;
+    private final StreamFaultManager streamFaultManager;
+    private final StreamMetrics streamMetrics;
+    private final TimeLimiter timeLimiter;
+    private final long streamProcessingTimeout;
     private final String fingerprint;
 
     private final List<Rule> rulesList;
@@ -73,8 +74,6 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
 
-        this.rulesList = Lists.newArrayList();
-
         final List<Rule> presenceRules = Lists.newArrayList();
         final List<Rule> exactRules = Lists.newArrayList();
         final List<Rule> greaterRules = Lists.newArrayList();
@@ -82,7 +81,7 @@ public class StreamRouterEngine {
         final List<Rule> regexRules = Lists.newArrayList();
 
         for (Stream stream : streams) {
-            final Boolean sufficient = stream.getMatchingType() == Stream.MatchingType.OR;
+            final boolean sufficient = stream.getMatchingType() == Stream.MatchingType.OR;
             for (StreamRule streamRule : stream.getStreamRules()) {
                 final Rule rule;
                 try {
@@ -111,11 +110,13 @@ public class StreamRouterEngine {
             }
         }
 
-        rulesList.addAll(presenceRules);
-        rulesList.addAll(exactRules);
-        rulesList.addAll(greaterRules);
-        rulesList.addAll(smallerRules);
-        rulesList.addAll(regexRules);
+        this.rulesList = new ImmutableList.Builder<Rule>()
+                .addAll(presenceRules)
+                .addAll(exactRules)
+                .addAll(greaterRules)
+                .addAll(smallerRules)
+                .addAll(regexRules)
+                .build();
     }
 
     /**
@@ -231,7 +232,7 @@ public class StreamRouterEngine {
         return matches;
     }
 
-    protected class Rule {
+    private class Rule {
         private final Stream stream;
         private final StreamRule rule;
         private final StreamRuleMatcher matcher;
