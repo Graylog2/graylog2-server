@@ -34,6 +34,7 @@ import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +256,7 @@ public class StreamRouterEngine {
             return matchingType;
         }
 
+        @Nullable
         public Stream match(Message message) {
             // TODO Add missing message recordings!
             try (final Timer.Context timer = streamMetrics.getExecutionTimer(rule.getId()).time()) {
