@@ -147,9 +147,7 @@ PUT           /system/logging/node/:node_id/subsystem/:subsystem/:level         
 
 # Dashboards
 GET           /dashboards                                                                        @controllers.DashboardsController.index()
-GET           /dashboards/new                                                                    @controllers.DashboardsController.newDashboard()
 GET           /dashboards/:id                                                                    @controllers.DashboardsController.show(id: String)
-POST          /dashboards/create                                                                 @controllers.DashboardsController.create()
 GET           /dashboards/:id/delete                                                             @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)

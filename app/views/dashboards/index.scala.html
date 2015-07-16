@@ -23,9 +23,7 @@
 
         <div class="col-md-2">
             @if(isPermitted(DASHBOARDS_CREATE)) {
-                <a href="@routes.DashboardsController.newDashboard()" style="margin-top: 20px;" class="btn btn-lg btn-success">
-                    Create dashboard
-                </a>
+                <div class="react-create-dashboard" style="margin-top: 20px" data-button-class="btn-success btn-lg"></div>
             }
         </div>
     </div>
@@ -41,7 +39,7 @@
             @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
                 <div class="alert alert-warning">
                     <i class="fa fa-info-circle"></i>
-                    No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
+                    No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <span class="react-create-dashboard" data-button-class="btn-link btn-text">Create one now</span>. }
                 </div>
             }
         </div>

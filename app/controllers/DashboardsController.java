@@ -89,37 +89,6 @@ public class DashboardsController extends AuthenticatedController {
         }
     }
 
-    public Result newDashboard() {
-        if (!Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
-            return redirect(routes.StartpageController.redirect());
-        }
-        final BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("Dashboards", routes.DashboardsController.index());
-        bc.addCrumb("Create", routes.DashboardsController.newDashboard());
-
-        return ok(views.html.dashboards.new_dashboard.render(currentUser(), bc, createDashboardForm));
-    }
-
-    public Result create() {
-        Form<CreateDashboardRequest> form = createDashboardForm.bindFromRequest();
-        if (form.hasErrors()) {
-            flash("error", "Please fill out all fields");
-            return redirect(routes.DashboardsController.newDashboard());
-        }
-
-        try {
-            CreateDashboardRequest cdr = form.get();
-            dashboardService.create(cdr);
-        } catch (APIException e) {
-            String message = "Could not create dashboard. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        }
-
-        return redirect(routes.DashboardsController.index());
-    }
-
     public Result delete(String id) {
         try {
             dashboardService.delete(id);

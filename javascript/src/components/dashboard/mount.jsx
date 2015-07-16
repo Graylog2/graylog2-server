@@ -2,10 +2,11 @@
 
 var React = require('react');
 var TrendConfigurationModal = require('./TrendConfigurationModal');
+var component;
 
 var dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');
 if (dialogConfigurationDiv) {
-    var component = React.render(<TrendConfigurationModal />, dialogConfigurationDiv);
+    component = React.render(<TrendConfigurationModal />, dialogConfigurationDiv);
     // XXX: to make it accessible from jquery based code
     if (window) {
         window.trendDialogConfiguration = component;
@@ -22,7 +23,7 @@ $('.react-edit-dashboard').each(function() {
     var buttonClass = this.getAttribute('data-button-class');
     var content = this.innerHTML;
 
-    var component = (
+    component = (
         <EditDashboardModalTrigger id={id} action="edit" title={title} description={description} buttonClass={buttonClass}>
             {content}
         </EditDashboardModalTrigger>
@@ -30,3 +31,20 @@ $('.react-edit-dashboard').each(function() {
 
     React.render(component, this);
 });
+
+var createDashboardElements = document.getElementsByClassName('react-create-dashboard');
+var reloadOnDashboardCreated = () => document.location.reload();
+
+for (var i = 0; i < createDashboardElements.length; i++) {
+    var element = createDashboardElements[i];
+    var content = element.innerHTML;
+    var buttonClass = element.getAttribute('data-button-class');
+
+    component = (
+        <EditDashboardModalTrigger action='create' buttonClass={buttonClass} onSaved={reloadOnDashboardCreated}>
+            {content}
+        </EditDashboardModalTrigger>
+    );
+
+    React.render(component, element);
+}

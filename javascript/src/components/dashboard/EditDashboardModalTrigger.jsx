@@ -28,7 +28,7 @@ var EditDashboardModalTrigger = React.createClass({
         return (
             <span>
                 <button onClick={this.openModal}
-                    className={"btn btn-info " + this.props.buttonClass}
+                    className={"btn " + this.props.buttonClass}
                     dangerouslySetInnerHTML={triggerButtonContent}>
                 </button>
                 <EditDashboardModal ref="modal" {...this.props}/>
