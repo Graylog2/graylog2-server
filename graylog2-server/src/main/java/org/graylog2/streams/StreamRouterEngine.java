@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -190,15 +191,18 @@ public class StreamRouterEngine {
 
     private Stream matchWithTimeOut(final Message message, final Rule rule) {
         Stream matchedStream = null;
-        try {
+        try (final Timer.Context timer = streamMetrics.getExecutionTimer(rule.getStreamRule().getId()).time()) {
             matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
                 @Override
                 public Stream call() throws Exception {
                     return rule.match(message);
                 }
             }, streamProcessingTimeout, TimeUnit.MILLISECONDS, true);
-        } catch (Exception e) {
+        } catch (UncheckedTimeoutException e) {
             streamFaultManager.registerFailure(rule.getStream());
+        } catch (Exception e) {
+            LOG.warn("Unexpected error during stream matching: ", e);
+            streamMetrics.markExceptionMeter(rule.getStream().getId());
         }
 
         return matchedStream;
