@@ -34,7 +34,6 @@ import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,7 @@ public class StreamRouterEngine {
             for (StreamRule streamRule : stream.getStreamRules()) {
                 final Rule rule;
                 try {
-                    rule = new Rule(stream, streamRule, sufficient);
+                    rule = new Rule(stream, streamRule, stream.getMatchingType());
                 } catch (InvalidStreamRuleTypeException e) {
                     LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
                     continue;
@@ -150,6 +149,7 @@ public class StreamRouterEngine {
         final Set<Stream> blackList = Sets.newHashSet();
 
         for (final Rule rule : rulesList) {
+            final Stream.MatchingType matchingType = rule.getMatchingType();
             if (blackList.contains(rule.getStream())) {
                 continue;
             }
@@ -167,14 +167,14 @@ public class StreamRouterEngine {
             }
 
             if (stream == null) {
-                if (!rule.isSufficient()) {
+                if (matchingType == Stream.MatchingType.AND) {
                     result.remove(rule.getStream());
                     // blacklist stream because it can't match anymore
                     blackList.add(rule.getStream());
                 }
             } else {
                 result.add(stream);
-                if (rule.isSufficient()) {
+                if (matchingType == Stream.MatchingType.OR) {
                     // blacklist stream because it is already matched
                     blackList.add(rule.getStream());
                 }
@@ -222,7 +222,7 @@ public class StreamRouterEngine {
 
             for (final StreamRule streamRule : stream.getStreamRules()) {
                 try {
-                    final Rule rule = new Rule(stream, streamRule, null);
+                    final Rule rule = new Rule(stream, streamRule, stream.getMatchingType());
                     match.addRule(rule);
                 } catch (InvalidStreamRuleTypeException e) {
                     LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
@@ -241,19 +241,18 @@ public class StreamRouterEngine {
         private final Stream stream;
         private final StreamRule rule;
         private final StreamRuleMatcher matcher;
-        private final Boolean sufficient;
+        private final Stream.MatchingType matchingType;
 
 
-        public Rule(Stream stream, StreamRule rule, Boolean sufficient) throws InvalidStreamRuleTypeException {
+        public Rule(Stream stream, StreamRule rule, Stream.MatchingType matchingType) throws InvalidStreamRuleTypeException {
             this.stream = stream;
             this.rule = rule;
-            this.sufficient = sufficient;
+            this.matchingType = matchingType;
             this.matcher = StreamRuleMatcherFactory.build(rule.getType());
         }
 
-        @Nullable
-        public Boolean isSufficient() {
-            return sufficient;
+        public Stream.MatchingType getMatchingType() {
+            return matchingType;
         }
 
         public Stream match(Message message) {
