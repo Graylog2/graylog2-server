@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -30,10 +31,14 @@ import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.MessageListCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
@@ -76,17 +81,20 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         try {
             // always set the result of processMessage, even if it is null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
-            event.setMessage(processMessage(event.getRaw()));
+            event.setMessageList(processMessage(event.getRaw()));
         } finally {
-            if (event.getMessage() != null) {
-                event.getMessage().recordTiming(serverStatus, "decode", context.stop());
+            if (event.getMessageList() != null) {
+                for (final Message message : event.getMessageList()) {
+                    message.recordTiming(serverStatus, "decode", context.stop());
+                }
             }
             // aid garbage collection to collect the raw message early (to avoid promoting it to later generations).
             event.clearRaw();
         }
     }
 
-    private Message processMessage(RawMessage raw) throws ExecutionException {
+    @Nullable
+    private List<Message> processMessage(final RawMessage raw) throws ExecutionException {
         if (raw == null) {
             LOG.warn("Ignoring null message");
             return null;
@@ -112,14 +120,16 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        final Message message;
+        final List<Message> messages;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
         try {
-            message = codec.decode(raw);
-            if (message != null) {
-                message.setJournalOffset(raw.getJournalOffset());
+            if (codec instanceof MessageListCodec) {
+                messages = ((MessageListCodec) codec).decodeMessageList(raw);
+            } else {
+                final Message message = codec.decode(raw);
+                messages = message == null ? null : Collections.singletonList(message);
             }
         } catch (RuntimeException e) {
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
@@ -128,6 +138,24 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             decodeTime = decodeTimeCtx.stop();
         }
 
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+
+        final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+
+        for (final Message message : messages) {
+            final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime);
+
+            if (processedMessage != null) {
+                processedMessages.add(processedMessage);
+            }
+        }
+
+        return processedMessages;
+    }
+
+    private Message postProcessMessage(RawMessage raw, Codec codec, String inputIdOnCurrentNode, String baseMetricName, Message message, long decodeTime) {
         if (message == null) {
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
             return null;
@@ -140,6 +168,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             return null;
         }
 
+        message.setJournalOffset(raw.getJournalOffset());
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 
