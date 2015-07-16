@@ -23,16 +23,16 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
-import com.google.common.util.concurrent.UncheckedTimeoutException;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,17 +55,7 @@ public class StreamRouterEngine {
     protected final long streamProcessingTimeout;
     private final String fingerprint;
 
-    private final Map<String, List<Rule>> presenceRules = Maps.newHashMap();
-    private final Map<String, List<Rule>> exactRules = Maps.newHashMap();
-    private final Map<String, List<Rule>> greaterRules = Maps.newHashMap();
-    private final Map<String, List<Rule>> smallerRules = Maps.newHashMap();
-    private final Map<String, List<Rule>> regexRules = Maps.newHashMap();
-
-    private final Set<String> presenceFields = Sets.newHashSet();
-    private final Set<String> exactFields = Sets.newHashSet();
-    private final Set<String> greaterFields = Sets.newHashSet();
-    private final Set<String> smallerFields = Sets.newHashSet();
-    private final Set<String> regexFields = Sets.newHashSet();
+    private final List<Rule> rulesList;
 
     public interface Factory {
         StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
@@ -83,33 +73,49 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
 
-        for (final Stream stream : streams) {
-            for (final StreamRule streamRule : stream.getStreamRules()) {
-                try {
-                    final Rule rule = new Rule(stream, streamRule);
+        this.rulesList = Lists.newArrayList();
 
-                    switch (streamRule.getType()) {
-                        case EXACT:
-                            addRule(exactRules, exactFields, streamRule.getField(), rule);
-                            break;
-                        case GREATER:
-                            addRule(greaterRules, greaterFields, streamRule.getField(), rule);
-                            break;
-                        case SMALLER:
-                            addRule(smallerRules, smallerFields, streamRule.getField(), rule);
-                            break;
-                        case REGEX:
-                            addRule(regexRules, regexFields, streamRule.getField(), rule);
-                            break;
-                        case PRESENCE:
-                            addRule(presenceRules, presenceFields, streamRule.getField(), rule);
-                            break;
-                    }
+        final List<Rule> presenceRules = Lists.newArrayList();
+        final List<Rule> exactRules = Lists.newArrayList();
+        final List<Rule> greaterRules = Lists.newArrayList();
+        final List<Rule> smallerRules = Lists.newArrayList();
+        final List<Rule> regexRules = Lists.newArrayList();
+
+        for (Stream stream : streams) {
+            final Boolean sufficient = stream.getMatchingType() == Stream.MatchingType.OR;
+            for (StreamRule streamRule : stream.getStreamRules()) {
+                final Rule rule;
+                try {
+                    rule = new Rule(stream, streamRule, sufficient);
                 } catch (InvalidStreamRuleTypeException e) {
                     LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
+                    continue;
+                }
+                switch (streamRule.getType()) {
+                    case PRESENCE:
+                        presenceRules.add(rule);
+                        break;
+                    case EXACT:
+                        exactRules.add(rule);
+                        break;
+                    case GREATER:
+                        greaterRules.add(rule);
+                        break;
+                    case SMALLER:
+                        smallerRules.add(rule);
+                        break;
+                    case REGEX:
+                        regexRules.add(rule);
+                        break;
                 }
             }
         }
+
+        rulesList.addAll(presenceRules);
+        rulesList.addAll(exactRules);
+        rulesList.addAll(greaterRules);
+        rulesList.addAll(smallerRules);
+        rulesList.addAll(regexRules);
     }
 
     /**
@@ -137,33 +143,63 @@ public class StreamRouterEngine {
      * @return the list of matching streams
      */
     public List<Stream> match(Message message) {
-        final Map<Stream, StreamMatch> matches = Maps.newHashMap();
-        final Set<Stream> timeouts = Sets.newHashSet();
-        final List<Stream> result = Lists.newArrayList();
-        final Set<String> fieldNames = message.getFieldNames();
+        final Set<Stream> result = Sets.newHashSet();
+        final Set<Stream> blackList = Sets.newHashSet();
 
-        // Execute the rules ordered by complexity. (fast rules first)
-        matchRules(message, presenceFields, presenceRules, matches);
-        // Only pass an intersection of the rules fields to avoid checking every field! (does not work for presence matching)
-        matchRules(message, Sets.intersection(fieldNames, exactFields), exactRules, matches);
-        matchRules(message, Sets.intersection(fieldNames, greaterFields), greaterRules, matches);
-        matchRules(message, Sets.intersection(fieldNames, smallerFields), smallerRules, matches);
-        // Execute regex rules with a timeout to prevent bad regexes to hang the processing.
-        matchRulesWithTimeout(message, Sets.intersection(fieldNames, regexFields), regexRules, matches, timeouts);
+        for (final Rule rule : rulesList) {
+            if (blackList.contains(rule.getStream())) {
+                continue;
+            }
 
-        // Register failure for streams where rules ran into a timeout.
-        for (Stream stream : timeouts) {
-            streamFaultManager.registerFailure(stream);
-        }
+            final StreamRule streamRule = rule.getStreamRule();
+            if (streamRule.getType() != StreamRuleType.PRESENCE && !message.hasField(streamRule.getField())) {
+                continue;
+            }
 
-        for (Map.Entry<Stream, StreamMatch> entry : matches.entrySet()) {
-            if (entry.getValue().isMatched()) {
-                result.add(entry.getKey());
-                streamMetrics.markIncomingMeter(entry.getKey().getId());
+            final Stream stream;
+            if (streamRule.getType() != StreamRuleType.REGEX) {
+                stream = rule.match(message);
+            } else {
+                stream = matchWithTimeOut(message, rule);
+            }
+
+            if (stream == null) {
+                if (!rule.isSufficient()) {
+                    result.remove(rule.getStream());
+                    // blacklist stream because it can't match anymore
+                    blackList.add(rule.getStream());
+                }
+            } else {
+                result.add(stream);
+                if (rule.isSufficient()) {
+                    // blacklist stream because it is already matched
+                    blackList.add(rule.getStream());
+                }
             }
         }
 
-        return result;
+
+        for (Stream stream : result) {
+            streamMetrics.markIncomingMeter(stream.getId());
+        }
+
+        return Lists.newArrayList(result);
+    }
+
+    private Stream matchWithTimeOut(final Message message, final Rule rule) {
+        Stream matchedStream = null;
+        try {
+            matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
+                @Override
+                public Stream call() throws Exception {
+                    return rule.match(message);
+                }
+            }, streamProcessingTimeout, TimeUnit.MILLISECONDS, true);
+        } catch (Exception e) {
+            streamFaultManager.registerFailure(rule.getStream());
+        }
+
+        return matchedStream;
     }
 
     /**
@@ -180,7 +216,7 @@ public class StreamRouterEngine {
 
             for (final StreamRule streamRule : stream.getStreamRules()) {
                 try {
-                    final Rule rule = new Rule(stream, streamRule);
+                    final Rule rule = new Rule(stream, streamRule, null);
                     match.addRule(rule);
                 } catch (InvalidStreamRuleTypeException e) {
                     LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
@@ -195,88 +231,22 @@ public class StreamRouterEngine {
         return matches;
     }
 
-    private void matchRules(Message message, Set<String> fields, Map<String, List<Rule>> rules, Map<Stream, StreamMatch> matches) {
-        for (String field : fields) {
-            for (Rule rule : rules.get(field)) {
-                registerMatch(matches, rule.match(message));
-            }
-        }
-    }
-
-    private void matchRulesWithTimeout(final Message message, Set<String> fields, Map<String, List<Rule>> rules, Map<Stream, StreamMatch> matches, Set<Stream> timeouts) {
-        for (String field : fields) {
-            for (final Rule rule : rules.get(field)) {
-                final Callable<Stream> task = new Callable<Stream>() {
-                    @Override
-                    public Stream call() {
-                        return rule.match(message);
-                    }
-                };
-
-                try {
-                    final Stream match = timeLimiter.callWithTimeout(task, streamProcessingTimeout, TimeUnit.MILLISECONDS, true);
-
-                    registerMatch(matches, match);
-                } catch (UncheckedTimeoutException e) {
-                    timeouts.add(rule.getStream());
-                } catch (Exception e) {
-                    LOG.error("Unexpected stream rule exception.", e);
-                }
-            }
-        }
-    }
-
-    private void registerMatch(Map<Stream, StreamMatch> matches, Stream match) {
-        if (match != null) {
-            if (!matches.containsKey(match)) {
-                matches.put(match, new StreamMatch(match));
-            }
-            matches.get(match).increment();
-        }
-    }
-
-    private void addRule(Map<String, List<Rule>> rules, Set<String> fields, String field, Rule rule) {
-        fields.add(field);
-
-        if (! rules.containsKey(field)) {
-            rules.put(field, Lists.newArrayList(rule));
-        } else {
-            rules.get(field).add(rule);
-        }
-    }
-
-    private class StreamMatch {
-        private final int ruleCount;
-        private int matches = 0;
-        private final Stream stream;
-
-        public StreamMatch(Stream stream) {
-            this.stream = stream;
-            this.ruleCount = stream.getStreamRules().size();
-        }
-
-        public void increment() {
-            matches++;
-        }
-
-        public boolean isMatched() {
-            switch (stream.getMatchingType()) {
-                case AND: return ruleCount == matches;
-                case OR: return ruleCount > 0;
-                default: return ruleCount == matches;
-            }
-        }
-    }
-
     protected class Rule {
         private final Stream stream;
         private final StreamRule rule;
         private final StreamRuleMatcher matcher;
+        private final Boolean sufficient;
 
-        public Rule(Stream stream, StreamRule rule) throws InvalidStreamRuleTypeException {
+
+        public Rule(Stream stream, StreamRule rule, Boolean sufficient) throws InvalidStreamRuleTypeException {
             this.stream = stream;
             this.rule = rule;
+            this.sufficient = sufficient;
             this.matcher = StreamRuleMatcherFactory.build(rule.getType());
+        }
+
+        public Boolean isSufficient() {
+            return sufficient;
         }
 
         public Stream match(Message message) {
