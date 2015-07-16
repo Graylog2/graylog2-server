@@ -18,11 +18,13 @@ package controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.Tools;
 import org.graylog2.restclient.models.*;
@@ -46,6 +48,7 @@ public class BundlesController extends AuthenticatedController {
     private OutputService outputService;
     private StreamService streamService;
     private DashboardService dashboardService;
+    private ExtractorService extractorService;
 
     final Form<ExportBundleRequest> exportBundleForm = Form.form(ExportBundleRequest.class);
 
@@ -54,12 +57,14 @@ public class BundlesController extends AuthenticatedController {
                              InputService inputService,
                              OutputService outputService,
                              StreamService streamService,
-                             DashboardService dashboardService) {
+                             DashboardService dashboardService,
+                             ExtractorService extractorService) {
         this.bundleService = bundleService;
         this.inputService = inputService;
         this.outputService = outputService;
         this.streamService = streamService;
         this.dashboardService = dashboardService;
+        this.extractorService = extractorService;
     }
 
     public Result index() {
@@ -84,7 +89,8 @@ public class BundlesController extends AuthenticatedController {
                 (List<Input>) data.get("inputs"),
                 (List<Output>) data.get("outputs"),
                 (List<Stream>) data.get("streams"),
-                (List<Dashboard>) data.get("dashboards")
+                (List<Dashboard>) data.get("dashboards"),
+                (List<GrokPatternSummary>) data.get("grok-patterns")
         ));
     }
 
@@ -107,7 +113,8 @@ public class BundlesController extends AuthenticatedController {
                     (List<Input>) data.get("inputs"),
                     (List<Output>) data.get("outputs"),
                     (List<Stream>) data.get("streams"),
-                    (List<Dashboard>) data.get("dashboards")
+                    (List<Dashboard>) data.get("dashboards"),
+                    (List<GrokPatternSummary>) data.get("grok-patterns")
             ));
         }
 
@@ -141,6 +148,7 @@ public class BundlesController extends AuthenticatedController {
             data.put("outputs", outputService.list());
             data.put("streams", streamService.all());
             data.put("dashboards", dashboardService.getAll());
+            data.put("grok-patterns", ImmutableList.copyOf(extractorService.allGrokPatterns()));
         } catch (APIException e) {
             Logger.error("Could not fetch data. We expected HTTP 200, but got a HTTP " + e.getHttpCode());
         } catch (IOException e) {
