@@ -16,11 +16,11 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.codahale.metrics.MetricRegistry;
 import org.graylog2.bundles.BundleImporter;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.extractors.ExtractorFactory;
@@ -47,10 +47,10 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final DashboardRegistry dashboardRegistry;
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
-    private final MetricRegistry metricRegistry;
     private final Searches searches;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
+    private final GrokPatternService grokPatternService;
 
     @Inject
     public BundleImporterProvider(final InputService inputService,
@@ -63,10 +63,10 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final DashboardRegistry dashboardRegistry,
                                   final DashboardWidgetCreator dashboardWidgetCreator,
                                   final ServerStatus serverStatus,
-                                  final MetricRegistry metricRegistry,
                                   final Searches searches,
                                   final MessageInputFactory messageInputFactory,
-                                  final InputLauncher inputLauncher) {
+                                  final InputLauncher inputLauncher,
+                                  final GrokPatternService grokPatternService) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -77,17 +77,17 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.dashboardRegistry = dashboardRegistry;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
-        this.metricRegistry = metricRegistry;
         this.searches = searches;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
+        this.grokPatternService = grokPatternService;
     }
 
     @Override
     public BundleImporter get() {
         return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, outputService, dashboardService,
-                dashboardRegistry, dashboardWidgetCreator, serverStatus, metricRegistry, searches, messageInputFactory,
-                inputLauncher);
+                dashboardRegistry, dashboardWidgetCreator, serverStatus, searches,
+                messageInputFactory, inputLauncher, grokPatternService);
     }
 }

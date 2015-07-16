@@ -23,6 +23,7 @@ import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
@@ -43,6 +44,7 @@ public class BundleExporter {
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
+    private final GrokPatternService grokPatternService;
 
     private Set<String> streamSet = new HashSet<>();
 
@@ -51,12 +53,14 @@ public class BundleExporter {
                           final StreamService streamService,
                           final OutputService outputService,
                           final DashboardService dashboardService,
-                          final DashboardWidgetCreator dashboardWidgetCreator) {
+                          final DashboardWidgetCreator dashboardWidgetCreator,
+                          final GrokPatternService grokPatternService) {
         this.inputService = inputService;
         this.streamService = streamService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
+        this.grokPatternService = grokPatternService;
     }
 
     public ConfigurationBundle export(final ExportBundle exportBundle) {
@@ -67,11 +71,13 @@ public class BundleExporter {
         final Set<Dashboard> dashboards = exportDashboards(exportBundle.getDashboards());
         final Set<Output> outputs = exportOutputs(exportBundle.getOutputs());
         final Set<Stream> streams = exportStreams(streamSet);
+        final Set<GrokPattern> grokPatterns = exportGrokPatterns(exportBundle.getGrokPatterns());
         final Set<Input> inputs = exportInputs(exportBundle.getInputs());
 
         configurationBundle.setName(exportBundle.getName());
         configurationBundle.setCategory(exportBundle.getCategory());
         configurationBundle.setDescription(exportBundle.getDescription());
+        configurationBundle.setGrokPatterns(grokPatterns);
         configurationBundle.setInputs(inputs);
         configurationBundle.setStreams(streams);
         configurationBundle.setOutputs(outputs);
@@ -80,13 +86,38 @@ public class BundleExporter {
         return configurationBundle;
     }
 
+    private Set<GrokPattern> exportGrokPatterns(final Set<String> grokPatterns) {
+        final ImmutableSet.Builder<GrokPattern> grokPatternBuilder = ImmutableSet.builder();
+
+        for (String name : grokPatterns) {
+            final GrokPattern grokPattern = exportGrokPattern(name);
+            if (grokPattern != null) {
+                grokPatternBuilder.add(grokPattern);
+            }
+        }
+
+        return grokPatternBuilder.build();
+    }
+
+    private GrokPattern exportGrokPattern(final String grokPatternName) {
+        final org.graylog2.grok.GrokPattern grokPattern;
+        try {
+            grokPattern = grokPatternService.load(grokPatternName);
+        } catch (NotFoundException e) {
+            LOG.debug("Requested grok pattern \"{}\" not found.", grokPatternName);
+            return null;
+        }
+
+        return GrokPattern.create(grokPattern.name, grokPattern.pattern);
+    }
+
     private Set<Input> exportInputs(final Set<String> inputs) {
         final ImmutableSet.Builder<Input> inputBuilder = ImmutableSet.builder();
 
         for (String inputId : inputs) {
             final Input input = exportInput(inputId);
             if (input != null) {
-                inputBuilder.add(exportInput(inputId));
+                inputBuilder.add(input);
             }
         }
 
@@ -312,7 +343,7 @@ public class BundleExporter {
                 final Object streamId = widgetConfig.get("stream_id");
                 if (streamId instanceof String) {
                     if (streamSet.add((String) streamId)) {
-                        LOG.debug("Adding stream {} to export list", (String) streamId);
+                        LOG.debug("Adding stream {} to export list", streamId);
                     }
                 }
 
