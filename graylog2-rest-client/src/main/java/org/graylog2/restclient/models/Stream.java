@@ -48,7 +48,7 @@ public class Stream {
     }
 
     private final ApiClient api;
-	
+
 	private final String id;
     private final String title;
     private final String description;
@@ -149,6 +149,7 @@ public class Stream {
                 .execute();
     }
 
+    @JsonIgnore
     public List<Alert> getAlerts() throws APIException, IOException {
         return getAlertsSince(0);
     }
@@ -163,6 +164,7 @@ public class Stream {
         return alerts;
     }
 
+    @JsonIgnore
     public Long getTotalAlerts() throws APIException, IOException {
         return getAlertsInformation(0).total;
     }
@@ -204,6 +206,7 @@ public class Stream {
         return (disabled != null && disabled);
     }
 
+    @JsonIgnore
     private AlertsResponse getAlertsInformation(int since) throws APIException, IOException {
         if (alertsResponse == null) {
             ApiRequestBuilder<AlertsResponse> call = api.path(routes.StreamAlertResource().list(getId()), AlertsResponse.class);
@@ -218,6 +221,7 @@ public class Stream {
         return alertsResponse;
     }
 
+    @JsonIgnore
     public int getActiveAlerts() throws APIException, IOException {
         CheckConditionResponse response = streamService.activeAlerts(this.getId());
         int size = (response.results == null ? 0 : response.results.size());
@@ -225,6 +229,7 @@ public class Stream {
         return size;
     }
 
+    @JsonIgnore
     public long getThroughput() throws APIException, IOException {
         long result = 0;
         final Map<Node, StreamThroughputResponse> throughputResponses = api.path(routes.StreamResource().oneStreamThroughput(getId()), StreamThroughputResponse.class)
@@ -239,10 +244,12 @@ public class Stream {
     }
 
 
+    @JsonIgnore
     public List<String> getUserAlertReceivers() {
         return userAlertReceivers;
     }
 
+    @JsonIgnore
     public List<String> getEmailAlertReceivers() {
         return emailAlertReceivers;
     }
