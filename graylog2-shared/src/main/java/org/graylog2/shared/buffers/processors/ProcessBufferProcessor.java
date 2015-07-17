@@ -70,19 +70,16 @@ public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent
 
     private void dispatchMessage(final Message msg) {
         incomingMessages.mark();
-        final Timer.Context tcx = processTime.time();
-
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
-        try {
+        try (final Timer.Context ignored = processTime.time()) {
             LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
             handleMessage(msg);
         } catch (Exception e) {
             LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
         } finally {
             outgoingMessages.mark();
-            tcx.stop();
         }
     }
 
