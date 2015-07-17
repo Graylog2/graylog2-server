@@ -114,16 +114,20 @@ public abstract class SearchResource extends RestResource {
         }
     }
 
-    protected org.graylog2.indexer.results.HistogramResult fieldHistogram(String field, String query, String interval,
-                                                                          String filter, org.graylog2.indexer.searches.timeranges.TimeRange timeRange) throws InvalidRangeFormatException {
+    protected org.graylog2.indexer.results.HistogramResult fieldHistogram(String field,
+                                                                          String query,
+                                                                          String interval,
+                                                                          String filter,
+                                                                          org.graylog2.indexer.searches.timeranges.TimeRange timeRange,
+                                                                          boolean includeCardinality) throws InvalidRangeFormatException {
         try {
             return searches.fieldHistogram(
                     query,
                     field,
                     Searches.DateHistogramInterval.valueOf(interval),
                     filter,
-                    timeRange
-            );
+                    timeRange,
+                    includeCardinality);
         } catch (Searches.FieldTypeException e) {
             LOG.error("Field histogram query failed. Make sure that field [{}] is a numeric type.", field);
             throw new BadRequestException();

@@ -279,14 +279,17 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
             @QueryParam("interval") @NotEmpty String interval,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "cardinality", value = "Calculate the cardinality of the field as well", required = false) @QueryParam("cardinality") boolean includeCardinality
+    ) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         interval = interval.toUpperCase();
         validateInterval(interval);
 
         try {
-            return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildRelativeTimeRange(range)));
+            return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildRelativeTimeRange(range),
+                                                       includeCardinality));
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

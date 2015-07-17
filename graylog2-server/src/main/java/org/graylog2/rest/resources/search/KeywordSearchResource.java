@@ -277,14 +277,17 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
             @QueryParam("interval") @NotEmpty String interval,
             @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "cardinality", value = "Calculate the cardinality of the field as well", required = false) @QueryParam("cardinality") boolean includeCardinality
+    ) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         interval = interval.toUpperCase();
         validateInterval(interval);
 
         try {
-            return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildKeywordTimeRange(keyword)));
+            return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildKeywordTimeRange(keyword),
+                                                       includeCardinality));
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

@@ -37,6 +37,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
@@ -463,14 +464,23 @@ public class Searches {
                 r.getTook());
     }
 
-    public HistogramResult fieldHistogram(String query, String field, DateHistogramInterval interval, String filter, TimeRange range) throws FieldTypeException {
+    public HistogramResult fieldHistogram(String query,
+                                          String field,
+                                          DateHistogramInterval interval,
+                                          String filter,
+                                          TimeRange range,
+                                          boolean includeCardinality) throws FieldTypeException {
+        final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
+                .field("timestamp")
+                .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
+                .interval(interval.toESInterval());
+
+        if (includeCardinality) {
+            dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
+        }
+
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
-                .subAggregation(
-                        AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                                .field("timestamp")
-                                .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
-                                .interval(interval.toESInterval())
-                )
+                .subAggregation(dateHistogramBuilder)
                 .filter(standardFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
