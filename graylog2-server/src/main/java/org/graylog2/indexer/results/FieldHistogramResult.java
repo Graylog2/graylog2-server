@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.MutableDateTime;
@@ -67,6 +68,10 @@ public class FieldHistogramResult extends HistogramResult {
             resultMap.put("max", stats.getMax());
             resultMap.put("total", stats.getSum());
             resultMap.put("mean", stats.getAvg());
+
+            // cardinality is only calculated if it was explicitly requested, so this might be null
+            final Cardinality cardinality = b.getAggregations().get(Searches.AGG_CARDINALITY);
+            resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getValue());
 
             final long timestamp = b.getKeyAsDate().getMillis() / 1000L;
             if (timestamp < minTimestamp) minTimestamp = timestamp;

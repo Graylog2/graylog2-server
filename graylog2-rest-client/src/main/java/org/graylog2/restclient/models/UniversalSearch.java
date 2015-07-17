@@ -255,7 +255,7 @@ public class UniversalSearch {
                 .execute();
     }
 
-    public FieldHistogramResponse fieldHistogram(String field, String interval) throws IOException, APIException {
+    public FieldHistogramResponse fieldHistogram(String field, String interval, boolean isCardinality) throws IOException, APIException {
         PathMethod routePath;
         switch (timeRange.getType()) {
             case ABSOLUTE:
@@ -276,6 +276,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .queryParam("cardinality", Boolean.toString(isCardinality))
                 .timeout(apiTimeout("search_universal_fieldhistogram", KEITH, TimeUnit.SECONDS))
                 .execute();
     }

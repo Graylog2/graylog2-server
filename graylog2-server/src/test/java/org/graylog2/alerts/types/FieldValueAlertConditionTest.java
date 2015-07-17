@@ -30,6 +30,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -147,7 +148,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
 
     protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
-            when(searches.fieldStats(anyString(), Matchers.eq("*"), anyString(), any(RelativeRange.class))).thenReturn(fieldStatsResult);
+            when(searches.fieldStats(anyString(), Matchers.eq("*"), anyString(), any(RelativeRange.class), anyBoolean(), anyBoolean())).thenReturn(fieldStatsResult);
         } catch (InvalidRangeFormatException | Searches.FieldTypeException e) {
             assertNotNull("This should not return an exception!", e);
         }

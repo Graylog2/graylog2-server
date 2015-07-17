@@ -25,8 +25,6 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.search.SearchHit;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
@@ -294,7 +292,7 @@ public class SearchesTest {
     @SuppressWarnings("unchecked")
     public void testFieldHistogram() throws Exception {
         final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range);
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
 
         assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.MINUTE);
         assertThat(h.getHistogramBoundaries()).isEqualTo(range);
@@ -313,7 +311,7 @@ public class SearchesTest {
     @SuppressWarnings("unchecked")
     public void fieldHistogramRecordsMetrics() throws Exception {
         final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range);
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);

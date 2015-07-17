@@ -53,6 +53,9 @@ public abstract class FieldStatsResult {
     @JsonProperty
     public abstract String builtQuery();
 
+    @JsonProperty
+    public abstract long cardinality();
+
     public static FieldStatsResult create(long time,
                                           long count,
                                           double sum,
@@ -62,8 +65,9 @@ public abstract class FieldStatsResult {
                                           double max,
                                           double variance,
                                           double stdDeviation,
-                                          String builtQuery) {
+                                          String builtQuery,
+                                          long cardinality) {
         return new AutoValue_FieldStatsResult(time, count, sum, sumOfSquares, mean, min, max,
-                variance, stdDeviation, builtQuery);
+                variance, stdDeviation, builtQuery, cardinality);
     }
 }
