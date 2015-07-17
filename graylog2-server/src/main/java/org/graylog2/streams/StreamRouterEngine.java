@@ -163,7 +163,7 @@ public class StreamRouterEngine {
             if (streamRuleType != StreamRuleType.REGEX) {
                 stream = rule.match(message);
             } else {
-                stream = matchWithTimeOut(message, rule);
+                stream = rule.matchWithTimeOut(message, streamProcessingTimeout, TimeUnit.MILLISECONDS);
             }
 
             final Stream.MatchingType matchingType = rule.getMatchingType();
@@ -187,26 +187,6 @@ public class StreamRouterEngine {
         }
 
         return ImmutableList.copyOf(result);
-    }
-
-    @Nullable
-    private Stream matchWithTimeOut(final Message message, final Rule rule) {
-        Stream matchedStream = null;
-        try (final Timer.Context ignored = streamMetrics.getExecutionTimer(rule.getStreamRule().getId()).time()) {
-            matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
-                @Override
-                public Stream call() throws Exception {
-                    return rule.match(message);
-                }
-            }, streamProcessingTimeout, TimeUnit.MILLISECONDS, true);
-        } catch (UncheckedTimeoutException e) {
-            streamFaultManager.registerFailure(rule.getStream());
-        } catch (Exception e) {
-            LOG.warn("Unexpected error during stream matching: ", e);
-            streamMetrics.markExceptionMeter(rule.getStream().getId());
-        }
-
-        return matchedStream;
     }
 
     /**
@@ -271,6 +251,27 @@ public class StreamRouterEngine {
                 streamMetrics.markExceptionMeter(rule.getStreamId());
                 return null;
             }
+        }
+
+        @Nullable
+        private Stream matchWithTimeOut(final Message message, long timeout, TimeUnit unit) {
+            Stream matchedStream = null;
+            try (final Timer.Context ignored = streamMetrics.getExecutionTimer(rule.getId()).time()) {
+                matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
+                    @Override
+                    @Nullable
+                    public Stream call() throws Exception {
+                        return match(message);
+                    }
+                }, timeout, unit, true);
+            } catch (UncheckedTimeoutException e) {
+                streamFaultManager.registerFailure(stream);
+            } catch (Exception e) {
+                LOG.warn("Unexpected error during stream matching", e);
+                streamMetrics.markExceptionMeter(rule.getStreamId());
+            }
+
+            return matchedStream;
         }
 
         public StreamRule getStreamRule() {
