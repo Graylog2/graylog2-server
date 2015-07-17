@@ -206,7 +206,6 @@ public class Stream {
         return (disabled != null && disabled);
     }
 
-    @JsonIgnore
     private AlertsResponse getAlertsInformation(int since) throws APIException, IOException {
         if (alertsResponse == null) {
             ApiRequestBuilder<AlertsResponse> call = api.path(routes.StreamAlertResource().list(getId()), AlertsResponse.class);
