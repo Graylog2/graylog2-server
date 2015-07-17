@@ -525,7 +525,7 @@ public class BundleImporter {
                 timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
                 break;
             case "keyword":
-                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
+                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"), true);
                 break;
             case "absolute":
                 final String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
