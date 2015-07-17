@@ -188,9 +188,10 @@ public class StreamRouterEngine {
         return ImmutableList.copyOf(result);
     }
 
+    @Nullable
     private Stream matchWithTimeOut(final Message message, final Rule rule) {
         Stream matchedStream = null;
-        try (final Timer.Context timer = streamMetrics.getExecutionTimer(rule.getStreamRule().getId()).time()) {
+        try (final Timer.Context ignored = streamMetrics.getExecutionTimer(rule.getStreamRule().getId()).time()) {
             matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
                 @Override
                 public Stream call() throws Exception {
@@ -256,7 +257,7 @@ public class StreamRouterEngine {
         @Nullable
         public Stream match(Message message) {
             // TODO Add missing message recordings!
-            try (final Timer.Context timer = streamMetrics.getExecutionTimer(rule.getId()).time()) {
+            try (final Timer.Context ignored = streamMetrics.getExecutionTimer(rule.getId()).time()) {
                 if (matcher.match(message, rule)) {
                     return stream;
                 } else {
