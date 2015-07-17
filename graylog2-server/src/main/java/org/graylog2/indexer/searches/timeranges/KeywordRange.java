@@ -22,38 +22,25 @@ import org.graylog2.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class KeywordRange implements TimeRange {
     private static final NaturalDateParser DATE_PARSER = new NaturalDateParser();
-
     private final String keyword;
-    private final boolean dynamic;
 
-    private DateTime from;
-    private DateTime to;
-
-    public KeywordRange(String keyword, boolean dynamic) throws InvalidRangeParametersException {
+    public KeywordRange(String keyword) throws InvalidRangeParametersException {
         if (isNullOrEmpty(keyword)) {
             throw new InvalidRangeParametersException();
         }
 
         try {
-            NaturalDateParser.Result result = parseKeyword(keyword);
-            from = result.getFrom();
-            to = result.getTo();
+            parseKeyword(keyword);
         } catch (NaturalDateParser.DateNotParsableException e) {
             throw new InvalidRangeParametersException("Could not parse from natural date: " + keyword);
         }
 
         this.keyword = keyword;
-        this.dynamic = dynamic;
-    }
-
-    public KeywordRange(String keyword) throws InvalidRangeParametersException {
-        this(keyword, false);
     }
 
     private NaturalDateParser.Result parseKeyword(String keyword) throws NaturalDateParser.DateNotParsableException {
@@ -79,19 +66,17 @@ public class KeywordRange implements TimeRange {
 
     public DateTime getFrom() {
         try {
-            return dynamic ? parseKeyword(keyword).getFrom() : from;
+            return parseKeyword(keyword).getFrom();
         } catch (NaturalDateParser.DateNotParsableException e) {
-            // This should never happen
-            return from;
+            return null;
         }
     }
 
     public DateTime getTo() {
         try {
-            return dynamic ? parseKeyword(keyword).getTo() : to;
+            return parseKeyword(keyword).getTo();
         } catch (NaturalDateParser.DateNotParsableException e) {
-            // This should never happen
-            return to;
+            return null;
         }
     }
 
@@ -110,13 +95,13 @@ public class KeywordRange implements TimeRange {
         if (o == null || getClass() != o.getClass()) return false;
 
         KeywordRange that = (KeywordRange) o;
-        return dynamic == that.dynamic && keyword.equals(that.keyword);
+        return keyword.equals(that.keyword);
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(keyword, dynamic);
+        return keyword.hashCode();
     }
 }
 

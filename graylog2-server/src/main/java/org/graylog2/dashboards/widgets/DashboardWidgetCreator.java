@@ -73,7 +73,7 @@ public class DashboardWidgetCreator {
                 timeRange = new RelativeRange(Integer.parseInt(String.valueOf(awr.config().get("range"))));
                 break;
             case "keyword":
-                timeRange = new KeywordRange((String) awr.config().get("keyword"), true);
+                timeRange = new KeywordRange((String) awr.config().get("keyword"));
                 break;
             case "absolute":
                 timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
@@ -110,7 +110,7 @@ public class DashboardWidgetCreator {
                 timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
                 break;
             case "keyword":
-                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"), true);
+                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
                 break;
             case "absolute":
                 String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
