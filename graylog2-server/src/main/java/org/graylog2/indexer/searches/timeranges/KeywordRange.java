@@ -84,6 +84,8 @@ public class KeywordRange implements TimeRange {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("keyword", getKeyword())
+                .add("from", getFrom())
+                .add("to", getTo())
                 .toString();
     }
 
