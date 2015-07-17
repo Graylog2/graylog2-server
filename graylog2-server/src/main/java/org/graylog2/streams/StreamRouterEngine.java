@@ -18,6 +18,7 @@
 package org.graylog2.streams;
 
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -184,7 +185,7 @@ public class StreamRouterEngine {
             streamMetrics.markIncomingMeter(stream.getId());
         }
 
-        return Lists.newArrayList(result);
+        return ImmutableList.copyOf(result);
     }
 
     private Stream matchWithTimeOut(final Message message, final Rule rule) {
