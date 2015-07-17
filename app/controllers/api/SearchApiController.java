@@ -175,7 +175,10 @@ public class SearchApiController extends AuthenticatedController {
 
         try {
             UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
-            FieldHistogramResponse histo = search.fieldHistogram(field, interval);
+            final boolean isCardinality = "cardinality".equalsIgnoreCase(valueType);
+            FieldHistogramResponse histo = search.fieldHistogram(field,
+                                                                 interval,
+                                                                 isCardinality);
 
             Map<String, Object> result = Maps.newHashMap();
             AbsoluteRange boundaries = histo.getHistogramBoundaries();
