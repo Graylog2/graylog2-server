@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     }
 
     @Nullable
-    private List<Message> processMessage(final RawMessage raw) throws ExecutionException {
+    private Collection<Message> processMessage(final RawMessage raw) throws ExecutionException {
         if (raw == null) {
             LOG.warn("Ignoring null message");
             return null;
@@ -120,7 +121,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        final List<Message> messages;
+        final Collection<Message> messages;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;

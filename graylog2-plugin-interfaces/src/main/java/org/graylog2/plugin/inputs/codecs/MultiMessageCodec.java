@@ -28,9 +28,9 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Collection;
 
 public interface MultiMessageCodec extends Codec {
     @Nullable
-    List<Message> decodeMessages(@Nonnull RawMessage rawMessage);
+    Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage);
 }
