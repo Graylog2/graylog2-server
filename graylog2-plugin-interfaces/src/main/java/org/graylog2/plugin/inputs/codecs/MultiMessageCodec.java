@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public interface MessageListCodec extends Codec {
+public interface MultiMessageCodec extends Codec {
     @Nullable
-    List<Message> decodeMessageList(@Nonnull RawMessage rawMessage);
+    List<Message> decodeMessages(@Nonnull RawMessage rawMessage);
 }

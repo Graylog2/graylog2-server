@@ -25,7 +25,7 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Collection;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -57,7 +57,7 @@ public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent
         // TODO The DecodingProcessor does not need to be a EventHandler. We decided to do it like this to keep the change as small as possible for 1.0.0.
         decodingProcessor.onEvent(event, 0L, false);
 
-        final List<Message> messageList = event.getMessageList();
+        final Collection<Message> messageList = event.getMessages();
         if (messageList == null) {
             // skip message events which could not be decoded properly
             return;

@@ -31,7 +31,7 @@ import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.codecs.MessageListCodec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,10 +81,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         try {
             // always set the result of processMessage, even if it is null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
-            event.setMessageList(processMessage(event.getRaw()));
+            event.setMessages(processMessage(event.getRaw()));
         } finally {
-            if (event.getMessageList() != null) {
-                for (final Message message : event.getMessageList()) {
+            if (event.getMessages() != null) {
+                for (final Message message : event.getMessages()) {
                     message.recordTiming(serverStatus, "decode", context.stop());
                 }
             }
@@ -125,8 +125,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
         try {
-            if (codec instanceof MessageListCodec) {
-                messages = ((MessageListCodec) codec).decodeMessageList(raw);
+            if (codec instanceof MultiMessageCodec) {
+                messages = ((MultiMessageCodec) codec).decodeMessages(raw);
             } else {
                 final Message message = codec.decode(raw);
                 messages = message == null ? null : Collections.singletonList(message);
