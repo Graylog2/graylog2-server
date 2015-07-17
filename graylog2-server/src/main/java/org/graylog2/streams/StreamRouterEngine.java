@@ -18,7 +18,6 @@
 package org.graylog2.streams;
 
 import com.codahale.metrics.Timer;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -111,13 +110,13 @@ public class StreamRouterEngine {
             }
         }
 
-        this.rulesList = new ImmutableList.Builder<Rule>()
-                .addAll(presenceRules)
-                .addAll(exactRules)
-                .addAll(greaterRules)
-                .addAll(smallerRules)
-                .addAll(regexRules)
-                .build();
+        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + regexRules.size();
+        this.rulesList = Lists.newArrayListWithCapacity(size);
+        this.rulesList.addAll(presenceRules);
+        this.rulesList.addAll(exactRules);
+        this.rulesList.addAll(greaterRules);
+        this.rulesList.addAll(smallerRules);
+        this.rulesList.addAll(regexRules);
     }
 
     /**
