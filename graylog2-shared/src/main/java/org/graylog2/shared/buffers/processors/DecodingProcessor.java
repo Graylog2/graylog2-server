@@ -126,6 +126,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
         try {
+            // This is ugly but needed for backwards compatibility of the Codec interface in 1.x.
+            // TODO The Codec interface should be changed for 2.0 to support collections of messages so we can remove this hack.
             if (codec instanceof MultiMessageCodec) {
                 messages = ((MultiMessageCodec) codec).decodeMessages(raw);
             } else {
