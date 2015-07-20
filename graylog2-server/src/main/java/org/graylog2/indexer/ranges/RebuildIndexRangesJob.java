@@ -95,6 +95,10 @@ public class RebuildIndexRangesJob extends SystemJob {
 
         final Stopwatch sw = Stopwatch.createStarted();
         for (String index : indexNames) {
+            if(index.equals(indices.getMetaIndexName())) {
+                continue;
+            }
+
             if (cancelRequested) {
                 info("Stop requested. Not calculating next index range, not updating ranges.");
                 sw.stop();
