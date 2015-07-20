@@ -13,6 +13,7 @@ import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 
 @Codec(name = "netflow", displayName = "Netflow")
-public class NetflowCodec extends AbstractCodec {
+public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
     private static final Logger LOG = LoggerFactory.getLogger(NetflowCodec.class);
 
     @Inject
@@ -34,8 +36,12 @@ public class NetflowCodec extends AbstractCodec {
     @Nullable
     @Override
     public Message decode(RawMessage rawMessage) {
-        LOG.info("DECODE NETFLOW");
+        throw new UnsupportedOperationException("MessageListCodec does not support decode()");
+    }
 
+    @Nullable
+    @Override
+    public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
         try {
             final NetFlowV5Packet packet = NetFlowParser.parse(rawMessage);
 
@@ -53,12 +59,11 @@ public class NetflowCodec extends AbstractCodec {
                 LOG.info("NetFLow Message: {}", message);
             }
 
-            //LOG.info("NetFlow packet: count={} - {}", packet.getCount(), packet);
+            return messages;
         } catch (FlowException e) {
             LOG.error("Error parsing NetFlow packet", e);
+            return null;
         }
-
-        return null;
     }
 
     @FactoryClass
