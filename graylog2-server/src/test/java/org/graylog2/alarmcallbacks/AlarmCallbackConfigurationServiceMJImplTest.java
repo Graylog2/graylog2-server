@@ -16,63 +16,28 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import com.codahale.metrics.json.MetricsModule;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnectionRule;
-import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
-import org.graylog2.shared.jackson.SizeSerializer;
-import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AlarmCallbackConfigurationServiceMJImplTest {
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
-
-    @Rule
-    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
-
+public class AlarmCallbackConfigurationServiceMJImplTest extends MongoDBServiceTest {
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
-            .registerModule(new JodaModule())
-            .registerModule(new GuavaModule())
-            .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-            .registerModule(new SimpleModule()
-                    .addSerializer(new ObjectIdSerializer())
-                    .addSerializer(new RangeJsonSerializer())
-                    .addSerializer(new SizeSerializer()));
-
-    private final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
     @Before
     public void setUpService() throws Exception {

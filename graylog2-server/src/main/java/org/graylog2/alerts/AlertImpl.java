@@ -32,6 +32,12 @@ import java.util.Map;
 
 @CollectionName("alerts")
 public class AlertImpl extends PersistedImpl implements Alert {
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_CONDITION_ID = "condition_id";
+    private static final String FIELD_STREAM_ID = "stream_id";
+    private static final String FIELD_DESCRIPTION = "description";
+    private static final String FIELD_CONDITION_PARAMETERS = "condition_parameters";
+    private static final String FIELD_TRIGGERED_AT = "triggered_at";
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertImpl.class);
 
@@ -49,14 +55,14 @@ public class AlertImpl extends PersistedImpl implements Alert {
     public Map<String,Object> toMap() {
         Map<String, Object> map = Maps.newHashMap();
 
-        DateTime triggeredAt = new DateTime(fields.get("triggered_at"), DateTimeZone.UTC);
+        DateTime triggeredAt = new DateTime(fields.get(FIELD_TRIGGERED_AT), DateTimeZone.UTC);
 
-        map.put("id", fields.get("_id").toString());
-        map.put("condition_id", fields.get("condition_id"));
-        map.put("stream_id", fields.get("stream_id"));
-        map.put("description", fields.get("description"));
-        map.put("condition_parameters", fields.get("condition_parameters"));
-        map.put("triggered_at", Tools.getISO8601String(triggeredAt));
+        map.put("id", fields.get(FIELD_ID).toString());
+        map.put(FIELD_CONDITION_ID, fields.get(FIELD_CONDITION_ID));
+        map.put(FIELD_STREAM_ID, fields.get(FIELD_STREAM_ID));
+        map.put(FIELD_DESCRIPTION, fields.get(FIELD_DESCRIPTION));
+        map.put(FIELD_CONDITION_PARAMETERS, fields.get(FIELD_CONDITION_PARAMETERS));
+        map.put(FIELD_TRIGGERED_AT, Tools.getISO8601String(triggeredAt));
 
         return map;
     }
@@ -73,26 +79,26 @@ public class AlertImpl extends PersistedImpl implements Alert {
 
     @Override
     public String getStreamId() {
-        return (String) fields.get("stream_id");
+        return (String) fields.get(FIELD_STREAM_ID);
     }
 
     @Override
     public String getConditionId() {
-        return (String) fields.get("condition_id");
+        return (String) fields.get(FIELD_CONDITION_ID);
     }
 
     @Override
     public DateTime getTriggeredAt() {
-        return (DateTime) fields.get("triggered_at");
+        return (DateTime) fields.get(FIELD_TRIGGERED_AT);
     }
 
     @Override
     public String getDescription() {
-        return (String) fields.get("description");
+        return (String) fields.get(FIELD_DESCRIPTION);
     }
 
     @Override
     public Map<String, Object> getConditionParameters() {
-        return (Map<String, Object>) fields.get("condition_parameters");
+        return (Map<String, Object>) fields.get(FIELD_CONDITION_PARAMETERS);
     }
 }

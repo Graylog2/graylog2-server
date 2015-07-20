@@ -24,13 +24,6 @@ import java.util.List;
 
 @ImplementedBy(AlarmCallbackHistoryServiceImpl.class)
 public interface AlarmCallbackHistoryService {
-    List<AlarmCallbackHistory> getForAlarmCallbackConfiguration(AlarmCallbackConfiguration alarmCallbackConfiguration);
-    List<AlarmCallbackHistory> getForAlarmCallbackConfiguration(AlarmCallbackConfiguration alarmCallbackConfiguration, int skip, int limit);
-    List<AlarmCallbackHistory> getForAlarmCallbackConfigurationId(String alarmCallbackConfigurationId);
-    List<AlarmCallbackHistory> getForAlarmCallbackConfigurationId(String alarmCallbackConfigurationId, int skip, int limit);
-    List<AlarmCallbackHistory> getForAlert(Alert alert);
-    List<AlarmCallbackHistory> getForAlert(Alert alert, int skip, int limit);
-    List<AlarmCallbackHistory> getForAlertId(String alertId);
     List<AlarmCallbackHistory> getForAlertId(String alertId, int skip, int limit);
     AlarmCallbackHistory save(AlarmCallbackHistory alarmCallbackHistory);
     AlarmCallbackHistory success(AlarmCallbackConfiguration alarmCallbackConfiguration, Alert alert, AlertCondition alertCondition);

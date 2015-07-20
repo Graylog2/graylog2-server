@@ -45,44 +45,8 @@ public class AlarmCallbackHistoryServiceImpl implements AlarmCallbackHistoryServ
     }
 
     @Override
-    public List<AlarmCallbackHistory> getForAlarmCallbackConfiguration(AlarmCallbackConfiguration alarmCallbackConfiguration) {
-        return getForAlarmCallbackConfiguration(alarmCallbackConfiguration, 0, 0);
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlarmCallbackConfiguration(AlarmCallbackConfiguration alarmCallbackConfiguration, int skip, int limit) {
-        return getForAlarmCallbackConfigurationId(alarmCallbackConfiguration.getId(), skip, limit);
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlarmCallbackConfigurationId(String alarmCallbackConfigurationId) {
-        return getForAlarmCallbackConfigurationId(alarmCallbackConfigurationId, 0, 0);
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlarmCallbackConfigurationId(String alarmCallbackConfigurationId, int skip, int limit) {
-        return toAbstractListType(coll.find(DBQuery.is("alarmcallbackconfiguration_id", alarmCallbackConfigurationId))
-                .skip(skip).limit(limit).toArray());
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlert(Alert alert) {
-        return getForAlert(alert, 0, 0);
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlert(Alert alert, int skip, int limit) {
-        return getForAlertId(alert.getId(), skip, limit);
-    }
-
-    @Override
-    public List<AlarmCallbackHistory> getForAlertId(String alertId) {
-        return getForAlertId(alertId, 0, 0);
-    }
-
-    @Override
     public List<AlarmCallbackHistory> getForAlertId(String alertId, int skip, int limit) {
-        return toAbstractListType(coll.find(DBQuery.is("alert_id", alertId)).skip(skip).limit(limit).toArray());
+        return toAbstractListType(coll.find(DBQuery.is(AlarmCallbackHistoryImpl.FIELD_ALERTID, alertId)).skip(skip).limit(limit).toArray());
     }
 
     @Override

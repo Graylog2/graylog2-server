@@ -26,14 +26,18 @@ import java.util.List;
 @AutoValue
 @JsonAutoDetect
 public abstract class AlarmCallbackHistoryListSummary {
+    private static final String FIELD_TOTAL = "total";
+    private static final String FIELD_HISTORIES = "histories";
+
     @JsonProperty
     public abstract int total();
 
-    @JsonProperty("histories")
+    @JsonProperty(FIELD_HISTORIES)
     public abstract List<AlarmCallbackHistorySummary> histories();
 
     @JsonCreator
-    public static AlarmCallbackHistoryListSummary create(@JsonProperty("total") int total, @JsonProperty("histories") List<AlarmCallbackHistorySummary> histories) {
+    public static AlarmCallbackHistoryListSummary create(@JsonProperty(FIELD_TOTAL) int total,
+                                                         @JsonProperty(FIELD_HISTORIES) List<AlarmCallbackHistorySummary> histories) {
         return new AutoValue_AlarmCallbackHistoryListSummary(total, histories);
     }
 
