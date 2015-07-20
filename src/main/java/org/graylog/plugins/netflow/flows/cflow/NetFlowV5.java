@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBuf;
 import org.graylog.plugins.netflow.utils.ByteBufUtils;
 import org.graylog.plugins.netflow.utils.UUIDs;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -183,8 +182,8 @@ public class NetFlowV5 implements NetFlow {
 
     @Override
     @Nullable
-    public Message toMessage(final RawMessage rawMessage) {
-        final String source = rawMessage.getRemoteAddress() != null ? rawMessage.getRemoteAddress().getAddress().getHostAddress() : null;
+    public Message toMessage() {
+        final String source = sender.getAddress().getHostAddress();
         final Message message = new Message(toMessageString(), source, timestamp);
 
         message.addField(MF_VERSION, NF_VERSION);

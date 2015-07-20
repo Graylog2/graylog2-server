@@ -53,10 +53,7 @@ public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
             final List<Message> messages = Lists.newArrayListWithCapacity(packet.getFlows().size());
 
             for (NetFlow flow : packet.getFlows()) {
-                final Message message = flow.toMessage(rawMessage);
-
-                messages.add(message);
-                LOG.info("NetFLow Message: {}", message);
+                messages.add(flow.toMessage());
             }
 
             return messages;

@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import io.netty.buffer.Unpooled;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.ResolvableInetSocketAddress;
-import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -22,19 +20,19 @@ public class NetFlowV5PacketTest {
     public void test() throws Exception {
         final URL resource = Resources.getResource("netflow-data/netflow-v5-1.dat");
         final byte[] bytes = Resources.toByteArray(resource);
-        final RawMessage rawMessage = new RawMessage(bytes, ResolvableInetSocketAddress.wrap(new InetSocketAddress("0.0.0.0", 2055)));
 
-        final NetFlowV5Packet packet = NetFlowV5Packet.parse(null, Unpooled.wrappedBuffer(bytes));
+        final NetFlowV5Packet packet = NetFlowV5Packet.parse(new InetSocketAddress("127.0.0.2", 2055), Unpooled.wrappedBuffer(bytes));
 
         final NetFlow flow1 = Lists.newArrayList(packet.getFlows()).get(0);
         final NetFlow flow2 = Lists.newArrayList(packet.getFlows()).get(1);
-        final Message message1 = flow1.toMessage(rawMessage);
-        final Message message2 = flow2.toMessage(rawMessage);
+        final Message message1 = flow1.toMessage();
+        final Message message2 = flow2.toMessage();
 
         assertEquals(2, packet.getFlows().size());
         //assertEquals(0, packet.engineId);
         //assertEquals(0, packet.engineType);
 
+        assertEquals("127.0.0.2", message1.getSource());
         assertEquals(5, message1.getField("nf_version"));
         assertNotNull(message1.getField("nf_id"));
         assertNotNull(message1.getField("nf_flow_packet_id"));
@@ -54,6 +52,7 @@ public class NetFlowV5PacketTest {
         assertEquals(230L, message1.getField("nf_bytes"));
         assertEquals(5L, message1.getField("nf_pkts"));
 
+        assertEquals("127.0.0.2", message1.getSource());
         assertEquals(5, message2.getField("nf_version"));
         assertNotNull(message2.getField("nf_id"));
         assertNotNull(message2.getField("nf_flow_packet_id"));
