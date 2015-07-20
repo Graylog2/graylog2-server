@@ -9,6 +9,7 @@ import org.graylog.plugins.netflow.utils.UUIDs;
 import org.joda.time.DateTime;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,30 +41,30 @@ import static org.graylog.plugins.netflow.utils.ByteBufUtils.getUnsignedInteger;
  * |       |               | remaining 14 bits hold value of sampling interval    |
  * *-------*---------------*------------------------------------------------------*
  */
-public class NetFlowV5Packet {
+public class NetFlowV5Packet implements NetFlowPacket {
     private static final int HEADER_SIZE = 24;
     private static final int FLOW_SIZE = 48;
 
     private static final String VERSION = "NetFlowV5 Packet";
 
-    public final UUID id;
-    public final InetSocketAddress sender;
-    public final int length;
-    public final long uptime;
-    public final DateTime timestamp;
-    public final List<NetFlowV5> flows;
-    public final long flowSequence;
-    public final int engineType;
-    public final int engineId;
-    public final int samplingInterval;
-    public final int samplingMode;
+    private final UUID id;
+    private final InetSocketAddress sender;
+    private final int length;
+    private final long uptime;
+    private final DateTime timestamp;
+    private final List<NetFlow> flows;
+    private final long flowSequence;
+    private final int engineType;
+    private final int engineId;
+    private final int samplingInterval;
+    private final int samplingMode;
 
     public NetFlowV5Packet(UUID id,
                            InetSocketAddress sender,
                            int length,
                            long uptime,
                            DateTime timestamp,
-                           List<NetFlowV5> flows,
+                           List<NetFlow> flows,
                            long flowSequence,
                            int engineType,
                            int engineId,
@@ -83,6 +84,9 @@ public class NetFlowV5Packet {
         this.samplingMode = samplingMode;
     }
 
+    public Collection<NetFlow> getFlows() {
+        return flows;
+    }
 
     @Override
     public String toString() {
@@ -128,9 +132,9 @@ public class NetFlowV5Packet {
         final int samplingInterval = sampling & 0x3FFF;
         final int samplingMode = sampling >> 14;
 
-        final List<NetFlowV5> flows = Lists.newArrayList();
+        final List<NetFlow> flows = Lists.newArrayListWithCapacity(count);
         for (int i = 0; i <= (count - 1); i++) {
-            final NetFlowV5 flowV5 = NetFlowV5.parse(sender,
+            final NetFlow flowV5 = NetFlowV5.parse(sender,
                     buf.slice(HEADER_SIZE + (i * FLOW_SIZE), FLOW_SIZE),
                     id,
                     uptime,

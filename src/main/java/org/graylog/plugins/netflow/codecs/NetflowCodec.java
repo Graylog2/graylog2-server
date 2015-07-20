@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.netflow.flows.FlowException;
 import org.graylog.plugins.netflow.flows.NetFlowParser;
-import org.graylog.plugins.netflow.flows.cflow.NetFlowV5;
-import org.graylog.plugins.netflow.flows.cflow.NetFlowV5Packet;
+import org.graylog.plugins.netflow.flows.cflow.NetFlow;
+import org.graylog.plugins.netflow.flows.cflow.NetFlowPacket;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -44,17 +44,16 @@ public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
     @Override
     public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
         try {
-            final NetFlowV5Packet packet = NetFlowParser.parse(rawMessage);
+            final NetFlowPacket packet = NetFlowParser.parse(rawMessage);
 
             if (packet == null) {
                 return null;
             }
 
-            final List<Message> messages = Lists.newArrayListWithCapacity(packet.flows.size());
+            final List<Message> messages = Lists.newArrayListWithCapacity(packet.getFlows().size());
 
-            for (NetFlowV5 flow : packet.flows) {
-                final String source = rawMessage.getRemoteAddress() != null ? rawMessage.getRemoteAddress().getAddress().toString() : null;
-                final Message message = new Message(flow.toMessageString(), source, flow.timestamp);
+            for (NetFlow flow : packet.getFlows()) {
+                final Message message = flow.toMessage(rawMessage);
 
                 messages.add(message);
                 LOG.info("NetFLow Message: {}", message);

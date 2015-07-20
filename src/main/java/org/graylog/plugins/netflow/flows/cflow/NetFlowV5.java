@@ -4,8 +4,11 @@ import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import org.graylog.plugins.netflow.utils.ByteBufUtils;
 import org.graylog.plugins.netflow.utils.UUIDs;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -13,8 +16,27 @@ import java.util.UUID;
 import static org.graylog.plugins.netflow.utils.ByteBufUtils.getInetAddress;
 import static org.graylog.plugins.netflow.utils.ByteBufUtils.getUnsignedInteger;
 
-public class NetFlowV5 {
-    private static String VERSION = "NetFlowV5";
+public class NetFlowV5 implements NetFlow {
+    private static final int NF_VERSION = 5;
+    private static final String VERSION = "NetFlowV5";
+
+    private static final String MF_VERSION = "nf_version";
+    private static final String MF_ID = "nf_id";
+    private static final String MF_FLOW_PACKET_ID = "nf_flow_packet_id";
+    private static final String MF_TOS = "nf_tos";
+    private static final String MF_SRC_ADDRESS = "nf_src_address";
+    private static final String MF_DST_ADDRESS = "nf_dst_address";
+    private static final String MF_NEXT_HOP = "nf_next_hop";
+    private static final String MF_SRC_PORT = "nf_src_port";
+    private static final String MF_DST_PORT = "nf_dst_port";
+    private static final String MF_SRC_MASK = "nf_src_mask";
+    private static final String MF_DST_MASK = "nf_dst_mask";
+    private static final String MF_PROTO = "nf_proto";
+    private static final String MF_TCP_FLAGS = "nf_tcp_flags";
+    private static final String MF_START = "nf_start";
+    private static final String MF_STOP = "nf_stop";
+    private static final String MF_BYTES = "nf_bytes";
+    private static final String MF_PKTS = "nf_pkts";
 
     public final UUID uuid;
     public final InetSocketAddress sender;
@@ -103,7 +125,7 @@ public class NetFlowV5 {
      * @param samplingInterval Interval samples are sent
      * @param calculateSamples Switch to turn on/off samples calculation
      */
-    public static NetFlowV5 parse(final InetSocketAddress sender,
+    public static NetFlow parse(final InetSocketAddress sender,
                                   final ByteBuf buf,
                                   final UUID fpId,
                                   final long uptime,
@@ -159,8 +181,44 @@ public class NetFlowV5 {
                 fpId);
     }
 
+    @Override
+    @Nullable
+    public Message toMessage(final RawMessage rawMessage) {
+        final String source = rawMessage.getRemoteAddress() != null ? rawMessage.getRemoteAddress().getAddress().getHostAddress() : null;
+        final Message message = new Message(toMessageString(), source, timestamp);
+
+        message.addField(MF_VERSION, NF_VERSION);
+        message.addField(MF_ID, uuid.toString());
+        message.addField(MF_FLOW_PACKET_ID, fpId.toString());
+        message.addField(MF_TOS, tos);
+        message.addField(MF_SRC_ADDRESS, srcAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
+        message.addField(MF_DST_ADDRESS, dstAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
+        if (nextHop.isPresent()) {
+            message.addField(MF_NEXT_HOP, nextHop.get().getHostAddress()); // TODO Check if this does a DNS lookup!
+        }
+        message.addField(MF_SRC_PORT, srcPort);
+        message.addField(MF_DST_PORT, dstPort);
+        message.addField(MF_SRC_MASK, srcMask);
+        message.addField(MF_DST_MASK, dstMask);
+        message.addField(MF_PROTO, proto);
+        message.addField(MF_TCP_FLAGS, tcpflags);
+        if (start.isPresent()) {
+            message.addField(MF_START, start.get());
+        }
+        if (stop.isPresent()) {
+            message.addField(MF_STOP, stop.get());
+        }
+        message.addField(MF_BYTES, bytes);
+        message.addField(MF_PKTS, pkts);
+
+        return message;
+    }
+
+    @Override
     public String toMessageString() {
-        return "ADD FLOW [" + srcAddress.toString() + "]:" + srcPort + " <> [" + dstAddress.toString() + "]:" + dstPort + " proto:" + proto + " pkts:" + pkts + " bytes:" + bytes;
+        return VERSION +" [" + srcAddress.getHostAddress() + "]:" + srcPort +
+                " <> [" + dstAddress.getHostAddress() + "]:" + dstPort +
+                " proto:" + proto + " pkts:" + pkts + " bytes:" + bytes;
     }
 
     @Override
