@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -30,10 +31,13 @@ import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
@@ -74,28 +78,33 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         final Timer.Context context = decodeTime.time();
         try {
-            // always set the result of processMessage, even if it is null, to avoid later stages to process old messages.
+            processMessage(event);
+        } catch (Exception e) {
+            LOG.error("Error processing message " + event.getRaw(), e);
+
+            // always clear the event fields, even if they are null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
-            event.setMessage(processMessage(event.getRaw()));
+            event.clearMessages();
         } finally {
             if (event.getMessage() != null) {
                 event.getMessage().recordTiming(serverStatus, "decode", context.stop());
+            } else if (event.getMessages() != null) {
+                for (final Message message : event.getMessages()) {
+                    message.recordTiming(serverStatus, "decode", context.stop());
+                }
             }
             // aid garbage collection to collect the raw message early (to avoid promoting it to later generations).
             event.clearRaw();
         }
     }
 
-    private Message processMessage(RawMessage raw) throws ExecutionException {
-        if (raw == null) {
-            LOG.warn("Ignoring null message");
-            return null;
-        }
+    private void processMessage(final MessageEvent event) throws ExecutionException {
+        final RawMessage raw = event.getRaw();
 
         final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
-        if(factory == null) {
+        if (factory == null) {
             LOG.warn("Couldn't find factory for codec {}, skipping message.", raw.getCodecName());
-            return null;
+            return;
         }
 
         final Codec codec = factory.create(raw.getCodecConfig());
@@ -112,14 +121,18 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        final Message message;
+        Message message = null;
+        Collection<Message> messages = null;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
         try {
-            message = codec.decode(raw);
-            if (message != null) {
-                message.setJournalOffset(raw.getJournalOffset());
+            // This is ugly but needed for backwards compatibility of the Codec interface in 1.x.
+            // TODO The Codec interface should be changed for 2.0 to support collections of messages so we can remove this hack.
+            if (codec instanceof MultiMessageCodec) {
+                messages = ((MultiMessageCodec) codec).decodeMessages(raw);
+            } else {
+                message = codec.decode(raw);
             }
         } catch (RuntimeException e) {
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
@@ -128,6 +141,24 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             decodeTime = decodeTimeCtx.stop();
         }
 
+        if (message != null) {
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime));
+        } else if (messages != null && !messages.isEmpty()) {
+            final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+
+            for (final Message msg : messages) {
+                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime);
+
+                if (processedMessage != null) {
+                    processedMessages.add(processedMessage);
+                }
+            }
+
+            event.setMessages(processedMessages);
+        }
+    }
+
+    private Message postProcessMessage(RawMessage raw, Codec codec, String inputIdOnCurrentNode, String baseMetricName, Message message, long decodeTime) {
         if (message == null) {
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
             return null;
@@ -140,6 +171,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             return null;
         }
 
+        message.setJournalOffset(raw.getJournalOffset());
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 
