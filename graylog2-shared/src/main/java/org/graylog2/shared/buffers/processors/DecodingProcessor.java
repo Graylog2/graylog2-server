@@ -36,9 +36,7 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -80,11 +78,17 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         final Timer.Context context = decodeTime.time();
         try {
-            // always set the result of processMessage, even if it is null, to avoid later stages to process old messages.
+            processMessage(event);
+        } catch (Exception e) {
+            LOG.error("Error processing message " + event.getRaw(), e);
+
+            // always clear the event fields, even if they are null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
-            event.setMessages(processMessage(event.getRaw()));
+            event.clearMessages();
         } finally {
-            if (event.getMessages() != null) {
+            if (event.getMessage() != null) {
+                event.getMessage().recordTiming(serverStatus, "decode", context.stop());
+            } else if (event.getMessages() != null) {
                 for (final Message message : event.getMessages()) {
                     message.recordTiming(serverStatus, "decode", context.stop());
                 }
@@ -94,17 +98,13 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
     }
 
-    @Nullable
-    private Collection<Message> processMessage(final RawMessage raw) throws ExecutionException {
-        if (raw == null) {
-            LOG.warn("Ignoring null message");
-            return null;
-        }
+    private void processMessage(final MessageEvent event) throws ExecutionException {
+        final RawMessage raw = event.getRaw();
 
         final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
-        if(factory == null) {
+        if (factory == null) {
             LOG.warn("Couldn't find factory for codec {}, skipping message.", raw.getCodecName());
-            return null;
+            return;
         }
 
         final Codec codec = factory.create(raw.getCodecConfig());
@@ -121,7 +121,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        final Collection<Message> messages;
+        Message message = null;
+        Collection<Message> messages = null;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
@@ -131,8 +132,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             if (codec instanceof MultiMessageCodec) {
                 messages = ((MultiMessageCodec) codec).decodeMessages(raw);
             } else {
-                final Message message = codec.decode(raw);
-                messages = message == null ? null : Collections.singletonList(message);
+                message = codec.decode(raw);
             }
         } catch (RuntimeException e) {
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
@@ -141,21 +141,21 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             decodeTime = decodeTimeCtx.stop();
         }
 
-        if (messages == null || messages.isEmpty()) {
-            return null;
-        }
+        if (message != null) {
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime));
+        } else if (messages != null && !messages.isEmpty()) {
+            final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
 
-        final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+            for (final Message msg : messages) {
+                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime);
 
-        for (final Message message : messages) {
-            final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime);
-
-            if (processedMessage != null) {
-                processedMessages.add(processedMessage);
+                if (processedMessage != null) {
+                    processedMessages.add(processedMessage);
+                }
             }
-        }
 
-        return processedMessages;
+            event.setMessages(processedMessages);
+        }
     }
 
     private Message postProcessMessage(RawMessage raw, Codec codec, String inputIdOnCurrentNode, String baseMetricName, Message message, long decodeTime) {

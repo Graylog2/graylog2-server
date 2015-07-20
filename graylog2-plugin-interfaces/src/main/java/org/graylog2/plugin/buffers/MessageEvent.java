@@ -48,6 +48,10 @@ public class MessageEvent {
     private Message msg;
     private Collection<Message> messages;
 
+    public boolean isSingleMessage() {
+        return msg != null;
+    }
+
     @Nullable
     public Message getMessage()
     {
@@ -68,6 +72,11 @@ public class MessageEvent {
         this.messages = messages;
     }
 
+    public void clearMessages() {
+        setMessage(null);
+        setMessages(null);
+    }
+
     /**
      * Sets the raw message but also clears out the {@link #getMessage() message} and {@link #getMessages() messages}
      * references to avoid handling stale messages and to let older messages be garbage collected earlier.
@@ -76,8 +85,7 @@ public class MessageEvent {
      */
     public void setRaw(@Nonnull RawMessage raw) {
         this.raw = raw;
-        setMessage(null);
-        setMessages(null);
+        clearMessages();
     }
 
     public void clearRaw() {
