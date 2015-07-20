@@ -49,7 +49,7 @@ public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
                 return null;
             }
 
-            final List<Message> messages = Lists.newArrayList();
+            final List<Message> messages = Lists.newArrayListWithCapacity(packet.flows.size());
 
             for (NetFlowV5 flow : packet.flows) {
                 final String source = rawMessage.getRemoteAddress() != null ? rawMessage.getRemoteAddress().getAddress().toString() : null;
