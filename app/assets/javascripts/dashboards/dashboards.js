@@ -83,9 +83,17 @@ $(document).ready(function() {
     };
 
     var reloadDashboard = function() {
-        lockDashboard();
+        var initialDashboardLockedStatus = isDashboardLocked();
+        if (!initialDashboardLockedStatus) {
+            lockDashboard();
+        }
+
         dashboardGrid.destroy();
         initializeDashboard();
+
+        if (!initialDashboardLockedStatus) {
+            unlockDashboard();
+        }
     };
 
     if (dashboard.length > 0){
@@ -205,9 +213,13 @@ $(document).ready(function() {
         toggleDashboardLock.data('locked', true);
     };
 
+    function isDashboardLocked() {
+        "use strict";
+        return Boolean(toggleDashboardLock.data('locked'));
+    }
+
     toggleDashboardLock.on('click', function() {
-        var locked = Boolean(toggleDashboardLock.data('locked'));
-        if (locked) {
+        if (isDashboardLocked()) {
             unlockDashboard();
         } else {
             lockDashboard();
