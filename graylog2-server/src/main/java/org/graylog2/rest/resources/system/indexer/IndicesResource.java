@@ -31,12 +31,13 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -64,16 +65,27 @@ import java.util.Set;
 public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
+    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final Indices indices;
+    private final Cluster cluster;
+    private final Deflector deflector;
+    private final SystemJobManager systemJobManager;
+    private final IndexRangeService indexRangeService;
+
     @Inject
-    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-    @Inject
-    private Indices indices;
-    @Inject
-    private Cluster cluster;
-    @Inject
-    private Deflector deflector;
-    @Inject
-    private SystemJobManager systemJobManager;
+    public IndicesResource(RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                           Indices indices,
+                           Cluster cluster,
+                           Deflector deflector,
+                           SystemJobManager systemJobManager,
+                           IndexRangeService indexRangeService) {
+        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.indices = indices;
+        this.cluster = cluster;
+        this.deflector = deflector;
+        this.systemJobManager = systemJobManager;
+        this.indexRangeService = indexRangeService;
+    }
 
     @GET
     @Timed
@@ -126,7 +138,7 @@ public class IndicesResource extends RestResource {
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
-    
+
     @GET
     @Timed
     @Path("/reopened")
@@ -146,7 +158,7 @@ public class IndicesResource extends RestResource {
             throw new InternalServerErrorException(e);
         }
 
-        return ClosedIndices.create(reopenedIndices, reopenedIndices.size()); 
+        return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
 
     @POST
@@ -233,14 +245,8 @@ public class IndicesResource extends RestResource {
         // Delete index.
         indices.delete(index);
 
-        // Trigger index ranges rebuild job.
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
-        try {
-            systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg);
+        if(!indexRangeService.delete(index)) {
+            LOG.warn("Couldn't delete index range for index <{}>", index);
         }
     }
 
