@@ -53,11 +53,13 @@
             </p>
 
             @if(!dashboard.getWidgets.isEmpty && isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                <div id="drag-widgets-description">
                 @views.html.partials.support.list_small() {
                     Drag widgets to any position you like in <a id="unlock-dashboard" href="#" role="button">
                         unlock / edit</a>
                     mode.
                 }
+                </div>
             }
         </div>
     </div>
@@ -66,7 +68,7 @@
         <div class="row content">
             <div class="col-md-12">
                 <div class="alert alert-info no-widgets">
-                    This has dashboard has no widgets yet. Learn how to add widgets in the @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_DASHBOARDS, "documentation").
+                    This dashboard has no widgets yet. Learn how to add widgets in the @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_DASHBOARDS, "documentation").
                 </div>
             </div>
         </div>

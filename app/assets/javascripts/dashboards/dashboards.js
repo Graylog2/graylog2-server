@@ -2,7 +2,9 @@ $(document).ready(function() {
     var dashboard = $(".dashboard");
     var toggleDashboardLock = $("#toggle-dashboard-lock");
     var unlockDashboardLink = $("#unlock-dashboard");
+    var dragWidgetsDescription = $("#drag-widgets-description");
     var toggleUpdateUnfocussed = $("#update-unfocussed");
+    var toggleFullscreen = $(".toggle-fullscreen");
 
     // Load all writable dashboards in the global registry first.
     $.ajax({
@@ -96,6 +98,25 @@ $(document).ready(function() {
         }
     };
 
+    function hideDashboardControls() {
+        "use strict";
+        toggleUpdateUnfocussed.hide();
+        toggleFullscreen.hide();
+        toggleDashboardLock.hide();
+        dragWidgetsDescription.hide();
+    }
+
+    function showEmptyDashboardMessage() {
+        "use strict";
+        var $parent = dashboard.parent();
+        var $emptyDashboardAlert = $("<div/>", {
+            class: "alert alert-info no-widgets",
+            text: "No more widgets to display"
+        });
+        var $emptyDashboardHelper = $("<div/>", { class: "content col-md-12" }).append($emptyDashboardAlert);
+        $parent.prepend($emptyDashboardHelper);
+    }
+
     if (dashboard.length > 0){
         initializeDashboard();
 
@@ -110,7 +131,7 @@ $(document).ready(function() {
             }
         });
     } else {
-        toggleDashboardLock.hide();
+        hideDashboardControls();
     }
 
     function applyDashboardsToAllSelectors() {
@@ -149,7 +170,14 @@ $(document).ready(function() {
                 type: 'POST',
                 success: function() {
                     showSuccess("Widget has been removed from dashboard!");
-                    dashboardGrid.remove_widget(gridsterWidget);
+                    dashboardGrid.remove_widget(gridsterWidget, function() {
+                        "use strict";
+                        if (this.$widgets.length === 0) {
+                            lockDashboard();
+                            hideDashboardControls();
+                            showEmptyDashboardMessage();
+                        }
+                    });
                 },
                 error: function(data) {
                     showError("Could not remove widget from dashboard.");
