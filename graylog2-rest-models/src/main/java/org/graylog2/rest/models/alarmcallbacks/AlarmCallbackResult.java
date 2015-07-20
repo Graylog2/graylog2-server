@@ -18,22 +18,15 @@ package org.graylog2.rest.models.alarmcallbacks;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Map;
 
 @JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = AlarmCallbackError.class, name = "error"),
+                @JsonSubTypes.Type(value = AlarmCallbackSuccess.class, name = "success") })
 public abstract class AlarmCallbackResult {
     public abstract String type();
-
-    @JsonCreator
-    public static AlarmCallbackResult create(Map<String, Object> result) {
-        if (result.get("type") != null) {
-            switch(result.get("type").toString().toLowerCase()) {
-                case "success": return AlarmCallbackSuccess.create();
-                case "error": return AlarmCallbackError.create((String)result.get("error"));
-                default: throw new IllegalArgumentException("Invalid AlarmCallbackResult passed. Type was: " + result.get("type"));
-            }
-        }
-        throw new IllegalArgumentException("Invalid AlarmCallbackResult passed. Type was null.");
-    }
 }
