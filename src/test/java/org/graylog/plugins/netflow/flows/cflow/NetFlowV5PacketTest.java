@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.net.InetSocketAddress;
 import java.net.URL;
 
+import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -48,8 +49,8 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message1.getField("nf_dst_mask"));
         assertEquals(6, message1.getField("nf_proto"));
         assertEquals(16, message1.getField("nf_tcp_flags"));
-        assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00"), message1.getField("nf_start"));
-        assertEquals(new DateTime("2015-05-02T18:38:07.196Z"), message1.getField("nf_stop"));
+        assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00", UTC), message1.getField("nf_start"));
+        assertEquals(new DateTime("2015-05-02T18:38:07.196Z", UTC), message1.getField("nf_stop"));
         assertEquals(230L, message1.getField("nf_bytes"));
         assertEquals(5L, message1.getField("nf_pkts"));
 
@@ -67,8 +68,8 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message2.getField("nf_dst_mask"));
         assertEquals(6, message2.getField("nf_proto"));
         assertEquals(24, message2.getField("nf_tcp_flags"));
-        assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00"), message2.getField("nf_start"));
-        assertEquals(new DateTime("2015-05-02T18:38:07.196Z"), message2.getField("nf_stop"));
+        assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00", UTC), message2.getField("nf_start"));
+        assertEquals(new DateTime("2015-05-02T18:38:07.196Z", UTC), message2.getField("nf_stop"));
         assertEquals(304L, message2.getField("nf_bytes"));
         assertEquals(4L, message2.getField("nf_pkts"));
     }
