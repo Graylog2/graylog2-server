@@ -133,6 +133,11 @@ public class Deflector { // extends Ablenkblech
             LOG.info("Cycling from <{}> to <{}>", oldTarget, newTarget);
         }
 
+        LOG.debug("Creating metadata index");
+        if(!indices.createMetaIndex()) {
+            LOG.error("Could not create metadata index <{}>", indices.getMetaIndexName());
+        }
+
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
         if (!indices.create(newTarget)) {

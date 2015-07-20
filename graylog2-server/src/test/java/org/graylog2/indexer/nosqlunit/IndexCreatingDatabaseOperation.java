@@ -28,19 +28,30 @@ import org.graylog2.indexer.indices.Indices;
 import java.io.InputStream;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
     private final DatabaseOperation<Client> databaseOperation;
     private final Client client;
     private final Set<String> indexes;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, Set<String> indexes,
+                                          ElasticsearchConfiguration elasticsearchConfiguration) {
         this.databaseOperation = databaseOperation;
         this.client = databaseOperation.connectionManager();
         this.indexes = ImmutableSet.copyOf(indexes);
+        this.elasticsearchConfiguration = checkNotNull(elasticsearchConfiguration);
     }
 
     @Override
     public void insert(InputStream dataScript) {
+        final Indices indices = new Indices(client, elasticsearchConfiguration, new IndexMapping(client));
+
+        if (!indices.createMetaIndex()) {
+            throw new IllegalStateException("Couldn't create metadata index");
+        }
+
         final IndicesAdminClient indicesAdminClient = client.admin().indices();
         for (String index : indexes) {
             IndicesExistsResponse indicesExistsResponse = indicesAdminClient.prepareExists(index)
@@ -51,7 +62,6 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping(client));
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }

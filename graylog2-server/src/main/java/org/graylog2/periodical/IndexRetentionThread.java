@@ -16,18 +16,17 @@
  */
 package org.graylog2.periodical;
 
-import javax.inject.Inject;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.indexer.retention.RetentionStrategy;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -36,6 +35,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -51,6 +51,7 @@ public class IndexRetentionThread extends Periodical {
     private final ActivityWriter activityWriter;
     private final SystemJobManager systemJobManager;
     private final Indices indices;
+    private final IndexRangeService indexRangeService;
 
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
@@ -59,7 +60,8 @@ public class IndexRetentionThread extends Periodical {
                                 Indices indices,
                                 Cluster cluster,
                                 ActivityWriter activityWriter,
-                                SystemJobManager systemJobManager) {
+                                SystemJobManager systemJobManager,
+                                IndexRangeService indexRangeService) {
         this.configuration = configuration;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.deflector = deflector;
@@ -67,6 +69,7 @@ public class IndexRetentionThread extends Periodical {
         this.cluster = cluster;
         this.activityWriter = activityWriter;
         this.systemJobManager = systemJobManager;
+        this.indexRangeService = indexRangeService;
     }
 
     @Override
@@ -94,11 +97,8 @@ public class IndexRetentionThread extends Periodical {
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
         try {
-            runRetention(
-                    RetentionStrategyFactory.fromString(configuration.getRetentionStrategy(), indices),
-                    deflectorIndices,
-                    removeCount
-            );
+            final RetentionStrategy retentionStrategy = RetentionStrategyFactory.build(configuration.getRetentionStrategy(), indices, indexRangeService);
+            runRetention(retentionStrategy, deflectorIndices, removeCount);
         } catch (RetentionStrategyFactory.NoSuchStrategyException e) {
             LOG.error("Could not run index retention. No such strategy.", e);
         } catch (NoTargetIndexException e) {

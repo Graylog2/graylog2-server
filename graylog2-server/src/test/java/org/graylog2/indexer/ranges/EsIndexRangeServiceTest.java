@@ -32,7 +32,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class EsIndexRangeServiceTest {
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule()
             .settings(ImmutableSettings.settingsBuilder().put("action.auto_create_index", false).build())
             .build();
-    private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2", "ignored");
+    private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2");
     private static final ElasticsearchConfiguration ELASTICSEARCH_CONFIGURATION = new ElasticsearchConfiguration() {
         @Override
         public String getIndexPrefix() {
@@ -75,14 +74,14 @@ public class EsIndexRangeServiceTest {
 
     public EsIndexRangeServiceTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(INDEX_NAMES));
+        this.elasticsearchRule.setLoadStrategyFactory(
+                new IndexCreatingLoadStrategyFactory(INDEX_NAMES, ELASTICSEARCH_CONFIGURATION));
     }
 
     @Before
     public void setUp() throws Exception {
-        final NullActivityWriter activityWriter = new NullActivityWriter();
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
-        indexRangeService = new EsIndexRangeService(client, activityWriter, new ObjectMapperProvider().get(), indices);
+        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices);
     }
 
     @Test
@@ -251,5 +250,25 @@ public class EsIndexRangeServiceTest {
     @Test(expected = IndexMissingException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
         indexRangeService.timestampStatsOfIndex("does-not-exist");
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deleteRemovesIndexRange() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+
+        assertThat(indexRangeService.delete("graylog_1")).isTrue();
+
+        assertThat(indexRangeService.findAll()).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deleteHandlesInvalidIndexNames() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+
+        assertThat(indexRangeService.delete("ignore_me")).isFalse();
+
+        assertThat(indexRangeService.findAll()).hasSize(2);
     }
 }
