@@ -14,6 +14,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,9 @@ public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
     public static class Config extends AbstractCodec.Config {
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+            if (cr.containsField(NettyTransport.CK_PORT)) {
+                cr.getField(NettyTransport.CK_PORT).setDefaultValue(2055);
+            }
         }
     }
 }
