@@ -60,8 +60,6 @@ public class NetFlowV5Packet implements NetFlowPacket {
     private static final int HEADER_SIZE = 24;
     private static final int FLOW_SIZE = 48;
 
-    private static final String VERSION = "NetFlowV5 Packet";
-
     private final UUID id;
     private final InetSocketAddress sender;
     private final int length;
