@@ -1,5 +1,6 @@
 package org.graylog.plugins.netflow.flows.cflow;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import org.graylog.plugins.netflow.flows.CorruptFlowPacketException;
@@ -91,20 +92,19 @@ public class NetFlowV5Packet implements NetFlowPacket {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("NetFlowV5Packet{");
-        sb.append("id=").append(id);
-        sb.append(", sender=").append(sender);
-        sb.append(", length=").append(length);
-        sb.append(", uptime=").append(uptime);
-        sb.append(", timestamp=").append(timestamp);
-        sb.append(", flows=").append(flows);
-        sb.append(", flowSequence=").append(flowSequence);
-        sb.append(", engineType=").append(engineType);
-        sb.append(", engineId=").append(engineId);
-        sb.append(", samplingInterval=").append(samplingInterval);
-        sb.append(", samplingMode=").append(samplingMode);
-        sb.append('}');
-        return sb.toString();
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("sender", sender)
+                .add("length", length)
+                .add("uptime", uptime)
+                .add("timestamp", timestamp)
+                .add("flows", flows)
+                .add("flowSequence", flowSequence)
+                .add("engineType", engineType)
+                .add("engineId", engineId)
+                .add("samplingInterval", samplingInterval)
+                .add("samplingMode", samplingMode)
+                .toString();
     }
 
     public static NetFlowV5Packet parse(InetSocketAddress sender, ByteBuf buf) throws FlowException {

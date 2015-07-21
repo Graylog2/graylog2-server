@@ -1,5 +1,6 @@
 package org.graylog.plugins.netflow.flows.cflow;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import org.graylog.plugins.netflow.utils.ByteBufUtils;
@@ -222,32 +223,31 @@ public class NetFlowV5 implements NetFlow {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("NetFlowV5{");
-        sb.append("uuid=").append(uuid);
-        sb.append(", sender=").append(sender);
-        sb.append(", length=").append(length);
-        sb.append(", uptime=").append(uptime);
-        sb.append(", timestamp=").append(timestamp);
-        sb.append(", srcPort=").append(srcPort);
-        sb.append(", dstPort=").append(dstPort);
-        sb.append(", srcAS=").append(srcAS);
-        sb.append(", dstAS=").append(dstAS);
-        sb.append(", pkts=").append(pkts);
-        sb.append(", bytes=").append(bytes);
-        sb.append(", proto=").append(proto);
-        sb.append(", tos=").append(tos);
-        sb.append(", tcpflags=").append(tcpflags);
-        sb.append(", start=").append(start);
-        sb.append(", stop=").append(stop);
-        sb.append(", srcAddress=").append(srcAddress);
-        sb.append(", dstAddress=").append(dstAddress);
-        sb.append(", nextHop=").append(nextHop);
-        sb.append(", snmpInput=").append(snmpInput);
-        sb.append(", snmpOutput=").append(snmpOutput);
-        sb.append(", srcMask=").append(srcMask);
-        sb.append(", dstMask=").append(dstMask);
-        sb.append(", fpId=").append(fpId);
-        sb.append('}');
-        return sb.toString();
+        return MoreObjects.toStringHelper(this)
+                .add("uuid", uuid)
+                .add("sender", sender)
+                .add("length", length)
+                .add("uptime", uptime)
+                .add("timestamp", timestamp)
+                .add("srcPort", srcPort)
+                .add("dstPort", dstPort)
+                .add("srcAS", srcAS)
+                .add("dstAS", dstAS)
+                .add("pkts", pkts)
+                .add("bytes", bytes)
+                .add("proto", proto)
+                .add("tos", tos)
+                .add("tcpflags", tcpflags)
+                .add("start", start)
+                .add("stop", stop)
+                .add("srcAddress", srcAddress)
+                .add("dstAddress", dstAddress)
+                .add("nextHop", nextHop)
+                .add("snmpInput", snmpInput)
+                .add("snmpOutput", snmpOutput)
+                .add("srcMask", srcMask)
+                .add("dstMask", dstMask)
+                .add("fpId", fpId)
+                .toString();
     }
 }
