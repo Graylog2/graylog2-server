@@ -26,6 +26,7 @@ import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.MutableDateTime;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class FieldHistogramResult extends HistogramResult {
@@ -53,16 +54,16 @@ public class FieldHistogramResult extends HistogramResult {
     }
 
     public Map<Long, Map<String, Number>> getResults() {
-        Map<Long, Map<String, Number>> results = Maps.newTreeMap();
-        long minTimestamp = Long.MAX_VALUE;
-        long maxTimestamp = Long.MIN_VALUE;
+        if (result.getBuckets().isEmpty()) {
+            return Collections.emptyMap();
+        }
 
+        final Map<Long, Map<String, Number>> results = Maps.newTreeMap();
         for (DateHistogram.Bucket b : result.getBuckets()) {
-            Map<String, Number> resultMap = Maps.newHashMap();
-
+            final ImmutableMap.Builder<String, Number> resultMap = ImmutableMap.builder();
             resultMap.put("total_count", b.getDocCount());
 
-            Stats stats = b.getAggregations().get(Searches.AGG_STATS);
+            final Stats stats = b.getAggregations().get(Searches.AGG_STATS);
             resultMap.put("count", stats.getCount());
             resultMap.put("min", stats.getMin());
             resultMap.put("max", stats.getMax());
@@ -74,14 +75,15 @@ public class FieldHistogramResult extends HistogramResult {
             resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getValue());
 
             final long timestamp = b.getKeyAsDate().getMillis() / 1000L;
-            if (timestamp < minTimestamp) minTimestamp = timestamp;
-            if (timestamp > maxTimestamp) maxTimestamp = timestamp;
-
-            results.put(timestamp, resultMap);
+            results.put(timestamp, resultMap.build());
         }
+
+        final Long minTimestamp = Collections.min(results.keySet());
+        final Long maxTimestamp = Collections.max(results.keySet());
         final MutableDateTime currentTime = new MutableDateTime(minTimestamp);
+
         while (currentTime.getMillis() < maxTimestamp) {
-            Map<String, Number> entry = results.get(currentTime.getMillis());
+            final Map<String, Number> entry = results.get(currentTime.getMillis());
 
             // advance timestamp by the interval's seconds value
             currentTime.add(interval.getPeriod());
