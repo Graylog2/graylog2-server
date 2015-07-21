@@ -52,7 +52,7 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
 
     @Nullable
     @Override
-    public Message decode(RawMessage rawMessage) {
+    public Message decode(@Nonnull RawMessage rawMessage) {
         throw new UnsupportedOperationException("MultiMessageCodec " + getClass() + " does not support decode()");
     }
 
