@@ -222,7 +222,7 @@
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
-                <version>1.5.2</version>
+                <version>1.6.1</version>
             </dependency>
 
             <dependency>
