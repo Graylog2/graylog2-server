@@ -45,8 +45,8 @@ public class AlarmCallbackHistoryServiceImpl implements AlarmCallbackHistoryServ
     }
 
     @Override
-    public List<AlarmCallbackHistory> getForAlertId(String alertId, int skip, int limit) {
-        return toAbstractListType(coll.find(DBQuery.is(AlarmCallbackHistoryImpl.FIELD_ALERTID, alertId)).skip(skip).limit(limit).toArray());
+    public List<AlarmCallbackHistory> getForAlertId(String alertId) {
+        return toAbstractListType(coll.find(DBQuery.is(AlarmCallbackHistoryImpl.FIELD_ALERTID, alertId)).toArray());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class AlarmCallbackHistoryServiceImpl implements AlarmCallbackHistoryServ
     }
 
     private List<AlarmCallbackHistory> toAbstractListType(List<AlarmCallbackHistoryImpl> histories) {
-        final List<AlarmCallbackHistory> result = Lists.newArrayList();
+        final List<AlarmCallbackHistory> result = Lists.newArrayListWithCapacity(histories.size());
         result.addAll(histories);
 
         return result;

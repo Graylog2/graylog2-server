@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.alarmcallbacks;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -31,14 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiresAuthentication
@@ -61,16 +59,12 @@ public class AlarmCallbackHistoryResource extends RestResource {
     public AlarmCallbackHistoryListSummary getForAlert(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks history we want.", required = true)
                                                        @PathParam("streamid") String streamid,
                                                        @ApiParam(name = "alertId", value = "The id of the alert whose callback history we want.", required = true)
-                                                       @PathParam("alertId") String alertId,
-                                                       @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
-                                                       @QueryParam("skip") @DefaultValue("0") int skip,
-                                                       @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                                       @QueryParam("limit") @DefaultValue("0") int limit) {
+                                                       @PathParam("alertId") String alertId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        final List<AlarmCallbackHistory> historyList = this.alarmCallbackHistoryService.getForAlertId(alertId, skip, limit);
+        final List<AlarmCallbackHistory> historyList = this.alarmCallbackHistoryService.getForAlertId(alertId);
 
-        final List<AlarmCallbackHistorySummary> historySummaryList = new ArrayList<>(historyList.size());
+        final List<AlarmCallbackHistorySummary> historySummaryList = Lists.newArrayListWithCapacity(historyList.size());
         for (AlarmCallbackHistory alarmCallbackHistory : historyList) {
             historySummaryList.add(AlarmCallbackHistorySummary.create(alarmCallbackHistory.id(),
                     alarmCallbackHistory.alarmcallbackConfiguration(),
