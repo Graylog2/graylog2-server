@@ -79,8 +79,8 @@ public class FieldHistogramResult extends HistogramResult {
             results.put(timestamp, resultMap.build());
         }
 
-        final Long minTimestamp = Collections.min(results.keySet());
-        final Long maxTimestamp = Collections.max(results.keySet());
+        final long minTimestamp = Collections.min(results.keySet());
+        final long maxTimestamp = Collections.max(results.keySet());
         final MutableDateTime currentTime = new MutableDateTime(minTimestamp, DateTimeZone.UTC);
 
         while (currentTime.getMillis() < maxTimestamp) {
