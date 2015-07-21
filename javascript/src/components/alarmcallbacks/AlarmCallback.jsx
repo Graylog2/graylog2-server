@@ -72,7 +72,8 @@ var AlarmCallback = React.createClass({
     },
     render() {
         var alarmCallback = this.props.alarmCallback;
-        var humanReadableType = this.props.types[alarmCallback.type].name;
+        var humanReadableType = (this._typeNotAvailable() ? <i>Type not available ({alarmCallback.type})</i> : this.props.types[alarmCallback.type].name);
+        var actionButtons = (this.props.hideButtons ? null : this._formatActionButtons());
         return (
             <div className="alert-callback" data-destination-id={alarmCallback.id}>
                 <Row style={{marginBottom: 0}}>
