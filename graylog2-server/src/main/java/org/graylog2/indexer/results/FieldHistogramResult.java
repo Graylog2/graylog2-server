@@ -24,6 +24,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
+import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
 
 import java.util.Collections;
@@ -80,7 +81,7 @@ public class FieldHistogramResult extends HistogramResult {
 
         final Long minTimestamp = Collections.min(results.keySet());
         final Long maxTimestamp = Collections.max(results.keySet());
-        final MutableDateTime currentTime = new MutableDateTime(minTimestamp);
+        final MutableDateTime currentTime = new MutableDateTime(minTimestamp, DateTimeZone.UTC);
 
         while (currentTime.getMillis() < maxTimestamp) {
             final Map<String, Number> entry = results.get(currentTime.getMillis());
