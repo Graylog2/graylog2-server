@@ -4,9 +4,9 @@ var React = require('react/addons');
 var AlertsStore = require('../../stores/alerts/AlertsStore');
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
+var Pagination = require('react-bootstrap').Pagination;
 var Spinner = require('../common/Spinner');
 var AlertsTable = require('./AlertsTable');
-var Paginator = require('../common/Paginator');
 var Input = require('react-bootstrap').Input;
 
 var AlertsComponent = React.createClass({
@@ -19,7 +19,8 @@ var AlertsComponent = React.createClass({
             currentPage: 1
         };
     },
-    _onSelected(pageNo) {
+    _onSelected(event, selectedEvent) {
+        var pageNo = selectedEvent.eventKey;
         this.setState({currentPage: pageNo});
         this.loadData(pageNo, this.state.limit);
     },
@@ -51,6 +52,7 @@ var AlertsComponent = React.createClass({
     },
     render() {
         if (this.state.alerts) {
+            var numberPages = Math.ceil(this.state.alerts.total/this.state.limit);
             return (
                 <Row className="content">
                     <Col md={12}>
@@ -64,8 +66,13 @@ var AlertsComponent = React.createClass({
                         </h2>
                         {' '}
                         <AlertsTable alerts={this.state.alerts.alerts} />
-                        <Paginator pages={Math.ceil(this.state.alerts.total/this.state.limit)} size={this.state.paginatorSize}
-                                   currentPage={this.state.currentPage} onSelected={this._onSelected}/>
+
+                        <div className="text-center">
+                            <Pagination bsSize="small" items={numberPages}
+                                        activePage={this.state.currentPage}
+                                        onSelect={this._onSelected} prev={true} next={true}
+                                        maxButtons={Math.min(this.state.paginatorSize, numberPages)}/>
+                        </div>
                     </Col>
                 </Row>
             );
