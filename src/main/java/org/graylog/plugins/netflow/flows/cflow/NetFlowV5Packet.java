@@ -107,10 +107,6 @@ public class NetFlowV5Packet implements NetFlowPacket {
         return sb.toString();
     }
 
-    public int getCount() {
-        return flows.size();
-    }
-
     public static NetFlowV5Packet parse(InetSocketAddress sender, ByteBuf buf) throws FlowException {
         final int version = (int) getUnsignedInteger(buf, 0, 2);
         if (version != 5) {
