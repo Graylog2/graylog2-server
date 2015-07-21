@@ -19,12 +19,12 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import controllers.*;
+import controllers.AuthenticatedController;
+import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
 import org.graylog2.restclient.models.api.responses.system.UserResponse;
-import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
@@ -61,7 +61,7 @@ public class UsersApiController extends AuthenticatedController {
             response.add(userResponse);
         }
 
-        return ok(Json.toJson(response));
+        return ok(Json.toJsonString(response)).as("application/json");
     }
 
     public Result loadUser(String username) {
@@ -71,7 +71,7 @@ public class UsersApiController extends AuthenticatedController {
 
         User user = userService.load(username);
         if (user != null) {
-            return ok(Json.toJson(user));
+            return ok(Json.toJsonString(user)).as("application/json");
         } else {
             return notFound();
         }

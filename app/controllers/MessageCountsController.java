@@ -19,8 +19,8 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import lib.json.Json;
 import org.graylog2.restclient.models.MessagesService;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -40,6 +40,6 @@ public class MessageCountsController extends AuthenticatedController {
         Map<String, Long> result = Maps.newHashMap();
         result.put("events", countResult);
 
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as("application/json");
     }
 }

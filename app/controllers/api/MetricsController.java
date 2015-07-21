@@ -9,6 +9,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import controllers.AuthenticatedController;
 import lib.SockJSUtils;
+import lib.json.Json;
 import lib.security.RedirectAuthenticator;
 import lib.sockjs.SockJsRouter;
 import models.sockjs.CreateSessionCommand;
@@ -27,7 +28,6 @@ import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.libs.F;
-import play.libs.Json;
 import play.sockjs.CookieCalculator;
 import play.sockjs.ScriptLocation;
 import play.sockjs.SockJS;
@@ -144,7 +144,7 @@ public class MetricsController extends AuthenticatedController {
                 for (String nodeId : entries.keySet()) {
                     pushResponse.metrics.add(createMetricUpdate(nodeId, entries.get(nodeId)));
                 }
-                out.write(Json.toJson(pushResponse).toString());
+                out.write(Json.toJsonString(pushResponse));
             } catch (Exception e){
                 log.error("Unhandled exception, catching to prevent scheduled task from ending, this is a bug.", e);
             }

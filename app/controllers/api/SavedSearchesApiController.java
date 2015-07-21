@@ -22,11 +22,11 @@ package controllers.api;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.SavedSearch;
 import org.graylog2.restclient.models.SavedSearchService;
 import org.graylog2.restclient.models.api.requests.searches.CreateSavedSearchRequest;
-import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Result;
 
@@ -55,7 +55,7 @@ public class SavedSearchesApiController extends AuthenticatedController {
                 response.add(search);
             }
 
-            return ok(Json.toJson(response));
+            return ok(Json.toJsonString(response)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

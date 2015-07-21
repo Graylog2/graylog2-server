@@ -1,5 +1,5 @@
 @(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, reactSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
-@import play.libs.Json
+@import lib.json.Json
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import org.graylog2.restclient.lib.Configuration
@@ -11,7 +11,7 @@
     <head>
         <title>Graylog - @title</title>
         <script type="text/javascript">
-            var userPreferences = @Html(Json.stringify(Json.toJson(currentUser.getPreferences)));
+            var userPreferences = @Html(Json.toJsonString(currentUser.getPreferences));
         </script>
         <meta name="robots" content="noindex, nofollow">
       	@partials.head()

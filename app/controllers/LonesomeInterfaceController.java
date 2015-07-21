@@ -19,9 +19,9 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import lib.json.Json;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.Node;
-import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 
@@ -52,6 +52,6 @@ public class LonesomeInterfaceController extends BaseController {
         map.put("connected", serverNodes.isConnected());
         map.put("connected_nodes_count", serverNodes.connectedNodesCount());
         map.put("total_nodes_count", serverNodes.totalNodesCount());
-        return ok(Json.toJson(map));
+        return ok(Json.toJsonString(map)).as("application/json");
     }
 }

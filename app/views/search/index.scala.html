@@ -13,7 +13,7 @@
         inputs: Map[String, models.descriptions.InputDescription]
         )(implicit stream: org.graylog2.restclient.models.Stream)
 
-@import play.libs.Json;
+@import lib.json.Json
 @import models.descriptions.StreamDescription
 @import views.helpers.Permissions
 @import lib.security.RestPermissions._
@@ -32,16 +32,16 @@
             data-query="@query"
             data-built-query="@searchResult.getBuiltQuery"
             data-current-page="@page"
-            data-selected-fields="@Json.toJson(selectedFields)"
+            data-selected-fields="@Json.toJsonString(selectedFields)"
             data-timerange="@search.getTimeRange"
-            data-search-result="@Json.toJson(searchResult)"
-            data-histogram="@Json.toJson(histogram)"
+            data-search-result="@Json.toJsonString(searchResult)"
+            data-histogram="@Json.toJsonString(histogram)"
             data-formatted-histogram="@formattedHistogramResults"
-            data-streams="@Json.toJson(streams)"
-            data-inputs="@Json.toJson(inputs)"
-            data-nodes="@Json.toJson(nodes)"
-            data-search-in-stream="@Json.toJson(StreamDescription.of(stream))"
-            data-permissions="@Json.toJson(currentUser.getPermissions)"
+            data-streams="@Json.toJsonString(streams)"
+            data-inputs="@Json.toJsonString(inputs)"
+            data-nodes="@Json.toJsonString(nodes)"
+            data-search-in-stream="@Json.toJsonString(StreamDescription.of(stream))"
+            data-permissions="@Json.toJsonString(currentUser.getPermissions)"
         >
     </div>
 }

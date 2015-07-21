@@ -21,10 +21,10 @@ package controllers.api;
 
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Source;
 import org.graylog2.restclient.models.SourcesService;
-import play.libs.Json;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class SourcesApiController extends AuthenticatedController {
         }
         try {
             List<Source> sources = sourcesService.all(range);
-            return ok(Json.toJson(sources));
+            return ok(Json.toJsonString(sources)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

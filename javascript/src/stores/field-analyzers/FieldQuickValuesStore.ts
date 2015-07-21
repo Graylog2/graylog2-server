@@ -13,8 +13,7 @@ import UserNotification = require('../../util/UserNotification');
 var FieldQuickValuesStore = {
     getQuickValues(field: string): JQueryPromise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
-        var searchInStream = SearchStore.searchInStream;
-        var streamId = searchInStream === undefined ? null : searchInStream.id;
+        var streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
 
         var url = jsRoutes.controllers.api.SearchApiController.fieldTerms(
             originalSearchURLParams.get('q'),

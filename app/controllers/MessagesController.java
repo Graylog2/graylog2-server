@@ -19,12 +19,12 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.MessagesService;
 import org.graylog2.restclient.models.api.results.MessageAnalyzeResult;
 import org.graylog2.restclient.models.api.results.MessageResult;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ public class MessagesController extends AuthenticatedController {
             result.put("fields", message.getFields());
             result.put("formatted_fields", message.getFormattedFields());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as("application/json");
         } catch (IOException e) {
             return status(500);
         } catch (APIException e) {
@@ -70,7 +70,7 @@ public class MessagesController extends AuthenticatedController {
             }
             final String stringifiedValue = String.valueOf(analyzeField);
             MessageAnalyzeResult result = messagesService.analyze(index, stringifiedValue);
-            return ok(Json.toJson(result.getTokens()));
+            return ok(Json.toJsonString(result.getTokens())).as("application/json");
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

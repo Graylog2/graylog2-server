@@ -1,14 +1,13 @@
 package controllers.api;
 
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.StreamService;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
 
 import static views.helpers.Permissions.isPermitted;
@@ -25,7 +24,7 @@ public class StreamOutputsApiController extends AuthenticatedController {
         if (!isPermitted(RestPermissions.STREAMS_READ, streamId) || !isPermitted(RestPermissions.OUTPUTS_READ))
             return forbidden();
 
-        return ok(Json.toJson(streamService.getOutputs(streamId)));
+        return ok(Json.toJsonString(streamService.getOutputs(streamId))).as("application/json");
     }
 
     public Result delete(String streamId, String outputId) throws APIException, IOException {

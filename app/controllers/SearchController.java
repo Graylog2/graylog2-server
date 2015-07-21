@@ -31,6 +31,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import lib.SearchTools;
+import lib.json.Json;
 import lib.security.RestPermissions;
 import models.descriptions.InputDescription;
 import models.descriptions.NodeDescription;
@@ -60,7 +61,6 @@ import org.graylog2.restclient.models.api.results.MessageResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import org.joda.time.Minutes;
 import play.Logger;
-import play.libs.Json;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -395,7 +395,7 @@ public class SearchController extends AuthenticatedController {
             index++;
         }
 
-        return Json.stringify(Json.toJson(points));
+        return Json.toJsonString(points);
     }
 
     protected Set<String> getSelectedFields(String fields) {

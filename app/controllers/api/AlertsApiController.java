@@ -22,11 +22,11 @@ package controllers.api;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.alerts.Alert;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -65,7 +65,7 @@ public class AlertsApiController extends AuthenticatedController {
 
             result.put("alerts", alerts);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

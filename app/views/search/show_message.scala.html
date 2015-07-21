@@ -5,14 +5,14 @@
         inputs: Map[String, models.descriptions.InputDescription]
         )
 
-@import play.libs.Json;
+@import lib.json.Json
 
 @main("Message " + message.getId, null, "", currentUser, true) {
 
     <div id="react-message-details"
-      data-message="@Json.toJson(message)"
-      data-nodes="@Json.toJson(nodes)"
-      data-streams="@Json.toJson(streams)"
-      data-inputs="@Json.toJson(inputs)">
+      data-message="@Json.toJsonString(message)"
+      data-nodes="@Json.toJsonString(nodes)"
+      data-streams="@Json.toJsonString(streams)"
+      data-inputs="@Json.toJsonString(inputs)">
     </div>
 }

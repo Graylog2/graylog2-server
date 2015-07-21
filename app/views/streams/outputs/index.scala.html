@@ -2,7 +2,7 @@
     breadcrumbs: lib.BreadcrumbList,
     stream: org.graylog2.restclient.models.Stream)
 
-@import play.libs.Json;
+@import lib.json.Json
 
 @main("Outputs of stream \"" + stream.getTitle + "\"", null, "", currentUser, false) {
 
@@ -29,6 +29,6 @@
         </div>
     </div>
 
-    <div class="react-output-component" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
+    <div class="react-output-component" data-stream-id="@stream.getId" data-permissions='@Json.toJsonString(currentUser.getPermissions)'>
     </div>
 }

@@ -198,7 +198,7 @@ public class Global extends GlobalSettings {
 
     }
 
-    private ObjectMapper buildObjectMapper() {
+    public static ObjectMapper buildObjectMapper() {
         return new ObjectMapper()
                 .registerModules(new GuavaModule(), new JodaModule())
                 .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
