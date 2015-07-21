@@ -11,6 +11,10 @@ Example fields:
 
 The plugin only supports NetFlow V5 at the moment.
 
+## Requirements
+
+Graylog 1.2.0 or later is needed to run this plugin.
+
 ## Credits
 
 The NetFlow parsing code is based on the https://github.com/wasted/netflow project and has been ported from Scala to Java.
