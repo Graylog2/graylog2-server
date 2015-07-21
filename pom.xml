@@ -12,6 +12,7 @@
     <name>${project.artifactId}</name>
     <description>Graylog ${project.artifactId} plugin.</description>
     <url>https://www.graylog.org</url>
+    <inceptionYear>2015</inceptionYear>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -75,12 +76,13 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.11</version>
                 <configuration>
-                    <header>com/mycila/maven/plugin/license/templates/Apache-2.txt</header>
+                    <header>src/main/resources/templates/APACHE-2.txt</header>
                     <properties>
                         <owner>Graylog, Inc.</owner>
                         <project.name>Graylog</project.name>
+                        <email>hello@graylog.org</email>
                     </properties>
                     <includes>
                         <include>**/src/main/java/**</include>
