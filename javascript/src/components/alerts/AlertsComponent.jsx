@@ -43,7 +43,7 @@ var AlertsComponent = React.createClass({
     },
     _showPerPageSelect() {
         return (
-            <Input type='select' onChange={this._onChangePageSize}>
+            <Input type='select' bsSize="small" label="Show:" onChange={this._onChangePageSize}>
                 <option value={10}>10</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
@@ -59,8 +59,8 @@ var AlertsComponent = React.createClass({
                         <h2>
                             Triggered alerts
 
-                            <small>{this.state.alerts.total} alerts total</small>
-                            <div style={{float: "right"}}>
+                            &nbsp;<small>{this.state.alerts.total} alerts total</small>
+                            <div className="form-inline" style={{float: "right"}}>
                                 {this._showPerPageSelect()}
                             </div>
                         </h2>
@@ -77,7 +77,13 @@ var AlertsComponent = React.createClass({
                 </Row>
             );
         } else {
-            return <Spinner />;
+            return (
+                <Row className="content">
+                    <Col md={12}>
+                        <Spinner />
+                    </Col>
+                </Row>
+            );
         }
     }
 });
