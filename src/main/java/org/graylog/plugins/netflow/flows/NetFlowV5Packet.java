@@ -1,11 +1,8 @@
-package org.graylog.plugins.netflow.flows.cflow;
+package org.graylog.plugins.netflow.flows;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
-import org.graylog.plugins.netflow.flows.CorruptFlowPacketException;
-import org.graylog.plugins.netflow.flows.FlowException;
-import org.graylog.plugins.netflow.flows.InvalidFlowVersionException;
 import org.graylog.plugins.netflow.utils.UUIDs;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

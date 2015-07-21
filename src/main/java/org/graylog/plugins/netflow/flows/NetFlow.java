@@ -1,4 +1,4 @@
-package org.graylog.plugins.netflow.flows.cflow;
+package org.graylog.plugins.netflow.flows;
 
 import org.graylog2.plugin.Message;
 

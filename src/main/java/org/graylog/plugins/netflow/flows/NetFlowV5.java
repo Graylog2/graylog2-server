@@ -1,4 +1,4 @@
-package org.graylog.plugins.netflow.flows.cflow;
+package org.graylog.plugins.netflow.flows;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;

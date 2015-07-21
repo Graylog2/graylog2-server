@@ -11,15 +11,15 @@ import java.util.Set;
 /**
  * Implement the PluginMetaData interface here.
  */
-public class NetflowPluginMetaData implements PluginMetaData {
+public class NetFlowPluginMetaData implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return "org.graylog.plugins.netflow.NetflowPluginPlugin";
+        return "org.graylog.plugins.netflow.NetFlowPlugin";
     }
 
     @Override
     public String getName() {
-        return "NetflowPlugin";
+        return "NetFlowPlugin";
     }
 
     @Override
@@ -40,12 +40,12 @@ public class NetflowPluginMetaData implements PluginMetaData {
     @Override
     public String getDescription() {
         // TODO Insert correct plugin description
-        return "Netflow input";
+        return "NetFlow input";
     }
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(1, 0, 0);
+        return new Version(1, 2, 0);
     }
 
     @Override

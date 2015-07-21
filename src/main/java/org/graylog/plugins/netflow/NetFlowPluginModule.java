@@ -1,7 +1,7 @@
 package org.graylog.plugins.netflow;
 
-import org.graylog.plugins.netflow.codecs.NetflowCodec;
-import org.graylog.plugins.netflow.inputs.NetflowInput;
+import org.graylog.plugins.netflow.codecs.NetFlowCodec;
+import org.graylog.plugins.netflow.inputs.NetFlowInput;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Extend the PluginModule abstract class here to add you plugin to the system.
  */
-public class NetflowPluginModule extends PluginModule {
+public class NetFlowPluginModule extends PluginModule {
     /**
      * Returns all configuration beans required by this plugin.
      *
@@ -24,7 +24,7 @@ public class NetflowPluginModule extends PluginModule {
 
     @Override
     protected void configure() {
-        addMessageInput(NetflowInput.class);
-        addCodec("netflow", NetflowCodec.class);
+        addMessageInput(NetFlowInput.class);
+        addCodec("netflow", NetFlowCodec.class);
     }
 }

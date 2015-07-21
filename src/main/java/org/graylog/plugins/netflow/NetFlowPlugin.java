@@ -10,14 +10,14 @@ import java.util.Collection;
 /**
  * Implement the Plugin interface here.
  */
-public class NetflowPlugin implements Plugin {
+public class NetFlowPlugin implements Plugin {
     @Override
     public PluginMetaData metadata() {
-        return new NetflowPluginMetaData();
+        return new NetFlowPluginMetaData();
     }
 
     @Override
     public Collection<PluginModule> modules () {
-        return Arrays.<PluginModule>asList(new NetflowPluginModule());
+        return Arrays.<PluginModule>asList(new NetFlowPluginModule());
     }
 }

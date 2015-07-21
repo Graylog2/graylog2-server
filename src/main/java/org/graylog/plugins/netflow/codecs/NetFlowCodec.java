@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.netflow.flows.FlowException;
 import org.graylog.plugins.netflow.flows.NetFlowParser;
-import org.graylog.plugins.netflow.flows.cflow.NetFlow;
-import org.graylog.plugins.netflow.flows.cflow.NetFlowPacket;
+import org.graylog.plugins.netflow.flows.NetFlow;
+import org.graylog.plugins.netflow.flows.NetFlowPacket;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -25,12 +25,12 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 
-@Codec(name = "netflow", displayName = "Netflow")
-public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
-    private static final Logger LOG = LoggerFactory.getLogger(NetflowCodec.class);
+@Codec(name = "netflow", displayName = "NetFlow")
+public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
+    private static final Logger LOG = LoggerFactory.getLogger(NetFlowCodec.class);
 
     @Inject
-    protected NetflowCodec(@Assisted Configuration configuration) {
+    protected NetFlowCodec(@Assisted Configuration configuration) {
         super(configuration);
     }
 
@@ -64,9 +64,9 @@ public class NetflowCodec extends AbstractCodec implements MultiMessageCodec {
     }
 
     @FactoryClass
-    public interface Factory extends AbstractCodec.Factory<NetflowCodec> {
+    public interface Factory extends AbstractCodec.Factory<NetFlowCodec> {
         @Override
-        NetflowCodec create(Configuration configuration);
+        NetFlowCodec create(Configuration configuration);
 
         @Override
         Config getConfig();
