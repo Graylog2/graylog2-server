@@ -1,50 +1,43 @@
-# Graylog NetFlow Plugin
+Graylog NetFlow Plugin
+======================
 
-NetFlow related Graylog plugins.
+This plugin provides a NetFlow UDP input to act as a Flow collector that receives data from Flow exporters. Each received Flow will be converted to a Graylog message.
 
+Example fields:
 
-## Testing
+![NetFlow example fields screenshot](netflow-example.png)
 
-Install the pmacct package to collect and send NetFlow data to Graylog.
+## Supported NetFlow Versions
 
-Example configuration:
+The plugin only supports NetFlow V5 at the moment.
 
-```
-daemonize: false
-debug: true
-interface: eth0
-plugins: nfprobe
-nfprobe_receiver: 10.0.2.2:5555 # ip and port of the Graylog NetFlow input
-nfprobe_version: 5              # NetFlow version
-```
+## Credits
 
-The following files provide examples and a config reference.
+The NetFlow parsing code is based on the https://github.com/wasted/netflow project and has been ported from Scala to Java.
 
-* /usr/share/doc/pmacct/EXAMPLES.gz
-* /usr/share/doc/pmacct/CONFIG-KEYS.gz
+## Development
 
-Start pmacctd with the config:
+### Testing
+
+To generate some NetFlow data for debugging and testing you can use softflowd.
+
+Example command and output:
 
 ```
-$ pmacctd -f pmacctd.conf
-INFO ( default/nfprobe ): 131070 bytes are available to address shared memory segment; buffer size is 244 bytes.
-INFO ( default/nfprobe ): Trying to allocate a shared memory segment of 3997452 bytes.
-OK ( default/core ): link type is: 1
-INFO ( default/nfprobe ): NetFlow probe plugin is originally based on softflowd 0.9.7 software, Copyright 2002 Damien Miller <djm@mindrot.org> All rights reserved.
-INFO ( default/nfprobe ):           TCP timeout: 3600s
-INFO ( default/nfprobe ):  TCP post-RST timeout: 120s
-INFO ( default/nfprobe ):  TCP post-FIN timeout: 300s
-INFO ( default/nfprobe ):           UDP timeout: 300s
-INFO ( default/nfprobe ):          ICMP timeout: 300s
-INFO ( default/nfprobe ):       General timeout: 3600s
-INFO ( default/nfprobe ):      Maximum lifetime: 604800s
-INFO ( default/nfprobe ):       Expiry interval: 60s
-INFO ( default/nfprobe ): Exporting flows to [10.0.2.2]:5555
-DEBUG ( default/nfprobe ): ADD FLOW seq:1 [10.0.2.2]:58442 <> [10.0.2.15]:22 proto:6
-```
+# softflowd -D -i eth0 -v 5 -t maxlife=1 -n 10.0.2.2:2055
 
-Running pmacctd without config and print out flows:
-
-```
-$ pmacctd -P print -r 1 -i eth0 -c src_host,dst_host
+Using eth0 (idx: 0)
+softflowd v0.9.9 starting data collection
+Exporting flows to [10.0.2.2]:2055
+ADD FLOW seq:1 [10.0.2.2]:48164 <> [10.0.2.15]:22 proto:6
+ADD FLOW seq:2 [10.0.2.2]:51428 <> [10.0.2.15]:22 proto:6
+Starting expiry scan: mode 0
+Queuing flow seq:1 (0x7fef0318bc70) for expiry reason 6
+Finished scan 1 flow(s) to be evicted
+Sending v5 flow packet len = 120
+sent 1 netflow packets
+EXPIRED: seq:1 [10.0.2.2]:48164 <> [10.0.2.15]:22 proto:6 octets>:322 packets>:7 octets<:596 packets<:7 start:2015-07-21T13:18:01.236 finish:2015-07-21T13:18:27.718 tcp>:10 tcp<:18 flowlabel>:00000000 flo
+wlabel<:00000000  (0x7fef0318bc70)
+ADD FLOW seq:3 [10.0.2.2]:2055 <> [10.0.2.15]:48363 proto:17
+ADD FLOW seq:4 [10.0.2.2]:48164 <> [10.0.2.15]:22 proto:6
 ```
