@@ -149,7 +149,6 @@ public class NetFlowV5 implements NetFlow {
                                   final int samplingInterval,
                                   final boolean calculateSamples) {
 
-        final boolean sampling = calculateSamples;
         final long pkts = getUnsignedInteger(buf, 16, 4);
         final long bytes = getUnsignedInteger(buf, 20, 4);
 
@@ -180,8 +179,8 @@ public class NetFlowV5 implements NetFlow {
                 dstPort,
                 srcAS != -1 ? Optional.of(srcAS) : Optional.<Integer>absent(),
                 dstAS != -1 ? Optional.of(dstAS) : Optional.<Integer>absent(),
-                sampling ? pkts * samplingInterval : pkts, // pkts
-                sampling ? bytes * samplingInterval : bytes, // bytes
+                calculateSamples ? pkts * samplingInterval : pkts, // pkts
+                calculateSamples ? bytes * samplingInterval : bytes, // bytes
                 proto,
                 tos,
                 tcpflags,
