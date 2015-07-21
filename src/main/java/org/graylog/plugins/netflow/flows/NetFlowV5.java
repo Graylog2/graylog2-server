@@ -188,7 +188,7 @@ public class NetFlowV5 implements NetFlow {
                 stop != 0 ? Optional.of(timestamp.minus(uptime - stop)) : Optional.<DateTime>absent(), // stop
                 srcAddress,
                 dstAddress,
-                ByteBufUtils.DEFAULT_INET_ADDRESS.equals(nextHop.getHostAddress()) ? Optional.<InetAddress>absent() : Optional.of(nextHop), // nextHop
+                ByteBufUtils.DEFAULT_INET_ADDRESS.equals(nextHop) ? Optional.<InetAddress>absent() : Optional.of(nextHop), // nextHop
                 snmpInput,
                 snmpOutput,
                 srcMask,
