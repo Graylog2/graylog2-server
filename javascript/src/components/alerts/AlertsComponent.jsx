@@ -53,26 +53,44 @@ var AlertsComponent = React.createClass({
     render() {
         if (this.state.alerts) {
             var numberPages = Math.ceil(this.state.alerts.total/this.state.limit);
+            var triggeredAlertsText;
+            var pagination;
+            var alertsPerPageSelector;
+
+            if (this.state.alerts.total > 0) {
+                triggeredAlertsText = <span>&nbsp; <small>{this.state.alerts.total} alerts total</small></span>;
+            }
+
+            if (numberPages > 0) {
+                alertsPerPageSelector = (
+                    <div className="form-inline" style={{float: "right"}}>
+                        {this._showPerPageSelect()}
+                    </div>
+                );
+
+                pagination = (
+                    <div className="text-center">
+                        <Pagination bsSize="small" items={numberPages}
+                                    activePage={this.state.currentPage}
+                                    onSelect={this._onSelected}
+                                    prev={true} next={true} first={true} last={true}
+                                    maxButtons={Math.min(this.state.paginatorSize, numberPages)}/>
+                    </div>
+                );
+            }
+
             return (
                 <Row className="content">
                     <Col md={12}>
                         <h2>
                             Triggered alerts
-
-                            &nbsp;<small>{this.state.alerts.total} alerts total</small>
-                            <div className="form-inline" style={{float: "right"}}>
-                                {this._showPerPageSelect()}
-                            </div>
+                            {triggeredAlertsText}
+                            {alertsPerPageSelector}
                         </h2>
-                        {' '}
+
                         <AlertsTable alerts={this.state.alerts.alerts} />
 
-                        <div className="text-center">
-                            <Pagination bsSize="small" items={numberPages}
-                                        activePage={this.state.currentPage}
-                                        onSelect={this._onSelected} prev={true} next={true}
-                                        maxButtons={Math.min(this.state.paginatorSize, numberPages)}/>
-                        </div>
+                        {pagination}
                     </Col>
                 </Row>
             );
