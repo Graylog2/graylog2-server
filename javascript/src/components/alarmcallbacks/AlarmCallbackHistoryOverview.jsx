@@ -5,7 +5,8 @@ var AlarmCallbackHistoryStore = require('../../stores/alarmcallbacks/AlarmCallba
 var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var Spinner = require('../common/Spinner');
 var AlarmCallbackHistory = require('./AlarmCallbackHistory');
-var Panel = require('react-bootstrap').Panel;
+var Col = require('react-bootstrap').Col;
+var Row = require('react-bootstrap').Row;
 
 var AlarmCallbackHistoryOverview = React.createClass({
     getInitialState() {
@@ -23,20 +24,18 @@ var AlarmCallbackHistoryOverview = React.createClass({
         });
     },
     _formatHistory(history) {
-        return <li key={"li-"+history._id}><AlarmCallbackHistory key={history._id} alarmCallbackHistory={history} types={this.state.types}/></li>;
+        return <AlarmCallbackHistory key={history._id} alarmCallbackHistory={history} types={this.state.types}/>;
     },
     render() {
         if (this.state.histories && this.state.types) {
             if (this.state.histories.length > 0) {
                 var histories = this.state.histories.map(this._formatHistory);
                 return (
-                    <div>
-                        <Panel header="Alarm Callback History">
-                            <ul>
-                                {histories}
-                            </ul>
-                        </Panel>
-                    </div>
+                    <Row>
+                        <Col md={12}>
+                            {histories}
+                        </Col>
+                    </Row>
                 );
             } else {
                 return (

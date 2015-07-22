@@ -13,20 +13,18 @@ var AlertsTable = React.createClass({
                 <table className="alerts table table-hover table-condensed">
                     <thead>
                     <tr>
-                        <th style={{width: "130px"}} data-dynatable-sorts="timestamp">Triggered</th>
-                        <th style={{display: "none"}}>Timestamp</th>
+                        <th style={{width: 150}}>Triggered</th>
                         <th>Condition</th>
-                        <th>Description</th>
+                        <th>Reason</th>
+                        <th style={{width: 120}}>&nbsp;</th>
                     </tr>
                     </thead>
-                    <tbody>
-                        {alerts}
-                    </tbody>
+                    {alerts}
                 </table>
             );
         } else {
             return (
-                <div style={{marginTop: '10px'}} className="alert alert-info">
+                <div style={{marginTop: 10}} className="alert alert-info">
                     This stream has never triggered an alert.
                 </div>
             );

@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react/addons');
+var Button = require('react-bootstrap').Button;
 var AlarmCallbackHistoryOverview = require('../alarmcallbacks/AlarmCallbackHistoryOverview');
 
 var Alert = React.createClass({
@@ -22,24 +23,41 @@ var Alert = React.createClass({
         e.preventDefault();
         this.setState({showAlarmCallbackHistory: !this.state.showAlarmCallbackHistory});
     },
-    render() {
-        var alert = this.props.alert;
-        var alarmCallbackHistory = (this.state.showAlarmCallbackHistory ? <div><br/><AlarmCallbackHistoryOverview alertId={alert.id} streamId={alert.stream_id} /></div>:null);
-        var historyIcon = (this.state.showAlarmCallbackHistory ? <i className="fa fa-caret-down" /> : <i className="fa fa-caret-right" />);
+    _getAlarmCallbackHistory(alert) {
         return (
             <tr>
-                <td>
-                    {momentHelper.toUserTimeZone(moment(alert.triggered_at)).fromNow()}
-                </td>
-                <td style={{display: 'none'}}>{momentHelper.toUserTimeZone(moment(alert.triggered_at)).format()}</td>
-                <td>
-                    <a href="#" onClick={this._onClickConditionId.bind(this, alert.condition_id)}>{alert.condition_id}</a>
-                </td>
-                <td>
-                    <a href="#" onClick={this._toggleHistory}>{historyIcon}</a> {alert.description}
-                    {alarmCallbackHistory}
+                <td colSpan="2">&nbsp;</td>
+                <td colSpan="2">
+                    <AlarmCallbackHistoryOverview alertId={alert.id} streamId={alert.stream_id}/>
                 </td>
             </tr>
+        );
+    },
+    render() {
+        var alert = this.props.alert;
+        var toggleHistoryText = this.state.showAlarmCallbackHistory ? "Hide callbacks" : "Show callbacks";
+        var alertTriggeredAt = momentHelper.toUserTimeZone(alert.triggered_at);
+        var alarmCallbackHistory= this.state.showAlarmCallbackHistory ? this._getAlarmCallbackHistory(alert) : null;
+        return (
+            <tbody>
+            <tr>
+                <td style={{borderTop: 0}}>
+                    <time title={alertTriggeredAt.format()} dateTime={alertTriggeredAt.format()}>
+                        {alertTriggeredAt.fromNow()}
+                    </time>
+                </td>
+                <td style={{borderTop: 0}}>
+                    <a href="#" onClick={this._onClickConditionId.bind(this, alert.condition_id)}>{alert.condition_id}</a>
+                </td>
+                <td style={{borderTop: 0}}>
+                    {alert.description}
+                </td>
+                <td className="text-right" style={{borderTop: 0}}>
+                    <Button bsStyle="info" bsSize="xsmall" onClick={this._toggleHistory}>{toggleHistoryText}</Button>
+                </td>
+            </tr>
+            {alarmCallbackHistory}
+            </tbody>
         );
     }
 });
