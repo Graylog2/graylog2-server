@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
@@ -64,12 +65,14 @@ public class TcpTransport extends AbstractTcpTransport {
 
     public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
     public static final String CK_MAX_MESSAGE_SIZE = "max_message_size";
+    public static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
     public static final String CK_TLS_CERT_FILE = "tls_cert_file";
     public static final String CK_TLS_KEY_FILE = "tls_key_file";
     public static final String CK_TLS_ENABLE = "tls_enable";
     public static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
     protected final ChannelBuffer[] delimiter;
     protected final int maxFrameLength;
+    private final boolean tcpKeepalive;
     private final boolean tlsEnable;
     private final String tlsKeyPassword;
     private final Configuration configuration;
@@ -102,6 +105,7 @@ public class TcpTransport extends AbstractTcpTransport {
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
+        this.tcpKeepalive = configuration.getBoolean(CK_TCP_KEEPALIVE);
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
         this.tlsKeyFile = getTlsFile(configuration, CK_TLS_KEY_FILE);
@@ -128,6 +132,14 @@ public class TcpTransport extends AbstractTcpTransport {
                 Executors.newCachedThreadPool(threadFactory),
                 metricRegistry,
                 name(TcpTransport.class, executorName, "executor-service"));
+    }
+
+    @Override
+    protected Bootstrap getBootstrap() {
+        final Bootstrap bootstrap = super.getBootstrap();
+        bootstrap.setOption("child.keepAlive", tcpKeepalive);
+
+        return bootstrap;
     }
 
     @Override
@@ -229,6 +241,14 @@ public class TcpTransport extends AbstractTcpTransport {
                             "The maximum length of a message.",
                             ConfigurationField.Optional.OPTIONAL,
                             NumberField.Attribute.ONLY_POSITIVE
+                    )
+            );
+            x.addField(
+                    new BooleanField(
+                            CK_TCP_KEEPALIVE,
+                            "TCP keepalive",
+                            false,
+                            "Enable TCP keepalive packets"
                     )
             );
             x.addField(
