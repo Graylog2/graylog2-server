@@ -11,8 +11,8 @@ var AlarmCallbackHistory = React.createClass({
         var result = (history.result.type === "error" ? this._redCross() : this._greenTick());
         var subtitle = (history.result.type === "error" ? <div style={{color: "red"}}>{history.result.error}</div> : null);
         return (
-            <AlarmCallback alarmCallback={history.alarmcallbackconfiguration} hideButtons={true} types={this.props.types}
-                           titleAnnotation={result} subtitle={subtitle}/>
+            <AlarmCallback alarmCallback={history.alarmcallbackconfiguration} types={this.props.types}
+                           titleAnnotation={result} subtitle={subtitle} concise={true}/>
         );
     }
 });
