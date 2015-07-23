@@ -4,7 +4,9 @@ var React = require('react');
 
 var StreamStateBadge = React.createClass({
     _onClick(evt) {
-        this.props.onClick(this.props.stream);
+        if (typeof this.props.onClick === 'function') {
+            this.props.onClick(this.props.stream);
+        }
     },
     render() {
         var stream = this.props.stream;
