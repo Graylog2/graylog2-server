@@ -25,12 +25,12 @@ import org.joda.time.DateTime;
 @AutoValue
 @JsonAutoDetect
 public abstract class AlarmCallbackHistorySummary {
-    static final String FIELD_ID = "_id";
-    static final String FIELD_ALARMCALLBACKCONFIGURATION = "alarmcallbackconfiguration";
-    static final String FIELD_ALERT_ID = "alert_id";
-    static final String FIELD_ALERTCONDITION_ID = "alertcondition_id";
-    static final String FIELD_RESULT = "result";
-    static final String FIELD_CREATED_AT = "created_at";
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_ALARMCALLBACKCONFIGURATION = "alarmcallbackconfiguration";
+    private static final String FIELD_ALERT_ID = "alert_id";
+    private static final String FIELD_ALERTCONDITION_ID = "alertcondition_id";
+    private static final String FIELD_RESULT = "result";
+    private static final String FIELD_CREATED_AT = "created_at";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();

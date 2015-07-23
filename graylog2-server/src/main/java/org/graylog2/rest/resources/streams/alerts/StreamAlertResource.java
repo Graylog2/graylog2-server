@@ -186,7 +186,7 @@ public class StreamAlertResource extends RestResource {
     }
 
     private List<AlertSummary> toSummaryList(List<Alert> alertList) {
-        final List<AlertSummary> result = Lists.newArrayList();
+        final List<AlertSummary> result = Lists.newArrayListWithCapacity(alertList.size());
         for (Alert alert : alertList) {
             result.add(AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()));
         }
