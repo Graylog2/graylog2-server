@@ -1,10 +1,11 @@
 package controllers.api;
 
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.rest.models.collector.responses.CollectorSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.CollectorService;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -22,6 +23,6 @@ public class CollectorsApiController extends AuthenticatedController {
     public Result index() throws APIException, IOException {
         final List<CollectorSummary> collectors = collectorService.all();
 
-        return ok(Json.toJson(collectors));
+        return ok(Json.toJsonString(collectors)).as(MediaType.JSON_UTF_8.toString());
     }
 }

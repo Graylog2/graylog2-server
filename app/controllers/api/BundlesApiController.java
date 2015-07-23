@@ -18,22 +18,20 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Multimap;
-import com.google.common.io.Files;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import org.graylog2.restclient.models.bundles.BundleService;
 import org.graylog2.restclient.models.bundles.ConfigurationBundle;
 import play.Logger;
-import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public class BundlesApiController extends AuthenticatedController {
     private final BundleService bundleService;
@@ -48,7 +46,7 @@ public class BundlesApiController extends AuthenticatedController {
     public Result index() {
         Multimap<String, ConfigurationBundle> bundles = bundleService.all();
 
-        return ok(Json.toJson(bundles.asMap()));
+        return ok(Json.toJsonString(bundles.asMap())).as(MediaType.JSON_UTF_8.toString());
     }
 
     @BodyParser.Of(BodyParser.MultipartFormData.class)

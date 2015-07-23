@@ -23,7 +23,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.DateTools;
@@ -33,7 +35,6 @@ import org.graylog2.restclient.models.IndexService;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailureSummary;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailuresResponse;
 import org.joda.time.DateTime;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.annotation.Nullable;
@@ -74,7 +75,7 @@ public class IndicesApiController extends AuthenticatedController {
             result.put("queryRecordCount", failures.total);
             result.put("totalRecordCount", failures.total);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException e) {
             String message = "Could not get indexer failures. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));

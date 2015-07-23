@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule])
 
-@import play.libs.Json
+@import lib.json.Json
 
 @main("Rules of stream \"" + stream.getTitle + "\"" , null, "", currentUser, false) {
 
@@ -16,6 +16,6 @@
     </div>
 
 
-    <div class="react-streamrules-editor" data-stream-id="@stream.getId" data-permissions='@Json.toJson(currentUser.getPermissions)'>
+    <div class="react-streamrules-editor" data-stream-id="@stream.getId" data-permissions='@Json.toJsonString(currentUser.getPermissions)'>
     </div>
 }

@@ -2,14 +2,15 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.StreamRule;
 import org.graylog2.restclient.models.StreamRuleService;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRuleRequest;
 import org.graylog2.restclient.models.api.responses.streams.CreateStreamRuleResponse;
 import org.graylog2.restclient.models.api.results.StreamRulesResult;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -41,12 +42,12 @@ public class StreamRulesApiController extends AuthenticatedController {
         for (StreamRule.Type type : StreamRule.Type.values()) {
             types.add(new Type(type.getId(), type.getShortDesc(), type.getLongDesc()));
         }
-        return ok(Json.toJson(types));
+        return ok(Json.toJsonString(types)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result list(String streamId) throws IOException, APIException {
         final StreamRulesResult result = streamRuleService.all(streamId);
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result update(String streamId, String streamRuleId) throws APIException, IOException {
@@ -65,6 +66,6 @@ public class StreamRulesApiController extends AuthenticatedController {
         final JsonNode json = request().body().asJson();
         final CreateStreamRuleRequest request = Json.fromJson(json, CreateStreamRuleRequest.class);
         final CreateStreamRuleResponse result = streamRuleService.create(streamId, request);
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 }

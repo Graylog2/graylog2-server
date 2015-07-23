@@ -19,13 +19,14 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.ExtractorService;
-import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -43,7 +44,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
 
     public Result index() {
         try {
-            return ok(Json.toJson(extractorService.allGrokPatterns()));
+            return ok(Json.toJsonString(extractorService.allGrokPatterns())).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException | IOException e) {
             log.error("Unable to get grok patterns");
         }

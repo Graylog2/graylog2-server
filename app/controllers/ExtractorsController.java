@@ -23,7 +23,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
+import lib.json.Json;
 import lib.security.RestPermissions;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Version;
@@ -33,12 +35,10 @@ import org.graylog2.restclient.models.Input;
 import org.graylog2.restclient.models.MessagesService;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
-import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorImportRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorListImportRequest;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import play.Logger;
-import play.libs.Json;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -271,7 +271,7 @@ public class ExtractorsController extends AuthenticatedController {
             result.put("extractors", extractors);
             result.put("version", Version.VERSION.toString());
 
-            String extractorExport = Json.stringify(Json.toJson(result));
+            String extractorExport = Json.toJsonString(result);
 
             return ok(views.html.system.inputs.extractors.export.render(
                             currentUser(),

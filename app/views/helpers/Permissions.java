@@ -19,6 +19,7 @@
 package views.helpers;
 
 import com.google.common.collect.Maps;
+import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
@@ -26,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-
-import static play.libs.Json.toJson;
 
 public class Permissions {
 
@@ -84,7 +83,7 @@ public class Permissions {
             permissionMap.put(permission.name(), isPermitted(permission));
         }
 
-        return toJson(permissionMap).toString();
+        return Json.toJsonString(permissionMap);
     }
 
 }

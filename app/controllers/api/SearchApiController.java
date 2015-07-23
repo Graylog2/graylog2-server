@@ -20,8 +20,10 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.SearchTools;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
@@ -39,7 +41,6 @@ import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.joda.time.MutableDateTime;
 import org.joda.time.Weeks;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -90,7 +91,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("std_deviation", stats.stdDeviation);
             result.put("cardinality", stats.cardinality);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -134,7 +135,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("other", terms.other);
             result.put("terms", terms.terms);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -188,7 +189,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("from", boundaries.getFrom());
             result.put("to", boundaries.getTo());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -239,7 +240,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("from", boundaries.getFrom());
             result.put("to", boundaries.getTo());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

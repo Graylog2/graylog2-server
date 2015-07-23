@@ -21,7 +21,9 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import models.descriptions.InputDescription;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -38,7 +40,6 @@ import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -73,7 +74,7 @@ public class InputsApiController extends AuthenticatedController {
             result.add(new InputDescription(inputState.getInput()));
         }
 
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result io(String nodeId, String inputId) {
@@ -89,7 +90,7 @@ public class InputsApiController extends AuthenticatedController {
             result.put("rx", Tools.byteToHuman(ioStats.readBytes));
             result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -123,7 +124,7 @@ public class InputsApiController extends AuthenticatedController {
         result.put("rx", Tools.byteToHuman(ioStats.readBytes));
         result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
 
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result connections(String nodeId, String inputId) {
@@ -136,7 +137,7 @@ public class InputsApiController extends AuthenticatedController {
             result.put("active", input.getConnections());
             result.put("total", input.getTotalConnections());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -153,7 +154,7 @@ public class InputsApiController extends AuthenticatedController {
 
         List<MessageResult> messages = search.search().getMessages();
         if (messages.size() > 0) {
-            return ok(Json.toJson(buildResultFromMessage(messages.get(0))));
+            return ok(Json.toJsonString(buildResultFromMessage(messages.get(0)))).as(MediaType.JSON_UTF_8.toString());
         } else {
             return notFound();
         }
@@ -168,7 +169,7 @@ public class InputsApiController extends AuthenticatedController {
                 return notFound();
             }
 
-            return ok(Json.toJson(buildResultFromMessage(recentlyReceivedMessage)));
+            return ok(Json.toJsonString(buildResultFromMessage(recentlyReceivedMessage))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return status(500);
         } catch (APIException e) {

@@ -18,7 +18,9 @@
  */
 package controllers;
 
+import com.google.common.net.MediaType;
 import lib.BreadcrumbList;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.accounts.LdapSettings;
 import org.graylog2.restclient.models.accounts.LdapSettingsService;
@@ -29,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -82,7 +83,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result apiTestLdapLogin() {
@@ -109,7 +110,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     private LdapTestConnectionRequest getLdapTestConnectionRequest(Map<String, String> formData) {

@@ -20,7 +20,9 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.metrics.Meter;
 import org.graylog2.restclient.models.BufferInfo;
@@ -36,7 +38,6 @@ import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.SystemJob;
 import org.graylog2.restclient.models.api.responses.JournalInfo;
 import play.libs.F;
-import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -67,7 +68,7 @@ public class SystemApiController extends AuthenticatedController {
         Map<String, Set<String>> result = Maps.newHashMap();
         result.put("fields", fields);
 
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result jobs() {
@@ -85,7 +86,7 @@ public class SystemApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             result.put("jobs", jobs);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -99,7 +100,7 @@ public class SystemApiController extends AuthenticatedController {
             result.put("count", clusterService.allNotifications().size());*/
             List<Notification> notifications = clusterService.allNotifications();
 
-            return ok(Json.toJson(notifications));
+            return ok(Json.toJsonString(notifications)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -126,7 +127,7 @@ public class SystemApiController extends AuthenticatedController {
         result.put("throughput", throughputPerNodes._1);
         result.put("nodecount", throughputPerNodes._2);
 
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result nodeThroughput(String nodeId) {
@@ -135,7 +136,7 @@ public class SystemApiController extends AuthenticatedController {
             final Node node = nodeService.loadNode(nodeId);
             result.put("throughput", node.getThroughput());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -147,7 +148,7 @@ public class SystemApiController extends AuthenticatedController {
             final Radio radio = nodeService.loadRadio(radioId);
             result.put("throughput", radio.getThroughput());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -159,7 +160,7 @@ public class SystemApiController extends AuthenticatedController {
             final Stream stream = streamService.get(streamId);
             long throughput = stream.getThroughput();
             result.put("throughput", throughput);
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException e) {
             return status(504, "Could not load stream " + streamId);
         } catch (IOException e) {
@@ -172,7 +173,7 @@ public class SystemApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             Node node = nodeService.loadNode(nodeId);
 
-            return ok(Json.toJson(jvmMap(node.jvm(), node.getBufferInfo())));
+            return ok(Json.toJsonString(jvmMap(node.jvm(), node.getBufferInfo()))).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -186,7 +187,7 @@ public class SystemApiController extends AuthenticatedController {
 
             result.put("uncommitted_entries", journalInfo.uncommittedJournalEntries);
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -195,7 +196,7 @@ public class SystemApiController extends AuthenticatedController {
     public Result radioHeap(String radioId) {
         try {
             Radio radio = nodeService.loadRadio(radioId);
-            return ok(Json.toJson(jvmMap(radio.jvm(), radio.getBuffers())));
+            return ok(Json.toJsonString(jvmMap(radio.jvm(), radio.getBuffers()))).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "radio not found");
         }
@@ -242,7 +243,7 @@ public class SystemApiController extends AuthenticatedController {
             Meter meter = (Meter) node.getSingleMetric("org.apache.log4j.Appender.all");
             result.put("total", meter.getTotal());
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         } catch (IOException e) {
@@ -279,7 +280,7 @@ public class SystemApiController extends AuthenticatedController {
                 result.put(shortName, meterMap);
             }
 
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         } catch (IOException e) {

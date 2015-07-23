@@ -2,14 +2,15 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Output;
 import org.graylog2.restclient.models.OutputService;
 import org.graylog2.restclient.models.api.requests.outputs.OutputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.AvailableOutputSummary;
-import play.libs.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -33,14 +34,14 @@ public class OutputsApiController extends AuthenticatedController {
         }
         final List<Output> outputs = outputService.list();
 
-        return ok(Json.toJson(outputs));
+        return ok(Json.toJsonString(outputs)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result available(String outputType) throws APIException, IOException {
         final Map<String, AvailableOutputSummary> types = outputService.available().types;
         final AvailableOutputSummary result = types.get(outputType);
         if (result != null) {
-            return ok(Json.toJson(result));
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } else {
             return notFound();
         }
@@ -54,7 +55,7 @@ public class OutputsApiController extends AuthenticatedController {
         for (Map.Entry<String, AvailableOutputSummary> entry : types.entrySet()) {
             result.put(entry.getKey(), entry.getValue().name);
         }
-        return ok(Json.toJson(result));
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result delete(String outputId) throws APIException, IOException {
@@ -74,7 +75,7 @@ public class OutputsApiController extends AuthenticatedController {
 
         final Output output = outputService.create(request);
 
-        return ok(Json.toJson(output));
+        return ok(Json.toJsonString(output)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result update(String outputId) throws APIException, IOException {
@@ -86,6 +87,6 @@ public class OutputsApiController extends AuthenticatedController {
 
         final Output output = outputService.update(outputId, request);
 
-        return ok(Json.toJson(output));
+        return ok(Json.toJsonString(output)).as(MediaType.JSON_UTF_8.toString());
     }
 }
