@@ -1,6 +1,7 @@
 package controllers.api;
 
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import models.descriptions.NodeDescription;
@@ -43,6 +44,6 @@ public class NodesApiController extends AuthenticatedController {
             return status(504, message);
         }
 
-        return ok(Json.toJsonString(nodes)).as("application/json");
+        return ok(Json.toJsonString(nodes)).as(MediaType.JSON_UTF_8.toString());
     }
 }

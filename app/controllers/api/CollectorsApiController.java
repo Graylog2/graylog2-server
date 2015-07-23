@@ -1,5 +1,6 @@
 package controllers.api;
 
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import org.graylog2.rest.models.collector.responses.CollectorSummary;
@@ -22,6 +23,6 @@ public class CollectorsApiController extends AuthenticatedController {
     public Result index() throws APIException, IOException {
         final List<CollectorSummary> collectors = collectorService.all();
 
-        return ok(Json.toJsonString(collectors)).as("application/json");
+        return ok(Json.toJsonString(collectors)).as(MediaType.JSON_UTF_8.toString());
     }
 }

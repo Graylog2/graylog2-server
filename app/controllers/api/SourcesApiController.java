@@ -19,6 +19,7 @@
  */
 package controllers.api;
 
+import com.google.common.net.MediaType;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.json.Json;
@@ -40,7 +41,7 @@ public class SourcesApiController extends AuthenticatedController {
         }
         try {
             List<Source> sources = sourcesService.all(range);
-            return ok(Json.toJsonString(sources)).as("application/json");
+            return ok(Json.toJsonString(sources)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

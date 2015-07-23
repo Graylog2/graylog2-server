@@ -2,6 +2,7 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import models.descriptions.StreamDescription;
@@ -28,11 +29,11 @@ public class StreamsApiController extends AuthenticatedController {
     public Result list() throws IOException, APIException {
         final List<Stream> streams  = this.streamService.all();
 
-        return ok(Json.toJsonString(streams)).as("application/json");
+        return ok(Json.toJsonString(streams)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result get(String streamId) throws IOException, APIException {
-        return ok(Json.toJsonString(streamService.get(streamId))).as("application/json");
+        return ok(Json.toJsonString(streamService.get(streamId))).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result delete(String streamId) throws APIException, IOException {
@@ -44,7 +45,7 @@ public class StreamsApiController extends AuthenticatedController {
         final JsonNode json = request().body().asJson();
         final CreateStreamRequest request = Json.fromJson(json, CreateStreamRequest.class);
 
-        return ok(Json.toJsonString(this.streamService.create(request))).as("application/json");
+        return ok(Json.toJsonString(this.streamService.create(request))).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result pause(String streamId) throws APIException, IOException {
@@ -78,7 +79,7 @@ public class StreamsApiController extends AuthenticatedController {
             final JsonNode jsonNode = request().body().asJson();
             final TestMatchRequest tmr = Json.fromJson(jsonNode, TestMatchRequest.class);
             final TestMatchResponse response = streamService.testMatch(stream_id, tmr);
-            return ok(Json.toJsonString(response)).as("application/json");
+            return ok(Json.toJsonString(response)).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException e) {
             String message = "Could not test stream rule matching. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, message);
@@ -100,6 +101,6 @@ public class StreamsApiController extends AuthenticatedController {
             return status(500, "Could not load streams, received HTTP " + e.getHttpCode() + ": " + e.getMessage());
         }
 
-        return ok(Json.toJsonString(streamDescriptions)).as("application/json");
+        return ok(Json.toJsonString(streamDescriptions)).as(MediaType.JSON_UTF_8.toString());
     }
 }

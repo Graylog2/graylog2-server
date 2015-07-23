@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.google.common.net.MediaType;
 import lib.BreadcrumbList;
 import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
@@ -82,7 +83,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(Json.toJsonString(result)).as("application/json");
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result apiTestLdapLogin() {
@@ -109,7 +110,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(Json.toJsonString(result)).as("application/json");
+        return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
     }
 
     private LdapTestConnectionRequest getLdapTestConnectionRequest(Map<String, String> formData) {

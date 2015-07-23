@@ -21,6 +21,7 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import org.graylog2.restclient.lib.APIException;
@@ -65,7 +66,7 @@ public class AlertsApiController extends AuthenticatedController {
 
             result.put("alerts", alerts);
 
-            return ok(Json.toJsonString(result)).as("application/json");
+            return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

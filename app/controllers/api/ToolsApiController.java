@@ -18,6 +18,7 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.MediaType;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.NaturalDateTest;
@@ -65,7 +66,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(Json.toJsonString(regexTest.test(request))).as("application/json");
+            return ok(Json.toJsonString(regexTest.test(request))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -81,7 +82,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(Json.toJsonString(substringTest.test(request))).as("application/json");
+            return ok(Json.toJsonString(substringTest.test(request))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -98,7 +99,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(Json.toJsonString(splitAndIndexTest.test(request))).as("application/json");
+            return ok(Json.toJsonString(splitAndIndexTest.test(request))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -112,7 +113,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
 
         try {
-            return ok(Json.toJsonString(naturalDateTest.test(string))).as("application/json");
+            return ok(Json.toJsonString(naturalDateTest.test(string))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -132,7 +133,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
 
         try {
-            return ok(Json.toJsonString(grokTest.test(request))).as("application/json");
+            return ok(Json.toJsonString(grokTest.test(request))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

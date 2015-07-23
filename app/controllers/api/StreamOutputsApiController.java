@@ -1,5 +1,6 @@
 package controllers.api;
 
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import lib.security.RestPermissions;
@@ -24,7 +25,7 @@ public class StreamOutputsApiController extends AuthenticatedController {
         if (!isPermitted(RestPermissions.STREAMS_READ, streamId) || !isPermitted(RestPermissions.OUTPUTS_READ))
             return forbidden();
 
-        return ok(Json.toJsonString(streamService.getOutputs(streamId))).as("application/json");
+        return ok(Json.toJsonString(streamService.getOutputs(streamId))).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result delete(String streamId, String outputId) throws APIException, IOException {

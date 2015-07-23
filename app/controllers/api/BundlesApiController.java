@@ -18,6 +18,7 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Multimap;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
@@ -45,7 +46,7 @@ public class BundlesApiController extends AuthenticatedController {
     public Result index() {
         Multimap<String, ConfigurationBundle> bundles = bundleService.all();
 
-        return ok(Json.toJsonString(bundles.asMap())).as("application/json");
+        return ok(Json.toJsonString(bundles.asMap())).as(MediaType.JSON_UTF_8.toString());
     }
 
     @BodyParser.Of(BodyParser.MultipartFormData.class)

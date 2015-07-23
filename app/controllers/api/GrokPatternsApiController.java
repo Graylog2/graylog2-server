@@ -19,6 +19,7 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
@@ -43,7 +44,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
 
     public Result index() {
         try {
-            return ok(Json.toJsonString(extractorService.allGrokPatterns())).as("application/json");
+            return ok(Json.toJsonString(extractorService.allGrokPatterns())).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException | IOException e) {
             log.error("Unable to get grok patterns");
         }

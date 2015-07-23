@@ -19,6 +19,7 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import lib.security.RestPermissions;
@@ -61,7 +62,7 @@ public class UsersApiController extends AuthenticatedController {
             response.add(userResponse);
         }
 
-        return ok(Json.toJsonString(response)).as("application/json");
+        return ok(Json.toJsonString(response)).as(MediaType.JSON_UTF_8.toString());
     }
 
     public Result loadUser(String username) {
@@ -71,7 +72,7 @@ public class UsersApiController extends AuthenticatedController {
 
         User user = userService.load(username);
         if (user != null) {
-            return ok(Json.toJsonString(user)).as("application/json");
+            return ok(Json.toJsonString(user)).as(MediaType.JSON_UTF_8.toString());
         } else {
             return notFound();
         }
