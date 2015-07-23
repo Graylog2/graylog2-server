@@ -17,8 +17,8 @@
       "alert_id": "alertId",
       "alertcondition_id": "alertConditionId",
       "result": {
-        "type": "error",
-        "error": "Dummy Error Message"
+        "error": "Dummy Error Message",
+        "type": "error"
       },
       "created_at": "2015-07-21T13:39:59.325Z"
     }

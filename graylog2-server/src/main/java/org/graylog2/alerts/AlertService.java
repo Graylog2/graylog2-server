@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
@@ -52,4 +53,5 @@ public interface AlertService extends PersistedService {
     Map<String, Object> asMap(final AlertCondition alertCondition);
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
+    Alert load(String alertId, String streamId) throws NotFoundException;
 }
