@@ -27,3 +27,6 @@ field_list_limit=100
 
 # You usually do not want to change this.
 application.global=lib.Global
+
+# Global timeout for communication with Graylog server nodes; default: 5s
+#timeout.DEFAULT=5s
