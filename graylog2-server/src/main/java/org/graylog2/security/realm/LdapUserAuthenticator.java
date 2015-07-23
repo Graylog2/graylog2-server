@@ -110,7 +110,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             final User user = userService.syncFromLdapEntry(userEntry, ldapSettings, principal);
             if (user == null) {
                 // in case there was an error reading, creating or modifying the user in mongodb, we do not authenticate the user.
-                LOG.error("Unable to sync LDAP user {}", userEntry.getDn());
+                LOG.error("Unable to sync LDAP user {} (DN {})", userEntry.getBindPrincipal(), userEntry.getDn());
                 return null;
             }
         } catch (LdapException e) {

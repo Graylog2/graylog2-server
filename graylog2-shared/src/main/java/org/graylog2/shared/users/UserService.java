@@ -21,6 +21,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService extends PersistedService {
@@ -39,4 +40,6 @@ public interface UserService extends PersistedService {
     User getAdminUser();
 
     long count();
+
+    Collection<User> loadAllForRole(Role role);
 }

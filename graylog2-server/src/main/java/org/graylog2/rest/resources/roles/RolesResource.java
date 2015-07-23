@@ -1,0 +1,230 @@
+package org.graylog2.rest.resources.roles;
+
+import com.google.common.collect.Sets;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
+import org.graylog2.rest.models.roles.responses.RoleResponse;
+import org.graylog2.rest.models.roles.responses.RolesResponse;
+import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.Role;
+import org.graylog2.users.RoleImpl;
+import org.graylog2.users.RoleService;
+import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static javax.ws.rs.core.Response.status;
+
+@RequiresAuthentication
+@Path("/roles")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@Api(value = "Roles", description = "User roles")
+public class RolesResource extends RestResource {
+    private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
+
+    private final RoleService roleService;
+
+    @Inject
+    public RolesResource(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    @GET
+    @RequiresPermissions(RestPermissions.ROLES_READ)
+    @ApiOperation(value = "List all roles", notes = "")
+    public RolesResponse listAll() throws NotFoundException {
+        final Set<Role> roles = roleService.loadAll();
+        Set<RoleResponse> roleResponses = Sets.newHashSet();
+        for (Role role : roles) {
+            roleResponses.add(RoleResponse.create(role.getName(), role.getPermissions()));
+        }
+
+        return RolesResponse.create(roleResponses);
+    }
+
+    @GET
+    @Path("{rolename}")
+    @ApiOperation("Retrieve permissions for a single role")
+    public RoleResponse read(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
+        checkPermission(RestPermissions.ROLES_READ, name);
+
+        final Role role = roleService.load(name);
+        return RoleResponse.create(role.getName(), role.getPermissions());
+    }
+
+    @POST
+    @RequiresPermissions(RestPermissions.ROLES_CREATE)
+    @ApiOperation(value = "Create a new role", notes = "")
+    public Response create(@ApiParam(name = "JSON body", value = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse) {
+        try {
+            roleService.load(roleResponse.name());
+            throw new BadRequestException("Role " + roleResponse.name() + " already exists.");
+        } catch (NotFoundException ignored) {
+        }
+
+        Role role = new RoleImpl();
+        role.setName(roleResponse.name());
+        role.setPermissions(roleResponse.permissions());
+        try {
+            role = roleService.save(role);
+        } catch (ValidationException e) {
+            log.error("Invalid role creation request.");
+            throw new BadRequestException(e);
+        }
+
+        final URI uri = getUriBuilderToSelf().path(RolesResource.class)
+                .path("{rolename}")
+                .build(role.getName());
+
+        return Response.created(uri).entity(RoleResponse.create(role.getName(), role.getPermissions())).build();
+    }
+
+    @PUT
+    @Path("{rolename}")
+    @ApiOperation("Update an existing role")
+    public RoleResponse update(
+            @ApiParam(name = "rolename", required = true) @PathParam("rolename") String name,
+            @ApiParam(name = "JSON Body", value = "The new representation of the role", required = true) RoleResponse role) throws NotFoundException {
+        final Role roleToUpdate = roleService.load(name);
+
+        roleToUpdate.setName(role.name());
+        roleToUpdate.setPermissions(role.permissions());
+        try {
+            roleService.save(roleToUpdate);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+        return RoleResponse.create(roleToUpdate.getName(), roleToUpdate.getPermissions());
+    }
+
+    @DELETE
+    @Path("{rolename}")
+    @ApiOperation(value = "Remove the named role")
+    public Response delete(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
+        checkPermission(RestPermissions.ROLES_DELETE, name);
+
+        if (roleService.delete(name) == 0) {
+            throw new NotFoundException();
+        }
+        return Response.noContent().build();
+    }
+
+    @GET
+    @Path("{rolename}/members")
+    @RequiresPermissions({RestPermissions.USERS_LIST, RestPermissions.ROLES_READ})
+    @ApiOperation(value = "Retrieve the role's members")
+    public RoleMembershipResponse getMembers(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
+        final Role role = roleService.load(name);
+
+        final Collection<User> users = userService.loadAllForRole(role);
+
+        Set<UserSummary> userSummaries = Sets.newHashSet();
+        for (User user : users) {
+            userSummaries.add(UserSummary.create(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getFullName(),
+                    isPermitted(RestPermissions.USERS_PERMISSIONSEDIT,
+                                user.getName()) ? user.getPermissions() : Collections.<String>emptyList(),
+                    user.getPreferences(),
+                    firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
+                    user.getSessionTimeoutMs(),
+                    user.isReadOnly(),
+                    user.isExternalUser(),
+                    user.getStartpage()
+            ));
+        }
+
+        return RoleMembershipResponse.create(role.getName(), userSummaries);
+    }
+
+    @PUT
+    @Path("{rolename}/members/{username}")
+    @ApiOperation("Add a user to a role")
+    public Response addMember(@ApiParam(name = "rolename") @PathParam("rolename") String rolename,
+                              @ApiParam(name = "username") @PathParam("username") String username,
+                              @ApiParam(name = "JSON Body") String body) throws NotFoundException {
+        checkPermission(RestPermissions.ROLES_EDIT, username);
+
+        final User user = userService.load(username);
+        if (user == null) {
+            throw new NotFoundException("User " + username + " has not been found.");
+        }
+
+        // verify that the role exists
+        final Role role = roleService.load(rolename);
+
+        final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
+        roles.add(role.getId());
+        user.setRoleIds(roles);
+
+        try {
+            userService.save(user);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Validation failed", e);
+        }
+
+        return status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("{rolename}/members/{username}")
+    @ApiOperation("Remove a user from a role")
+    public Response removeMember(@ApiParam(name = "rolename") @PathParam("rolename") String rolename,
+                                 @ApiParam(name = "username") @PathParam("username") String username) throws NotFoundException {
+        checkPermission(RestPermissions.ROLES_EDIT, username);
+
+        final User user = userService.load(username);
+        if (user == null) {
+            throw new NotFoundException("User " + username + " has not been found.");
+        }
+
+        // verify that the role exists
+        final Role role = roleService.load(rolename);
+
+        final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
+        roles.remove(role.getId());
+        user.setRoleIds(roles);
+
+        try {
+            userService.save(user);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Validation failed", e);
+        }
+
+
+        return status(Response.Status.NO_CONTENT).build();
+    }
+}

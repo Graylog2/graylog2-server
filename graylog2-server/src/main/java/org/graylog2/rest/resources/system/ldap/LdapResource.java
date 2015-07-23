@@ -163,7 +163,7 @@ public class LdapResource extends RestResource {
                         request.principal(),
                         request.activeDirectory());
                 if (entry != null) {
-                    userPrincipalName = entry.getDn();
+                    userPrincipalName = entry.getBindPrincipal();
                     entryMap = entry.getAttributes();
                 }
             } catch (CursorException | LdapException e) {

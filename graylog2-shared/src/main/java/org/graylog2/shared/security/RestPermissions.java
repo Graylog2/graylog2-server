@@ -47,6 +47,7 @@ public class RestPermissions {
     public static final String USERS_TOKENCREATE = "users:tokencreate";
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
+    public static final String USERS_ROLESEDIT = "users:rolesedit";
     public static final String THROUGHPUT_READ = "throughput:read";
     public static final String MESSAGECOUNT_READ = "messagecount:read";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
@@ -120,6 +121,10 @@ public class RestPermissions {
     public static final String JOURNAL_READ = "journal:read";
     public static final String JOURNAL_EDIT = "journal:edit";
     public static final String COLLECTORS_READ = "collectors:read";
+    public static final String ROLES_CREATE = "roles:create";
+    public static final String ROLES_READ = "roles:read";
+    public static final String ROLES_EDIT = "roles:edit";
+    public static final String ROLES_DELETE = "roles:delete";
 
     // Standard set of permissions of readers.
     private static final Set<String> READER_BASE_PERMISSIONS = ImmutableSet.<String>builder().add(

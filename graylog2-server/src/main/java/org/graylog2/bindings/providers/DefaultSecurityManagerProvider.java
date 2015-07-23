@@ -31,8 +31,15 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
+import org.graylog2.security.InMemoryRolePermissionResolver;
+import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.security.MongoDbSessionDAO;
-import org.graylog2.security.realm.*;
+import org.graylog2.security.realm.AccessTokenAuthenticator;
+import org.graylog2.security.realm.GraylogSimpleAccountRealm;
+import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.security.realm.MongoDbAuthorizationRealm;
+import org.graylog2.security.realm.PasswordAuthenticator;
+import org.graylog2.security.realm.SessionAuthenticator;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -49,7 +56,9 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
                                           LdapUserAuthenticator ldapUserAuthenticator,
                                           SessionAuthenticator sessionAuthenticator,
                                           AccessTokenAuthenticator accessTokenAuthenticator,
-                                          Configuration configuration) {
+                                          Configuration configuration,
+                                          InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
+                                          MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager) {
         final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
         inMemoryRealm.setCachingEnabled(false);
         inMemoryRealm.addRootAccount(
@@ -60,7 +69,8 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
 
         passwordAuthenticator.setCachingEnabled(false);
         passwordAuthenticator.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
-        mongoDbAuthorizationRealm.setCachingEnabled(false);
+        mongoDbAuthorizationRealm.setCachingEnabled(true);
+        mongoDbAuthorizationRealm.setCacheManager(mongoDbAuthorizationCacheManager);
 
         ldapUserAuthenticator.setCachingEnabled(false);
 
@@ -78,7 +88,11 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         if (authenticator instanceof ModularRealmAuthenticator) {
             ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
         }
-        sm.setAuthorizer(new ModularRealmAuthorizer(Lists.<Realm>newArrayList(mongoDbAuthorizationRealm, inMemoryRealm)));
+        final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(Lists.<Realm>newArrayList(
+                mongoDbAuthorizationRealm,
+                inMemoryRealm));
+        authorizer.setRolePermissionResolver(inMemoryRolePermissionResolver);
+        sm.setAuthorizer(authorizer);
 
         final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator() {
