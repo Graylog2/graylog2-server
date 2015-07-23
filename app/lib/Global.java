@@ -18,12 +18,7 @@
  */
 package lib;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -32,6 +27,7 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import lib.json.Json;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RedirectAuthenticator;
 import lib.security.RethrowingFirstSuccessfulStrategy;
@@ -66,7 +62,6 @@ import play.Configuration;
 import play.GlobalSettings;
 import play.api.mvc.EssentialFilter;
 import play.libs.F;
-import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 
@@ -145,7 +140,7 @@ public class Global extends GlobalSettings {
         // Dirty hack to disable the play2-graylog2 AccessLog if the plugin isn't there
         gelfAccessLog = app.configuration().getBoolean("graylog2.appender.send-access-log", false);
 
-        final ObjectMapper objectMapper = buildObjectMapper();
+        final ObjectMapper objectMapper = Json.buildObjectMapper();
         Json.setObjectMapper(objectMapper);
 
         final List<Module> modules = Lists.newArrayList();
@@ -196,15 +191,6 @@ public class Global extends GlobalSettings {
         }
         SecurityUtils.setSecurityManager(securityManager);
 
-    }
-
-    public static ObjectMapper buildObjectMapper() {
-        return new ObjectMapper()
-                .registerModules(new GuavaModule(), new JodaModule())
-                .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
-                .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Override

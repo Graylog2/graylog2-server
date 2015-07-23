@@ -17,14 +17,18 @@
 
 package lib.json;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lib.Global;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 import java.io.IOException;
 
 public class Json extends play.libs.Json {
 
-    protected final static ObjectMapper objectMapper = Global.buildObjectMapper();
+    protected final static ObjectMapper objectMapper = buildObjectMapper();
 
     /**
      * Convert an Object to its string representation using the global ObjectMapper.
@@ -37,5 +41,14 @@ public class Json extends play.libs.Json {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ObjectMapper buildObjectMapper() {
+        return new ObjectMapper()
+                .registerModules(new GuavaModule(), new JodaModule())
+                .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 }
