@@ -96,7 +96,7 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
                 .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
                 .put(PERMISSIONS, new ListValidator())
-                .put(ROLES, new ListValidator())
+                .put(ROLES, new ListValidator(true))
                 .build();
     }
 

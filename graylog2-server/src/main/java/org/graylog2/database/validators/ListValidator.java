@@ -22,9 +22,19 @@ import org.graylog2.plugin.database.validators.Validator;
 import java.util.List;
 
 public class ListValidator implements Validator {
+    private boolean allowMissing;
+
+    public ListValidator() {
+        this(false);
+    }
+
+    public ListValidator(boolean allowNull) {
+        this.allowMissing = allowNull;
+    }
+
     @Override
     public ValidationResult validate(Object value) {
-        if (value instanceof List)
+        if ((allowMissing && (value == null)) || (value instanceof List))
             return new ValidationResult.ValidationPassed();
         else
             return new ValidationResult.ValidationFailed("Value is not a list!");
