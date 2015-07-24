@@ -21,6 +21,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.users.Role;
 
 import javax.validation.ConstraintViolation;
+import java.util.Map;
 import java.util.Set;
 
 public interface RoleService {
@@ -29,6 +30,8 @@ public interface RoleService {
     Role load(String roleName) throws NotFoundException;
 
     Set<Role> loadAll() throws NotFoundException;
+
+    Map<String, Role> loadAllIdMap() throws NotFoundException;
 
     Role save(Role role) throws ValidationException;
 

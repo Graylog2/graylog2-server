@@ -36,6 +36,8 @@ import org.graylog2.shared.security.ldap.LdapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashSet;
@@ -51,7 +53,8 @@ public class LdapConnector {
 
     private final int connectionTimeout;
 
-    public LdapConnector(final int connectionTimeout) {
+    @Inject
+    public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
     }
 

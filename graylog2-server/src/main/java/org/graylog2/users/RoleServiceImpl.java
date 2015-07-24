@@ -16,7 +16,9 @@
  */
 package org.graylog2.users;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
@@ -30,9 +32,11 @@ import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.util.Map;
 import java.util.Set;
 
 public class RoleServiceImpl implements RoleService {
@@ -85,6 +89,18 @@ public class RoleServiceImpl implements RoleService {
             Iterators.addAll(roles, rolesCursor);
         }
         return roles;
+    }
+
+    @Override
+    public Map<String, Role> loadAllIdMap() throws NotFoundException {
+        final Set<Role> roles = loadAll();
+        return Maps.uniqueIndex(roles, new Function<Role, String>() {
+            @Nullable
+            @Override
+            public String apply(Role input) {
+                return input.getId();
+            }
+        });
     }
 
     @Override

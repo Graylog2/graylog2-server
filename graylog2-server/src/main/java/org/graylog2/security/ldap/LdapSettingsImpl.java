@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.ldap;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -23,13 +24,18 @@ import org.apache.shiro.codec.Hex;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.security.AESTools;
 import org.graylog2.shared.security.ldap.LdapSettings;
+import org.graylog2.shared.users.Role;
+import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Map;
@@ -56,19 +62,23 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String ACTIVE_DIRECTORY = "active_directory";
     public static final String DEFAULT_GROUP = "reader";
     public static final String TRUST_ALL_CERTS = "trust_all_certificates";
+    public static final String GROUP_MAPPING = "group_role_mapping";
 
     protected Configuration configuration;
+    private final RoleService roleService;
 
     @AssistedInject
-    public LdapSettingsImpl(Configuration configuration) {
+    public LdapSettingsImpl(Configuration configuration, RoleService roleService) {
         super(Maps.<String, Object>newHashMap());
         this.configuration = configuration;
+        this.roleService = roleService;
     }
 
     @AssistedInject
-    public LdapSettingsImpl(Configuration configuration, @Assisted ObjectId id, @Assisted Map<String, Object> fields) {
+    public LdapSettingsImpl(Configuration configuration, RoleService roleService, @Assisted ObjectId id, @Assisted Map<String, Object> fields) {
         super(id, fields);
         this.configuration = configuration;
+        this.roleService = roleService;
     }
 
     @Override
@@ -238,4 +248,78 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         fields.put(TRUST_ALL_CERTS, trustAllCertificates);
     }
 
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, String> getGroupMapping() {
+        final Map<String, String> groupMapping = (Map<String, String>) fields.get(GROUP_MAPPING);
+
+        if (groupMapping == null || groupMapping.isEmpty()) {
+            return Maps.newHashMap();
+        }
+        else {
+            // we store role ids, but the outside world uses role names to identify them
+            try {
+                final Map<String, Role> idToRole = roleService.loadAllIdMap();
+                return Maps.newHashMap(Maps.transformValues(groupMapping, new RoleIdToNameFunction(idToRole)));
+            } catch (NotFoundException e) {
+                LOG.error("Unable to load role mapping");
+                return Maps.newHashMap();
+            }
+        }
+    }
+
+    @Override
+    public void setGroupMapping(Map<String, String> mapping) {
+        Map<String, String> internal;
+        if (mapping == null) {
+            internal = Maps.newHashMap();
+        } else {
+            // we store ids internally but external users use the group names
+            try {
+                final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), new RoleToNameFunction());
+
+                internal = Maps.newHashMap(Maps.transformValues(mapping, new Function<String, String>() {
+                    @Nullable
+                    @Override
+                    public String apply(@Nullable String groupName) {
+                        if (groupName == null || !nameToRole.containsKey(groupName)) {
+                            return null;
+                        }
+                        return nameToRole.get(groupName).getId();
+                    }
+                }));
+            } catch (NotFoundException e) {
+                LOG.error("Unable to convert group names to ids", e);
+                internal = Maps.newHashMap();
+            }
+        }
+
+        fields.put(GROUP_MAPPING, internal);
+    }
+
+    private static class RoleIdToNameFunction implements Function<String, String> {
+        private final Map<String, Role> idToRole;
+
+        public RoleIdToNameFunction(Map<String, Role> idToRole) {
+            this.idToRole = idToRole;
+        }
+
+        @Nullable
+        @Override
+        public String apply(String groupId) {
+            if (groupId == null || !idToRole.containsKey(groupId)) {
+                return null;
+            }
+            return idToRole.get(groupId).getName().toLowerCase();
+        }
+    }
+
+    private static class RoleToNameFunction implements Function<Role, String> {
+        @Nullable
+        @Override
+        public String apply(@Nullable Role input) {
+            return input != null ? input.getName().toLowerCase() : null;
+        }
+    }
 }

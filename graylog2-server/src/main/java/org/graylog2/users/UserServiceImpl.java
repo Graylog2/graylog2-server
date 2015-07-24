@@ -25,6 +25,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
@@ -41,6 +42,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -50,11 +52,15 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final Configuration configuration;
+    private final RoleService roleService;
 
     @Inject
-    public UserServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
+    public UserServiceImpl(final MongoConnection mongoConnection,
+                           final Configuration configuration,
+                           final RoleService roleService) {
         super(mongoConnection);
         this.configuration = configuration;
+        this.roleService = roleService;
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
     }
@@ -174,8 +180,32 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             }
         }
 
-        // TODO translate ldap groups into graylog roles
-        user.setRoleIds(userEntry.getGroups());
+        // map ldap groups to user roles, if the mapping is present
+        final Set<String> translatedRoleIds = Sets.newHashSet();
+        if (!userEntry.getGroups().isEmpty()) {
+            try {
+                final Map<String, Role> roleIdToRole = roleService.loadAllIdMap();
+                for (String ldapGroupName : userEntry.getGroups()) {
+                    final String roleId = ldapSettings.getGroupMapping().get(ldapGroupName);
+                    if (roleId == null) {
+                        LOG.warn("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
+                        continue;
+                    }
+                    final Role role = roleIdToRole.get(roleId);
+                    if (role != null) {
+                        LOG.warn("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
+                        translatedRoleIds.add(role.getId());
+                    } else {
+                        LOG.warn("User {}: No role found for ldap group <{}>", username, ldapGroupName);
+                    }
+                }
+
+            } catch (NotFoundException e) {
+                LOG.error("Unable to load user roles", e);
+            }
+        }
+        user.setRoleIds(translatedRoleIds);
+
     }
 
     @Override

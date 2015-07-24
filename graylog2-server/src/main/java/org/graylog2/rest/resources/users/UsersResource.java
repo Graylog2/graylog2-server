@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -39,6 +40,7 @@ import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -65,6 +67,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -80,14 +83,17 @@ public class UsersResource extends RestResource {
 
     private final UserService userService;
     private final AccessTokenService accessTokenService;
+    private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
     private final Configuration configuration;
 
     @Inject
     public UsersResource(UserService userService,
                          AccessTokenService accessTokenService,
+                         InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                          Configuration configuration) {
         this.userService = userService;
         this.accessTokenService = accessTokenService;
+        this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         this.configuration = configuration;
     }
 
@@ -427,12 +433,29 @@ public class UsersResource extends RestResource {
     }
 
     private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
+
+        final List<String> permissions;
+
+        if (includePermissions) {
+            Set<String> permSet = Sets.newHashSet(user.getPermissions());
+
+            for (String roleId : user.getRoleIds()) {
+                final Set<String> rolePerms = inMemoryRolePermissionResolver.resolveStringPermission(roleId);
+                if (rolePerms != null) {
+                    permSet.addAll(rolePerms);
+                }
+            }
+            permissions = Lists.newArrayList(permSet);
+        }
+        else {
+            permissions = Collections.emptyList();
+        }
         return UserSummary.create(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getFullName(),
-                includePermissions ? user.getPermissions() : Collections.<String>emptyList(),
+                permissions,
                 user.getPreferences(),
                 firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
                 user.getSessionTimeoutMs(),

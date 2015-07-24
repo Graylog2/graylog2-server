@@ -37,6 +37,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
@@ -47,6 +48,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     private final LdapSettingsService ldapSettingsService;
     private final UserService userService;
 
+    @Inject
     public LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
         this.ldapConnector = ldapConnector;
         this.userService = userService;

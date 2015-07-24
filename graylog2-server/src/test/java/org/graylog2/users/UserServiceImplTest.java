@@ -36,6 +36,7 @@ import java.util.Collections;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class UserServiceImplTest {
     @ClassRule
@@ -45,12 +46,14 @@ public class UserServiceImplTest {
     private MongoConnection mongoConnection;
     private Configuration configuration;
     private UserServiceImpl userService;
+    private RoleService roleService;
 
     @Before
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
-        this.userService = new UserServiceImpl(mongoConnection, configuration);
+        this.roleService = mock(RoleService.class);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService);
     }
 
     @Test

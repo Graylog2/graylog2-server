@@ -35,7 +35,6 @@ import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
@@ -54,6 +53,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -61,10 +61,10 @@ import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.shiro.authz.annotation.Logical.OR;
 
 @RequiresAuthentication
-@RequiresPermissions(RestPermissions.LDAP_EDIT)
-// TODO even viewing the settings needs this permission, because it contains a password
+
 @Api(value = "System/LDAP", description = "LDAP settings")
 @Path("/system/ldap")
 public class LdapResource extends RestResource {
@@ -79,11 +79,9 @@ public class LdapResource extends RestResource {
     @Inject
     private LdapConnector ldapConnector;
 
-    @Inject
-    private LdapUserAuthenticator ldapAuthenticator;
-
     @GET
     @Timed
+    @RequiresPermissions(RestPermissions.LDAP_EDIT)
     @ApiOperation("Get the LDAP configuration if it is configured")
     @Path("/settings")
     @Produces(MediaType.APPLICATION_JSON)
@@ -104,11 +102,13 @@ public class LdapResource extends RestResource {
                 ldapSettings.getSearchBase(),
                 ldapSettings.getSearchPattern(),
                 ldapSettings.getDisplayNameAttribute(),
-                ldapSettings.getDefaultGroup());
+                ldapSettings.getDefaultGroup(),
+                ldapSettings.getGroupMapping());
     }
 
     @POST
     @Timed
+    @RequiresPermissions(RestPermissions.LDAP_EDIT)
     @ApiOperation("Test LDAP Configuration")
     @Path("/test")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -190,6 +190,7 @@ public class LdapResource extends RestResource {
 
     @PUT
     @Timed
+    @RequiresPermissions(RestPermissions.LDAP_EDIT)
     @ApiOperation("Update the LDAP configuration")
     @Path("/settings")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -209,15 +210,44 @@ public class LdapResource extends RestResource {
         ldapSettings.setEnabled(request.enabled());
         ldapSettings.setDisplayNameAttribute(request.displayNameAttribute());
         ldapSettings.setDefaultGroup(request.defaultGroup());
+        ldapSettings.setGroupMapping(request.groupMapping());
 
         ldapSettingsService.save(ldapSettings);
     }
 
     @DELETE
     @Timed
+    @RequiresPermissions(RestPermissions.LDAP_EDIT)
     @ApiOperation("Remove the LDAP configuration")
     @Path("/settings")
     public void deleteLdapSettings() {
         ldapSettingsService.delete();
     }
+
+    @GET
+    @ApiOperation(value = "Get the LDAP group to Graylog role mapping", notes = "The return value is a simple hash with keys being the LDAP group names and the values the corresponding Graylog role names.")
+    @RequiresPermissions(value = {RestPermissions.LDAPGROUPS_READ, RestPermissions.LDAP_EDIT}, logical = OR)
+    @Path("/settings/groups")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, String> readGroupMapping(){
+        final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());
+        return ldapSettings.getGroupMapping();
+    }
+
+    @PUT
+    @RequiresPermissions(value = {RestPermissions.LDAPGROUPS_EDIT, RestPermissions.LDAP_EDIT}, logical = OR)
+    @ApiOperation(value = "Update the LDAP group to Graylog role mapping", notes = "Corresponds directly to the output of GET /system/ldap/settings/groups")
+    @Path("/settings/groups")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateGroupMappingSettings(@ApiParam(name = "JSON body", required = true, value = "A hash in which the keys are the LDAP group names and values is the Graylog role name.")
+                                   @Valid @NotNull Map<String, String> groupMapping) throws ValidationException {
+        final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());
+
+        ldapSettings.setGroupMapping(groupMapping);
+        ldapSettingsService.save(ldapSettings);
+
+        return Response.noContent().build();
+    }
+
+
 }

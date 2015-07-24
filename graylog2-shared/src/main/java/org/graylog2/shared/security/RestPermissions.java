@@ -85,6 +85,8 @@ public class RestPermissions {
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
     public static final String LDAP_EDIT = "ldap:edit";
+    public static final String LDAPGROUPS_READ = "ldapgroups:read";
+    public static final String LDAPGROUPS_EDIT = "ldapgroups:edit";
     public static final String LOGGERS_READ = "loggers:read";
     public static final String LOGGERS_EDIT = "loggers:edit";
     public static final String LOGGERS_READSUBSYSTEM = "loggers:readsubsystem";
