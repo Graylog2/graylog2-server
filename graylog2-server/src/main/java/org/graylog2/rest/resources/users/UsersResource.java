@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.users;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -43,7 +44,9 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +70,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -84,16 +88,19 @@ public class UsersResource extends RestResource {
     private final UserService userService;
     private final AccessTokenService accessTokenService;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
+    private final RoleService roleService;
     private final Configuration configuration;
 
     @Inject
     public UsersResource(UserService userService,
                          AccessTokenService accessTokenService,
                          InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
+                         RoleService roleService,
                          Configuration configuration) {
         this.userService = userService;
         this.accessTokenService = accessTokenService;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
+        this.roleService = roleService;
         this.configuration = configuration;
     }
 
@@ -436,10 +443,20 @@ public class UsersResource extends RestResource {
 
         final List<String> permissions;
 
+        final Set<String> roleIds = user.getRoleIds();
+        Set<String> roleNames = null;
+        if (!roleIds.isEmpty()) {
+            try {
+                final Map<String, Role> idMap = roleService.loadAllIdMap();
+                roleNames = Sets.newHashSet(Collections2.transform(roleIds, new Role.RoleIdToNameFunction(idMap)));
+            } catch (org.graylog2.database.NotFoundException e) {
+                LOG.error("Unable to load roles", e);
+            }
+        }
         if (includePermissions) {
             Set<String> permSet = Sets.newHashSet(user.getPermissions());
 
-            for (String roleId : user.getRoleIds()) {
+            for (String roleId : roleIds) {
                 final Set<String> rolePerms = inMemoryRolePermissionResolver.resolveStringPermission(roleId);
                 if (rolePerms != null) {
                     permSet.addAll(rolePerms);
@@ -461,7 +478,8 @@ public class UsersResource extends RestResource {
                 user.getSessionTimeoutMs(),
                 user.isReadOnly(),
                 user.isExternalUser(),
-                user.getStartpage()
+                user.getStartpage(),
+                roleNames
         );
     }
 }

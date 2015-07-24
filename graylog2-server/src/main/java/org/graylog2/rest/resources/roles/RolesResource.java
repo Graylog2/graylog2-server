@@ -29,6 +29,7 @@ import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.rest.models.roles.responses.RolesResponse;
 import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -70,10 +71,12 @@ public class RolesResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
 
     private final RoleService roleService;
+    private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
-    public RolesResource(RoleService roleService) {
+    public RolesResource(RoleService roleService, InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         this.roleService = roleService;
+        this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
     }
 
     @GET
@@ -179,7 +182,8 @@ public class RolesResource extends RestResource {
                     user.getSessionTimeoutMs(),
                     user.isReadOnly(),
                     user.isExternalUser(),
-                    user.getStartpage()
+                    user.getStartpage(),
+                    null
             ));
         }
 

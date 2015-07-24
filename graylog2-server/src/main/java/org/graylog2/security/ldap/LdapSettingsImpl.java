@@ -261,7 +261,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             // we store role ids, but the outside world uses role names to identify them
             try {
                 final Map<String, Role> idToRole = roleService.loadAllIdMap();
-                return Maps.newHashMap(Maps.transformValues(groupMapping, new RoleIdToNameFunction(idToRole)));
+                return Maps.newHashMap(Maps.transformValues(groupMapping, new Role.RoleIdToNameFunction(idToRole)));
             } catch (NotFoundException e) {
                 LOG.error("Unable to load role mapping");
                 return Maps.newHashMap();
@@ -277,7 +277,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         } else {
             // we store ids internally but external users use the group names
             try {
-                final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), new RoleToNameFunction());
+                final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), new Role.RoleToNameFunction());
 
                 internal = Maps.newHashMap(Maps.transformValues(mapping, new Function<String, String>() {
                     @Nullable
@@ -298,28 +298,4 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         fields.put(GROUP_MAPPING, internal);
     }
 
-    private static class RoleIdToNameFunction implements Function<String, String> {
-        private final Map<String, Role> idToRole;
-
-        public RoleIdToNameFunction(Map<String, Role> idToRole) {
-            this.idToRole = idToRole;
-        }
-
-        @Nullable
-        @Override
-        public String apply(String groupId) {
-            if (groupId == null || !idToRole.containsKey(groupId)) {
-                return null;
-            }
-            return idToRole.get(groupId).getName().toLowerCase();
-        }
-    }
-
-    private static class RoleToNameFunction implements Function<Role, String> {
-        @Nullable
-        @Override
-        public String apply(@Nullable Role input) {
-            return input != null ? input.getName().toLowerCase() : null;
-        }
-    }
 }

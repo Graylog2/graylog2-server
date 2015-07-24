@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -67,18 +68,34 @@ public abstract class UserSummary {
     @Nullable
     public abstract Map<String, String> startpage();
 
+    @JsonProperty
+    @Nullable
+    public abstract Set<String> roles();
+
     @JsonCreator
     public static UserSummary create(@JsonProperty("id") @Nullable String id,
-                              @JsonProperty("username") String username,
-                              @JsonProperty("email") String email,
-                              @JsonProperty("full_name") @Nullable String fullName,
-                              @JsonProperty("permissions") @Nullable List<String> permissions,
-                              @JsonProperty("preferences") @Nullable Map<String, Object> preferences,
-                              @JsonProperty("timezone") @Nullable String timezone,
-                              @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
-                              @JsonProperty("readonly") boolean readOnly,
-                              @JsonProperty("external") boolean external,
-                              @JsonProperty("startpage") @Nullable Map<String, String> startpage) {
-        return new AutoValue_UserSummary(id, username, email, fullName, permissions, preferences, timezone, sessionTimeoutMs, readOnly, external, startpage);
+                                     @JsonProperty("username") String username,
+                                     @JsonProperty("email") String email,
+                                     @JsonProperty("full_name") @Nullable String fullName,
+                                     @JsonProperty("permissions") @Nullable List<String> permissions,
+                                     @JsonProperty("preferences") @Nullable Map<String, Object> preferences,
+                                     @JsonProperty("timezone") @Nullable String timezone,
+                                     @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
+                                     @JsonProperty("readonly") boolean readOnly,
+                                     @JsonProperty("external") boolean external,
+                                     @JsonProperty("startpage") @Nullable Map<String, String> startpage,
+                                     @JsonProperty("roles") @Nullable Set<String> roles) {
+        return new AutoValue_UserSummary(id,
+                                         username,
+                                         email,
+                                         fullName,
+                                         permissions,
+                                         preferences,
+                                         timezone,
+                                         sessionTimeoutMs,
+                                         readOnly,
+                                         external,
+                                         startpage,
+                                         roles);
     }
 }
