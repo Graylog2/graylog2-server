@@ -17,12 +17,8 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.YearMonth;
-import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -31,15 +27,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class DateConverter extends Converter {
+public class DateConverter extends AbstractDateConverter {
     private static final Logger LOG = LoggerFactory.getLogger(DateConverter.class);
 
     private final String dateFormat;
-    private final DateTimeZone timeZone;
 
     public DateConverter(Map<String, Object> config) throws ConfigurationException {
         super(Type.DATE, config);
@@ -49,21 +42,6 @@ public class DateConverter extends Converter {
         }
 
         this.dateFormat = ((String) config.get("date_format")).trim();
-        this.timeZone = buildTimeZone(config.get("time_zone"));
-    }
-
-    private static DateTimeZone buildTimeZone(Object timeZoneId) {
-        if (timeZoneId instanceof String) {
-            try {
-                final String timeZoneString = (String) timeZoneId;
-                final String zoneId = firstNonNull(emptyToNull(timeZoneString.trim()), "Etc/UTC");
-                return DateTimeZone.forID(zoneId);
-            } catch (IllegalArgumentException e) {
-                return DateTimeZone.forID("Etc/UTC");
-            }
-        } else {
-            return DateTimeZone.forID("Etc/UTC");
-        }
     }
 
     @Override
@@ -79,10 +57,5 @@ public class DateConverter extends Converter {
                 .withDefaultYear(YearMonth.now(timeZone).getYear())
                 .withZone(timeZone);
         return DateTime.parse(value, formatter);
-    }
-
-    @Override
-    public boolean buildsMultipleFields() {
-        return false;
     }
 }

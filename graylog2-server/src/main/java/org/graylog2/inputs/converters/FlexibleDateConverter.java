@@ -18,40 +18,19 @@ package org.graylog2.inputs.converters;
 
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
-import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.emptyToNull;
-
-public class FlexibleDateConverter extends Converter {
-    private final DateTimeZone timeZone;
-
+public class FlexibleDateConverter extends AbstractDateConverter {
     public FlexibleDateConverter(Map<String, Object> config) {
         super(Type.FLEXDATE, config);
-
-        this.timeZone = buildTimeZone(config.get("time_zone"));
-    }
-
-    private static DateTimeZone buildTimeZone(Object timeZoneId) {
-        if (timeZoneId instanceof String) {
-            try {
-                final String timeZoneString = (String) timeZoneId;
-                final String zoneId = firstNonNull(emptyToNull(timeZoneString.trim()), "Etc/UTC");
-                return DateTimeZone.forID(zoneId);
-            } catch (IllegalArgumentException e) {
-                return DateTimeZone.forID("Etc/UTC");
-            }
-        } else {
-            return DateTimeZone.forID("Etc/UTC");
-        }
     }
 
     @Override
+    @Nullable
     public Object convert(String value) {
         if (value == null || value.isEmpty()) {
             return null;
@@ -65,10 +44,5 @@ public class FlexibleDateConverter extends Converter {
         }
 
         return new DateTime(r.get(0).getDates().get(0), timeZone);
-    }
-
-    @Override
-    public boolean buildsMultipleFields() {
-        return false;
     }
 }
