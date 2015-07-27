@@ -17,17 +17,19 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
+import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
-public class DateConverter extends Converter {
+import static com.google.common.base.Strings.isNullOrEmpty;
 
+public class DateConverter extends AbstractDateConverter {
     private static final Logger LOG = LoggerFactory.getLogger(DateConverter.class);
 
     private final String dateFormat;
@@ -39,24 +41,21 @@ public class DateConverter extends Converter {
             throw new ConfigurationException("Missing config [date_format].");
         }
 
-        dateFormat = ((String) config.get("date_format")).trim();
+        this.dateFormat = ((String) config.get("date_format")).trim();
     }
 
     @Override
-    public Object convert(String value) {
-        if (value == null || value.isEmpty()) {
+    @Nullable
+    public Object convert(@Nullable String value) {
+        if (isNullOrEmpty(value)) {
             return null;
         }
 
-        final DateTime localNow = Tools.iso8601();
-
-        LOG.debug("Trying to parse date <{}> with pattern <{}>.", value, dateFormat);
-
-        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
-    }
-
-    @Override
-    public boolean buildsMultipleFields() {
-        return false;
+        LOG.debug("Trying to parse date <{}> with pattern <{}> and timezone <{}>.", value, dateFormat, timeZone);
+        final DateTimeFormatter formatter = DateTimeFormat
+                .forPattern(dateFormat)
+                .withDefaultYear(YearMonth.now(timeZone).getYear())
+                .withZone(timeZone);
+        return DateTime.parse(value, formatter);
     }
 }

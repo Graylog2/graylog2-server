@@ -227,6 +227,9 @@ public class Extractor {
                 if (formFieldSet(form, "converter_date_format")) {
                     config.put("date_format", form.get("converter_date_format")[0]);
                 }
+                if (formFieldSet(form, "converter_date_time_zone")) {
+                    config.put("time_zone", form.get("converter_date_time_zone")[0]);
+                }
                 break;
             case FLEXDATE:
                 if (formFieldSet(form, "converter_flexdate_time_zone")) {
