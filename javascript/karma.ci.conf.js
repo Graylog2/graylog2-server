@@ -1,3 +1,5 @@
+var webpackSharedConfig = require("./webpack.shared.config");
+
 module.exports = function(config) {
   config.set({
 
@@ -8,8 +10,14 @@ module.exports = function(config) {
     files: [
       'test/shim/es5-shim.js',
       'test/shim/server-side-global-vars.js',
-      'dist/tests.js'
+      'test/src/*.js',
+      'test/src/**/*.js',
     ],
+
+    preprocessors: {
+      'test/src/*.js': ['webpack'],
+      'test/src/**/*.js': ['webpack'],
+    },
 
     reporters: ['progress'],
 
@@ -25,6 +33,8 @@ module.exports = function(config) {
 
     captureTimeout: 60000,
 
-    singleRun: true
+    singleRun: true,
+
+    webpack: webpackSharedConfig
   });
 };
