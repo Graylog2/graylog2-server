@@ -5,10 +5,10 @@
   "author": "torch",
   "license": "GPL",
   "scripts": {
-    "build": "./node_modules/.bin/gulp deploy-prod",
-    "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js",
+    "build": "./node_modules/.bin/webpack",
+    "test": "./node_modules/karma/bin/karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
-    "watch": "./tools/prepare-dev && ./node_modules/.bin/gulp watch"
+    "watch": "./node_modules/.bin/webpack --watch"
   },
   "dependencies": {
     "c3": "^0.4.10",
@@ -27,33 +27,25 @@
     "sockjs-client": "1.0.x"
   },
   "devDependencies": {
-    "browserify": "*",
-    "gulp": "*",
-    "gulp-compile-handlebars": "*",
-    "gulp-concat": "*",
-    "gulp-debug": "*",
-    "gulp-jshint": "*",
-    "gulp-livereload": "*",
-    "gulp-rename": "*",
-    "gulp-rev": "*",
-    "gulp-uglify": "*",
-    "gulp-util": "*",
-    "jquery": "*",
-    "jshint-stylish": "*",
-    "del": "*",
-    "run-sequence": "*",
-    "vinyl-source-stream": "*",
-    "vinyl-paths": "*",
-    "watchify": "*",
-    "tsify": "*",
-    "karma": "*",
-    "karma-jasmine": "*",
+    "awesome-typescript-loader": "^0.9.2",
+    "babel-core": "^5.8.12",
+    "babel-eslint": "^4.0.5",
+    "babel-loader": "^5.3.2",
+    "eslint": "^0.24.1",
+    "eslint-loader": "^0.14.2",
+    "eslint-plugin-react": "^3.1.0",
+    "html-webpack-plugin": "^1.6.0",
     "jasmine-core": "*",
+    "jquery": "*",
+    "json-loader": "^0.5.2",
+    "karma": "^0.12.37",
     "karma-chrome-launcher": "*",
     "karma-html2js-preprocessor": "*",
+    "karma-jasmine": "*",
     "karma-phantomjs-launcher": "*",
+    "karma-webpack": "*",
     "phantomjs": ">=1.9",
-    "gulp-babel": "*",
-    "babelify": "*"
+    "typescript": "^1.5.3",
+    "webpack": "^1.10.5"
   }
 }
