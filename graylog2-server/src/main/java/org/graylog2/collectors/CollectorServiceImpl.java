@@ -25,6 +25,7 @@ import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.models.collector.requests.CollectorRegistrationRequest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -94,7 +95,7 @@ public class CollectorServiceImpl implements CollectorService {
     @Override
     public int destroyExpired(int time, TimeUnit unit) {
         int count = 0;
-        final DateTime threshold = DateTime.now().minusSeconds(Ints.checkedCast(unit.toSeconds(time)));
+        final DateTime threshold = DateTime.now(DateTimeZone.UTC).minusSeconds(Ints.checkedCast(unit.toSeconds(time)));
         for (Collector collector : all())
             if (collector.getLastSeen().isBefore(threshold))
                 count += destroy(collector);
@@ -104,7 +105,7 @@ public class CollectorServiceImpl implements CollectorService {
 
     @Override
     public Collector fromRequest(String collectorId, CollectorRegistrationRequest request, String collectorVersion) {
-        return CollectorImpl.create(collectorId, request.nodeId(), collectorVersion, CollectorNodeDetails.create(request.nodeDetails().operatingSystem()), DateTime.now());
+        return CollectorImpl.create(collectorId, request.nodeId(), collectorVersion, CollectorNodeDetails.create(request.nodeDetails().operatingSystem()), DateTime.now(DateTimeZone.UTC));
     }
 
     private List<Collector> toAbstractListType(DBCursor<CollectorImpl> collectors) {

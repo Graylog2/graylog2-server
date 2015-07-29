@@ -21,6 +21,7 @@ import io.airlift.airline.Option;
 import kafka.log.LogSegment;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 @SuppressWarnings("LocalCanBeFinal")
 @Command(name = "show", description = "Shows information about the persisted message journal")
@@ -74,8 +75,8 @@ public class JournalShow extends AbstractJournalCommand {
             sb.append("\t\t").append("Segment ").append(i++).append("\n");
             sb.append("\t\t\t").append("Base offset: ").append(segment.baseOffset()).append("\n");
             sb.append("\t\t\t").append("Size in bytes: ").append(segment.size()).append("\n");
-            sb.append("\t\t\t").append("Created at: ").append(new DateTime(segment.created())).append("\n");
-            sb.append("\t\t\t").append("Last modified: ").append(new DateTime(segment.lastModified())).append("\n");
+            sb.append("\t\t\t").append("Created at: ").append(new DateTime(segment.created(), DateTimeZone.UTC)).append("\n");
+            sb.append("\t\t\t").append("Last modified: ").append(new DateTime(segment.lastModified(), DateTimeZone.UTC)).append("\n");
         }
     }
 

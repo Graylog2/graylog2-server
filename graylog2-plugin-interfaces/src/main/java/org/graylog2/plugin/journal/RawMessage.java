@@ -32,6 +32,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +167,7 @@ public class RawMessage implements Serializable {
     }
 
     public DateTime getTimestamp() {
-        return new DateTime(msgBuilder.getTimestamp()); // TODO PERFORMANCE object creation
+        return new DateTime(msgBuilder.getTimestamp(), DateTimeZone.UTC); // TODO PERFORMANCE object creation
     }
 
     public byte[] getPayload() {

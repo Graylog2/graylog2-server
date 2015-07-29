@@ -28,6 +28,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Before;
@@ -40,7 +41,9 @@ import javax.validation.Validator;
 import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,7 +86,7 @@ public class CollectorServiceImplTest {
     @ShouldMatchDataSet(location = "collectorsSingleDataset.json")
     @IgnorePropertyValue(properties = {"_id", "last_seen"})
     public void testSaveFirstRecord() throws Exception {
-        final Collector collector = CollectorImpl.create("collectorId", "nodeId", "0.0.1", CollectorNodeDetails.create("DummyOS 1.0"), DateTime.now());
+        final Collector collector = CollectorImpl.create("collectorId", "nodeId", "0.0.1", CollectorNodeDetails.create("DummyOS 1.0"), DateTime.now(DateTimeZone.UTC));
 
         final Collector result = this.collectorService.save(collector);
 
