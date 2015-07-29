@@ -31,6 +31,7 @@ import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +72,7 @@ public class MetricUtils {
     }
 
     public static Map<String, Object> map(String metricName, Metric metric) {
-        String type = metric.getClass().getSimpleName().toLowerCase();
+        String type = metric.getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
 
         if (type.isEmpty()) {
             type = "gauge";
@@ -120,7 +121,7 @@ public class MetricUtils {
         result.time = time;
         result.rate = rate;
         result.rateUnit = "events/second";
-        result.durationUnit = TimeUnit.MICROSECONDS.toString().toLowerCase();
+        result.durationUnit = TimeUnit.MICROSECONDS.toString().toLowerCase(Locale.ENGLISH);
 
         return result;
     }

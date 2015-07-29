@@ -28,6 +28,7 @@ import org.joda.time.Period;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 
 public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_cluster_name")
@@ -185,7 +186,7 @@ public class ElasticsearchConfiguration {
     }
 
     public String getIndexPrefix() {
-        return indexPrefix.toLowerCase();
+        return indexPrefix.toLowerCase(Locale.ENGLISH);
     }
 
     public int getMaxNumberOfIndices() {

@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -243,7 +244,7 @@ public class ESTimestampFixup {
             }
 
             processBulk(bulk, commandLineOptions.isFix());
-            LOG.info("Changed {} of total {} documents ({}% checked)", changedCount, totalCount, String.format("%.2f", ((double) processedCount / totalCount) * 100));
+            LOG.info("Changed {} of total {} documents ({}% checked)", changedCount, totalCount, String.format(Locale.ENGLISH, "%.2f", ((double) processedCount / totalCount) * 100));
         }
 
         stopEsNode();

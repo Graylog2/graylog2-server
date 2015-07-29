@@ -17,14 +17,13 @@
 package org.graylog2.restclient.lib.metrics;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Gauge extends Metric {
 
     private final Object value;
-    DecimalFormat df = new DecimalFormat("#.##");
+    DecimalFormat df = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
 
     public Gauge(Object value) {

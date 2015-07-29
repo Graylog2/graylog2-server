@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
@@ -95,12 +96,12 @@ public class MetricsHistoryResource extends RestResource {
             final DBObject value = cursor.next();
             metricsData.put("node", value.get("node"));
 
-            final MetricType metricType = MetricType.valueOf(((String) value.get("type")).toUpperCase());
+            final MetricType metricType = MetricType.valueOf(((String) value.get("type")).toUpperCase(Locale.ENGLISH));
             Map<String, Object> dataPoint = Maps.newHashMap();
             values.add(dataPoint);
 
             dataPoint.put("timestamp", value.get("timestamp"));
-            metricsData.put("type", metricType.toString().toLowerCase());
+            metricsData.put("type", metricType.toString().toLowerCase(Locale.ENGLISH));
 
             switch (metricType) {
                 case GAUGE:

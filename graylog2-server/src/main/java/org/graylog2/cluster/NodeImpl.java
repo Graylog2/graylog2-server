@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 
 @CollectionName("nodes")
@@ -71,7 +72,7 @@ public class NodeImpl extends PersistedImpl implements Node {
             return Type.SERVER;
         }
 
-        return Type.valueOf(fields.get("type").toString().toUpperCase());
+        return Type.valueOf(fields.get("type").toString().toUpperCase(Locale.ENGLISH));
     }
 
     @Override

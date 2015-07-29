@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
@@ -252,14 +253,14 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                         (String) ex.get(Extractor.FIELD_ID),
                         (String) ex.get(Extractor.FIELD_TITLE),
                         order.intValue(),
-                        Extractor.CursorStrategy.valueOf(((String) ex.get(Extractor.FIELD_CURSOR_STRATEGY)).toUpperCase()),
-                        Extractor.Type.valueOf(((String) ex.get(Extractor.FIELD_TYPE)).toUpperCase()),
+                        Extractor.CursorStrategy.valueOf(((String) ex.get(Extractor.FIELD_CURSOR_STRATEGY)).toUpperCase(Locale.ENGLISH)),
+                        Extractor.Type.valueOf(((String) ex.get(Extractor.FIELD_TYPE)).toUpperCase(Locale.ENGLISH)),
                         (String) ex.get(Extractor.FIELD_SOURCE_FIELD),
                         (String) ex.get(Extractor.FIELD_TARGET_FIELD),
                         (Map<String, Object>) ex.get(Extractor.FIELD_EXTRACTOR_CONFIG),
                         (String) ex.get(Extractor.FIELD_CREATOR_USER_ID),
                         getConvertersOfExtractor(ex),
-                        Extractor.ConditionType.valueOf(((String) ex.get(Extractor.FIELD_CONDITION_TYPE)).toUpperCase()),
+                        Extractor.ConditionType.valueOf(((String) ex.get(Extractor.FIELD_CONDITION_TYPE)).toUpperCase(Locale.ENGLISH)),
                         (String) ex.get(Extractor.FIELD_CONDITION_VALUE)
                 );
 
@@ -299,7 +300,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
             try {
                 listBuilder.add(ConverterFactory.factory(
-                        Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase()),
+                        Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase(Locale.ENGLISH)),
                         (Map<String, Object>) c.get(Extractor.FIELD_CONVERTER_CONFIG)
                 ));
             } catch (ConverterFactory.NoSuchConverterException e1) {

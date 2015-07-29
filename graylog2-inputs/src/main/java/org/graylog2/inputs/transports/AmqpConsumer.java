@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -106,7 +107,7 @@ public class AmqpConsumer {
         }
 
         for (int i = 0; i < parallelQueues; i++) {
-            final String queueName = String.format(queue, i);
+            final String queueName = String.format(Locale.ENGLISH, queue, i);
             channel.queueDeclare(queueName, true, false, false, null);
             channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
                 @Override

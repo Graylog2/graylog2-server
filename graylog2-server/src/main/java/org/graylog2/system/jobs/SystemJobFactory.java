@@ -20,6 +20,7 @@ import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
 import javax.inject.Inject;
+import java.util.Locale;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -36,7 +37,7 @@ public class SystemJobFactory {
     }
 
     public SystemJob build(String jobName) throws NoSuchJobException {
-        switch(SystemJob.Type.valueOf(jobName.toUpperCase())) {
+        switch(SystemJob.Type.valueOf(jobName.toUpperCase(Locale.ENGLISH))) {
             case FIX_DEFLECTOR_DELETE_INDEX:
                 return fixDeflectorByDeleteJobFactory.create();
             case FIX_DEFLECTOR_MOVE_INDEX:

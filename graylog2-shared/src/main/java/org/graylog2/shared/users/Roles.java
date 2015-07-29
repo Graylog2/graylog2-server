@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class Roles {
@@ -73,7 +74,7 @@ public abstract class Roles {
             if (roleName == null) {
                 return null;
             }
-            final Role role = nameToRole.get(roleName.toLowerCase());
+            final Role role = nameToRole.get(roleName.toLowerCase(Locale.ENGLISH));
             if (role == null) {
                 return null;
             }
@@ -93,7 +94,7 @@ public abstract class Roles {
         public String apply(@Nullable Role input) {
             if (input != null) {
                 final String name = input.getName();
-                return lowerCase ? name.toLowerCase() : name;
+                return lowerCase ? name.toLowerCase(Locale.ENGLISH) : name;
             }
             else return null;
         }

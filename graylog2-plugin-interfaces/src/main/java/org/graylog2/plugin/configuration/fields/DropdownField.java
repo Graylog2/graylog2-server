@@ -24,6 +24,7 @@ package org.graylog2.plugin.configuration.fields;
 
 import com.google.common.collect.Maps;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +73,7 @@ public class DropdownField extends AbstractConfigurationField {
             Map<String, String> units = Maps.newHashMap();
 
             for(TimeUnit unit : TimeUnit.values()) {
-                String human = unit.toString().toLowerCase();
+                String human = unit.toString().toLowerCase(Locale.ENGLISH);
                 units.put(unit.toString(), Character.toUpperCase(human.charAt(0)) + human.substring(1));
             }
 

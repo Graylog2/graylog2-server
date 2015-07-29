@@ -23,11 +23,11 @@ import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.models.system.responses.SystemJVMResponse;
-import org.graylog2.shared.ServerVersion;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -38,6 +38,7 @@ import javax.ws.rs.Produces;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -74,8 +75,8 @@ public class SystemResource extends RestResource {
                 Tools.getISO8601String(serverStatus.getStartedAt()),
                 serverStatus.isProcessing(),
                 Tools.getLocalCanonicalHostname(),
-                serverStatus.getLifecycle().getDescription().toLowerCase(),
-                serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(),
+                serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH),
+                serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH),
                 serverStatus.getTimezone().getID());
     }
 

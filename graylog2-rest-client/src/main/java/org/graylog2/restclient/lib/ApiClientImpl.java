@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -179,7 +180,7 @@ class ApiClientImpl implements ApiClient {
     @Override
     public <T> org.graylog2.restclient.lib.ApiRequestBuilder<T> path(PathMethod pathMethod, Class<T> responseClasse) {
         Method httpMethod;
-        switch (pathMethod.getMethod().toUpperCase()) {
+        switch (pathMethod.getMethod().toUpperCase(Locale.ENGLISH)) {
             case "GET":
                 httpMethod = Method.GET;
                 break;

@@ -18,6 +18,7 @@ package org.graylog2.inputs.converters;
 
 import org.graylog2.plugin.inputs.Converter;
 
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class LowercaseConverter extends Converter {
             return value;
         }
 
-        return value.toLowerCase();
+        return value.toLowerCase(Locale.ENGLISH);
     }
 
     @Override

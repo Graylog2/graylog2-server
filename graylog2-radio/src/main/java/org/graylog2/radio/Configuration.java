@@ -24,6 +24,7 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.Duration;
 
 import java.net.URI;
+import java.util.Locale;
 
 import static org.graylog2.plugin.Tools.getUriWithPort;
 import static org.graylog2.plugin.Tools.getUriWithScheme;
@@ -111,7 +112,7 @@ public class Configuration extends BaseConfiguration {
 
     public TRANSPORT_TYPE getTransportType() {
         try {
-            return TRANSPORT_TYPE.valueOf(transportType.toUpperCase());
+            return TRANSPORT_TYPE.valueOf(transportType.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid [transport_type] configured: " + transportType);
         }

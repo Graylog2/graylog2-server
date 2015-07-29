@@ -35,9 +35,9 @@ import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.AdditionalMediaType;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -52,6 +52,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Locale;
 
 @RequiresAuthentication
 @Api(value = "Search/Absolute", description = "Message search")
@@ -197,7 +198,7 @@ public class AbsoluteSearchResource extends SearchResource {
             return buildTermsStatsResult(
                     searches.termsStats(keyField,
                             valueField,
-                            Searches.TermsStatsOrder.valueOf(order.toUpperCase()),
+                            Searches.TermsStatsOrder.valueOf(order.toUpperCase(Locale.ENGLISH)),
                             size,
                             query,
                             filter,
@@ -255,7 +256,7 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
 
-        interval = interval.toUpperCase();
+        interval = interval.toUpperCase(Locale.ENGLISH);
         validateInterval(interval);
 
         try {
@@ -296,7 +297,7 @@ public class AbsoluteSearchResource extends SearchResource {
     ) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
 
-        interval = interval.toUpperCase();
+        interval = interval.toUpperCase(Locale.ENGLISH);
         validateInterval(interval);
 
         try {

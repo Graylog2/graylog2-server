@@ -29,6 +29,7 @@ import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class DashboardWidget {
@@ -146,7 +147,7 @@ public abstract class DashboardWidget {
     public static DashboardWidget factory(Dashboard dashboard, DashboardWidgetResponse w) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
         Type type;
         try {
-            type = Type.valueOf(w.type.toUpperCase());
+            type = Type.valueOf(w.type.toUpperCase(Locale.ENGLISH));
         } catch(IllegalArgumentException e) {
             throw new NoSuchWidgetTypeException();
         }

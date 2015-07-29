@@ -16,6 +16,8 @@
  */
 package org.graylog2.restclient.models;
 
+import java.util.Locale;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -53,7 +55,7 @@ public class SearchSort {
     public String toApiParam() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(field).append(":").append(direction.toString().toLowerCase());
+        sb.append(field).append(":").append(direction.toString().toLowerCase(Locale.ENGLISH));
 
         return sb.toString();
     }
