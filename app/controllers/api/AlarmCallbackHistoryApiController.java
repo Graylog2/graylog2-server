@@ -3,7 +3,7 @@ package controllers.api;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.AlarmCallbackHistoryService;
-import play.libs.Json;
+import lib.json.Json;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -18,6 +18,6 @@ public class AlarmCallbackHistoryApiController extends AuthenticatedController {
     }
 
     public Result list(String streamId, String alertId) throws APIException, IOException {
-        return ok(Json.toJson(alarmCallbackHistoryService.list(streamId, alertId)));
+        return ok(Json.toJsonString(alarmCallbackHistoryService.list(streamId, alertId)));
     }
 }

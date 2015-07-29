@@ -78,6 +78,6 @@ public class AlertsApiController extends AuthenticatedController {
     }
 
     public Result list(String streamId, Integer skip, Integer limit) throws APIException, IOException {
-        return ok(Json.toJson(streamAlertService.listPaginated(streamId, skip, limit)));
+        return ok(Json.toJsonString(streamAlertService.listPaginated(streamId, skip, limit)));
     }
 }
