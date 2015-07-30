@@ -52,17 +52,12 @@ public class ApiClientTest extends BaseApiTest {
         final URL queryParamWithPlus = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " (.+)").node(node).unauthenticated().prepareUrl(node);
 
         Assert.assertEquals(url.getUserInfo(), "foo:session");
-        Assert.assertEquals("query param with + should be escaped", "query=+(.%2B)", queryParamWithPlus.getQuery());
+        Assert.assertEquals("query param with + should be escaped", "query=%20(.%2B)", queryParamWithPlus.getQuery());
 
         final URL queryParamWithDoubleQuotes = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " \".+\"").node(node).unauthenticated().prepareUrl(node);
         Assert.assertEquals("query param with \" should be escaped",
-                "query=+%22.%2B%22",
+                "query=%20%22.%2B%22",
                 queryParamWithDoubleQuotes.getQuery());
-
-        final URL queryParamWithColon = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", "mac:00\\:12\\:f0\\:53\\:42\\:2b").node(node).unauthenticated().prepareUrl(node);
-        Assert.assertEquals("query param with \\ should be escaped",
-                "query=mac:00%5C:12%5C:f0%5C:53%5C:42%5C:2b",
-                queryParamWithColon.getQuery());
 
         final URL queryParamWithPercentage = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", "%bcd").node(node).unauthenticated().prepareUrl(node);
         Assert.assertEquals("query param with % should be escaped",
@@ -110,7 +105,7 @@ public class ApiClientTest extends BaseApiTest {
         Node node2 = it.next();
         api.setHttpClient(client);
 
-        final ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
+        final ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource").unauthenticated();
         final URL url1 = requestBuilder.prepareUrl(node1);
         final URL url2 = requestBuilder.prepareUrl(node2);
         stubHttpProvider.expectResponse(Uri.create(url1.toString()), 200, "{}");

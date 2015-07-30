@@ -42,6 +42,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.client.listener.TransferCompletionHandler;
 import com.ning.http.client.listener.TransferListener;
+import com.squareup.okhttp.HttpUrl;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
@@ -55,13 +56,10 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +68,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -638,24 +635,24 @@ class ApiClientImpl implements ApiClient {
             final AsyncHttpClient.BoundRequestBuilder requestBuilder;
             final String userInfo = url.getUserInfo();
             // have to hack around here, because the userInfo will unescape the @ in usernames :(
-            try {
-                url = UriBuilder.fromUri(url.toURI()).userInfo(null).build().toURL();
-            } catch (URISyntaxException | MalformedURLException ignore) {
-                // cannot happen, because it was a valid url before
-            }
+            final HttpUrl httpUrl = HttpUrl.get(url)
+                    .newBuilder()
+                    .username("")
+                    .password("")
+                    .build();
 
             switch (method) {
                 case GET:
-                    requestBuilder = client.prepareGet(url.toString());
+                    requestBuilder = client.prepareGet(httpUrl.toString());
                     break;
                 case POST:
-                    requestBuilder = client.preparePost(url.toString());
+                    requestBuilder = client.preparePost(httpUrl.toString());
                     break;
                 case PUT:
-                    requestBuilder = client.preparePut(url.toString());
+                    requestBuilder = client.preparePut(httpUrl.toString());
                     break;
                 case DELETE:
-                    requestBuilder = client.prepareDelete(url.toString());
+                    requestBuilder = client.prepareDelete(httpUrl.toString());
                     break;
                 default:
                     throw new IllegalStateException("Illegal method " + method.toString());
@@ -696,7 +693,7 @@ class ApiClientImpl implements ApiClient {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 
-            URI builtUrl;
+            HttpUrl builtUrl;
             try {
                 String path;
                 if (pathParams.isEmpty()) {
@@ -704,13 +701,14 @@ class ApiClientImpl implements ApiClient {
                 } else {
                     path = MessageFormat.format(pathTemplate, pathParams.toArray());
                 }
-                final List<String> queryParamsValues = Lists.newArrayList();
-                final UriBuilder uriBuilder = UriBuilder.fromUri(target.getTransportAddress());
-                uriBuilder.path(path);
+
+                final HttpUrl.Builder builder = HttpUrl.parse(target.getTransportAddress())
+                        .newBuilder()
+                        .encodedPath(path);
+
                 for (String key : queryParams.keySet()) {
                     for (String value : queryParams.get(key)) {
-                        uriBuilder.queryParam(key, "{" + key + "}");
-                        queryParamsValues.add(value);
+                        builder.addQueryParameter(key, value);
                     }
                 }
 
@@ -719,13 +717,15 @@ class ApiClientImpl implements ApiClient {
                 }
                 if (sessionId != null) {
                     // pass the current session id via basic auth and special "password"
-                    uriBuilder.userInfo(sessionId + ":session");
+                    builder.username(sessionId);
+                    builder.password("session");
                 }
-                builtUrl = uriBuilder.build(queryParamsValues.toArray());
-                return builtUrl.toURL();
-            } catch (MalformedURLException e) {
+
+                builtUrl = builder.build();
+                return builtUrl.url();
+            } catch (RuntimeException e) {
                 LOG.error("Could not build target URL", e);
-                throw new RuntimeException(e);
+                throw e;
             }
         }
 
