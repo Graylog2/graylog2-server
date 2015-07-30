@@ -1,7 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList)
 
-@import play.libs.Json
+@import lib.json.Json
 
 @main("Outputs in cluster", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -24,6 +24,6 @@
         </div>
     </div>
 
-    <div class="react-output-component" data-permissions='@Json.toJson(currentUser.getPermissions)'>
+    <div class="react-output-component" data-permissions='@Json.toJsonString(currentUser.getPermissions)'>
     </div>
 }
