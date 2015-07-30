@@ -8,7 +8,7 @@
     "build": "./node_modules/.bin/webpack",
     "test": "./node_modules/karma/bin/karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
-    "watch": "./node_modules/.bin/webpack --watch"
+    "watch": "./node_modules/.bin/webpack --watch --devtool eval"
   },
   "dependencies": {
     "c3": "^0.4.10",
