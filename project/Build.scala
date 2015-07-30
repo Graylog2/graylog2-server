@@ -34,8 +34,7 @@ object ApplicationBuild extends Build {
   val repositories = Seq(
     Resolver.mavenLocal,
     Resolver.sonatypeRepo("releases"),
-    Resolver.sonatypeRepo("snapshots"),
-    Resolver.typesafeRepo("releases")
+    Resolver.sonatypeRepo("snapshots")
   )
 
   // Helper
