@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -703,16 +704,13 @@ class ApiClientImpl implements ApiClient {
                 } else {
                     path = MessageFormat.format(pathTemplate, pathParams.toArray());
                 }
+                final List<String> queryParamsValues = Lists.newArrayList();
                 final UriBuilder uriBuilder = UriBuilder.fromUri(target.getTransportAddress());
                 uriBuilder.path(path);
                 for (String key : queryParams.keySet()) {
                     for (String value : queryParams.get(key)) {
-                        // Jersey's UriBuilderImpl doesn't encode double quotes, which is correct per RFC 3986
-                        // (http://tools.ietf.org/html/rfc3986#section-3.4), but causes problems down the stack,
-                        // see https://github.com/Graylog2/graylog2-server/issues/793
-                        // So we fall back manually encoding double quotes right now because URLEncoder.encode does
-                        // too much and we'd end up with partially double encoded URIs. F... my life.
-                        uriBuilder.queryParam(key, value.replace("\"", "%22"));
+                        uriBuilder.queryParam(key, "{" + key + "}");
+                        queryParamsValues.add(value);
                     }
                 }
 
@@ -723,7 +721,7 @@ class ApiClientImpl implements ApiClient {
                     // pass the current session id via basic auth and special "password"
                     uriBuilder.userInfo(sessionId + ":session");
                 }
-                builtUrl = uriBuilder.build();
+                builtUrl = uriBuilder.build(queryParamsValues.toArray());
                 return builtUrl.toURL();
             } catch (MalformedURLException e) {
                 LOG.error("Could not build target URL", e);

@@ -59,6 +59,16 @@ public class ApiClientTest extends BaseApiTest {
                 "query=+%22.%2B%22",
                 queryParamWithDoubleQuotes.getQuery());
 
+        final URL queryParamWithColon = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", "mac:00\\:12\\:f0\\:53\\:42\\:2b").node(node).unauthenticated().prepareUrl(node);
+        Assert.assertEquals("query param with \\ should be escaped",
+                "query=mac:00%5C:12%5C:f0%5C:53%5C:42%5C:2b",
+                queryParamWithColon.getQuery());
+
+        final URL queryParamWithPercentage = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", "%bcd").node(node).unauthenticated().prepareUrl(node);
+        Assert.assertEquals("query param with % should be escaped",
+                "query=%25bcd",
+                queryParamWithPercentage.getQuery());
+
         final URL urlWithNonAsciiChars = api.get(EmptyResponse.class).node(node).path("/some/resourçe").unauthenticated().prepareUrl(node);
         Assert.assertEquals("non-ascii chars are escaped in path",
                 "/some/resour%C3%A7e",
