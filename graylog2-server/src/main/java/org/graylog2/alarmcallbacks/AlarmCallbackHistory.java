@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.alerts;
+package org.graylog2.alarmcallbacks;
 
-import org.graylog2.plugin.database.Persisted;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackResult;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.joda.time.DateTime;
 
-import java.util.Map;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface Alert extends Persisted {
-    String getStreamId();
-    String getConditionId();
-    DateTime getTriggeredAt();
-    String getDescription();
-    Map<String, Object> getConditionParameters();
+public interface AlarmCallbackHistory {
+    String id();
+    AlarmCallbackSummary alarmcallbackConfiguration();
+    String alertId();
+    String alertConditionId();
+    AlarmCallbackResult result();
+    DateTime createdAt();
 }
