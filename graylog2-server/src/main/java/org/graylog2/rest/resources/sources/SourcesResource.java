@@ -31,8 +31,8 @@ import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.sources.responses.SourcesList;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
@@ -56,8 +57,7 @@ import java.util.concurrent.TimeUnit;
 @Path("/sources")
 public class SourcesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SourcesResource.class);
-    private static final String CACHE_KEY = "sources_list";
-    private static final Cache<String, TermsResult> CACHE = CacheBuilder.newBuilder()
+    private static final Cache<Integer, TermsResult> CACHE = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .build();
 
@@ -78,18 +78,19 @@ public class SourcesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid range parameter provided.")
     })
-
     @Produces(MediaType.APPLICATION_JSON)
     public SourcesList list(
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
-            @QueryParam("range") @Min(0) final int range) {
+            @QueryParam("range") @Min(0) final int range,
+            @ApiParam(name = "size", value = "Maximum size of the result set.", required = false, defaultValue = "5000")
+            @QueryParam("size") @DefaultValue("5000") @Min(0) final int size) {
         final TermsResult sources;
         try {
-            sources = CACHE.get(CACHE_KEY + range, new Callable<TermsResult>() {
+            sources = CACHE.get(range, new Callable<TermsResult>() {
                 @Override
                 public TermsResult call() throws Exception {
                     try {
-                        return searches.terms("source", 5000, "*", new RelativeRange(range));
+                        return searches.terms("source", size, "*", new RelativeRange(range));
                     } catch (InvalidRangeParametersException | InvalidRangeFormatException e) {
                         throw new ExecutionException(e);
                     }
@@ -97,8 +98,8 @@ public class SourcesResource extends RestResource {
             });
         } catch (ExecutionException e) {
             if (e.getCause() instanceof InvalidRangeParametersException) {
-                LOG.error("Invalid relative time range value.", e);
-                throw new BadRequestException("Invalid time range " + range, e);
+                LOG.error("Invalid relative time range: " + range, e);
+                throw new BadRequestException("Invalid time range: " + range, e);
             } else {
                 LOG.error("Could not calculate list of sources.", e);
                 throw new InternalServerErrorException(e);
