@@ -28,6 +28,7 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.alerts.Alert;
+import org.graylog2.restclient.models.alerts.StreamAlertService;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -37,10 +38,12 @@ import java.util.Map;
 
 public class AlertsApiController extends AuthenticatedController {
     private final StreamService streamService;
+    private final StreamAlertService streamAlertService;
 
     @Inject
-    public AlertsApiController(StreamService streamService) {
+    public AlertsApiController(StreamService streamService, StreamAlertService streamAlertService) {
         this.streamService = streamService;
+        this.streamAlertService = streamAlertService;
     }
 
     public Result allAllowedSince(Integer since) {
@@ -72,5 +75,9 @@ public class AlertsApiController extends AuthenticatedController {
         } catch (APIException e) {
             return internalServerError("api exception " + e);
         }
+    }
+
+    public Result list(String streamId, Integer skip, Integer limit) throws APIException, IOException {
+        return ok(Json.toJsonString(streamAlertService.listPaginated(streamId, skip, limit)));
     }
 }

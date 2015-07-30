@@ -246,6 +246,7 @@ DELETE        /a/streams/:stream_id/rules/:streamrule_id                        
 
 # API: Alerts
 GET           /a/streams/alerts/allowed                                                          @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)
+GET           /a/streams/:stream_id/alerts                                                       @controllers.api.AlertsApiController.list(stream_id: String, skip: Integer ?= 0, limit: Integer ?= 0)
 
 # API: Indices
 GET           /a/system/indices/failures/dynatable                                               @controllers.api.IndicesApiController.failures(perPage:Integer ?= 50, offset:Integer ?= 0)
@@ -286,6 +287,9 @@ GET           /a/streams/:stream_id/alarmcallbacks/available                    
 POST          /a/streams/:stream_id/alarmcallbacks                                               @controllers.api.AlarmCallbacksApiController.create(stream_id: String)
 DELETE        /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                             @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
 PUT           /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                             @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
+
+# API: Alarm Callback History
+GET         /a/streams/:stream_id/alerts/:alert_id/history                           @controllers.api.AlarmCallbackHistoryApiController.list(stream_id: String, alert_id: String)
 
 # API: Collectors
 GET           /a/system/collectors                                                               @controllers.api.CollectorsApiController.index()

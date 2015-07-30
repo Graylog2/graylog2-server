@@ -25,4 +25,5 @@ $(document).ready(() => {
     require('./components/messageloaders/mount');
     require('./components/streamrules/mount');
     require('./components/search/mount');
+    require('./components/alerts/mount');
 });

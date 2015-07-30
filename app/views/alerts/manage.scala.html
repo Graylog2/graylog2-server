@@ -1,10 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream,
         alertConditions: List[org.graylog2.restclient.models.alerts.AlertCondition],
-        totalAlerts: Long,
-        alerts: List[org.graylog2.restclient.models.alerts.Alert],
         users: String,
-        availableAlarmCallbacks: Map[String, org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse],
-        alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
 @import lib.json.Json
@@ -159,9 +155,6 @@
         </div>
     </div>
 
-    <div class="row content">
-        <div class="col-md-12">
-            @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
-        </div>
+    <div class="react-alerts-component" data-stream-id="@stream.getId" data-permissions='@Json.toJsonString(currentUser.getPermissions)'>
     </div>
 }
