@@ -17,7 +17,6 @@ object ApplicationBuild extends Build {
     cache,
     javaCore,
     "com.google.guava" % "guava" % "18.0",
-    "com.ning" % "async-http-client" % "1.8.14",
     "org.apache.shiro" % "shiro-core" % "1.2.2",
     "com.google.inject" % "guice" % "4.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "4.0",

@@ -18,7 +18,7 @@
  */
 package lib.security;
 
-import com.ning.http.util.Base64;
+import com.google.common.io.BaseEncoding;
 import controllers.routes;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.restclient.lib.APIException;
@@ -36,6 +36,7 @@ import play.mvc.Security.Authenticator;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 public class RedirectAuthenticator extends Authenticator {
@@ -156,16 +157,12 @@ public class RedirectAuthenticator extends Authenticator {
 
         final byte[] decodedAuth;
         final String[] credString;
-        try {
-            decodedAuth = Base64.decode(authToken);
-            credString = new String(decodedAuth, "UTF-8").split(":", 2);
-        } catch (IOException e) {
-            log.error("Unable to decode basic auth information: ", e);
+        decodedAuth = BaseEncoding.base64().decode(authToken);
+        credString = new String(decodedAuth, StandardCharsets.UTF_8).split(":", 2);
+
+        if (credString.length != 2) {
             return null;
         }
-
-        if (credString == null || credString.length != 2)
-            return null;
 
         final String userName = credString[0];
         final String password = credString[1];
