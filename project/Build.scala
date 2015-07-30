@@ -28,7 +28,6 @@ object ApplicationBuild extends Build {
     "com.github.fdimuccio" %% "play2-sockjs" % "0.3.1",
 
     "junit" % "junit" % "4.12" % "test",
-    "org.mockito" % "mockito-all" % "1.9.5" % "test",
     "org.assertj" % "assertj-core" % "2.0.0" % "test"
   )
   val repositories = Seq(
