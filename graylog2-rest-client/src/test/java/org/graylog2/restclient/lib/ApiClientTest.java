@@ -52,12 +52,17 @@ public class ApiClientTest extends BaseApiTest {
         final URL queryParamWithPlus = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " (.+)").node(node).unauthenticated().prepareUrl(node);
 
         Assert.assertEquals(url.getUserInfo(), "foo:session");
-        Assert.assertEquals("query param with + should be escaped", "query=+(.%2B)", queryParamWithPlus.getQuery());
+        Assert.assertEquals("query param with + should be escaped", "query=%20(.%2B)", queryParamWithPlus.getQuery());
 
         final URL queryParamWithDoubleQuotes = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " \".+\"").node(node).unauthenticated().prepareUrl(node);
         Assert.assertEquals("query param with \" should be escaped",
-                "query=+%22.%2B%22",
+                "query=%20%22.%2B%22",
                 queryParamWithDoubleQuotes.getQuery());
+
+        final URL queryParamWithPercentage = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", "%bcd").node(node).unauthenticated().prepareUrl(node);
+        Assert.assertEquals("query param with % should be escaped",
+                "query=%25bcd",
+                queryParamWithPercentage.getQuery());
 
         final URL urlWithNonAsciiChars = api.get(EmptyResponse.class).node(node).path("/some/resourçe").unauthenticated().prepareUrl(node);
         Assert.assertEquals("non-ascii chars are escaped in path",
@@ -100,7 +105,7 @@ public class ApiClientTest extends BaseApiTest {
         Node node2 = it.next();
         api.setHttpClient(client);
 
-        final ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
+        final ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource").unauthenticated();
         final URL url1 = requestBuilder.prepareUrl(node1);
         final URL url2 = requestBuilder.prepareUrl(node2);
         stubHttpProvider.expectResponse(Uri.create(url1.toString()), 200, "{}");
