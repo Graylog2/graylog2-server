@@ -162,16 +162,19 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type;
-        try {
-            type = AbstractAlertCondition.Type.valueOf(ccr.type().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + ccr.type() + "]");
+        final String type = ccr.type();
+        if (type == null) {
+            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Missing alert condition type");
         }
 
-        Map<String, Object> parameters = ccr.parameters();
+        final AbstractAlertCondition.Type alertConditionType;
+        try {
+            alertConditionType = AbstractAlertCondition.Type.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
+        }
 
-        return createAlertCondition(type, stream, null, Tools.iso8601(), userId, parameters);
+        return createAlertCondition(alertConditionType, stream, null, Tools.iso8601(), userId, ccr.parameters());
     }
 
     @Override
