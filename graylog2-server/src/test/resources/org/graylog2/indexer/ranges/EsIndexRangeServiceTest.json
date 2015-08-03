@@ -192,7 +192,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_1",
+            "indexName": "graylog_meta",
             "indexType": "index_range",
             "indexId": "graylog_1"
           }
@@ -200,6 +200,7 @@
         {
           "data": {
             "_id": "graylog_1",
+            "index_name": "graylog_1",
             "calculated_at": "2015-01-01T00:00:00.000Z",
             "begin": "2015-01-01T00:00:00.000Z",
             "end": "2015-01-02T00:00:00.000Z",
@@ -212,7 +213,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_2",
+            "indexName": "graylog_meta",
             "indexType": "index_range",
             "indexId": "graylog_2"
           }
@@ -220,30 +221,11 @@
         {
           "data": {
             "_id": "graylog_2",
+            "index_name": "graylog_2",
             "calculated_at": "2015-01-02T00:00:00.000Z",
             "begin": "2015-01-03T00:00:00.000Z",
             "end": "2015-01-03T00:00:00.000Z",
             "took_ms": 42
-          }
-        }
-      ]
-    },
-    {
-      "document": [
-        {
-          "index": {
-            "indexName": "ignored",
-            "indexType": "index_range",
-            "indexId": "ignored"
-          }
-        },
-        {
-          "data": {
-            "_id": "ignored",
-            "calculated_at": "2015-01-01T00:00:00.000Z",
-            "begin": "2015-01-01T00:00:00.000Z",
-            "end": "2015-01-02T00:00:00.000Z",
-            "took_ms": 23
           }
         }
       ]

@@ -68,7 +68,8 @@ public class IndicesTest {
 
     public IndicesTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(
+                new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME), CONFIG));
     }
 
     @Before

@@ -22,16 +22,20 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
 import com.lordofthejars.nosqlunit.core.ReflectionLoadStrategyFactory;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 
 import java.util.Set;
 
 public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     private final LoadStrategyFactory loadStrategyFactory;
     private final Set<String> indexNames;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
-    public IndexCreatingLoadStrategyFactory(Set<String> indexNames) {
+    public IndexCreatingLoadStrategyFactory(Set<String> indexNames,
+                                            ElasticsearchConfiguration elasticsearchConfiguration) {
         this.loadStrategyFactory = new ReflectionLoadStrategyFactory();
         this.indexNames = ImmutableSet.copyOf(indexNames);
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     @Override
@@ -39,6 +43,6 @@ public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     public LoadStrategyOperation getLoadStrategyInstance(LoadStrategyEnum loadStrategyEnum, DatabaseOperation databaseOperation) {
         return loadStrategyFactory.getLoadStrategyInstance(
                 loadStrategyEnum,
-                new IndexCreatingDatabaseOperation(databaseOperation, indexNames));
+                new IndexCreatingDatabaseOperation(databaseOperation, indexNames, elasticsearchConfiguration));
     }
 }

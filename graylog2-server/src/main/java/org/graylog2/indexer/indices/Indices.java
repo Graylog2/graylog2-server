@@ -49,7 +49,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
@@ -65,7 +64,6 @@ import org.elasticsearch.search.SearchHit;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +78,7 @@ import java.util.concurrent.TimeUnit;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 @Singleton
-public class Indices implements IndexManagement {
+public class Indices {
 
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
 
@@ -203,11 +201,39 @@ public class Indices implements IndexManagement {
                 configuration.isStoreTimestampsAsDocValues());
         final PutMappingResponse messageMappingResponse =
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
+
+        return messageMappingResponse.isAcknowledged();
+    }
+
+    public boolean createMetaIndex() {
+        final String indexName = getMetaIndexName();
+
+        final IndicesExistsRequest indicesExistsRequest = c.admin().indices().prepareExists(indexName).request();
+        final IndicesExistsResponse indicesExistsResponse = c.admin().indices().exists(indicesExistsRequest).actionGet();
+
+        if (!indicesExistsResponse.isExists()) {
+            final Map<String, String> keywordLowercase = ImmutableMap.of(
+                    "tokenizer", "keyword",
+                    "filter", "lowercase");
+            final Map<String, Object> settings = ImmutableMap.of(
+                    "number_of_shards", configuration.getShards(),
+                    "number_of_replicas", configuration.getReplicas(),
+                    "index.analysis.analyzer.analyzer_keyword", keywordLowercase);
+            final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName).setSettings(settings).request();
+            if (!c.admin().indices().create(cir).actionGet().isAcknowledged()) {
+                return false;
+            }
+        }
+
         final Map<String, Object> metaMapping = indexMapping.metaMapping();
         final PutMappingResponse metaMappingResponse =
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_INDEX_RANGE, metaMapping).actionGet();
 
-        return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
+        return metaMappingResponse.isAcknowledged();
+    }
+
+    public String getMetaIndexName() {
+        return configuration.getIndexPrefix() + "_meta";
     }
 
     public Set<String> getAllMessageFields() {

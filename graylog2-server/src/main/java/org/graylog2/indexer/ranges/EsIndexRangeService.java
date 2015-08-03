@@ -25,6 +25,8 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
@@ -34,6 +36,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.Index;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -69,14 +72,12 @@ public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
 
     private final Client client;
-    private final ActivityWriter activityWriter;
     private final ObjectMapper objectMapper;
     private final Indices indices;
 
     @Inject
-    public EsIndexRangeService(Client client, ActivityWriter activityWriter, ObjectMapper objectMapper, Indices indices) {
+    public EsIndexRangeService(Client client, ObjectMapper objectMapper, Indices indices) {
         this.client = client;
-        this.activityWriter = activityWriter;
         this.objectMapper = objectMapper;
         this.indices = indices;
     }
@@ -84,7 +85,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Override
     @Nullable
     public IndexRange get(String index) throws NotFoundException {
-        final GetRequest request = new GetRequestBuilder(client, index)
+        final GetRequest request = new GetRequestBuilder(client, indices.getMetaIndexName())
                 .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(index)
                 .request();
@@ -97,17 +98,17 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         if (!r.isExists()) {
-            throw new NotFoundException("Index [" + index + "] not found.");
+            throw new NotFoundException("Metadata for index [" + index + "] not found.");
         }
 
-        return parseSource(r.getIndex(), r.getSource());
+        return parseSource(r.getSource());
     }
 
     @Nullable
-    private IndexRange parseSource(String index, Map<String, Object> fields) {
+    private IndexRange parseSource(Map<String, Object> fields) {
         try {
             return IndexRange.create(
-                    index,
+                    (String) fields.get("index_name"),
                     parseFromDateString((String) fields.get("begin")),
                     parseFromDateString((String) fields.get("end")),
                     parseFromDateString((String) fields.get("calculated_at")),
@@ -131,14 +132,14 @@ public class EsIndexRangeService implements IndexRangeService {
                 .must(endRangeQuery);
         final SearchRequest request = client.prepareSearch()
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
+                .setIndices(indices.getMetaIndexName())
                 .setQuery(completeRangeQuery)
                 .request();
 
         final SearchResponse response = client.search(request).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
+            final IndexRange indexRange = parseSource(searchHit.getSource());
             if (indexRange != null) {
                 indexRanges.add(indexRange);
             }
@@ -151,14 +152,15 @@ public class EsIndexRangeService implements IndexRangeService {
     public SortedSet<IndexRange> findAll() {
         final SearchRequest request = client.prepareSearch()
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
+                .setIndices(indices.getMetaIndexName())
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(QueryBuilders.matchAllQuery())
                 .request();
 
         final SearchResponse response = client.search(request).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
+            final IndexRange indexRange = parseSource(searchHit.getSource());
             if (indexRange != null) {
                 indexRanges.add(indexRange);
             }
@@ -174,7 +176,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final TimestampStats stats = timestampStatsOfIndex(index);
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
-        LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
+        LOG.info("Calculated range of index [{}] in [{}ms].", index, duration);
         return IndexRange.create(index, stats.min(), stats.max(), now, duration);
     }
 
@@ -230,14 +232,8 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         final String indexName = indexRange.indexName();
-        final boolean readOnly = indices.isReadOnly(indexName);
-
-        if (readOnly) {
-            indices.setReadWrite(indexName);
-        }
-
         final IndexRequest request = client.prepareIndex()
-                .setIndex(indexName)
+                .setIndex(indices.getMetaIndexName())
                 .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(indexName)
                 .setRefresh(true)
@@ -245,14 +241,23 @@ public class EsIndexRangeService implements IndexRangeService {
                 .request();
         final IndexResponse response = client.index(request).actionGet();
 
-        if (readOnly) {
-            indices.setReadOnly(indexName);
-        }
-
         if (response.isCreated()) {
             LOG.debug("Successfully saved index range: {}", indexRange);
         } else {
             LOG.debug("Successfully updated index range: {}", indexRange);
         }
+    }
+
+    @Override
+    public boolean delete(String index) {
+        final DeleteRequest request = client.prepareDelete()
+                .setIndex(indices.getMetaIndexName())
+                .setType(IndexMapping.TYPE_INDEX_RANGE)
+                .setId(index)
+                .setRefresh(true)
+                .request();
+        final DeleteResponse response = client.delete(request).actionGet();
+
+        return response.isFound();
     }
 }

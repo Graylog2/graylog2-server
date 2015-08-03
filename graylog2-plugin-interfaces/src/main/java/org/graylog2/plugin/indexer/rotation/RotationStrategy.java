@@ -28,6 +28,7 @@ public interface RotationStrategy {
 
     interface Result {
         String getDescription();
+
         boolean shouldRotate();
     }
 

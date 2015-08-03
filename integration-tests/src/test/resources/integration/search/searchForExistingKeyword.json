@@ -4,7 +4,7 @@
       "document" : [
         {
           "index" : {
-            "indexName": "graylog_0",
+            "indexName": "graylog_meta",
             "indexType": "index_range",
             "indexId": "graylog_0"
           }

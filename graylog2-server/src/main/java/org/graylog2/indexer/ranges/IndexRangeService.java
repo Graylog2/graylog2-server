@@ -30,5 +30,7 @@ public interface IndexRangeService {
 
     void save(IndexRange indexRange);
 
+    boolean delete(String index);
+
     IndexRange calculateRange(String index);
 }

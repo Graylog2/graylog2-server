@@ -20,6 +20,7 @@ import com.google.common.base.Stopwatch;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -43,14 +44,17 @@ public class RebuildIndexRangesJob extends SystemJob {
     protected final Deflector deflector;
     private final ActivityWriter activityWriter;
     protected final IndexRangeService indexRangeService;
+    protected final Indices indices;
 
     @AssistedInject
     public RebuildIndexRangesJob(@Assisted Deflector deflector,
                                  ActivityWriter activityWriter,
-                                 IndexRangeService indexRangeService) {
+                                 IndexRangeService indexRangeService,
+                                 Indices indices) {
         this.deflector = deflector;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
+        this.indices = indices;
     }
 
     @Override
@@ -77,15 +81,24 @@ public class RebuildIndexRangesJob extends SystemJob {
     public void execute() {
         info("Re-calculating index ranges.");
 
-        String[] indices = deflector.getAllDeflectorIndexNames();
-        if (indices == null || indices.length == 0) {
-            info("No indices, nothing to calculate.");
+        String[] indexNames = deflector.getAllDeflectorIndexNames();
+        if (indexNames == null || indexNames.length == 0) {
+            info("No indexNames, nothing to calculate.");
             return;
         }
-        indicesToCalculate = indices.length;
+        indicesToCalculate = indexNames.length;
 
-        Stopwatch sw = Stopwatch.createStarted();
-        for (String index : indices) {
+        if(!indices.createMetaIndex()) {
+            LOG.error("Couldn't create metadata index <{}>", indices.getMetaIndexName());
+            return;
+        }
+
+        final Stopwatch sw = Stopwatch.createStarted();
+        for (String index : indexNames) {
+            if(index.equals(indices.getMetaIndexName())) {
+                continue;
+            }
+
             if (cancelRequested) {
                 info("Stop requested. Not calculating next index range, not updating ranges.");
                 sw.stop();
@@ -103,7 +116,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             }
         }
 
-        info("Done calculating index ranges for " + indices.length + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
+        info("Done calculating index ranges for " + indexNames.length + " indexNames. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
     }
 
     protected void info(String what) {

@@ -19,6 +19,7 @@ package org.graylog2.indexer.ranges;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,9 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public CreateNewSingleIndexRangeJob(@Assisted Deflector deflector,
                                         @Assisted String indexName,
                                         ActivityWriter activityWriter,
-                                        IndexRangeService indexRangeService) {
-        super(deflector, activityWriter, indexRangeService);
+                                        IndexRangeService indexRangeService,
+                                        Indices indices) {
+        super(deflector, activityWriter, indexRangeService, indices);
         this.indexName = checkNotNull(indexName);
     }
 
@@ -55,6 +57,12 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     @Override
     public void execute() {
         LOG.info("Calculating ranges for index {}.", indexName);
+
+        if(!indices.createMetaIndex()) {
+            LOG.error("Couldn't create metadata index <{}>", indices.getMetaIndexName());
+            return;
+        }
+
         try {
             final IndexRange indexRange = indexRangeService.calculateRange(indexName);
             indexRangeService.save(indexRange);

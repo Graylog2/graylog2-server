@@ -14,27 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.retention.strategies;
+package org.graylog2.indexer.retention;
 
-import org.graylog2.plugin.indexer.retention.IndexManagement;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.ranges.IndexRangeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DeletionRetentionStrategy extends RetentionStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(DeletionRetentionStrategy.class);
 
-    public DeletionRetentionStrategy(IndexManagement indexManagement) {
-        super(indexManagement);
-    }
+    private final IndexRangeService indexRangeService;
 
-    protected void onMessage(Map<String, String> message) {}
-
-    @Override
-    protected boolean iterates() {
-        return false;
+    public DeletionRetentionStrategy(Indices indices, IndexRangeService indexRangeService) {
+        super(indices);
+        this.indexRangeService = indexRangeService;
     }
 
     @Override
@@ -42,4 +38,13 @@ public class DeletionRetentionStrategy extends RetentionStrategy {
         return Type.DELETE;
     }
 
+    @Override
+    protected void doRun(String indexName) {
+        LOG.info("Deleting index <{}>", indexName);
+        indices.delete(indexName);
+
+        if (!indexRangeService.delete(indexName)) {
+            LOG.warn("Couldn't delete index range for index <{}>", indexName);
+        }
+    }
 }
