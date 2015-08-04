@@ -29,6 +29,10 @@ public interface Role {
 
     void setName(String name);
 
+    String getDescription();
+
+    void setDescription(String description);
+
     Set<String> getPermissions();
 
     void setPermissions(Set<String> permissions);

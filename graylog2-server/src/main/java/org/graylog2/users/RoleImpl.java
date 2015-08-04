@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.shared.users.Role;
 
+import javax.annotation.Nullable;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -35,6 +36,9 @@ public class RoleImpl implements Role {
 
     @NotNull
     public Set<String> permissions;
+
+    @Nullable
+    private String description;
 
     @JsonProperty
     public String nameLower() {
@@ -60,6 +64,18 @@ public class RoleImpl implements Role {
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    @JsonProperty
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(@Nullable String description) {
+        this.description = description;
     }
 
     @Override
