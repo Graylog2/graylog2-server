@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-var DataFilter = require('./DataFilter');
+var TypeAheadDataFilter = require('./TypeAheadDataFilter');
 
 var DataTableElement = React.createClass({
     render() {
@@ -16,6 +16,12 @@ var DataTable = React.createClass({
             headers: this.props.headers,
             rows: this.props.rows,
             filteredRows: this.props.rows
+        };
+    },
+    getDefaultProps() {
+        return {
+            filterSuggestions: [],
+            displayKey: "value"
         };
     },
     componentWillReceiveProps(newProps) {
@@ -55,10 +61,13 @@ var DataTable = React.createClass({
             filter = (
                 <div className="row">
                     <div className="col-md-4">
-                        <DataFilter label={this.props.filterLabel}
-                                    data={this.state.rows}
-                                    filterKeys={this.props.filterKeys}
-                                    onFilterUpdate={this.filterDataRows}/>
+                        <TypeAheadDataFilter label={this.props.filterLabel}
+                                             data={this.state.rows}
+                                             displayKey={this.props.displayKey}
+                                             filterBy={this.props.filterBy}
+                                             filterSuggestions={this.props.filterSuggestions}
+                                             searchInKeys={this.props.filterKeys}
+                                             onDataFiltered={this.filterDataRows}/>
                     </div>
                 </div>
             );
