@@ -32,7 +32,6 @@ import lib.security.PlayAuthenticationListener;
 import lib.security.RedirectAuthenticator;
 import lib.security.RethrowingFirstSuccessfulStrategy;
 import lib.security.ServerRestInterfaceRealm;
-import models.LocalAdminUser;
 import models.ModelFactoryModule;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -42,7 +41,6 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.realm.SimpleAccountRealm;
 import org.graylog2.logback.appender.AccessLog;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.DateTools;
@@ -164,11 +162,6 @@ public class Global extends GlobalSettings {
         RedirectAuthenticator.userService = injector.getInstance(UserService.class);
         RedirectAuthenticator.sessionService = injector.getInstance(SessionService.class);
 
-        // temporarily disabled for preview to prevent confusion.
-//        LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
-//        localAdminRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA2"));
-//        setupLocalUser(api, localAdminRealm, app);
-
         Realm serverRestInterfaceRealm = injector.getInstance(ServerRestInterfaceRealm.class);
         final DefaultSecurityManager securityManager =
                 new DefaultSecurityManager(
@@ -273,24 +266,6 @@ public class Global extends GlobalSettings {
         return new Configuration(
                 config.withFallback(configuration.getWrappedConfiguration().underlying())
         );
-    }
-
-    private void setupLocalUser(ApiClient api, SimpleAccountRealm realm, Application app) {
-        final Configuration config = app.configuration();
-        final String username = config.getString("local-user.name", "localadmin");
-        final String passwordHash = config.getString("local-user.password-sha2");
-        if (passwordHash == null) {
-            log.warn("No password hash for local user {} set. " +
-                            "If you lose connection to the graylog2-server at {}, you will be unable to log in!",
-                    username, config.getString("graylog2-server"));
-            return;
-        }
-        realm.addAccount(
-                username,
-                passwordHash,
-                "local-admin"
-        );
-        LocalAdminUser.createSharedInstance(api, username, passwordHash);
     }
 
 }
