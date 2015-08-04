@@ -17,6 +17,7 @@
 package org.graylog2.rest.models.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -31,7 +32,9 @@ public abstract class IndexRangesResponse {
     @JsonProperty
     public abstract List<IndexRangeSummary> ranges();
 
-    public static IndexRangesResponse create(int total, List<IndexRangeSummary> ranges) {
+    @JsonCreator
+    public static IndexRangesResponse create(@JsonProperty("total") int total,
+                                             @JsonProperty("ranges") List<IndexRangeSummary> ranges) {
         return new AutoValue_IndexRangesResponse(total, ranges);
     }
 }
