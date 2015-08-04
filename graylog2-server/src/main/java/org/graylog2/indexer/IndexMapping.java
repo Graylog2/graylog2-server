@@ -22,6 +22,7 @@ import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.Client;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Tools;
 
 import javax.inject.Inject;
@@ -74,11 +75,11 @@ public class IndexMapping {
                 "index", "no",
                 "doc_values", true);
         final Map<String, ? extends Serializable> properties = ImmutableMap.of(
-                "index_name", stringProperty,
-                "begin", dateProperty,
-                "end", dateProperty,
-                "calculated_at", dateProperty,
-                "took_ms", intProperty
+                IndexRange.FIELD_INDEX_NAME, stringProperty,
+                IndexRange.FIELD_BEGIN, dateProperty,
+                IndexRange.FIELD_END, dateProperty,
+                IndexRange.FIELD_CALCULATED_AT, dateProperty,
+                IndexRange.FIELD_TOOK_MS, intProperty
         );
 
         return ImmutableMap.<String, Object>of(

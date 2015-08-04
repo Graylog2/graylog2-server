@@ -28,8 +28,9 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.responses.IndexRangesResponse;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -46,6 +47,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.SortedSet;
 
 @RequiresAuthentication
 @Api(value = "System/IndexRanges", description = "Index timeranges")
@@ -74,12 +76,20 @@ public class IndexRangesResource extends RestResource {
     @ApiOperation(value = "Get a list of all index ranges")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexRangesResponse list() {
-        final List<IndexRange> ranges = Lists.newArrayList();
-        for (IndexRange range : indexRangeService.findAll()) {
+        final SortedSet<IndexRange> all = indexRangeService.findAll();
+        final List<IndexRangeSummary> ranges = Lists.newArrayListWithCapacity(all.size());
+        for (IndexRange range : all) {
             if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.indexName())) {
                 continue;
             }
-            ranges.add(range);
+            final IndexRangeSummary indexRange = IndexRangeSummary.create(
+                    range.indexName(),
+                    range.begin(),
+                    range.end(),
+                    range.calculatedAt(),
+                    range.calculationDuration()
+            );
+            ranges.add(indexRange);
         }
 
         return IndexRangesResponse.create(ranges.size(), ranges);
