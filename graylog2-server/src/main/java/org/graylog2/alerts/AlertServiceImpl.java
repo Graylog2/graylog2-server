@@ -27,6 +27,7 @@ import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -162,16 +163,19 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type;
-        try {
-            type = AbstractAlertCondition.Type.valueOf(ccr.type().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + ccr.type() + "]");
+        final String type = ccr.type();
+        if (type == null) {
+            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Missing alert condition type");
         }
 
-        Map<String, Object> parameters = ccr.parameters();
+        final AbstractAlertCondition.Type alertConditionType;
+        try {
+            alertConditionType = AbstractAlertCondition.Type.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
+        }
 
-        return createAlertCondition(type, stream, null, Tools.iso8601(), userId, parameters);
+        return createAlertCondition(alertConditionType, stream, null, Tools.iso8601(), userId, ccr.parameters());
     }
 
     @Override
@@ -233,5 +237,46 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
                 .put("parameters", alertCondition.getParameters())
                 .put("in_grace", inGracePeriod(alertCondition))
                 .build();
+    }
+
+    @Override
+    public List<Alert> listForStreamId(String streamId, int skip, int limit) {
+        QueryBuilder qb = QueryBuilder.start("stream_id").is(streamId);
+
+        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
+
+        final List<DBObject> alertObjects = query(AlertImpl.class,
+                qb.get(),
+                sort,
+                limit,
+                skip
+        );
+
+        final List<Alert> alerts = Lists.newArrayListWithCapacity(alertObjects.size());
+
+        for (DBObject alertObj : alertObjects) {
+            alerts.add(new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap()));
+        }
+
+        return alerts;
+    }
+
+    @Override
+    public Alert load(String alertId, String streamId) throws NotFoundException {
+        final DBObject query = QueryBuilder.start("stream_id").is(streamId).and("_id").is(new ObjectId(alertId)).get();
+
+        final List<DBObject> alertObjects = query(AlertImpl.class, query);
+
+        if (alertObjects.size() == 0) {
+            throw new NotFoundException("Alert with id " + alertId + " not found for Stream " + streamId + ".");
+        }
+
+        if (alertObjects.size() > 1) {
+            throw new NotFoundException("Multiple Alerts with id " + alertId + " found for Stream " + streamId + ".");
+        }
+
+        final DBObject alertObj = alertObjects.get(0);
+
+        return new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap());
     }
 }

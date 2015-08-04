@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.alerts;
+package org.graylog2.rest.models.alarmcallbacks;
 
-import org.graylog2.plugin.database.Persisted;
-import org.joda.time.DateTime;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface Alert extends Persisted {
-    String getStreamId();
-    String getConditionId();
-    DateTime getTriggeredAt();
-    String getDescription();
-    Map<String, Object> getConditionParameters();
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = AlarmCallbackError.class, name = "error"),
+                @JsonSubTypes.Type(value = AlarmCallbackSuccess.class, name = "success") })
+public abstract class AlarmCallbackResult {
+    public abstract String type();
 }

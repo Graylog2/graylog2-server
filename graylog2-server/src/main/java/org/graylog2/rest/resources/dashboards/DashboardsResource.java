@@ -261,23 +261,23 @@ public class DashboardsResource extends RestResource {
         try {
             widget = dashboardWidgetCreator.fromRequest(searches, awr, getCurrentUser().getName());
 
-            Dashboard dashboard = dashboardRegistry.get(dashboardId);
+            final Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
             if (dashboard == null) {
                 LOG.error("Dashboard [{}] not found.", dashboardId);
-                throw new WebApplicationException(404);
+                throw new WebApplicationException("Dashboard [" + dashboardId + "] not found.", 404);
             }
 
             dashboardService.addWidget(dashboard, widget);
         } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
-            LOG.error("No such widget type.", e2);
-            throw new BadRequestException(e2);
+            LOG.debug("No such widget type.", e2);
+            throw new BadRequestException("No such widget type.", e2);
         } catch (InvalidRangeParametersException e3) {
-            LOG.error("Invalid timerange parameters provided.", e3);
-            throw new BadRequestException(e3);
+            LOG.debug("Invalid timerange parameters provided.", e3);
+            throw new BadRequestException("Invalid timerange parameters provided.", e3);
         } catch (InvalidWidgetConfigurationException e4) {
-            LOG.error("Invalid widget configuration.", e4);
-            throw new BadRequestException(e4);
+            LOG.debug("Invalid widget configuration.", e4);
+            throw new BadRequestException("Invalid widget configuration.", e4);
         }
 
         final Map<String, String> result = ImmutableMap.of("widget_id", widget.getId());

@@ -42,6 +42,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private static final Logger LOG = LoggerFactory.getLogger(FieldContentValueAlertCondition.class);
 
@@ -62,6 +65,9 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         this.configuration = configuration;
         this.field = (String) parameters.get("field");
         this.value = (String) parameters.get("value");
+
+        checkArgument(!isNullOrEmpty(field), "\"field\" must not be empty.");
+        checkArgument(!isNullOrEmpty(value), "\"value\" must not be empty.");
     }
 
     @Override
