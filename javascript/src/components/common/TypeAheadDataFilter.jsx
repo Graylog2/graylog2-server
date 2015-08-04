@@ -13,8 +13,9 @@ var TypeAheadDataFilter = React.createClass({
             filterByKey: `${this.props.filterBy}s`
         };
     },
-    _onSearchTextChanged(event, text) {
-        this.setState({filterText: text}, this.filterData);
+    _onSearchTextChanged(event) {
+        event.preventDefault();
+        this.setState({filterText: this.refs.typeAheadInput.getValue()}, this.filterData);
     },
     _onFilterAdded(event, suggestion) {
         this.setState({
@@ -72,7 +73,7 @@ var TypeAheadDataFilter = React.createClass({
                 <li key={`li-${filter}`}>
                     <span className="pill label label-default">
                         tag: {filter}
-                        <a className="tag-remove" data-target={filter} onClick={this._onFilterRemoved}></a>
+                        <a className="tag-remove" data-target={filter} onClick={this._onFilterRemoved}/>
                     </span>
                 </li>
             );
@@ -80,16 +81,17 @@ var TypeAheadDataFilter = React.createClass({
 
         return (
             <div className="filter">
-                <TypeAheadInput ref="typeAheadInput"
-                                onFieldChange={this._onSearchTextChanged}
-                                onSuggestionSelected={this._onFilterAdded}
-                                suggestionText={`Filter by ${this.props.filterBy}: `}
-                                suggestions={this.props.filterSuggestions}
-                                label={this.props.label}
-                                displayKey={this.props.displayKey}>
+                <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{display: 'inline'}}>
+                    <TypeAheadInput ref="typeAheadInput"
+                                    onSuggestionSelected={this._onFilterAdded}
+                                    suggestionText={`Filter by ${this.props.filterBy}: `}
+                                    suggestions={this.props.filterSuggestions}
+                                    label={this.props.label}
+                                    displayKey={this.props.displayKey}/>
                     <ButtonInput type="button" value="Reset" style={{marginLeft: 5}} onClick={this._resetFilters}
                                  disabled={this.state.filters.count() === 0 && this.state.filterText === ''}/>
-                </TypeAheadInput>
+                    <ButtonInput type="submit" value="Filter" style={{marginLeft: 5}}/>
+                </form>
                 <ul className="pill-list">
                     {filters}
                 </ul>

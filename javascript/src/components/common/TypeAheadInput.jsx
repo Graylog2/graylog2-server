@@ -4,7 +4,6 @@
 
 var React = require('react');
 var Input = require('react-bootstrap').Input;
-var ButtonInput = require('react-bootstrap').ButtonInput;
 var $ = require('jquery');
 
 var TypeAheadInput = React.createClass({
@@ -48,23 +47,18 @@ var TypeAheadInput = React.createClass({
     componentWillReceiveProps(newProps) {
         // TODO: Update typeahead dataset
     },
+
+    getValue() {
+        return $(this.fieldInput).typeahead('val');
+    },
     clear() {
         $(this.fieldInput).typeahead('val', '');
     },
-    _onFieldChanged(event) {
-        event.preventDefault();
-        this.props.onFieldChange(event, this.fieldInput.value);
-    },
     render() {
-        return (
-            <form className="form-inline" onSubmit={this._onFieldChanged} style={{display: 'inline'}}>
-                <Input type="text" ref="fieldInput"
-                       wrapperClassName="typeahead-wrapper"
-                       label={this.props.label}/>
-                <ButtonInput type="submit" value="Filter" style={{marginLeft: 5}}/>
-                {this.props.children}
-            </form>
-        );
+        return <Input type="text" ref="fieldInput"
+                      wrapperClassName="typeahead-wrapper"
+                      label={this.props.label}
+                      onKeyPress={this.props.onKeyPress}/>;
     }
 });
 
