@@ -50,7 +50,7 @@ public class IndexService {
         IndexRangesResponse rr = api.path(routes.IndexRangesResource().list(), IndexRangesResponse.class)
                 .execute();
 
-        for (IndexRangeSummary range : rr.ranges) {
+        for (IndexRangeSummary range : rr.ranges()) {
             indices.add(indexFactory.fromRangeResponse(range));
         }
 

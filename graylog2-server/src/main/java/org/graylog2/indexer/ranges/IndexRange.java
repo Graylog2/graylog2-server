@@ -26,21 +26,27 @@ import java.util.Comparator;
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexRange {
+    public static final String PREFIX = "gl2_index_range_";
+    public static final String FIELD_TOOK_MS = PREFIX + "took_ms";
+    public static final String FIELD_CALCULATED_AT = PREFIX + "calculated_at";
+    public static final String FIELD_END = PREFIX + "end";
+    public static final String FIELD_BEGIN = PREFIX + "begin";
+    public static final String FIELD_INDEX_NAME = PREFIX + "index_name";
     public static final Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
 
-    @JsonProperty
+    @JsonProperty(FIELD_INDEX_NAME)
     public abstract String indexName();
 
-    @JsonProperty
+    @JsonProperty(FIELD_BEGIN)
     public abstract DateTime begin();
 
-    @JsonProperty
+    @JsonProperty(FIELD_END)
     public abstract DateTime end();
 
-    @JsonProperty
+    @JsonProperty(FIELD_CALCULATED_AT)
     public abstract DateTime calculatedAt();
 
-    @JsonProperty("took_ms")
+    @JsonProperty(FIELD_TOOK_MS)
     public abstract int calculationDuration();
 
     public static IndexRange create(String indexName,
