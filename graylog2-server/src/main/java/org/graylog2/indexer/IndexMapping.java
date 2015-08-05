@@ -104,15 +104,23 @@ public class IndexMapping {
      * Disable analyzing for every field by default.
      */
     private List<Map<String, Map<String, Object>>> partDefaultAllInDynamicTemplate() {
-        final Map<String, String> notAnalyzed = ImmutableMap.of("index", "not_analyzed");
+        final Map<String, Serializable> mappingInternal = ImmutableMap.<String, Serializable>of(
+                "index", "not_analyzed",
+                "doc_values", true);
+        final Map<String, Object> defaultInternal = ImmutableMap.of(
+                "match", "gl2_*",
+                "mapping", mappingInternal);
+        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
+
+        final Map<String, String> mappingAll = ImmutableMap.of("index", "not_analyzed");
         final Map<String, Object> defaultAll = ImmutableMap.of(
                 // Match all
                 "match", "*",
                 // Analyze nothing by default
-                "mapping", notAnalyzed);
-        final Map<String, Map<String, Object>> template = ImmutableMap.of("store_generic", defaultAll);
+                "mapping", mappingAll);
+        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
 
-        return ImmutableList.of(template);
+        return ImmutableList.of(templateInternal, templateAll);
     }
 
     /*
@@ -137,15 +145,10 @@ public class IndexMapping {
     }
 
     private Map<String, Serializable> typeTimeWithMillis(boolean storeAsDocValues) {
-        final ImmutableMap.Builder<String, Serializable> builder = ImmutableMap.<String, Serializable>builder()
-                .put("type", "date")
-                .put("format", Tools.ES_DATE_FORMAT);
-
-        if (storeAsDocValues) {
-            builder.put("doc_values", true);
-        }
-
-        return builder.build();
+        return ImmutableMap.<String, Serializable>of(
+                "type", "date",
+                "format", Tools.ES_DATE_FORMAT,
+                "doc_values", storeAsDocValues);
     }
 
     private Map<String, Boolean> enabled() {
