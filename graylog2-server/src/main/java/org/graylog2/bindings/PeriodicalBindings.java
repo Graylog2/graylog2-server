@@ -27,6 +27,7 @@ import org.graylog2.periodical.ClusterIdGeneratorPeriodical;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DeadLetterThread;
 import org.graylog2.periodical.GarbageCollectionWarningThread;
+import org.graylog2.periodical.IndexRangesMigrationPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
@@ -58,5 +59,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(ClusterIdGeneratorPeriodical.class);
         periodicalBinder.addBinding().to(PurgeExpiredCollectorsThread.class);
+        periodicalBinder.addBinding().to(IndexRangesMigrationPeriodical.class);
     }
 }

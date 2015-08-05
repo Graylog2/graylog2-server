@@ -65,6 +65,7 @@ public interface Notification extends Persisted {
         JOURNAL_UTILIZATION_TOO_HIGH,
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
+        INDEX_RANGES_RECALCULATION,
         GENERIC
     }
 

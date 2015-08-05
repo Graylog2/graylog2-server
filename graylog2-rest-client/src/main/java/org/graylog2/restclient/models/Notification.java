@@ -41,6 +41,7 @@ public class Notification {
         JOURNAL_UTILIZATION_TOO_HIGH,
         JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
         OUTPUT_DISABLED,
+        INDEX_RANGES_RECALCULATION,
         GENERIC;
 
         public static Type fromString(String name) {
