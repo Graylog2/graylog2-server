@@ -38,6 +38,9 @@ var TypeAheadDataFilter = React.createClass({
             var key = datum[searchInKey];
             var value = this.state.filterText;
 
+            if (key === null) {
+                return false;
+            }
             var containsFilter = function (entry, value) {
                 if (typeof entry === 'undefined') {
                     return false;
