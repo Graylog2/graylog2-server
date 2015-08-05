@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Optional;
 
 import java.util.Set;
 
@@ -31,10 +32,15 @@ public abstract class RoleResponse {
     public abstract String name();
 
     @JsonProperty
+    public abstract Optional<String> description();
+
+    @JsonProperty
     public abstract Set<String> permissions();
 
     @JsonCreator
-    public static RoleResponse create(@JsonProperty("name") String name, @JsonProperty("permissions") Set<String> permissions) {
-        return new AutoValue_RoleResponse(name, permissions);
+    public static RoleResponse create(@JsonProperty("name") String name,
+                                      @JsonProperty("description") Optional<String> description,
+                                      @JsonProperty("permissions") Set<String> permissions) {
+        return new AutoValue_RoleResponse(name, description, permissions);
     }
 }
