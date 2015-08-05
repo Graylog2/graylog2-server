@@ -30,7 +30,13 @@ var TypeAheadDataFilter = React.createClass({
     },
     _matchFilters(datum) {
         return this.state.filters.every((filter) => {
-            return datum[this.state.filterByKey].indexOf(filter) !== -1;
+            var dataToFilter = datum[this.state.filterByKey];
+
+            if (this.props.filterSuggestionAccessor) {
+                dataToFilter = dataToFilter.map((data) => data[this.props.filterSuggestionAccessor]);
+            }
+
+            return dataToFilter.indexOf(filter) !== -1;
         }, this);
     },
     _matchStringSearch(datum) {
@@ -38,6 +44,9 @@ var TypeAheadDataFilter = React.createClass({
             var key = datum[searchInKey];
             var value = this.state.filterText;
 
+            if (key === null) {
+                return false;
+            }
             var containsFilter = function (entry, value) {
                 if (typeof entry === 'undefined') {
                     return false;
@@ -79,13 +88,21 @@ var TypeAheadDataFilter = React.createClass({
             );
         });
 
+        var suggestions;
+
+        if (this.props.filterSuggestionAccessor) {
+            suggestions = this.props.filterSuggestions.map((filterSuggestion) => filterSuggestion[this.props.filterSuggestionAccessor]);
+        } else {
+            suggestions = this.props.filterSuggestions;
+        }
+
         return (
             <div className="filter">
                 <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{display: 'inline'}}>
                     <TypeAheadInput ref="typeAheadInput"
                                     onSuggestionSelected={this._onFilterAdded}
                                     suggestionText={`Filter by ${this.props.filterBy}: `}
-                                    suggestions={this.props.filterSuggestions}
+                                    suggestions={suggestions}
                                     label={this.props.label}
                                     displayKey={this.props.displayKey}/>
                     <ButtonInput type="button" value="Reset" style={{marginLeft: 5}} onClick={this._resetFilters}
