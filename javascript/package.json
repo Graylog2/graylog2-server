@@ -9,7 +9,7 @@
     "test": "./node_modules/karma/bin/karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
     "watch": "cp templates/scripts.scala.html.dev.template ../app/views/build/scripts.scala.html && ./node_modules/.bin/webpack --watch --devtool eval --config webpack.dev.config.js",
-    "hot": "cp templates/scripts.scala.html.hmr.template ../app/views/build/scripts.scala.html && ./node_modules/webpack/node_modules/.bin/webpack-dev-server --hot --inline --config webpack.hmr.config.js --content-base ../public --devtool eval"
+    "hot": "cp templates/scripts.scala.html.hmr.template ../app/views/build/scripts.scala.html && ./node_modules/.bin/webpack-dev-server --hot --inline --config webpack.hmr.config.js --content-base ../public --devtool eval"
   },
   "dependencies": {
     "c3": "^0.4.10",
@@ -49,6 +49,7 @@
     "phantomjs": ">=1.9",
     "react-hot-loader": "^1.2.8",
     "typescript": "^1.5.3",
-    "webpack": "^1.10.5"
+    "webpack": "^1.10.5",
+    "webpack-dev-server": "^1.10.1"
   }
 }
