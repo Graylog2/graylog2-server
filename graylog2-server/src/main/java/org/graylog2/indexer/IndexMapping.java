@@ -90,9 +90,9 @@ public class IndexMapping {
                         "format", "date_time"));
     }
 
-    public Map<String, Object> messageMapping(final String analyzer, boolean storeTimestampsAsDocValues) {
+    public Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(
-                "properties", partFieldProperties(analyzer, storeTimestampsAsDocValues),
+                "properties", partFieldProperties(analyzer),
                 "dynamic_templates", partDefaultAllInDynamicTemplate(),
                 // Compress source field
                 "_source", enabledAndCompressed(),
@@ -118,14 +118,13 @@ public class IndexMapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    private Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer,
-                                                                                 boolean storeTimestampsAsDocValues) {
+    private Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer) {
         return ImmutableMap.of(
                 "message", analyzedString(analyzer),
                 "full_message", analyzedString(analyzer),
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                "timestamp", typeTimeWithMillis(storeTimestampsAsDocValues),
+                "timestamp", typeTimeWithMillis(true),
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 "source", analyzedString("analyzer_keyword"));
     }
@@ -137,12 +136,12 @@ public class IndexMapping {
                 "analyzer", analyzer);
     }
 
-    private Map<String, Serializable> typeTimeWithMillis(boolean storeTimestampsAsDocValues) {
+    private Map<String, Serializable> typeTimeWithMillis(boolean storeAsDocValues) {
         final ImmutableMap.Builder<String, Serializable> builder = ImmutableMap.<String, Serializable>builder()
                 .put("type", "date")
                 .put("format", Tools.ES_DATE_FORMAT);
 
-        if (storeTimestampsAsDocValues) {
+        if (storeAsDocValues) {
             builder.put("doc_values", true);
         }
 

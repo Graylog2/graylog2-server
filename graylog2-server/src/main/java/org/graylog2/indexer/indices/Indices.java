@@ -199,8 +199,7 @@ public class Indices implements IndexManagement {
             return false;
         }
 
-        final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer(),
-                configuration.isStoreTimestampsAsDocValues());
+        final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
         final PutMappingResponse messageMappingResponse =
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
         final Map<String, Object> metaMapping = indexMapping.metaMapping();
