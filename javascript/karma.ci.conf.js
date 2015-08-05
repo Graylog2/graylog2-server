@@ -1,5 +1,7 @@
 var webpackSharedConfig = require("./webpack.shared.config");
 
+webpackSharedConfig.externals = [];
+
 module.exports = function(config) {
   config.set({
 
