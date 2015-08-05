@@ -187,6 +187,14 @@ GET           /a/system/user/:username                                          
 DELETE        /a/system/user/:username                                                           @controllers.api.UsersApiController.deleteUser(username: String)
 PUT           /a/system/user/:username/preferences                                               @controllers.api.UsersApiController.saveUserPreferences(username: String)
 
+# Roles
+GET           /a/system/roles                                                                    @controllers.api.RolesApiController.listRoles()
+POST          /a/system/role                                                                     @controllers.api.RolesApiController.createRole()
+GET           /a/system/role/:rolename                                                           @controllers.api.RolesApiController.loadRole(rolename: String)
+DELETE        /a/system/role/:rolename                                                           @controllers.api.RolesApiController.deleteRole(rolename: String)
+PUT           /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.addMember(rolename: String, username: String)
+DELETE        /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.deleteMember(rolename: String, username: String)
+
 # API: Nodes
 GET           /a/system/nodes                                                                    @controllers.api.NodesApiController.nodes()
 

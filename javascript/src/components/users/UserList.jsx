@@ -73,11 +73,16 @@ var UserList = React.createClass({
             userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
         }
 
-        var roleBadge = null;
+        var roleBadges = [];
         if (this._hasAdminRole(user)) {
-            roleBadge = <span className="label label-info">Admin</span>;
+            roleBadges.push(<span key="_builtin_admin" className="label label-info">Admin</span>);
         } else {
-            roleBadge = <span className="label label-default">Reader</span>;
+            roleBadges.push(<span key="_builtin_reader" className="label label-default">Reader</span>);
+        }
+        var i;
+        for (i = 0; i < user.roles.length; i++) {
+            var role = user.roles[i];
+            roleBadges.push(<span key={role} className="label label-default">{role}</span>);
         }
 
         var actions = null;
@@ -111,7 +116,7 @@ var UserList = React.createClass({
                 <td className="limited">{user.full_name}</td>
                 <td className="limited">{user.username}</td>
                 <td className="limited">{user.email}</td>
-                <td>{roleBadge}</td>
+                <td>{roleBadges}</td>
                 <td>{actions}</td>
             </tr>
         );
@@ -128,6 +133,8 @@ var UserList = React.createClass({
                            headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}
                            rows={this.state.users}
+                           filterBy="Role"
+                           filterSuggestions={["admin", "reader", "devs"]}
                            dataRowFormatter={this._userInfoFormatter}
                            filterLabel="Filter Users"
                            filterKeys={filterKeys}/>

@@ -31,6 +31,7 @@ public enum RestPermissions {
     USERS_TOKENCREATE("users:tokencreate"),
     USERS_TOKENLIST("users:tokenlist"),
     USERS_TOKENREMOVE("users:tokenremove"),
+    USERS_ROLESEDIT("users:rolesedit"),
     THROUGHPUT_READ("throughput:read"),
     MESSAGECOUNT_READ("messagecount:read"),
     DASHBOARDS_CREATE("dashboards:create"),
@@ -94,7 +95,11 @@ public enum RestPermissions {
     THREADS_DUMP("threads:dump"),
     LBSTATUS_CHANGE("lbstatus:change"),
     NODE_SHUTDOWN("node:shutdown"),
-    COLLECTORS_READ("collectors:read");
+    COLLECTORS_READ("collectors:read"),
+    ROLES_CREATE("roles:create"),
+    ROLES_READ("roles:read"),
+    ROLES_EDIT("roles:edit"),
+    ROLES_DELETE("roles:delete");
 
     private final String permission;
 
