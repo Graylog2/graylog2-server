@@ -37,7 +37,7 @@ echo -n "Using npm "
 
 ./node_modules/.bin/npm install --no-spin
 ./node_modules/.bin/npm test
-./node_modules/.bin/npm build
+./node_modules/.bin/npm run build
 popd
 
 
