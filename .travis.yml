@@ -3,11 +3,6 @@ language: java
 jdk:
   - oraclejdk7
   - oraclejdk8
-cache:
-  directories:
-    - $HOME/.ivy2
-    - $HOME/.m2
-    - $HOME/.sbt
 env:
   global:
   - secure: |-
