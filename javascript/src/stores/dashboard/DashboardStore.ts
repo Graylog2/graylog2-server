@@ -17,35 +17,46 @@ interface Dashboard {
 }
 
 class DashboardStore {
-    private _dashboards: Immutable.Map<string, Dashboard>;
-    private _onDashboardsChanged: {(dashboards: Immutable.Map<string, Dashboard>): void; }[] = [];
+    private _writableDashboards: Immutable.Map<string, Dashboard>;
+    private _onWritableDashboardsChanged: {(dashboards: Immutable.Map<string, Dashboard>): void; }[] = [];
 
     constructor() {
-        this._dashboards = Immutable.Map<string, Dashboard>();
+        this._writableDashboards = Immutable.Map<string, Dashboard>();
     }
 
-    get dashboards(): Immutable.Map<string, Dashboard> {
-        return this._dashboards;
+    get writableDashboards(): Immutable.Map<string, Dashboard> {
+        return this._writableDashboards;
     }
 
-    set dashboards(newDashboards: Immutable.Map<string, Dashboard>) {
-        this._dashboards = newDashboards;
+    set writableDashboards(newDashboards: Immutable.Map<string, Dashboard>) {
+        this._writableDashboards = newDashboards;
         this._emitChange();
     }
 
     _emitChange() {
-        this._onDashboardsChanged.forEach((callback) => callback(this.dashboards));
+        this._onWritableDashboardsChanged.forEach((callback) => callback(this.writableDashboards));
     }
 
-    addOnDashboardsChangedCallback(dashboardChangeCallback: (dashboards: Immutable.Map<string, Dashboard>) => void) {
-        this._onDashboardsChanged.push(dashboardChangeCallback);
+    addOnWritableDashboardsChangedCallback(dashboardChangeCallback: (dashboards: Immutable.Map<string, Dashboard>) => void) {
+        this._onWritableDashboardsChanged.push(dashboardChangeCallback);
     }
 
-    updateDashboards() {
+    updateWritableDashboards() {
         var promise = this.getWritableDashboardList();
-        promise.done((dashboards) => this.dashboards = Immutable.Map<string, Dashboard>(dashboards));
+        promise.done((dashboards) => this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards));
     }
 
+    listDashboards(): JQueryPromise<string[]> {
+        var url = jsRoutes.controllers.api.DashboardsApiController.index().url;
+        var promise = $.getJSON(url);
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.status !== 404) {
+                UserNotification.error("Loading dashboard list failed with status: " + errorThrown,
+                    "Could not load dashboards");
+            }
+        });
+        return promise;
+    }
 
     getWritableDashboardList(): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.api.DashboardsApiController.listWritable().url;
@@ -71,7 +82,7 @@ class DashboardStore {
 
         promise.done(() => {
             UserNotification.success("Dashboard successfully created");
-            this.updateDashboards();
+            this.updateWritableDashboards();
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + errorThrown,
