@@ -22,6 +22,6 @@ conf/graylog-web-interface.conf
 .DS_Store
 javascript/node_modules
 javascript/dist
-app/assets/javascripts/build/app*.js
+app/views/build/scripts.scala.html
 public/javascripts/build
 
