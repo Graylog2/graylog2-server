@@ -14,6 +14,7 @@ interface Dashboard {
     id: string;
     description: string;
     title: string;
+    content_pack: string;
 }
 
 class DashboardStore {
