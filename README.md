@@ -26,7 +26,11 @@ $ activator run
 * `cd javascript/`
 * `npm run watch`
 
-The `npm run watch` command will do a `npm install` if needed, and run the `gulp watch` task immediately afterwards.
+**_or_**
+* `npm run hot` for hot reloading.
+
+The `npm run watch` command will do a `npm install` if needed, and run the `webpack --watch` task immediately afterwards.
+The `npm run hot` command will do the same, but run the `webpack-dev-server` instead and allows in-browser hot reloading.
 In order to make switching between different branches faster, we use a script to store all `node_modules` folders
 into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
 
