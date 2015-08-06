@@ -1,0 +1,4 @@
+<script src="@routes.Assets.at("javascripts/jquery-browserify-shim.js")" type="text/javascript"></script>
+{% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
+    <script src="@routes.Assets.at("javascripts/build/{%=o.htmlWebpackPlugin.files.chunks[chunk].entry.split("/").reverse()[0] %}")"></script>
+{% } %}

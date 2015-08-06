@@ -23,3 +23,5 @@ conf/graylog-web-interface.conf
 javascript/node_modules
 javascript/dist
 app/assets/javascripts/build/app*.js
+public/javascripts/build
+
