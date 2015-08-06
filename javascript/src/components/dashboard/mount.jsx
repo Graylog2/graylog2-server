@@ -1,44 +1,42 @@
-'use strict';
+const React = require('react');
+const $ = require('jquery');
 
-var React = require('react');
-var $ = require('jquery');
+const TrendConfigurationModal = require('./TrendConfigurationModal');
+const EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
+const DashboardListPage = require('./DashboardListPage');
 
-var TrendConfigurationModal = require('./TrendConfigurationModal');
-var EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
-var DashboardListPage = require('./DashboardListPage');
+let component;
 
-var component;
-
-var dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');
+const dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');
 if (dialogConfigurationDiv) {
-    component = React.render(<TrendConfigurationModal />, dialogConfigurationDiv);
-    // XXX: to make it accessible from jquery based code
-    if (window) {
-        window.trendDialogConfiguration = component;
-    }
+  component = React.render(<TrendConfigurationModal />, dialogConfigurationDiv);
+  // XXX: to make it accessible from jquery based code
+  if (window) {
+    window.trendDialogConfiguration = component;
+  }
 }
 
-$('.react-edit-dashboard').each(function() {
-    var id = this.getAttribute('data-dashboard-id');
-    var title = this.getAttribute('data-dashboard-title');
-    var description = this.getAttribute('data-dashboard-description');
-    var buttonClass = this.getAttribute('data-button-class');
-    var content = this.innerHTML;
+$('.react-edit-dashboard').each(function () {
+  const id = this.getAttribute('data-dashboard-id');
+  const title = this.getAttribute('data-dashboard-title');
+  const description = this.getAttribute('data-dashboard-description');
+  const buttonClass = this.getAttribute('data-button-class');
+  const content = this.innerHTML;
 
-    component = (
-        <EditDashboardModalTrigger id={id} action="edit" title={title} description={description} buttonClass={buttonClass}>
-            {content}
-        </EditDashboardModalTrigger>
-    );
+  component = (
+    <EditDashboardModalTrigger id={id} action="edit" title={title} description={description} buttonClass={buttonClass}>
+      {content}
+    </EditDashboardModalTrigger>
+  );
 
-    React.render(component, this);
+  React.render(component, this);
 });
 
-var dashboardListPage = document.getElementById('react-dashboard-list-page');
+const dashboardListPage = document.getElementById('react-dashboard-list-page');
 if (dashboardListPage) {
-    var permissions = JSON.parse(dashboardListPage.getAttribute('data-permissions'));
-    var username = dashboardListPage.getAttribute('data-user-name');
-    component = <DashboardListPage permissions={permissions} username={username}/>;
+  const permissions = JSON.parse(dashboardListPage.getAttribute('data-permissions'));
+  const username = dashboardListPage.getAttribute('data-user-name');
+  component = <DashboardListPage permissions={permissions} username={username}/>;
 
-    React.render(component, dashboardListPage);
+  React.render(component, dashboardListPage);
 }
