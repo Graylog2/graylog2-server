@@ -106,6 +106,7 @@
         <guice.version>4.0</guice.version>
         <drools.version>6.2.0.Final</drools.version>
         <slf4j.version>1.7.12</slf4j.version>
+        <log4j.version>2.4</log4j.version>
         <mongojack.version>2.3.0</mongojack.version>
         <swagger.version>1.3.11</swagger.version>
         <sigar.version>1.6.4</sigar.version>
@@ -265,7 +266,7 @@
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
-                <artifactId>metrics-log4j</artifactId>
+                <artifactId>metrics-log4j2</artifactId>
                 <version>${metrics.version}</version>
             </dependency>
             <dependency>
@@ -418,7 +419,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>5.1.3.Final</version>
+                <version>5.2.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.graylog2</groupId>
@@ -431,11 +432,7 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
+            <!-- SLF4J Legacy Bridges -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
@@ -447,14 +444,25 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <!-- Apache Log4j 2 -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>apache-log4j-extras</artifactId>
-                <version>1.2.17</version>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -499,6 +507,30 @@
                     <exclusion>
                         <groupId>javax.jms</groupId>
                         <artifactId>jms</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Exclude log4j dependency from Zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.3.6</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.101tec</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>0.3</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -640,6 +672,12 @@
                 <groupId>org.fusesource</groupId>
                 <artifactId>sigar</artifactId>
                 <version>${sigar.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.graylog2.repackaged</groupId>
@@ -766,6 +804,37 @@
         <dependency>
             <groupId>com.jayway.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+        </dependency>
+        <!-- Logging dependencies for tests -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -936,12 +1005,6 @@
                         <include>**/*Spec.class</include>
                         <include>**/*Test.class</include>
                     </includes>
-                    <systemProperties>
-                        <property>
-                            <name>log4j.configuration</name>
-                            <value>test-log4j.xml</value>
-                        </property>
-                    </systemProperties>
                 </configuration>
             </plugin>
             <plugin>

@@ -34,7 +34,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Scopes;
 import com.google.inject.Stage;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -149,9 +151,9 @@ public class ESTimestampFixup {
         jCommander.setProgramName("graylog2-es-fixup");
 
         if (commandLineOptions.isDebug()) {
-            org.apache.log4j.Logger.getLogger(ESTimestampFixup.class).setLevel(Level.DEBUG);
+            initializeLogging(Level.DEBUG);
         } else {
-            org.apache.log4j.Logger.getLogger(ESTimestampFixup.class).setLevel(Level.INFO);
+            initializeLogging(Level.INFO);
         }
 
         if (commandLineOptions.isHelp()) {
@@ -170,6 +172,16 @@ public class ESTimestampFixup {
 
         final Injector injector = Guice.createInjector(Stage.PRODUCTION, new Bindings(configuration));
         injector.getInstance(ESTimestampFixup.class).run(commandLineOptions, args);
+    }
+
+    private static void initializeLogging(final Level logLevel) {
+        final LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(logLevel);
+        config.getLoggerConfig(ESTimestampFixup.class.getCanonicalName()).setLevel(logLevel);
+
+        context.updateLoggers(config);
     }
 
     private final Node node;

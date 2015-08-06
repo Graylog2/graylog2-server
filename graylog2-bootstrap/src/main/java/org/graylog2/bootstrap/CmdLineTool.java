@@ -18,7 +18,7 @@ package org.graylog2.bootstrap;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.log4j.InstrumentedAppender;
+import com.codahale.metrics.log4j2.InstrumentedAppender;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.Repository;
@@ -42,7 +42,9 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
@@ -62,7 +64,6 @@ import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -148,7 +149,7 @@ public abstract class CmdLineTool implements CliCommand {
 
     @Override
     public void run() {
-        setupLogger();
+        final Level logLevel = setupLogger();
 
         final PluginBindings pluginBindings = installPluginConfigAndBindings(getPluginPath(configFile));
 
@@ -180,25 +181,19 @@ public abstract class CmdLineTool implements CliCommand {
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
 
+        addInstrumentedAppender(metrics, logLevel);
+
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
         reporter.start();
-
-        InstrumentedAppender logMetrics = new InstrumentedAppender(metrics);
-        logMetrics.activateOptions();
-        org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
-
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
 
         startCommand();
     }
 
     protected abstract void startCommand();
 
-    protected void setupLogger() {
-        // Are we in debug mode?
-        Level logLevel = Level.INFO;
+    protected Level setupLogger() {
+        final Level logLevel;
         if (isDebug()) {
             LOG.info("Running in Debug mode");
             logLevel = Level.DEBUG;
@@ -207,9 +202,33 @@ public abstract class CmdLineTool implements CliCommand {
             InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
         } else if (onlyLogErrors()) {
             logLevel = Level.ERROR;
+        } else {
+            logLevel = Level.INFO;
         }
-        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger("org.graylog2").setLevel(logLevel);
+
+        initializeLogging(logLevel);
+
+        return logLevel;
+    }
+
+    private void initializeLogging(final Level logLevel) {
+        final LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(logLevel);
+        config.getLoggerConfig(Main.class.getPackage().getName()).setLevel(logLevel);
+
+        context.updateLoggers(config);
+    }
+
+    private void addInstrumentedAppender(final MetricRegistry metrics, final Level level) {
+        final InstrumentedAppender appender = new InstrumentedAppender(metrics, null, null, false);
+        appender.start();
+
+        final LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, null);
+        context.updateLoggers(config);
     }
 
     protected boolean onlyLogErrors() {
