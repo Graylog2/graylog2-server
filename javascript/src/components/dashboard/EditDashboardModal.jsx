@@ -68,17 +68,29 @@ var EditDashboardModal = React.createClass({
             promise = DashboardStore.createDashboard(this.state.title, this.state.description);
             promise.done((id) => {
                 this.close();
+
                 if (typeof this.props.onSaved === 'function') {
                     this.props.onSaved(id);
                 }
+
+                this.setState(this.getInitialState());
             });
         } else {
             promise = DashboardStore.saveDashboard(this.state);
             promise.done(() => {
                 this.close();
+
                 var idSelector = '[data-dashboard-id="' + this.state.id + '"]';
-                $(idSelector + '.dashboard-title').html(this.state.title);
-                $(idSelector + '.dashboard-description').html(this.state.description);
+                var $title = $(idSelector + '.dashboard-title');
+                if ($title.length > 0) {
+                    $title.html(this.state.title);
+                }
+
+                var $description = $(idSelector + '.dashboard-description');
+                if ($description.length > 0) {
+                    $description.html(this.state.description);
+                }
+
                 if (typeof this.props.onSaved === 'function') {
                     this.props.onSaved(this.state.id);
                 }
