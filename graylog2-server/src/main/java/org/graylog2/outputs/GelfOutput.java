@@ -60,7 +60,6 @@ public class GelfOutput implements MessageOutput {
     private static final String CK_RECONNECT_DELAY = "reconnect_delay";
     private static final String CK_TCP_NO_DELAY = "tcp_no_delay";
     private static final String CK_TCP_KEEP_ALIVE = "tcp_keep_alive";
-    private static final String CK_TLS_ENABLED = "tls_enabled";
     private static final String CK_TLS_VERIFICATION_ENABLED = "tls_verification_enabled";
     private static final String CK_TLS_TRUST_CERT_CHAIN = "tls_trust_cert_chain";
 
@@ -103,7 +102,6 @@ public class GelfOutput implements MessageOutput {
         final int reconnectDelay = configuration.getInt(CK_RECONNECT_DELAY, 500);
         final boolean tcpKeepAlive = configuration.getBoolean(CK_TCP_KEEP_ALIVE, false);
         final boolean tcpNoDelay = configuration.getBoolean(CK_TCP_NO_DELAY, false);
-        final boolean tlsEnabled = configuration.getBoolean(CK_TLS_ENABLED, false);
         final boolean tlsVerificationEnabled = configuration.getBoolean(CK_TLS_VERIFICATION_ENABLED, false);
         final String tlsTrustCertChain = configuration.getString(CK_TLS_TRUST_CERT_CHAIN);
 
@@ -111,12 +109,27 @@ public class GelfOutput implements MessageOutput {
             throw new MessageOutputConfigurationException("Protocol and/or hostname missing!");
         }
 
-        if (tlsEnabled && tlsVerificationEnabled && isNullOrEmpty(tlsTrustCertChain)) {
-            throw new MessageOutputConfigurationException("TLS trust certificate chain file missing!");
+        final GelfTransports transport;
+        final boolean tlsEnabled;
+        switch (protocol.toUpperCase()) {
+            case "UDP":
+                transport = GelfTransports.UDP;
+                tlsEnabled = false;
+                break;
+            case "TCP":
+                transport = GelfTransports.TCP;
+                tlsEnabled = false;
+                break;
+            case "TCP+TLS":
+                transport = GelfTransports.TCP;
+                tlsEnabled = true;
+                break;
+            default:
+                throw new MessageOutputConfigurationException("Unknown protocol " + protocol);
         }
 
         final File tlsTrustCertChainFile;
-        if (tlsEnabled && tlsVerificationEnabled) {
+        if (tlsEnabled && !isNullOrEmpty(tlsTrustCertChain)) {
             tlsTrustCertChainFile = new File(tlsTrustCertChain);
 
             if (!tlsTrustCertChainFile.isFile() && !tlsTrustCertChainFile.canRead()) {
@@ -127,7 +140,7 @@ public class GelfOutput implements MessageOutput {
         }
 
         final GelfConfiguration gelfConfiguration = new GelfConfiguration(hostname, port)
-                .transport(GelfTransports.valueOf(protocol.toUpperCase()))
+                .transport(transport)
                 .connectTimeout(connectTimeout)
                 .reconnectDelay(reconnectDelay)
                 .tcpKeepAlive(tcpKeepAlive)
@@ -138,6 +151,11 @@ public class GelfOutput implements MessageOutput {
 
             if (tlsVerificationEnabled) {
                 gelfConfiguration.enableTlsCertVerification();
+            } else {
+                gelfConfiguration.disableTlsCertVerification();
+            }
+
+            if (tlsTrustCertChainFile != null) {
                 gelfConfiguration.tlsTrustCertChainFile(tlsTrustCertChainFile);
             }
         }
@@ -233,6 +251,7 @@ public class GelfOutput implements MessageOutput {
         public ConfigurationRequest getRequestedConfiguration() {
             final Map<String, String> protocols = ImmutableMap.of(
                     "TCP", "TCP",
+                    "TCP+TLS", "TCP+TLS",
                     "UDP", "UDP");
             final ConfigurationRequest configurationRequest = new ConfigurationRequest();
             configurationRequest.addField(new TextField(CK_HOSTNAME, "Destination host", "", "This is the hostname of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
@@ -242,8 +261,7 @@ public class GelfOutput implements MessageOutput {
             configurationRequest.addField(new NumberField(CK_RECONNECT_DELAY, "TCP Reconnect Delay", 500, "Time to wait between reconnects in milliseconds", ConfigurationField.Optional.OPTIONAL, NumberField.Attribute.ONLY_POSITIVE));
             configurationRequest.addField(new BooleanField(CK_TCP_NO_DELAY, "TCP No Delay", false, "Whether to use Nagle's algorithm for TCP connections"));
             configurationRequest.addField(new BooleanField(CK_TCP_KEEP_ALIVE, "TCP Keep Alive", false, "Whether to send TCP keep alive packets"));
-            configurationRequest.addField(new BooleanField(CK_TLS_ENABLED, "Use TLS", false, "Whether to encrypt the connection using TLS"));
-            configurationRequest.addField(new BooleanField(CK_TLS_VERIFICATION_ENABLED, "TLS verification", false, "Whether to verify peers using TLS"));
+            configurationRequest.addField(new BooleanField(CK_TLS_VERIFICATION_ENABLED, "TLS verification", false, "Whether to verify peers when using TLS"));
             configurationRequest.addField(new TextField(CK_TLS_TRUST_CERT_CHAIN, "TLS Trust Certificate Chain", "", "Local file which contains the trust certificate chain", ConfigurationField.Optional.OPTIONAL));
 
             return configurationRequest;
