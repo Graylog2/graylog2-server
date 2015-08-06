@@ -176,6 +176,15 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    public Result delete(String id) throws APIException, IOException {
+        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, id)) {
+            return forbidden();
+        }
+
+        this.dashboardService.delete(id);
+        return ok();
+    }
+
     public Result setWidgetPositions(String dashboardId) {
 
         try {

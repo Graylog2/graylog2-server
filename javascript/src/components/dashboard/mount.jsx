@@ -1,7 +1,12 @@
 'use strict';
 
 var React = require('react');
+var $ = require('jquery');
+
 var TrendConfigurationModal = require('./TrendConfigurationModal');
+var EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
+var DashboardListPage = require('./DashboardListPage');
+
 var component;
 
 var dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');
@@ -12,9 +17,6 @@ if (dialogConfigurationDiv) {
         window.trendDialogConfiguration = component;
     }
 }
-
-var $ = require('jquery');
-var EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
 
 $('.react-edit-dashboard').each(function() {
     var id = this.getAttribute('data-dashboard-id');
@@ -32,19 +34,11 @@ $('.react-edit-dashboard').each(function() {
     React.render(component, this);
 });
 
-var createDashboardElements = document.getElementsByClassName('react-create-dashboard');
-var reloadOnDashboardCreated = () => document.location.reload();
+var dashboardListPage = document.getElementById('react-dashboard-list-page');
+if (dashboardListPage) {
+    var permissions = JSON.parse(dashboardListPage.getAttribute('data-permissions'));
+    var username = dashboardListPage.getAttribute('data-user-name');
+    component = <DashboardListPage permissions={permissions} username={username}/>;
 
-for (var i = 0; i < createDashboardElements.length; i++) {
-    var element = createDashboardElements[i];
-    var content = element.innerHTML;
-    var buttonClass = element.getAttribute('data-button-class');
-
-    component = (
-        <EditDashboardModalTrigger action='create' buttonClass={buttonClass} onSaved={reloadOnDashboardCreated}>
-            {content}
-        </EditDashboardModalTrigger>
-    );
-
-    React.render(component, element);
+    React.render(component, dashboardListPage);
 }

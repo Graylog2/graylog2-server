@@ -18,10 +18,26 @@ interface Dashboard {
 
 class DashboardStore {
     private _writableDashboards: Immutable.Map<string, Dashboard>;
+    private _dashboards: Immutable.List<Dashboard>;
     private _onWritableDashboardsChanged: {(dashboards: Immutable.Map<string, Dashboard>): void; }[] = [];
+    private _onDashboardsChanged: {(dashboards: Immutable.List<Dashboard>): void; }[] = [];
 
     constructor() {
+        this._dashboards = Immutable.List<Dashboard>();
         this._writableDashboards = Immutable.Map<string, Dashboard>();
+    }
+
+    get dashboards(): Immutable.List<Dashboard> {
+        return this._dashboards;
+    }
+
+    set dashboards(newDashboards: Immutable.List<Dashboard>) {
+        this._dashboards = newDashboards;
+        this._emitDashboardsChange();
+    }
+
+    _emitDashboardsChange() {
+        this._onDashboardsChanged.forEach((callback) => callback(this.dashboards));
     }
 
     get writableDashboards(): Immutable.Map<string, Dashboard> {
@@ -30,10 +46,10 @@ class DashboardStore {
 
     set writableDashboards(newDashboards: Immutable.Map<string, Dashboard>) {
         this._writableDashboards = newDashboards;
-        this._emitChange();
+        this._emitWritableDashboardsChange();
     }
 
-    _emitChange() {
+    _emitWritableDashboardsChange() {
         this._onWritableDashboardsChanged.forEach((callback) => callback(this.writableDashboards));
     }
 
@@ -41,14 +57,37 @@ class DashboardStore {
         this._onWritableDashboardsChanged.push(dashboardChangeCallback);
     }
 
+    addOnDashboardsChangedCallback(dashboardChangeCallback: (dashboards: Immutable.List<Dashboard>) => void) {
+        this._onDashboardsChanged.push(dashboardChangeCallback);
+    }
+
     updateWritableDashboards() {
         var promise = this.getWritableDashboardList();
         promise.done((dashboards) => this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards));
     }
 
+    updateDashboards() {
+        var promise = this.listDashboards();
+        promise.done((dashboards) => {
+            var dashboardMap = Immutable.Map<string, Dashboard>(dashboards);
+            this.dashboards = Immutable.List<Dashboard>(dashboardMap.values());
+        });
+    }
+
     listDashboards(): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.api.DashboardsApiController.index().url;
         var promise = $.getJSON(url);
+        promise.then((dashboards) => {
+            var dashboardMap = Immutable.Map<string, Dashboard>(dashboards);
+            var dashboardList = Immutable.List<Dashboard>();
+
+            dashboardMap.forEach((dashboard: Dashboard, id: string) => {
+                dashboard.id = id;
+                dashboardList.push(dashboard);
+            });
+
+            return dashboardList;
+        });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading dashboard list failed with status: " + errorThrown,
@@ -82,7 +121,12 @@ class DashboardStore {
 
         promise.done(() => {
             UserNotification.success("Dashboard successfully created");
-            this.updateWritableDashboards();
+
+            if (this._onDashboardsChanged.length > 0) {
+                this.updateDashboards();
+            } else if (this._onWritableDashboardsChanged.length > 0) {
+                this.updateWritableDashboards();
+            }
         });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + errorThrown,
@@ -102,10 +146,43 @@ class DashboardStore {
             contentType: 'application/json'
         });
 
-        promise.done(() => UserNotification.success("Dashboard successfully updated"));
+        promise.done(() => {
+            UserNotification.success("Dashboard successfully updated");
+
+            if (this._onDashboardsChanged.length > 0) {
+                this.updateDashboards();
+            } else if (this._onWritableDashboardsChanged.length > 0) {
+                this.updateWritableDashboards();
+            }
+        });
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
                 "Could not save dashboard");
+        });
+
+        return promise;
+    }
+
+    remove(dashboard: Dashboard): JQueryPromise<string[]> {
+        var url = jsRoutes.controllers.api.DashboardsApiController.delete(dashboard.id).url;
+        var promise = $.ajax({
+            type: "DELETE",
+            url: url
+        });
+
+        promise.done(() => {
+            UserNotification.success("Dashboard successfully deleted");
+
+            if (this._onDashboardsChanged.length > 0) {
+                this.updateDashboards();
+            } else if (this._onWritableDashboardsChanged.length > 0) {
+                this.updateWritableDashboards();
+            }
+        });
+
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
+                "Could not delete dashboard");
         });
 
         return promise;

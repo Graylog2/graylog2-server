@@ -1,48 +1,8 @@
-@(currentUser: org.graylog2.restclient.models.User, dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
+@(currentUser: org.graylog2.restclient.models.User)
 
-@import views.helpers.Permissions._
-@import lib.security.RestPermissions._
+@import lib.json.Json
 
 @main("Dashboards", null, "", currentUser, false) {
-
-    <div class="row content content-head">
-        <div class="col-md-10">
-            <h1>Dashboards</h1>
-
-            <p class="description">
-                Use dashboards to create specific views on your messages. Create a new dashboard here and add any
-                graph or chart you create in other parts of Graylog with one click.
-            </p>
-
-            @views.html.partials.support.list_small() {
-                Take a look at the
-                @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_DASHBOARDS, "dashboard tutorial")
-                for lots of other useful tips.
-            }
-        </div>
-
-        <div class="col-md-2">
-            @if(isPermitted(DASHBOARDS_CREATE)) {
-                <div class="react-create-dashboard" style="margin-top: 20px" data-button-class="btn-success btn-lg"></div>
-            }
-        </div>
+    <div id="react-dashboard-list-page" data-permissions='@Json.toJsonString(currentUser.getPermissions)' data-user-name="@currentUser.getName">
     </div>
-
-    <div class="row content">
-        <div class="col-md-12">
-            <ul class="streams">
-                @for(dashboard <- dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).toSeq.sortBy(_.getTitle.toLowerCase)) {
-                    @views.html.dashboards.dashboard.render(currentUser, dashboard)
-                }
-            </ul>
-
-            @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
-                <div class="alert alert-warning">
-                    <i class="fa fa-info-circle"></i>
-                    No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <span class="react-create-dashboard" data-button-class="btn-link btn-text">Create one now</span>. }
-                </div>
-            }
-        </div>
-    </div>
-
 }

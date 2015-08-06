@@ -48,16 +48,7 @@ public class DashboardsController extends AuthenticatedController {
     private DashboardService dashboardService;
 
     public Result index() {
-        try {
-            List<Dashboard> dashboards = dashboardService.getAll();
-
-            return ok(views.html.dashboards.index.render(currentUser(), dashboards));
-        } catch (APIException e) {
-            String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        }
+        return ok(views.html.dashboards.index.render(currentUser()));
     }
 
     public Result show(String id) {
@@ -88,18 +79,4 @@ public class DashboardsController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
     }
-
-    public Result delete(String id) {
-        try {
-            dashboardService.delete(id);
-            flash("success", "Dashboard was deleted successfully");
-            return redirect(routes.DashboardsController.index());
-        } catch (APIException e) {
-            String message = "Could not delete dashboard. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        }
-    }
-
 }
