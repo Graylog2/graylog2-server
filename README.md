@@ -1,25 +1,38 @@
-Graylog NetFlow Plugin
-======================
+NetFlow Plugin for Graylog
+==========================
 
 This plugin provides a NetFlow UDP input to act as a Flow collector that receives data from Flow exporters. Each received Flow will be converted to a Graylog message.
 
-Example fields:
-
-![NetFlow example fields screenshot](netflow-example.png)
+**Required Graylog version:** 1.2 and later
 
 ## Supported NetFlow Versions
 
 The plugin only supports NetFlow V5 at the moment.
 
-## Requirements
+## Installation
 
-Graylog 1.2.0 or later is needed to run this plugin.
+[Download the plugin](https://github.com/Graylog2/graylog-plugin-netflow/releases)
+and place the `.jar` file in your Graylog plugin directory. The plugin directory
+is the `plugins/` folder relative from your `graylog-server` directory by default
+and can be configured in your `graylog.conf` file.
+
+Restart `graylog-server` and you are done.
+
+## Setup
+
+In the Graylog web interface, go to System/Inputs and create a new NetFlow input like this:
+
+![NetFlow input creation dialog](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-udp-input-1.png)
+
+Example fields:
+
+![NetFlow example fields screenshot](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-example.png)
 
 ## Credits
 
 The NetFlow parsing code is based on the https://github.com/wasted/netflow project and has been ported from Scala to Java.
 
-## Development
+## Plugin Development
 
 ### Testing
 
@@ -45,3 +58,15 @@ wlabel<:00000000  (0x7fef0318bc70)
 ADD FLOW seq:3 [10.0.2.2]:2055 <> [10.0.2.15]:48363 proto:17
 ADD FLOW seq:4 [10.0.2.2]:48164 <> [10.0.2.15]:22 proto:6
 ```
+
+## Plugin Release
+
+We are using the maven release plugin:
+
+```
+$ mvn release:prepare
+[...]
+$ mvn release:perform
+```
+
+This sets the version numbers, creates a tag and pushes to GitHub. TravisCI will build the release artifacts and upload to GitHub automatically.
