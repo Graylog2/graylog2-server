@@ -179,6 +179,7 @@ var SearchBar = React.createClass({
         }
 
         this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
+        this.refs.width.getInputDOMNode().value = SearchStore.width;
     },
     _savedSearchSelected() {
         var selectedSavedSearch = this.refs['savedSearchesSelector'].getValue();
@@ -317,7 +318,7 @@ var SearchBar = React.createClass({
                                   onSubmit={this._prepareSearch}>
                                 <Input type='hidden' name='rangetype' value={this.state.rangeType}/>
                                 <Input type='hidden' ref='fields' name='fields' value=''/>
-                                <Input type='hidden' name='width' value={$(window).width()}/>
+                                <Input type='hidden' ref='width' name='width' value=''/>
 
                                 <div className="timerange-selector-container">
                                     <div className='row no-bm'>

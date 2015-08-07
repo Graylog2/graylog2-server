@@ -24,6 +24,7 @@ class SearchStore {
     private _fields: Immutable.Set<string>;
     public sortField: string;
     public sortOrder: string;
+    public width: number;
     savedSearch: string;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
@@ -42,7 +43,9 @@ class SearchStore {
         this.savedSearch = this.originalSearch.get('saved');
         this.sortField = this.originalSearch.get('sortField');
         this.sortOrder = this.originalSearch.get('sortOrder');
+        this.width = window.innerWidth;
 
+        window.addEventListener('resize', () => this.width = window.innerWidth);
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
         $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
         $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
@@ -312,12 +315,14 @@ class SearchStore {
 
     _reloadSearchWithNewParam(param: string, value: any) {
         var searchURLParams = this.getOriginalSearchURLParams();
+        searchURLParams = searchURLParams.set("width", this.width);
         searchURLParams = searchURLParams.set(param, value);
         URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
     }
 
     _reloadSearchWithNewParams(newParams: Immutable.Map<string, any>) {
         var searchURLParams = this.getOriginalSearchURLParams();
+        searchURLParams = searchURLParams.set("width", this.width);
         searchURLParams = searchURLParams.merge(newParams);
         URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
     }
