@@ -24,7 +24,9 @@ In the Graylog web interface, go to System/Inputs and create a new NetFlow input
 
 ![NetFlow input creation dialog](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-udp-input-1.png)
 
-Example fields:
+## Example Message
+
+This is an example NetFlow message in Graylog:
 
 ![NetFlow example fields screenshot](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-example.png)
 
