@@ -17,6 +17,7 @@
 package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -203,5 +204,11 @@ public class StreamImpl extends PersistedImpl implements Stream {
         } else {
             return MatchingType.valueOf(matchingTypeString);
         }
+    }
+
+    @Override
+    public void setMatchingType(MatchingType matchingType) {
+        Preconditions.checkNotNull(matchingType);
+        fields.put(FIELD_MATCHING_TYPE, matchingType.toString());
     }
 }

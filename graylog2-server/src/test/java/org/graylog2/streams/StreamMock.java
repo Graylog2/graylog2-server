@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class StreamMock implements Stream {
     private String id;
     private String title;
@@ -36,6 +38,7 @@ public class StreamMock implements Stream {
     private boolean disabled;
     private String contentPack;
     private List<StreamRule> streamRules;
+    private MatchingType matchingType;
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Lists.<StreamRule>newArrayList());
@@ -49,6 +52,7 @@ public class StreamMock implements Stream {
         }
         this.contentPack = (String) stream.get(StreamImpl.FIELD_CONTENT_PACK);
         this.streamRules = streamRules;
+        this.matchingType = firstNonNull((MatchingType) stream.get(StreamImpl.FIELD_MATCHING_TYPE), MatchingType.AND);
     }
 
     @Override
@@ -155,6 +159,11 @@ public class StreamMock implements Stream {
 
     @Override
     public MatchingType getMatchingType() {
-        return MatchingType.AND;
+        return this.matchingType;
+    }
+
+    @Override
+    public void setMatchingType(MatchingType matchingType) {
+        this.matchingType = matchingType;
     }
 }

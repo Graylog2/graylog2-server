@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,7 +44,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
-import org.graylog2.rest.resources.streams.requests.UpdateStreamRequest;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
@@ -197,8 +198,17 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         final Stream stream = streamService.load(streamId);
 
-        stream.setTitle(cr.title());
-        stream.setDescription(cr.description());
+        if (!Strings.isNullOrEmpty(cr.title())) {
+            stream.setTitle(cr.title());
+        }
+
+        if (!Strings.isNullOrEmpty(cr.description())) {
+            stream.setDescription(cr.description());
+        }
+
+        if (cr.matchingType() != null) {
+            stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
+        }
 
         streamService.save(stream);
 
