@@ -10,6 +10,7 @@ var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
 var Alert = require('react-bootstrap').Alert;
 var StreamRuleForm = require('./StreamRuleForm');
 var Spinner = require('../common/Spinner');
+var MatchingTypeSwitcher = require('../streams/MatchingTypeSwitcher');
 
 var StreamRulesEditor = React.createClass({
     getInitialState() {
@@ -54,12 +55,12 @@ var StreamRulesEditor = React.createClass({
             if (this.state.matchData.matches) {
                 return (
                     <span>
-                        <i className="fa fa-check" style={{"color":"green"}}/> This message matches all rules and would be routed to this stream.
+                        <i className="fa fa-check" style={{"color":"green"}}/> This message would be routed to this stream.
                     </span>);
             } else {
                 return (
                     <span>
-                        <i className="fa fa-remove" style={{"color":"red"}}/> This message does not match one or more of the rules and would not be routed to this stream.
+                        <i className="fa fa-remove" style={{"color":"red"}}/> This message would not be routed to this stream.
                     </span>);
             }
         } else {
@@ -105,6 +106,7 @@ var StreamRulesEditor = React.createClass({
 
                         {this._explainMatchResult()}
 
+                        <MatchingTypeSwitcher stream={this.state.stream} onChange={this.loadData}/>
                         <Alert ref='well' bsStyle={styles}>
                             <StreamRuleList stream={this.state.stream} streamRuleTypes={this.state.streamRuleTypes}
                                             permissions={this.props.permissions} matchData={this.state.matchData}/>
