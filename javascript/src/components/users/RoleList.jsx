@@ -22,13 +22,18 @@ var RoleList = React.createClass({
         return <th>{header}</th>;
     },
     _roleInfoFormatter(role) {
+
+        let actions = [
+            <button key="delete" className="btn btn-primary btn-xs" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</button>,
+            <button key="edit" className="btn btn-info btn-xs" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</button>
+        ];
+
         return (
             <tr key={role.name}>
                 <td className="centered">{role.name}</td>
                 <td className="limited">{role.description}</td>
                 <td>
-                    <button className="btn btn-primary btn-xs" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</button>
-                    <button className="btn btn-info btn-xs" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</button>
+                    {role.read_only ? null : actions}
                 </td>
             </tr>
         );
