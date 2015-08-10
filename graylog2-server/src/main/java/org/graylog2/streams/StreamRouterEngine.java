@@ -316,7 +316,7 @@ public class StreamRouterEngine {
                     return matches.values().contains(false);
                 case AND:
                 default:
-                    return !matches.values().contains(false);
+                    return matches.size() > 0 && !matches.values().contains(false);
             }
         }
 
