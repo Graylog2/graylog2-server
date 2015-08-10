@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.sun.javafx.beans.annotations.NonNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public abstract class UpdateStreamRequest {
         return new AutoValue_UpdateStreamRequest(title, description, matchingType);
     }
 
-    public static UpdateStreamRequest updateMatchingType(@NonNull String matchingType) {
+    public static UpdateStreamRequest updateMatchingType(@Nonnull String matchingType) {
         return create(null, null, matchingType, null);
     }
 }
