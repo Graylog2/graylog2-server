@@ -190,7 +190,9 @@ PUT           /a/system/user/:username/preferences                              
 # Roles
 GET           /a/system/roles                                                                    @controllers.api.RolesApiController.listRoles()
 POST          /a/system/role                                                                     @controllers.api.RolesApiController.createRole()
+PUT           /a/system/role/:rolename                                                           @controllers.api.RolesApiController.updateRole(rolename: String)
 GET           /a/system/role/:rolename                                                           @controllers.api.RolesApiController.loadRole(rolename: String)
+GET           /a/system/role/:rolename/members                                                   @controllers.api.RolesApiController.loadMembers(rolename: String)
 DELETE        /a/system/role/:rolename                                                           @controllers.api.RolesApiController.deleteRole(rolename: String)
 PUT           /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.addMember(rolename: String, username: String)
 DELETE        /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.deleteMember(rolename: String, username: String)

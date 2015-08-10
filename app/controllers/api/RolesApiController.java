@@ -4,6 +4,7 @@ import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import lib.security.RestPermissions;
+import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.restclient.models.RolesService;
 import play.mvc.Result;
@@ -21,6 +22,18 @@ public class RolesApiController extends AuthenticatedController {
     @Inject
     public RolesApiController(RolesService rolesService) {
         this.rolesService = rolesService;
+    }
+
+    public Result loadMembers(String rolename) {
+        if (!isPermitted(RestPermissions.ROLES_READ, rolename)) {
+            return forbidden();
+        }
+
+        final RoleMembershipResponse members = rolesService.getMembers(rolename);
+        if (members == null) {
+            return internalServerError();
+        }
+        return jsonOk(members);
     }
 
     public Result listRoles() {
@@ -46,6 +59,21 @@ public class RolesApiController extends AuthenticatedController {
         if (role == null) {
             return internalServerError();
         }
+        return jsonOk(role);
+    }
+
+    public Result updateRole(String rolename) {
+        if (!isPermitted(RestPermissions.ROLES_EDIT, rolename)) {
+            return forbidden();
+        }
+
+        RoleResponse updatedRole = Json.fromJson(request().body().asJson(), RoleResponse.class);
+        if (isNullOrEmpty(updatedRole.name()) || updatedRole.permissions() == null || updatedRole.permissions().isEmpty()) {
+            return badRequest("Missing fields");
+        }
+
+        final RoleResponse role = rolesService.updateRole(rolename, updatedRole);
+
         return jsonOk(role);
     }
 

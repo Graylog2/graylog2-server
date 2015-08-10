@@ -2,8 +2,10 @@
 
 var React = require('react');
 
-var UsersStore = require('../../stores/users/UsersStore');
+var UsersStore = require('../../stores/users/UsersStore').UsersStore;
 var DataTable = require('../common/DataTable');
+
+var Input = require('react-bootstrap').Input;
 
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
