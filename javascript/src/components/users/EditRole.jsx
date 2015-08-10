@@ -19,14 +19,23 @@ var EditRole = React.createClass({
     },
 
     getInitialState() {
+        let role = this.props.initialRole;
+        if (role === null) {
+            // for the create dialog
+            role = {name: null, description: null, permissions: [""]};
+        }
         return {
-            role: this.props.initialRole,
-            initialName: this.props.initialRole.name
+            role: role,
+            initialName: this._safeRoleName(this.props.initialRole)
         };
     },
 
+    _safeRoleName(role) {
+        return role === null ? null : role.name;
+    },
+
     componentWillReceiveProps(newProps) {
-        this.setState({role: newProps.initialRole, initialName: newProps.initialRole.name});
+        this.setState({role: newProps.initialRole, initialName: this._safeRoleName(newProps.initialRole)});
     },
 
     _setName(ev) {
@@ -41,9 +50,16 @@ var EditRole = React.createClass({
     },
 
     render() {
+        let titleText;
+        if (this.state.initialName === null) {
+            titleText = "Create a new role";
+        } else {
+            titleText = "Edit role " + this.state.initialName;
+        }
         return (
             <Row>
                 <Col md={12}>
+                    <h1>{titleText}</h1>
                     <form>
                         <label htmlFor="role-name">Name:</label>
                         <input id="role-name" type="text" className="form-control" onChange={this._setName} value={this.state.role.name} required/>
@@ -56,7 +72,7 @@ var EditRole = React.createClass({
                     </form>
                 </Col>
             </Row>);
-    }
+    },
 });
 
 module.exports = EditRole;

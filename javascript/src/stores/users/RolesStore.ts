@@ -5,10 +5,12 @@ declare var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
-import UsersStore = require("UsersStore");
+import UsersStore = require("./UsersStore");
 
 export interface Role {
     name: string;
+    description: string;
+    permissions: string[];
 }
 
 export interface RoleMembership {

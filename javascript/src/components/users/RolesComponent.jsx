@@ -33,8 +33,11 @@ var RolesComponent = React.createClass({
         });
     },
 
+    _showCreateRole() {
+        this.setState({showEditRole: true});
+    },
     _showEditRole(role) {
-        this.setState({editRole: role});
+        this.setState({showEditRole: true, editRole: role});
     },
     _deleteRole(role) {
         if (window.confirm("Do you really want to delete role " + role.name + "?")) {
@@ -42,28 +45,33 @@ var RolesComponent = React.createClass({
                 if (membership.users.length != 0) {
                     UserNotification.error("Cannot delete role " + role.name + ". It is still assigned to " + membership.users.length + " users.");
                 } else {
-                    RolesStore.deleteRole(role.name);
+                    RolesStore.deleteRole(role.name).done(this.loadRoles);
                 }
             });
         }
     },
     _saveRole(initialName, role) {
-        RolesStore.updateRole(initialName, role).done(() => {this.setState({editRole: null})});
+        if (initialName === null) {
+            RolesStore.createRole(role).done(this._clearEditRole).done(this.loadRoles);
+        } else {
+            RolesStore.updateRole(initialName, role).done(this._clearEditRole).done(this.loadRoles);
+        }
     },
-    _cancelEdit(ev) {
-        this.setState({editRole: null});
+    _clearEditRole() {
+        this.setState({showEditRole: false, editRole: null});
     },
 
     render() {
         var content = null;
         if (!this.state.rolesLoaded) {
             content = <span>Loading roles...</span>;
-        } else if (this.state.editRole !== null) {
-            content = <EditRole initialRole={this.state.editRole} onSave={this._saveRole} cancelEdit={this._cancelEdit}/>;
+        } else if (this.state.showEditRole) {
+            content = <EditRole initialRole={this.state.editRole} onSave={this._saveRole} cancelEdit={this._clearEditRole}/>;
         } else {
             content = <RoleList roles={this.state.roles}
                                 showEditRole={this._showEditRole}
-                                deleteRole={this._deleteRole} />;
+                                deleteRole={this._deleteRole}
+                                createRole={this._showCreateRole} />;
         }
         return (
             <Row>
