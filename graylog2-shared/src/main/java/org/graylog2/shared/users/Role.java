@@ -37,6 +37,8 @@ public interface Role {
 
     void setPermissions(Set<String> permissions);
 
+    boolean isReadOnly();
+
     class RoleIdToNameFunction implements Function<String, String> {
         private final Map<String, Role> idToRole;
 

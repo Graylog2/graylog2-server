@@ -129,7 +129,7 @@ public class RestPermissions {
     public static final String ROLES_DELETE = "roles:delete";
 
     // Standard set of permissions of readers.
-    private static final Set<String> READER_BASE_PERMISSIONS = ImmutableSet.<String>builder().add(
+    public static final Set<String> READER_BASE_PERMISSIONS = ImmutableSet.<String>builder().add(
                     BUFFERS_READ,
                     FIELDNAMES_READ,
                     INDEXERCLUSTER_READ,

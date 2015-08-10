@@ -21,28 +21,41 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static org.mongojack.DBQuery.and;
+import static org.mongojack.DBQuery.is;
+
 public class RoleServiceImpl implements RoleService {
+    private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
 
     private static final String ROLES = "roles";
     private static final String NAME_LOWER = "name_lower";
+    private static final String READ_ONLY = "read_only";
+
+    private static final String ADMIN_ROLENAME = "Admin";
+    private static final String READER_ROLENAME = "Reader";
 
     private final JacksonDBCollection<RoleImpl, ObjectId> dbCollection;
     private final Validator validator;
@@ -60,6 +73,42 @@ public class RoleServiceImpl implements RoleService {
                 mapper.get());
         // lower case role names are unique, this allows arbitrary naming, but still uses an index
         dbCollection.createIndex(new BasicDBObject(NAME_LOWER, 1), new BasicDBObject("unique", true));
+
+        // make sure the two built-in roles actually exist
+        ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
+                          "Grants all permissions for Graylog administrators (built-in)");
+        ensureBuiltinRole(READER_ROLENAME, RestPermissions.READER_BASE_PERMISSIONS, "Reader",
+                          "Grants basic permissions for every Graylog user (built-in)");
+
+    }
+
+    private void ensureBuiltinRole(String roleName,
+                                   Set<String> expectedPermissions,
+                                   String name, String description) {
+        RoleImpl previousRole = null;
+        try {
+            previousRole = load(roleName);
+            if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions()))  {
+                log.error("Invalid role '{}', fixing it.", roleName);
+                throw new IllegalArgumentException(); // jump to fix code
+            }
+        } catch (NotFoundException |IllegalArgumentException | NoSuchElementException ignored) {
+            log.info("{} role is missing or invalid, re-adding it as a built-in role.", roleName);
+            final RoleImpl fixedAdmin = new RoleImpl();
+            // copy the mongodb id over, in order to update the role instead of readding it
+            if (previousRole != null) {
+                fixedAdmin._id = previousRole._id;
+            }
+            fixedAdmin.setReadOnly(true);
+            fixedAdmin.setName(name);
+            fixedAdmin.setDescription(description);
+            fixedAdmin.setPermissions(expectedPermissions);
+            try {
+                save(fixedAdmin);
+            } catch (DuplicateKeyException | ValidationException e) {
+                log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
+            }
+        }
     }
 
     @Override
@@ -73,7 +122,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleImpl load(String roleName) throws NotFoundException {
-        final RoleImpl role = dbCollection.findOne(DBQuery.is(NAME_LOWER, roleName.toLowerCase()));
+        final RoleImpl role = dbCollection.findOne(is(NAME_LOWER, roleName.toLowerCase()));
 
         if (role == null) {
             throw new NotFoundException("No role found with name " + roleName);
@@ -125,7 +174,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public int delete(String roleName) {
-        return dbCollection.remove(DBQuery.is(NAME_LOWER, roleName.toLowerCase())).getN();
+        final DBQuery.Query nameMatchesAndNotReadonly = and(is(READ_ONLY, false), is(NAME_LOWER, roleName.toLowerCase()));
+        return dbCollection.remove(nameMatchesAndNotReadonly).getN();
     }
 
 

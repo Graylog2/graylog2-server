@@ -37,5 +37,10 @@ public interface RoleService {
 
     Set<ConstraintViolation<Role>> validate(Role role);
 
+    /**
+     * Deletes the (case insensitively) named role, unless it is read only.
+     * @param roleName role name to delete, case insensitive
+     * @return the number of deleted roles
+     */
     int delete(String roleName);
 }
