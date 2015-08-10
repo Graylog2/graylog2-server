@@ -14,9 +14,8 @@ import UserNotification from 'util/UserNotification';
 const Stream = React.createClass({
   propTypes() {
     return {
-      permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
       stream: PropTypes.object.isRequired,
-      streamRuleTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
+      permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
       onResume: PropTypes.func.isRequired,
     };
   },
@@ -24,7 +23,8 @@ const Stream = React.createClass({
   render() {
     const stream = this.props.stream;
     const permissions = this.props.permissions;
-    const editRulesLink = (this.isPermitted(permissions, ['streams:edit:' + stream.id]) ? <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : null);
+    const editRulesLink = (this.isPermitted(permissions, ['streams:edit:' + stream.id]) ?
+      <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : null);
 
     let manageOutputsLink = null;
     let manageAlertsLink = null;
@@ -35,24 +35,31 @@ const Stream = React.createClass({
                             className="btn btn-info">Manage alerts</a>);
     }
 
-    let toggleStreamLink = null;
+    let toggleStreamLink;
     if (this.isAnyPermitted(permissions, ['streams:changestate:' + stream.id, 'streams:edit:' + stream.id])) {
       if (stream.disabled) {
-        toggleStreamLink = (<a className="btn btn-success toggle-stream-button" onClick={this._onResume}>Start stream</a>);
+        toggleStreamLink = (
+          <a className="btn btn-success toggle-stream-button" onClick={this._onResume}>Start stream</a>
+        );
       } else {
-        toggleStreamLink = (<a className="btn btn-primary toggle-stream-button" onClick={this._onPause}>Pause stream</a>);
+        toggleStreamLink = (
+          <a className="btn btn-primary toggle-stream-button" onClick={this._onPause}>Pause stream</a>
+        );
       }
     }
 
-    const createdFromContentPack = (stream.content_pack ? <i className="fa fa-cube" title="Created from content pack"></i> : null);
+    const createdFromContentPack = (stream.content_pack ?
+      <i className="fa fa-cube" title="Created from content pack"></i> : null);
 
     return (
       <li className="stream">
         <h2>
-          <a href={jsRoutes.controllers.StreamSearchController.index(stream.id, '*', 'relative', 300).url}>{stream.title}</a>
+          <a
+            href={jsRoutes.controllers.StreamSearchController.index(stream.id, '*', 'relative', 300).url}>{stream.title}</a>
 
           <StreamStateBadge stream={stream} onClick={this.props.onResume}/>
         </h2>
+
         <div className="stream-data">
           <div className="stream-actions pull-right">
             {editRulesLink}{' '}
@@ -70,20 +77,29 @@ const Stream = React.createClass({
             {stream.description}
           </div>
           <div className="stream-metadata">
-            <StreamThroughput streamId={stream.id} />
+            <StreamThroughput streamId={stream.id}/>
 
             , {this._formatNumberOfStreamRules(stream)}
 
-            <CollapsibleStreamRuleList key={'streamRules-' + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+            <CollapsibleStreamRuleList key={'streamRules-' + stream.id} stream={stream}
+                                       streamRuleTypes={this.props.streamRuleTypes}
                                        permissions={this.props.permissions}/>
           </div>
         </div>
-        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule" onSubmit={this._onSaveStreamRule} streamRuleTypes={this.props.streamRuleTypes}/>
+        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule" onSubmit={this._onSaveStreamRule}
+                        streamRuleTypes={this.props.streamRuleTypes}/>
       </li>
     );
   },
   _formatNumberOfStreamRules(stream) {
-    return (stream.stream_rules.length > 0 ? stream.stream_rules.length + ' configured stream rule(s).' : 'no configured rules.');
+    let verbalMatchingType;
+    switch (stream.matching_type) {
+      case 'OR': verbalMatchingType = 'at least one'; break;
+      default:
+      case 'AND': verbalMatchingType = 'all'; break;
+    }
+    return (stream.stream_rules.length > 0 ?
+      'Must match ' + verbalMatchingType + ' of the ' + stream.stream_rules.length + ' configured stream rule(s).' : 'No configured rules.');
   },
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
@@ -91,7 +107,8 @@ const Stream = React.createClass({
     }
   },
   _onResume() {
-    StreamsStore.resume(this.props.stream.id, () => {});
+    StreamsStore.resume(this.props.stream.id, () => {
+    });
   },
   _onUpdate(streamId, stream) {
     StreamsStore.update(streamId, stream, () => UserNotification.success('Stream \'' + stream.title + '\' was updated successfully.', 'Success'));
@@ -101,7 +118,8 @@ const Stream = React.createClass({
   },
   _onPause() {
     if (window.confirm('Do you really want to pause stream \'' + this.props.stream.title + '\'?')) {
-      StreamsStore.pause(this.props.stream.id, () => {});
+      StreamsStore.pause(this.props.stream.id, () => {
+      });
     }
   },
   _onQuickAdd() {
