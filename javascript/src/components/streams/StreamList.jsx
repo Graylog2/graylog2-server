@@ -33,16 +33,19 @@ var StreamList = React.createClass({
             var createStreamButton;
             if (this.isPermitted(this.props.permissions, ["streams:create"])) {
                 createStreamButton = (
-                    <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
+                    <span>
+                        <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
                                         buttonText="Create one now" ref='createStreamButton'
                                         onSave={this.props.onStreamCreated} />
+                        .
+                    </span>
                 );
             }
 
             return (
                 <Alert bsStyle='warning'>
                     <i className="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. {createStreamButton}.
+                    No streams configured. {createStreamButton}
                 </Alert>
             );
         }

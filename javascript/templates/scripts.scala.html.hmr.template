@@ -1,0 +1,4 @@
+<script src="@routes.Assets.at("javascripts/jquery-browserify-shim.js")" type="text/javascript"></script>
+<script src="http://localhost:8080/webpack-dev-server.js"></script>
+<script src="http://localhost:8080/assets/javascripts/build/app.js"></script>
+

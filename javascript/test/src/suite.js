@@ -1,2 +1,0 @@
-require("./queryParserTests");
-require("./UserPreferencesButtonTest");
