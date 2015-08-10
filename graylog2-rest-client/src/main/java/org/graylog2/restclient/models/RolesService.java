@@ -82,13 +82,13 @@ public class RolesService {
         }
     }
 
-    public RoleResponse updateRole(RoleResponse role) {
+    public RoleResponse updateRole(String oldRoleName, RoleResponse role) {
         try {
-            final RoleResponse response = api.path(routes.RolesResource().update(role.name()), RoleResponse.class).body(
+            final RoleResponse response = api.path(routes.RolesResource().update(oldRoleName), RoleResponse.class).body(
                     role).execute();
             return response;
         } catch (APIException | IOException e) {
-            log.error("Unable to update role " + role.name(), e);
+            log.error("Unable to update role " + oldRoleName, e);
         }
         return null;
     }

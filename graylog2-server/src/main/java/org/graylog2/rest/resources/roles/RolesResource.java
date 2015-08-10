@@ -141,7 +141,7 @@ public class RolesResource extends RestResource {
         final Role roleToUpdate = roleService.load(name);
 
         roleToUpdate.setName(role.name());
-        roleToUpdate.setDescription(role.description().get());
+        roleToUpdate.setDescription(role.description().orNull());
         roleToUpdate.setPermissions(role.permissions());
         try {
             roleService.save(roleToUpdate);
