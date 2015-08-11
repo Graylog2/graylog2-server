@@ -1,10 +1,9 @@
-const React = require('react');
-const Alert = require('react-bootstrap').Alert;
+import React from 'react';
+import { Alert } from 'react-bootstrap';
 
-const Dashboard = require('./Dashboard');
-const EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
-
-const PermissionsMixin = require('../../util/PermissionsMixin');
+import Dashboard from './Dashboard';
+import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+import PermissionsMixin from '../../util/PermissionsMixin';
 
 const DashboardList = React.createClass({
   mixins: [PermissionsMixin],
@@ -46,4 +45,4 @@ const DashboardList = React.createClass({
   },
 });
 
-module.exports = DashboardList;
+export default DashboardList;

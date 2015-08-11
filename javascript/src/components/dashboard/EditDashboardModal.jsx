@@ -1,8 +1,8 @@
-const $ = require('jquery');
+import $ from 'jquery';
 
-const React = require('react');
-const BootstrapModal = require('../bootstrap/BootstrapModal');
-const DashboardStore = require('../../stores/dashboard/DashboardStore');
+import React from 'react';
+import BootstrapModal from '../bootstrap/BootstrapModal';
+import DashboardStore from '../../stores/dashboard/DashboardStore';
 
 const EditDashboardModal = React.createClass({
   getInitialState() {
@@ -100,4 +100,4 @@ const EditDashboardModal = React.createClass({
   },
 });
 
-module.exports = EditDashboardModal;
+export default EditDashboardModal;

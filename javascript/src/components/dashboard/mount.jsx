@@ -1,9 +1,9 @@
-const React = require('react');
-const $ = require('jquery');
+import React from 'react';
+import $ from 'jquery';
 
-const TrendConfigurationModal = require('./TrendConfigurationModal');
-const EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
-const DashboardListPage = require('./DashboardListPage');
+import TrendConfigurationModal from './TrendConfigurationModal';
+import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+import DashboardListPage from './DashboardListPage';
 
 let component;
 

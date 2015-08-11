@@ -1,13 +1,13 @@
 /* global jsRoutes */
 
-const React = require('react');
-const DropdownButton = require('react-bootstrap').DropdownButton;
-const MenuItem = require('react-bootstrap').MenuItem;
+import React from 'react';
+import { DropdownButton } from 'react-bootstrap';
+import { MenuItem } from 'react-bootstrap';
 
-const EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
-const PermissionsMixin = require('../../util/PermissionsMixin');
+import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+import PermissionsMixin from '../../util/PermissionsMixin';
 
-const DashboardStore = require('../../stores/dashboard/DashboardStore');
+import DashboardStore from '../../stores/dashboard/DashboardStore';
 
 const Dashboard = React.createClass({
   mixins: [PermissionsMixin],
@@ -57,4 +57,4 @@ const Dashboard = React.createClass({
   },
 });
 
-module.exports = Dashboard;
+export default Dashboard;

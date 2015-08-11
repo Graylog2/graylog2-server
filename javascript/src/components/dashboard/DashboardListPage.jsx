@@ -1,16 +1,15 @@
-const React = require('react');
-const Immutable = require('immutable');
+import React from 'react';
+import Immutable from 'immutable';
 
-const DashboardList = require('./DashboardList');
-const EditDashboardModalTrigger = require('./EditDashboardModalTrigger');
+import DashboardList from './DashboardList';
+import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+import DashboardStore from '../../stores/dashboard/DashboardStore';
 
-const DashboardStore = require('../../stores/dashboard/DashboardStore');
-
-const Spinner = require('../common/Spinner');
-const SupportLink = require('../support/SupportLink');
-const DocsHelper = require('../../util/DocsHelper');
-const DocumentationLink = require('../support/DocumentationLink');
-const PermissionsMixin = require('../../util/PermissionsMixin');
+import Spinner from '../common/Spinner';
+import SupportLink from '../support/SupportLink';
+import DocsHelper from '../../util/DocsHelper';
+import DocumentationLink from '../support/DocumentationLink';
+import PermissionsMixin from '../../util/PermissionsMixin';
 
 const DashboardListPage = React.createClass({
   mixins: [PermissionsMixin],
@@ -100,4 +99,4 @@ const DashboardListPage = React.createClass({
   },
 });
 
-module.exports = DashboardListPage;
+export default DashboardListPage;
