@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.security.ldap;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -76,10 +77,12 @@ public class LdapEntry {
 
     @Override
     public String toString() {
-        return "LdapEntry{" +
-                "dn='" + dn + '\'' +
-                ", attributes=" + attributes +
-                ", groups=" + groups +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("dn", dn)
+                .add("bindPrincipal", bindPrincipal)
+                .add("attributes", attributes)
+                .add("groups", groups)
+                .toString();
     }
 }
