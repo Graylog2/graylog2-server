@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.roles.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -24,6 +25,7 @@ import org.graylog2.rest.models.users.responses.UserSummary;
 import java.util.Collection;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class RoleMembershipResponse {
 
     @JsonProperty
