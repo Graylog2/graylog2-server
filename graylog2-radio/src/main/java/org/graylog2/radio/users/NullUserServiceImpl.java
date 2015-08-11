@@ -27,6 +27,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -108,6 +109,6 @@ public class NullUserServiceImpl implements UserService {
 
     @Override
     public Collection<User> loadAllForRole(Role role) {
-        return null;
+        return Collections.emptySet();
     }
 }
