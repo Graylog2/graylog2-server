@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Optional;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @AutoValue
@@ -29,12 +31,14 @@ import java.util.Set;
 public abstract class RoleResponse {
 
     @JsonProperty
+    @NotBlank
     public abstract String name();
 
     @JsonProperty
     public abstract Optional<String> description();
 
     @JsonProperty
+    @NotNull
     public abstract Set<String> permissions();
 
     @JsonProperty

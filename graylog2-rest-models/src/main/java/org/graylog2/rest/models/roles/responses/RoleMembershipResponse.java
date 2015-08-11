@@ -21,7 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.rest.models.users.responses.UserSummary;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 @AutoValue
@@ -29,9 +31,11 @@ import java.util.Collection;
 public abstract class RoleMembershipResponse {
 
     @JsonProperty
+    @NotBlank
     public abstract String role();
 
     @JsonProperty
+    @NotNull
     public abstract Collection<UserSummary> users();
 
     @JsonCreator
