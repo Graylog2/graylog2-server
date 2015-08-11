@@ -159,13 +159,12 @@ public class RolesResource extends RestResource {
     @DELETE
     @Path("{rolename}")
     @ApiOperation(value = "Remove the named role")
-    public Response delete(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
+    public void delete(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_DELETE, name);
 
         if (roleService.delete(name) == 0) {
             throw new NotFoundException();
         }
-        return Response.noContent().build();
     }
 
     @GET
