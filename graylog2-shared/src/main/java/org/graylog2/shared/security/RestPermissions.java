@@ -178,9 +178,15 @@ public class RestPermissions {
             throw new IllegalArgumentException("Username was null or empty when getting reader permissions.");
         }
 
+        perms.addAll(userSelfEditPermissions(username));
+
+        return perms.build();
+    }
+
+    public static Set<String> userSelfEditPermissions(String username) {
+        ImmutableSet.Builder<String> perms = ImmutableSet.builder();
         perms.add(perInstance(USERS_EDIT, username));
         perms.add(perInstance(USERS_PASSWORDCHANGE, username));
-
         return perms.build();
     }
 
