@@ -246,7 +246,7 @@ public class LdapResource extends RestResource {
     @Path("/settings/groups")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateGroupMappingSettings(@ApiParam(name = "JSON body", required = true, value = "A hash in which the keys are the LDAP group names and values is the Graylog role name.")
-                                   @Valid @NotNull Map<String, String> groupMapping) throws ValidationException {
+                                   @NotNull Map<String, String> groupMapping) throws ValidationException {
         final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());
 
         ldapSettings.setGroupMapping(groupMapping);
