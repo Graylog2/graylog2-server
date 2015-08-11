@@ -131,7 +131,7 @@ public class LdapConnector {
                 }
 
                 for (Attribute attribute : e.getAttributes()) {
-                    if (activeDirectory && attribute.getId().equalsIgnoreCase("userPrincipalName")) {
+                    if (activeDirectory && "userPrincipalName".equalsIgnoreCase(attribute.getId())) {
                         ldapEntry.setBindPrincipal(attribute.getString());
                     }
                     if (attribute.isHumanReadable()) {
