@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.roles;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -58,6 +59,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -173,11 +175,16 @@ public class RolesResource extends RestResource {
     @ApiOperation(value = "Retrieve the role's members")
     public RoleMembershipResponse getMembers(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
         final Role role = roleService.load(name);
+        final Map<String, Role> idMap = roleService.loadAllIdMap();
 
         final Collection<User> users = userService.loadAllForRole(role);
 
-        Set<UserSummary> userSummaries = Sets.newHashSet();
+        Set<UserSummary> userSummaries = Sets.newHashSetWithExpectedSize(users.size());
         for (User user : users) {
+            final Set<String> roleIds = user.getRoleIds();
+            final Set<String> roleNames = Sets.newHashSet(
+                    Collections2.transform(roleIds,
+                                           new Role.RoleIdToNameFunction(idMap)));
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
@@ -191,7 +198,7 @@ public class RolesResource extends RestResource {
                     user.isReadOnly(),
                     user.isExternalUser(),
                     user.getStartpage(),
-                    null
+                    roleNames
             ));
         }
 
