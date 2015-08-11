@@ -130,6 +130,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
                 .setIndices(indices.allIndicesAlias())
                 .setQuery(completeRangeQuery)
+                .setSize(Integer.MAX_VALUE)
                 .request();
 
         final SearchResponse response = client.search(request).actionGet();
@@ -150,6 +151,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .setTypes(IndexMapping.TYPE_INDEX_RANGE)
                 .setIndices(indices.allIndicesAlias())
                 .setQuery(QueryBuilders.matchAllQuery())
+                .setSize(Integer.MAX_VALUE)
                 .request();
 
         final SearchResponse response = client.search(request).actionGet();
