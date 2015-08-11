@@ -236,7 +236,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result == null || result.isEmpty()) {
             return Collections.emptySet();
         }
-        final Set<User> users = Sets.newHashSet();
+        final Set<User> users = Sets.newHashSetWithExpectedSize(result.size());
         for (DBObject dbObject : result) {
             //noinspection unchecked
             users.add(new UserImpl((ObjectId) dbObject.get("_id"), dbObject.toMap()));
