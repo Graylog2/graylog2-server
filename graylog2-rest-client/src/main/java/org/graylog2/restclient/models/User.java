@@ -17,6 +17,7 @@
 package org.graylog2.restclient.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.MoreObjects;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.shiro.SecurityUtils;
@@ -80,7 +81,7 @@ public class User {
                 long sessionTimeoutMs,
                 Map<String, Object> preferences,
                 Set<String> roles) {
-        this.roles = roles == null ? Collections.<String>emptySet() : roles;
+        this.roles = MoreObjects.firstNonNull(roles, Collections.<String>emptySet());
         DateTimeZone timezone1 = null;
         this.sessionTimeoutMs = sessionTimeoutMs;
         this.api = api;
@@ -88,7 +89,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.fullName = fullName;
-        this.permissions = permissions == null ? Collections.<String>emptyList() : permissions;
+        this.permissions = MoreObjects.firstNonNull(permissions, Collections.<String>emptyList());
         this.sessionId = sessionId;
         try {
             if (timezone != null) {
@@ -102,11 +103,7 @@ public class User {
         this.readonly = readonly;
         this.external = external;
         this.startpage = startpage;
-        if (preferences != null) {
-            this.preferences = preferences;
-        } else {
-            this.preferences = Collections.emptyMap();
-        }
+        this.preferences = MoreObjects.firstNonNull(preferences, Collections.<String, Object>emptyMap());
     }
 
     public boolean update(ChangeUserRequest request) {
