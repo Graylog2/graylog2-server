@@ -265,7 +265,7 @@ public class UserImpl extends PersistedImpl implements User {
     public Set<String> getRoleIds() {
         final List<ObjectId> roles = (List<ObjectId>) fields.get(ROLES);
         if (roles == null) {
-            return Sets.newHashSet();
+            return Collections.emptySet();
         }
         return Sets.newHashSet(Collections2.transform(roles, new ObjectIdStringFunction()));
     }
