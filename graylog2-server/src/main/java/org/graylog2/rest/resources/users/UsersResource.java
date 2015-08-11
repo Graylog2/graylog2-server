@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
@@ -59,6 +60,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -160,6 +162,16 @@ public class UsersResource extends RestResource {
         user.setFullName(cr.fullName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
+        final List<String> roles = cr.roles();
+        if (roles != null) {
+            try {
+                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+                final Iterable<String> roleIds = Iterables.transform(roles, new Role.RoleNameToIdFunction(nameMap));
+                user.setRoleIds(Sets.newHashSet(roleIds));
+            } catch (org.graylog2.database.NotFoundException e) {
+                throw new InternalServerErrorException(e);
+            }
+        }
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());

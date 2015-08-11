@@ -153,6 +153,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public Map<String, Role> loadAllLowercaseNameMap() throws NotFoundException {
+        final Set<Role> roles = loadAll();
+        return Maps.uniqueIndex(roles, new Role.RoleToNameFunction());
+    }
+
+    @Override
     public RoleImpl save(Role role1) throws ValidationException {
         // sucky but necessary because of graylog2-shared not knowing about mongodb :(
         if (!(role1 instanceof RoleImpl)) {

@@ -48,11 +48,33 @@ public interface Role {
 
         @Nullable
         @Override
-        public String apply(String groupId) {
-            if (groupId == null || !idToRole.containsKey(groupId)) {
+        public String apply(String roleId) {
+            if (roleId == null || !idToRole.containsKey(roleId)) {
                 return null;
             }
-            return idToRole.get(groupId).getName().toLowerCase();
+            return idToRole.get(roleId).getName().toLowerCase();
+        }
+    }
+
+    class RoleNameToIdFunction implements Function<String, String> {
+
+        private final Map<String, Role> nameToRole;
+
+        public RoleNameToIdFunction(Map<String, Role> nameToRole) {
+            this.nameToRole = nameToRole;
+        }
+
+        @Nullable
+        @Override
+        public String apply(@Nullable String roleName) {
+            if (roleName == null) {
+                return null;
+            }
+            final Role role = nameToRole.get(roleName.toLowerCase());
+            if (role == null) {
+                return null;
+            }
+            return role.getId();
         }
     }
 
