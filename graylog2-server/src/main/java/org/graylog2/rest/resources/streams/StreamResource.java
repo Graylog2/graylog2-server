@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -72,6 +73,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +209,12 @@ public class StreamResource extends RestResource {
         }
 
         if (cr.matchingType() != null) {
-            stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
+            try {
+                stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid matching type '" + cr.matchingType()
+                        + "' specified. Should be one of: " + Arrays.toString(Stream.MatchingType.values()));
+            }
         }
 
         streamService.save(stream);
