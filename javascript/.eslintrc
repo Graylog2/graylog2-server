@@ -1,4 +1,7 @@
 {
   "extends": "airbnb",
+  "rules": {
+    "no-else-return": 1,
+  }
 }
 
