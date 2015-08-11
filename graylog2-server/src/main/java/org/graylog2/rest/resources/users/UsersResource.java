@@ -463,6 +463,7 @@ public class UsersResource extends RestResource {
                 roleNames = Sets.newHashSet(Collections2.transform(roleIds, new Role.RoleIdToNameFunction(idMap)));
             } catch (org.graylog2.database.NotFoundException e) {
                 LOG.error("Unable to load roles", e);
+                throw new InternalServerErrorException("Unable to load roles", e);
             }
         }
         if (includePermissions) {
