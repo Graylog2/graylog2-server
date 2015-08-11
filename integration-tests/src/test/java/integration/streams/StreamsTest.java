@@ -415,7 +415,7 @@ public class StreamsTest extends BaseRestTest {
 
         final JsonPath response = given()
                 .when()
-                .body(jsonResourceForMethod())
+                .body("{\"matching_type\":\"OR\"}")
                 .put("/streams/" + streamId)
                 .then()
                 .statusCode(200)
@@ -442,7 +442,7 @@ public class StreamsTest extends BaseRestTest {
 
         given()
                 .when()
-                .body(jsonResourceForMethod())
+                .body("{\"matching_type\":\"INVALID\"}")
                 .put("/streams/" + streamId)
                 .then()
                 .statusCode(400);
@@ -463,7 +463,7 @@ public class StreamsTest extends BaseRestTest {
 
         given()
                 .when()
-                .body(jsonResourceForMethod())
+                .body("{\"matching_type\":\"OR\"}")
                 .put("/streams/" + streamId)
                 .then()
                 .statusCode(404);
