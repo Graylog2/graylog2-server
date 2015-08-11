@@ -164,6 +164,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_CREATED_AT, (Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT))));
         result.put(FIELD_RULES, streamRules);
         result.put(FIELD_OUTPUTS, outputs);
+        result.put(FIELD_MATCHING_TYPE, getMatchingType());
         return result;
     }
 
