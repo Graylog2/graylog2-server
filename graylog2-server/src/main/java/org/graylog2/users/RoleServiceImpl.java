@@ -29,6 +29,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
+import org.graylog2.shared.users.Roles;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -160,7 +161,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Map<String, Role> loadAllLowercaseNameMap() throws NotFoundException {
         final Set<Role> roles = loadAll();
-        return Maps.uniqueIndex(roles, new Role.RoleToNameFunction());
+        return Maps.uniqueIndex(roles, Roles.roleToNameFunction());
     }
 
     @Override

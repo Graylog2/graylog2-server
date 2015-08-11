@@ -46,6 +46,7 @@ import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
+import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
@@ -166,7 +167,7 @@ public class UsersResource extends RestResource {
         if (roles != null) {
             try {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                final Iterable<String> roleIds = Iterables.transform(roles, new Role.RoleNameToIdFunction(nameMap));
+                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
                 user.setRoleIds(Sets.newHashSet(roleIds));
             } catch (org.graylog2.database.NotFoundException e) {
                 throw new InternalServerErrorException(e);
@@ -460,7 +461,7 @@ public class UsersResource extends RestResource {
         if (!roleIds.isEmpty()) {
             try {
                 final Map<String, Role> idMap = roleService.loadAllIdMap();
-                roleNames = Sets.newHashSet(Collections2.transform(roleIds, new Role.RoleIdToNameFunction(idMap)));
+                roleNames = Sets.newHashSet(Collections2.transform(roleIds, Roles.roleIdToNameFunction(idMap)));
             } catch (org.graylog2.database.NotFoundException e) {
                 LOG.error("Unable to load roles", e);
                 throw new InternalServerErrorException("Unable to load roles", e);

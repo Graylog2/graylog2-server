@@ -16,10 +16,6 @@
  */
 package org.graylog2.shared.users;
 
-import com.google.common.base.Function;
-
-import javax.annotation.Nullable;
-import java.util.Map;
 import java.util.Set;
 
 public interface Role {
@@ -39,50 +35,4 @@ public interface Role {
 
     boolean isReadOnly();
 
-    class RoleIdToNameFunction implements Function<String, String> {
-        private final Map<String, Role> idToRole;
-
-        public RoleIdToNameFunction(Map<String, Role> idToRole) {
-            this.idToRole = idToRole;
-        }
-
-        @Nullable
-        @Override
-        public String apply(String roleId) {
-            if (roleId == null || !idToRole.containsKey(roleId)) {
-                return null;
-            }
-            return idToRole.get(roleId).getName().toLowerCase();
-        }
-    }
-
-    class RoleNameToIdFunction implements Function<String, String> {
-
-        private final Map<String, Role> nameToRole;
-
-        public RoleNameToIdFunction(Map<String, Role> nameToRole) {
-            this.nameToRole = nameToRole;
-        }
-
-        @Nullable
-        @Override
-        public String apply(@Nullable String roleName) {
-            if (roleName == null) {
-                return null;
-            }
-            final Role role = nameToRole.get(roleName.toLowerCase());
-            if (role == null) {
-                return null;
-            }
-            return role.getId();
-        }
-    }
-
-    class RoleToNameFunction implements Function<Role, String> {
-        @Nullable
-        @Override
-        public String apply(@Nullable Role input) {
-            return input != null ? input.getName().toLowerCase() : null;
-        }
-    }
 }
