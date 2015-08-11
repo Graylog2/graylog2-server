@@ -63,6 +63,8 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String DEFAULT_GROUP = "reader";
     public static final String TRUST_ALL_CERTS = "trust_all_certificates";
     public static final String GROUP_MAPPING = "group_role_mapping";
+    public static final String GROUP_SEARCH_BASE = "group_search_base";
+    public static final String GROUP_ID_ATTRIBUTE = "group_id_attribute";
 
     protected Configuration configuration;
     private final RoleService roleService;
@@ -296,6 +298,28 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         }
 
         fields.put(GROUP_MAPPING, internal);
+    }
+
+    @Override
+    public String getGroupSearchBase() {
+        final Object o = fields.get(GROUP_SEARCH_BASE);
+        return o != null ? o.toString() : "";
+    }
+
+    @Override
+    public void setGroupSearchBase(String groupSearchBase) {
+        fields.put(GROUP_SEARCH_BASE, groupSearchBase);
+    }
+
+    @Override
+    public String getGroupIdAttribute() {
+        final Object o = fields.get(GROUP_ID_ATTRIBUTE);
+        return o != null ? o.toString() : "";
+    }
+
+    @Override
+    public void setGroupIdAttribute(String groupIdAttribute) {
+        fields.put(GROUP_ID_ATTRIBUTE, groupIdAttribute);
     }
 
 }

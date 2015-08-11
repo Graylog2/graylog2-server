@@ -103,7 +103,9 @@ public class LdapResource extends RestResource {
                 ldapSettings.getSearchPattern(),
                 ldapSettings.getDisplayNameAttribute(),
                 ldapSettings.getDefaultGroup(),
-                ldapSettings.getGroupMapping());
+                ldapSettings.getGroupMapping(),
+                ldapSettings.getGroupSearchBase(),
+                ldapSettings.getGroupIdAttribute());
     }
 
     @POST
@@ -161,7 +163,9 @@ public class LdapResource extends RestResource {
                         request.searchBase(),
                         request.searchPattern(),
                         request.principal(),
-                        request.activeDirectory());
+                        request.activeDirectory(),
+                        request.groupSearchBase(),
+                        request.groupIdAttribute());
                 if (entry != null) {
                     userPrincipalName = entry.getBindPrincipal();
                     entryMap = entry.getAttributes();
@@ -211,6 +215,8 @@ public class LdapResource extends RestResource {
         ldapSettings.setDisplayNameAttribute(request.displayNameAttribute());
         ldapSettings.setDefaultGroup(request.defaultGroup());
         ldapSettings.setGroupMapping(request.groupMapping());
+        ldapSettings.setGroupSearchBase(request.groupSearchBase());
+        ldapSettings.setGroupIdAttribute(request.groupIdAttribute());
 
         ldapSettingsService.save(ldapSettings);
     }

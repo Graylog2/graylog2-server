@@ -78,4 +78,12 @@ public interface LdapSettings extends Persisted {
     Map<String, String> getGroupMapping();
 
     void setGroupMapping(Map<String, String> mapping);
+
+    String getGroupSearchBase();
+
+    void setGroupSearchBase(String groupSearchBase);
+
+    String getGroupIdAttribute();
+
+    void setGroupIdAttribute(String groupIdAttribute);
 }

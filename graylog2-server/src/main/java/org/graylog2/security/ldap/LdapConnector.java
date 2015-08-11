@@ -97,7 +97,13 @@ public class LdapConnector {
         return connection;
     }
 
-    public LdapEntry search(LdapNetworkConnection connection, String searchBase, String searchPattern, String principal, boolean activeDirectory) throws LdapException, CursorException {
+    public LdapEntry search(LdapNetworkConnection connection,
+                            String searchBase,
+                            String searchPattern,
+                            String principal,
+                            boolean activeDirectory,
+                            String groupSearchBase,
+                            String groupIdAttribute) throws LdapException, CursorException {
         final LdapEntry ldapEntry = new LdapEntry();
 
         final String filter = MessageFormat.format(searchPattern, sanitizePrincipal(principal));
@@ -134,10 +140,21 @@ public class LdapConnector {
                 LOG.trace("No LDAP entry found for filter {}", filter);
                 return null;
             }
-            // TODO ActiveDirectory could use the memberOf attribute, but then we'd need to resolve the CN of each group, too.
-            // TODO we do not check for dynamic groups yet.
-            ldapEntry.addGroups(findGroups(connection, "CN=Builtin,DC=corp,DC=graylog,DC=org", "group", "cn", ldapEntry.getDn()));
-            LOG.trace("LDAP search found entry for DN {} with search filter {}: {}", ldapEntry.getDn(), filter, ldapEntry);
+            if (groupSearchBase != null && groupIdAttribute != null) {
+                // TODO ActiveDirectory could use the memberOf attribute, but then we'd need to resolve the CN of each group, too.
+                // TODO we do not check for dynamic groups yet.
+                ldapEntry.addGroups(findGroups(connection,
+                                               groupSearchBase,
+                                               "group",
+                                               groupIdAttribute,
+                                               ldapEntry.getDn()));
+                LOG.trace("LDAP search found entry for DN {} with search filter {}: {}",
+                          ldapEntry.getDn(),
+                          filter,
+                          ldapEntry);
+            } else {
+                LOG.trace("LDAP group search base or group id attribute missing, not searching for LDAP groups.");
+            }
             return ldapEntry;
         } finally {
             if (entryCursor != null) {
