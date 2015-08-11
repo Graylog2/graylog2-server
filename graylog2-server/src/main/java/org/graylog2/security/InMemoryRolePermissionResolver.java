@@ -28,6 +28,7 @@ import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,9 +64,6 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
     @Override
     public Collection<Permission> resolvePermissionsInRole(String roleId) {
         final Set<String> permissions = resolveStringPermission(roleId);
-        if (permissions == null) {
-            return Collections.emptySet();
-        }
 
         // copy to avoid reiterating all the time
         return Sets.newHashSet(Collections2.transform(permissions, new Function<String, Permission>() {
@@ -77,19 +75,20 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
         }));
     }
 
-    @Nullable
+    @Nonnull
     public Set<String> resolveStringPermission(String roleId) {
         final ImmutableMap<String, Role> index = idToRoleIndex.get();
 
-        if (!index.containsKey(roleId)) {
+        final Role role = index.get(roleId);
+        if (role == null) {
             log.debug("Unknown role {}, cannot resolve permissions.", roleId);
-            return null;
+            return Collections.emptySet();
         }
 
-        final Set<String> permissions = index.get(roleId).getPermissions();
+        final Set<String> permissions = role.getPermissions();
         if (permissions == null) {
             log.debug("Role {} has no permissions assigned, cannot resolve permissions.", roleId);
-            return null;
+            return Collections.emptySet();
         }
         return permissions;
     }
