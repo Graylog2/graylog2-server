@@ -131,6 +131,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public boolean exists(String roleName) {
+        return dbCollection.getCount(is(NAME_LOWER, roleName.toLowerCase())) == 1;
+    }
+
+    @Override
     public Set<Role> loadAll() throws NotFoundException {
         final DBCursor<RoleImpl> rolesCursor = dbCollection.find();
         Set<Role> roles = Sets.newHashSet();

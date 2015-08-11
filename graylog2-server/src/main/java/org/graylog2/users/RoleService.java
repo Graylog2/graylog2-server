@@ -29,6 +29,8 @@ public interface RoleService {
 
     Role load(String roleName) throws NotFoundException;
 
+    boolean exists(String roleName);
+
     Set<Role> loadAll() throws NotFoundException;
 
     Map<String, Role> loadAllIdMap() throws NotFoundException;
