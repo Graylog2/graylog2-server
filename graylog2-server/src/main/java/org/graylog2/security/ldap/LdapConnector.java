@@ -36,6 +36,7 @@ import org.graylog2.shared.security.ldap.LdapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.nio.charset.StandardCharsets;
@@ -97,6 +98,7 @@ public class LdapConnector {
         return connection;
     }
 
+    @Nullable
     public LdapEntry search(LdapNetworkConnection connection,
                             String searchBase,
                             String searchPattern,
