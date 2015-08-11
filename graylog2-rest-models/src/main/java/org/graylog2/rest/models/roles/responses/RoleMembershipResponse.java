@@ -39,7 +39,7 @@ public abstract class RoleMembershipResponse {
     public abstract Collection<UserSummary> users();
 
     @JsonCreator
-    public static RoleMembershipResponse create(@JsonProperty("role") String roleName, @JsonProperty("users") Collection<UserSummary> users) {
+    public static RoleMembershipResponse create(@JsonProperty("role") @NotBlank String roleName, @JsonProperty("users") @NotNull Collection<UserSummary> users) {
         return new AutoValue_RoleMembershipResponse(roleName, users);
     }
 }

@@ -45,9 +45,9 @@ public abstract class RoleResponse {
     public abstract boolean readOnly();
 
     @JsonCreator
-    public static RoleResponse create(@JsonProperty("name") String name,
+    public static RoleResponse create(@JsonProperty("name") @NotBlank String name,
                                       @JsonProperty("description") Optional<String> description,
-                                      @JsonProperty("permissions") Set<String> permissions,
+                                      @JsonProperty("permissions") @NotNull Set<String> permissions,
                                       @JsonProperty("read_only") boolean readOnly) {
         return new AutoValue_RoleResponse(name, description, permissions, readOnly);
     }
