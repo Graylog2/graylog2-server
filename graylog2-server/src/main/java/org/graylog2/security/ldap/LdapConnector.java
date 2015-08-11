@@ -40,7 +40,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -152,7 +151,7 @@ public class LdapConnector {
                                   String groupObjectClass,
                                   String groupIdAttribute,
                                   String dn) throws LdapException {
-        final HashSet<String> groups = Sets.newHashSet();
+        final Set<String> groups = Sets.newHashSet();
 
         EntryCursor groupSearch = null;
         try {
