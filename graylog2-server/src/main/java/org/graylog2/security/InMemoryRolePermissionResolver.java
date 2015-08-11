@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -62,7 +63,9 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
     @Override
     public Collection<Permission> resolvePermissionsInRole(String roleId) {
         final Set<String> permissions = resolveStringPermission(roleId);
-        if (permissions == null) return null;
+        if (permissions == null) {
+            return Collections.emptySet();
+        }
 
         // copy to avoid reiterating all the time
         return Sets.newHashSet(Collections2.transform(permissions, new Function<String, Permission>() {
