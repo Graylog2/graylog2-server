@@ -206,7 +206,7 @@ public class RolesResource extends RestResource {
     @ApiOperation("Add a user to a role")
     public Response addMember(@ApiParam(name = "rolename") @PathParam("rolename") String rolename,
                               @ApiParam(name = "username") @PathParam("username") String username,
-                              @ApiParam(name = "JSON Body") String body) throws NotFoundException {
+                              @ApiParam(name = "JSON Body", value = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.") String body) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_EDIT, username);
 
         final User user = userService.load(username);
