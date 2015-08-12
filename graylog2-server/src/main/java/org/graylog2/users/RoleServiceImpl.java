@@ -17,7 +17,6 @@
 package org.graylog2.users;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
@@ -139,11 +138,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Set<Role> loadAll() throws NotFoundException {
         final DBCursor<RoleImpl> rolesCursor = dbCollection.find();
-        Set<Role> roles = Sets.newHashSet();
-        if (rolesCursor.hasNext()) {
-            Iterators.addAll(roles, rolesCursor);
-        }
-        return roles;
+        return Sets.newHashSet((Iterable<? extends Role>) rolesCursor);
     }
 
     @Override
