@@ -12,6 +12,9 @@ import DocumentationLink from '../support/DocumentationLink';
 import PermissionsMixin from '../../util/PermissionsMixin';
 
 const DashboardListPage = React.createClass({
+  propTypes: {
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string),
+  },
   mixins: [PermissionsMixin],
   getInitialState() {
     return {

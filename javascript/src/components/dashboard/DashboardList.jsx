@@ -1,4 +1,5 @@
 import React from 'react';
+import Immutable from 'immutable';
 import { Alert } from 'react-bootstrap';
 
 import Dashboard from './Dashboard';
@@ -6,6 +7,11 @@ import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from '../../util/PermissionsMixin';
 
 const DashboardList = React.createClass({
+  propTypes: {
+    dashboards: React.PropTypes.instanceOf(Immutable.List),
+    onDashboardAdd: React.PropTypes.func,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string),
+  },
   mixins: [PermissionsMixin],
   render() {
     if (this.props.dashboards.isEmpty()) {

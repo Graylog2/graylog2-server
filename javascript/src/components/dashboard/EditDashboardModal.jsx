@@ -7,6 +7,13 @@ import BootstrapModal from '../bootstrap/BootstrapModal';
 import DashboardStore from '../../stores/dashboard/DashboardStore';
 
 const EditDashboardModal = React.createClass({
+  propTypes: {
+    action: React.PropTypes.oneOf(['create', 'edit']),
+    description: React.PropTypes.string,
+    id: React.PropTypes.string,
+    onSaved: React.PropTypes.func,
+    title: React.PropTypes.string,
+  },
   getInitialState() {
     return {
       id: this.props.id,

@@ -10,6 +10,10 @@ import PermissionsMixin from '../../util/PermissionsMixin';
 import DashboardStore from '../../stores/dashboard/DashboardStore';
 
 const Dashboard = React.createClass({
+  propTypes: {
+    dashboard: React.PropTypes.object,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string),
+  },
   mixins: [PermissionsMixin],
   render() {
     let dashboardActions;
@@ -21,7 +25,8 @@ const Dashboard = React.createClass({
                                      description={this.props.dashboard.description} buttonClass="btn-info"/>
           &nbsp;
           <DropdownButton title="More actions" pullRight>
-            <MenuItem href={jsRoutes.controllers.StartpageController.set("dashboard", this.props.dashboard.id).url}>Set as startpage</MenuItem>
+            <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
+              as startpage</MenuItem>
             <MenuItem divider/>
             <MenuItem onSelect={this._onDashboardDelete}>Delete this dashboard</MenuItem>
           </DropdownButton>
