@@ -23,6 +23,7 @@ import org.graylog2.shared.users.Role;
 import javax.annotation.Nullable;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 import java.util.Set;
 
 public class RoleImpl implements Role {
@@ -99,5 +100,22 @@ public class RoleImpl implements Role {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoleImpl role = (RoleImpl) o;
+        return readOnly == role.readOnly &&
+                Objects.equals(_id, role._id) &&
+                Objects.equals(name, role.name) &&
+                Objects.equals(permissions, role.permissions) &&
+                Objects.equals(description, role.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_id, name, permissions, description, readOnly);
     }
 }
