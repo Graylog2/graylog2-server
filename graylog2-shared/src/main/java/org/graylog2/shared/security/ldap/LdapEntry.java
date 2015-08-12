@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class LdapEntry {
@@ -84,5 +85,21 @@ public class LdapEntry {
                 .add("attributes", attributes)
                 .add("groups", groups)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LdapEntry ldapEntry = (LdapEntry) o;
+        return Objects.equals(attributes, ldapEntry.attributes) &&
+                Objects.equals(groups, ldapEntry.groups) &&
+                Objects.equals(dn, ldapEntry.dn) &&
+                Objects.equals(bindPrincipal, ldapEntry.bindPrincipal);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(attributes, groups, dn, bindPrincipal);
     }
 }
