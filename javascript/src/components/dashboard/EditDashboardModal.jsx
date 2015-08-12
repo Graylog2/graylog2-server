@@ -1,6 +1,8 @@
 import $ from 'jquery';
 
 import React from 'react';
+import { Input } from 'react-bootstrap';
+
 import BootstrapModal from '../bootstrap/BootstrapModal';
 import DashboardStore from '../../stores/dashboard/DashboardStore';
 
@@ -23,20 +25,8 @@ const EditDashboardModal = React.createClass({
     );
     const body = (
       <fieldset>
-        <div className="form-group">
-          <label htmlFor={`${this.props.id}-title`}>Title:</label>
-          <input id={`${this.props.id}-title`}
-                 type="text"
-                 className="form-control"
-                 onChange={this._onTitleChange}
-                 value={this.state.title}
-                 required/>
-        </div>
-        <div className="form-group">
-          <label>Description:</label>
-          <input type="text" className="form-control" onChange={this._onDescriptionChange}
-                 value={this.state.description} required/>
-        </div>
+        <Input id={`${this.props.id}-title`} type="text" label="Title:" onChange={this._onTitleChange} value={this.state.title} required/>
+        <Input type="text" label="Description:" onChange={this._onDescriptionChange} value={this.state.description} required/>
       </fieldset>
     );
 
