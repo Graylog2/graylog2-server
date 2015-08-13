@@ -2,6 +2,12 @@
   "extends": "airbnb",
   "rules": {
     "no-else-return": 1,
+  },
+  "settings": {
+    "import/resolve": {
+      "extensions": [".js", ".jsx", ".ts"],
+      "moduleDirectory": ["src", "node_modules"]
+    }
   }
 }
 
