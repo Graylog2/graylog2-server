@@ -7,7 +7,7 @@ class MatchingTypeSwitcher extends Component {
   static propTypes = {
     stream: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-  }
+  };
   render() {
     const valueLink = {
       value: this.props.stream.matching_type,
