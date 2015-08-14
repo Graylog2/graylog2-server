@@ -12,7 +12,7 @@
     "hot": "cp templates/scripts.scala.html.hmr.template ../app/views/build/scripts.scala.html && ./node_modules/.bin/webpack-dev-server --hot --inline --config webpack.hmr.config.js --content-base ../public --devtool eval"
   },
   "dependencies": {
-    "c3": "^0.4.10",
+    "c3": "^0.4.11-rc3",
     "crossfilter": "1.3.x",
     "d3": "3.5.x",
     "dc": "2.0.0-beta.12",
