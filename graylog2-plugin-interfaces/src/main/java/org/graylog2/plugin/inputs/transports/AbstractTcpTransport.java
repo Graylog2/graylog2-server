@@ -78,6 +78,7 @@ import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -93,6 +94,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     public static final String CK_TLS_NEED_CLIENT_AUTH = "tls_need_client_auth";
     public static final String CK_TLS_WANT_CLIENT_AUTH = "tls_want_client_auth";
     public static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
+    private static final Joiner JOINER = Joiner.on("_").skipNulls();
 
     protected final Executor bossExecutor;
     protected final Executor workerExecutor;
@@ -230,7 +232,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             .newArrayList(cf.generateCertificates(new FileInputStream(file)));
                     for (int i = 0; i < certChain.size(); i++) {
                         Certificate cert = certChain.get(i);
-                        trustStore.setCertificateEntry(file.getAbsolutePath() + "_" + i, cert);
+                        trustStore.setCertificateEntry(JOINER.join(file.getAbsolutePath(), i), cert);
                         LOG.debug("adding certificate to truststore:", cert.toString());
                     }
                 }
