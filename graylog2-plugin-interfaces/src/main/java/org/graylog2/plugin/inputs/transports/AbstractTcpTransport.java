@@ -29,10 +29,10 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.transports.util.KeyUtil;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.bootstrap.Bootstrap;
@@ -40,19 +40,25 @@ import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.ssl.SslContext;
+import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.TrustManager;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
-
-import static com.google.common.base.Strings.emptyToNull;
 
 public abstract class AbstractTcpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTcpTransport.class);
@@ -61,6 +67,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private static final String CK_TLS_KEY_FILE = "tls_key_file";
     private static final String CK_TLS_ENABLE = "tls_enable";
     private static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
+    public static final String CK_TLS_NEED_CLIENT_AUTH = "tls_need_client_auth";
+    public static final String CK_TLS_WANT_CLIENT_AUTH = "tls_want_client_auth";
+    public static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
 
     protected final Executor bossExecutor;
     protected final Executor workerExecutor;
@@ -71,6 +80,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private final String tlsKeyPassword;
     private File tlsCertFile;
     private File tlsKeyFile;
+	private final File tlsClientAuthCertFile;
+	private final boolean tlsNeedClientAuth;
+	private final boolean tlsWantClientAuth;
 
     public AbstractTcpTransport(
             Configuration configuration,
@@ -89,6 +101,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
         this.tlsKeyFile = getTlsFile(configuration, CK_TLS_KEY_FILE);
         this.tlsKeyPassword = configuration.getString(CK_TLS_KEY_PASSWORD);
+		this.tlsNeedClientAuth = configuration.getBoolean(CK_TLS_NEED_CLIENT_AUTH);
+		this.tlsWantClientAuth = configuration.getBoolean(CK_TLS_WANT_CLIENT_AUTH);
+		this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
+
 
         this.localRegistry.register("open_connections", connectionCounter.gaugeCurrent());
         this.localRegistry.register("total_connections", connectionCounter.gaugeTotal());
@@ -149,12 +165,33 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             @Override
             public ChannelHandler call() throws Exception {
                 try {
-                    return SslContext.newServerContext(tlsCertFile, tlsKeyFile, emptyToNull(tlsKeyPassword)).newHandler();
+                    return new SslHandler(createSslEngine());
                 } catch (SSLException e) {
                     LOG.error("Error creating SSL context. Make sure the certificate and key are in the correct format: cert=X.509 key=PKCS#8");
                     throw e;
                 }
             }
+
+			private SSLEngine createSslEngine() throws FileNotFoundException, IOException, GeneralSecurityException {
+				SSLContext instance = SSLContext.getInstance("TLS");
+				TrustManager[] initTrustStore = new TrustManager[0];
+				if ((tlsWantClientAuth || tlsNeedClientAuth)) {
+					if (tlsClientAuthCertFile.exists()) {
+						initTrustStore = KeyUtil.initTrustStore(tlsClientAuthCertFile);
+					} else {
+						LOG.warn(
+								"client auth configured, but no authorized certificates / certificate authorities configured");
+					}
+				}
+				instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore,
+						new SecureRandom());
+				SSLEngine engine = instance.createSSLEngine();
+				engine.setUseClientMode(false);
+				engine.setNeedClientAuth(tlsNeedClientAuth);
+				engine.setNeedClientAuth(tlsWantClientAuth);
+				return engine;
+			}
+
         };
     }
 
@@ -200,6 +237,12 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             TextField.Attribute.IS_PASSWORD
                     )
             );
+			x.addField(
+					new BooleanField(CK_TLS_NEED_CLIENT_AUTH, "TLS Need Client Auth", false, "TLS Need Client Auth"));
+			x.addField(
+					new BooleanField(CK_TLS_WANT_CLIENT_AUTH, "TLS Want Client Auth", false, "TLS Want Client Auth"));
+			x.addField(new TextField(CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE, "TLS Client Auth Trusted Certs", "",
+					"TLS Client Auth Trusted Certs  (File or Directory)", ConfigurationField.Optional.OPTIONAL));
 
             return x;
         }
