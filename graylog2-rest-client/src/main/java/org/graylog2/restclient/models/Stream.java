@@ -39,8 +39,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Strings.emptyToNull;
-
 public class Stream {
     private final StreamService streamService;
 
