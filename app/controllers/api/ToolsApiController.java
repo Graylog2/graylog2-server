@@ -23,11 +23,13 @@ import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.NaturalDateTest;
 import lib.extractors.testers.GrokTest;
+import lib.extractors.testers.JsonTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
 import lib.json.Json;
 import org.graylog2.rest.models.tools.requests.GrokTestRequest;
+import org.graylog2.rest.models.tools.requests.JsonTestRequest;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.requests.SplitAndIndexTestRequest;
 import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
@@ -43,18 +45,21 @@ public class ToolsApiController extends AuthenticatedController {
     private final SplitAndIndexTest splitAndIndexTest;
     private final NaturalDateTest naturalDateTest;
     private final GrokTest grokTest;
+    private final JsonTest jsonTest;
 
     @Inject
     private ToolsApiController(RegexTest regexTest,
                                SubstringTest substringTest,
                                SplitAndIndexTest splitAndIndexTest,
                                NaturalDateTest naturalDateTest,
-                               GrokTest grokTest) {
+                               GrokTest grokTest,
+                               JsonTest jsonTest) {
         this.regexTest = regexTest;
         this.substringTest = substringTest;
         this.splitAndIndexTest = splitAndIndexTest;
         this.naturalDateTest = naturalDateTest;
         this.grokTest = grokTest;
+        this.jsonTest = jsonTest;
     }
 
     public Result regexTest() {
@@ -134,6 +139,22 @@ public class ToolsApiController extends AuthenticatedController {
 
         try {
             return ok(Json.toJsonString(grokTest.test(request))).as(MediaType.JSON_UTF_8.toString());
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            if (e.getHttpCode() == 422) {
+                return status(422);
+            }
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public Result jsonTest() {
+        final JsonNode json = request().body().asJson();
+        final JsonTestRequest request = Json.fromJson(json, JsonTestRequest.class);
+
+        try {
+            return ok(Json.toJsonString(jsonTest.test(request))).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

@@ -63,6 +63,7 @@ var MessageFieldDescription = React.createClass({
                         <li><a href={this._getNewExtractorRoute("split_and_index")}>Split &amp; Index</a></li>
                         <li><a href={this._getNewExtractorRoute("copy_input")}>Copy Input</a></li>
                         <li><a href={this._getNewExtractorRoute("grok")}>Grok pattern</a></li>
+                        <li><a href={this._getNewExtractorRoute("json")}>JSON</a></li>
                     </ul>
                 </li>
                 <MenuItem onClick={this._loadTerms(this.props.fieldName)}>Show terms of {this.props.fieldName}</MenuItem>
