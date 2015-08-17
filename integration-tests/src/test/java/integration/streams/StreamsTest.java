@@ -65,10 +65,7 @@ public class StreamsTest extends BaseRestTest {
 
         assertThat(afterCount).isEqualTo(beforeCount+1);
 
-        given()
-            .when()
-                .get("/streams/" + streamId)
-            .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("title", equalTo("TestStream"))
@@ -96,10 +93,7 @@ public class StreamsTest extends BaseRestTest {
 
         assertThat(afterCount).isEqualTo(beforeCount+1);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("title", equalTo(streamTitle))
@@ -128,10 +122,7 @@ public class StreamsTest extends BaseRestTest {
 
         assertThat(afterCount).isEqualTo(beforeCount+1);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("title", equalTo(streamTitle))
@@ -235,10 +226,7 @@ public class StreamsTest extends BaseRestTest {
 
         assertThat(streamCount()).isEqualTo(0);
 
-        given()
-                .when()
-                .get("/streams/"+streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(404);
     }
 
@@ -248,10 +236,7 @@ public class StreamsTest extends BaseRestTest {
         final String streamId = "552b92b2e4b0c055e41ffb8f";
         assertThat(streamCount()).isEqualTo(1);
 
-        given()
-                .when()
-                .delete("/streams/"+streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(404);
 
         assertThat(streamCount()).isEqualTo(1);
@@ -337,10 +322,7 @@ public class StreamsTest extends BaseRestTest {
                 .then()
                 .statusCode(204);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("disabled", equalTo(true));
@@ -357,10 +339,7 @@ public class StreamsTest extends BaseRestTest {
                 .then()
                 .statusCode(204);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("disabled", equalTo(true));
@@ -373,7 +352,7 @@ public class StreamsTest extends BaseRestTest {
 
         given()
                 .when()
-                .post("/streams/"+streamId+"/pause")
+                .post("/streams/" + streamId + "/pause")
                 .then()
                 .statusCode(404);
     }
@@ -389,10 +368,7 @@ public class StreamsTest extends BaseRestTest {
                 .then()
                 .statusCode(204);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("disabled", equalTo(false));
@@ -409,10 +385,7 @@ public class StreamsTest extends BaseRestTest {
                 .then()
                 .statusCode(204);
 
-        given()
-                .when()
-                .get("/streams/" + streamId)
-                .then()
+        getStream(streamId)
                 .statusCode(200)
                 .assertThat()
                 .body("disabled", equalTo(false));
@@ -425,9 +398,86 @@ public class StreamsTest extends BaseRestTest {
 
         given()
                 .when()
-                .post("/streams/"+streamId+"/resume")
+                .post("/streams/" + streamId + "/resume")
                 .then()
                 .statusCode(404);
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void updatingMatchingTypeOfStream() {
+        // id of stream to be updated
+        final String streamId = "552b92b2e4b0c055e41ffb8d";
+        // id of stream that is supposed to be left untampered
+        final String otherStreamId = "552b92b2e4b0c055e41ffb8e";
+
+        assertThat(streamCount()).isEqualTo(2);
+
+        final JsonPath response = given()
+                .when()
+                .body("{\"matching_type\":\"OR\"}")
+                .put("/streams/" + streamId)
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().jsonPath();
+
+        assertThat(response.getString("matching_type")).isEqualTo("OR");
+
+        getStream(streamId)
+                .statusCode(200)
+                .assertThat()
+                .body("matching_type", equalTo("OR"));
+
+        getStream(otherStreamId)
+                .statusCode(200)
+                .assertThat()
+                .body("matching_type", equalTo("AND"));
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void updatingUsingInvalidMatchingTypeOfStreamShouldFail() {
+        final String streamId = "552b92b2e4b0c055e41ffb8d";
+
+        given()
+                .when()
+                .body("{\"matching_type\":\"INVALID\"}")
+                .put("/streams/" + streamId)
+                .then()
+                .statusCode(400);
+
+        final JsonPath getResponse = getStream(streamId)
+                .statusCode(200)
+                .extract().jsonPath();
+
+        assertThat(getResponse.getString("matching_type")).isEqualTo("AND");
+    }
+
+    @Test
+    @MongoDbSeed(locations = {"single-stream", "second-single-stream"})
+    public void updatingMatchingTypeOfNonexistingStreamShouldFail() {
+        final String streamId = "552b92b2e4b0deadbeefaffe";
+        final String otherStreamId1 = "552b92b2e4b0c055e41ffb8e";
+        final String otherStreamId2 = "552b92b2e4b0c055e41ffb8d";
+
+        given()
+                .when()
+                .body("{\"matching_type\":\"OR\"}")
+                .put("/streams/" + streamId)
+                .then()
+                .statusCode(404);
+
+        // Verify that existing streams are not changed
+        getStream(otherStreamId1)
+                .statusCode(200)
+                .assertThat()
+                .body("matching_type", equalTo("AND"));
+
+        getStream(otherStreamId2)
+                .statusCode(200)
+                .assertThat()
+                .body("matching_type", equalTo("AND"));
     }
 
     protected ValidatableResponse createStreamFromRequest(String request) {
@@ -452,5 +502,12 @@ public class StreamsTest extends BaseRestTest {
                 .extract().jsonPath();
 
         return response.getInt("total");
+    }
+
+    protected ValidatableResponse getStream(String streamId) {
+        return given()
+                .when()
+                .get("/streams/" + streamId)
+                .then();
     }
 }
