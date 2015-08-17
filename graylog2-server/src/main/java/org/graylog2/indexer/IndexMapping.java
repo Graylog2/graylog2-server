@@ -90,9 +90,9 @@ public class IndexMapping {
                         "format", "date_time"));
     }
 
-    public Map<String, Object> messageMapping(final String analyzer, boolean storeTimestampsAsDocValues) {
+    public Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(
-                "properties", partFieldProperties(analyzer, storeTimestampsAsDocValues),
+                "properties", partFieldProperties(analyzer),
                 "dynamic_templates", partDefaultAllInDynamicTemplate(),
                 // Compress source field
                 "_source", enabledAndCompressed(),
@@ -104,28 +104,35 @@ public class IndexMapping {
      * Disable analyzing for every field by default.
      */
     private List<Map<String, Map<String, Object>>> partDefaultAllInDynamicTemplate() {
-        final Map<String, String> notAnalyzed = ImmutableMap.of("index", "not_analyzed");
+        final Map<String, Serializable> mappingInternal = ImmutableMap.<String, Serializable>of(
+                "index", "not_analyzed",
+                "doc_values", true);
+        final Map<String, Object> defaultInternal = ImmutableMap.of(
+                "match", "gl2_*",
+                "mapping", mappingInternal);
+        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
+
+        final Map<String, String> mappingAll = ImmutableMap.of("index", "not_analyzed");
         final Map<String, Object> defaultAll = ImmutableMap.of(
                 // Match all
                 "match", "*",
                 // Analyze nothing by default
-                "mapping", notAnalyzed);
-        final Map<String, Map<String, Object>> template = ImmutableMap.of("store_generic", defaultAll);
+                "mapping", mappingAll);
+        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
 
-        return ImmutableList.of(template);
+        return ImmutableList.of(templateInternal, templateAll);
     }
 
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    private Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer,
-                                                                                 boolean storeTimestampsAsDocValues) {
+    private Map<String, Map<String, ? extends Serializable>> partFieldProperties(String analyzer) {
         return ImmutableMap.of(
                 "message", analyzedString(analyzer),
                 "full_message", analyzedString(analyzer),
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                "timestamp", typeTimeWithMillis(storeTimestampsAsDocValues),
+                "timestamp", typeTimeWithMillis(true),
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 "source", analyzedString("analyzer_keyword"));
     }
@@ -137,16 +144,11 @@ public class IndexMapping {
                 "analyzer", analyzer);
     }
 
-    private Map<String, Serializable> typeTimeWithMillis(boolean storeTimestampsAsDocValues) {
-        final ImmutableMap.Builder<String, Serializable> builder = ImmutableMap.<String, Serializable>builder()
-                .put("type", "date")
-                .put("format", Tools.ES_DATE_FORMAT);
-
-        if (storeTimestampsAsDocValues) {
-            builder.put("doc_values", true);
-        }
-
-        return builder.build();
+    private Map<String, Serializable> typeTimeWithMillis(boolean storeAsDocValues) {
+        return ImmutableMap.<String, Serializable>of(
+                "type", "date",
+                "format", Tools.ES_DATE_FORMAT,
+                "doc_values", storeAsDocValues);
     }
 
     private Map<String, Boolean> enabled() {
