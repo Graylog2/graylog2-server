@@ -44,7 +44,6 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -69,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 
 public class KeyUtil {
@@ -140,7 +140,7 @@ public class KeyUtil {
 				if (!Strings.isNullOrEmpty(m.group(1))) {
 					throw new IllegalArgumentException("unsupported key type PCKS1 please convert to PCKS8");
 				}
-				encoded = Base64.getDecoder().decode(m.group(3).replaceAll("[\\r\\n]", ""));
+                encoded = BaseEncoding.base64().decode(m.group(3).replaceAll("[\\r\\n]", ""));
 				keySpec = createKeySpec(encoded, password);
 
 			} else {
