@@ -80,9 +80,8 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        final NullActivityWriter activityWriter = new NullActivityWriter();
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
-        indexRangeService = new EsIndexRangeService(client, activityWriter, new ObjectMapperProvider().get(), indices);
+        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices);
     }
 
     @Test

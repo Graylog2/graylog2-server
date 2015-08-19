@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,7 +44,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
-import org.graylog2.rest.resources.streams.requests.UpdateStreamRequest;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -71,6 +73,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -197,8 +200,22 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         final Stream stream = streamService.load(streamId);
 
-        stream.setTitle(cr.title());
-        stream.setDescription(cr.description());
+        if (!Strings.isNullOrEmpty(cr.title())) {
+            stream.setTitle(cr.title());
+        }
+
+        if (!Strings.isNullOrEmpty(cr.description())) {
+            stream.setDescription(cr.description());
+        }
+
+        if (cr.matchingType() != null) {
+            try {
+                stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid matching type '" + cr.matchingType()
+                        + "' specified. Should be one of: " + Arrays.toString(Stream.MatchingType.values()));
+            }
+        }
 
         streamService.save(stream);
 

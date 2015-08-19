@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.streams;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public interface Stream extends Persisted {
 
         public static final MatchingType DEFAULT = AND;
 
+        @JsonCreator
         public static MatchingType valueOfOrDefault(String name) {
             return (emptyToNull(name) == null ? DEFAULT : valueOf(name));
         }
@@ -59,6 +61,8 @@ public interface Stream extends Persisted {
     void setDisabled(Boolean disabled);
 
     void setContentPack(String contentPack);
+
+    void setMatchingType(MatchingType matchingType);
 
     Boolean isPaused();
 

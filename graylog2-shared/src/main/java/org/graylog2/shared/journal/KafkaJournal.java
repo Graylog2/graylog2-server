@@ -497,8 +497,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
 
         } catch (OffsetOutOfRangeException e) {
-            // TODO how do we recover from this? the exception doesn't contain the next valid offset :(
-            LOG.warn("Offset out of range, no messages available starting at offset {}", readOffset);
+            // This is fine, the reader tries to read faster than the writer commited data. Next read will get the data.
+            LOG.debug("Offset out of range, no messages available starting at offset {}", readOffset);
         } catch (Exception e) {
             // the scala code does not declare the IOException in kafkaLog.read() so we can't catch it here
             // sigh.

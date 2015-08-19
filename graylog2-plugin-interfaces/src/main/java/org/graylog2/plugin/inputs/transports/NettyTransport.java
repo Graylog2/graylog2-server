@@ -51,6 +51,7 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.jboss.netty.channel.socket.DefaultDatagramChannelConfig;
 import org.jboss.netty.channel.socket.ServerSocketChannelConfig;
@@ -191,6 +192,20 @@ public abstract class NettyTransport implements Transport {
      */
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(final MessageInput input) {
         LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = Maps.newLinkedHashMap();
+
+        handlerList.put("exception-logger", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new SimpleChannelUpstreamHandler() {
+                    @Override
+                    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+                        log.error("Error on Input [" + input.getName() + "/" + input.getId() + "] (channel "
+                                + e.getChannel().toString() + ")", e.getCause());
+                        super.exceptionCaught(ctx, e);
+                    }
+                };
+            }
+        });
 
         handlerList.put("packet-meta-dumper", new Callable<ChannelHandler>() {
             @Override

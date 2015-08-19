@@ -56,10 +56,10 @@ public class IndexRangeTest {
         String json = objectMapper.writeValueAsString(indexRange);
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
 
-        assertThat(JsonPath.read(document, "$.index_name")).isEqualTo(indexName);
-        assertThat(JsonPath.read(document, "$.begin")).asString().isEqualTo(begin.toString());
-        assertThat(JsonPath.read(document, "$.end")).isEqualTo(end.toString());
-        assertThat(JsonPath.read(document, "$.calculated_at")).isEqualTo(calculatedAt.toString());
-        assertThat(JsonPath.read(document, "$.took_ms")).isEqualTo(calculationDuration);
+        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
+        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
+        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_END)).isEqualTo(end.toString());
+        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
+        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
     }
 }

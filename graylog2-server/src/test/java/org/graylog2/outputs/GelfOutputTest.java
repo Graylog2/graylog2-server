@@ -16,11 +16,9 @@
  */
 package org.graylog2.outputs;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -40,12 +38,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final Message message = mock(Message.class);
         final GelfMessage gelfMessage = new GelfMessage("Test");
-        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
-                "hostname", "localhost",
-                "protocol", "tcp",
-                "port", 12201));
-
-        final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(configuration, transport));
+        final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(transport));
         doReturn(gelfMessage).when(gelfOutput).toGELFMessage(message);
 
         gelfOutput.write(message);
@@ -66,11 +59,7 @@ public class GelfOutputTest {
     @Test
     public void testToGELFMessageTimestamp() throws Exception {
         final GelfTransport transport = mock(GelfTransport.class);
-        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
-                "hostname", "localhost",
-                "protocol", "tcp",
-                "port", 12201));
-        final GelfOutput gelfOutput = new GelfOutput(configuration, transport);
+        final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final Message message = new Message("Test", "Source", now);
 
@@ -82,11 +71,7 @@ public class GelfOutputTest {
     @Test
     public void testToGELFMessageFullMessage() throws Exception {
         final GelfTransport transport = mock(GelfTransport.class);
-        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
-                "hostname", "localhost",
-                "protocol", "tcp",
-                "port", 12201));
-        final GelfOutput gelfOutput = new GelfOutput(configuration, transport);
+        final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final Message message = new Message("Test", "Source", now);
         message.addField(Message.FIELD_FULL_MESSAGE, "Full Message");

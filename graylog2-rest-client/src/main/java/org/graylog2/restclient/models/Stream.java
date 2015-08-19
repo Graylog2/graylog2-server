@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Stream {
-
     private final StreamService streamService;
 
     public interface Factory {
@@ -57,6 +56,7 @@ public class Stream {
     private final String contentPack;
     private final List<StreamRule> streamRules;
     private final Boolean disabled;
+    private final String matchingType;
 
     private final UserService userService;
     private final AlertConditionService alertConditionService;
@@ -111,6 +111,8 @@ public class Stream {
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
             streamRules.add(streamRuleFactory.fromSummaryResponse(streamRuleSummaryResponse));
         }
+
+        this.matchingType = ssr.matchingType;
 	}
 
     public void addAlertCondition(CreateAlertConditionRequest r) throws APIException, IOException {
@@ -253,4 +255,7 @@ public class Stream {
         return emailAlertReceivers;
     }
 
+    public String getMatchingType() {
+        return matchingType;
+    }
 }

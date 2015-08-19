@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -67,7 +68,8 @@ public abstract class Extractor implements EmbeddedPersistable {
         REGEX,
         SPLIT_AND_INDEX,
         COPY_INPUT,
-        GROK;
+        GROK,
+        JSON;
 
         /**
          * Just like {@link #valueOf(String)} but uses the upper case string and doesn't throw exceptions.
@@ -415,6 +417,31 @@ public abstract class Extractor implements EmbeddedPersistable {
             return endIndex;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Result result = (Result) o;
+            return Objects.equals(beginIndex, result.beginIndex) &&
+                    Objects.equals(endIndex, result.endIndex) &&
+                    Objects.equals(value, result.value) &&
+                    Objects.equals(target, result.target);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, target, beginIndex, endIndex);
+        }
+
+        @Override
+        public String toString() {
+            return com.google.common.base.Objects.toStringHelper(this)
+                    .add("value", value)
+                    .add("target", target)
+                    .add("beginIndex", beginIndex)
+                    .add("endIndex", endIndex)
+                    .toString();
+        }
     }
 
     private static class ResultPredicate implements Predicate<Result> {

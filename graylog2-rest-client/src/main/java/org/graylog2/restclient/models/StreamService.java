@@ -18,6 +18,8 @@ package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
 import javax.inject.Inject;
+
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.alerts.Alert;
@@ -94,7 +96,7 @@ public class StreamService {
         return csr.streamId;
     }
 
-    public void update(String streamId, CreateStreamRequest request) throws APIException, IOException {
+    public void update(String streamId, UpdateStreamRequest request) throws APIException, IOException {
         api.path(resource.update(streamId)).body(request).expect(Http.Status.OK).execute();
     }
 

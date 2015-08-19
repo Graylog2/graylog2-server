@@ -12,11 +12,11 @@
         {
           "data" : {
             "_id": "graylog_0",
-            "index_name": "graylog_0",
-            "begin": "2015-01-01T00:00:00.000Z",
-            "end": "2015-12-31T23:59:59.999Z",
-            "calculated_at": "2015-06-16T11:32:16.827Z",
-            "took_ms": 42
+            "gl2_index_range_index_name": "graylog_0",
+            "gl2_index_range_begin": "2015-01-01T00:00:00.000Z",
+            "gl2_index_range_end": "2015-12-31T23:59:59.999Z",
+            "gl2_index_range_calculated_at": "2015-06-16T11:32:16.827Z",
+            "gl2_index_range_took_ms": 42
           }
         }
       ]
