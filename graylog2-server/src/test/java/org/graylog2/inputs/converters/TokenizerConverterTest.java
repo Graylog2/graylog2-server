@@ -149,6 +149,16 @@ public class TokenizerConverterTest {
         assertEquals(1, result.size());
         assertEquals("v1", result.get("k1"));
     }
+    
+    @Test
+    public void testFilterWithSingleQuotedValue() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1='v1' more otters");
+
+        assertEquals(1, result.size());
+        assertEquals("v1", result.get("k1"));
+    }
 
     @Test
     public void testFilterWithIDAdditionalField() {
@@ -165,6 +175,18 @@ public class TokenizerConverterTest {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
         @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("otters in k1=\"v1\" k2=v2 more otters");
+
+        assertThat(result)
+                .hasSize(2)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", "v2");
+    }
+    
+    @Test
+    public void testFilterWithMixedSingleQuotedAndPlainValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1='v1' k2=v2 more otters");
 
         assertThat(result)
                 .hasSize(2)
@@ -196,5 +218,44 @@ public class TokenizerConverterTest {
                 .containsEntry("k1", "v1")
                 .containsEntry("k2", " v2")
                 .containsEntry("k3", " v3 ");
+    }
+    
+    @Test
+    public void testFilterRetainsWhitespaceInSingleQuotedValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1= v1  k2=' v2' k3=' v3 ' more otters");
+
+        assertThat(result)
+                .hasSize(3)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", " v2")
+                .containsEntry("k3", " v3 ");
+    }
+    
+    @Test 
+    public void testFilterRetainsNestedSingleQuotesInDoubleQuotedValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1= v1  k2=\" 'v2'\" k3=\" 'v3' \" more otters");
+
+        assertThat(result)
+                .hasSize(3)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", " 'v2'")
+                .containsEntry("k3", " 'v3' ");
+    }
+    
+        @Test 
+    public void testFilterRetainsNestedDoubleQuotesInSingleQuotedValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1= v1  k2=' \"v2\"' k3=' \"v3\" ' more otters");
+
+        assertThat(result)
+                .hasSize(3)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", " \"v2\"")
+                .containsEntry("k3", " \"v3\" ");
     }
 }
