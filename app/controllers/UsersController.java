@@ -16,7 +16,9 @@
  */
 package controllers;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -49,6 +51,7 @@ import views.html.system.users.new_user;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -99,7 +102,16 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("New", routes.UsersController.newUserForm());
 
         final List<String> permissions = permissionsService.all();
-        final Set<RoleResponse> roles = rolesService.loadAll();
+        final Set<RoleResponse> roleResponses = rolesService.loadAll();
+        final List<String> roleNames =
+                Lists.newArrayList(Collections2.transform(roleResponses,
+                                                          new Function<RoleResponse, String>() {
+                                                              @Nullable
+                                                              @Override
+                                                              public String apply(@Nullable RoleResponse input) {
+                                                                  return input.name();
+                                                              }
+                                                          }));
         try {
             return ok(new_user.render(
                     createUserForm,
@@ -109,7 +121,8 @@ public class UsersController extends AuthenticatedController {
                     DateTools.getGroupedTimezoneIds().asMap(),
                     DateTools.getApplicationTimeZone(),
                     streamService.all(),
-                    bc));
+                    bc,
+                    roleNames));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -133,6 +146,15 @@ public class UsersController extends AuthenticatedController {
         }
 
         final Set<RoleResponse> roleResponses = rolesService.loadAll();
+        final List<String> roleNames =
+                Lists.newArrayList(Collections2.transform(roleResponses,
+                                                          new Function<RoleResponse, String>() {
+                                                              @Nullable
+                                                              @Override
+                                                              public String apply(@Nullable RoleResponse input) {
+                                                                  return input.name();
+                                                              }
+                                                          }));
 
         final Form<ChangeUserRequestForm> form = changeUserForm.fill(new ChangeUserRequestForm(user));
         boolean requiresOldPassword = checkRequireOldPassword(username);
@@ -149,7 +171,7 @@ public class UsersController extends AuthenticatedController {
                             streamService.all(),
                             dashboardService.getAll(),
                             bc,
-                            Lists.newArrayList(roleResponses))
+                            roleNames)
             );
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -164,13 +186,24 @@ public class UsersController extends AuthenticatedController {
             return redirect(routes.StartpageController.redirect());
         }
 
-        Form<CreateUserRequestForm> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequestForm.class);
+        final Form<CreateUserRequestForm> createUserRequestForm = Form.form(CreateUserRequestForm.class).bindFromRequest();
         final CreateUserRequestForm request = createUserRequestForm.get();
 
         if (createUserRequestForm.hasErrors()) {
             BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
             final List<String> permissions = permissionsService.all();
+
+            final Set<RoleResponse> roleResponses = rolesService.loadAll();
+            final List<String> roleNames =
+                    Lists.newArrayList(Collections2.transform(roleResponses,
+                                                              new Function<RoleResponse, String>() {
+                                                                  @Nullable
+                                                                  @Override
+                                                                  public String apply(@Nullable RoleResponse input) {
+                                                                      return input.name();
+                                                                  }
+                                                              }));
             try {
                 return badRequest(new_user.render(
                         createUserRequestForm,
@@ -180,7 +213,8 @@ public class UsersController extends AuthenticatedController {
                         DateTools.getGroupedTimezoneIds().asMap(),
                         DateTools.getApplicationTimeZone(),
                         streamService.all(),
-                        bc));
+                        bc,
+                        roleNames));
             } catch (IOException e) {
                 return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
             } catch (APIException e) {
@@ -232,8 +266,16 @@ public class UsersController extends AuthenticatedController {
             final List<String> all = permissionsService.all();
             boolean requiresOldPassword = checkRequireOldPassword(username);
 
-            final Set<RoleResponse> roles = rolesService.loadAll();
-            try {
+            final Set<RoleResponse> roleResponses = rolesService.loadAll();
+            final List<String> roleNames =
+                    Lists.newArrayList(Collections2.transform(roleResponses,
+                                                              new Function<RoleResponse, String>() {
+                                                                  @Nullable
+                                                                  @Override
+                                                                  public String apply(@Nullable RoleResponse input) {
+                                                                      return input.name();
+                                                                  }
+                                                              }));            try {
                 return badRequest(edit.render(
                         requestForm,
                         username,
@@ -246,7 +288,7 @@ public class UsersController extends AuthenticatedController {
                         streamService.all(),
                         dashboardService.getAll(),
                         bc,
-                        Lists.newArrayList(roles)));
+                        roleNames));
             } catch (IOException e) {
                 return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
             } catch (APIException e) {
@@ -383,7 +425,7 @@ public class UsersController extends AuthenticatedController {
 
     public static class EditRolesForm {
         @Nullable
-        public List<String> roles;
+        public List<String> roles = Lists.newArrayList();
 
         public EditRolesForm() {
         }

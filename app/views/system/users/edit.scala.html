@@ -9,7 +9,7 @@
         streams: List[org.graylog2.restclient.models.Stream],
         dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard],
         breadcrumbs: lib.BreadcrumbList,
-        roles: List[org.graylog2.rest.models.roles.responses.RoleResponse])
+        roleNames: List[String])
 @import com.google.common.collect.ImmutableList
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
@@ -285,8 +285,8 @@
 
                             <div class="col-sm-9">
                                 <select id="edituserroles" name="roles[]" class="chosen-select" data-placeholder="Choose roles..." multiple>
-                                @for(role <- roles.sortBy(_.name)) {
-                                    <option @if(user.getRoles.contains(role.name)) {selected} value="@role.name">@role.name </option>
+                                @for(role <- roleNames.sorted) {
+                                    <option @if(user.getRoles.contains(role)) {selected} value="@role">@role </option>
                                 }
                                 </select>
                                 <span class="help-block">Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
