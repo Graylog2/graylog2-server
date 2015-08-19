@@ -72,7 +72,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         // special case for the locally defined user, we don't store that in MongoDB.
         if (configuration.getRootUsername().equals(username)) {
             LOG.debug("User {} is the built-in admin user", username);
-            return new UserImpl.LocalAdminUser(configuration);
+            return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
         }
 
         final DBObject query = new BasicDBObject();
@@ -219,7 +219,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User getAdminUser() {
-        return new UserImpl.LocalAdminUser(configuration);
+        return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
     }
 
     @Override

@@ -59,6 +59,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final JacksonDBCollection<RoleImpl, ObjectId> dbCollection;
     private final Validator validator;
+    private final String adminRoleObjectId;
 
     @Inject
     protected RoleServiceImpl(MongoConnection mongoConnection,
@@ -75,16 +76,16 @@ public class RoleServiceImpl implements RoleService {
         dbCollection.createIndex(new BasicDBObject(NAME_LOWER, 1), new BasicDBObject("unique", true));
 
         // make sure the two built-in roles actually exist
-        ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                          "Grants all permissions for Graylog administrators (built-in)");
+        adminRoleObjectId = ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
+                                              "Grants all permissions for Graylog administrators (built-in)");
         ensureBuiltinRole(READER_ROLENAME, RestPermissions.READER_BASE_PERMISSIONS, "Reader",
                           "Grants basic permissions for every Graylog user (built-in)");
 
     }
 
-    private void ensureBuiltinRole(String roleName,
-                                   Set<String> expectedPermissions,
-                                   String name, String description) {
+    private String ensureBuiltinRole(String roleName,
+                                     Set<String> expectedPermissions,
+                                     String name, String description) {
         RoleImpl previousRole = null;
         try {
             previousRole = load(roleName);
@@ -104,11 +105,17 @@ public class RoleServiceImpl implements RoleService {
             fixedAdmin.setDescription(description);
             fixedAdmin.setPermissions(expectedPermissions);
             try {
-                save(fixedAdmin);
+                final RoleImpl savedRole = save(fixedAdmin);
+                return savedRole.getId();
             } catch (DuplicateKeyException | ValidationException e) {
                 log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
             }
         }
+        if (previousRole == null) {
+            log.error("Unable to access fixed " + roleName + " role, please restart Graylog to fix this.");
+            return null;
+        }
+        return previousRole.getId();
     }
 
     @Override
@@ -185,5 +192,8 @@ public class RoleServiceImpl implements RoleService {
         return dbCollection.remove(nameMatchesAndNotReadonly).getN();
     }
 
-
+    @Override
+    public String getAdminRoleObjectId() {
+        return adminRoleObjectId;
+    }
 }

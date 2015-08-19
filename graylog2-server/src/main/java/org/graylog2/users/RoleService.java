@@ -47,4 +47,6 @@ public interface RoleService {
      * @return the number of deleted roles
      */
     int delete(String roleName);
+
+    String getAdminRoleObjectId();
 }
