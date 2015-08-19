@@ -8,7 +8,8 @@
         timezones: Map[String, Collection[String]],
         streams: List[org.graylog2.restclient.models.Stream],
         dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard],
-        breadcrumbs: lib.BreadcrumbList)
+        breadcrumbs: lib.BreadcrumbList,
+        roles: List[org.graylog2.rest.models.roles.responses.RoleResponse])
 @import com.google.common.collect.ImmutableList
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
@@ -267,7 +268,7 @@
         </div>
     </div>
 
-    @if(isPermitted(USERS_PERMISSIONSEDIT)) {
+    @if(isPermitted(USERS_ROLESEDIT)) {
         <div class="row content">
             <div class="col-lg-8">
                 <h2>Change user role</h2>
@@ -278,54 +279,23 @@
                         </div>
                     </div>
                 } else {
-                    <form class="form-horizontal" style="margin-top: 10px;" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
+                    <form class="form-horizontal" style="margin-top: 10px;" action="@routes.UsersController.updateRoles(user.getName)" method="POST">
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">User Role</label>
+                            <label class="col-sm-3 control-label">User Roles</label>
 
                             <div class="col-sm-9">
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" name="permissiontype" value="reader" @if(!isPermitted(user, "*")) {
-                                            checked="checked" } />
-                                        Reader
-                                    </label>
-                                </div>
-                                <span class="help-block">
-                                    Reader users <strong>can't use the global search</strong>. An administrator has to
-                                    explicitly grant them permissions to read or edit any stream or dashboard. They <strong>
-                                    can't modify Graylog's configuration or add new users</strong>.
-                                </span>
-
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" name="permissiontype" value="admin" @if(isPermitted(user, "*")) {
-                                            checked="checked" } />
-                                        Administrator
-                                    </label>
-                                </div>
-                                <span class="help-block">
-                                    Administrators <strong>have full control over Graylog</strong>
-                                    , being able to access the
-                                    global search, and any streams or dashboards. They can also <strong>modify Graylog's
-                                    configuration and add new users</strong>.
-                                </span>
+                                <select id="edituserroles" name="roles[]" class="chosen-select" data-placeholder="Choose roles..." multiple>
+                                @for(role <- roles.sortBy(_.name)) {
+                                    <option @if(user.getRoles.contains(role.name)) {selected} value="@role.name">@role.name </option>
+                                }
+                                </select>
+                                <span class="help-block">Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-sm-offset-3 col-sm-9">
-                                <div class="panel panel-info">
-                                    <div class="panel-body">
-                                        <strong>Note:</strong>
-                                        Changing the user role will reset previously assigned stream and dashboard permissions.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <button class="btn btn-warning" type="submit" data-confirm="Really update role for @user.getName?">
+                                <button class="btn btn-success" type="submit" data-confirm="Really update roles for @user.getName?">
                                     Update role
                                 </button>
                             </div>

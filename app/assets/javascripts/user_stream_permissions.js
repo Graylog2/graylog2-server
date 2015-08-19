@@ -35,4 +35,7 @@ $(document).ready(function() {
             }
         });
 
+    $("#edituserroles")
+        .chosen({search_contains:true, width:"250px", inherit_select_classes:true});
+
 });
