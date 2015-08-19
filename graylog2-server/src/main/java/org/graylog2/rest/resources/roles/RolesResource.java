@@ -166,7 +166,7 @@ public class RolesResource extends RestResource {
     @ApiOperation(value = "Remove the named role")
     public void delete(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_DELETE, name);
-
+        // TODO unassign roles from current role members
         if (roleService.delete(name) == 0) {
             throw new NotFoundException();
         }
