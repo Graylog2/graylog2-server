@@ -17,7 +17,9 @@
 package org.graylog2.rest.resources.roles;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -184,8 +186,9 @@ public class RolesResource extends RestResource {
         for (User user : users) {
             final Set<String> roleIds = user.getRoleIds();
             final Set<String> roleNames = Sets.newHashSet(
+                    Iterables.filter(
                     Collections2.transform(roleIds,
-                                           Roles.roleIdToNameFunction(idMap)));
+                                           Roles.roleIdToNameFunction(idMap)), Predicates.notNull()));
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
