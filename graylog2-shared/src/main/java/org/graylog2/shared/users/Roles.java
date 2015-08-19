@@ -51,7 +51,7 @@ public abstract class Roles {
             if (roleId == null || !idToRole.containsKey(roleId)) {
                 return null;
             }
-            return idToRole.get(roleId).getName().toLowerCase();
+            return idToRole.get(roleId).getName();
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class Roles {
         @Nullable
         @Override
         public String apply(@Nullable Role input) {
-            return input != null ? input.getName().toLowerCase() : null;
+            return input != null ? input.getName() : null;
         }
     }
 }
