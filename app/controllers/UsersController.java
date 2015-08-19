@@ -40,10 +40,8 @@ import org.graylog2.restclient.models.api.requests.CreateUserRequestForm;
 import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Result;
-import scala.annotation.meta.field;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
@@ -59,7 +57,6 @@ import static lib.security.RestPermissions.DASHBOARDS_EDIT;
 import static lib.security.RestPermissions.DASHBOARDS_READ;
 import static lib.security.RestPermissions.STREAMS_EDIT;
 import static lib.security.RestPermissions.STREAMS_READ;
-import static lib.security.RestPermissions.USERS_PERMISSIONSEDIT;
 
 public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
