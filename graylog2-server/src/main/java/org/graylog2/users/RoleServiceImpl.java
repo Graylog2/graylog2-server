@@ -156,7 +156,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Map<String, Role> loadAllLowercaseNameMap() throws NotFoundException {
         final Set<Role> roles = loadAll();
-        return Maps.uniqueIndex(roles, Roles.roleToNameFunction());
+        return Maps.uniqueIndex(roles, Roles.roleToNameFunction(true));
     }
 
     @Override
