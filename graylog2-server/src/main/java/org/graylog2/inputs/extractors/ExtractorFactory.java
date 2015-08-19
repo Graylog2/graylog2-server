@@ -26,9 +26,6 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorFactory {
     private final MetricRegistry metricRegistry;
     private final GrokPatternService grokPatternService;
@@ -40,16 +37,16 @@ public class ExtractorFactory {
     }
 
     public Extractor factory(String id,
-                                    String title,
-                                    long order,
-                                    Extractor.CursorStrategy cursorStrategy,
-                                    Extractor.Type type,
-                                    String sourceField,
-                                    String targetField,
-                                    Map<String, Object> extractorConfig,
-                                    String creatorUserId, List<Converter> converters,
-                                    Extractor.ConditionType conditionType,
-                                    String conditionValue)
+                             String title,
+                             long order,
+                             Extractor.CursorStrategy cursorStrategy,
+                             Extractor.Type type,
+                             String sourceField,
+                             String targetField,
+                             Map<String, Object> extractorConfig,
+                             String creatorUserId, List<Converter> converters,
+                             Extractor.ConditionType conditionType,
+                             String conditionValue)
             throws NoSuchExtractorException, Extractor.ReservedFieldException, ConfigurationException {
 
         // TODO convert to guice factory
@@ -64,6 +61,8 @@ public class ExtractorFactory {
                 return new CopyInputExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case GROK:
                 return new GrokExtractor(metricRegistry, grokPatternService.loadAll(), id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+            case JSON:
+                return new JsonExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             default:
                 throw new NoSuchExtractorException();
         }
