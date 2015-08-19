@@ -73,12 +73,7 @@ var UserList = React.createClass({
             userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
         }
 
-        var roleBadge = null;
-        if (this._hasAdminRole(user)) {
-            roleBadge = <span className="label label-info">Admin</span>;
-        } else {
-            roleBadge = <span className="label label-default">Reader</span>;
-        }
+        var roleBadges = user.roles.map((role) => <span key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
         var actions = null;
         if (!user.read_only) {
@@ -111,7 +106,7 @@ var UserList = React.createClass({
                 <td className="limited">{user.full_name}</td>
                 <td className="limited">{user.username}</td>
                 <td className="limited">{user.email}</td>
-                <td>{roleBadge}</td>
+                <td>{roleBadges}</td>
                 <td>{actions}</td>
             </tr>
         );
