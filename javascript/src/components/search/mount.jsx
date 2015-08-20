@@ -11,6 +11,11 @@ var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 var searchBarElem = document.getElementById('react-search-bar');
 if (searchBarElem) {
     SearchStore.initializeFieldsFromHash();
+    var searchInStream = searchBarElem.getAttribute('data-search-in-stream');
+    if (searchInStream) {
+        searchInStream = JSON.parse(searchInStream);
+        SearchStore.searchInStream = searchInStream;
+    }
     SavedSearchesStore.updateSavedSearches();
     React.render(<SearchBar />, searchBarElem);
 }
