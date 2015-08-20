@@ -36,8 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -67,7 +69,8 @@ public abstract class Extractor implements EmbeddedPersistable {
         REGEX,
         SPLIT_AND_INDEX,
         COPY_INPUT,
-        GROK;
+        GROK,
+        JSON;
 
         /**
          * Just like {@link #valueOf(String)} but uses the upper case string and doesn't throw exceptions.
@@ -247,21 +250,20 @@ public abstract class Extractor implements EmbeddedPersistable {
                     msg.addField(targetField, converted);
                 } else {
                     @SuppressWarnings("unchecked")
-                    final Map<String, Object> convert =
-                            (Map<String, Object>) converter.convert((String) msg.getField(targetField));
+                    final Map<String, Object> additionalFields = new HashMap<>((Map<String, Object>) converter.convert((String) msg.getField(targetField)));
                     for (final String reservedField : Message.RESERVED_FIELDS) {
-                        if (convert.containsKey(reservedField)) {
+                        if (additionalFields.containsKey(reservedField)) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug(
                                         "Not setting reserved field {} from converter {} on message {}, rest of the message is being processed",
                                         reservedField, converter.getType(), msg.getId());
                             }
                             converterExceptions.incrementAndGet();
-                            convert.remove(reservedField);
+                            additionalFields.remove(reservedField);
                         }
                     }
 
-                    msg.addFields(convert);
+                    msg.addFields(additionalFields);
                 }
             } catch (Exception e) {
                 this.converterExceptions.incrementAndGet();
@@ -415,6 +417,31 @@ public abstract class Extractor implements EmbeddedPersistable {
             return endIndex;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Result result = (Result) o;
+            return Objects.equals(beginIndex, result.beginIndex) &&
+                    Objects.equals(endIndex, result.endIndex) &&
+                    Objects.equals(value, result.value) &&
+                    Objects.equals(target, result.target);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, target, beginIndex, endIndex);
+        }
+
+        @Override
+        public String toString() {
+            return com.google.common.base.Objects.toStringHelper(this)
+                    .add("value", value)
+                    .add("target", target)
+                    .add("beginIndex", beginIndex)
+                    .add("endIndex", endIndex)
+                    .toString();
+        }
     }
 
     private static class ResultPredicate implements Predicate<Result> {

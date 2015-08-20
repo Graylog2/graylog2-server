@@ -53,7 +53,8 @@ public class Extractor {
         REGEX("Regular expression"),
         SPLIT_AND_INDEX("Split & Index"),
         COPY_INPUT("Copy Input"),
-        GROK("Grok pattern");
+        GROK("Grok pattern"),
+        JSON("JSON");
         private final String description;
 
         Type(String description) {
@@ -177,6 +178,9 @@ public class Extractor {
                 break;
             case GROK:
                 loadGrokConfig(form);
+                break;
+            case JSON:
+                loadJsonConfig(form);
                 break;
         }
     }
@@ -342,6 +346,13 @@ public class Extractor {
         }
 
         extractorConfig.put("grok_pattern", form.get("grok_pattern")[0]);
+    }
+
+    private void loadJsonConfig(Map<String, String[]> form) {
+        extractorConfig.put("flatten", form.containsKey("flatten"));
+        extractorConfig.put("list_separator", form.get("list_separator")[0]);
+        extractorConfig.put("key_separator", form.get("key_separator")[0]);
+        extractorConfig.put("kv_separator", form.get("kv_separator")[0]);
     }
 
     private boolean formFieldSet(Map<String, String[]> form, String key) {
