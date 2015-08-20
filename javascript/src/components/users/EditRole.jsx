@@ -5,7 +5,9 @@ var Immutable = require('immutable');
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
 var Button = require('react-bootstrap').Button;
+var Input = require('react-bootstrap').Input;
 
+var PermissionSelector = require('./PermissionSelector');
 var RolesStore = require('../../stores/users/RolesStore').RolesStore;
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
@@ -60,16 +62,15 @@ var EditRole = React.createClass({
             <Row>
                 <Col md={12}>
                     <h1>{titleText}</h1>
-                    <form>
-                        <label htmlFor="role-name">Name:</label>
-                        <input id="role-name" type="text" className="form-control" onChange={this._setName} value={this.state.role.name} required/>
+                    <div>
+                        <Input id="role-name" type="text" label="Name" onChange={this._setName} value={this.state.role.name} required/>
+                        <Input id="role-description" type="text" label="Description" onChange={this._setDescription} value={this.state.role.description} required/>
 
-                        <label htmlFor="role-description">Description:</label>
-                        <input id="role-description" type="text" className="form-control" onChange={this._setDescription} value={this.state.role.description}/>
+                        <PermissionSelector streams={this.props.streams} dashboards={this.props.dashboards} />
 
                         <Button onClick={ev => this.props.onSave(this.state.initialName, this.state.role)}>Save</Button>
                         <Button onClick={this.props.cancelEdit}>Cancel</Button>
-                    </form>
+                    </div>
                 </Col>
             </Row>);
     },
