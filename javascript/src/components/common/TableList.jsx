@@ -33,8 +33,7 @@ const TableList = React.createClass({
     };
   },
   render() {
-    var i = 0;
-    const formattedItems = this.state.filteredItems.map(item => this._formatItem(item, i++)).toJS();
+    const formattedItems = this.state.filteredItems.map(item => this._formatItem(item)).toJS();
     let filter;
 
     if (this.props.filterKeys.length !== 0) {
@@ -100,7 +99,7 @@ const TableList = React.createClass({
     const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
     this.setState({selected: newSelected, allSelected: !this.state.allSelected});
   },
-  _formatItem(item, idx) {
+  _formatItem(item) {
     const header = (
       <div>
         <div className="pull-right" style={{marginTop: 10, marginBottom: 10}}>
@@ -118,7 +117,7 @@ const TableList = React.createClass({
       </div>
     );
     return (
-      <ListGroupItem key={`item-${idx}-${item.title}`} header={header}>
+      <ListGroupItem key={`item-${item[this.props.idKey]}`} header={header}>
         <span style={{marginLeft: 20}}>{item[this.props.descriptionKey]}</span>
       </ListGroupItem>
     );
