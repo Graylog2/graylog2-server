@@ -17,6 +17,8 @@ const TableList = React.createClass({
     filterKeys: React.PropTypes.arrayOf(React.PropTypes.string),
     filterLabel: React.PropTypes.string,
     items: React.PropTypes.instanceOf(Immutable.List),
+    headerActionsFactory: React.PropTypes.func,
+    itemActionsFactory: React.PropTypes.func,
   },
   getInitialState() {
     return {
@@ -30,6 +32,8 @@ const TableList = React.createClass({
       idKey: 'id',
       titleKey: 'title',
       descriptionKey: 'description',
+      headerActionsFactory: () => {},
+      itemActionsFactory: () => {},
     };
   },
   render() {
@@ -74,21 +78,15 @@ const TableList = React.createClass({
     this.setState({filteredItems: Immutable.List(filteredItems), allSelected: false});
   },
   _headerItem() {
-    let permissionButtons;
+    let bulkHeaderActions;
 
     if (this.state.selected.count() > 1) {
-      permissionButtons = (
-        <div className="pull-right" style={{marginTop: 10, marginBottom: 10}}>
-          <Button bsSize="xsmall" bsStyle="info">Read selected</Button>
-          &nbsp;
-          <Button bsSize="xsmall" bsStyle="info">Edit selected</Button>
-        </div>
-      );
+      bulkHeaderActions = this.props.headerActionsFactory(this.state.selected);
     }
 
     const header = (
       <div>
-        {permissionButtons}
+        {bulkHeaderActions}
         <Input type="checkbox" label="Select all" checked={this.state.allSelected} onChange={this._toggleSelectAll}
                groupClassName="form-group-inline"/>
       </div>
@@ -103,10 +101,7 @@ const TableList = React.createClass({
     const header = (
       <div>
         <div className="pull-right" style={{marginTop: 10, marginBottom: 10}}>
-          <ButtonGroup bsSize="small">
-            <Button active>Read</Button>
-            <Button>Edit</Button>
-          </ButtonGroup>
+          {this.props.itemActionsFactory(item)}
         </div>
 
         <Input type="checkbox"
