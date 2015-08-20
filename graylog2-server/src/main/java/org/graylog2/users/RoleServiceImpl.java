@@ -83,6 +83,7 @@ public class RoleServiceImpl implements RoleService {
 
     }
 
+    @Nullable
     private String ensureBuiltinRole(String roleName,
                                      Set<String> expectedPermissions,
                                      String name, String description) {
@@ -104,6 +105,7 @@ public class RoleServiceImpl implements RoleService {
             fixedAdmin.setName(name);
             fixedAdmin.setDescription(description);
             fixedAdmin.setPermissions(expectedPermissions);
+            
             try {
                 final RoleImpl savedRole = save(fixedAdmin);
                 return savedRole.getId();
@@ -111,10 +113,12 @@ public class RoleServiceImpl implements RoleService {
                 log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
             }
         }
+
         if (previousRole == null) {
             log.error("Unable to access fixed " + roleName + " role, please restart Graylog to fix this.");
             return null;
         }
+
         return previousRole.getId();
     }
 
