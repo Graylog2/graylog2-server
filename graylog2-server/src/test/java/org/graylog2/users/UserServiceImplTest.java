@@ -31,29 +31,36 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
     @ClassRule
     public static final InMemoryMongoDb MONGO = newInMemoryMongoDbRule().build();
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+
     private MongoConnection mongoConnection;
     private Configuration configuration;
     private UserServiceImpl userService;
+    @Mock
     private RoleService roleService;
 
     @Before
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
-        this.roleService = mock(RoleService.class);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService);
+
+        when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
 
     @Test
