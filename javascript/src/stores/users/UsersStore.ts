@@ -6,11 +6,34 @@ declare var jsRoutes: any;
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
 
-var UsersStore = {
+export interface StartPage {
+    id: string;
+    type: string;
+}
+
+export interface User {
+    username: string;
+    id: string;
+    full_name: string;
+    email: string;
+    permissions: string[];
+    timezone: string;
+    preferences?: any;
+    roles: string[];
+
+    read_only: boolean;
+    external: boolean;
+    session_timeout_ms: number;
+
+    startpage?: StartPage;
+}
+
+export var UsersStore = {
     editUserFormUrl(username: string) {
         return URLUtils.appPrefixed("/system/users/edit/" + username);
     },
-    loadUsers(): JQueryPromise<string[]> {
+
+    loadUsers(): JQueryPromise<User[]> {
         var url = URLUtils.appPrefixed('/a/system/users');
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
@@ -21,7 +44,8 @@ var UsersStore = {
         });
         return promise;
     },
-    load(username: string): JQueryPromise<string[]> {
+
+    load(username: string): JQueryPromise<User> {
         var promise = $.getJSON(jsRoutes.controllers.api.UsersApiController.loadUser(username).url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading user failed with status: " + errorThrown,
@@ -30,6 +54,7 @@ var UsersStore = {
 
         return promise;
     },
+
     deleteUser(username: string): JQueryPromise<string[]> {
         var url = URLUtils.appPrefixed('/a/system/user/' + username);
         var promise = $.ajax({
@@ -49,5 +74,3 @@ var UsersStore = {
         return promise;
     }
 };
-
-export = UsersStore;

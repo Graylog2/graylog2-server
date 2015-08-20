@@ -2,8 +2,10 @@
 
 var React = require('react');
 
-var UsersStore = require('../../stores/users/UsersStore');
+var UsersStore = require('../../stores/users/UsersStore').UsersStore;
 var DataTable = require('../common/DataTable');
+
+var Input = require('react-bootstrap').Input;
 
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
@@ -123,6 +125,8 @@ var UserList = React.createClass({
                            headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}
                            rows={this.state.users}
+                           filterBy="Role"
+                           filterSuggestions={["admin", "reader", "devs"]}
                            dataRowFormatter={this._userInfoFormatter}
                            filterLabel="Filter Users"
                            filterKeys={filterKeys}/>

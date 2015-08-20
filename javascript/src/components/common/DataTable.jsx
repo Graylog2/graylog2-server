@@ -69,6 +69,9 @@ var DataTable = React.createClass({
                                              searchInKeys={this.props.filterKeys}
                                              onDataFiltered={this.filterDataRows}/>
                     </div>
+                    <div className="col-md-8">
+                        {this.props.children}
+                    </div>
                 </div>
             );
         }
