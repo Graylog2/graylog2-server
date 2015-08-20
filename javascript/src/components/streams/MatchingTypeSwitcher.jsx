@@ -14,7 +14,7 @@ class MatchingTypeSwitcher extends Component {
       requestChange: this.handleTypeChange.bind(this),
     };
     return (
-      <div className="form-inline">
+      <div>
         A message needs to match{' '}
         <OverlayTrigger
           placement="top"
@@ -22,14 +22,23 @@ class MatchingTypeSwitcher extends Component {
           trigger="manual"
           defaultOverlayShown={false}
           overlay={<Tooltip>Saved!</Tooltip>}>
-          <Input type="select" className="form-inline input-sm" valueLink={valueLink}>
-            <option value="AND">all rules</option>
-            <option value="OR">at least one rule</option>
-          </Input>
+          <div>
+            <Input type="radio" label="Matching all of the following rules"
+                   checked={this.props.stream.matching_type === 'AND'} onChange={this.handleTypeChangeToAnd.bind(this)}/>
+            <Input type="radio" label="Matching at least one of the following rules"
+                   checked={this.props.stream.matching_type === 'OR'} onChange={this.handleTypeChangeToOr.bind(this)}/>
+          </div>
         </OverlayTrigger>
-        {' '}to be routed into this stream.{' '}
       </div>
     );
+  }
+
+  handleTypeChangeToAnd() {
+    this.handleTypeChange("AND");
+  }
+
+  handleTypeChangeToOr() {
+    this.handleTypeChange("OR");
   }
 
   handleTypeChange(newValue) {
