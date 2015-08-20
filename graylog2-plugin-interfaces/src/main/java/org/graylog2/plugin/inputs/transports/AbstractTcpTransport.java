@@ -49,7 +49,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManager;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -80,9 +79,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private final String tlsKeyPassword;
     private File tlsCertFile;
     private File tlsKeyFile;
-	private final File tlsClientAuthCertFile;
-	private final boolean tlsNeedClientAuth;
-	private final boolean tlsWantClientAuth;
+    private final File tlsClientAuthCertFile;
+    private final boolean tlsNeedClientAuth;
+    private final boolean tlsWantClientAuth;
 
     public AbstractTcpTransport(
             Configuration configuration,
@@ -101,9 +100,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
         this.tlsKeyFile = getTlsFile(configuration, CK_TLS_KEY_FILE);
         this.tlsKeyPassword = configuration.getString(CK_TLS_KEY_PASSWORD);
-		this.tlsNeedClientAuth = configuration.getBoolean(CK_TLS_NEED_CLIENT_AUTH);
-		this.tlsWantClientAuth = configuration.getBoolean(CK_TLS_WANT_CLIENT_AUTH);
-		this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
+        this.tlsNeedClientAuth = configuration.getBoolean(CK_TLS_NEED_CLIENT_AUTH);
+        this.tlsWantClientAuth = configuration.getBoolean(CK_TLS_WANT_CLIENT_AUTH);
+        this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
 
 
         this.localRegistry.register("open_connections", connectionCounter.gaugeCurrent());
@@ -172,25 +171,25 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 }
             }
 
-			private SSLEngine createSslEngine() throws FileNotFoundException, IOException, GeneralSecurityException {
-				SSLContext instance = SSLContext.getInstance("TLS");
-				TrustManager[] initTrustStore = new TrustManager[0];
-				if ((tlsWantClientAuth || tlsNeedClientAuth)) {
-					if (tlsClientAuthCertFile.exists()) {
-						initTrustStore = KeyUtil.initTrustStore(tlsClientAuthCertFile);
-					} else {
-						LOG.warn(
-								"client auth configured, but no authorized certificates / certificate authorities configured");
-					}
-				}
-				instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore,
-						new SecureRandom());
-				SSLEngine engine = instance.createSSLEngine();
-				engine.setUseClientMode(false);
-				engine.setNeedClientAuth(tlsNeedClientAuth);
-				engine.setNeedClientAuth(tlsWantClientAuth);
-				return engine;
-			}
+            private SSLEngine createSslEngine() throws FileNotFoundException, IOException, GeneralSecurityException {
+                SSLContext instance = SSLContext.getInstance("TLS");
+                TrustManager[] initTrustStore = new TrustManager[0];
+                if ((tlsWantClientAuth || tlsNeedClientAuth)) {
+                    if (tlsClientAuthCertFile.exists()) {
+                        initTrustStore = KeyUtil.initTrustStore(tlsClientAuthCertFile);
+                    } else {
+                        LOG.warn(
+                                "client auth configured, but no authorized certificates / certificate authorities configured");
+                    }
+                }
+                instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore,
+                        new SecureRandom());
+                SSLEngine engine = instance.createSSLEngine();
+                engine.setUseClientMode(false);
+                engine.setNeedClientAuth(tlsNeedClientAuth);
+                engine.setNeedClientAuth(tlsWantClientAuth);
+                return engine;
+            }
 
         };
     }
@@ -237,12 +236,12 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             TextField.Attribute.IS_PASSWORD
                     )
             );
-			x.addField(
-					new BooleanField(CK_TLS_NEED_CLIENT_AUTH, "TLS Need Client Auth", false, "TLS Need Client Auth"));
-			x.addField(
-					new BooleanField(CK_TLS_WANT_CLIENT_AUTH, "TLS Want Client Auth", false, "TLS Want Client Auth"));
-			x.addField(new TextField(CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE, "TLS Client Auth Trusted Certs", "",
-					"TLS Client Auth Trusted Certs  (File or Directory)", ConfigurationField.Optional.OPTIONAL));
+            x.addField(
+                    new BooleanField(CK_TLS_NEED_CLIENT_AUTH, "TLS Need Client Auth", false, "TLS Need Client Auth"));
+            x.addField(
+                    new BooleanField(CK_TLS_WANT_CLIENT_AUTH, "TLS Want Client Auth", false, "TLS Want Client Auth"));
+            x.addField(new TextField(CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE, "TLS Client Auth Trusted Certs", "",
+                    "TLS Client Auth Trusted Certs  (File or Directory)", ConfigurationField.Optional.OPTIONAL));
 
             return x;
         }
