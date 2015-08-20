@@ -66,9 +66,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private static final String CK_TLS_KEY_FILE = "tls_key_file";
     private static final String CK_TLS_ENABLE = "tls_enable";
     private static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
-    public static final String CK_TLS_NEED_CLIENT_AUTH = "tls_need_client_auth";
-    public static final String CK_TLS_WANT_CLIENT_AUTH = "tls_want_client_auth";
-    public static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
+    private static final String CK_TLS_NEED_CLIENT_AUTH = "tls_need_client_auth";
+    private static final String CK_TLS_WANT_CLIENT_AUTH = "tls_want_client_auth";
+    private static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
 
     protected final Executor bossExecutor;
     protected final Executor workerExecutor;
@@ -172,25 +172,26 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             }
 
             private SSLEngine createSslEngine() throws FileNotFoundException, IOException, GeneralSecurityException {
-                SSLContext instance = SSLContext.getInstance("TLS");
+                final SSLContext instance = SSLContext.getInstance("TLS");
                 TrustManager[] initTrustStore = new TrustManager[0];
+
                 if ((tlsWantClientAuth || tlsNeedClientAuth)) {
                     if (tlsClientAuthCertFile.exists()) {
                         initTrustStore = KeyUtil.initTrustStore(tlsClientAuthCertFile);
                     } else {
-                        LOG.warn(
-                                "client auth configured, but no authorized certificates / certificate authorities configured");
+                        LOG.warn("client auth configured, but no authorized certificates / certificate authorities configured");
                     }
                 }
-                instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore,
-                        new SecureRandom());
-                SSLEngine engine = instance.createSSLEngine();
+
+                instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore, new SecureRandom());
+                final SSLEngine engine = instance.createSSLEngine();
+
                 engine.setUseClientMode(false);
                 engine.setNeedClientAuth(tlsNeedClientAuth);
                 engine.setNeedClientAuth(tlsWantClientAuth);
+
                 return engine;
             }
-
         };
     }
 
@@ -237,11 +238,27 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                     )
             );
             x.addField(
-                    new BooleanField(CK_TLS_NEED_CLIENT_AUTH, "TLS Need Client Auth", false, "TLS Need Client Auth"));
+                    new BooleanField(
+                            CK_TLS_NEED_CLIENT_AUTH,
+                            "TLS Need Client Auth",
+                            false,
+                            "TLS Need Client Auth")
+            );
             x.addField(
-                    new BooleanField(CK_TLS_WANT_CLIENT_AUTH, "TLS Want Client Auth", false, "TLS Want Client Auth"));
-            x.addField(new TextField(CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE, "TLS Client Auth Trusted Certs", "",
-                    "TLS Client Auth Trusted Certs  (File or Directory)", ConfigurationField.Optional.OPTIONAL));
+                    new BooleanField(
+                            CK_TLS_WANT_CLIENT_AUTH,
+                            "TLS Want Client Auth",
+                            false,
+                            "TLS Want Client Auth")
+            );
+            x.addField(
+                    new TextField(
+                            CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE,
+                            "TLS Client Auth Trusted Certs",
+                            "",
+                            "TLS Client Auth Trusted Certs  (File or Directory)",
+                            ConfigurationField.Optional.OPTIONAL)
+            );
 
             return x;
         }
