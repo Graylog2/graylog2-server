@@ -115,22 +115,26 @@ const PermissionSelector = React.createClass({
       <div>
         <TabbedArea defaultActiveKey={1} animation={false}>
           <TabPane eventKey={1} tab="Streams">
-            <TableList
-              items={this.props.streams}
-              filterLabel="Filter Streams"
-              filterKeys={['title']}
-              itemActionsFactory={streamItemButtons}
-              headerActionsFactory={multiStreamButtons}
-            />
+            <div style={{marginTop: 10}}>
+              <TableList
+                items={this.props.streams}
+                filterLabel="Filter Streams"
+                filterKeys={['title']}
+                itemActionsFactory={streamItemButtons}
+                headerActionsFactory={multiStreamButtons}
+              />
+            </div>
           </TabPane>
           <TabPane eventKey={2} tab="Dashboards">
-            <TableList
-              items={this.props.dashboards}
-              filterLabel="Filter Dashboards"
-              filterKeys={['title']}
-              itemActionsFactory={dashboardItemButtons}
-              headerActionsFactory={multiDashboardButtons}
-            />
+            <div style={{marginTop: 10}}>
+              <TableList
+                items={this.props.dashboards}
+                filterLabel="Filter Dashboards"
+                filterKeys={['title']}
+                itemActionsFactory={dashboardItemButtons}
+                headerActionsFactory={multiDashboardButtons}
+              />
+            </div>
           </TabPane>
         </TabbedArea>
       </div>

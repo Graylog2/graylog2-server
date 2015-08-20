@@ -60,7 +60,7 @@ var DataTable = React.createClass({
         if (this.props.filterKeys.length !== 0) {
             filter = (
                 <div className="row">
-                    <div className="col-md-4">
+                    <div className="col-md-8">
                         <TypeAheadDataFilter label={this.props.filterLabel}
                                              data={this.state.rows}
                                              displayKey={this.props.displayKey}
@@ -69,7 +69,7 @@ var DataTable = React.createClass({
                                              searchInKeys={this.props.filterKeys}
                                              onDataFiltered={this.filterDataRows}/>
                     </div>
-                    <div className="col-md-8">
+                    <div className="col-md-4">
                         {this.props.children}
                     </div>
                 </div>
