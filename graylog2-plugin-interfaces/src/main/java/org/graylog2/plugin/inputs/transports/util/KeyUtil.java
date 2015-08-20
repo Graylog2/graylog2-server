@@ -24,10 +24,10 @@ package org.graylog2.plugin.inputs.transports.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
-import org.apache.velocity.util.EnumerationIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +121,7 @@ public class KeyUtil {
     }
 
     private static String join(Enumeration<String> aliases) {
-        return JOINER.join(new EnumerationIterator(aliases));
+        return JOINER.join(Iterators.forEnumeration(aliases));
     }
 
     protected static PrivateKey loadPrivateKey(File file, String password)
@@ -167,5 +167,4 @@ public class KeyUtil {
         cipher.init(Cipher.DECRYPT_MODE, sk, pkInfo.getAlgParameters());
         return pkInfo.getKeySpec(cipher);
     }
-
 }
