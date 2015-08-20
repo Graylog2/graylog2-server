@@ -4,6 +4,7 @@
 @import lib.security.RestPermissions._
 @import org.graylog2.restclient.lib.Configuration
 @import org.graylog2.restclient.lib.Version
+@import models.descriptions.StreamDescription
 
 
 <!DOCTYPE html>
@@ -27,7 +28,7 @@
 		<div class="container-fluid">
 
             @if(reactSearch && (stream != null || (isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD)))) {
-                <div id="react-search-bar"></div>
+                <div id="react-search-bar" data-search-in-stream="@Json.toJsonString(StreamDescription.of(stream))"></div>
             }
 
             <div class="row alert-bar">
