@@ -69,27 +69,26 @@ class DashboardStore {
 
     updateDashboards() {
         var promise = this.listDashboards();
-        promise.done((dashboards) => {
-            var dashboardMap = Immutable.Map<string, Dashboard>(dashboards);
-            this.dashboards = Immutable.List<Dashboard>(dashboardMap.values());
+        promise.done((dashboardList) => {
+            this.dashboards = dashboardList;
         });
     }
 
-    listDashboards(): JQueryPromise<string[]> {
+    listDashboards(): JQueryPromise<Immutable.List<Dashboard>> {
         var url = jsRoutes.controllers.api.DashboardsApiController.index().url;
         var promise = $.getJSON(url);
-        promise.then((dashboards) => {
+        promise = promise.then((dashboards) => {
             var dashboardMap = Immutable.Map<string, Dashboard>(dashboards);
             var dashboardList = Immutable.List<Dashboard>();
 
             dashboardMap.forEach((dashboard: Dashboard, id: string) => {
                 dashboard.id = id;
-                dashboardList.push(dashboard);
+                dashboardList = dashboardList.push(dashboard);
             });
 
             return dashboardList;
         });
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        promise = promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading dashboard list failed with status: " + errorThrown,
                     "Could not load dashboards");
