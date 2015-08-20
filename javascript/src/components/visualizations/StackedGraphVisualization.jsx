@@ -63,7 +63,40 @@ var StackedGraphVisualization = React.createClass({
         return series.toOrderedSet().sortBy((dataPoint) => dataPoint.get('timestamp'));
     },
     _getGraphType() {
-        return (this.props.config.renderer === 'scatterplot') ? 'scatter' : this.props.config.renderer;
+        var graphType;
+
+        switch (this.props.config.renderer) {
+            case 'scatterplot':
+                graphType = 'scatter';
+            break;
+            case 'line':
+                graphType = (this.props.config.interpolation !== 'step-after') ? 'spline' : 'step';
+                break;
+            case 'area':
+                graphType = (this.props.config.interpolation !== 'step-after') ? 'area-spline' : 'area-step';
+                break;
+            default:
+                graphType = this.props.config.renderer;
+        }
+
+        return graphType;
+    },
+    _applyGraphConfiguration(graphType) {
+        switch (graphType) {
+            case 'bar':
+                // Automatically resize bar width
+                var numberDataPoints = this.state.dataPoints.size;
+                this.graph.internal.config.bar_width_ratio = Math.max(0.015, this.barWidthScale(numberDataPoints));
+                break;
+            case 'spline':
+            case 'area-spline':
+                this.graph.internal.config.spline_interpolation_type = this.props.config.interpolation;
+                break;
+            case 'step':
+            case 'area-step':
+                this.graph.internal.config.line_step_type = this.props.config.interpolation;
+                break;
+        }
     },
     renderGraph() {
         var graphDomNode = React.findDOMNode(this);
@@ -168,17 +201,14 @@ var StackedGraphVisualization = React.createClass({
         }
     },
     drawData() {
+        var graphType = this._getGraphType();
+        this._applyGraphConfiguration(graphType);
+
         // Generate custom tick values for the time axis
         this.graph.internal.config.axis_x_tick_values = graphHelper.customTickInterval()(
             this.state.dataPoints.first().get('timestamp') - 1000,
             this.state.dataPoints.last().get('timestamp') + 1000
         );
-
-        if (this.props.config.renderer === 'bar') {
-            // Automatically resize bar width
-            var numberDataPoints = this.state.dataPoints.size;
-            this.graph.internal.config.bar_width_ratio = Math.max(0.015, this.barWidthScale(numberDataPoints));
-        }
 
         this.graph.load({
             json: this.state.dataPoints.toJS(),
@@ -186,7 +216,7 @@ var StackedGraphVisualization = React.createClass({
                 x: 'timestamp',
                 value: this.series.toJS()
             },
-            type: this._getGraphType()
+            type: graphType
         });
     },
     render() {

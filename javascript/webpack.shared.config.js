@@ -9,7 +9,7 @@ var webpackConfig = {
     },
     module: {
         preLoaders: [
-            //{ test: /\.js(x)?$/, loader: "eslint-loader", exclude: /node_modules/ }
+            //{ test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules/ }
         ],
         loaders: [
             { test: /\.json$/, loader: 'json-loader' },
@@ -19,10 +19,11 @@ var webpackConfig = {
     },
     resolve: {
         // you can now require('file') instead of require('file.coffee')
-        extensions: ['', '.js', '.json', '.jsx', '.ts']
+        extensions: ['', '.js', '.json', '.jsx', '.ts'],
+        modulesDirectories: ['src', 'node_modules'],
     },
     externals: {
-        "jquery" : "jQuery"
+        'jquery' : 'jQuery'
     },
     eslint: {
         configFile: '.eslintrc'

@@ -19,12 +19,12 @@ var AddToDashboardMenu = React.createClass({
     mixins: [PermissionsMixin],
     getInitialState() {
         return {
-            dashboards: DashboardStore.dashboards,
+            dashboards: DashboardStore.writableDashboards,
             selectedDashboard: ""
         };
     },
     componentDidMount() {
-        DashboardStore.addOnDashboardsChangedCallback(dashboards => this.setState({dashboards: dashboards}));
+        DashboardStore.addOnWritableDashboardsChangedCallback(dashboards => this.setState({dashboards: dashboards}));
         $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
     },
     _setOriginalSearchParams(originalSearchParams) {

@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var Immutable = require('immutable');
 var Panel = require('react-bootstrap').Panel;
 var ListGroup = require('react-bootstrap').ListGroup;
 var ListGroupItem = require('react-bootstrap').ListGroupItem;
@@ -20,6 +21,7 @@ var QuickValuesVisualization = React.createClass({
     getInitialState() {
         this.filters = [];
         this.triggerRender = true;
+        this.shouldUpdateData = true;
         this.dcGroupName = "quickvalue-" + this.props.id;
         this.quickValuesData = crossfilter();
         this.dimension = this.quickValuesData.dimension((d) => d.term);
@@ -29,7 +31,7 @@ var QuickValuesVisualization = React.createClass({
             total: undefined,
             others: undefined,
             missing: undefined,
-            terms: {}
+            terms: Immutable.List(),
         };
     },
     componentDidMount() {
@@ -47,15 +49,20 @@ var QuickValuesVisualization = React.createClass({
         if (newProps.data) {
             var quickValues = newProps.data;
 
-            var terms = Object.keys(quickValues.terms);
+            var total = quickValues.total - quickValues.missing;
+
+            var terms = Immutable.List(Immutable.Map(quickValues.terms).keys());
 
             var formattedTerms = terms.map((term) => {
                 var count = quickValues.terms[term];
-                return {
+                return Immutable.Map({
                     term: StringUtils.escapeHTML(term),
-                    count: count
-                };
+                    count: count,
+                    percentage: count / total,
+                });
             });
+
+            this.shouldUpdateData = !formattedTerms.equals(this.state.terms);
 
             this.setState({
                 total: quickValues.total,
@@ -87,8 +94,7 @@ var QuickValuesVisualization = React.createClass({
                 return colourBadge + " " + d.term;
             },
             (d) => {
-                var total = this.state.total - this.state.missing;
-                return NumberUtils.formatPercentage(d.count / total);
+                return NumberUtils.formatPercentage(d.percentage);
             },
             (d) => NumberUtils.formatNumber(d.count)
         ];
@@ -192,11 +198,13 @@ var QuickValuesVisualization = React.createClass({
         }
     },
     drawData() {
-        this._clearDataFilters();
-        this.quickValuesData.remove();
-        this.quickValuesData.add(this.state.terms);
-        this._restoreDataFilters();
-        this.dataTable.redraw();
+        if (this.shouldUpdateData) {
+            this._clearDataFilters();
+            this.quickValuesData.remove();
+            this.quickValuesData.add(this.state.terms.toJS());
+            this._restoreDataFilters();
+            this.dataTable.redraw();
+        }
 
         if (this.props.config['show_pie_chart']) {
             if (this.triggerRender) {

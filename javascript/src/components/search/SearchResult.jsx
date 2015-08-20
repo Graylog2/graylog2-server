@@ -93,7 +93,7 @@ var SearchResult = React.createClass({
     componentDidMount() {
         this._updateWidth();
         this._initializeAffix();
-        DashboardStore.updateDashboards();
+        DashboardStore.updateWritableDashboards();
         $(window).on('resize', this._resizeCallback);
     },
     componentWillUnmount() {

@@ -51,6 +51,22 @@ In this case just set the correct (installed!) Python binary before running `npm
 npm config set python python2.7
 ```
 
+#### Update Javascript dependencies
+
+a. Update a single dependency
+
+* Update `package.json` file with the new dependency
+* `npm update <npm-package>`
+* `npm shrinkwrap --dev` to save the whole dependency tree into the `npm-shrinkwrap.json` file
+
+b. Update devDependencies
+
+* `npm shinkwrap` to keep the dependency tree (without devDependencies) into `npm-shrinkwrap.json`
+* Update `package.json` file with the new devDependencies
+* `npm install`
+* Do more work with the new devDependencies
+* `npm shrinkwrap --dev` to export the whole dependency tree with the new devDependencies into `npm-shrinkwrap.json`
+
 ![YourKit](https://s3.amazonaws.com/graylog2public/images/yourkit.png)
 
 YourKit supports our open source project by sponsoring its full-featured Java Profiler. YourKit, LLC is the creator of [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp) and [YourKit .NET Profiler](http://www.yourkit.com/.net/profiler/index.jsp), innovative and intelligent tools for profiling Java and .NET applications.

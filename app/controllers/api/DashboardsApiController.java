@@ -84,6 +84,7 @@ public class DashboardsApiController extends AuthenticatedController {
                 dashboard.put("title", d.getTitle());
                 dashboard.put("description", d.getDescription());
                 dashboard.put("created_by", (d.getCreatorUser() == null) ? null : d.getCreatorUser().getName());
+                dashboard.put("content_pack", d.getContentPack());
 
                 result.put(d.getId(), dashboard);
             }
@@ -106,6 +107,7 @@ public class DashboardsApiController extends AuthenticatedController {
                 dashboard.put("title", d.getTitle());
                 dashboard.put("description", d.getDescription());
                 dashboard.put("created_by", (d.getCreatorUser() == null) ? null : d.getCreatorUser().getName());
+                dashboard.put("content_pack", d.getContentPack());
 
                 result.put(d.getId(), dashboard);
             }
@@ -174,6 +176,15 @@ public class DashboardsApiController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
+    }
+
+    public Result delete(String id) throws APIException, IOException {
+        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, id)) {
+            return forbidden();
+        }
+
+        this.dashboardService.delete(id);
+        return ok();
     }
 
     public Result setWidgetPositions(String dashboardId) {

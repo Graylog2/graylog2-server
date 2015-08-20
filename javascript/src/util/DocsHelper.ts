@@ -9,6 +9,7 @@ interface Pages {
 class DocsHelper {
     PAGES: Pages = {
         WELCOME: "", // Welcome page to the documentation
+        DASHBOARDS: "dashboards.html",
         EXTERNAL_DASHBOARDS: "external_dashboards.html",
         SEARCH_QUERY_LANGUAGE: "queries.html",
         STREAMS: "streams.html"

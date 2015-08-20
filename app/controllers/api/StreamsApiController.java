@@ -6,6 +6,7 @@ import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
 import lib.json.Json;
 import models.descriptions.StreamDescription;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
@@ -60,7 +61,7 @@ public class StreamsApiController extends AuthenticatedController {
 
     public Result update(String streamId) throws APIException, IOException {
         final JsonNode json = request().body().asJson();
-        final CreateStreamRequest request = Json.fromJson(json, CreateStreamRequest.class);
+        final UpdateStreamRequest request = Json.fromJson(json, UpdateStreamRequest.class);
 
         this.streamService.update(streamId, request);
         return ok();
