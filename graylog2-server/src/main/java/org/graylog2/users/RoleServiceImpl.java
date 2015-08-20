@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mongojack.DBQuery.and;
 import static org.mongojack.DBQuery.is;
 
@@ -76,8 +77,8 @@ public class RoleServiceImpl implements RoleService {
         dbCollection.createIndex(new BasicDBObject(NAME_LOWER, 1), new BasicDBObject("unique", true));
 
         // make sure the two built-in roles actually exist
-        adminRoleObjectId = ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                                              "Grants all permissions for Graylog administrators (built-in)");
+        adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
+                                                           "Grants all permissions for Graylog administrators (built-in)"));
         ensureBuiltinRole(READER_ROLENAME, RestPermissions.READER_BASE_PERMISSIONS, "Reader",
                           "Grants basic permissions for every Graylog user (built-in)");
 
@@ -94,7 +95,7 @@ public class RoleServiceImpl implements RoleService {
                 log.error("Invalid role '{}', fixing it.", roleName);
                 throw new IllegalArgumentException(); // jump to fix code
             }
-        } catch (NotFoundException |IllegalArgumentException | NoSuchElementException ignored) {
+        } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
             log.info("{} role is missing or invalid, re-adding it as a built-in role.", roleName);
             final RoleImpl fixedAdmin = new RoleImpl();
             // copy the mongodb id over, in order to update the role instead of readding it
