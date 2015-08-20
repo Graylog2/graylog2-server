@@ -125,7 +125,7 @@ GET           /system/users/edit/:username                                      
 POST          /system/users/password/:username                                                   @controllers.UsersController.changePassword(username: String)
 POST          /system/users/startpage/reset/:username                                            @controllers.StartpageController.reset(username: String)
 POST          /system/users/updateroles/:username                                                @controllers.UsersController.updateRoles(username: String)
-
+GET           /system/roles                                                                      @controllers.UsersController.rolesPage()
 # Sources
 GET           /sources                                                                           @controllers.SourcesController.list()
 

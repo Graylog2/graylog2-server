@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.mvc.Result;
 import views.helpers.Permissions;
+import views.html.system.roles.roles;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
 
@@ -412,6 +413,10 @@ public class UsersController extends AuthenticatedController {
         }
 
         return redirect(routes.UsersController.editUserForm(username));
+    }
+
+    public Result rolesPage() {
+        return ok(roles.render(currentUser()));
     }
 
     private static BreadcrumbList breadcrumbs() {

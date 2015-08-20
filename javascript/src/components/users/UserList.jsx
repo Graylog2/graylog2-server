@@ -3,6 +3,7 @@
 var React = require('react');
 
 var UsersStore = require('../../stores/users/UsersStore').UsersStore;
+var RolesStore = require('../../stores/users/RolesStore').RolesStore;
 var DataTable = require('../common/DataTable');
 
 var Input = require('react-bootstrap').Input;
@@ -16,11 +17,13 @@ var UserList = React.createClass({
         return {
             currentUsername: this.props.currentUsername,
             currentUser: null,
-            users: []
+            users: [],
+            roles: []
         };
     },
     componentDidMount() {
         this.loadUsers();
+        RolesStore.loadRoles().done((roles) => {this.setState({roles: roles.map(role => role.name)})});
     },
     loadUsers: function () {
         var promise = UsersStore.loadUsers();
@@ -125,8 +128,8 @@ var UserList = React.createClass({
                            headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}
                            rows={this.state.users}
-                           filterBy="Role"
-                           filterSuggestions={["admin", "reader", "devs"]}
+                           filterBy="role"
+                           filterSuggestions={this.state.roles}
                            dataRowFormatter={this._userInfoFormatter}
                            filterLabel="Filter Users"
                            filterKeys={filterKeys}/>
