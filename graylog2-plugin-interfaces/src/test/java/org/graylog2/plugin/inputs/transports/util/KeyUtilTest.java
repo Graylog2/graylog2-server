@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class KeyToolTest {
+public class KeyUtilTest {
 
     private static final String SERVER_KEY_PEM_E_PKCS8 = "server.key.pem.e.pkcs8";
     private static final String X509 = "X509";
