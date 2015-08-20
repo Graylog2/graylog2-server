@@ -40,7 +40,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class KeyUtilTest {
-
     private static final String SERVER_KEY_PEM_E_PKCS8 = "server.key.pem.e.pkcs8";
     private static final String X509 = "X509";
     private static final String DIR = "dir";
@@ -53,7 +52,7 @@ public class KeyUtilTest {
     @Test
     public void testLoadCertificateFile()
             throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         KeyUtil.loadCertificates(ks, resourceToFile(SERVER_CRT), CertificateFactory.getInstance(X509));
         assertEquals(1, ks.size());
@@ -66,70 +65,60 @@ public class KeyUtilTest {
     @Test
     public void testLoadCertificateDir()
             throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         KeyUtil.loadCertificates(ks, resourceToFile(DIR), CertificateFactory.getInstance(X509));
         assertEquals(1, ks.size());
     }
 
-    @Test
-    public void testLoadPriveKeyPemUnencryptedPCKS1() throws IOException, GeneralSecurityException {
-        File resourceToFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1);
-        try {
-            SslContext.newServerContext(resourceToFile(SERVER_CRT), resourceToFile);
-            fail();
-        } catch (Exception e) {
-            // expected
-        }
-        try {
-            KeyUtil.loadPrivateKey(resourceToFile, null);
-            fail();
-        } catch (Exception e) {
-            // expected
-        }
-
+    @Test(expected = IllegalArgumentException.class)
+    public void testLoadPrivateKeyPemUnencryptedPKCS1() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1);
+        KeyUtil.loadPrivateKey(keyFile, null);
     }
 
     @Test
-    public void testLoadPriveKeyPemUnencryptedPKCS8() throws IOException, GeneralSecurityException {
-        File resourceToFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8);
-        SslContext.newServerContext(resourceToFile(SERVER_CRT), resourceToFile, null);
-        PrivateKey loadPrivateKey = KeyUtil.loadPrivateKey(resourceToFile, null);
-        assertNotNull(loadPrivateKey);
+    public void testLoadPrivateKeyPemUnencryptedPKCS8() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, null);
+
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, null);
+        assertNotNull(privateKey);
     }
 
     @Test
-    public void testLoadPriveKeyPemPKCSEncrypted() throws IOException, GeneralSecurityException {
-        File resourceToFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8);
-        SslContext.newServerContext(resourceToFile(SERVER_CRT), resourceToFile, "test");
-        PrivateKey loadPrivateKey = KeyUtil.loadPrivateKey(resourceToFile, "test");
-        assertNotNull(loadPrivateKey);
+    public void testLoadPrivateKeyPemPKCSEncrypted() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, "test");
+
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, "test");
+        assertNotNull(privateKey);
     }
 
     @Test
-    public void testLoadPriveKeyDerPKCS8Encrypted() throws IOException, GeneralSecurityException {
-        File resourceToFile = resourceToFile(SERVER_KEY_DER_E_PKCS8);
+    public void testLoadPrivateKeyDerPKCS8Encrypted() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8);
         try {
-            SslContext.newServerContext(resourceToFile(SERVER_CRT), resourceToFile, "test");
+            SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, "test");
             fail();
         } catch (Exception e) {
             // expected, not supported by netty
         }
-        PrivateKey loadPrivateKey = KeyUtil.loadPrivateKey(resourceToFile, "test");
-        assertNotNull(loadPrivateKey);
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, "test");
+        assertNotNull(privateKey);
     }
 
     @Test
-    public void testLoadPriveKeyDerPKCS8Unencrypted() throws IOException, GeneralSecurityException {
-        File resourceToFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8);
+    public void testLoadPrivateKeyDerPKCS8Unencrypted() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8);
         try {
-            SslContext.newServerContext(resourceToFile(SERVER_CRT), resourceToFile, null);
+            SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, null);
             fail();
         } catch (Exception e) {
             // expected, not supported by netty
         }
-        PrivateKey loadPrivateKey = KeyUtil.loadPrivateKey(resourceToFile, null);
-        assertNotNull(loadPrivateKey);
-    }
 
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, null);
+        assertNotNull(privateKey);
+    }
 }
