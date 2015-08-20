@@ -73,7 +73,7 @@ var UserList = React.createClass({
             userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
         }
 
-        var roleBadges = user.roles.map((role) => <span key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
+        var roleBadges = user.roles.map((role) => <span key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`} style={{marginRight: 5}}>{role}</span>);
 
         var actions = null;
         if (!user.read_only) {
