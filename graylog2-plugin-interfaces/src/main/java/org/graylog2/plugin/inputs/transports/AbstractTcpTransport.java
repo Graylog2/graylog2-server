@@ -179,7 +179,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 }
             }
 
-            private SSLEngine createSslEngine() throws FileNotFoundException, IOException, GeneralSecurityException {
+            private SSLEngine createSslEngine() throws IOException, GeneralSecurityException {
                 final SSLContext instance = SSLContext.getInstance("TLS");
                 TrustManager[] initTrustStore = new TrustManager[0];
 
