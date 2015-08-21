@@ -49,4 +49,6 @@ public interface RoleService {
     int delete(String roleName);
 
     String getAdminRoleObjectId();
+
+    String getReaderRoleObjectId();
 }

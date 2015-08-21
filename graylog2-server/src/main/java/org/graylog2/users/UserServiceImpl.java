@@ -30,7 +30,6 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
@@ -170,18 +169,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             ((UserImpl) user).setHashedPassword("User synced from LDAP.");
         }
 
-        // only touch the permissions if none existed for this account before
-        // i.e. only determine the new permissions for an account on initially importing it.
-        if (user.getPermissions() == null) {
-            if (ldapSettings.getDefaultGroup().equals("reader")) {
-                user.setPermissions(Lists.newArrayList(RestPermissions.readerPermissions(username)));
-            } else {
-                user.setPermissions(Lists.newArrayList("*"));
-            }
-        }
-
         // map ldap groups to user roles, if the mapping is present
-        final Set<String> translatedRoleIds = Sets.newHashSet();
+        final Set<String> translatedRoleIds = Sets.newHashSet(Sets.union(Sets.newHashSet(ldapSettings.getDefaultGroupId()),
+                                                                         ldapSettings.getAdditionalDefaultGroupIds()));
         if (!userEntry.getGroups().isEmpty()) {
             try {
                 final Map<String, Role> roleIdToRole = roleService.loadAllIdMap();

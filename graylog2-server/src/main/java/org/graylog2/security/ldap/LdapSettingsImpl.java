@@ -67,7 +67,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String DISPLAY_NAME_ATTRIBUTE = "username_attribute";
     public static final String USE_START_TLS = "use_start_tls";
     public static final String ACTIVE_DIRECTORY = "active_directory";
-    public static final String DEFAULT_GROUP = "reader";
+    public static final String DEFAULT_GROUP = "default_group";
     public static final String TRUST_ALL_CERTS = "trust_all_certificates";
     public static final String GROUP_MAPPING = "group_role_mapping";
     public static final String GROUP_SEARCH_BASE = "group_search_base";
@@ -238,13 +238,34 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
 
     @Override
     public String getDefaultGroup() {
+        final String defaultGroupId = getDefaultGroupId();
+        if (defaultGroupId.equals(roleService.getReaderRoleObjectId())) {
+            return "Reader";
+        }
+        try {
+            final Map<String, Role> idToRole = roleService.loadAllIdMap();
+            return idToRole.get(defaultGroupId).getName();
+        } catch (Exception e) {
+            LOG.error("Unable to load role mapping");
+            return "Reader";
+        }
+    }
+
+    @Override
+    public String getDefaultGroupId() {
         final Object o = fields.get(DEFAULT_GROUP);
-        return o != null ? o.toString() : "reader"; // reader is the safe default
+        return o == null ? roleService.getReaderRoleObjectId() : (String) o;
     }
 
     @Override
     public void setDefaultGroup(String defaultGroup) {
-        fields.put(DEFAULT_GROUP, defaultGroup);
+        String groupId = roleService.getReaderRoleObjectId();
+        try {
+            groupId = roleService.load(defaultGroup).getId();
+        } catch (NotFoundException e) {
+            LOG.error("Unable to load role mapping");
+        }
+        fields.put(DEFAULT_GROUP, groupId);
     }
 
     @Override
@@ -332,9 +353,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
 
     @Override
     public Set<String> getAdditionalDefaultGroups() {
-        @SuppressWarnings("unchecked")
-        final List<String> additionalGroups = (List<String>) fields.get(ADDITIONAL_DEFAULT_GROUPS);
-
+        final Set<String> additionalGroups = getAdditionalDefaultGroupIds();
         try {
             final Map<String, Role> idToRole = roleService.loadAllIdMap();
             return Sets.newHashSet(Collections2.transform(additionalGroups, Roles.roleIdToNameFunction(idToRole)));
@@ -342,6 +361,13 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             LOG.error("Unable to load role mapping");
             return Collections.emptySet();
         }
+    }
+
+    @Override
+    public Set<String> getAdditionalDefaultGroupIds() {
+        @SuppressWarnings("unchecked")
+        final List<String> additionalGroups = (List<String>) fields.get(ADDITIONAL_DEFAULT_GROUPS);
+        return additionalGroups == null ? Collections.<String>emptySet() : Sets.newHashSet(additionalGroups);
     }
 
     @Override
