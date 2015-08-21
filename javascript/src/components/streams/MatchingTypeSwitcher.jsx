@@ -1,29 +1,25 @@
 import React from 'react';
 import { PropTypes, Component } from 'react';
-import { Input, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Input } from 'react-bootstrap';
 import StreamsStore from '../../stores/streams/StreamsStore';
+
+import UserNotification from '../../util/UserNotification';
 
 class MatchingTypeSwitcher extends Component {
   static propTypes = {
     stream: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
+
   render() {
     return (
       <div className="streamrule-connector-type-form">
-        <OverlayTrigger
-          placement="top"
-          ref="savedTooltip"
-          trigger="manual"
-          defaultOverlayShown={false}
-          overlay={<Tooltip>Saved!</Tooltip>}>
-          <div>
-            <Input type="radio" label="A message must mactch all of the following rules"
-                   checked={this.props.stream.matching_type === 'AND'} onChange={this.handleTypeChangeToAnd.bind(this)}/>
-            <Input type="radio" label="A message must match at least one of the following rules"
-                   checked={this.props.stream.matching_type === 'OR'} onChange={this.handleTypeChangeToOr.bind(this)}/>
-          </div>
-        </OverlayTrigger>
+        <div>
+          <Input type="radio" label="A message must match all of the following rules"
+                 checked={this.props.stream.matching_type === 'AND'} onChange={this.handleTypeChangeToAnd.bind(this)}/>
+          <Input type="radio" label="A message must match at least one of the following rules"
+                 checked={this.props.stream.matching_type === 'OR'} onChange={this.handleTypeChangeToOr.bind(this)}/>
+        </div>
       </div>
     );
   }
@@ -37,11 +33,13 @@ class MatchingTypeSwitcher extends Component {
   }
 
   handleTypeChange(newValue) {
-    StreamsStore.update(this.props.stream.id, { 'matching_type': newValue }, () => {
-      this.props.onChange();
-      this.refs.savedTooltip.show();
-      window.setTimeout(() => this.refs.savedTooltip.hide(), 1000);
-    });
+    if (window.confirm('You are about to change how rules are applied to this stream, do you want to continue?')) {
+      StreamsStore.update(this.props.stream.id, {'matching_type': newValue}, () => {
+        this.props.onChange();
+        UserNotification.success(`Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
+          'Success');
+      });
+    }
   }
 }
 
