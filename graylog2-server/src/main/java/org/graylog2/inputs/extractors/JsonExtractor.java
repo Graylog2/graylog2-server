@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
-import org.drools.core.beliefsystem.defeasible.Join;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,25 +78,35 @@ public class JsonExtractor extends Extractor {
 
     @Override
     protected Result[] run(String value) {
+        final Map<String, Object> extractedJson = extractJson(value);
+        final List<Result> results = new ArrayList<>(extractedJson.size());
+        for (Map.Entry<String, Object> entry : extractedJson.entrySet()) {
+            results.add(new Result(entry.getValue(), entry.getKey(), -1, -1));
+        }
+
+        return results.toArray(new Result[results.size()]);
+    }
+
+    public Map<String, Object> extractJson(String value) {
         if (isNullOrEmpty(value)) {
-            return new Result[0];
+            return Collections.emptyMap();
         }
 
         final Map<String, Object> json;
         try {
             json = mapper.readValue(value, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
-            return new Result[0];
+            return Collections.emptyMap();
         }
 
-        final List<Result> results = new ArrayList<>();
+        final Map<String, Object> results = new HashMap<>(json.size());
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for(Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue())) {
-            results.add(new Result(entry.value(), entry.key(), -1, -1));
+                results.put(entry.key(), entry.value());
             }
         }
 
-        return results.toArray(new Result[results.size()]);
+        return results;
     }
 
     private Collection<Entry> parseValue(String key, Object value) {
