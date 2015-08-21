@@ -37,7 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.mvc.BodyParser;
 import play.mvc.Result;
+import views.html.system.ldap.groups;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -98,6 +100,9 @@ public class LdapController extends AuthenticatedController {
         final Set<String> selectedAdditionalGroups = ldapSettings != null && ldapSettings.getAdditionalDefaultGroups() != null ? ldapSettings.getAdditionalDefaultGroups() : Collections.<String>emptySet();
         return ok(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), ldapSettingsForm, roles,
                                                       selectedAdditionalGroups));
+    }
+    public Result groups() {
+        return ok(groups.render(currentUser()));
     }
 
     public Result apiTestLdapConnection() {
@@ -266,6 +271,26 @@ public class LdapController extends AuthenticatedController {
             }
         }
         return redirect(routes.UsersController.index());
+    }
+
+    public Result apiGroups() {
+        Set<String> ldapGroups = ldapSettingsService.loadGroups();
+        return ok(Json.toJsonString(ldapGroups));
+    }
+
+    public Result apiLoadGroupMapping() {
+        final Map<String, String> groupMapping = ldapSettingsService.getGroupMapping();
+        return ok(Json.toJsonString(groupMapping));
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result apiSaveGroupMapping() {
+        //noinspection unchecked
+        Map<String, String> mapping = (Map<String, String>)Json.fromJson(request().body().asJson(), Map.class);
+
+        ldapSettingsService.updateGroupMapping(mapping);
+
+        return ok();
     }
 
     private BreadcrumbList breadcrumbs() {

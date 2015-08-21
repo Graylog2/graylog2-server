@@ -5,6 +5,7 @@ var UserPreferencesButton = require('./UserPreferencesButton');
 var UserPreferencesModal = require('./UserPreferencesModal');
 var UserList = require('./UserList');
 var RolesComponent = require('./RolesComponent');
+var LdapGroupsComponent = require('./LdapGroupsComponent');
 
 var editUserPreferencesButton = document.getElementById('react-user-preferences-button');
 var editUserPreferences = document.getElementById('react-user-preferences-modal');
@@ -26,3 +27,10 @@ var roleList = document.getElementById('react-roles-component');
 if (roleList) {
     React.render(<RolesComponent />, roleList);
 }
+
+var ldapgroups = document.getElementById('react-ldapgroups-component');
+
+if (ldapgroups) {
+    React.render(<LdapGroupsComponent />, ldapgroups);
+}
+

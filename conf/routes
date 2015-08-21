@@ -134,9 +134,13 @@ GET           /startpage/set                                                    
 
 # LDAP configuration
 GET           /system/ldap                                                                       @controllers.LdapController.index()
+GET           /system/ldap/groups                                                                @controllers.LdapController.groups()
 POST          /system/ldap                                                                       @controllers.LdapController.saveLdapSettings()
+GET           /a/system/ldap/groups                                                              @controllers.LdapController.apiGroups()
 POST          /a/system/ldap/testconnect                                                         @controllers.LdapController.apiTestLdapConnection()
 POST          /a/system/ldap/testlogin                                                           @controllers.LdapController.apiTestLdapLogin()
+GET           /a/system/ldap/groupmapping                                                        @controllers.LdapController.apiLoadGroupMapping()
+POST          /a/system/ldap/groupmapping                                                        @controllers.LdapController.apiSaveGroupMapping()
 
 # Systemjobs
 POST          /systemjobs/trigger                                                                @controllers.SystemJobsController.trigger()

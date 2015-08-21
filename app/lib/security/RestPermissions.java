@@ -72,6 +72,7 @@ public enum RestPermissions {
     SYSTEMJOBS_READ("systemjobs:read"),
     SYSTEMJOBS_CREATE("systemjobs:create"),
     LDAP_EDIT("ldap:edit"),
+    LDAPGROUPS_EDIT("ldapgroups:edit"),
     LOGGERS_READ("loggers:read"),
     LOGGERS_EDIT("loggers:edit"),
     LOGGERS_READSUBSYSTEM("loggers:readsubsystem"),
