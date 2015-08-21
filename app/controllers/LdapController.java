@@ -18,12 +18,18 @@
  */
 package controllers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import lib.BreadcrumbList;
 import lib.json.Json;
+import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.RolesService;
 import org.graylog2.restclient.models.accounts.LdapSettings;
 import org.graylog2.restclient.models.accounts.LdapSettingsService;
+import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest;
 import org.graylog2.restclient.models.api.requests.accounts.LdapTestConnectionRequest;
 import org.graylog2.restclient.models.api.responses.accounts.LdapConnectionTestResponse;
@@ -33,38 +39,65 @@ import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Result;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static play.data.Form.form;
 
 public class LdapController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(LdapController.class);
-    private final Form<LdapSettingsRequest> settingsForm = form(LdapSettingsRequest.class);
+    private final Form<LdapSettingsRequest2> settingsForm = form(LdapSettingsRequest2.class);
 
     private final LdapSettingsService ldapSettingsService;
+    private final RolesService rolesService;
 
     @Inject
-    public LdapController(final LdapSettingsService ldapSettingsService) {
+    public LdapController(final LdapSettingsService ldapSettingsService, RolesService rolesService) {
         this.ldapSettingsService = ldapSettingsService;
+        this.rolesService = rolesService;
     }
 
     public Result index() {
         final LdapSettings ldapSettings = ldapSettingsService.load();
-        final Form<LdapSettingsRequest> ldapSettingsForm;
+        final Form<LdapSettingsRequest2> ldapSettingsForm;
         if (ldapSettings == null) {
-            final LdapSettingsRequest newRequest = new LdapSettingsRequest();
+            final LdapSettingsRequest2 newRequest = new LdapSettingsRequest2();
             newRequest.ldapUri = "ldap:///";
             newRequest.enabled = true;
             newRequest.defaultGroup = "";
             ldapSettingsForm = settingsForm.fill(newRequest);
         } else {
-            ldapSettingsForm = settingsForm.fill(ldapSettings.toRequest());
+            final LdapSettingsRequest settingsRequest = ldapSettings.toRequest();
+            final LdapSettingsRequest2 request = new LdapSettingsRequest2();
+            request.enabled = settingsRequest.enabled;
+            request.activeDirectory = settingsRequest.activeDirectory;
+            request.ldapUri= settingsRequest.ldapUri;
+            request.systemUsername = settingsRequest.systemUsername;
+            request.systemPassword = settingsRequest.systemPassword;
+            request.useStartTls = settingsRequest.useStartTls;
+            request.trustAllCertificates = settingsRequest.trustAllCertificates;
+            request.searchBase= settingsRequest.searchBase;
+            request.searchPattern= settingsRequest.searchPattern;
+            request.displayNameAttribute = settingsRequest.displayNameAttribute;
+            request.defaultGroup = settingsRequest.defaultGroup;
+            request.groupMapping = settingsRequest.groupMapping;
+            request.groupSearchBase= settingsRequest.groupSearchBase;
+            request.groupIdAttribute= settingsRequest.groupIdAttribute;
+            request.additionalDefaultGroups = Lists.newArrayList(settingsRequest.additionalDefaultGroups == null ? Collections.<String>emptyList() : settingsRequest.additionalDefaultGroups);
+
+            ldapSettingsForm = settingsForm.fill(request);
         }
 
-        return ok(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), ldapSettingsForm));
+        final List<RoleResponse> roles = Lists.newArrayList(rolesService.loadAll());
+        final Set<String> selectedAdditionalGroups = ldapSettings != null && ldapSettings.getAdditionalDefaultGroups() != null ? ldapSettings.getAdditionalDefaultGroups() : Collections.<String>emptySet();
+        return ok(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), ldapSettingsForm, roles,
+                                                      selectedAdditionalGroups));
     }
 
     public Result apiTestLdapConnection() {
@@ -125,14 +158,34 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result saveLdapSettings() {
-        final Form<LdapSettingsRequest> form = settingsForm.bindFromRequest();
+        final Form<LdapSettingsRequest2> form = settingsForm.bindFromRequest();
         if (form.hasErrors()) {
             flash("error", "Please correct these errors: " + form.errors());
-            return badRequest(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), form));
+            final List<RoleResponse> roles = Lists.newArrayList(rolesService.loadAll());
+            final Set<String> additionalGroupsAsSet = safeAdditionalGroupsAsSet(form.get().additionalDefaultGroups);
+            return badRequest(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), form, roles,
+                                                                  additionalGroupsAsSet));
         }
-        final LdapSettingsRequest formValue = form.get();
+        final LdapSettingsRequest2 formValue = form.get();
+        final LdapSettingsRequest request = new LdapSettingsRequest();
+        request.enabled = formValue.enabled;
+        request.activeDirectory = formValue.activeDirectory;
+        request.ldapUri= formValue.ldapUri;
+        request.systemUsername = formValue.systemUsername;
+        request.systemPassword = formValue.systemPassword;
+        request.useStartTls = formValue.useStartTls;
+        request.trustAllCertificates = formValue.trustAllCertificates;
+        request.searchBase= formValue.searchBase;
+        request.searchPattern= formValue.searchPattern;
+        request.displayNameAttribute = formValue.displayNameAttribute;
+        request.defaultGroup = formValue.defaultGroup;
+        request.groupMapping = formValue.groupMapping;
+        request.groupSearchBase= formValue.groupSearchBase;
+        request.groupIdAttribute= formValue.groupIdAttribute;
+        request.additionalDefaultGroups = safeAdditionalGroupsAsSet(formValue.additionalDefaultGroups);
+
         try {
-            final LdapSettings settings = ldapSettingsService.create(formValue);
+            final LdapSettings settings = ldapSettingsService.create(request);
             if (settings.save()) {
                 flash("success", "LDAP settings updated");
             } else {
@@ -142,6 +195,65 @@ public class LdapController extends AuthenticatedController {
             flash("error", "Unable to update LDAP settings!");
         }
         return redirect(routes.UsersController.index());
+    }
+
+    private Set<String> safeAdditionalGroupsAsSet(List<String> additionalDefaultGroups) {
+        return Sets.newHashSet(additionalDefaultGroups == null ? Collections.<String>emptySet() : additionalDefaultGroups);
+    }
+
+    // TODO this is duplicated, because Set<String> additionalDefaultGroups cannot be a Set for form binding, it has to be a List
+    // to avoid refactoring the entire hierarchy and all dependencies we duplicate it and then adapt the one attribute.
+    public static class LdapSettingsRequest2 extends ApiRequest {
+
+        @JsonProperty("enabled")
+        public boolean enabled;
+
+        @JsonProperty("active_directory")
+        public boolean activeDirectory;
+
+        @JsonProperty("ldap_uri")
+        public String ldapUri;
+
+        @JsonProperty("system_username")
+        public String systemUsername;
+
+        @JsonProperty("system_password")
+        public String systemPassword;
+
+        @JsonProperty("use_start_tls")
+        public boolean useStartTls;
+
+        @JsonProperty("trust_all_certificates")
+        public boolean trustAllCertificates;
+
+        @JsonProperty("search_base")
+        public String searchBase;
+
+        @JsonProperty("search_pattern")
+        public String searchPattern;
+
+        @JsonProperty("display_name_attribute")
+        public String displayNameAttribute;
+
+        @JsonProperty("default_group")
+        public String defaultGroup;
+
+        @JsonProperty("group_mapping")
+        @Nullable
+        public Map<String, String> groupMapping;
+
+        @JsonProperty("group_search_base")
+        @Nullable
+        public String groupSearchBase;
+
+        @JsonProperty("group_id_attribute")
+        @Nullable
+        public String groupIdAttribute;
+
+        @JsonProperty("additional_default_groups")
+        @Nullable
+        public List<String> additionalDefaultGroups;
+
     }
 
     public Result removeLdapSettings() {
