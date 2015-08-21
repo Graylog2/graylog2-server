@@ -9,10 +9,6 @@ class MatchingTypeSwitcher extends Component {
     onChange: PropTypes.func.isRequired,
   };
   render() {
-    const valueLink = {
-      value: this.props.stream.matching_type,
-      requestChange: this.handleTypeChange.bind(this),
-    };
     return (
       <div className="streamrule-connector-type-form">
         <OverlayTrigger
