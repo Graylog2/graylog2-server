@@ -115,7 +115,11 @@ public class KeyUtil {
         final char[] password = Strings.nullToEmpty(tlsKeyPassword).toCharArray();
         ks.setKeyEntry("key", privateKey, password, certChain.toArray(new Certificate[certChain.size()]));
 
-        LOG.info("KeyStore: {}, aliases: {}", ks, join(ks.aliases()));
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Private key file: {}", tlsKeyFile);
+            LOG.debug("Certificate file: {}", tlsCertFile);
+            LOG.debug("Aliases: {}", join(ks.aliases()));
+        }
 
         final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, password);
