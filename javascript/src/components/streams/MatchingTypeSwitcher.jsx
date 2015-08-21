@@ -29,11 +29,11 @@ class MatchingTypeSwitcher extends Component {
   }
 
   handleTypeChangeToAnd() {
-    this.handleTypeChange("AND");
+    this.handleTypeChange('AND');
   }
 
   handleTypeChangeToOr() {
-    this.handleTypeChange("OR");
+    this.handleTypeChange('OR');
   }
 
   handleTypeChange(newValue) {
