@@ -183,8 +183,8 @@
                         <div class="row">
                             <div class="col-sm-4">
                                 <select id="defaultGroup" name="defaultGroup" class="form-control" placeholder="" required>
-                                    <option value="Reader" @if("reader".equals(ldapForm("defaultGroup").value())) {selected}>Reader - basic access</option>
-                                    <option value="Admin" @if("admin".equals(ldapForm("defaultGroup").value())) {selected}>Administrator - complete access</option>
+                                    <option value="Reader" @if("reader".equalsIgnoreCase(ldapForm("defaultGroup").value())) {selected}>Reader - basic access</option>
+                                    <option value="Admin" @if("admin".equalsIgnoreCase(ldapForm("defaultGroup").value())) {selected}>Administrator - complete access</option>
                                 </select>
                             </div>
                         </div>
