@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class LdapSettingsRequest extends ApiRequest {
 
@@ -72,7 +72,7 @@ public class LdapSettingsRequest extends ApiRequest {
 
     @JsonProperty("additional_default_groups")
     @Nullable
-    public List<String> additionalDefaultGroups;
+    public Set<String> additionalDefaultGroups;
 
     public boolean isEnabled() {
         return enabled;
@@ -190,11 +190,11 @@ public class LdapSettingsRequest extends ApiRequest {
     }
 
     @Nullable
-    public List<String> getAdditionalDefaultGroups() {
+    public Set<String> getAdditionalDefaultGroups() {
         return additionalDefaultGroups;
     }
 
-    public void setAdditionalDefaultGroups(@Nullable List<String> additionalDefaultGroups) {
+    public void setAdditionalDefaultGroups(@Nullable Set<String> additionalDefaultGroups) {
         this.additionalDefaultGroups = additionalDefaultGroups;
     }
 }

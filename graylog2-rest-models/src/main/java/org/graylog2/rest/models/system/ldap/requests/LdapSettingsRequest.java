@@ -24,8 +24,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -77,7 +77,7 @@ public abstract class LdapSettingsRequest {
 
     @JsonProperty
     @Nullable
-    public abstract List<String> additionalDefaultGroups();
+    public abstract Set<String> additionalDefaultGroups();
 
     @JsonCreator
     public static LdapSettingsRequest create(@JsonProperty("enabled") boolean enabled,
@@ -94,7 +94,7 @@ public abstract class LdapSettingsRequest {
                                              @JsonProperty("group_mapping") @Nullable Map<String, String> groupMapping,
                                              @JsonProperty("group_search_base") @Nullable String groupSearchBase,
                                              @JsonProperty("group_id_attribute") @Nullable String groupIdAttribute,
-                                             @JsonProperty("group_id_attribute") @Nullable List<String> additionalDefaultGroups) {
+                                             @JsonProperty("additional_default_groups") @Nullable Set<String> additionalDefaultGroups) {
         return new AutoValue_LdapSettingsRequest(enabled,
                                                  systemUsername,
                                                  systemPassword,

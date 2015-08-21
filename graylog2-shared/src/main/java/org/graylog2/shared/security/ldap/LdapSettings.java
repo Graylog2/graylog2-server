@@ -21,6 +21,7 @@ import org.graylog2.plugin.database.Persisted;
 import javax.annotation.Nonnull;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -86,4 +87,9 @@ public interface LdapSettings extends Persisted {
     String getGroupIdAttribute();
 
     void setGroupIdAttribute(String groupIdAttribute);
+
+    void setAdditionalDefaultGroups(Set<String> strings);
+
+    Set<String> getAdditionalDefaultGroups();
+
 }

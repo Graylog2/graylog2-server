@@ -17,7 +17,10 @@
 package org.graylog2.security.ldap;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.shiro.codec.Hex;
@@ -40,7 +43,9 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @CollectionName("ldap_settings")
 public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
@@ -67,6 +72,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String GROUP_MAPPING = "group_role_mapping";
     public static final String GROUP_SEARCH_BASE = "group_search_base";
     public static final String GROUP_ID_ATTRIBUTE = "group_id_attribute";
+    public static final String ADDITIONAL_DEFAULT_GROUPS = "additional_default_groups";
 
     protected Configuration configuration;
     private final RoleService roleService;
@@ -324,4 +330,40 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
         fields.put(GROUP_ID_ATTRIBUTE, groupIdAttribute);
     }
 
+    @Override
+    public Set<String> getAdditionalDefaultGroups() {
+        @SuppressWarnings("unchecked")
+        final List<String> additionalGroups = (List<String>) fields.get(ADDITIONAL_DEFAULT_GROUPS);
+
+        try {
+            final Map<String, Role> idToRole = roleService.loadAllIdMap();
+            return Sets.newHashSet(Collections2.transform(additionalGroups, Roles.roleIdToNameFunction(idToRole)));
+        } catch (NotFoundException e) {
+            LOG.error("Unable to load role mapping");
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public void setAdditionalDefaultGroups(Set<String> groupNames) {
+        LOG.warn("Storing default group ids: {}", groupNames);
+        try {
+            final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
+            final List<String> groupIds = Lists.newArrayList(Collections2.transform(groupNames, new Function<String, String>() {
+                @Nullable
+                @Override
+                public String apply(@Nullable String groupName) {
+                    if (groupName == null || !nameToRole.containsKey(groupName)) {
+                        return null;
+                    }
+                    return nameToRole.get(groupName).getId();
+                }
+            }));
+            fields.put(ADDITIONAL_DEFAULT_GROUPS, groupIds);
+        } catch (NotFoundException e) {
+            LOG.error("Unable to convert group names to ids", e);
+            throw new IllegalStateException("Unable to convert group names to ids", e);
+        }
+
+    }
 }
