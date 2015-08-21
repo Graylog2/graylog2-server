@@ -46,6 +46,8 @@ public class NotificationTypeFactory {
                 return new EsClusterStatusRedNotification(notification);
             case ES_UNAVAILABLE:
                 return new EsClusterUnavailableNotification(notification);
+            case INDEX_RANGES_RECALCULATION:
+                return new IndexRangesRecalculationNotification(notification);
             case NO_INPUT_RUNNING:
                 return new NoInputRunningNotification(notification);
             case INPUT_FAILED_TO_START:
