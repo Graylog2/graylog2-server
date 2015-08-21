@@ -204,6 +204,37 @@ public class LdapConnector {
         return groups;
     }
 
+    public Set<String> listGroups(LdapNetworkConnection connection,
+                                  String groupSearchBase,
+                                  String groupObjectClass,
+                                  String groupIdAttribute) throws LdapException {
+        final Set<String> groups = Sets.newHashSet();
+
+        EntryCursor groupSearch = null;
+        try {
+            groupSearch = connection.search(
+                    groupSearchBase,
+                    "(objectClass=" + groupObjectClass + ")",
+                    SearchScope.SUBTREE,
+                    "*");
+            for (Entry e : groupSearch) {
+                if (! e.containsAttribute(groupIdAttribute)) {
+                    LOG.trace("Unknown group id attribute {}, skipping group entry {}", groupIdAttribute, e);
+                    continue;
+                }
+                final String groupId = e.get(groupIdAttribute).getString();
+                groups.add(groupId);
+            }
+        } finally {
+            if (groupSearch != null) {
+                groupSearch.close();
+            }
+        }
+
+        return groups;
+
+    }
+
     /**
      * Escapes any special chars (RFC 4515) from a string representing a
      * a search filter assertion value.

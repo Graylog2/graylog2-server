@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.ldap;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -45,9 +46,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -58,6 +61,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -257,5 +261,47 @@ public class LdapResource extends RestResource {
         return Response.noContent().build();
     }
 
+    @GET
+    @ApiOperation(value = "Get the available LDAP groups", notes = "")
+    @RequiresPermissions(RestPermissions.LDAPGROUPS_READ)
+    @Path("/groups")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Set<String> readGroups(){
+        final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());
 
+        if (!ldapSettings.isEnabled()) {
+            throw new BadRequestException("LDAP is disabled.");
+        }
+        if (Strings.isNullOrEmpty(ldapSettings.getGroupSearchBase()) || Strings.isNullOrEmpty(ldapSettings.getGroupIdAttribute())) {
+            throw new BadRequestException("LDAP group configuration settings are not set.");
+        }
+
+        final LdapConnectionConfig config = new LdapConnectionConfig();
+        final URI ldapUri = ldapSettings.getUri();
+        config.setLdapHost(ldapUri.getHost());
+        config.setLdapPort(ldapUri.getPort());
+        config.setUseSsl(ldapUri.getScheme().startsWith("ldaps"));
+        config.setUseTls(ldapSettings.isUseStartTls());
+
+        if (ldapSettings.isTrustAllCertificates()) {
+            config.setTrustManagers(new TrustAllX509TrustManager());
+        }
+
+        if (!isNullOrEmpty(ldapSettings.getSystemUserName()) && !isNullOrEmpty(ldapSettings.getSystemPassword())) {
+            config.setName(ldapSettings.getSystemUserName());
+            config.setCredentials(ldapSettings.getSystemPassword());
+        }
+
+        try {
+            LdapNetworkConnection connection = ldapConnector.connect(config);
+            final Set<String> groups = ldapConnector.listGroups(connection,
+                                                               ldapSettings.getGroupSearchBase(),
+                                                               "group",
+                                                               ldapSettings.getGroupIdAttribute());
+            return groups;
+        } catch (LdapException e) {
+            LOG.error("Unable to retrieve available LDAP groups", e);
+            throw new InternalServerErrorException(e);
+        }
+    }
 }
