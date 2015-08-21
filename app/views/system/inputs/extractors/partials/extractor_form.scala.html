@@ -73,6 +73,10 @@
                     @if(extractorType.equals(Extractor.Type.GROK)) {
                         @views.html.system.inputs.extractors.configurations.grok(extractor)
                     }
+
+                    @if(extractorType.equals(Extractor.Type.JSON)) {
+                        @views.html.system.inputs.extractors.configurations.json(extractor)
+                    }
                 </div>
             </div>
 
@@ -126,7 +130,7 @@
                 </div>
             </div>
 
-            @if(!extractorType.equals(Extractor.Type.GROK)) {
+            @if(!extractorType.equals(Extractor.Type.GROK) && !extractorType.equals(Extractor.Type.JSON)) {
                 <div class="row row-sm">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -178,7 +182,7 @@
                 </div>
             </div>
 
-            @if(!extractorType.equals(Extractor.Type.GROK)) {
+            @if(!extractorType.equals(Extractor.Type.GROK) && !extractorType.equals(Extractor.Type.JSON)) {
                 <div class="row row-sm">
                     <div class="col-md-12">
                         <div class="form-group">

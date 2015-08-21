@@ -67,6 +67,16 @@ $(document).ready(function () {
         });
     };
 
+    var testJson = function (flatten, list_separator, key_separator, kv_separator) {
+        return testExtractor('/a/tools/json_test', {
+            string: $("#xtrc-example").text(),
+            flatten: flatten,
+            list_separator: list_separator,
+            key_separator: key_separator,
+            kv_separator: kv_separator
+        });
+    };
+
     // Try regular expression against example.
     $(".xtrc-try-regex").on("click", function () {
         var button = $(this);
@@ -197,6 +207,48 @@ $(document).ready(function () {
         highlightedElement.html(highlightedText);
         example.append(highlightedElement);
         example.append(textAfterHighlight);
+    }
+
+    // Try JSON against example.
+    $(".xtrc-try-json").on("click", function () {
+        var button = $(this);
+
+        var warningText = "We were not able to run the JSON extraction. Please check your parameters.";
+
+        button.html("<i class='fa fa-spinner fa-spin'></i> Trying...");
+
+        var promise = testJson(
+            $("#flatten").is(":checked"),
+            $("#list_separator").val(),
+            $("#key_separator").val(),
+            $("#kv_separator").val()
+        );
+
+        promise.done(function (result) {
+            console.info(result);
+            showJsonMatches(result);
+        });
+
+        promise.fail(function () {
+            showError(warningText);
+        });
+
+        promise.always(function () {
+            button.html("Try!");
+        });
+    });
+
+    function showJsonMatches(result) {
+        var fields = $("#json-matches");
+
+        var matchesHtml = "<dl>";
+        for (var match in result.matches) {
+            matchesHtml += "<dt>" + htmlEscape(match) + "</dt>";
+            matchesHtml += "<dd>" + htmlEscape(result.matches[match]) + "</dd>";
+        }
+        matchesHtml += "</dl>";
+
+        fields.html(matchesHtml);
     }
 
     // Try grok against example.
