@@ -28,7 +28,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class TokenizerConverter extends Converter {
     // ┻━┻ ︵ ¯\(ツ)/¯ ︵ ┻━┻
-    private static final Pattern PATTERN = Pattern.compile("(?:^|\\s)(?:([\\w-]+)\\s?=\\s?((?:\"[^\"]+\")|(?:[\\S]+)))");
+    private static final Pattern PATTERN = Pattern.compile("(?:^|\\s)(?:([\\w-]+)\\s?=\\s?((?:\"[^\"]+\")|(?:'[^']+')|(?:[\\S]+)))");
 
     public TokenizerConverter(Map<String, Object> config) {
         super(Type.TOKENIZER, config);
@@ -59,7 +59,8 @@ public class TokenizerConverter extends Converter {
     }
 
     private String removeQuotes(String s) {
-        if (s.startsWith("\"")  && s.endsWith("\"")) {
+        if ((s.startsWith("\"") && s.endsWith("\"")) ||
+                (s.startsWith("'") && s.endsWith("'")) ) {
             return s.substring(1, s.length() - 1);
         } else {
             return s;

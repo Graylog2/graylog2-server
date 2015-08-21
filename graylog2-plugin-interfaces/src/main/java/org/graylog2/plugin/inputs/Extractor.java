@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -249,21 +250,20 @@ public abstract class Extractor implements EmbeddedPersistable {
                     msg.addField(targetField, converted);
                 } else {
                     @SuppressWarnings("unchecked")
-                    final Map<String, Object> convert =
-                            (Map<String, Object>) converter.convert((String) msg.getField(targetField));
+                    final Map<String, Object> additionalFields = new HashMap<>((Map<String, Object>) converter.convert((String) msg.getField(targetField)));
                     for (final String reservedField : Message.RESERVED_FIELDS) {
-                        if (convert.containsKey(reservedField)) {
+                        if (additionalFields.containsKey(reservedField)) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug(
                                         "Not setting reserved field {} from converter {} on message {}, rest of the message is being processed",
                                         reservedField, converter.getType(), msg.getId());
                             }
                             converterExceptions.incrementAndGet();
-                            convert.remove(reservedField);
+                            additionalFields.remove(reservedField);
                         }
                     }
 
-                    msg.addFields(convert);
+                    msg.addFields(additionalFields);
                 }
             } catch (Exception e) {
                 this.converterExceptions.incrementAndGet();
