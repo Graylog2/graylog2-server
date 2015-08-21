@@ -35,8 +35,6 @@ import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
-import org.graylog2.bindings.providers.LdapConnectorProvider;
-import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.RotationStrategyProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
@@ -88,6 +86,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.users.RoleService;
+import org.graylog2.users.RoleServiceImpl;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -148,8 +148,8 @@ public class ServerBindings extends Graylog2Module {
         bind(Client.class).toProvider(EsClientProvider.class).asEagerSingleton();
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
-        bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
-        bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
+        bind(LdapConnector.class).in(Scopes.SINGLETON);
+        bind(LdapUserAuthenticator.class).in(Scopes.SINGLETON);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
@@ -169,12 +169,14 @@ public class ServerBindings extends Graylog2Module {
         bind(SecurityContextFactory.class).to(ShiroSecurityContextFactory.class);
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
-        install(new FactoryModuleBuilder().implement(StreamRouterEngine.class, StreamRouterEngine.class).build(StreamRouterEngine.Factory.class));
+        install(new FactoryModuleBuilder().implement(StreamRouterEngine.class, StreamRouterEngine.class).build(
+                StreamRouterEngine.Factory.class));
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
         bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 
         bind(ProcessBufferProcessor.class).to(ServerProcessBufferProcessor.class);
+        bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
     }
 
     private void bindDynamicFeatures() {

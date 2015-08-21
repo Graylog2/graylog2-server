@@ -14,30 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bindings.providers;
+package org.graylog2.database;
 
-import javax.inject.Inject;
-import org.graylog2.Configuration;
-import org.graylog2.security.ldap.LdapConnector;
+import com.google.common.base.Function;
+import org.bson.types.ObjectId;
 
-import javax.inject.Provider;
+import javax.annotation.Nullable;
 
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class LdapConnectorProvider implements Provider<LdapConnector> {
-    private static LdapConnector ldapConnector = null;
-
-    @Inject
-    public LdapConnectorProvider(final Configuration configuration) {
-        if (ldapConnector == null) {
-            ldapConnector = new LdapConnector(configuration.getLdapConnectionTimeout());
-        }
-    }
-
+public class ObjectIdStringFunction implements Function<ObjectId, String> {
+    @Nullable
     @Override
-    public LdapConnector get() {
-        return ldapConnector;
+    public String apply(ObjectId input) {
+        return input.toHexString();
     }
 }

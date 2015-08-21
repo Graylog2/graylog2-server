@@ -18,12 +18,14 @@ package org.graylog2.users;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
@@ -31,12 +33,17 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -45,11 +52,17 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final Configuration configuration;
+    private final RoleService roleService;
 
     @Inject
-    public UserServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
+    public UserServiceImpl(final MongoConnection mongoConnection,
+                           final Configuration configuration,
+                           final RoleService roleService) {
         super(mongoConnection);
         this.configuration = configuration;
+        this.roleService = roleService;
+        // ensure that the users' roles array is indexed
+        collection(UserImpl.class).createIndex(UserImpl.ROLES);
     }
 
     @Override
@@ -59,7 +72,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         // special case for the locally defined user, we don't store that in MongoDB.
         if (configuration.getRootUsername().equals(username)) {
             LOG.debug("User {} is the built-in admin user", username);
-            return new UserImpl.LocalAdminUser(configuration);
+            return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
         }
 
         final DBObject query = new BasicDBObject();
@@ -157,15 +170,40 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             ((UserImpl) user).setHashedPassword("User synced from LDAP.");
         }
 
-        // only touch the permissions if none existed for this account before
-        // i.e. only determine the new permissions for an account on initially importing it.
         if (user.getPermissions() == null) {
-            if (ldapSettings.getDefaultGroup().equals("reader")) {
-                user.setPermissions(Lists.newArrayList(RestPermissions.readerPermissions(username)));
-            } else {
-                user.setPermissions(Lists.<String>newArrayList("*"));
+            user.setPermissions(Lists.newArrayList(RestPermissions.userSelfEditPermissions(username)));
+        } else {
+            user.setPermissions(Lists.newArrayList(Sets.union(RestPermissions.userSelfEditPermissions(username),
+                                                              Sets.newHashSet(user.getPermissions()))));
+        }
+
+        // map ldap groups to user roles, if the mapping is present
+        final Set<String> translatedRoleIds = Sets.newHashSet(Sets.union(Sets.newHashSet(ldapSettings.getDefaultGroupId()),
+                                                                         ldapSettings.getAdditionalDefaultGroupIds()));
+        if (!userEntry.getGroups().isEmpty()) {
+            try {
+                final Map<String, Role> roleNameToRole = roleService.loadAllLowercaseNameMap();
+                for (String ldapGroupName : userEntry.getGroups()) {
+                    final String roleName = ldapSettings.getGroupMapping().get(ldapGroupName);
+                    if (roleName == null) {
+                        LOG.warn("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
+                        continue;
+                    }
+                    final Role role = roleNameToRole.get(roleName.toLowerCase());
+                    if (role != null) {
+                        LOG.warn("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
+                        translatedRoleIds.add(role.getId());
+                    } else {
+                        LOG.warn("User {}: No role found for ldap group <{}>", username, ldapGroupName);
+                    }
+                }
+
+            } catch (NotFoundException e) {
+                LOG.error("Unable to load user roles", e);
             }
         }
+        user.setRoleIds(translatedRoleIds);
+
     }
 
     @Override
@@ -179,11 +217,28 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User getAdminUser() {
-        return new UserImpl.LocalAdminUser(configuration);
+        return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
     }
 
     @Override
     public long count() {
         return totalCount(UserImpl.class);
+    }
+
+    @Override
+    public Collection<User> loadAllForRole(Role role) {
+        final String roleId = role.getId();
+        final DBObject query = BasicDBObjectBuilder.start(UserImpl.ROLES, new ObjectId(roleId)).get();
+
+        final List<DBObject> result = query(UserImpl.class, query);
+        if (result == null || result.isEmpty()) {
+            return Collections.emptySet();
+        }
+        final Set<User> users = Sets.newHashSetWithExpectedSize(result.size());
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(new UserImpl((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+        return users;
     }
 }

@@ -27,8 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 
 public class LdapSettings {
     private static final Logger log = LoggerFactory.getLogger(LdapSettings.class);
@@ -57,6 +60,10 @@ public class LdapSettings {
         response.setUseStartTls(request.useStartTls);
         response.setTrustAllCertificates(request.trustAllCertificates);
         response.setDefaultGroup(request.defaultGroup);
+        response.setGroupMapping(request.groupMapping);
+        response.setGroupIdAttribute(request.groupIdAttribute);
+        response.setGroupSearchBase(request.groupSearchBase);
+        response.setAdditionalDefaultGroups(request.additionalDefaultGroups);
         this.response = response;
     }
 
@@ -88,6 +95,10 @@ public class LdapSettings {
         request.useStartTls = isUseStartTls();
         request.trustAllCertificates = isTrustAllCertificates();
         request.defaultGroup = getDefaultGroup();
+        request.groupIdAttribute = getGroupIdAttribute();
+        request.groupSearchBase = getGroupSearchBase();
+        request.groupMapping = getGroupMapping();
+        request.additionalDefaultGroups = getAdditionalDefaultGroups();
         return request;
     }
 
@@ -192,5 +203,25 @@ public class LdapSettings {
 
     public void setDefaultGroup(String defaultGroup) {
         response.setDefaultGroup(defaultGroup);
+    }
+
+    @Nullable
+    public Map<String, String> getGroupMapping() {
+        return response.getGroupMapping();
+    }
+
+    @Nullable
+    public Set<String> getAdditionalDefaultGroups() {
+        return response.getAdditionalDefaultGroups();
+    }
+
+    @Nullable
+    public String getGroupSearchBase() {
+        return response.getGroupSearchBase();
+    }
+
+    @Nullable
+    public String getGroupIdAttribute() {
+        return response.getGroupIdAttribute();
     }
 }

@@ -60,6 +60,6 @@ public class PermissionsResource extends RestResource {
             @ApiParam(name = "username", required = true)
             @PathParam("username") String username) {
         return ReaderPermissionResponse.create(
-                Ordering.natural().sortedCopy(RestPermissions.readerPermissions(username)));
+                Ordering.natural().sortedCopy(RestPermissions.userSelfEditPermissions(username)));
     }
 }

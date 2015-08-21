@@ -18,7 +18,10 @@ package org.graylog2.shared.security.ldap;
 
 import org.graylog2.plugin.database.Persisted;
 
+import javax.annotation.Nonnull;
 import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -66,9 +69,31 @@ public interface LdapSettings extends Persisted {
 
     String getDefaultGroup();
 
+    String getDefaultGroupId();
+
     void setDefaultGroup(String defaultGroup);
 
     boolean isTrustAllCertificates();
 
     void setTrustAllCertificates(boolean trustAllCertificates);
+
+    @Nonnull
+    Map<String, String> getGroupMapping();
+
+    void setGroupMapping(Map<String, String> mapping);
+
+    String getGroupSearchBase();
+
+    void setGroupSearchBase(String groupSearchBase);
+
+    String getGroupIdAttribute();
+
+    void setGroupIdAttribute(String groupIdAttribute);
+
+    void setAdditionalDefaultGroups(Set<String> strings);
+
+    Set<String> getAdditionalDefaultGroups();
+
+    Set<String> getAdditionalDefaultGroupIds();
+
 }

@@ -16,13 +16,19 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
+import org.graylog2.database.ObjectIdStringFunction;
 import org.graylog2.database.PersistedImpl;
+import org.graylog2.database.StringObjectIdFunction;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.LimitedOptionalStringValidator;
 import org.graylog2.database.validators.LimitedStringValidator;
@@ -33,9 +39,11 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -63,6 +71,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
     public static final String HASH_ALGORITHM = "SHA-1";
+    public static final String ROLES = "roles";
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
@@ -88,6 +97,7 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
                 .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
                 .put(PERMISSIONS, new ListValidator())
+                .put(ROLES, new ListValidator(true))
                 .build();
     }
 
@@ -250,6 +260,19 @@ public class UserImpl extends PersistedImpl implements User {
         return false;
     }
 
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    @Override
+    public Set<String> getRoleIds() {
+        final List<ObjectId> roles = firstNonNull((List<ObjectId>) fields.get(ROLES), Collections.<ObjectId>emptyList());
+        return Sets.newHashSet(Collections2.transform(roles, new ObjectIdStringFunction()));
+    }
+
+    @Override
+    public void setRoleIds(Set<String> roles) {
+        fields.put(ROLES, Lists.newArrayList(Collections2.transform(roles, new StringObjectIdFunction())));
+    }
+
     @Override
     public void setStartpage(final String type, final String id) {
         final Map<String, String> startpage = Maps.newHashMap();
@@ -264,10 +287,12 @@ public class UserImpl extends PersistedImpl implements User {
 
     public static class LocalAdminUser extends UserImpl {
         private final Configuration configuration;
+        private final Set<String> roles;
 
-        public LocalAdminUser(Configuration configuration) {
+        public LocalAdminUser(Configuration configuration, String adminRoleObjectId) {
             super(null, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
+            this.roles = ImmutableSet.of(adminRoleObjectId);
         }
 
         @Override
@@ -323,5 +348,16 @@ public class UserImpl extends PersistedImpl implements User {
         public boolean isLocalAdmin() {
             return true;
         }
+
+        @Nonnull
+        @Override
+        public Set<String> getRoleIds() {
+            return roles;
+        }
+
+        @Override
+        public void setRoleIds(Set<String> roles) {
+        }
     }
+
 }

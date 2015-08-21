@@ -22,20 +22,21 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
 import org.graylog2.rest.models.metrics.responses.RateMetricsResponse;
 import org.graylog2.rest.models.metrics.responses.TimerMetricsResponse;
 import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class MetricUtils {
+    private static final Logger log = LoggerFactory.getLogger(MetricUtils.class);
 
     public static Map<String, Object> mapAll(Map<String, Metric> metrics) {
         return mapAllFiltered(metrics, null);
@@ -181,6 +182,15 @@ public class MetricUtils {
             return (T) metricRegistry.getMetrics().get(name);
         }
     }
+
+    public static void safelyRegisterAll(MetricRegistry metricRegistry, MetricSet metrics) throws IllegalArgumentException {
+        try {
+            metricRegistry.registerAll(metrics);
+        } catch (IllegalArgumentException e) {
+            log.error("Duplicate metric set registered", e);
+        }
+    }
+
     public static Gauge<Long> constantGauge(final long constant) {
         return new Gauge<Long>() {
             @Override

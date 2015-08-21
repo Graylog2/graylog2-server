@@ -27,16 +27,17 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
-import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
@@ -47,6 +48,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     private final LdapSettingsService ldapSettingsService;
     private final UserService userService;
 
+    @Inject
     public LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
         this.ldapConnector = ldapConnector;
         this.userService = userService;
@@ -89,10 +91,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             final String password = String.valueOf(token.getPassword());
 
             final LdapEntry userEntry = ldapConnector.search(connection,
-                    ldapSettings.getSearchBase(),
-                    ldapSettings.getSearchPattern(),
-                    principal,
-                    ldapSettings.isActiveDirectory());
+                                                             ldapSettings.getSearchBase(),
+                                                             ldapSettings.getSearchPattern(),
+                                                             principal,
+                                                             ldapSettings.isActiveDirectory(),
+                                                             ldapSettings.getGroupSearchBase(),
+                                                             ldapSettings.getGroupIdAttribute());
             if (userEntry == null) {
                 LOG.debug("User {} not found in LDAP", principal);
                 return null;
@@ -110,7 +114,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             final User user = userService.syncFromLdapEntry(userEntry, ldapSettings, principal);
             if (user == null) {
                 // in case there was an error reading, creating or modifying the user in mongodb, we do not authenticate the user.
-                LOG.error("Unable to sync LDAP user {}", userEntry.getDn());
+                LOG.error("Unable to sync LDAP user {} (DN {})", userEntry.getBindPrincipal(), userEntry.getDn());
                 return null;
             }
         } catch (LdapException e) {

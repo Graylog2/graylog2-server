@@ -19,6 +19,10 @@ package org.graylog2.restclient.models.api.requests.accounts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
+import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Set;
+
 public class LdapSettingsRequest extends ApiRequest {
 
     @JsonProperty("enabled")
@@ -53,6 +57,22 @@ public class LdapSettingsRequest extends ApiRequest {
 
     @JsonProperty("default_group")
     public String defaultGroup;
+
+    @JsonProperty("group_mapping")
+    @Nullable
+    public Map<String, String> groupMapping;
+
+    @JsonProperty("group_search_base")
+    @Nullable
+    public String groupSearchBase;
+
+    @JsonProperty("group_id_attribute")
+    @Nullable
+    public String groupIdAttribute;
+
+    @JsonProperty("additional_default_groups")
+    @Nullable
+    public Set<String> additionalDefaultGroups;
 
     public boolean isEnabled() {
         return enabled;
@@ -140,5 +160,41 @@ public class LdapSettingsRequest extends ApiRequest {
 
     public void setDefaultGroup(String defaultGroup) {
         this.defaultGroup = defaultGroup;
+    }
+
+    @Nullable
+    public Map<String, String> getGroupMapping() {
+        return groupMapping;
+    }
+
+    public void setGroupMapping(@Nullable Map<String, String> groupMapping) {
+        this.groupMapping = groupMapping;
+    }
+
+    @Nullable
+    public String getGroupSearchBase() {
+        return groupSearchBase;
+    }
+
+    public void setGroupSearchBase(@Nullable String groupSearchBase) {
+        this.groupSearchBase = groupSearchBase;
+    }
+
+    @Nullable
+    public String getGroupIdAttribute() {
+        return groupIdAttribute;
+    }
+
+    public void setGroupIdAttribute(@Nullable String groupIdAttribute) {
+        this.groupIdAttribute = groupIdAttribute;
+    }
+
+    @Nullable
+    public Set<String> getAdditionalDefaultGroups() {
+        return additionalDefaultGroups;
+    }
+
+    public void setAdditionalDefaultGroups(@Nullable Set<String> additionalDefaultGroups) {
+        this.additionalDefaultGroups = additionalDefaultGroups;
     }
 }

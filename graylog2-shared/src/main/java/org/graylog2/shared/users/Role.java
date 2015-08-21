@@ -16,30 +16,23 @@
  */
 package org.graylog2.shared.users;
 
-import org.graylog2.plugin.database.PersistedService;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
+import java.util.Set;
 
-import java.util.Collection;
-import java.util.List;
+public interface Role {
+    String getId();
 
-public interface UserService extends PersistedService {
-    User load(String username);
+    String getName();
 
-    int delete(String username);
+    void setName(String name);
 
-    User create();
+    String getDescription();
 
-    List<User> loadAll();
+    void setDescription(String description);
 
-    User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username);
+    Set<String> getPermissions();
 
-    void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
+    void setPermissions(Set<String> permissions);
 
-    User getAdminUser();
+    boolean isReadOnly();
 
-    long count();
-
-    Collection<User> loadAllForRole(Role role);
 }

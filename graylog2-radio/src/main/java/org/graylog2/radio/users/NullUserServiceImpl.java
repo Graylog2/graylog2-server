@@ -23,8 +23,11 @@ import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
+import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -102,5 +105,10 @@ public class NullUserServiceImpl implements UserService {
     @Override
     public int delete(String username) {
         return 0;
+    }
+
+    @Override
+    public Collection<User> loadAllForRole(Role role) {
+        return Collections.emptySet();
     }
 }

@@ -58,7 +58,7 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
             if (permissions != null) {
                 info.setStringPermissions(Sets.newHashSet(permissions));
             }
-
+            info.setRoles(user.getRoleIds());
         }
 
         LOG.debug("User {} has permissions: {}", principals, permissions);

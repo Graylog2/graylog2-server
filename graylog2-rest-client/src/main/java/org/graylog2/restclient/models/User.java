@@ -17,6 +17,7 @@
 package org.graylog2.restclient.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.MoreObjects;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.shiro.SecurityUtils;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class User {
     private static final Logger log = LoggerFactory.getLogger(User.class);
@@ -56,12 +58,13 @@ public class User {
     private final Startpage startpage;
     private final long sessionTimeoutMs;
     private final Map<String, Object> preferences;
+    private final Set<String> roles;
 
     private Subject subject;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String sessionId) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage(), ur.sessionTimeoutMs, ur.preferences);
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage(), ur.sessionTimeoutMs, ur.preferences, ur.roles);
     }
 
     public User(ApiClient api,
@@ -76,7 +79,9 @@ public class User {
                 boolean external,
                 Startpage startpage,
                 long sessionTimeoutMs,
-                Map<String, Object> preferences) {
+                Map<String, Object> preferences,
+                Set<String> roles) {
+        this.roles = MoreObjects.firstNonNull(roles, Collections.<String>emptySet());
         DateTimeZone timezone1 = null;
         this.sessionTimeoutMs = sessionTimeoutMs;
         this.api = api;
@@ -84,7 +89,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.fullName = fullName;
-        this.permissions = permissions;
+        this.permissions = MoreObjects.firstNonNull(permissions, Collections.<String>emptyList());
         this.sessionId = sessionId;
         try {
             if (timezone != null) {
@@ -98,11 +103,7 @@ public class User {
         this.readonly = readonly;
         this.external = external;
         this.startpage = startpage;
-        if (preferences != null) {
-            this.preferences = preferences;
-        } else {
-            this.preferences = Collections.emptyMap();
-        }
+        this.preferences = MoreObjects.firstNonNull(preferences, Collections.<String, Object>emptyMap());
     }
 
     public boolean update(ChangeUserRequest request) {
@@ -136,9 +137,6 @@ public class User {
     }
 
     public List<String> getPermissions() {
-        if (permissions == null) {
-            return Collections.emptyList();
-        }
         return permissions;
     }
 
@@ -172,6 +170,10 @@ public class User {
 
     public boolean isExternal() {
         return external;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
     }
 
     public void setSubject(Subject subject) {

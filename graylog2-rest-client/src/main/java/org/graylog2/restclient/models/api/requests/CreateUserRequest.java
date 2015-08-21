@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
+import com.google.common.collect.Lists;
 import org.graylog2.restclient.models.User;
 import org.joda.time.DateTimeZone;
 
@@ -56,6 +57,7 @@ public class CreateUserRequest extends ChangeUserRequest {
             this.timezone = timeZone.getID();
         }
         this.sessionTimeoutMs = user.getSessionTimeoutMs();
+        this.roles = Lists.newArrayList(user.getRoles());
     }
 
     public CreateUserRequest(CreateUserRequest c) {
@@ -67,5 +69,6 @@ public class CreateUserRequest extends ChangeUserRequest {
         timezone = c.timezone;
         startpage = c.startpage;
         sessionTimeoutMs = c.sessionTimeoutMs;
+        roles = c.roles;
     }
 }
