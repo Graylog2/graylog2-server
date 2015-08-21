@@ -1,71 +1,16 @@
 import React from 'react';
 import Immutable from 'immutable';
 
-import { TabbedArea, TabPane, Button, ButtonGroup} from 'react-bootstrap';
+import { TabbedArea, TabPane, Button, ButtonGroup } from 'react-bootstrap';
 
 import TableList from '../common/TableList';
-import DataTable from '../common/DataTable';
 
 const PermissionSelector = React.createClass({
-
-  _toggleStreamReadPermissions(stream) {
-    this._toggleReadPermissions('streams', Immutable.Set.of(stream.id));
-  },
-  _toggleStreamEditPermissions(stream) {
-    this._toggleEditPermissions('streams', Immutable.Set.of(stream.id));
-  },
-
-  _toggleDashboardReadPermissions(dashboard) {
-    this._toggleReadPermissions('dashboards', Immutable.Set.of(dashboard.id));
-  },
-  _toggleDashboardEditPermissions(dashboard) {
-    this._toggleEditPermissions('dashboards', Immutable.Set.of(dashboard.id));
-  },
-
-  _toggleReadPermissions(target, idList) {
-    let added = Immutable.Set();
-    let deleted = Immutable.Set();
-
-    idList.forEach((id) => {
-      const readTarget = target + ':read:' + id;
-      const editTarget = target + ':edit:' + id;
-
-      if (this.props.permissions.contains(readTarget)) {
-        deleted = deleted.add(readTarget).add(editTarget);
-      } else {
-        added = added.add(readTarget);
-      }
-    }, this);
-    this.props.onChange(added, deleted);
-  },
-  _toggleEditPermissions(target, idList) {
-    let added = Immutable.Set();
-    let deleted = Immutable.Set();
-
-    idList.forEach((id) => {
-      const readTarget = target + ':read:' + id;
-      const editTarget = target + ':edit:' + id;
-
-      if (this.props.permissions.contains(editTarget)) {
-        deleted = deleted.add(editTarget);
-      } else {
-        added = added.add(readTarget).add(editTarget);
-      }
-    }, this);
-    this.props.onChange(added, deleted);
-  },
-
-  _toggleAllStreamsRead(streamIds) {
-    this._toggleReadPermissions('streams', streamIds);
-  },
-  _toggleAllStreamsEdit(streamIds) {
-    this._toggleEditPermissions('streams', streamIds);
-  },
-  _toggleAllDashboardsRead(dashboardIds) {
-    this._toggleReadPermissions('dashboards', dashboardIds);
-  },
-  _toggleAllDashboardsEdit(dashboardIds) {
-    this._toggleEditPermissions('dashboards', dashboardIds);
+  propTypes: {
+    onChange: React.PropTypes.func,
+    streams: React.PropTypes.array,
+    dashboards: React.PropTypes.array,
+    permissions: React.PropTypes.array,
   },
 
   render() {
@@ -139,6 +84,78 @@ const PermissionSelector = React.createClass({
         </TabbedArea>
       </div>
     );
+  },
+
+  /*
+   * onClick actions for single edits
+   */
+  _toggleStreamReadPermissions(stream) {
+    this._toggleReadPermissions('streams', Immutable.Set.of(stream.id));
+  },
+
+  _toggleStreamEditPermissions(stream) {
+    this._toggleEditPermissions('streams', Immutable.Set.of(stream.id));
+  },
+
+  _toggleDashboardReadPermissions(dashboard) {
+    this._toggleReadPermissions('dashboards', Immutable.Set.of(dashboard.id));
+  },
+
+  _toggleDashboardEditPermissions(dashboard) {
+    this._toggleEditPermissions('dashboards', Immutable.Set.of(dashboard.id));
+  },
+
+  /*
+   * onClick actions for bulk edits
+   */
+
+  _toggleAllStreamsRead(streamIds) {
+    this._toggleReadPermissions('streams', streamIds);
+  },
+
+  _toggleAllStreamsEdit(streamIds) {
+    this._toggleEditPermissions('streams', streamIds);
+  },
+
+  _toggleAllDashboardsRead(dashboardIds) {
+    this._toggleReadPermissions('dashboards', dashboardIds);
+  },
+
+  _toggleAllDashboardsEdit(dashboardIds) {
+    this._toggleEditPermissions('dashboards', dashboardIds);
+  },
+
+  _toggleReadPermissions(target, idList) {
+    let added = Immutable.Set.of();
+    let deleted = Immutable.Set.of();
+
+    idList.forEach((id) => {
+      const readTarget = target + ':read:' + id;
+      const editTarget = target + ':edit:' + id;
+
+      if (this.props.permissions.contains(readTarget)) {
+        deleted = deleted.add(readTarget).add(editTarget);
+      } else {
+        added = added.add(readTarget);
+      }
+    }, this);
+    this.props.onChange(added, deleted);
+  },
+  _toggleEditPermissions(target, idList) {
+    let added = Immutable.Set.of();
+    let deleted = Immutable.Set.of();
+
+    idList.forEach((id) => {
+      const readTarget = target + ':read:' + id;
+      const editTarget = target + ':edit:' + id;
+
+      if (this.props.permissions.contains(editTarget)) {
+        deleted = deleted.add(editTarget);
+      } else {
+        added = added.add(readTarget).add(editTarget);
+      }
+    }, this);
+    this.props.onChange(added, deleted);
   },
 });
 
