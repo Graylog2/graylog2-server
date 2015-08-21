@@ -1,4 +1,8 @@
-@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, ldapForm: Form[org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest])
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        ldapForm: Form[controllers.LdapController.LdapSettingsRequest2],
+        roles: List[org.graylog2.rest.models.roles.responses.RoleResponse],
+        selectedAdditionalGroups: Set[String])
 
 @main("LDAP Settings", null, "", currentUser, false) {
 
@@ -148,24 +152,82 @@
                     </div>
                 </div>
 
+                <legend class="col-sm-offset-3 col-sm-9">Group Mapping</legend>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label" for="defaultGroup">Default User Role</label>
+                    <label class="col-sm-3 control-label" for="groupSearchBase">Group Search Base DN</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="groupSearchBase" class="form-control" name="groupSearchBase" placeholder="Group Search Base" value="@ldapForm("groupSearchBase").value()">
+                        <span class="help-block ldap-help">The base tree to limit the LDAP group search query to, e.g. <code>
+                            cn=users,dc=example,dc=com</code>
+                        </span>
+                        <span class="help-block ad-help hidden">
+                            The base tree to limit the Active Directory group search query to, e.g. <code>
+                            cn=users,dc=example,dc=com</code>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="groupIdAttribute">Group Id Attribute</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="groupIdAttribute" name="groupIdAttribute" class="form-control" placeholder="Group Id Attribute" value="@ldapForm("groupIdAttribute").value()">
+                        <span class="help-block ldap-help">Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.
+                        </span>
+                        <span class="help-block ad-help hidden">Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="defaultGroup">Base User Role</label>
                     <div class="col-sm-9">
                         <div class="row">
                             <div class="col-sm-4">
                                 <select id="defaultGroup" name="defaultGroup" class="form-control" placeholder="" required>
-                                    <option value="reader" @if("reader".equals(ldapForm("defaultGroup").value())) {selected}>Reader</option>
-                                    <option value="admin" @if("admin".equals(ldapForm("defaultGroup").value())) {selected}>Administrator</option>
+                                    <option value="Reader" @if("reader".equalsIgnoreCase(ldapForm("defaultGroup").value())) {selected}>Reader - basic access</option>
+                                    <option value="Admin" @if("admin".equalsIgnoreCase(ldapForm("defaultGroup").value())) {selected}>Administrator - complete access</option>
                                 </select>
                             </div>
                         </div>
-                        <span class="help-block">
-                            Determines the default user role for new users.
+                        <span class="help-block ldap-help">
+                            The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
+                            You can assign additional permissions by mapping LDAP groups to Graylog roles, or you can assign additional Graylog roles to LDAP users below.
+                        </span>
+                        <span class="help-block ad-help hidden">
+                            The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
+                            You can assign additional permissions by mapping Active Directory groups to Graylog roles, or you can assign additional Graylog roles to Active Directory users below.
                         </span>
                         <div class="panel panel-info">
                             <div class="panel-body">
-                                Changing the default role will only affect to new users created via LDAP!<br/>
-                                In order to change existing accounts, you need to reset their permissions or delete them.
+                                <p>Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
+                                In order to change existing accounts, you need to edit their roles manually or delete them so they are recreated on the next login.<br/></p>
+                                <p>LDAP/Active Directory changes, such as group to role mapping will be performed whenever the user logs into Graylog.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="additionalDefaultGroups">Additional Default Roles</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <select id="additionalDefaultGroups" name="additionalDefaultGroups[]" class="chosen-select" data-placeholder="Choose static roles" multiple>
+                                    @for(role <- roles.filterNot((r) => "reader".equalsIgnoreCase(r.name()) || "admin".equalsIgnoreCase(r.name())).sortBy(_.name)) {
+                                    <option value="@role.name" @if(selectedAdditionalGroups.contains(role.name)) {selected}>@role.name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <span class="help-block ldap-help">
+                            Choose the additional roles each LDAP user will have by default, leave it empty if you only want to map LDAP groups to Graylog roles.
+                        </span>
+                        <span class="help-block ad-help hidden">
+                            Choose the additional roles each Active Directory user will have by default, leave it empty if you only want to map Active Directory groups to Graylog roles.
+                        </span>
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                <p>Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
+                                    In order to change existing accounts, you need to edit their roles manually or delete them so they are recreated on the next login.<br/></p>
+                                <p>LDAP/Active Directory changes, such as group to role mapping will be performed whenever the user logs into Graylog.</p>
                             </div>
                         </div>
                     </div>

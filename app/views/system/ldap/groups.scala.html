@@ -1,0 +1,16 @@
+@(currentUser: org.graylog2.restclient.models.User)
+
+@main("LDAP Group mapping", null, "", currentUser, false) {
+    <div class="row content content-head">
+        <div class="col-md-8">
+            <h1>LDAP Group mapping</h1>
+            <p class="description">Map LDAP groups to Graylog roles</p>
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+            <div id="react-ldapgroups-component"></div>
+        </div>
+    </div>
+}

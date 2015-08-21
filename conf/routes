@@ -124,8 +124,8 @@ GET           /system/users/new                                                 
 GET           /system/users/edit/:username                                                       @controllers.UsersController.editUserForm(username: String)
 POST          /system/users/password/:username                                                   @controllers.UsersController.changePassword(username: String)
 POST          /system/users/startpage/reset/:username                                            @controllers.StartpageController.reset(username: String)
-POST          /system/users/resetpermissions/:username                                           @controllers.UsersController.resetPermissions(username: String)
-
+POST          /system/users/updateroles/:username                                                @controllers.UsersController.updateRoles(username: String)
+GET           /system/roles                                                                      @controllers.UsersController.rolesPage()
 # Sources
 GET           /sources                                                                           @controllers.SourcesController.list()
 
@@ -134,9 +134,13 @@ GET           /startpage/set                                                    
 
 # LDAP configuration
 GET           /system/ldap                                                                       @controllers.LdapController.index()
+GET           /system/ldap/groups                                                                @controllers.LdapController.groups()
 POST          /system/ldap                                                                       @controllers.LdapController.saveLdapSettings()
+GET           /a/system/ldap/groups                                                              @controllers.LdapController.apiGroups()
 POST          /a/system/ldap/testconnect                                                         @controllers.LdapController.apiTestLdapConnection()
 POST          /a/system/ldap/testlogin                                                           @controllers.LdapController.apiTestLdapLogin()
+GET           /a/system/ldap/groupmapping                                                        @controllers.LdapController.apiLoadGroupMapping()
+POST          /a/system/ldap/groupmapping                                                        @controllers.LdapController.apiSaveGroupMapping()
 
 # Systemjobs
 POST          /systemjobs/trigger                                                                @controllers.SystemJobsController.trigger()
@@ -185,6 +189,16 @@ GET           /a/system/users/:username                                         
 GET           /a/system/user/:username                                                           @controllers.api.UsersApiController.loadUser(username: String)
 DELETE        /a/system/user/:username                                                           @controllers.api.UsersApiController.deleteUser(username: String)
 PUT           /a/system/user/:username/preferences                                               @controllers.api.UsersApiController.saveUserPreferences(username: String)
+
+# Roles
+GET           /a/system/roles                                                                    @controllers.api.RolesApiController.listRoles()
+POST          /a/system/role                                                                     @controllers.api.RolesApiController.createRole()
+PUT           /a/system/role/:rolename                                                           @controllers.api.RolesApiController.updateRole(rolename: String)
+GET           /a/system/role/:rolename                                                           @controllers.api.RolesApiController.loadRole(rolename: String)
+GET           /a/system/role/:rolename/members                                                   @controllers.api.RolesApiController.loadMembers(rolename: String)
+DELETE        /a/system/role/:rolename                                                           @controllers.api.RolesApiController.deleteRole(rolename: String)
+PUT           /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.addMember(rolename: String, username: String)
+DELETE        /a/system/role/:rolename/:username                                                 @controllers.api.RolesApiController.deleteMember(rolename: String, username: String)
 
 # API: Nodes
 GET           /a/system/nodes                                                                    @controllers.api.NodesApiController.nodes()

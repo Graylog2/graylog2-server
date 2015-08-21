@@ -58,6 +58,7 @@ public class UsersApiController extends AuthenticatedController {
             userResponse.readonly = user.isReadonly();
             userResponse.external = user.isExternal();
             userResponse.permissions = user.getPermissions();
+            userResponse.roles = user.getRoles();
 
             response.add(userResponse);
         }

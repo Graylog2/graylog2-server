@@ -35,4 +35,38 @@ $(document).ready(function() {
             }
         });
 
+    var rolesChangeHandler = function(event, param) {
+        // do not allow to unselect everything, but default to reader role
+        var $rolesSelect = $(event.target);
+        var adminSelected = $rolesSelect.find("option[value=Admin]:selected").length > 0;
+        var readerSelected = $rolesSelect.find("option[value=Reader]:selected").length > 0;
+
+        // Don't allow reader and admin at the same time, deselect admin if choosing reader
+        if (param['selected'] === 'Reader' && adminSelected) {
+            $rolesSelect.find("option[value=Admin]").attr("selected", false);
+        }
+        // always at least enable "Reader" role
+        if (param['deselected'] === 'Reader' && !adminSelected) {
+            $rolesSelect.find("option[value=Reader]").attr("selected", true);
+        }
+
+        // choosing Admin deselects reader
+        if (param['selected'] === 'Admin' && readerSelected) {
+            $rolesSelect.find("option[value=Reader]").attr("selected", false);
+        }
+        // fall back to reader role if admin is deselected
+        if (param['deselected'] === 'Admin' && !readerSelected) {
+            $rolesSelect.find("option[value=Reader]").attr("selected", true);
+        }
+        $rolesSelect.chosen().trigger("chosen:updated");
+    };
+
+    $("#edituserroles")
+        .chosen({search_contains:true, width:"250px", inherit_select_classes:true})
+        .change(rolesChangeHandler);
+
+    $(".roles-select")
+        .chosen({search_contains:true, inherit_select_classes:true, allow_single_deselect:false})
+        .change(rolesChangeHandler);
+
 });

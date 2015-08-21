@@ -2,8 +2,11 @@
 
 var React = require('react');
 
-var UsersStore = require('../../stores/users/UsersStore');
+var UsersStore = require('../../stores/users/UsersStore').UsersStore;
+var RolesStore = require('../../stores/users/RolesStore').RolesStore;
 var DataTable = require('../common/DataTable');
+
+var Input = require('react-bootstrap').Input;
 
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
@@ -14,11 +17,13 @@ var UserList = React.createClass({
         return {
             currentUsername: this.props.currentUsername,
             currentUser: null,
-            users: []
+            users: [],
+            roles: []
         };
     },
     componentDidMount() {
         this.loadUsers();
+        RolesStore.loadRoles().done((roles) => {this.setState({roles: roles.map(role => role.name)})});
     },
     loadUsers: function () {
         var promise = UsersStore.loadUsers();
@@ -73,12 +78,7 @@ var UserList = React.createClass({
             userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
         }
 
-        var roleBadge = null;
-        if (this._hasAdminRole(user)) {
-            roleBadge = <span className="label label-info">Admin</span>;
-        } else {
-            roleBadge = <span className="label label-default">Reader</span>;
-        }
+        var roleBadges = user.roles.map((role) => <span key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`} style={{marginRight: 5}}>{role}</span>);
 
         var actions = null;
         if (!user.read_only) {
@@ -111,7 +111,7 @@ var UserList = React.createClass({
                 <td className="limited">{user.full_name}</td>
                 <td className="limited">{user.username}</td>
                 <td className="limited">{user.email}</td>
-                <td>{roleBadge}</td>
+                <td>{roleBadges}</td>
                 <td>{actions}</td>
             </tr>
         );
@@ -128,6 +128,8 @@ var UserList = React.createClass({
                            headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}
                            rows={this.state.users}
+                           filterBy="role"
+                           filterSuggestions={this.state.roles}
                            dataRowFormatter={this._userInfoFormatter}
                            filterLabel="Filter Users"
                            filterKeys={filterKeys}/>

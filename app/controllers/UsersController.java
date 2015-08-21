@@ -16,18 +16,21 @@
  */
 package controllers;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lib.BreadcrumbList;
 import lib.security.RestPermissions;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.DateTools;
-import org.graylog2.restclient.lib.Tools;
 import org.graylog2.restclient.models.PermissionsService;
+import org.graylog2.restclient.models.RolesService;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
@@ -38,10 +41,10 @@ import org.graylog2.restclient.models.api.requests.CreateUserRequestForm;
 import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Result;
 import views.helpers.Permissions;
+import views.html.system.roles.roles;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
 
@@ -56,7 +59,6 @@ import static lib.security.RestPermissions.DASHBOARDS_EDIT;
 import static lib.security.RestPermissions.DASHBOARDS_READ;
 import static lib.security.RestPermissions.STREAMS_EDIT;
 import static lib.security.RestPermissions.STREAMS_READ;
-import static lib.security.RestPermissions.USERS_PERMISSIONSEDIT;
 
 public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
@@ -64,18 +66,25 @@ public class UsersController extends AuthenticatedController {
     private static final Form<CreateUserRequestForm> createUserForm = Form.form(CreateUserRequestForm.class);
     private static final Form<ChangeUserRequestForm> changeUserForm = Form.form(ChangeUserRequestForm.class);
     private static final Form<ChangePasswordRequest> changePasswordForm = Form.form(ChangePasswordRequest.class);
+    private static final Form<EditRolesForm> editRolesForm = Form.form(EditRolesForm.class);
 
     private final UserService userService;
     private final PermissionsService permissionsService;
     private final StreamService streamService;
     private final DashboardService dashboardService;
+    private final RolesService rolesService;
 
     @Inject
-    public UsersController(UserService userService, PermissionsService permissionsService, StreamService streamService, DashboardService dashboardService) {
+    public UsersController(UserService userService,
+                           PermissionsService permissionsService,
+                           StreamService streamService,
+                           DashboardService dashboardService,
+                           RolesService rolesService) {
         this.userService = userService;
         this.permissionsService = permissionsService;
         this.streamService = streamService;
         this.dashboardService = dashboardService;
+        this.rolesService = rolesService;
     }
 
     public Result index() {
@@ -92,6 +101,16 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("New", routes.UsersController.newUserForm());
 
         final List<String> permissions = permissionsService.all();
+        final Set<RoleResponse> roleResponses = rolesService.loadAll();
+        final List<String> roleNames =
+                Lists.newArrayList(Collections2.transform(roleResponses,
+                                                          new Function<RoleResponse, String>() {
+                                                              @Nullable
+                                                              @Override
+                                                              public String apply(@Nullable RoleResponse input) {
+                                                                  return input.name();
+                                                              }
+                                                          }));
         try {
             return ok(new_user.render(
                     createUserForm,
@@ -101,7 +120,8 @@ public class UsersController extends AuthenticatedController {
                     DateTools.getGroupedTimezoneIds().asMap(),
                     DateTools.getApplicationTimeZone(),
                     streamService.all(),
-                    bc));
+                    bc,
+                    roleNames));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -124,6 +144,17 @@ public class UsersController extends AuthenticatedController {
             return redirect(routes.UsersController.index());
         }
 
+        final Set<RoleResponse> roleResponses = rolesService.loadAll();
+        final List<String> roleNames =
+                Lists.newArrayList(Collections2.transform(roleResponses,
+                                                          new Function<RoleResponse, String>() {
+                                                              @Nullable
+                                                              @Override
+                                                              public String apply(@Nullable RoleResponse input) {
+                                                                  return input.name();
+                                                              }
+                                                          }));
+
         final Form<ChangeUserRequestForm> form = changeUserForm.fill(new ChangeUserRequestForm(user));
         boolean requiresOldPassword = checkRequireOldPassword(username);
         try {
@@ -138,7 +169,8 @@ public class UsersController extends AuthenticatedController {
                             DateTools.getGroupedTimezoneIds().asMap(),
                             streamService.all(),
                             dashboardService.getAll(),
-                            bc)
+                            bc,
+                            roleNames)
             );
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -153,13 +185,24 @@ public class UsersController extends AuthenticatedController {
             return redirect(routes.StartpageController.redirect());
         }
 
-        Form<CreateUserRequestForm> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequestForm.class);
+        final Form<CreateUserRequestForm> createUserRequestForm = Form.form(CreateUserRequestForm.class).bindFromRequest();
         final CreateUserRequestForm request = createUserRequestForm.get();
 
         if (createUserRequestForm.hasErrors()) {
             BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
             final List<String> permissions = permissionsService.all();
+
+            final Set<RoleResponse> roleResponses = rolesService.loadAll();
+            final List<String> roleNames =
+                    Lists.newArrayList(Collections2.transform(roleResponses,
+                                                              new Function<RoleResponse, String>() {
+                                                                  @Nullable
+                                                                  @Override
+                                                                  public String apply(@Nullable RoleResponse input) {
+                                                                      return input.name();
+                                                                  }
+                                                              }));
             try {
                 return badRequest(new_user.render(
                         createUserRequestForm,
@@ -169,7 +212,8 @@ public class UsersController extends AuthenticatedController {
                         DateTools.getGroupedTimezoneIds().asMap(),
                         DateTools.getApplicationTimeZone(),
                         streamService.all(),
-                        bc));
+                        bc,
+                        roleNames));
             } catch (IOException e) {
                 return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
             } catch (APIException e) {
@@ -221,7 +265,16 @@ public class UsersController extends AuthenticatedController {
             final List<String> all = permissionsService.all();
             boolean requiresOldPassword = checkRequireOldPassword(username);
 
-            try {
+            final Set<RoleResponse> roleResponses = rolesService.loadAll();
+            final List<String> roleNames =
+                    Lists.newArrayList(Collections2.transform(roleResponses,
+                                                              new Function<RoleResponse, String>() {
+                                                                  @Nullable
+                                                                  @Override
+                                                                  public String apply(@Nullable RoleResponse input) {
+                                                                      return input.name();
+                                                                  }
+                                                              }));            try {
                 return badRequest(edit.render(
                         requestForm,
                         username,
@@ -233,7 +286,8 @@ public class UsersController extends AuthenticatedController {
                         DateTools.getGroupedTimezoneIds().asMap(),
                         streamService.all(),
                         dashboardService.getAll(),
-                        bc));
+                        bc,
+                        roleNames));
             } catch (IOException e) {
                 return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
             } catch (APIException e) {
@@ -328,43 +382,41 @@ public class UsersController extends AuthenticatedController {
         return redirect(routes.UsersController.editUserForm(username));
     }
 
-    public Result resetPermissions(String username) {
-        if (!Permissions.isPermitted(RestPermissions.USERS_EDIT, username)) {
+    public Result updateRoles(String username) {
+        if (!Permissions.isPermitted(RestPermissions.USERS_ROLESEDIT, username)) {
             return redirect(routes.StartpageController.redirect());
         }
 
-        final DynamicForm requestForm = Form.form().bindFromRequest();
-
-        boolean isAdmin = false;
-        final String field = requestForm.get("permissiontype");
-        if (field != null && field.equalsIgnoreCase("admin")) {
-            isAdmin = true;
-        }
+        final Form<EditRolesForm> rolesForm = editRolesForm.bindFromRequest();
+        final EditRolesForm form = rolesForm.get();
 
         final User user = userService.load(username);
-        if (user == null) {
-            flash("error", "User '" + username + "' not found.");
-            return redirect(routes.UsersController.index());
+        if (user != null) {
+            boolean success = true;
+            for (String role : user.getRoles()) {
+                final boolean removed = rolesService.removeMembership(role, user.getName());
+                success = success && removed;
+            }
+            if (form.roles != null) {
+                for (String role : form.roles) {
+                    final boolean added = rolesService.addMembership(role, user.getName());
+                    success = success && added;
+                }
+            }
+            if (success) {
+                flash("success", "Updated roles for " + username);
+            } else {
+                flash("error", "An error occurred while updating roles for user " + username);
+            }
+        } else {
+            flash("error", "Unable to change roles for " + username);
         }
 
-        if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
-            flash("error", "Unable to change user role");
-            return redirect(routes.UsersController.editUserForm(username));
-        }
-
-        final ChangeUserRequest changeRequest = new ChangeUserRequest(user);
-        if (isAdmin) {
-            changeRequest.permissions = Lists.newArrayList("*");
-        } else {
-            changeRequest.permissions = permissionsService.readerPermissions(username);
-        }
-        final boolean success = user.update(changeRequest);
-        if (success) {
-            flash("success", "Successfully changed user role for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
-        } else {
-            flash("error", "Unable to change user role for " + user.getFullName());
-        }
         return redirect(routes.UsersController.editUserForm(username));
+    }
+
+    public Result rolesPage() {
+        return ok(roles.render(currentUser()));
     }
 
     private static BreadcrumbList breadcrumbs() {
@@ -372,5 +424,14 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Users", routes.UsersController.index());
         return bc;
+    }
+
+    public static class EditRolesForm {
+        @Nullable
+        public List<String> roles = Lists.newArrayList();
+
+        public EditRolesForm() {
+        }
+
     }
 }

@@ -57,11 +57,16 @@ public class Permissions {
             return Boolean.FALSE;
         }
         final String instancePermission = permission + ":" + instanceId;
-        final boolean permitted = user.getSubject().isPermitted(instancePermission);
-        if (log.isDebugEnabled()) {
-            log.debug("{} has permission {}: {}", user.getName(), instancePermission, permitted);
+        try {
+            final boolean permitted = user.getSubject().isPermitted(instancePermission);
+            if (log.isDebugEnabled()) {
+                log.debug("{} has permission {}: {}", user.getName(), instancePermission, permitted);
+            }
+            return permitted;
+        } catch (Exception e) {
+            log.error("WAT", e);
         }
-        return permitted;
+        return Boolean.FALSE;
     }
 
     public static Boolean isPermitted(User user, RestPermissions permission) {

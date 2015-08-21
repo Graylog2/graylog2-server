@@ -53,7 +53,11 @@ sockJsWebSocketsEnabled = @lib.SockJSUtils.isWebsocketsEnabled;
     routes.javascript.SystemController.index,
     routes.javascript.UsersController.editUserForm,
     routes.javascript.UsersController.index,
+    routes.javascript.UsersController.rolesPage,
     routes.javascript.CollectorsController.index,
+    routes.javascript.LdapController.apiGroups,
+    routes.javascript.LdapController.apiLoadGroupMapping,
+    routes.javascript.LdapController.apiSaveGroupMapping,
     api.routes.javascript.AlarmCallbacksApiController.available,
     api.routes.javascript.AlarmCallbacksApiController.create,
     api.routes.javascript.AlarmCallbacksApiController.delete,
@@ -102,11 +106,18 @@ sockJsWebSocketsEnabled = @lib.SockJSUtils.isWebsocketsEnabled;
     api.routes.javascript.StreamRulesApiController.delete,
     api.routes.javascript.SystemApiController.fields,
     api.routes.javascript.ToolsApiController.naturalDateTest,
-    api.routes.javascript.UsersApiController.loadUser
+    api.routes.javascript.UsersApiController.loadUser,
+    api.routes.javascript.RolesApiController.listRoles,
+    api.routes.javascript.RolesApiController.createRole,
+    api.routes.javascript.RolesApiController.updateRole,
+    api.routes.javascript.RolesApiController.deleteRole,
+    api.routes.javascript.RolesApiController.addMember,
+    api.routes.javascript.RolesApiController.deleteMember,
+    api.routes.javascript.RolesApiController.loadMembers
 )
 
 <div id="navigation-bar"
-    data-permissions='@Permissions.asJson(SEARCHES_ABSOLUTE, SEARCHES_RELATIVE, SEARCHES_KEYWORD, SOURCES_READ, INPUTS_READ, INPUTS_CREATE, INPUTS_EDIT, OUTPUTS_READ, INDICES_READ, LOGGERS_READ, DASHBOARDS_CREATE, USERS_EDIT, STREAMS_CREATE, COLLECTORS_READ)'
+    data-permissions='@Permissions.asJson(SEARCHES_ABSOLUTE, SEARCHES_RELATIVE, SEARCHES_KEYWORD, SOURCES_READ, INPUTS_READ, INPUTS_CREATE, INPUTS_EDIT, OUTPUTS_READ, INDICES_READ, LOGGERS_READ, DASHBOARDS_CREATE, USERS_EDIT, ROLES_EDIT, STREAMS_CREATE, COLLECTORS_READ)'
     data-request-path="@request.path"
     data-login-name="@currentUser.getName"
     data-full-name="@currentUser.getFullName">

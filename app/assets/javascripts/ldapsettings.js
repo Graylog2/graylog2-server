@@ -1,6 +1,9 @@
 $(document).ready(function() {
     var ldapEnabled = $("#ldap-enabled");
 
+    $("#additionalDefaultGroups")
+      .chosen({search_contains:true, width:"250px", inherit_select_classes:true});
+
     var uri = new URI($(".uri-edit-component").data("uri"));
     var updateSchemeElement = function(uri) {
         $("#ldap-uri-scheme").text(uri.scheme() + "://")
