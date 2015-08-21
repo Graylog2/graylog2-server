@@ -16,8 +16,6 @@
  */
 package org.graylog2.restclient.models.accounts;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest;
@@ -28,7 +26,12 @@ import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 @Singleton
 public class LdapSettingsService {
@@ -65,6 +68,36 @@ public class LdapSettingsService {
         }
         // otherwise just create the new settings object.
         return ldapSettingsFactory.fromSettingsRequest(request);
+    }
+
+    public Set<String> loadGroups() {
+        try {
+            final Set<String> ldapGroups;
+            //noinspection unchecked
+            ldapGroups = (Set<String>)api.path(routes.LdapResource().readGroups(), Set.class).execute();
+            return ldapGroups;
+        } catch (IOException | APIException e) {
+            log.error("Unable to load ldap groups", e);
+            return Collections.emptySet();
+        }
+    }
+
+    public Map<String, String> getGroupMapping() {
+        try {
+            //noinspection unchecked
+            return (Map<String, String>)api.path(routes.LdapResource().readGroupMapping(), Map.class).execute();
+        } catch (APIException | IOException e) {
+            log.error("Unable to load ldap group mapping", e);
+            return Collections.emptyMap();
+        }
+    }
+
+    public void updateGroupMapping(Map<String, String> mapping) {
+        try {
+            api.path(routes.LdapResource().updateGroupMappingSettings()).body(mapping).execute();
+        } catch (APIException | IOException e) {
+            log.error("Unable to update ldap group mapping", e);
+        }
     }
 
     public LdapConnectionTestResponse testLdapConfiguration(LdapTestConnectionRequest request) throws APIException, IOException {
