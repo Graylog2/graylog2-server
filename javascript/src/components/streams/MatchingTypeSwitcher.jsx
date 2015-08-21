@@ -14,8 +14,7 @@ class MatchingTypeSwitcher extends Component {
       requestChange: this.handleTypeChange.bind(this),
     };
     return (
-      <div>
-        A message needs to match{' '}
+      <div className="streamrule-connector-type-form">
         <OverlayTrigger
           placement="top"
           ref="savedTooltip"
@@ -23,9 +22,9 @@ class MatchingTypeSwitcher extends Component {
           defaultOverlayShown={false}
           overlay={<Tooltip>Saved!</Tooltip>}>
           <div>
-            <Input type="radio" label="Matching all of the following rules"
+            <Input type="radio" label="A message must mactch all of the following rules"
                    checked={this.props.stream.matching_type === 'AND'} onChange={this.handleTypeChangeToAnd.bind(this)}/>
-            <Input type="radio" label="Matching at least one of the following rules"
+            <Input type="radio" label="A message must match at least one of the following rules"
                    checked={this.props.stream.matching_type === 'OR'} onChange={this.handleTypeChangeToOr.bind(this)}/>
           </div>
         </OverlayTrigger>
