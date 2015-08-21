@@ -205,6 +205,7 @@ POST          /a/tools/regex_test                                               
 POST          /a/tools/substring_test                                                            @controllers.api.ToolsApiController.substringTest()
 POST          /a/tools/split_and_index_test                                                      @controllers.api.ToolsApiController.splitAndIndexTest()
 POST          /a/tools/grok_test                                                                 @controllers.api.ToolsApiController.grokTest()
+POST          /a/tools/json_test                                                                 @controllers.api.ToolsApiController.jsonTest()
 GET           /a/tools/natural_date_test                                                         @controllers.api.ToolsApiController.naturalDateTest(string ?= "")
 
 # API: Server Connection

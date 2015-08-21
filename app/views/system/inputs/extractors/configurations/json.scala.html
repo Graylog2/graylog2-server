@@ -1,0 +1,85 @@
+@(extractor: org.graylog2.restclient.models.Extractor = null)
+@flatten = @{
+    if(extractor == null) {
+        false
+    } else {
+        Boolean.parseBoolean(String.valueOf(extractor.getExtractorConfig.get("flatten")))
+    }
+}
+@list_separator = @{
+    if(extractor == null) {
+        ", "
+    } else {
+        String.valueOf(extractor.getExtractorConfig.get("list_separator"))
+    }
+}
+@key_separator = @{
+    if(extractor == null) {
+        "."
+    } else {
+        String.valueOf(extractor.getExtractorConfig.get("key_separator"))
+    }
+}
+@kv_separator = @{
+    if(extractor == null) {
+        "="
+    } else {
+        String.valueOf(extractor.getExtractorConfig.get("kv_separator"))
+    }
+}
+
+<input type="hidden" name="extractor_type" value="json" />
+<div class="form-group">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="checkbox">
+                <label for="flatten">
+                    <input name="flatten" id="flatten" type="checkbox" value="flatten" @if(flatten) { checked="checked" } />
+                    Flatten structures
+                </label>
+            </div>
+            <span class="help-block">
+                Whether to flatten JSON objects into a single message field or to expand into multiple fields.
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="list_separator">List item separator:</label>
+    <div class="row">
+        <div class="col-md-5">
+            <input name="list_separator" id="list_separator" type="text" class="form-control" value="@list_separator" required />
+        </div>
+    </div>
+    <span class="help-block">
+        What string to use to concatenate items of a JSON list.
+    </span>
+</div>
+<div class="form-group">
+    <label for="key_separator">Key separator:</label>
+    <div class="row">
+        <div class="col-md-5">
+            <input name="key_separator" id="key_separator" type="text" class="form-control" value="@key_separator" required />
+        </div>
+    </div>
+    <span class="help-block">
+        What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).
+    </span>
+</div>
+<div class="form-group">
+    <label for="kv_separator">Key/value separator:</label>
+    <div class="row">
+        <div class="col-md-5">
+            <input name="kv_separator" id="kv_separator" type="text" class="form-control" value="@kv_separator" required />
+        </div>
+    </div>
+    <span class="help-block">
+        What string to use when concatenating key/value pairs of a JSON object (only used if flattened).
+    </span>
+</div>
+
+<button class="btn btn-info xtrc-try-json" type="button">Try!</button>
+
+<div id="json-matches">
+</div>
