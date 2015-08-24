@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class IndexRangesRecalculationNotification implements NotificationType {
-    private static final String TITLE = "Index ranges recalculation required!";
+    private static final String TITLE = "Index ranges recalculation required";
     private static final String DESCRIPTION = "The index ranges are out of sync. Please go to System/Indices and trigger a index range recalculation from the Maintenance menu.";
 
     private final Notification notification;
