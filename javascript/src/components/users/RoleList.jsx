@@ -25,6 +25,7 @@ var RoleList = React.createClass({
 
         let actions = [
             <button key="delete" className="btn btn-primary btn-xs" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</button>,
+            <span>&nbsp;</span>,
             <button key="edit" className="btn btn-info btn-xs" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</button>
         ];
 
@@ -32,7 +33,7 @@ var RoleList = React.createClass({
             <tr key={role.name}>
                 <td className="centered">{role.name}</td>
                 <td className="limited">{role.description}</td>
-                <td>
+                <td style={{width: 150}}>
                     {role.read_only ? null : actions}
                 </td>
             </tr>
