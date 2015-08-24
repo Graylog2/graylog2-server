@@ -108,6 +108,9 @@ var Navigation = React.createClass({
         if (this._isActive("/system/users")) {
             suffix = " / Users";
         }
+        if (this._isActive("/system/roles")) {
+            suffix = " / Roles";
+        }
         if (this._isActive("/system/contentpacks")) {
             suffix = " / Content Packs";
         }
