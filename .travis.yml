@@ -36,6 +36,7 @@ deploy:
       - master
       - 1.0
       - 1.1
+      - 1.2
 notifications:
   slack:
     on_success: change
