@@ -32,10 +32,9 @@ const LdapGroupsComponent = React.createClass({
     const options = this.state.roles.sort().map(role => {
       return (<option key={role.name} value={role.name}>{role.name}</option>);
     });
-    const content = this.state.groups.sort().map(group => {
+    const content = this.state.groups.sortBy(group => group.toLocaleUpperCase()).map(group => {
       return (<li key={group}>
-        {group}
-        <Input data-group={group} type="select" value={this.state.mapping.get(group, '')} onChange={this._updateMapping}>
+        <Input label={group} data-group={group} type="select" value={this.state.mapping.get(group, '')} onChange={this._updateMapping} labelClassName="col-sm-3" wrapperClassName="col-sm-4">
           <option value="">None</option>
           {options}
         </Input>
@@ -52,15 +51,17 @@ const LdapGroupsComponent = React.createClass({
       </Row>);
     } else {
       return (
-        <Row>
-          <Col md={12}>
-            <ul>{content}</ul>
-          </Col>
-          <Col>
-            <Button onClick={this._saveMapping}>Save</Button>
-            <Button href={jsRoutes.controllers.UsersController.index().url}>Cancel</Button>
-          </Col>
-        </Row>
+        <form className='form-horizontal'>
+          <Row>
+            <Col md={12}>
+              <ul>{content}</ul>
+            </Col>
+            <Col md={10} push={2}>
+              <Button onClick={this._saveMapping} bsStyle="success">Save</Button>&nbsp;
+              <Button href={jsRoutes.controllers.UsersController.index().url}>Cancel</Button>
+            </Col>
+          </Row>
+        </form>
       );
     }
   },
