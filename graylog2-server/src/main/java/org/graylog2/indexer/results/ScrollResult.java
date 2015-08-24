@@ -67,7 +67,7 @@ public class ScrollResult extends IndexQueryResult {
             LOG.debug("[{}] Reached end of scroll results.", queryHash, getOriginalQuery());
             return null;
         }
-        LOG.debug("[{}] New scroll id {}", queryHash, search.getScrollId());
+        LOG.debug("[{}][{}] New scroll id {}, number of hits in chunk: {}", queryHash, chunkId, search.getScrollId(), hits.getHits().length);
         scrollId = search.getScrollId(); // save the id for the next request.
 
         return new ScrollChunk(hits, fields, chunkId++);
