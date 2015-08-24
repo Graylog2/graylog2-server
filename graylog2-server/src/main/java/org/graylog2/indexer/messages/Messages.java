@@ -18,9 +18,11 @@ package org.graylog2.indexer.messages;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -28,6 +30,7 @@ import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
 import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequestBuilder;
@@ -54,6 +57,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Singleton
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
@@ -64,6 +69,10 @@ public class Messages {
         }
     };
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
+    private static final Retryer<BulkResponse> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResponse>newBuilder()
+            .retryIfException(ES_TIMEOUT_EXCEPTION_PREDICATE)
+            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+            .build();
 
     private final Client c;
     private final String deflectorName;
@@ -115,31 +124,29 @@ public class Messages {
             requestBuilder.add(buildIndexRequest(deflectorName, msg.toElasticSearchObject(), msg.getId()));
         }
 
-        final BulkResponse response;
-        try {
-            response = RetryerBuilder.<BulkResponse>newBuilder()
-                    .retryIfException(ES_TIMEOUT_EXCEPTION_PREDICATE)
-                    .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
-                    .build()
-                    .call(new Callable<BulkResponse>() {
-                        @Override
-                        public BulkResponse call() throws Exception {
-                            return c.bulk(requestBuilder.request()).actionGet();
-                        }
-                    });
-        } catch (ExecutionException | RetryException e) {
-            LOG.error("Couldn't bulk index " + messages.size() + " messages.", e);
-            return false;
-        }
+        final BulkResponse response = runBulkRequest(requestBuilder.request());
 
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
                 response.getItems().length, response.getTookInMillis(), response.hasFailures());
-
         if (response.hasFailures()) {
             propagateFailure(response.getItems(), messages, response.buildFailureMessage());
         }
 
         return !response.hasFailures();
+    }
+
+    private BulkResponse runBulkRequest(final BulkRequest request) {
+        try {
+            return c.bulk(request).actionGet();
+        } catch (ElasticsearchTimeoutException timeoutException) {
+            LOG.debug("Bulk indexing request timed out. Retrying.", timeoutException);
+            try {
+                return BULK_REQUEST_RETRYER.call(new BulkRequestCallable(c, request));
+            } catch (ExecutionException | RetryException e) {
+                LOG.error("Couldn't bulk index " + request.numberOfActions() + " messages.", e);
+                throw Throwables.propagate(e);
+            }
+        }
     }
 
     private void propagateFailure(BulkItemResponse[] items, List<Message> messages, String errorMessage) {
@@ -172,5 +179,20 @@ public class Messages {
                 .setOpType(IndexRequest.OpType.INDEX)
                 .setType(IndexMapping.TYPE_MESSAGE)
                 .setConsistencyLevel(WriteConsistencyLevel.ONE);
+    }
+
+    private static class BulkRequestCallable implements Callable<BulkResponse> {
+        private final Client client;
+        private final BulkRequest request;
+
+        public BulkRequestCallable(Client client, BulkRequest request) {
+            this.client = checkNotNull(client);
+            this.request = checkNotNull(request);
+        }
+
+        @Override
+        public BulkResponse call() throws Exception {
+            return client.bulk(request).actionGet();
+        }
     }
 }
