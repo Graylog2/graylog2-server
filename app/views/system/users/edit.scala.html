@@ -87,6 +87,15 @@
 
                 @if(isPermitted(USERS_EDIT)) {
                     <div class="form-group">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">Setting individual permissions is deprecated, please consider migrating to roles instead.</div>
+                                <div class="panel-body">
+                                    The permissions listed here are the result of combining all granted permissions by the roles assigned to a user,
+                                        which you can edit at the bottom of this page, as well as legacy, individual permissions which were assigned to the user before.
+                                </div>
+                            </div>
+                        </div>
                         <label class="col-sm-3 control-label" for="streampermissions">Streams Permissions</label>
                         <div class="col-sm-9">
                             <select id="streampermissions" name="streampermissions[]" class="chosen-select" data-placeholder="Choose read permissions..." multiple>
