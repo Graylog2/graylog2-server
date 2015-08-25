@@ -19,12 +19,15 @@ const LdapGroupsComponent = React.createClass({
       groups: Immutable.Set.of(),
       roles: Immutable.Set.of(),
       mapping: Immutable.Map(),
+      groupsErrorMessage: null,
     };
   },
 
   componentDidMount() {
     LdapGroupsStore.loadMapping().done(mapping => this.setState({mapping: Immutable.Map(mapping), loaded: this.state.loaded + 1}));
-    LdapGroupsStore.loadGroups().done(groups => this.setState({groups: Immutable.Set(groups), loaded: this.state.loaded + 1}));
+    LdapGroupsStore.loadGroups()
+      .done(groups => this.setState({groups: Immutable.Set(groups), loaded: this.state.loaded + 1}))
+      .fail((jqXHR, textStatus, errorThrown) => this.setState({groupsErrorMessage: errorThrown}));
     RolesStore.loadRoles().done(roles => this.setState({roles: Immutable.Set(roles), loaded: this.state.loaded + 1}));
   },
 
@@ -40,13 +43,20 @@ const LdapGroupsComponent = React.createClass({
         </Input>
       </li>);
     });
+    if (this.state.groupsErrorMessage !== null) {
+      return (
+        <div>
+          <Panel header="Error: Unable to load LDAP groups" bsStyle="danger">The error message was:<br/>{this.state.groupsErrorMessage}</Panel>
+        </div>
+      );
+    }
     if (this.state.loading < 3) {
       return <Spinner />;
     }
     if (content.size === 0) {
       return (<Row>
         <Col md={12} push={1}>
-          <Panel bsStyle="info">No LDAP/Active Directory groups found. Please check your LDAP settings.</Panel>
+          <Panel bsStyle="info">No LDAP/Active Directory groups found. Please verify that your <a href={jsRoutes.controllers.LdapController.index().url}>LDAP group mapping</a> settings are correct.</Panel>
         </Col>
       </Row>);
     } else {
