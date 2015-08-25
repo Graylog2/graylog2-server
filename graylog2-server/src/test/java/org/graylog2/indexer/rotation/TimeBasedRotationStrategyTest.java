@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.rotation;
 
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.DateTime;
@@ -30,6 +31,9 @@ import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TimeBasedRotationStrategyTest {
 
@@ -48,21 +52,21 @@ public class TimeBasedRotationStrategyTest {
 
         // should snap to 14:00:00
         period = Period.hours(1);
-        final DateTime hourAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
+        final DateTime hourAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(hourAnchor.getHourOfDay(), 14);
         assertEquals(hourAnchor.getMinuteOfHour(), 0);
         assertEquals(hourAnchor.getSecondOfMinute(), 0);
 
         // should snap to 14:45:00
         period = Period.minutes(5);
-        final DateTime fiveMins = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
+        final DateTime fiveMins = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(fiveMins.getHourOfDay(), 14);
         assertEquals(fiveMins.getMinuteOfHour(), 45);
         assertEquals(fiveMins.getSecondOfMinute(), 0);
 
         // should snap to 2014-3-15 00:00:00
         period = Period.days(1).withHours(6);
-        final DateTime dayAnd6Hours = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
+        final DateTime dayAnd6Hours = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(dayAnd6Hours.getYear(), 2014);
         assertEquals(dayAnd6Hours.getMonthOfYear(), 3);
         assertEquals(dayAnd6Hours.getDayOfMonth(), 15);
@@ -71,13 +75,22 @@ public class TimeBasedRotationStrategyTest {
         assertEquals(dayAnd6Hours.getSecondOfMinute(), 0);
 
         period = Period.days(30);
-        final DateTime thirtyDays = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
+        final DateTime thirtyDays = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(thirtyDays.getYear(), 2014);
         assertEquals(thirtyDays.getMonthOfYear(), 2);
         assertEquals(thirtyDays.getDayOfMonth(), 17);
         assertEquals(thirtyDays.getHourOfDay(), 0);
         assertEquals(thirtyDays.getMinuteOfHour(), 0);
         assertEquals(thirtyDays.getSecondOfMinute(), 0);
+
+        period = Period.hours(1);
+        final DateTime diffAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(initialTime.minusMinutes(61), period);
+        assertEquals(diffAnchor.getYear(), 2014);
+        assertEquals(diffAnchor.getMonthOfYear(), 3);
+        assertEquals(diffAnchor.getDayOfMonth(), 15);
+        assertEquals(diffAnchor.getHourOfDay(), 13);
+        assertEquals(diffAnchor.getMinuteOfHour(), 0);
+        assertEquals(diffAnchor.getSecondOfMinute(), 0);
 
     }
 
@@ -88,13 +101,16 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
 
+        Indices indices = mock(Indices.class);
+        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
+
         final Period period = Period.hours(1);
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(period);
+        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(period, indices);
 
         RotationStrategy.Result result;
 
         result = hourlyRotation.shouldRotate("ignored");
-        assertTrue("Should rotate the first index", result.shouldRotate());
+        assertFalse("Should not rotate the first index", result.shouldRotate());
 
         clock.tick(seconds(2));
 
@@ -114,11 +130,14 @@ public class TimeBasedRotationStrategyTest {
 
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
+        Indices indices = mock(Indices.class);
+        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
 
         final Period period = Period.minutes(10);
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(period);
+        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(period, indices);
         RotationStrategy.Result result;
 
+        // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
         result = tenMinRotation.shouldRotate("ignored");
         assertTrue("Should rotate the first index", result.shouldRotate());
 
