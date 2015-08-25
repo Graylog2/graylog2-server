@@ -26,6 +26,7 @@ import org.graylog2.collectors.Collector;
 import org.graylog2.collectors.CollectorService;
 import org.graylog2.rest.models.collector.requests.CollectorRegistrationRequest;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -60,10 +61,10 @@ public class CollectorRegistrationResource extends RestResource {
             @ApiResponse(code = 400, message = "The supplied request is not valid.")
     })
     public Response register(@ApiParam(name = "collectorId", value = "The collector id this collector is registering as.", required = true)
-                             @PathParam("collectorId") String collectorId,
+                             @PathParam("collectorId") @NotEmpty String collectorId,
                              @ApiParam(name = "JSON body", required = true)
                              @Valid @NotNull CollectorRegistrationRequest request,
-                             @HeaderParam(value = "X-Graylog-Collector-Version") String collectorVersion) {
+                             @HeaderParam(value = "X-Graylog-Collector-Version") @NotEmpty String collectorVersion) {
         final Collector collector = collectorService.fromRequest(collectorId, request, collectorVersion);
 
         collectorService.save(collector);
