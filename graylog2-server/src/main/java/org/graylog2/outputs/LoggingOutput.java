@@ -32,16 +32,13 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class LoggingOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(LoggingOutput.class);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final Configuration configuration;
 
     @Inject
-    public LoggingOutput(@Assisted Stream stream, @Assisted Configuration config) throws MessageOutputConfigurationException {
+    public LoggingOutput(@Assisted Configuration config) throws MessageOutputConfigurationException {
         LOG.info("Initializing");
         configuration = config;
         isRunning.set(true);
@@ -68,7 +65,6 @@ public class LoggingOutput implements MessageOutput {
         for (Message message : messages) {
             write(message);
         }
-
     }
 
     public interface Factory extends MessageOutput.Factory<LoggingOutput> {

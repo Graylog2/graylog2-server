@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.DateTime;
@@ -39,18 +40,20 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
 
     private final Period rotationPeriod;
+    private final Indices indices;
     private DateTime lastRotation;
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(ElasticsearchConfiguration configuration) {
-        this(configuration.getMaxTimePerIndex());
+    public TimeBasedRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
+        this(configuration.getMaxTimePerIndex(), indices);
     }
 
-    public TimeBasedRotationStrategy(Period rotationPeriod) {
+    public TimeBasedRotationStrategy(Period rotationPeriod, Indices indices) {
         this.rotationPeriod = rotationPeriod.normalizedStandard();
         anchor = determineRotationPeriodAnchor(rotationPeriod);
         lastRotation = null;
+        this.indices = indices;
     }
 
     /**
@@ -114,13 +117,16 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
 
     @Nonnull
     @Override
-    public Result shouldRotate(String ignored) {
-        // in case we could not determine the last time a time-based rotation was performed, always rotate immediately
+    public Result shouldRotate(String index) {
         final DateTime now = Tools.iso8601();
+        // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (lastRotation == null) {
-            lastRotation = now;
+            lastRotation = indices.indexCreationDate(index);
             anchor = determineRotationPeriodAnchor(rotationPeriod);
-            return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
+            // still not able to figure out the last rotation time, we'll rotate forcibly
+            if (lastRotation == null) {
+                return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
+            }
         }
 
         final DateTime nextRotation = anchor.plus(rotationPeriod);
