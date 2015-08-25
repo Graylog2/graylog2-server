@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.rotation;
 
+import com.google.common.base.MoreObjects;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
@@ -29,11 +30,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
 
-import static org.joda.time.DateTimeFieldType.*;
+import static org.joda.time.DateTimeFieldType.dayOfMonth;
+import static org.joda.time.DateTimeFieldType.hourOfDay;
+import static org.joda.time.DateTimeFieldType.minuteOfHour;
+import static org.joda.time.DateTimeFieldType.monthOfYear;
+import static org.joda.time.DateTimeFieldType.secondOfMinute;
+import static org.joda.time.DateTimeFieldType.weekOfWeekyear;
+import static org.joda.time.DateTimeFieldType.year;
 
 @Singleton
 public class TimeBasedRotationStrategy implements RotationStrategy {
@@ -51,7 +59,7 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
 
     public TimeBasedRotationStrategy(Period rotationPeriod, Indices indices) {
         this.rotationPeriod = rotationPeriod.normalizedStandard();
-        anchor = determineRotationPeriodAnchor(rotationPeriod);
+        anchor = determineRotationPeriodAnchor(null, rotationPeriod);
         lastRotation = null;
         this.indices = indices;
     }
@@ -70,7 +78,7 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
      * @param period the rotation period
      * @return the anchor DateTime to calculate rotation periods from
      */
-    protected static DateTime determineRotationPeriodAnchor(Period period) {
+    protected static DateTime determineRotationPeriodAnchor(@Nullable DateTime lastAnchor, Period period) {
         final Period normalized = period.normalizedStandard();
         int years = normalized.getYears();
         int months = normalized.getMonths();
@@ -97,12 +105,12 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
             throw new IllegalArgumentException("Could not determine rotation stride length.");
         }
 
-        final DateTime now = Tools.iso8601();
+        final DateTime anchorTime = MoreObjects.firstNonNull(lastAnchor, Tools.iso8601());
 
-        final DateTimeField field = largestStrideType.getField(now.getChronology());
+        final DateTimeField field = largestStrideType.getField(anchorTime.getChronology());
         // use normalized here to make sure we actually have the largestStride type available! see https://github.com/Graylog2/graylog2-server/issues/836
         int periodValue = normalized.get(largestStrideType.getDurationType());
-        final long fieldValue = field.roundFloor(now.getMillis());
+        final long fieldValue = field.roundFloor(anchorTime.getMillis());
 
         final int fieldValueInUnit = field.get(fieldValue);
         if (periodValue == 0) {
@@ -122,7 +130,7 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (lastRotation == null) {
             lastRotation = indices.indexCreationDate(index);
-            anchor = determineRotationPeriodAnchor(rotationPeriod);
+            anchor = determineRotationPeriodAnchor(lastRotation, rotationPeriod);
             // still not able to figure out the last rotation time, we'll rotate forcibly
             if (lastRotation == null) {
                 return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
