@@ -133,7 +133,7 @@ public class LdapController extends AuthenticatedController {
     public Result apiTestLdapLogin() {
         final DynamicForm dynamicForm = form().bindFromRequest(
                 "url", "systemUsername", "systemPassword", "ldapType", "useStartTls", "trustAllCertificates",
-                "searchBase", "searchPattern", "principal", "password");
+                "searchBase", "searchPattern", "principal", "password", "groupSearchBase", "groupIdAttribute");
         final Map<String, String> formData = dynamicForm.data();
 
         LdapConnectionTestResponse result;
@@ -146,6 +146,8 @@ public class LdapController extends AuthenticatedController {
             request.searchPattern = formData.get("searchPattern");
             request.principal = formData.get("principal");
             request.password = formData.get("password");
+            request.groupSearchBase= formData.get("groupSearchBase");
+            request.groupIdAttribute= formData.get("groupIdAttribute");
             result = ldapSettingsService.testLdapConfiguration(request);
         } catch (APIException e) {
             log.error("Unable to test login: {}", e.getMessage());

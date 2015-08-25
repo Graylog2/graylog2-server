@@ -174,7 +174,9 @@ $(document).ready(function() {
                 searchPattern: $("#searchPattern").val(),
                 displayNameAttribute: $("#displayNameAttribute").val(),
                 principal: $("#ldap-test-username").val(),
-                password: $("#ldap-test-password").val()
+                password: $("#ldap-test-password").val(),
+                groupSearchBase: $("#groupSearchBase").val(),
+                groupIdAttribute: $("#groupIdAttribute").val()
             },
             success: function(loginResult) {
                 var isEmptyEntry = $.isEmptyObject(loginResult.entry);
@@ -183,11 +185,16 @@ $(document).ready(function() {
                     var buttonMessage = loginResult.login_authenticated ? "Login ok!" : "User found!";
                     ldapTestLoginButton.removeClass().addClass("btn btn-success").text(buttonMessage);
 
-                    Object.keys(loginResult.entry).forEach(function(element) {
+                    Object.keys(loginResult.entry).forEach(function (element) {
                         $("#ldap-entry-attributes")
-                            .append("<dt>" + element + "</dt>")
-                            .append("<dd>" + loginResult.entry[element] + "</dd>");
+                          .append("<dt>" + element + "</dt>")
+                          .append("<dd>" + loginResult.entry[element] + "</dd>");
                     });
+                    if (typeof(loginResult.groups) !== "undefined") {
+                        loginResult.groups.map(function (group) {
+                            $("#ldap-group-list").append("<li>" + group + "</li>");
+                        });
+                    }
                     var login_auth_classes = "";
                     var entry_exists_classes = "";
                     if (loginResult.login_authenticated) {
