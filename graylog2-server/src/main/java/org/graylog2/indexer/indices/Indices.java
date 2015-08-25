@@ -33,6 +33,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
@@ -49,7 +51,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
@@ -66,6 +67,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +129,11 @@ public class Indices implements IndexManagement {
                 BulkResponse response = c.bulk(request.request()).actionGet();
 
                 LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                        source, target, response.getItems().length, response.getTookInMillis(), response.hasFailures());
+                         source,
+                         target,
+                         response.getItems().length,
+                         response.getTookInMillis(),
+                         response.hasFailures());
 
                 if (response.hasFailures()) {
                     throw new RuntimeException("Failed to move a message. Check your indexer log.");
@@ -419,5 +426,25 @@ public class Indices implements IndexManagement {
 
         final ClusterHealthResponse response = c.admin().cluster().health(request).actionGet(5L, TimeUnit.MINUTES);
         return response.getStatus();
+    }
+
+    @Nullable
+    public DateTime indexCreationDate(String index) {
+        final GetIndexRequest indexRequest = c.admin().indices().prepareGetIndex()
+                .addFeatures(GetIndexRequest.Feature.SETTINGS)
+                .addIndices(index)
+                .request();
+        try {
+            final GetIndexResponse response = c.admin().indices()
+                    .getIndex(indexRequest).actionGet(1,TimeUnit.SECONDS);
+            final Settings settings = response.settings().get(index);
+            if (settings == null) {
+                return null;
+            }
+            return new DateTime(settings.getAsLong("creation_date", 0L), DateTimeZone.UTC);
+        } catch (ElasticsearchException e) {
+            LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
+            return null;
+        }
     }
 }

@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.rotation;
 
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -30,6 +32,9 @@ import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TimeBasedRotationStrategyTest {
 
@@ -88,8 +93,11 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
 
+        Indices indices = mock(Indices.class);
+        when(indices.indexCreationDate(anyString())).thenReturn(Tools.iso8601());
+
         final Period period = Period.hours(1);
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(period);
+        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(period, indices);
 
         RotationStrategy.Result result;
 
@@ -114,9 +122,11 @@ public class TimeBasedRotationStrategyTest {
 
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
+        Indices indices = mock(Indices.class);
+        when(indices.indexCreationDate(anyString())).thenReturn(Tools.iso8601());
 
         final Period period = Period.minutes(10);
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(period);
+        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(period, indices);
         RotationStrategy.Result result;
 
         result = tenMinRotation.shouldRotate("ignored");
