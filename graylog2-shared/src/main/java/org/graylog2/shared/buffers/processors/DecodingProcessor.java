@@ -33,6 +33,7 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         try {
             processMessage(event);
         } catch (Exception e) {
-            LOG.error("Error processing message " + event.getRaw(), e);
+            LOG.error("Error processing message " + event.getRaw(), ExceptionUtils.getRootCause(e));
 
             // always clear the event fields, even if they are null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
@@ -135,6 +136,13 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message = codec.decode(raw);
             }
         } catch (RuntimeException e) {
+            String remote = "unknown source";
+            final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
+            if (remoteAddress != null) {
+                remote = remoteAddress.getInetSocketAddress().toString();
+            }
+            LOG.error("Unable to decode raw message {} (journal offset {}) encoded as {} received from {}.",
+                      raw.getId(), raw.getJournalOffset(), raw.getCodecName(), remote);
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
             throw e;
         } finally {
