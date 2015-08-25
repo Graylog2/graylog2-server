@@ -17,8 +17,8 @@
 package org.graylog2.periodical;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -35,22 +35,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A {@link Periodical} to check if index ranges need to be recalculated and notify the administrators about it.
  *
  * @see <a href="https://github.com/Graylog2/graylog2-server/pull/1274">Refactor index ranges handling (#1274)</a>
+ * @since 1.2.0
  */
 public class IndexRangesMigrationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesMigrationPeriodical.class);
 
     private final Cluster cluster;
-    private final Indices indices;
+    private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final NotificationService notificationService;
 
     @Inject
     public IndexRangesMigrationPeriodical(final Cluster cluster,
-                                          final Indices indices,
+                                          final Deflector deflector,
                                           final IndexRangeService indexRangeService,
                                           final NotificationService notificationService) {
         this.cluster = checkNotNull(cluster);
-        this.indices = checkNotNull(indices);
+        this.deflector = checkNotNull(deflector);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.notificationService = checkNotNull(notificationService);
     }
@@ -61,7 +62,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         }
 
-        final int numberOfIndices = indices.getAll().size();
+        final int numberOfIndices = deflector.getAllDeflectorIndexNames().length;
         final int numberOfIndexRanges = indexRangeService.findAll().size();
         if (numberOfIndices > numberOfIndexRanges) {
             LOG.info("There are more indices ({}) than there are index ranges ({}). Notifying administrator.",

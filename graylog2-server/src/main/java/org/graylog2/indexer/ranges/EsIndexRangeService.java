@@ -111,6 +111,7 @@ public class EsIndexRangeService implements IndexRangeService {
                     (int) fields.get(IndexRange.FIELD_TOOK_MS)
             );
         } catch (Exception e) {
+            LOG.debug("Couldn't create index range from fields: " + fields);
             return null;
         }
     }
