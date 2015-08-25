@@ -19,6 +19,7 @@
 package controllers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
@@ -102,7 +103,12 @@ public class LdapController extends AuthenticatedController {
                                                       selectedAdditionalGroups));
     }
     public Result groups() {
-        return ok(groups.render(currentUser()));
+        final LdapSettings ldapSettings = ldapSettingsService.load();
+        boolean groupSettingsEnabled = false;
+        if (ldapSettings != null) {
+            groupSettingsEnabled = !Strings.isNullOrEmpty(ldapSettings.getGroupSearchBase()) && !Strings.isNullOrEmpty(ldapSettings.getGroupIdAttribute());
+        }
+        return ok(groups.render(currentUser(), ldapSettings != null && ldapSettings.isEnabled(), groupSettingsEnabled));
     }
 
     public Result apiTestLdapConnection() {

@@ -1,4 +1,4 @@
-@(currentUser: org.graylog2.restclient.models.User)
+@(currentUser: org.graylog2.restclient.models.User, ldapEnabled: Boolean, groupSettingsEnabled: Boolean)
 
 @main("LDAP Group mapping", null, "", currentUser, false) {
     <div class="row content content-head">
@@ -10,7 +10,15 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <div id="react-ldapgroups-component"></div>
+            @if(!ldapEnabled) {
+                <div>LDAP is disabled, cannot edit LDAP group mapping. Please enable LDAP integration in the <a href="@routes.LdapController.index()">LDAP settings</a>.</div>
+            } else {
+                @if(!groupSettingsEnabled) {
+                    <div>Required LDAP configuration is not set, please check the <a href="@routes.LdapController.index()">LDAP configuration settings</a> to enable group mapping.</div>
+                } else {
+                    <div id="react-ldapgroups-component"></div>
+                }
+            }
         </div>
     </div>
 }
