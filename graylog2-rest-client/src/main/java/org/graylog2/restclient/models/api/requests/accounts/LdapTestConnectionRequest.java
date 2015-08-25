@@ -53,4 +53,10 @@ public class LdapTestConnectionRequest extends ApiRequest {
 
     @JsonProperty("password")
     public String password;
+
+    @JsonProperty("group_search_base")
+    public String groupSearchBase;
+
+    @JsonProperty("group_id_attribute")
+    public String groupIdAttribute;
 }

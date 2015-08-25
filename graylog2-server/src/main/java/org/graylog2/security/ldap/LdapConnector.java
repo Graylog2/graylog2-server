@@ -155,7 +155,7 @@ public class LdapConnector {
                           filter,
                           ldapEntry);
             } else {
-                LOG.trace("LDAP group search base or group id attribute missing, not searching for LDAP groups.");
+                LOG.info("LDAP group search base or group id attribute missing, not searching for LDAP groups.");
             }
             return ldapEntry;
         } finally {
@@ -181,7 +181,7 @@ public class LdapConnector {
                     "*");
             for (Entry e : groupSearch) {
                 if (! e.containsAttribute(groupIdAttribute)) {
-                    LOG.trace("Unknown group id attribute {}, skipping group entry {}", groupIdAttribute, e);
+                    LOG.warn("Unknown group id attribute {}, skipping group entry {}", groupIdAttribute, e);
                     continue;
                 }
                 final String groupId = e.get(groupIdAttribute).getString();
@@ -218,8 +218,8 @@ public class LdapConnector {
                     SearchScope.SUBTREE,
                     "*");
             for (Entry e : groupSearch) {
-                if (! e.containsAttribute(groupIdAttribute)) {
-                    LOG.trace("Unknown group id attribute {}, skipping group entry {}", groupIdAttribute, e);
+                if (!e.containsAttribute(groupIdAttribute)) {
+                    LOG.warn("Unknown group id attribute {}, skipping group entry {}", groupIdAttribute, e);
                     continue;
                 }
                 final String groupId = e.get(groupIdAttribute).getString();

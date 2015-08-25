@@ -19,6 +19,7 @@ package org.graylog2.restclient.models.api.responses.accounts;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
+import java.util.Set;
 
 public class LdapConnectionTestResponse {
     public boolean connected;
@@ -30,6 +31,8 @@ public class LdapConnectionTestResponse {
     public boolean loginAuthenticated;
 
     public Map<String, String> entry;
+
+    public Set<String> groups;
 
     public String exception;
 }

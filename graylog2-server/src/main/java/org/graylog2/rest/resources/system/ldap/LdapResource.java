@@ -143,11 +143,11 @@ public class LdapResource extends RestResource {
             try {
                 connection = ldapConnector.connect(config);
             } catch (LdapException e) {
-                return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), e.getMessage());
+                return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), Collections.<String>emptySet(), e.getMessage());
             }
 
             if (null == connection) {
-                return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), "Could not connect to LDAP server");
+                return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), Collections.<String>emptySet(), "Could not connect to LDAP server");
             }
 
             boolean connected = connection.isConnected();
@@ -155,13 +155,14 @@ public class LdapResource extends RestResource {
 
             // the web interface allows testing the connection only, in that case we can bail out early.
             if (request.testConnectOnly()) {
-                return LdapTestConfigResponse.create(connected, systemAuthenticated, false, Collections.<String, String>emptyMap());
+                return LdapTestConfigResponse.create(connected, systemAuthenticated, false, Collections.<String, String>emptyMap(), Collections.<String>emptySet());
             }
 
             String userPrincipalName = null;
             boolean loginAuthenticated = false;
             Map<String, String> entryMap = Collections.emptyMap();
             String exception = null;
+            Set<String> groups = Collections.emptySet();
             try {
                 final LdapEntry entry = ldapConnector.search(
                         connection,
@@ -174,6 +175,7 @@ public class LdapResource extends RestResource {
                 if (entry != null) {
                     userPrincipalName = entry.getBindPrincipal();
                     entryMap = entry.getAttributes();
+                    groups = entry.getGroups();
                 }
             } catch (CursorException | LdapException e) {
                 exception = e.getMessage();
@@ -185,7 +187,7 @@ public class LdapResource extends RestResource {
                 exception = e.getMessage();
             }
 
-            return LdapTestConfigResponse.create(connected, systemAuthenticated, loginAuthenticated, entryMap, exception);
+            return LdapTestConfigResponse.create(connected, systemAuthenticated, loginAuthenticated, entryMap, groups, exception);
         } finally {
             if (connection != null) {
                 try {

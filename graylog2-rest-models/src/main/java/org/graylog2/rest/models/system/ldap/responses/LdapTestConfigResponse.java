@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -40,6 +41,9 @@ public abstract class LdapTestConfigResponse {
     public abstract Map<String, String> entry();
 
     @JsonProperty
+    public abstract Set<String> groups();
+
+    @JsonProperty
     @Nullable
     public abstract String exception();
 
@@ -48,13 +52,15 @@ public abstract class LdapTestConfigResponse {
                                                 @JsonProperty("system_authenticated") boolean systemAuthenticated,
                                                 @JsonProperty("login_authenticated") boolean loginAuthenticated,
                                                 @JsonProperty("entry") Map<String, String> entry,
+                                                @JsonProperty("groups") Set<String> groups,
                                                 @JsonProperty("exception") @Nullable String exception) {
-        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, exception);
+        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, groups, exception);
     }
     public static LdapTestConfigResponse create(boolean connected,
                                                 boolean systemAuthenticated,
                                                 boolean loginAuthenticated,
-                                                Map<String, String> entry) {
-        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, null);
+                                                Map<String, String> entry,
+                                                Set<String> groups) {
+        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, groups, null);
     }
 }
