@@ -115,7 +115,7 @@ public abstract class SearchResource extends RestResource {
                 return searches.fieldStats(field, query, filter, timeRange, true, true);
             } catch (Searches.FieldTypeException e1) {
                 LOG.error("Retrieving field statistics for field {} failed while calculating the cardinality. Cause: {}", field, ExceptionUtils.getRootCauseMessage(e1));
-                throw new BadRequestException();
+                throw new BadRequestException("Field " + field + " is not of a numeric type and the cardinality could not be calculated either.", e1);
             }
         }
     }
