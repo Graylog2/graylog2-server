@@ -25,6 +25,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,12 +79,12 @@ public class GrokExtractorTest {
         assertEquals("ISO date is parsed", 1, results.length);
         Object value = results[0].getValue();
         assertTrue(value instanceof Date);
-        DateTime date = new DateTime(value);
+        DateTime date = new DateTime(value, DateTimeZone.UTC);
 
         assertEquals(2015, date.getYear());
         assertEquals(7, date.getMonthOfYear());
         assertEquals(31, date.getDayOfMonth());
-        assertEquals(12, date.getHourOfDay());
+        assertEquals(10, date.getHourOfDay());
         assertEquals(5, date.getMinuteOfHour());
         assertEquals(36, date.getSecondOfMinute());
         assertEquals(773, date.getMillisOfSecond());
