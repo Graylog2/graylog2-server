@@ -33,18 +33,13 @@ import org.elasticsearch.action.get.MultiGetRequestBuilder;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.Index;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
@@ -128,23 +123,9 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        final RangeQueryBuilder beginRangeQuery = QueryBuilders.rangeQuery(IndexRange.FIELD_BEGIN).gte(begin.getMillis());
-        final RangeQueryBuilder endRangeQuery = QueryBuilders.rangeQuery(IndexRange.FIELD_END).lte(end.getMillis());
-        final BoolQueryBuilder completeRangeQuery = QueryBuilders.boolQuery()
-                .must(beginRangeQuery)
-                .must(endRangeQuery);
-        final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
-                .setQuery(completeRangeQuery)
-                .setSize(Integer.MAX_VALUE)
-                .request();
-
-        final SearchResponse response = client.search(request).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
-            if (indexRange != null) {
+        for (IndexRange indexRange : findAll()) {
+            if (indexRange.begin().getMillis() >= begin.getMillis() && indexRange.end().getMillis() <= end.getMillis()) {
                 indexRanges.add(indexRange);
             }
         }
