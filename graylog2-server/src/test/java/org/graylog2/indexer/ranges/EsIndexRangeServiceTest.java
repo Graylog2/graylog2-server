@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -68,10 +70,10 @@ public class EsIndexRangeServiceTest {
     @Rule
     public ElasticsearchRule elasticsearchRule;
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     @Inject
     private Client client;
     private Indices indices;
-    private Deflector deflector;
 
     private EsIndexRangeService indexRangeService;
 
@@ -83,8 +85,8 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
-        deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, null, indices);
-        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices, deflector);
+        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, null, indices);
+        indexRangeService = new EsIndexRangeService(client, objectMapper, indices, deflector, Duration.minutes(1L));
     }
 
     @Test

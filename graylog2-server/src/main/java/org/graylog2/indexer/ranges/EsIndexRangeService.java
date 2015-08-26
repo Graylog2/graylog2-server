@@ -18,9 +18,13 @@ package org.graylog2.indexer.ranges;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
@@ -28,9 +32,6 @@ import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetItemResponse;
-import org.elasticsearch.action.get.MultiGetRequestBuilder;
-import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -59,29 +60,64 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
 
+    private final LoadingCache<String, IndexRange> cache;
     private final Client client;
     private final ObjectMapper objectMapper;
     private final Indices indices;
     private final Deflector deflector;
 
     @Inject
-    public EsIndexRangeService(Client client, ObjectMapper objectMapper, Indices indices, Deflector deflector) {
+    public EsIndexRangeService(Client client,
+                               ObjectMapper objectMapper,
+                               Indices indices,
+                               Deflector deflector,
+                               @Named("elasticsearch_index_range_expiration") Duration indexRangeExpiration) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.indices = indices;
         this.deflector = deflector;
+
+        final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
+            @Override
+            public IndexRange load(String indexName) throws Exception {
+                final IndexRange indexRange = loadIndexRange(indexName);
+
+                if (indexRange == null) {
+                    throw new NotFoundException("Couldn't load index range for index " + indexName);
+                }
+
+                return indexRange;
+            }
+        };
+        this.cache = CacheBuilder.<String, IndexRange>newBuilder()
+                .expireAfterWrite(indexRangeExpiration.getQuantity(), indexRangeExpiration.getUnit())
+                .build(cacheLoader);
     }
 
     @Override
-    @Nullable
     public IndexRange get(String index) throws NotFoundException {
+        try {
+            return cache.get(index);
+        } catch (ExecutionException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof NotFoundException) {
+                throw (NotFoundException) cause;
+            } else {
+                throw new NotFoundException(e.getCause());
+            }
+        }
+    }
+
+    private IndexRange loadIndexRange(String index) throws NotFoundException {
         final GetRequest request = new GetRequestBuilder(client, index)
                 .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(index)
@@ -98,7 +134,12 @@ public class EsIndexRangeService implements IndexRangeService {
             throw new NotFoundException("Index [" + index + "] not found.");
         }
 
-        return parseSource(r.getIndex(), r.getSource());
+        final IndexRange indexRange = parseSource(r.getIndex(), r.getSource());
+        if (indexRange == null) {
+            throw new NotFoundException("Index [" + index + "] not found.");
+        }
+
+        return indexRange;
     }
 
     @Nullable
@@ -135,22 +176,12 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        final MultiGetRequestBuilder requestBuilder = client.prepareMultiGet();
-        for (String index : deflector.getAllDeflectorIndexNames()) {
-            requestBuilder.add(index, IndexMapping.TYPE_INDEX_RANGE, index);
-        }
-
-        final MultiGetResponse response = client.multiGet(requestBuilder.request()).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (MultiGetItemResponse itemResponse : response) {
-            if (itemResponse.getFailure() != null) {
-                LOG.warn("Couldn't get index range of index <{}>. Reason:", itemResponse.getIndex(), itemResponse.getFailure().getMessage());
-                continue;
-            }
-
-            final IndexRange indexRange = parseSource(itemResponse.getIndex(), itemResponse.getResponse().getSource());
-            if (indexRange != null) {
-                indexRanges.add(indexRange);
+        for (String index : deflector.getAllDeflectorIndexNames()) {
+            try {
+                indexRanges.add(cache.get(index));
+            } catch (ExecutionException e) {
+                LOG.warn("Couldn't load index range for index " + index, e.getCause());
             }
         }
 
@@ -244,5 +275,7 @@ public class EsIndexRangeService implements IndexRangeService {
         } else {
             LOG.debug("Successfully updated index range: {}", indexRange);
         }
+
+        cache.put(indexName, indexRange);
     }
 }

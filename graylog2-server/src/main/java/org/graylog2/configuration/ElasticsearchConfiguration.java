@@ -123,6 +123,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_request_timeout", validator = PositiveDurationValidator.class)
     private Duration requestTimeout = Duration.minutes(1L);
 
+    @Parameter(value = "elasticsearch_index_range_expiration", validator = PositiveDurationValidator.class)
+    private Duration indexRangeExpiration = Duration.minutes(1L);
+
     public String getClusterName() {
         return clusterName;
     }
@@ -253,5 +256,9 @@ public class ElasticsearchConfiguration {
 
     public Duration getRequestTimeout() {
         return requestTimeout;
+    }
+
+    public Duration getIndexRangeExpiration() {
+        return indexRangeExpiration;
     }
 }
