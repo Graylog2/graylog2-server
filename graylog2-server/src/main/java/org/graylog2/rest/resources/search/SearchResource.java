@@ -109,8 +109,12 @@ public abstract class SearchResource extends RestResource {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
         } catch (Searches.FieldTypeException e) {
-            LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
-            throw new BadRequestException();
+            try {
+                return searches.fieldStats(field, query, filter, timeRange, true, true);
+            } catch (Searches.FieldTypeException e1) {
+                LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
+                throw new BadRequestException();
+            }
         }
     }
 
