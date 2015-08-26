@@ -44,6 +44,7 @@ import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,8 +110,13 @@ public abstract class SearchResource extends RestResource {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
         } catch (Searches.FieldTypeException e) {
-            LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
-            throw new BadRequestException();
+            try {
+                LOG.debug("Stats query failed, make sure that field [{}] is a numeric type. Retrying without numeric statistics to calculate the field's cardinality.", field);
+                return searches.fieldStats(field, query, filter, timeRange, true, true);
+            } catch (Searches.FieldTypeException e1) {
+                LOG.error("Retrieving field statistics for field {} failed while calculating the cardinality. Cause: {}", field, ExceptionUtils.getRootCauseMessage(e1));
+                throw new BadRequestException("Field " + field + " is not of a numeric type and the cardinality could not be calculated either.", e1);
+            }
         }
     }
 
