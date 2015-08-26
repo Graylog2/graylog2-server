@@ -27,6 +27,7 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
@@ -70,6 +71,7 @@ public class EsIndexRangeServiceTest {
     @Inject
     private Client client;
     private Indices indices;
+    private Deflector deflector;
 
     private EsIndexRangeService indexRangeService;
 
@@ -81,7 +83,8 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
-        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices);
+        deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, null, indices);
+        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices, deflector);
     }
 
     @Test

@@ -28,6 +28,9 @@ import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetRequestBuilder;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -47,6 +50,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
@@ -70,12 +74,14 @@ public class EsIndexRangeService implements IndexRangeService {
     private final Client client;
     private final ObjectMapper objectMapper;
     private final Indices indices;
+    private final Deflector deflector;
 
     @Inject
-    public EsIndexRangeService(Client client, ObjectMapper objectMapper, Indices indices) {
+    public EsIndexRangeService(Client client, ObjectMapper objectMapper, Indices indices, Deflector deflector) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.indices = indices;
+        this.deflector = deflector;
     }
 
     @Override
@@ -148,17 +154,20 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
-                .setQuery(QueryBuilders.matchAllQuery())
-                .setSize(Integer.MAX_VALUE)
-                .request();
+        final MultiGetRequestBuilder requestBuilder = client.prepareMultiGet();
+        for (String index : deflector.getAllDeflectorIndexNames()) {
+            requestBuilder.add(index, IndexMapping.TYPE_INDEX_RANGE, index);
+        }
 
-        final SearchResponse response = client.search(request).actionGet();
+        final MultiGetResponse response = client.multiGet(requestBuilder.request()).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
+        for (MultiGetItemResponse itemResponse : response) {
+            if (itemResponse.getFailure() != null) {
+                LOG.warn("Couldn't get index range of index <{}>. Reason:", itemResponse.getIndex(), itemResponse.getFailure().getMessage());
+                continue;
+            }
+
+            final IndexRange indexRange = parseSource(itemResponse.getIndex(), itemResponse.getResponse().getSource());
             if (indexRange != null) {
                 indexRanges.add(indexRange);
             }
