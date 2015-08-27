@@ -57,11 +57,6 @@ public class IndexChangeMonitor extends AbstractLifecycleComponent<IndexChangeMo
         }
 
         if (eventBus != null) {
-            final List<String> indicesCreated = event.indicesCreated();
-            if (!indicesCreated.isEmpty()) {
-                eventBus.post(IndicesCreatedEvent.create(indicesCreated));
-            }
-
             final List<String> indicesDeleted = event.indicesDeleted();
             if (!indicesDeleted.isEmpty()) {
                 eventBus.post(IndicesDeletedEvent.create(indicesDeleted));
