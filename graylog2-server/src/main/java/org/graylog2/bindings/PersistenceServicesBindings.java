@@ -62,7 +62,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(PersistedDeadLetterService.class).to(PersistedDeadLetterServiceImpl.class);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
-        bind(IndexRangeService.class).to(EsIndexRangeService.class);
+        bind(IndexRangeService.class).to(EsIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class);

@@ -16,7 +16,10 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
@@ -27,6 +30,7 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
@@ -67,6 +71,7 @@ public class EsIndexRangeServiceTest {
     @Rule
     public ElasticsearchRule elasticsearchRule;
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     @Inject
     private Client client;
     private Indices indices;
@@ -81,7 +86,9 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
-        indexRangeService = new EsIndexRangeService(client, new ObjectMapperProvider().get(), indices);
+        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, null, indices);
+        indexRangeService = new EsIndexRangeService(client, objectMapper, indices, deflector,
+                new EventBus("local"), new EventBus("cluster"), new MetricRegistry());
     }
 
     @Test

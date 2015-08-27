@@ -14,14 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.indexer.ranges;
 
-import org.elasticsearch.common.inject.AbstractModule;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-public class MonitorModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(ClusterStateMonitor.class).asEagerSingleton();
-        bind(IndexChangeMonitor.class).asEagerSingleton();
+@JsonAutoDetect
+@AutoValue
+public abstract class IndexRangeUpdatedEvent {
+    private static final String FIELD_INDEX_NAME = "index_name";
+
+    @JsonProperty(FIELD_INDEX_NAME)
+    public abstract String indexName();
+
+    @JsonCreator
+    public static IndexRangeUpdatedEvent create(@JsonProperty(FIELD_INDEX_NAME) String indexName) {
+        return new AutoValue_IndexRangeUpdatedEvent(indexName);
     }
 }

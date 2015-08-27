@@ -16,12 +16,19 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
@@ -30,27 +37,28 @@ import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.Index;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.esplugin.IndexChangeMonitor;
+import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -60,27 +68,77 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
 
+    private final LoadingCache<String, IndexRange> cache;
     private final Client client;
     private final ObjectMapper objectMapper;
     private final Indices indices;
+    private final Deflector deflector;
+    private final EventBus clusterEventBus;
+
 
     @Inject
-    public EsIndexRangeService(Client client, ObjectMapper objectMapper, Indices indices) {
+    public EsIndexRangeService(Client client,
+                               ObjectMapper objectMapper,
+                               Indices indices,
+                               Deflector deflector,
+                               EventBus eventBus,
+                               @ClusterEventBus EventBus clusterEventBus,
+                               MetricRegistry metricRegistry) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.indices = indices;
+        this.deflector = deflector;
+        this.clusterEventBus = clusterEventBus;
+
+        final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
+            @Override
+            public IndexRange load(String indexName) throws Exception {
+                final IndexRange indexRange = loadIndexRange(indexName);
+
+                if (indexRange == null) {
+                    throw new NotFoundException("Couldn't load index range for index " + indexName);
+                }
+
+                return indexRange;
+            }
+        };
+        this.cache = CacheBuilder.<String, IndexRange>newBuilder()
+                .recordStats()
+                .build(cacheLoader);
+
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(MetricRegistry.name(this.getClass(), "cache"), cache));
+
+        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
+        IndexChangeMonitor.setEventBus(eventBus);
+        eventBus.register(this);
+        clusterEventBus.register(this);
     }
 
     @Override
-    @Nullable
     public IndexRange get(String index) throws NotFoundException {
+        try {
+            return cache.get(index);
+        } catch (ExecutionException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof NotFoundException) {
+                throw (NotFoundException) cause;
+            } else {
+                throw new NotFoundException(e.getCause());
+            }
+        }
+    }
+
+    private IndexRange loadIndexRange(String index) throws NotFoundException {
         final GetRequest request = new GetRequestBuilder(client, index)
                 .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(index)
@@ -94,10 +152,15 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         if (!r.isExists()) {
-            throw new NotFoundException("Index [" + index + "] not found.");
+            throw new NotFoundException("Couldn't find index range for index " + index);
         }
 
-        return parseSource(r.getIndex(), r.getSource());
+        final IndexRange indexRange = parseSource(r.getIndex(), r.getSource());
+        if (indexRange == null) {
+            throw new NotFoundException("Couldn't parse index range for index " + index);
+        }
+
+        return indexRange;
     }
 
     @Nullable
@@ -122,23 +185,9 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        final RangeQueryBuilder beginRangeQuery = QueryBuilders.rangeQuery(IndexRange.FIELD_BEGIN).gte(begin.getMillis());
-        final RangeQueryBuilder endRangeQuery = QueryBuilders.rangeQuery(IndexRange.FIELD_END).lte(end.getMillis());
-        final BoolQueryBuilder completeRangeQuery = QueryBuilders.boolQuery()
-                .must(beginRangeQuery)
-                .must(endRangeQuery);
-        final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
-                .setQuery(completeRangeQuery)
-                .setSize(Integer.MAX_VALUE)
-                .request();
-
-        final SearchResponse response = client.search(request).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
-            if (indexRange != null) {
+        for (IndexRange indexRange : findAll()) {
+            if (indexRange.begin().getMillis() >= begin.getMillis() && indexRange.end().getMillis() <= end.getMillis()) {
                 indexRanges.add(indexRange);
             }
         }
@@ -148,19 +197,12 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        final SearchRequest request = client.prepareSearch()
-                .setTypes(IndexMapping.TYPE_INDEX_RANGE)
-                .setIndices(indices.allIndicesAlias())
-                .setQuery(QueryBuilders.matchAllQuery())
-                .setSize(Integer.MAX_VALUE)
-                .request();
-
-        final SearchResponse response = client.search(request).actionGet();
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (SearchHit searchHit : response.getHits()) {
-            final IndexRange indexRange = parseSource(searchHit.getIndex(), searchHit.getSource());
-            if (indexRange != null) {
-                indexRanges.add(indexRange);
+        for (String index : deflector.getAllDeflectorIndexNames()) {
+            try {
+                indexRanges.add(cache.get(index));
+            } catch (ExecutionException e) {
+                LOG.warn("Couldn't load index range for index " + index);
             }
         }
 
@@ -240,7 +282,6 @@ public class EsIndexRangeService implements IndexRangeService {
                 .setIndex(indexName)
                 .setType(IndexMapping.TYPE_INDEX_RANGE)
                 .setId(indexName)
-                .setRefresh(true)
                 .setSource(source)
                 .request();
         final IndexResponse response = client.index(request).actionGet();
@@ -254,5 +295,24 @@ public class EsIndexRangeService implements IndexRangeService {
         } else {
             LOG.debug("Successfully updated index range: {}", indexRange);
         }
+
+        cache.put(indexName, indexRange);
+        clusterEventBus.post(IndexRangeUpdatedEvent.create(indexName));
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexDeletion(IndicesDeletedEvent event) {
+        for (String index : event.indices()) {
+            cache.invalidate(index);
+        }
+
+        cache.cleanUp();
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexRangeUpdate(IndexRangeUpdatedEvent event) {
+        cache.refresh(event.indexName());
     }
 }
