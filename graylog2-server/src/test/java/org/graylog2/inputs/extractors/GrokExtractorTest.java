@@ -24,13 +24,17 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class GrokExtractorTest {
@@ -49,8 +53,13 @@ public class GrokExtractorTest {
         number.name = "NUMBER";
         number.pattern = "(?:%{BASE10NUM:UNWANTED})";
 
+        final GrokPattern data = new GrokPattern();
+        data.name = "GREEDY";
+        data.pattern = ".*";
+
         patternSet.add(baseNum);
         patternSet.add(number);
+        patternSet.add(data);
     }
 
     @Test
@@ -61,6 +70,24 @@ public class GrokExtractorTest {
         assertEquals("NUMBER is marked as UNWANTED and does not generate a field", 1, results.length);
         assertEquals(Integer.class, results[0].getValue().getClass());
         assertEquals(199999, results[0].getValue());
+    }
+
+    @Test
+    public void testDateExtraction() {
+        final GrokExtractor extractor = makeExtractor("%{GREEDY:timestamp;date;yyyy-MM-dd'T'HH:mm:ss.SSSX}");
+        final Extractor.Result[] results = extractor.run("2015-07-31T10:05:36.773Z");
+        assertEquals("ISO date is parsed", 1, results.length);
+        Object value = results[0].getValue();
+        assertTrue(value instanceof Date);
+        DateTime date = new DateTime(value, DateTimeZone.UTC);
+
+        assertEquals(2015, date.getYear());
+        assertEquals(7, date.getMonthOfYear());
+        assertEquals(31, date.getDayOfMonth());
+        assertEquals(10, date.getHourOfDay());
+        assertEquals(5, date.getMinuteOfHour());
+        assertEquals(36, date.getSecondOfMinute());
+        assertEquals(773, date.getMillisOfSecond());
     }
 
     private GrokExtractor makeExtractor(String pattern) {

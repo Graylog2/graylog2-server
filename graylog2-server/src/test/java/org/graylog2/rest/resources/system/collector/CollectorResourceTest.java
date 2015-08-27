@@ -18,24 +18,30 @@ package org.graylog2.rest.resources.system.collector;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Lists;
-import org.graylog2.Configuration;
 import org.graylog2.collectors.Collector;
 import org.graylog2.collectors.CollectorNodeDetails;
 import org.graylog2.collectors.CollectorService;
-import org.graylog2.database.NotFoundException;
+import org.graylog2.rest.models.collector.CollectorNodeDetailsSummary;
+import org.graylog2.rest.models.collector.requests.CollectorRegistrationRequest;
 import org.graylog2.rest.models.collector.responses.CollectorList;
 import org.graylog2.rest.models.collector.responses.CollectorSummary;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.graylog2.rest.assertj.ResponseAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,9 +57,7 @@ public class CollectorResourceTest extends RestResourceBaseTest {
     @Before
     public void setUp() throws Exception {
         this.collectors = getDummyCollectorList();
-        final Configuration config = mock(Configuration.class);
-        when(config.getCollectorInactiveThreshold()).thenReturn(Duration.minutes(1));
-        this.resource = new CollectorResource(collectorService, config);
+        this.resource = new CollectorResource(collectorService, Duration.minutes(1));
         when(collectorService.all()).thenReturn(collectors);
     }
 
@@ -99,11 +103,65 @@ public class CollectorResourceTest extends RestResourceBaseTest {
 
         return collector;
     }
+
     private List<Collector> getDummyCollectorList() {
         final Collector collector1 = getDummyCollector("collector1id", "collector1nodeid", DateTime.now(), "DummyOS 1.0");
         final Collector collector2 = getDummyCollector("collector2id", "collector2nodeid", DateTime.now(), "DummyOS 1.0");
         final Collector collector3 = getDummyCollector("collector3id", "collector3nodeid", DateTime.now(), "DummyOS 1.0");
 
         return Lists.newArrayList(collector1, collector2, collector3);
+    }
+
+    @Test
+    public void testRegister() throws Exception {
+        final CollectorRegistrationRequest input = CollectorRegistrationRequest.create("nodeId", CollectorNodeDetailsSummary.create("DummyOS 1.0"));
+
+        final Response response = this.resource.register("collectorId", input, "0.0.1");
+
+        assertThat(response).isSuccess();
+    }
+
+    @Test
+    @Ignore
+    public void testRegisterInvalidCollectorId() throws Exception {
+        final CollectorRegistrationRequest invalid = CollectorRegistrationRequest.create("nodeId", CollectorNodeDetailsSummary.create("DummyOS 1.0"));
+
+        final Response response = this.resource.register("", invalid, "0.0.1");
+
+        assertThat(response).isError();
+        assertThat(response).isStatus(Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    @Ignore
+    public void testRegisterInvalidNodeId() throws Exception {
+        final CollectorRegistrationRequest invalid = CollectorRegistrationRequest.create("", CollectorNodeDetailsSummary.create("DummyOS 1.0"));
+
+        final Response response = this.resource.register("collectorId", invalid, "0.0.1");
+
+        assertThat(response).isError();
+        assertThat(response).isStatus(Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    @Ignore
+    public void testRegisterMissingNodeDetails() throws Exception {
+        final CollectorRegistrationRequest invalid = CollectorRegistrationRequest.create("nodeId", null);
+
+        final Response response = this.resource.register("collectorId", invalid, "0.0.1");
+
+        assertThat(response).isError();
+        assertThat(response).isStatus(Response.Status.BAD_REQUEST);
+    }
+
+    @Test
+    @Ignore
+    public void testRegisterMissingOperatingSystem() throws Exception {
+        final CollectorRegistrationRequest invalid = CollectorRegistrationRequest.create("nodeId", CollectorNodeDetailsSummary.create(""));
+
+        final Response response = this.resource.register("collectorId", invalid, "0.0.1");
+
+        assertThat(response).isError();
+        assertThat(response).isStatus(Response.Status.BAD_REQUEST);
     }
 }

@@ -196,7 +196,7 @@ public class Deflector { // extends Ablenkblech
             try {
                 indexNumbers.add(extractIndexNumber(indexName));
             } catch (NumberFormatException ex) {
-                continue;
+                LOG.debug("Couldn't extract index number from index name " + indexName, ex);
             }
         }
 
@@ -208,8 +208,9 @@ public class Deflector { // extends Ablenkblech
     }
 
     public String[] getAllDeflectorIndexNames() {
-        final List<String> result = Lists.newArrayListWithExpectedSize(indices.getAll().size());
-        for (String indexName : indices.getAll().keySet()) {
+        final Map<String, IndexStats> indices = this.indices.getAll();
+        final List<String> result = Lists.newArrayListWithExpectedSize(indices.size());
+        for (String indexName : indices.keySet()) {
             if (isGraylog2Index(indexName)) {
                 result.add(indexName);
             }
@@ -220,14 +221,11 @@ public class Deflector { // extends Ablenkblech
 
     public Map<String, IndexStats> getAllDeflectorIndices() {
         final ImmutableMap.Builder<String, IndexStats> result = ImmutableMap.builder();
+        for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
+            final String name = e.getKey();
 
-        if (indices != null) {
-            for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
-                final String name = e.getKey();
-
-                if (isGraylog2Index(name)) {
-                    result.put(name, e.getValue());
-                }
+            if (isGraylog2Index(name)) {
+                result.put(name, e.getValue());
             }
         }
         return result.build();

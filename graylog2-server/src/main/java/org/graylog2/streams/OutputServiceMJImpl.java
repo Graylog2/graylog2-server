@@ -26,6 +26,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
@@ -45,20 +46,28 @@ public class OutputServiceMJImpl implements OutputService {
     private final JacksonDBCollection<OutputAVImpl, String> coll;
     private final DBCollection dbCollection;
     private final StreamService streamService;
+    private final OutputRegistry outputRegistry;
 
     @Inject
     public OutputServiceMJImpl(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapperProvider,
-                               StreamService streamService) {
+                               StreamService streamService,
+                               OutputRegistry outputRegistry) {
         this.streamService = streamService;
         final String collectionName = OutputAVImpl.class.getAnnotation(CollectionName.class).value();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, OutputAVImpl.class, String.class, mapperProvider.get());
+        this.outputRegistry = outputRegistry;
     }
 
     @Override
     public Output load(String streamOutputId) throws NotFoundException {
-        return coll.findOneById(streamOutputId);
+        final Output output = coll.findOneById(streamOutputId);
+        if (output == null) {
+            throw new NotFoundException("Couldn't find output with id " + streamOutputId);
+        }
+
+        return output;
     }
 
     @Override
@@ -90,6 +99,7 @@ public class OutputServiceMJImpl implements OutputService {
     @Override
     public void destroy(Output model) throws NotFoundException {
         coll.removeById(model.getId());
+        outputRegistry.removeOutput(model);
         streamService.removeOutputFromAllStreams(model);
     }
 
