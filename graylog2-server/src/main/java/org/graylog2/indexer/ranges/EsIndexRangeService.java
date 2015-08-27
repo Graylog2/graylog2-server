@@ -49,6 +49,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
@@ -82,6 +83,8 @@ public class EsIndexRangeService implements IndexRangeService {
     private final ObjectMapper objectMapper;
     private final Indices indices;
     private final Deflector deflector;
+    private final EventBus clusterEventBus;
+
 
     @Inject
     public EsIndexRangeService(Client client,
@@ -89,11 +92,13 @@ public class EsIndexRangeService implements IndexRangeService {
                                Indices indices,
                                Deflector deflector,
                                EventBus eventBus,
+                               @ClusterEventBus EventBus clusterEventBus,
                                MetricRegistry metricRegistry) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.indices = indices;
         this.deflector = deflector;
+        this.clusterEventBus = clusterEventBus;
 
         final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
             @Override
@@ -116,6 +121,7 @@ public class EsIndexRangeService implements IndexRangeService {
         // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
         IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
+        clusterEventBus.register(this);
     }
 
     @Override
@@ -292,6 +298,7 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         cache.put(indexName, indexRange);
+        clusterEventBus.post(IndexRangeUpdatedEvent.create(indexName));
     }
 
     @Subscribe
@@ -302,5 +309,11 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         cache.cleanUp();
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexRangeUpdate(IndexRangeUpdatedEvent event) {
+        cache.refresh(event.indexName());
     }
 }
