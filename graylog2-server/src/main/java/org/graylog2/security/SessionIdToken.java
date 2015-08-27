@@ -16,7 +16,10 @@
  */
 package org.graylog2.security;
 
+import com.google.common.base.MoreObjects;
 import org.apache.shiro.authc.HostAuthenticationToken;
+
+import java.util.Objects;
 
 public class SessionIdToken implements HostAuthenticationToken {
 
@@ -47,5 +50,25 @@ public class SessionIdToken implements HostAuthenticationToken {
         return host;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SessionIdToken that = (SessionIdToken) o;
+        return Objects.equals(sessionId, that.sessionId) &&
+                Objects.equals(host, that.host);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(sessionId, host);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("sessionId", sessionId)
+                .add("host", host)
+                .toString();
+    }
 }
