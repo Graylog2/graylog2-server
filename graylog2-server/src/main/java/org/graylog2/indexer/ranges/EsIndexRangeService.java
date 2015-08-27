@@ -152,12 +152,12 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         if (!r.isExists()) {
-            throw new NotFoundException("Index [" + index + "] not found.");
+            throw new NotFoundException("Couldn't find index range for index " + index);
         }
 
         final IndexRange indexRange = parseSource(r.getIndex(), r.getSource());
         if (indexRange == null) {
-            throw new NotFoundException("Index [" + index + "] not found.");
+            throw new NotFoundException("Couldn't parse index range for index " + index);
         }
 
         return indexRange;
