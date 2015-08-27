@@ -116,7 +116,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 .recordStats()
                 .build(cacheLoader);
 
-        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(cache));
+        MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(MetricRegistry.name(this.getClass(), "cache"), cache));
 
         // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
         IndexChangeMonitor.setEventBus(eventBus);

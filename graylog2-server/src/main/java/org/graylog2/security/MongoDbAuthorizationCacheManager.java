@@ -59,7 +59,7 @@ public class MongoDbAuthorizationCacheManager implements CacheManager {
                     .concurrencyLevel(8)
                     .recordStats()
                     .build();
-            MetricUtils.safelyRegisterAll(registry, new CacheStatsSet(cache));
+            MetricUtils.safelyRegisterAll(registry, new CacheStatsSet(MetricRegistry.name(MongoDbAuthorizationCacheManager.class, "cache"), cache));
         }
 
         @Override
