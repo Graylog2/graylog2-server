@@ -202,7 +202,7 @@ public class EsIndexRangeService implements IndexRangeService {
             try {
                 indexRanges.add(cache.get(index));
             } catch (ExecutionException e) {
-                LOG.warn("Couldn't load index range for index " + index, e.getCause());
+                LOG.warn("Couldn't load index range for index " + index);
             }
         }
 
