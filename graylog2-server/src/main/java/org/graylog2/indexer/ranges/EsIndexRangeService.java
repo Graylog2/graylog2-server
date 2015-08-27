@@ -18,7 +18,6 @@ package org.graylog2.indexer.ranges;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
@@ -26,6 +25,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
@@ -48,6 +50,8 @@ import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.esplugin.IndexChangeMonitor;
+import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.Tools;
@@ -60,12 +64,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
 
@@ -80,7 +85,7 @@ public class EsIndexRangeService implements IndexRangeService {
                                ObjectMapper objectMapper,
                                Indices indices,
                                Deflector deflector,
-                               @Named("elasticsearch_index_range_expiration") Duration indexRangeExpiration) {
+                               EventBus eventBus) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.indices = indices;
@@ -98,9 +103,11 @@ public class EsIndexRangeService implements IndexRangeService {
                 return indexRange;
             }
         };
-        this.cache = CacheBuilder.<String, IndexRange>newBuilder()
-                .expireAfterWrite(indexRangeExpiration.getQuantity(), indexRangeExpiration.getUnit())
-                .build(cacheLoader);
+        this.cache = CacheBuilder.<String, IndexRange>newBuilder().build(cacheLoader);
+
+        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
+        IndexChangeMonitor.setEventBus(eventBus);
+        eventBus.register(this);
     }
 
     @Override
@@ -277,5 +284,15 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         cache.put(indexName, indexRange);
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexDeletion(IndicesDeletedEvent event) {
+        for (String index : event.indices()) {
+            cache.invalidate(index);
+        }
+
+        cache.cleanUp();
     }
 }

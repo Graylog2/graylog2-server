@@ -16,12 +16,16 @@
  */
 package org.graylog2.indexer.esplugin;
 
-import org.elasticsearch.common.inject.AbstractModule;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 
-public class MonitorModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(ClusterStateMonitor.class).asEagerSingleton();
-        bind(IndexChangeMonitor.class).asEagerSingleton();
+import java.util.List;
+
+@AutoValue
+public abstract class IndicesCreatedEvent {
+    public abstract List<String> indices();
+
+    public static IndicesCreatedEvent create(List<String> indices) {
+        return new AutoValue_IndicesCreatedEvent(ImmutableList.copyOf(indices));
     }
 }
