@@ -16,6 +16,7 @@
  */
 package org.graylog2.outputs;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -35,6 +36,7 @@ import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -61,7 +63,7 @@ public class OutputRegistry {
 
     @Inject
     public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
-                          final OutputService outputService,
+                          OutputService outputService,
                           MessageOutputFactory messageOutputFactory,
                           NotificationService notificationService,
                           NodeId nodeId,
@@ -85,29 +87,30 @@ public class OutputRegistry {
                 });
     }
 
+    @Nullable
     public MessageOutput getOutputForIdAndStream(String id, Stream stream) {
         final AtomicInteger faultCount;
         try {
             faultCount = this.faultCounters.get(id);
         } catch (ExecutionException e) {
-            LOG.error("Unable to retrieve output fault counter: ", e);
+            LOG.error("Unable to retrieve output fault counter", e);
             return null;
         }
 
         try {
-            if (faultCount.get() < faultCountThreshold)
+            if (faultCount.get() < faultCountThreshold) {
                 return this.runningMessageOutputs.get(id, loadForIdAndStream(id, stream));
+            }
         } catch (ExecutionException | UncheckedExecutionException e) {
             if (!(e.getCause() instanceof NotFoundException)) {
                 final int number = faultCount.addAndGet(1);
-                LOG.error("Unable to fetch output {}, fault #{}: ", id, number, e);
+                LOG.error("Unable to fetch output " + id + ", fault #" + number, e);
                 if (number >= faultCountThreshold) {
                     LOG.error("Output {} has crossed threshold of {} faults in {} seconds. Disabling for {} seconds.",
                             id,
                             faultCountThreshold,
                             faultPenaltySeconds,
-                            faultPenaltySeconds
-                    );
+                            faultPenaltySeconds);
 
                     final Notification notification = notificationService.buildNow()
                             .addType(Notification.Type.OUTPUT_DISABLED)
@@ -137,33 +140,35 @@ public class OutputRegistry {
     }
 
     protected MessageOutput launchOutput(Output output, Stream stream) throws MessageOutputConfigurationException {
-        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output,
-                stream,
-                new org.graylog2.plugin.configuration.Configuration(output.getConfiguration())
-        );
-        if (messageOutput == null)
+        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output, stream,
+                new org.graylog2.plugin.configuration.Configuration(output.getConfiguration()));
+
+        if (messageOutput == null) {
             throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
+        }
 
         return messageOutput;
     }
 
+    @VisibleForTesting
     protected Map<String, MessageOutput> getRunningMessageOutputs() {
         return ImmutableMap.copyOf(runningMessageOutputs.asMap());
     }
 
     public Set<MessageOutput> getMessageOutputs() {
-        final ImmutableSet.Builder<MessageOutput> builder = ImmutableSet.builder();
-
-        builder.addAll(this.runningMessageOutputs.asMap().values());
-        builder.add(defaultMessageOutput);
-        return ImmutableSet.copyOf(builder.build());
+        return ImmutableSet.<MessageOutput>builder()
+                .addAll(runningMessageOutputs.asMap().values())
+                .add(defaultMessageOutput)
+                .build();
     }
 
     public void removeOutput(Output output) {
         final MessageOutput messageOutput = runningMessageOutputs.getIfPresent(output.getId());
-        if (messageOutput != null)
+        if (messageOutput != null) {
             messageOutput.stop();
+        }
+
         runningMessageOutputs.invalidate(output.getId());
-        this.faultCounters.invalidate(output.getId());
+        faultCounters.invalidate(output.getId());
     }
 }
