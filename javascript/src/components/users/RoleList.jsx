@@ -25,7 +25,7 @@ var RoleList = React.createClass({
 
         let actions = [
             <button key="delete" className="btn btn-primary btn-xs" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</button>,
-            <span>&nbsp;</span>,
+            <span key="space">&nbsp;</span>,
             <button key="edit" className="btn btn-info btn-xs" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</button>
         ];
 
