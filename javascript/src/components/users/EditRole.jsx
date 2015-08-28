@@ -17,7 +17,9 @@ var EditRole = React.createClass({
   propTypes: {
     initialRole: React.PropTypes.object,
     onSave: React.PropTypes.func.isRequired,
-    cancelEdit: React.PropTypes.func.isRequired
+    cancelEdit: React.PropTypes.func.isRequired,
+    streams: React.PropTypes.object,
+    dashboards: React.PropTypes.object,
   },
 
   getInitialState() {

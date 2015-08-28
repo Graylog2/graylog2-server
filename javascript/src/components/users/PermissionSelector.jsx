@@ -8,9 +8,9 @@ import TableList from '../common/TableList';
 const PermissionSelector = React.createClass({
   propTypes: {
     onChange: React.PropTypes.func,
-    streams: React.PropTypes.array,
-    dashboards: React.PropTypes.array,
-    permissions: React.PropTypes.array,
+    streams: React.PropTypes.object,
+    dashboards: React.PropTypes.object,
+    permissions: React.PropTypes.object,
   },
 
   render() {
