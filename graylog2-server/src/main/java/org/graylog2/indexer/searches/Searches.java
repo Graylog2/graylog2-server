@@ -184,7 +184,7 @@ public class Searches {
         request.searchType(SearchType.COUNT);
 
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
@@ -212,7 +212,7 @@ public class Searches {
             }
         }
         final SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         return new ScrollResult(c, query, request.source(), r, fields);
     }
@@ -247,7 +247,7 @@ public class Searches {
         SearchRequest request = searchRequest(config, indexNames).request();
 
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, config.range());
 
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
@@ -278,7 +278,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsResult(
@@ -363,7 +363,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsStatsResult(
@@ -416,7 +416,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
@@ -452,7 +452,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new DateHistogramResult(
@@ -498,7 +498,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldHistogramResult(
@@ -619,12 +619,20 @@ public class Searches {
         srb.addSort("timestamp", sort);
 
         SearchResponse r = c.search(srb.request()).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, null);
 
         if (r.getHits() != null && r.getHits().totalHits() > 0) {
             return r.getHits().getAt(0);
         } else {
             return null;
+        }
+    }
+
+    private void recordEsMetrics(SearchResponse r, @Nullable TimeRange range) {
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+
+        if (range != null) {
+            esTimeRangeHistogram.update(TimeRanges.toSeconds(range));
         }
     }
 
@@ -635,7 +643,6 @@ public class Searches {
         if (range != null) {
             bfb = FilterBuilders.boolFilter();
             bfb.must(IndexHelper.getTimestampRangeFilter(range));
-            esTimeRangeHistogram.update(TimeRanges.toSeconds(range));
         }
 
         // Not creating a filter for a "*" value because an empty filter used to be submitted that way.
