@@ -19,14 +19,17 @@ package org.graylog2.indexer.results;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class FieldStatsResult extends IndexQueryResult {
 
+    private final Filter filterAggregation;
     @Nullable
     private final ExtendedStats extendedStats;
     @Nullable
@@ -34,54 +37,54 @@ public class FieldStatsResult extends IndexQueryResult {
     private List<ResultMessage> searchHits;
 
 
-    public FieldStatsResult(@Nullable ExtendedStats extendedStats,
+    public FieldStatsResult(@Nonnull Filter filterAggregation,
+                            @Nullable ExtendedStats extendedStats,
                             @Nullable Cardinality cardinality,
                             SearchHits hits,
                             String query,
                             BytesReference source, TimeValue took) {
         super(query, source, took);
-
-
+        this.filterAggregation = filterAggregation;
         this.extendedStats = extendedStats;
         this.cardinality = cardinality;
         this.searchHits = buildResults(hits);
     }
 
     public long getCount() {
-        return extendedStats != null ? extendedStats.getCount() : 0;
+        return filterAggregation.getDocCount();
     }
 
     public double getSum() {
-        return extendedStats != null ? extendedStats.getSum() : 0;
+        return extendedStats != null ? extendedStats.getSum() : Double.NaN;
     }
 
     public double getSumOfSquares() {
-        return extendedStats != null ? extendedStats.getSumOfSquares() : 0;
+        return extendedStats != null ? extendedStats.getSumOfSquares() : Double.NaN;
     }
 
     public double getMean() {
-        return extendedStats != null ? extendedStats.getAvg() : 0;
+        return extendedStats != null ? extendedStats.getAvg() : Double.NaN;
     }
 
     public double getMin() {
-        return extendedStats != null ? extendedStats.getMin() : 0;
+        return extendedStats != null ? extendedStats.getMin() : Double.NaN;
     }
 
     public double getMax() {
-        return extendedStats != null ? extendedStats.getMax() : 0;
+        return extendedStats != null ? extendedStats.getMax() : Double.NaN;
     }
 
     public double getVariance() {
-        return extendedStats != null ? extendedStats.getVariance() : 0;
+        return extendedStats != null ? extendedStats.getVariance() : Double.NaN;
     }
 
     public double getStdDeviation() {
-        return extendedStats != null ? extendedStats.getStdDeviation() : 0;
+        return extendedStats != null ? extendedStats.getStdDeviation() : Double.NaN;
     }
 
 
     public long getCardinality() {
-        return cardinality == null ? 0 : cardinality.getValue();
+        return cardinality == null ? Long.MIN_VALUE : cardinality.getValue();
     }
 
     public List<ResultMessage> getSearchHits() {
