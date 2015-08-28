@@ -73,13 +73,13 @@ var RolesComponent = React.createClass({
       content = <span>Loading roles...</span>;
     } else if (this.state.showEditRole) {
       content =
-        <EditRole initialRole={this.state.editRole} streams={this.state.streams} dashboards={this.state.dashboards}
-                  onSave={this._saveRole} cancelEdit={this._clearEditRole}/>;
+        (<EditRole initialRole={this.state.editRole} streams={this.state.streams} dashboards={this.state.dashboards}
+                  onSave={this._saveRole} cancelEdit={this._clearEditRole}/>);
     } else {
-      content = <RoleList roles={this.state.roles}
+      content = (<RoleList roles={this.state.roles}
                           showEditRole={this._showEditRole}
                           deleteRole={this._deleteRole}
-                          createRole={this._showCreateRole}/>;
+                          createRole={this._showCreateRole}/>);
     }
     return (
       <Row>
