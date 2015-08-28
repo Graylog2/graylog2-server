@@ -6,6 +6,7 @@ var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
 var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
+var Alert = require('react-bootstrap').Alert;
 
 var PermissionSelector = require('./PermissionSelector');
 var RolesStore = require('../../stores/users/RolesStore').RolesStore;
@@ -59,6 +60,10 @@ var EditRole = React.createClass({
     this.setState({role: role});
   },
 
+  _saveDisabled() {
+    return this.state.role === null || this.state.role.name === null || this.state.role.name === '' || this.state.role.permissions.length === 0;
+  },
+
   render() {
     let titleText;
     if (this.state.initialName === null) {
@@ -66,6 +71,13 @@ var EditRole = React.createClass({
     } else {
       titleText = 'Edit role ' + this.state.initialName;
     }
+
+    const saveDisabled = this._saveDisabled();
+    let saveDisabledAlert = null;
+    if (saveDisabled) {
+      saveDisabledAlert = (<Alert bsStyle='warning' style={{marginBottom: 10}}>Please name the role and select at least one permission to save it.</Alert>);
+    }
+
     return (
       <Row>
         <Col md={12}>
@@ -74,15 +86,15 @@ var EditRole = React.createClass({
             <Input id="role-name" type="text" label="Name" onChange={this._setName} value={this.state.role.name}
                    required/>
             <Input id="role-description" type="text" label="Description" onChange={this._setDescription}
-                   value={this.state.role.description} required/>
+                   value={this.state.role.description}/>
 
             <PermissionSelector streams={this.props.streams}
                                 dashboards={this.props.dashboards}
                                 permissions={Immutable.Set(this.state.role.permissions)}
                                 onChange={this._updatePermissions}
             />
-
-            <Button onClick={ev => this.props.onSave(this.state.initialName, this.state.role)}>Save</Button>
+            {saveDisabledAlert}
+            <Button onClick={ev => this.props.onSave(this.state.initialName, this.state.role)} style={{marginRight: 5}} bsStyle="primary" disabled={saveDisabled}>Save</Button>
             <Button onClick={this.props.cancelEdit}>Cancel</Button>
           </div>
         </Col>
