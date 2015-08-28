@@ -31,6 +31,11 @@ var CreateAlarmCallbackButton = React.createClass({
                     {' '}
                     <button className="btn btn-success form-control" disabled={this.state.typeName === this.PLACEHOLDER}
                             onClick={this._openModal}>Add callback</button>
+
+                    &nbsp;
+                    <a href="https://marketplace.graylog.org/" target="_blank" className="btn btn-info form-control">
+                        <i className="fa fa-external-link"></i>&nbsp; Find more callbacks
+                    </a>
                 </div>
                 {configurationForm}
             </div>
