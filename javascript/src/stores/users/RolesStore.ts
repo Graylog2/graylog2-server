@@ -43,8 +43,8 @@ export var RolesStore = {
             UserNotification.success("Role \"" + newRole.name + "\" was created successfully");
         });
 
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Creating role \"" + role.name + "\" failed with status: " + errorThrown,
+        promise.fail((jqXHR) => {
+            UserNotification.error("Creating role \"" + role.name + "\" failed with status: " + jqXHR.responseText,
                 "Could not create role");
         });
 

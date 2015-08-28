@@ -1,15 +1,19 @@
 package controllers.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.ApiErrorMessage;
 import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.RolesService;
 import play.mvc.Result;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -17,10 +21,12 @@ import static views.helpers.Permissions.isPermitted;
 
 public class RolesApiController extends AuthenticatedController {
 
+    private final ObjectMapper mapper;
     private final RolesService rolesService;
 
     @Inject
-    public RolesApiController(RolesService rolesService) {
+    public RolesApiController(ObjectMapper mapper, RolesService rolesService) {
+        this.mapper = mapper;
         this.rolesService = rolesService;
     }
 
@@ -55,7 +61,17 @@ public class RolesApiController extends AuthenticatedController {
         if (isNullOrEmpty(newRole.name()) || newRole.permissions() == null || newRole.permissions().isEmpty()) {
             return badRequest("Missing fields");
         }
-        final RoleResponse role = rolesService.create(newRole);
+        final RoleResponse role;
+        try {
+            role = rolesService.create(newRole);
+        } catch (APIException e) {
+            try {
+                final ApiErrorMessage apiErrorMessage = mapper.readValue(e.getResponseBody(), ApiErrorMessage.class);
+                return badRequest(apiErrorMessage.message);
+            } catch (IOException e1) {
+                return internalServerError();
+            }
+        }
         if (role == null) {
             return internalServerError();
         }
@@ -124,4 +140,5 @@ public class RolesApiController extends AuthenticatedController {
     private static Status jsonOk(Object returnValue) {
         return ok(Json.toJsonString(returnValue)).as(MediaType.JSON_UTF_8.toString());
     }
+
 }
