@@ -70,6 +70,10 @@ public class LdapSettingsRequest extends ApiRequest {
     @Nullable
     public String groupIdAttribute;
 
+    @JsonProperty("group_object_class")
+    @Nullable
+    public String groupObjectClass;
+
     @JsonProperty("additional_default_groups")
     @Nullable
     public Set<String> additionalDefaultGroups;
@@ -187,6 +191,15 @@ public class LdapSettingsRequest extends ApiRequest {
 
     public void setGroupIdAttribute(@Nullable String groupIdAttribute) {
         this.groupIdAttribute = groupIdAttribute;
+    }
+
+    @Nullable
+    public String getGroupObjectClass() {
+        return groupObjectClass;
+    }
+
+    public void setGroupObjectClass(@Nullable String groupObjectClass) {
+        this.groupObjectClass = groupObjectClass;
     }
 
     @Nullable

@@ -72,6 +72,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String GROUP_MAPPING = "group_role_mapping";
     public static final String GROUP_SEARCH_BASE = "group_search_base";
     public static final String GROUP_ID_ATTRIBUTE = "group_id_attribute";
+    public static final String GROUP_OBJECT_CLASS = "group_object_class";
     public static final String ADDITIONAL_DEFAULT_GROUPS = "additional_default_groups";
 
     protected Configuration configuration;
@@ -349,6 +350,17 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     @Override
     public void setGroupIdAttribute(String groupIdAttribute) {
         fields.put(GROUP_ID_ATTRIBUTE, groupIdAttribute);
+    }
+
+    @Override
+    public String getGroupObjectClass() {
+        final Object o = fields.get(GROUP_OBJECT_CLASS);
+        return o != null ? o.toString() : "";
+    }
+
+    @Override
+    public void setGroupObjectClass(String groupObjectClass) {
+        fields.put(GROUP_OBJECT_CLASS, groupObjectClass);
     }
 
     @Override
