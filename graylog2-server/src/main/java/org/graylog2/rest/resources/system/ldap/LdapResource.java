@@ -300,7 +300,7 @@ public class LdapResource extends RestResource {
             LdapNetworkConnection connection = ldapConnector.connect(config);
             final Set<String> groups = ldapConnector.listGroups(connection,
                                                                ldapSettings.getGroupSearchBase(),
-                                                               "group",
+                                                               ldapSettings.getGroupObjectClass(),
                                                                ldapSettings.getGroupIdAttribute());
             return groups;
         } catch (LdapException e) {
