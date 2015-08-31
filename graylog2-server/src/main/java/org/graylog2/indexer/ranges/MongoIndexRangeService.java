@@ -65,8 +65,8 @@ public class MongoIndexRangeService extends PersistedServiceImpl implements Inde
         final String indexName = (String) dbo.get("index");
         final DateTime begin = new DateTime(0L, DateTimeZone.UTC);
         final DateTime end = new DateTime((Integer) dbo.get("start") * 1000L, DateTimeZone.UTC);
-        final DateTime calculatedAt = new DateTime((Integer) dbo.get("calculated_at") * 1000L, DateTimeZone.UTC);
-        final int calculationDuration = (Integer) dbo.get("took_ms");
+        final DateTime calculatedAt = new DateTime(firstNonNull((Integer) dbo.get("calculated_at"), 0) * 1000L, DateTimeZone.UTC);
+        final int calculationDuration = firstNonNull((Integer) dbo.get("took_ms"), 0);
 
         return IndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
     }

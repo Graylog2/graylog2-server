@@ -28,6 +28,11 @@
       "start": "HAHA",
       "took_ms": 42,
       "calculated_at": 1420329600
+    },
+    {
+      "id": "id5",
+      "index": "graylog_99",
+      "start": 1420070400
     }
   ]
 }
