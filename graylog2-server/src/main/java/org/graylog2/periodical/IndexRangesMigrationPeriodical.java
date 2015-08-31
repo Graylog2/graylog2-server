@@ -16,10 +16,15 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -27,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,16 +51,19 @@ public class IndexRangesMigrationPeriodical extends Periodical {
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final NotificationService notificationService;
+    private final MongoIndexRangeService mongoIndexRangeService;
 
     @Inject
     public IndexRangesMigrationPeriodical(final Cluster cluster,
                                           final Deflector deflector,
                                           final IndexRangeService indexRangeService,
-                                          final NotificationService notificationService) {
+                                          final NotificationService notificationService,
+                                          final MongoIndexRangeService mongoIndexRangeService) {
         this.cluster = checkNotNull(cluster);
         this.deflector = checkNotNull(deflector);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.notificationService = checkNotNull(notificationService);
+        this.mongoIndexRangeService = checkNotNull(mongoIndexRangeService);
     }
 
     @Override
@@ -62,7 +72,33 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         }
 
-        final int numberOfIndices = deflector.getAllDeflectorIndexNames().length;
+        // Migrate old MongoDB index ranges
+        final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllDeflectorIndexNames());
+        final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
+        final SortedSet<IndexRange> mongoIndexRanges = Sets.filter(
+                mongoIndexRangeService.findAll(),
+                new Predicate<IndexRange>() {
+                    @Override
+                    public boolean apply(IndexRange input) {
+                        boolean found = false;
+                        for (IndexRange indexRange : indexRanges) {
+                            if (indexRange.indexName().equals(input.indexName())) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        return !found && indexNames.contains(input.indexName());
+                    }
+                });
+
+        for (IndexRange indexRange : mongoIndexRanges) {
+            LOG.info("Migrating index range from MongoDB: {}", indexRange);
+            indexRangeService.save(indexRange);
+            mongoIndexRangeService.markAsMigrated(indexRange.indexName());
+        }
+
+        final int numberOfIndices = indexNames.size();
         final int numberOfIndexRanges = indexRangeService.findAll().size();
         if (numberOfIndices > numberOfIndexRanges) {
             LOG.info("There are more indices ({}) than there are index ranges ({}). Notifying administrator.",
