@@ -28,6 +28,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -63,6 +64,7 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -72,6 +74,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
@@ -182,16 +185,13 @@ public class Searches {
         request.searchType(SearchType.COUNT);
 
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
-        final SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, null, false);
-        if (range != null && filter != null) {
-            srb.setPostFilter(standardFilters(range, filter));
-        }
+        final SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, filter, null, false);
 
         // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
         // until we've scrolled through the entire set.
@@ -213,7 +213,7 @@ public class Searches {
             }
         }
         final SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         return new ScrollResult(c, query, request.source(), r, fields);
     }
@@ -248,7 +248,7 @@ public class Searches {
         SearchRequest request = searchRequest(config, indexNames).request();
 
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, config.range());
 
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
@@ -273,13 +273,13 @@ public class Searches {
                 .subAggregation(
                         AggregationBuilders.missing("missing")
                                 .field(field))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         srb.addAggregation(builder);
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsResult(
@@ -358,13 +358,13 @@ public class Searches {
                                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(valueField))
                                 .order(termsOrder)
                                 .size(size))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         srb.addAggregation(builder);
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsStatsResult(
@@ -399,7 +399,7 @@ public class Searches {
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
         if (!onlyCardinality) {
             builder.subAggregation(AggregationBuilders.extendedStats(AGG_EXTENDED_STATS).field(field));
         }
@@ -417,7 +417,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
@@ -440,7 +440,7 @@ public class Searches {
                         AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                                 .field("timestamp")
                                 .interval(interval.toESInterval()))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -453,7 +453,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new DateHistogramResult(
@@ -481,7 +481,7 @@ public class Searches {
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
                 .subAggregation(dateHistogramBuilder)
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -499,7 +499,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, range);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldHistogramResult(
@@ -556,6 +556,18 @@ public class Searches {
             TimeRange range,
             Sorting sort,
             boolean highlight) {
+        return standardSearchRequest(query, indices, limit, offset, range, null, sort, highlight);
+    }
+
+    private SearchRequestBuilder standardSearchRequest(
+            String query,
+            Set<String> indices,
+            int limit,
+            int offset,
+            TimeRange range,
+            String filter,
+            Sorting sort,
+            boolean highlight) {
         if (query == null || query.trim().isEmpty()) {
             query = "*";
         }
@@ -563,22 +575,21 @@ public class Searches {
         SearchRequestBuilder srb = c.prepareSearch();
         srb.setIndices(indices.toArray(new String[indices.size()]));
 
+        final QueryBuilder queryBuilder;
+
         if (query.trim().equals("*")) {
-            srb.setQuery(matchAllQuery());
+            queryBuilder = matchAllQuery();
         } else {
             QueryStringQueryBuilder qs = queryStringQuery(query);
             qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
-            srb.setQuery(qs);
+            queryBuilder = qs;
         }
 
+        srb.setQuery(QueryBuilders.filteredQuery(queryBuilder, standardFilters(range, filter)));
         srb.setFrom(offset);
 
         if (limit > 0) {
             srb.setSize(limit);
-        }
-
-        if (range != null) {
-            srb.setPostFilter(IndexHelper.getTimestampRangeFilter(range));
         }
 
         if (sort != null) {
@@ -598,13 +609,7 @@ public class Searches {
     }
 
     private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) {
-        SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
-
-        if (range != null && filter != null) {
-            srb.setPostFilter(standardFilters(range, filter));
-        }
-
-        return srb;
+        return standardSearchRequest(query, indices, limit, offset, range, filter, sort, true);
     }
 
     private SearchHit oneOfIndex(String index, QueryBuilder q, SortOrder sort) {
@@ -615,7 +620,7 @@ public class Searches {
         srb.addSort("timestamp", sort);
 
         SearchResponse r = c.search(srb.request()).actionGet();
-        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+        recordEsMetrics(r, null);
 
         if (r.getHits() != null && r.getHits().totalHits() > 0) {
             return r.getHits().getAt(0);
@@ -624,27 +629,43 @@ public class Searches {
         }
     }
 
-    private BoolFilterBuilder standardFilters(TimeRange range, String filter) {
-        BoolFilterBuilder bfb = FilterBuilders.boolFilter();
-
-        boolean set = false;
+    private void recordEsMetrics(SearchResponse r, @Nullable TimeRange range) {
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         if (range != null) {
-            bfb.must(IndexHelper.getTimestampRangeFilter(range));
-            set = true;
             esTimeRangeHistogram.update(TimeRanges.toSeconds(range));
         }
+    }
 
-        if (filter != null && !filter.isEmpty() && !filter.equals("*")) {
-            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery(filter)));
-            set = true;
+    @Nullable
+    private FilterBuilder standardFilters(TimeRange range, String filter) {
+        BoolFilterBuilder bfb = null;
+
+        if (range != null) {
+            bfb = FilterBuilders.boolFilter();
+            bfb.must(IndexHelper.getTimestampRangeFilter(range));
         }
 
-        if (!set) {
-            throw new RuntimeException("Either range or filter must be set.");
+        // Not creating a filter for a "*" value because an empty filter used to be submitted that way.
+        if (!isNullOrEmpty(filter) && !filter.equals("*")) {
+            if (bfb == null) {
+                bfb = FilterBuilders.boolFilter();
+            }
+            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery(filter)));
         }
 
         return bfb;
+    }
+
+    private FilterBuilder standardAggregationFilters(TimeRange range, String filter) {
+        final FilterBuilder filterBuilder = standardFilters(range, filter);
+
+        // Throw an exception here to avoid exposing an internal Elasticsearch exception later.
+        if (filterBuilder == null) {
+            throw new RuntimeException("Either range or filter must be set.");
+        }
+
+        return filterBuilder;
     }
 
     public static class FieldTypeException extends Exception {

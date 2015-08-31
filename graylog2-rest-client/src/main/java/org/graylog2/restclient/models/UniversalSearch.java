@@ -135,8 +135,8 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParam("limit", pageSize)
                 .queryParam("offset", page * pageSize)
-                .queryParam("filter", (filter == null ? "*" : filter))
                 .queryParam("sort", order.toApiParam());
+        addFilterQueryParam(builder);
         if (selectedFields != null && !selectedFields.isEmpty()) {
             builder.queryParam("fields", Joiner.on(',').skipNulls().join(selectedFields));
         }
@@ -190,13 +190,13 @@ public class UniversalSearch {
             default:
                 throw new RuntimeException("Invalid time range type!");
         }
-        DateHistogramResponse response = api.path(routePath, DateHistogramResponse.class)
+        final ApiRequestBuilder<DateHistogramResponse> builder = api.path(routePath, DateHistogramResponse.class)
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
-                .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(apiTimeout("search_universal_histogram", KEITH, TimeUnit.SECONDS))
-                .execute();
+                .timeout(apiTimeout("search_universal_histogram", KEITH, TimeUnit.SECONDS));
+        addFilterQueryParam(builder);
+        final DateHistogramResponse response = builder.execute();
         return new DateHistogramResult(
                 response.query,
                 response.time,
@@ -222,13 +222,13 @@ public class UniversalSearch {
             default:
                 throw new RuntimeException("Invalid time range type!");
         }
-        return api.path(routePath, FieldStatsResponse.class)
+        final ApiRequestBuilder<FieldStatsResponse> builder = api.path(routePath, FieldStatsResponse.class)
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
-                .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(apiTimeout("search_universal_stats", KEITH, TimeUnit.SECONDS))
-                .execute();
+                .timeout(apiTimeout("search_universal_stats", KEITH, TimeUnit.SECONDS));
+        addFilterQueryParam(builder);
+        return builder.execute();
     }
 
     public FieldTermsResponse fieldTerms(String field) throws IOException, APIException {
@@ -246,13 +246,13 @@ public class UniversalSearch {
             default:
                 throw new RuntimeException("Invalid time range type!");
         }
-        return api.path(routePath, FieldTermsResponse.class)
+        final ApiRequestBuilder<FieldTermsResponse> builder = api.path(routePath, FieldTermsResponse.class)
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
-                .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(apiTimeout("search_universal_terms", KEITH, TimeUnit.SECONDS))
-                .execute();
+                .timeout(apiTimeout("search_universal_terms", KEITH, TimeUnit.SECONDS));
+        addFilterQueryParam(builder);
+        return builder.execute();
     }
 
     public FieldHistogramResponse fieldHistogram(String field, String interval, boolean isCardinality) throws IOException, APIException {
@@ -270,15 +270,21 @@ public class UniversalSearch {
             default:
                 throw new RuntimeException("Invalid time range type!");
         }
-        return api.path(routePath, FieldHistogramResponse.class)
+        final ApiRequestBuilder<FieldHistogramResponse> builder = api.path(routePath, FieldHistogramResponse.class)
                 .queryParam("field", field)
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
-                .queryParam("filter", (filter == null ? "*" : filter))
                 .queryParam("cardinality", Boolean.toString(isCardinality))
-                .timeout(apiTimeout("search_universal_fieldhistogram", KEITH, TimeUnit.SECONDS))
-                .execute();
+                .timeout(apiTimeout("search_universal_fieldhistogram", KEITH, TimeUnit.SECONDS));
+        addFilterQueryParam(builder);
+        return builder.execute();
+    }
+
+    private void addFilterQueryParam(ApiRequestBuilder<?> builder) {
+        if (filter != null) {
+            builder.queryParam("filter", filter);
+        }
     }
 
     public SearchSort getOrder() {
