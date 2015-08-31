@@ -105,9 +105,9 @@ var TypeAheadDataFilter = React.createClass({
                                     suggestions={suggestions}
                                     label={this.props.label}
                                     displayKey={this.props.displayKey}/>
+                    <ButtonInput type="submit" value="Filter" style={{marginLeft: 5}}/>
                     <ButtonInput type="button" value="Reset" style={{marginLeft: 5}} onClick={this._resetFilters}
                                  disabled={this.state.filters.count() === 0 && this.state.filterText === ''}/>
-                    <ButtonInput type="submit" value="Filter" style={{marginLeft: 5}}/>
                 </form>
                 <ul className="pill-list">
                     {filters}
