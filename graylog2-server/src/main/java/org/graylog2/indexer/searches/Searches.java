@@ -28,6 +28,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -272,7 +273,7 @@ public class Searches {
                 .subAggregation(
                         AggregationBuilders.missing("missing")
                                 .field(field))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         srb.addAggregation(builder);
 
@@ -357,7 +358,7 @@ public class Searches {
                                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(valueField))
                                 .order(termsOrder)
                                 .size(size))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         srb.addAggregation(builder);
 
@@ -398,7 +399,7 @@ public class Searches {
         }
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
         if (!onlyCardinality) {
             builder.subAggregation(AggregationBuilders.extendedStats(AGG_EXTENDED_STATS).field(field));
         }
@@ -439,7 +440,7 @@ public class Searches {
                         AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                                 .field("timestamp")
                                 .interval(interval.toESInterval()))
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -480,7 +481,7 @@ public class Searches {
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
                 .subAggregation(dateHistogramBuilder)
-                .filter(standardFilters(range, filter));
+                .filter(standardAggregationFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -637,7 +638,7 @@ public class Searches {
     }
 
     @Nullable
-    private BoolFilterBuilder standardFilters(TimeRange range, String filter) {
+    private FilterBuilder standardFilters(TimeRange range, String filter) {
         BoolFilterBuilder bfb = null;
 
         if (range != null) {
@@ -654,6 +655,17 @@ public class Searches {
         }
 
         return bfb;
+    }
+
+    private FilterBuilder standardAggregationFilters(TimeRange range, String filter) {
+        final FilterBuilder filterBuilder = standardFilters(range, filter);
+
+        // Throw an exception here to avoid exposing an internal Elasticsearch exception later.
+        if (filterBuilder == null) {
+            throw new RuntimeException("Either range or filter must be set.");
+        }
+
+        return filterBuilder;
     }
 
     public static class FieldTypeException extends Exception {
