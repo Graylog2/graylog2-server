@@ -159,6 +159,7 @@ $(document).ready(function() {
     ldapTestLoginButton.on("click", function() {
         $(this).prop("disabled", true);
         $("#ldap-entry-attributes").html("");
+        $("#ldap-group-list").html("");
         $("#attr-well").addClass("hidden");
         $.ajax({
             type: "POST",
