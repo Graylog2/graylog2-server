@@ -6,6 +6,7 @@ var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
 var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
+var FormControls = require('react-bootstrap').FormControls;
 var Alert = require('react-bootstrap').Alert;
 
 var PermissionSelector = require('./PermissionSelector');
@@ -82,17 +83,19 @@ var EditRole = React.createClass({
       <Row>
         <Col md={12}>
           <h1>{titleText}</h1>
-          <div>
+          <div style={{marginTop: 10}}>
             <Input id="role-name" type="text" label="Name" onChange={this._setName} value={this.state.role.name}
                    required/>
             <Input id="role-description" type="text" label="Description" onChange={this._setDescription}
                    value={this.state.role.description}/>
 
+            <FormControls.Static label="Permissions" help="Select the permissions for this role" className="hidden"/>
             <PermissionSelector streams={this.props.streams}
                                 dashboards={this.props.dashboards}
                                 permissions={Immutable.Set(this.state.role.permissions)}
                                 onChange={this._updatePermissions}
             />
+            <hr/>
             {saveDisabledAlert}
             <Button onClick={ev => this.props.onSave(this.state.initialName, this.state.role)} style={{marginRight: 5}} bsStyle="primary" disabled={saveDisabled}>Save</Button>
             <Button onClick={this.props.cancelEdit}>Cancel</Button>
