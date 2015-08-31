@@ -125,7 +125,7 @@
 
                     <small>
                         @if(index.getRange.getBegin.isEqual(0L)) {
-                            Contains no messages
+                            Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
                             @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
                                 , @Tools.byteToHuman(index.getInfo.getStoreSizeBytes)
                             }
