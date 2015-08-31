@@ -54,13 +54,18 @@ public abstract class ChangeUserRequest {
     @Nullable
     public abstract Long sessionTimeoutMs();
 
+    @JsonProperty
+    @Nullable
+    public abstract List<String> roles();
+
     @JsonCreator
     public static ChangeUserRequest create(@JsonProperty("email") @Nullable @Email String email,
                                            @JsonProperty("full_name") @Nullable String fullName,
                                            @JsonProperty("permissions") @Nullable List<String> permissions,
                                            @JsonProperty("timezone") @Nullable String timezone,
                                            @JsonProperty("startpage") @Nullable @Valid Startpage startpage,
-                                           @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs) {
-        return new AutoValue_ChangeUserRequest(email, fullName, permissions, timezone, startpage, sessionTimeoutMs);
+                                           @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
+                                           @JsonProperty("roles") @Nullable List<String> roles) {
+        return new AutoValue_ChangeUserRequest(email, fullName, permissions, timezone, startpage, sessionTimeoutMs, roles);
     }
 }
