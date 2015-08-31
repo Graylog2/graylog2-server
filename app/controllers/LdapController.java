@@ -92,6 +92,7 @@ public class LdapController extends AuthenticatedController {
             request.groupMapping = settingsRequest.groupMapping;
             request.groupSearchBase= settingsRequest.groupSearchBase;
             request.groupIdAttribute= settingsRequest.groupIdAttribute;
+            request.groupObjectClass= settingsRequest.groupObjectClass;
             request.additionalDefaultGroups = Lists.newArrayList(settingsRequest.additionalDefaultGroups == null ? Collections.<String>emptyList() : settingsRequest.additionalDefaultGroups);
 
             ldapSettingsForm = settingsForm.fill(request);
@@ -146,8 +147,9 @@ public class LdapController extends AuthenticatedController {
             request.searchPattern = formData.get("searchPattern");
             request.principal = formData.get("principal");
             request.password = formData.get("password");
-            request.groupSearchBase= formData.get("groupSearchBase");
-            request.groupIdAttribute= formData.get("groupIdAttribute");
+            request.groupSearchBase = formData.get("groupSearchBase");
+            request.groupIdAttribute = formData.get("groupIdAttribute");
+            request.groupObjectClass = formData.get("groupObjectClass");
             result = ldapSettingsService.testLdapConfiguration(request);
         } catch (APIException e) {
             log.error("Unable to test login: {}", e.getMessage());
@@ -195,6 +197,7 @@ public class LdapController extends AuthenticatedController {
         request.groupMapping = formValue.groupMapping;
         request.groupSearchBase= formValue.groupSearchBase;
         request.groupIdAttribute= formValue.groupIdAttribute;
+        request.groupObjectClass = formValue.groupObjectClass;
         request.additionalDefaultGroups = safeAdditionalGroupsAsSet(formValue.additionalDefaultGroups);
 
         try {
@@ -262,6 +265,10 @@ public class LdapController extends AuthenticatedController {
         @JsonProperty("group_id_attribute")
         @Nullable
         public String groupIdAttribute;
+
+        @JsonProperty("group_object_class")
+        @Nullable
+        public String groupObjectClass;
 
         @JsonProperty("additional_default_groups")
         @Nullable

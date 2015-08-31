@@ -176,7 +176,8 @@ $(document).ready(function() {
                 principal: $("#ldap-test-username").val(),
                 password: $("#ldap-test-password").val(),
                 groupSearchBase: $("#groupSearchBase").val(),
-                groupIdAttribute: $("#groupIdAttribute").val()
+                groupIdAttribute: $("#groupIdAttribute").val(),
+                groupObjectClass: $("#groupObjectClass").val()
             },
             success: function(loginResult) {
                 var isEmptyEntry = $.isEmptyObject(loginResult.entry);
