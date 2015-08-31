@@ -185,11 +185,12 @@ var WidgetEditConfigModal = React.createClass({
 
         switch (this.state.type) {
             case this.props.widgetTypes.STATS_COUNT:
+                var defaultStatisticalFunction = this.state.config["stats_function"] === 'stddev' ? 'std_deviation' : this.state.config["stats_function"];
                 controls.push(
                     <Input key="statsCountStatisticalFunction"
                            type="select"
                            label="Statistical function"
-                           defaultValue={this.state.config["stats_function"]}
+                           defaultValue={defaultStatisticalFunction}
                            onChange={this._onStatisticalFunctionChange("stats_function")}
                            help="Statistical function applied to the data.">
                         {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
