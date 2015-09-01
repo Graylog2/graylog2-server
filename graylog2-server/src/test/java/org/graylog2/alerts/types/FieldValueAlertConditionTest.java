@@ -148,7 +148,13 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
 
     protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
-            when(searches.fieldStats(anyString(), Matchers.eq("*"), anyString(), any(RelativeRange.class), anyBoolean(), anyBoolean())).thenReturn(fieldStatsResult);
+            when(searches.fieldStats(anyString(),
+                                     Matchers.eq("*"),
+                                     anyString(),
+                                     any(RelativeRange.class),
+                                     anyBoolean(),
+                                     anyBoolean(),
+                                     anyBoolean())).thenReturn(fieldStatsResult);
         } catch (InvalidRangeFormatException | Searches.FieldTypeException e) {
             assertNotNull("This should not return an exception!", e);
         }

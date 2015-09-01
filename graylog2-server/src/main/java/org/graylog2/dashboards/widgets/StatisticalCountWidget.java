@@ -155,7 +155,8 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
                                              filter,
                                              timeRange,
                                              needsCardinality,
-                                             !(needsCount || needsCardinality));
+                                             !(needsCount || needsCardinality),
+                                             needsCount);
             if (trend && timeRange instanceof RelativeRange) {
                 DateTime toPrevious = timeRange.getFrom();
                 DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
@@ -167,7 +168,8 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
                                                  filter,
                                                  previousTimeRange,
                                                  needsCardinality,
-                                                 !(needsCount || needsCardinality));
+                                                 !(needsCount || needsCardinality),
+                                                 needsCount);
                 Map<String, Object> results = Maps.newHashMap();
                 results.put("now", getStatisticalValue(fieldStatsResult));
                 results.put("previous", getStatisticalValue(previousFieldStatsResult));

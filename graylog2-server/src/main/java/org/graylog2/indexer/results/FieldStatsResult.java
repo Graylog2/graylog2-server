@@ -19,17 +19,17 @@ package org.graylog2.indexer.results;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class FieldStatsResult extends IndexQueryResult {
 
-    private final Filter filterAggregation;
+    @Nullable
+    private final ValueCount valueCount;
     @Nullable
     private final ExtendedStats extendedStats;
     @Nullable
@@ -37,21 +37,26 @@ public class FieldStatsResult extends IndexQueryResult {
     private List<ResultMessage> searchHits;
 
 
-    public FieldStatsResult(@Nonnull Filter filterAggregation,
+    public FieldStatsResult(@Nullable ValueCount valueCount,
                             @Nullable ExtendedStats extendedStats,
                             @Nullable Cardinality cardinality,
                             SearchHits hits,
                             String query,
                             BytesReference source, TimeValue took) {
         super(query, source, took);
-        this.filterAggregation = filterAggregation;
+        this.valueCount = valueCount;
         this.extendedStats = extendedStats;
         this.cardinality = cardinality;
         this.searchHits = buildResults(hits);
     }
 
     public long getCount() {
-        return filterAggregation.getDocCount();
+        if (valueCount != null) {
+            return valueCount.getValue();
+        } else if (extendedStats != null) {
+            return extendedStats.getCount();
+        }
+        return Long.MIN_VALUE;
     }
 
     public double getSum() {
