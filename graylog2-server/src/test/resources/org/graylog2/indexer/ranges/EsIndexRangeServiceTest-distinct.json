@@ -11,7 +11,6 @@
         },
         {
           "data": {
-            "_id": "graylog_1",
             "gl2_index_range_index_name": "graylog_1",
             "gl2_index_range_calculated_at": "2015-01-02T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-01T00:00:00.000Z",
@@ -32,7 +31,6 @@
         },
         {
           "data": {
-            "_id": "graylog_2",
             "gl2_index_range_index_name": "graylog_2",
             "gl2_index_range_calculated_at": "2015-01-03T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-02T00:00:00.000Z",
@@ -53,7 +51,6 @@
         },
         {
           "data": {
-            "_id": "graylog_3",
             "gl2_index_range_index_name": "graylog_3",
             "gl2_index_range_calculated_at": "2015-01-04T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-03T00:00:00.000Z",
@@ -74,7 +71,6 @@
         },
         {
           "data": {
-            "_id": "graylog_4",
             "gl2_index_range_index_name": "graylog_4",
             "gl2_index_range_calculated_at": "2015-01-05T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-04T00:00:00.000Z",
@@ -95,7 +91,6 @@
         },
         {
           "data": {
-            "_id": "graylog_5",
             "gl2_index_range_index_name": "graylog_5",
             "gl2_index_range_calculated_at": "2015-01-06T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-05T00:00:00.000Z",
