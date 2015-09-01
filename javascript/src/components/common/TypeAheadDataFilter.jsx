@@ -33,10 +33,12 @@ var TypeAheadDataFilter = React.createClass({
             var dataToFilter = datum[this.state.filterByKey];
 
             if (this.props.filterSuggestionAccessor) {
-                dataToFilter = dataToFilter.map((data) => data[this.props.filterSuggestionAccessor]);
+                dataToFilter = dataToFilter.map((data) => data[this.props.filterSuggestionAccessor].toLocaleLowerCase());
+            } else {
+                dataToFilter = dataToFilter.map(data => data.toLocaleLowerCase());
             }
 
-            return dataToFilter.indexOf(filter) !== -1;
+            return dataToFilter.indexOf(filter.toLocaleLowerCase()) !== -1;
         }, this);
     },
     _matchStringSearch(datum) {
@@ -91,10 +93,12 @@ var TypeAheadDataFilter = React.createClass({
         var suggestions;
 
         if (this.props.filterSuggestionAccessor) {
-            suggestions = this.props.filterSuggestions.map((filterSuggestion) => filterSuggestion[this.props.filterSuggestionAccessor]);
+            suggestions = this.props.filterSuggestions.map((filterSuggestion) => filterSuggestion[this.props.filterSuggestionAccessor].toLocaleLowerCase());
         } else {
-            suggestions = this.props.filterSuggestions;
+            suggestions = this.props.filterSuggestions.map((filterSuggestion) => filterSuggestion.toLocaleLowerCase());
         }
+
+        suggestions.filter((filterSuggestion) => !this.state.filters.includes(filterSuggestion));
 
         return (
             <div className="filter">
