@@ -187,7 +187,7 @@ public class EsIndexRangeService implements IndexRangeService {
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (IndexRange indexRange : findAll()) {
-            if (indexRange.begin().getMillis() >= begin.getMillis() && indexRange.end().getMillis() <= end.getMillis()) {
+            if (indexRange.begin().getMillis() <= end.getMillis() && indexRange.end().getMillis() >= begin.getMillis()) {
                 indexRanges.add(indexRange);
             }
         }

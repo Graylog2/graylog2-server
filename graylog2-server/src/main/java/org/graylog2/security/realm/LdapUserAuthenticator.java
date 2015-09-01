@@ -96,7 +96,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                                                              principal,
                                                              ldapSettings.isActiveDirectory(),
                                                              ldapSettings.getGroupSearchBase(),
-                                                             ldapSettings.getGroupIdAttribute());
+                                                             ldapSettings.getGroupIdAttribute(),
+                                                             ldapSettings.getGroupObjectClass());
             if (userEntry == null) {
                 LOG.debug("User {} not found in LDAP", principal);
                 return null;

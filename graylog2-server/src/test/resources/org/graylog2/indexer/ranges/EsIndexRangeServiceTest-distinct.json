@@ -1,0 +1,109 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_1",
+            "indexType": "index_range",
+            "indexId": "graylog_1"
+          }
+        },
+        {
+          "data": {
+            "_id": "graylog_1",
+            "gl2_index_range_index_name": "graylog_1",
+            "gl2_index_range_calculated_at": "2015-01-02T00:00:00.000Z",
+            "gl2_index_range_begin": "2015-01-01T00:00:00.000Z",
+            "gl2_index_range_end": "2015-01-02T00:00:00.000Z",
+            "gl2_index_range_took_ms": 42
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_2",
+            "indexType": "index_range",
+            "indexId": "graylog_2"
+          }
+        },
+        {
+          "data": {
+            "_id": "graylog_2",
+            "gl2_index_range_index_name": "graylog_2",
+            "gl2_index_range_calculated_at": "2015-01-03T00:00:00.000Z",
+            "gl2_index_range_begin": "2015-01-02T00:00:00.000Z",
+            "gl2_index_range_end": "2015-01-03T00:00:00.000Z",
+            "gl2_index_range_took_ms": 42
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_3",
+            "indexType": "index_range",
+            "indexId": "graylog_3"
+          }
+        },
+        {
+          "data": {
+            "_id": "graylog_3",
+            "gl2_index_range_index_name": "graylog_3",
+            "gl2_index_range_calculated_at": "2015-01-04T00:00:00.000Z",
+            "gl2_index_range_begin": "2015-01-03T00:00:00.000Z",
+            "gl2_index_range_end": "2015-01-04T00:00:00.000Z",
+            "gl2_index_range_took_ms": 42
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_4",
+            "indexType": "index_range",
+            "indexId": "graylog_4"
+          }
+        },
+        {
+          "data": {
+            "_id": "graylog_4",
+            "gl2_index_range_index_name": "graylog_4",
+            "gl2_index_range_calculated_at": "2015-01-05T00:00:00.000Z",
+            "gl2_index_range_begin": "2015-01-04T00:00:00.000Z",
+            "gl2_index_range_end": "2015-01-05T00:00:00.000Z",
+            "gl2_index_range_took_ms": 42
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_5",
+            "indexType": "index_range",
+            "indexId": "graylog_5"
+          }
+        },
+        {
+          "data": {
+            "_id": "graylog_5",
+            "gl2_index_range_index_name": "graylog_5",
+            "gl2_index_range_calculated_at": "2015-01-06T00:00:00.000Z",
+            "gl2_index_range_begin": "2015-01-05T00:00:00.000Z",
+            "gl2_index_range_end": "2015-01-06T00:00:00.000Z",
+            "gl2_index_range_took_ms": 42
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -63,6 +63,7 @@ public class LdapSettings {
         response.setGroupMapping(request.groupMapping);
         response.setGroupIdAttribute(request.groupIdAttribute);
         response.setGroupSearchBase(request.groupSearchBase);
+        response.setGroupObjectClass(request.groupObjectClass);
         response.setAdditionalDefaultGroups(request.additionalDefaultGroups);
         this.response = response;
     }
@@ -98,6 +99,7 @@ public class LdapSettings {
         request.groupIdAttribute = getGroupIdAttribute();
         request.groupSearchBase = getGroupSearchBase();
         request.groupMapping = getGroupMapping();
+        request.groupObjectClass = getGroupObjectClass();
         request.additionalDefaultGroups = getAdditionalDefaultGroups();
         return request;
     }
@@ -223,5 +225,10 @@ public class LdapSettings {
     @Nullable
     public String getGroupIdAttribute() {
         return response.getGroupIdAttribute();
+    }
+
+    @Nullable
+    public String getGroupObjectClass() {
+        return response.getGroupObjectClass();
     }
 }

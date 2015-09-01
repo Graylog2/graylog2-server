@@ -25,21 +25,12 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CacheStatsSet implements MetricSet {
-    // without type args, because the only call we care about (.stats()) is not generic
-    private final Cache cache;
-    private final String prefix;
+    private final Map<String, Metric> metrics;
 
-    public CacheStatsSet(String prefix, Cache cache) {
-        this.prefix = checkNotNull(prefix);
-        this.cache = checkNotNull(cache);
-    }
-
-    @Override
-    public Map<String, Metric> getMetrics() {
-        return ImmutableMap.<String, Metric>builder()
+    public CacheStatsSet(final String prefix, final Cache cache) {
+        this.metrics = ImmutableMap.<String, Metric>builder()
                 .put(name(prefix, "requests"), new Gauge<Long>() {
                     @Override
                     public Long getValue() {
@@ -97,4 +88,8 @@ public class CacheStatsSet implements MetricSet {
                 .build();
     }
 
+    @Override
+    public Map<String, Metric> getMetrics() {
+        return metrics;
+    }
 }

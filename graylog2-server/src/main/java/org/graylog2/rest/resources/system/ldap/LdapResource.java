@@ -171,7 +171,8 @@ public class LdapResource extends RestResource {
                         request.principal(),
                         request.activeDirectory(),
                         request.groupSearchBase(),
-                        request.groupIdAttribute());
+                        request.groupIdAttribute(),
+                        request.groupObjectClass());
                 if (entry != null) {
                     userPrincipalName = entry.getBindPrincipal();
                     entryMap = entry.getAttributes();
@@ -224,6 +225,7 @@ public class LdapResource extends RestResource {
         ldapSettings.setGroupMapping(request.groupMapping());
         ldapSettings.setGroupSearchBase(request.groupSearchBase());
         ldapSettings.setGroupIdAttribute(request.groupIdAttribute());
+        ldapSettings.setGroupObjectClass(request.groupObjectClass());
         ldapSettings.setAdditionalDefaultGroups(request.additionalDefaultGroups());
 
         ldapSettingsService.save(ldapSettings);
@@ -298,7 +300,7 @@ public class LdapResource extends RestResource {
             LdapNetworkConnection connection = ldapConnector.connect(config);
             final Set<String> groups = ldapConnector.listGroups(connection,
                                                                ldapSettings.getGroupSearchBase(),
-                                                               "group",
+                                                               ldapSettings.getGroupObjectClass(),
                                                                ldapSettings.getGroupIdAttribute());
             return groups;
         } catch (LdapException e) {
