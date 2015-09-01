@@ -81,7 +81,7 @@ public class SearchApiController extends AuthenticatedController {
             FieldStatsResponse stats = search.fieldStats(field);
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("count", stats.count);
+            result.put("count", stats.count < 0 ? "N/A" : stats.count);
             result.put("sum", stats.sum);
             result.put("mean", stats.mean);
             result.put("min", stats.min);
@@ -89,7 +89,7 @@ public class SearchApiController extends AuthenticatedController {
             result.put("variance", stats.variance);
             result.put("sum_of_squares", stats.sumOfSquares);
             result.put("std_deviation", stats.stdDeviation);
-            result.put("cardinality", stats.cardinality);
+            result.put("cardinality", stats.cardinality < 0 ? "N/A" : stats.cardinality);
 
             return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (IOException e) {

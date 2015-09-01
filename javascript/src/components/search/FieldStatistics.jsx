@@ -1,3 +1,5 @@
+/* globals isNumber */
+
 'use strict';
 
 var React = require('react');
@@ -96,9 +98,9 @@ var FieldStatistics = React.createClass({
                         <td>{maybeSpinner}</td>
                         <td>{field}</td>
                         {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
-                          const formatNumber = NumberUtils.formatNumber(stats[statFunction]);
+                          const formatNumber = isNumber(stats[statFunction]) ? NumberUtils.formatNumber(stats[statFunction]) : stats[statFunction];
                           const numberStyle = {};
-                          if (formatNumber === 'NaN' || formatNumber === '-Infinity' || formatNumber === 'Infinity') {
+                          if (formatNumber === 'NaN' || formatNumber === '-Infinity' || formatNumber === 'Infinity' || formatNumber === 'N/A') {
                             numberStyle.color = 'lightgray';
                           }
                           return <td key={statFunction + '-td'}><span style={numberStyle}>{formatNumber}</span></td>;
