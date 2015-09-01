@@ -43,6 +43,7 @@ import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
@@ -89,6 +90,7 @@ public class Searches {
     public static final String AGG_HISTOGRAM = "gl2_histogram";
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
+    public static final String AGG_VALUE_COUNT = "gl2_value_count";
 
     public enum TermsStatsOrder {
         TERM,
@@ -385,10 +387,16 @@ public class Searches {
 
     public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) throws FieldTypeException {
         // by default include the cardinality aggregation, as well.
-        return fieldStats(field, query, filter, range, true, false);
+        return fieldStats(field, query, filter, range, true, true, true);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range, boolean includeCardinality, boolean onlyCardinality)
+    public FieldStatsResult fieldStats(String field,
+                                       String query,
+                                       String filter,
+                                       TimeRange range,
+                                       boolean includeCardinality,
+                                       boolean includeStats,
+                                       boolean includeCount)
             throws FieldTypeException {
         SearchRequestBuilder srb;
 
@@ -400,7 +408,10 @@ public class Searches {
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
                 .filter(standardAggregationFilters(range, filter));
-        if (!onlyCardinality) {
+        if (includeCount) {
+            builder.subAggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));
+        }
+        if (includeStats) {
             builder.subAggregation(AggregationBuilders.extendedStats(AGG_EXTENDED_STATS).field(field));
         }
         if (includeCardinality) {
@@ -421,6 +432,7 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
+                (ValueCount) f.getAggregations().get(AGG_VALUE_COUNT),
                 (ExtendedStats) f.getAggregations().get(AGG_EXTENDED_STATS),
                 (Cardinality) f.getAggregations().get(AGG_CARDINALITY),
                 r.getHits(),
