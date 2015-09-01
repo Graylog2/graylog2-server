@@ -385,10 +385,10 @@ public class Searches {
 
     public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) throws FieldTypeException {
         // by default include the cardinality aggregation, as well.
-        return fieldStats(field, query, filter, range, true, false);
+        return fieldStats(field, query, filter, range, true, true);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range, boolean includeCardinality, boolean onlyCardinality)
+    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range, boolean includeCardinality, boolean includeStats)
             throws FieldTypeException {
         SearchRequestBuilder srb;
 
@@ -400,7 +400,7 @@ public class Searches {
 
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
                 .filter(standardFilters(range, filter));
-        if (!onlyCardinality) {
+        if (includeStats) {
             builder.subAggregation(AggregationBuilders.extendedStats(AGG_EXTENDED_STATS).field(field));
         }
         if (includeCardinality) {

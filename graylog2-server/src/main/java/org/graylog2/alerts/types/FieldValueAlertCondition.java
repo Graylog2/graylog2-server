@@ -99,7 +99,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         try {
             final String filter = "streams:" + stream.getId();
             // TODO we don't support cardinality yet
-            final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60), false, false);
+            final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60), false, true);
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
