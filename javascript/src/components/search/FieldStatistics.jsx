@@ -96,7 +96,12 @@ var FieldStatistics = React.createClass({
                         <td>{maybeSpinner}</td>
                         <td>{field}</td>
                         {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
-                            return <td key={statFunction + "-td"}>{NumberUtils.formatNumber(stats[statFunction])}</td>;
+                          const formatNumber = NumberUtils.formatNumber(stats[statFunction]);
+                          const numberStyle = {};
+                          if (formatNumber === 'NaN' || formatNumber === '-Infinity' || formatNumber === 'Infinity') {
+                            numberStyle.color = 'lightgray';
+                          }
+                          return <td key={statFunction + '-td'}><span style={numberStyle}>{formatNumber}</span></td>;
                         })}
                     </tr>
                 );

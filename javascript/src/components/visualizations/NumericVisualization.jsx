@@ -94,11 +94,7 @@ var NumericVisualization = React.createClass({
         return fontSize;
     },
     _formatData() {
-        try {
-            return numeral(this.state.currentNumber).format("0,0.[00]");
-        } catch(e) {
-            return String(this.state.currentNumber);
-        }
+        return String(NumberUtils.formatNumber(this.state.currentNumber));
     },
     _isIndicatorActive(index, trendIndicatorType) {
         if ((this.state.percentage === 0) ||
