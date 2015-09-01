@@ -16,10 +16,12 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.collect.UnmodifiableIterator;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -35,10 +37,10 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -48,8 +50,6 @@ import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -59,15 +59,10 @@ import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
-import org.elasticsearch.common.collect.UnmodifiableIterator;
-import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.Index;
-import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.indices.IndexMissingException;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
@@ -77,6 +72,7 @@ import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.joda.time.DateTime;
@@ -102,12 +98,14 @@ public class Indices implements IndexManagement {
     private final Client c;
     private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
+    private final Messages messages;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;
+        this.messages = messages;
     }
 
     public void move(String source, String target) {
@@ -132,7 +130,7 @@ public class Indices implements IndexManagement {
                 Map<String, Object> doc = hit.getSource();
                 String id = (String) doc.remove("_id");
 
-                request.add(manualIndexRequest(target, doc, id).request());
+                request.add(messages.buildIndexRequest(target, doc, id));
             }
 
             request.setConsistencyLevel(WriteConsistencyLevel.ONE);
@@ -254,27 +252,17 @@ public class Indices implements IndexManagement {
         return fields;
     }
 
-    private IndexRequestBuilder manualIndexRequest(String index, Map<String, Object> doc, String id) {
-        final IndexRequestBuilder b = new IndexRequestBuilder(c);
-        b.setIndex(index);
-        b.setId(id);
-        b.setSource(doc);
-        b.setOpType(IndexRequest.OpType.INDEX);
-        b.setType(IndexMapping.TYPE_MESSAGE);
-        b.setConsistencyLevel(WriteConsistencyLevel.ONE);
-
-        return b;
-    }
-
     public void setReadOnly(String index) {
-        ImmutableSettings.Builder sb = ImmutableSettings.builder();
+        final Settings.Builder sb = Settings.builder()
+                // https://www.elastic.co/guide/en/elasticsearch/reference/2.0/indices-update-settings.html
+                .put("index.blocks.write", true) // Block writing.
+                .put("index.blocks.read", false) // Allow reading.
+                .put("index.blocks.metadata", false); // Allow getting metadata.
 
-        // http://www.elasticsearch.org/guide/reference/api/admin-indices-update-settings/
-        sb.put("index.blocks.write", true); // Block writing.
-        sb.put("index.blocks.read", false); // Allow reading.
-        sb.put("index.blocks.metadata", false); // Allow getting metadata.
-
-        c.admin().indices().updateSettings(new UpdateSettingsRequest(index).settings(sb.build())).actionGet();
+        final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
+                .setSettings(sb)
+                .request();
+        c.admin().indices().updateSettings(request).actionGet();
     }
 
     public boolean isReadOnly(String index) {
@@ -285,7 +273,7 @@ public class Indices implements IndexManagement {
     }
 
     public void setReadWrite(String index) {
-        Settings settings = ImmutableSettings.builder()
+        Settings settings = Settings.builder()
                 .put("index.blocks.write", false)
                 .put("index.blocks.read", false)
                 .put("index.blocks.metadata", false)
@@ -447,14 +435,15 @@ public class Indices implements IndexManagement {
     }
 
     public void optimizeIndex(String index) {
-        // http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
-        final OptimizeRequest or = new OptimizeRequest(index)
-                .maxNumSegments(configuration.getIndexOptimizationMaxNumSegments())
-                .onlyExpungeDeletes(false)
-                .flush(true);
+        // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/indices-forcemerge.html
+        final ForceMergeRequest request = c.admin().indices().prepareForceMerge(index)
+                .setMaxNumSegments(configuration.getIndexOptimizationMaxNumSegments())
+                .setOnlyExpungeDeletes(false)
+                .setFlush(true)
+                .request();
 
         // Using a specific timeout to override the global Elasticsearch request timeout
-        c.admin().indices().optimize(or).actionGet(1L, TimeUnit.HOURS);
+        c.admin().indices().forceMerge(request).actionGet(1L, TimeUnit.HOURS);
     }
 
     public ClusterHealthStatus waitForRecovery(String index) {
@@ -501,22 +490,24 @@ public class Indices implements IndexManagement {
      */
     public TimestampStats timestampStatsOfIndex(String index) {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
-                .filter(FilterBuilders.existsFilter("timestamp"))
+                .filter(QueryBuilders.existsQuery("timestamp"))
                 .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
                 .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
         final SearchRequestBuilder srb = c.prepareSearch()
                 .setIndices(index)
-                .setSearchType(SearchType.COUNT)
+                .setSearchType(SearchType.QUERY_THEN_FETCH)
+                .setSize(0)
                 .addAggregation(builder);
 
         final SearchResponse response;
         try {
             response = c.search(srb.request()).actionGet();
-        } catch (IndexMissingException e) {
+        } catch (org.elasticsearch.index.IndexNotFoundException e) {
+            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
             throw e;
         } catch (ElasticsearchException e) {
             LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
-            throw new IndexMissingException(new Index(index));
+            throw new org.elasticsearch.index.IndexNotFoundException("Index " + index + " not found", e);
         }
 
         final Filter f = response.getAggregations().get("agg");

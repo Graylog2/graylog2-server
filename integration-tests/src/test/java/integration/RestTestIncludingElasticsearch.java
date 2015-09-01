@@ -16,18 +16,19 @@
  */
 package integration;
 
-import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
+import org.elasticsearch.common.settings.Settings;
 import org.junit.Rule;
 
-import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-import static com.lordofthejars.nosqlunit.elasticsearch.RemoteElasticsearchConfigurationBuilder.remoteElasticsearch;
+import static com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
+import static com.github.joschi.nosqlunit.elasticsearch2.RemoteElasticsearchConfigurationBuilder.remoteElasticsearch;
+
 
 public class RestTestIncludingElasticsearch extends BaseRestTest {
     @Rule
     public ElasticsearchRule elasticsearchRule = newElasticsearchRule().configure(remoteElasticsearch()
             .host(IntegrationTestsConfig.getEsHost())
-            .settings(ImmutableSettings.builder().put("cluster.name", IntegrationTestsConfig.getEsClusterName()).build())
+            .settings(Settings.builder().put("cluster.name", IntegrationTestsConfig.getEsClusterName()).build())
             .port(IntegrationTestsConfig.getEsPort()).build()).build();
 
 }

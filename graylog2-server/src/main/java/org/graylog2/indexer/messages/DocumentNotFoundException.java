@@ -16,18 +16,12 @@
  */
 package org.graylog2.indexer.messages;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class DocumentNotFoundException extends Exception {
+    public DocumentNotFoundException(String index, String messageId) {
+        super("Couldn't find message <" + messageId + "> in index <" + index + ">");
+    }
 
-	/**
-	 * Re-generate if you modify the class structure.
-	 */
-	private static final long serialVersionUID = -4347296409541352478L;
-
-	public DocumentNotFoundException() {
-		super();
-	}
-	
+    public DocumentNotFoundException() {
+        super("Couldn't find message in index");
+    }
 }

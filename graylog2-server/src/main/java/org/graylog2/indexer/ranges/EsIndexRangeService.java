@@ -24,12 +24,12 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.indices.IndexMissingException;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
@@ -93,7 +93,7 @@ public class EsIndexRangeService implements IndexRangeService {
     public IndexRange get(String index) throws NotFoundException {
         try {
             return cache.get(index);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | UncheckedExecutionException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof NotFoundException) {
                 throw (NotFoundException) cause;
@@ -104,15 +104,12 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     private IndexRange loadIndexRange(String index) throws NotFoundException {
-        final GetRequest request = new GetRequestBuilder(client, index)
-                .setType("index_range")
-                .setId(index)
-                .request();
+        final GetRequest request = client.prepareGet(index, "index_range", index).request();
 
         final GetResponse r;
         try {
             r = client.get(request).actionGet();
-        } catch (IndexMissingException | NoShardAvailableActionException e) {
+        } catch (IndexNotFoundException | NoShardAvailableActionException e) {
             throw new NotFoundException(e);
         }
 

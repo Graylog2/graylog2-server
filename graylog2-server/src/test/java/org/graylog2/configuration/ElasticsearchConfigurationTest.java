@@ -47,6 +47,14 @@ public class ElasticsearchConfigurationTest {
     }
 
     @Test
+    public void testGetPathHome() throws ValidationException, RepositoryException {
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
+        new JadConfig(new InMemoryRepository(), configuration).process();
+
+        assertEquals(configuration.getPathHome(), "data/elasticsearch");
+    }
+
+    @Test
     public void testIsClientNode() throws ValidationException, RepositoryException {
         final Map<String, String> props = new HashMap<>();
         final ElasticsearchConfiguration configuration1 = new ElasticsearchConfiguration();

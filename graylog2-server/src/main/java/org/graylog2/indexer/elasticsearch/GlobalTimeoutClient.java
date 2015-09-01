@@ -18,24 +18,22 @@ package org.graylog2.indexer.elasticsearch;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.Action;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ClusterAdminClient;
+import org.elasticsearch.client.ElasticsearchClient;
 import org.elasticsearch.client.FilterClient;
-import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.transport.TransportRequestOptions;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkArgument;
@@ -56,23 +54,8 @@ public class GlobalTimeoutClient extends FilterClient {
     }
 
     @Override
-    public <Request extends ActionRequest, Response extends ActionResponse, RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder, Client>> ActionFuture<Response> execute(Action<Request, Response, RequestBuilder, Client> action, Request request) {
-        return GlobalTimeoutActionFuture.create(super.execute(action, request), timeout, unit);
-    }
-
-    @Override
-    public ClusterAdminClient cluster() {
-        return new GlobalTimeoutClusterAdminClient(super.cluster(), timeout, unit);
-    }
-
-    @Override
-    public IndicesAdminClient indices() {
-        return new GlobalTimeoutIndicesAdminClient(super.indices(), timeout, unit);
-    }
-
-    @Override
-    public AdminClient admin() {
-        return new GlobalTimeoutAdminClient(super.admin(), timeout, unit);
+    protected <Request extends ActionRequest, Response extends ActionResponse, RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder>> void doExecute(Action<Request, Response, RequestBuilder> action, Request request, ActionListener<Response> listener) {
+        super.doExecute(new GlobalTimeoutAction<>(action, timeout, unit), request, listener);
     }
 
     @Override
@@ -81,140 +64,37 @@ public class GlobalTimeoutClient extends FilterClient {
         return super.search(request);
     }
 
-    public static class GlobalTimeoutAdminClient implements AdminClient {
-        private final AdminClient in;
-        private final long timeout;
-        private final TimeUnit unit;
-
-        public GlobalTimeoutAdminClient(AdminClient in, long timeout, TimeUnit unit) {
-            this.in = checkNotNull(in);
-
-            checkArgument(timeout > 0);
-            this.timeout = timeout;
-            this.unit = checkNotNull(unit);
-        }
-
-        @Override
-        public IndicesAdminClient indices() {
-            return new GlobalTimeoutIndicesAdminClient(in.indices(), timeout, unit);
-        }
-
-        @Override
-        public ClusterAdminClient cluster() {
-            return new GlobalTimeoutClusterAdminClient(in.cluster(), timeout, unit);
-        }
+    @Override
+    public void search(final SearchRequest request, final ActionListener<SearchResponse> listener) {
+        searchRequests.inc();
+        super.search(request, listener);
     }
 
-    public static class GlobalTimeoutClusterAdminClient extends FilterClient.ClusterAdmin {
-        private final long timeout;
-        private final TimeUnit unit;
+    public static class GlobalTimeoutAction<Request extends ActionRequest, Response extends ActionResponse, RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder>>
+            extends Action<Request, Response, RequestBuilder> {
+        private final Action<Request, Response, RequestBuilder> action;
+        private final TimeValue timeout;
 
-        public GlobalTimeoutClusterAdminClient(ClusterAdminClient in, long timeout, TimeUnit unit) {
-            super(in);
-
-            checkArgument(timeout > 0);
-            this.timeout = timeout;
-            this.unit = checkNotNull(unit);
+        public GlobalTimeoutAction(final Action<Request, Response, RequestBuilder> action, long duration, TimeUnit timeUnit) {
+            super(action.name());
+            this.action = checkNotNull(action);
+            this.timeout = new TimeValue(duration, timeUnit);
         }
 
         @Override
-        public <Request extends ActionRequest, Response extends ActionResponse, RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder, ClusterAdminClient>> ActionFuture<Response> execute(Action<Request, Response, RequestBuilder, ClusterAdminClient> action, Request request) {
-            return GlobalTimeoutActionFuture.create(super.execute(action, request), timeout, unit);
-        }
-    }
-
-    public static class GlobalTimeoutIndicesAdminClient extends FilterClient.IndicesAdmin {
-        private final long timeout;
-        private final TimeUnit unit;
-
-        public GlobalTimeoutIndicesAdminClient(IndicesAdminClient in, long timeout, TimeUnit unit) {
-            super(in);
-
-            checkArgument(timeout > 0);
-            this.timeout = timeout;
-            this.unit = checkNotNull(unit);
+        public TransportRequestOptions transportOptions(Settings settings) {
+            final TransportRequestOptions result = super.transportOptions(settings);
+            return result.timeout() == null ? result.withTimeout(timeout) : result;
         }
 
         @Override
-        public <Request extends ActionRequest, Response extends ActionResponse, RequestBuilder extends ActionRequestBuilder<Request, Response, RequestBuilder, IndicesAdminClient>> ActionFuture<Response> execute(Action<Request, Response, RequestBuilder, IndicesAdminClient> action, Request request) {
-            return GlobalTimeoutActionFuture.create(super.execute(action, request), timeout, unit);
-        }
-    }
-
-    public static class GlobalTimeoutActionFuture<T> implements ActionFuture<T> {
-        private final ActionFuture<T> in;
-        private final long timeout;
-        private final TimeUnit unit;
-
-        private GlobalTimeoutActionFuture(ActionFuture<T> in, long timeout, TimeUnit unit) {
-            this.in = checkNotNull(in);
-
-            checkArgument(timeout > 0);
-            this.timeout = timeout;
-            this.unit = checkNotNull(unit);
-        }
-
-        public static <Response extends ActionResponse> GlobalTimeoutActionFuture<Response> create(ActionFuture<Response> actionFuture, long timeout, TimeUnit unit) {
-            return actionFuture == null ? null : new GlobalTimeoutActionFuture<>(actionFuture, timeout, unit);
+        public RequestBuilder newRequestBuilder(ElasticsearchClient client) {
+            return action.newRequestBuilder(client);
         }
 
         @Override
-        public T actionGet() throws ElasticsearchException {
-            return in.actionGet(timeout, unit);
-        }
-
-        @Override
-        public T actionGet(String timeout) throws ElasticsearchException {
-            return in.actionGet(timeout);
-        }
-
-        @Override
-        public T actionGet(long timeoutMillis) throws ElasticsearchException {
-            return in.actionGet(timeoutMillis);
-        }
-
-        @Override
-        public T actionGet(long timeout, TimeUnit unit) throws ElasticsearchException {
-            return in.actionGet(timeout, unit);
-        }
-
-        @Override
-        public T actionGet(TimeValue timeout) throws ElasticsearchException {
-            return in.actionGet(timeout);
-        }
-
-        @Override
-        public Throwable getRootFailure() {
-            return in.getRootFailure();
-        }
-
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return in.cancel(mayInterruptIfRunning);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return in.isCancelled();
-        }
-
-        @Override
-        public boolean isDone() {
-            return in.isDone();
-        }
-
-        @Override
-        public T get() throws InterruptedException, ExecutionException {
-            try {
-                return in.get(timeout, unit);
-            } catch (TimeoutException e) {
-                throw new ExecutionException(e.getCause());
-            }
-        }
-
-        @Override
-        public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return in.get(timeout, unit);
+        public Response newResponse() {
+            return action.newResponse();
         }
     }
 }

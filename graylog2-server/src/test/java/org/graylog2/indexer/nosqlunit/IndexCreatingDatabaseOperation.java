@@ -24,6 +24,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.messages.Messages;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
     public void insert(InputStream dataScript) {
         final IndicesAdminClient indicesAdminClient = client.admin().indices();
         for (String index : indexes) {
-            IndicesExistsResponse indicesExistsResponse = indicesAdminClient.prepareExists(index)
+            final IndicesExistsResponse indicesExistsResponse = indicesAdminClient.prepareExists(index)
                     .execute()
                     .actionGet();
 
@@ -51,7 +52,10 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping());
+            final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
+            final Messages messages = new Messages(client, configuration);
+            final Indices indices = new Indices(client, configuration, new IndexMapping(), messages);
+
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }

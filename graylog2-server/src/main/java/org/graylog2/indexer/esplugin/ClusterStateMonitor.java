@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.esplugin;
 
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.Maps;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.ClusterChangedEvent;
@@ -23,16 +24,16 @@ import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.ClusterStateListener;
 import org.elasticsearch.cluster.node.DiscoveryNode;
-import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
+import org.elasticsearch.common.component.AbstractLifecycleComponent;
 import org.elasticsearch.common.settings.Settings;
 import org.graylog2.indexer.cluster.Cluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.Map;
 
-public class ClusterStateMonitor extends org.elasticsearch.common.component.AbstractLifecycleComponent<ClusterStateMonitor> implements ClusterStateListener {
+public class ClusterStateMonitor extends AbstractLifecycleComponent<ClusterStateMonitor> implements ClusterStateListener {
     private static final Logger log = LoggerFactory.getLogger(ClusterStateMonitor.class);
     private static final EnumSet<ClusterState.ClusterStateStatus> VALID_CLUSTER_STATES =
             EnumSet.of(ClusterState.ClusterStateStatus.BEING_APPLIED, ClusterState.ClusterStateStatus.APPLIED);
@@ -68,7 +69,7 @@ public class ClusterStateMonitor extends org.elasticsearch.common.component.Abst
             return;
         }
         if (cluster != null) {
-            final HashMap<String, DiscoveryNode> nodes = Maps.newHashMap();
+            final Map<String, DiscoveryNode> nodes = Maps.newHashMap();
             for (ObjectObjectCursor<String, DiscoveryNode> cursor : event.state().getNodes().dataNodes()) {
                 nodes.put(cursor.key, cursor.value);
             }
