@@ -203,7 +203,8 @@ var SearchResult = React.createClass({
 
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                                      histogram={this.props.histogram}
-                                     permissions={this.props.permissions}/>
+                                     permissions={this.props.permissions}
+                                     isStreamSearch={this.props.searchInStream !== null}/>
 
                     <FieldGraphs ref='fieldGraphsComponent'
                                  resolution={this.props.histogram['interval']}

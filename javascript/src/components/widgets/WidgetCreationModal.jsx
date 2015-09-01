@@ -65,8 +65,10 @@ var WidgetCreationModal = React.createClass({
 
         switch (this.props.widgetType) {
             case Widget.Type.SEARCH_RESULT_COUNT:
-            case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
                 title = "message count";
+                break;
+            case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
+                title = "stream message count";
                 break;
             case Widget.Type.STATS_COUNT:
                 title = "field statistical value";
@@ -86,7 +88,11 @@ var WidgetCreationModal = React.createClass({
                 }
                 break;
             case Widget.Type.SEARCH_RESULT_CHART:
-                title = "search histogram";
+                if (this.props.isStreamSearch) {
+                    title = "stream histogram";
+                } else {
+                    title = "search histogram";
+                }
                 break;
             case Widget.Type.STACKED_CHART:
                 title = "combined graph";
