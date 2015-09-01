@@ -128,6 +128,9 @@ var StackedGraphVisualization = React.createClass({
                 names: this.seriesNames.toJS(),
                 colors: colours.toJS()
             },
+            padding: {
+                right: 10
+            },
             axis: {
                 x: {
                     type: 'timeseries',
@@ -147,6 +150,9 @@ var StackedGraphVisualization = React.createClass({
                     tick: {
                         count: 3,
                         format: this.yAxisFormatter
+                    },
+                    padding: {
+                        bottom: 0
                     }
                 }
             },
