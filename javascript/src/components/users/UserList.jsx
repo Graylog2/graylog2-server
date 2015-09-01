@@ -56,8 +56,8 @@ var UserList = React.createClass({
         var formattedHeaderCell;
 
         switch (header.toLocaleLowerCase()) {
-            case 'name':
-                formattedHeaderCell = <th className="name">{header}</th>;
+            case '':
+                formattedHeaderCell = <th className="user-type">{header}</th>;
                 break;
             case 'actions':
                 formattedHeaderCell = <th className="actions">{header}</th>;
