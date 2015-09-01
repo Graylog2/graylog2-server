@@ -110,7 +110,8 @@ public class LdapResource extends RestResource {
                 ldapSettings.getGroupMapping(),
                 ldapSettings.getGroupSearchBase(),
                 ldapSettings.getGroupIdAttribute(),
-                ldapSettings.getAdditionalDefaultGroups());
+                ldapSettings.getAdditionalDefaultGroups(),
+                ldapSettings.getGroupSearchPattern());
     }
 
     @POST
@@ -172,7 +173,7 @@ public class LdapResource extends RestResource {
                         request.activeDirectory(),
                         request.groupSearchBase(),
                         request.groupIdAttribute(),
-                        request.groupObjectClass());
+                        request.groupSearchPattern());
                 if (entry != null) {
                     userPrincipalName = entry.getBindPrincipal();
                     entryMap = entry.getAttributes();
@@ -225,7 +226,7 @@ public class LdapResource extends RestResource {
         ldapSettings.setGroupMapping(request.groupMapping());
         ldapSettings.setGroupSearchBase(request.groupSearchBase());
         ldapSettings.setGroupIdAttribute(request.groupIdAttribute());
-        ldapSettings.setGroupObjectClass(request.groupObjectClass());
+        ldapSettings.setGroupSearchPattern(request.groupSearchPattern());
         ldapSettings.setAdditionalDefaultGroups(request.additionalDefaultGroups());
 
         ldapSettingsService.save(ldapSettings);
@@ -300,7 +301,7 @@ public class LdapResource extends RestResource {
             LdapNetworkConnection connection = ldapConnector.connect(config);
             final Set<String> groups = ldapConnector.listGroups(connection,
                                                                ldapSettings.getGroupSearchBase(),
-                                                               ldapSettings.getGroupObjectClass(),
+                                                               ldapSettings.getGroupSearchPattern(),
                                                                ldapSettings.getGroupIdAttribute());
             return groups;
         } catch (LdapException e) {

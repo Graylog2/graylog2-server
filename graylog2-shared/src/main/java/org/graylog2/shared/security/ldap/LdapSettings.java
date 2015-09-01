@@ -90,9 +90,9 @@ public interface LdapSettings extends Persisted {
 
     void setGroupIdAttribute(String groupIdAttribute);
 
-    String getGroupObjectClass();
+    String getGroupSearchPattern();
 
-    void setGroupObjectClass(String groupObjectClass);
+    void setGroupSearchPattern(String groupSearchPattern);
 
     void setAdditionalDefaultGroups(Set<String> strings);
 
