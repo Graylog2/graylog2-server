@@ -64,7 +64,8 @@ var LegacyHistogram = React.createClass({
                                     widgetType={Widget.Type.SEARCH_RESULT_CHART}
                                     configuration={{interval: this.props.histogram.interval}}
                                     pullRight={true}
-                                    permissions={this.props.permissions}/>
+                                    permissions={this.props.permissions}
+                                    isStreamSearch={this.props.isStreamSearch}/>
             </div>
             <h1>Histogram</h1>
 

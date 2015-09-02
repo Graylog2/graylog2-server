@@ -104,7 +104,8 @@ var AddToDashboardMenu = React.createClass({
                                      supportsTrending={true}
                                      configuration={this.props.configuration}
                                      onConfigurationSaved={this._saveWidget}
-                                     fields={this.props.fields}/>
+                                     fields={this.props.fields}
+                                     isStreamSearch={this.props.isStreamSearch}/>
             </div>
         );
     }
