@@ -77,7 +77,7 @@ public abstract class LdapTestConfigRequest {
 
     @JsonProperty
     @Nullable
-    public abstract String groupObjectClass();
+    public abstract String groupSearchPattern();
 
     @JsonCreator
     public static LdapTestConfigRequest create(@JsonProperty("system_username") @Nullable String systemUsername,
@@ -93,7 +93,7 @@ public abstract class LdapTestConfigRequest {
                                                @JsonProperty("test_connect_only") boolean testConnectOnly,
                                                @JsonProperty("group_search_base") @Nullable String groupSearchBase,
                                                @JsonProperty("group_id_attribute") @Nullable String groupIdAttribute,
-                                               @JsonProperty("group_object_class") @Nullable String groupObjectClass) {
+                                               @JsonProperty("group_search_pattern") @Nullable String groupSearchPattern) {
         return new AutoValue_LdapTestConfigRequest(systemUsername,
                                                    systemPassword,
                                                    ldapUri,
@@ -107,6 +107,6 @@ public abstract class LdapTestConfigRequest {
                                                    testConnectOnly,
                                                    groupSearchBase,
                                                    groupIdAttribute,
-                                                   groupObjectClass);
+                                                   groupSearchPattern);
     }
 }

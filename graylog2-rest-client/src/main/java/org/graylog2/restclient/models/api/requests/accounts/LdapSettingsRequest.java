@@ -70,9 +70,9 @@ public class LdapSettingsRequest extends ApiRequest {
     @Nullable
     public String groupIdAttribute;
 
-    @JsonProperty("group_object_class")
+    @JsonProperty("group_search_pattern")
     @Nullable
-    public String groupObjectClass;
+    public String groupSearchPattern;
 
     @JsonProperty("additional_default_groups")
     @Nullable
@@ -194,12 +194,12 @@ public class LdapSettingsRequest extends ApiRequest {
     }
 
     @Nullable
-    public String getGroupObjectClass() {
-        return groupObjectClass;
+    public String getGroupSearchPattern() {
+        return groupSearchPattern;
     }
 
-    public void setGroupObjectClass(@Nullable String groupObjectClass) {
-        this.groupObjectClass = groupObjectClass;
+    public void setGroupSearchPattern(@Nullable String groupSearchPattern) {
+        this.groupSearchPattern = groupSearchPattern;
     }
 
     @Nullable
