@@ -58,15 +58,6 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-
-        final UserPermissionMigrationState migrationState =
-                clusterConfigService.getOrDefault(UserPermissionMigrationState.class,
-                                                  UserPermissionMigrationState.create(false));
-        if (migrationState.migrationDone()) {
-            log.debug("User permission migration already done, not running migration again.");
-            return;
-        }
-
         final List<User> users = userService.loadAll();
         final String adminRoleId = roleService.getAdminRoleObjectId();
         final String readerRoleId = roleService.getReaderRoleObjectId();
@@ -155,7 +146,11 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return true;
+        final UserPermissionMigrationState migrationState =
+                clusterConfigService.getOrDefault(UserPermissionMigrationState.class,
+                                                  UserPermissionMigrationState.create(false));
+        // don't run again if the cluster config says we've already migrated the users
+        return !migrationState.migrationDone();
     }
 
     @Override
