@@ -2,27 +2,31 @@
         breadcrumbs: lib.BreadcrumbList,
         clusterHealth: org.graylog2.restclient.models.ESClusterHealth)
 
-@main("Indices", null, "", currentUser) {
+@main("Indices", null, "", currentUser, false) {
 
   @views.html.partials.breadcrumbs(breadcrumbs)
 
-  <div class="row">
-    <h1><i class="fa fa-reorder"></i> Indices</h1>
-    This is an overview of all indices (message stores) Graylog is currently taking in account
-    for searches and analysis. You can learn more about the index model in the
-    @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_INDEX_MODEL, "documentation").
-    Closed indices can be re-opened at any time.
-
-    <br />
+  <div class="row content content-head">
+    <div class="col-md-10">
+      <h1>Indices</h1>
+      <p class="description">
+        This is an overview of all indices (message stores) Graylog is currently taking in account
+        for searches and analysis. You can learn more about the index model in the
+        @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_INDEX_MODEL, "documentation").
+        Closed indices can be re-opened at any time.
+      </p>
+    </div>
   </div>
 
-  <div class="row">
-    @views.html.partials.es_cluster_health.render(clusterHealth)
+  <div class="row content">
+    <div class="col-md-12">
+      @views.html.partials.es_cluster_health.render(clusterHealth)
 
-    <div class="index-info">
-      <div class="alert alert-danger">
-        <i class="fa fa-info-circle"></i> Indices information is not available at the moment.
-        @if(clusterHealth == null) {Please check again once the cluster is available.}
+      <div class="index-info">
+        <div class="alert alert-danger">
+          <i class="fa fa-info-circle"></i> Indices information is not available at the moment.
+          @if(clusterHealth == null) {Please check again once the cluster is available.}
+        </div>
       </div>
     </div>
   </div>

@@ -23,6 +23,7 @@ import lib.notifications.NotificationType;
 import lib.notifications.NotificationTypeFactory;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.*;
 import play.mvc.Result;
@@ -35,9 +36,6 @@ import java.util.List;
 import static lib.security.RestPermissions.*;
 import static views.helpers.Permissions.isPermitted;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SystemController extends AuthenticatedController {
 
     private final NodeService nodeService;
@@ -69,8 +67,15 @@ public class SystemController extends AuthenticatedController {
             int totalSystemMessages = permittedSystemMessages ? clusterService.getNumberOfSystemMessages() : 0;
             List<SystemMessage> systemMessages = permittedSystemMessages ? clusterService.getSystemMessages(page) : Collections.<SystemMessage>emptyList();
             ESClusterHealth clusterHealth = isPermitted(INDEXERCLUSTER_READ) ? clusterService.getESClusterHealth() : null;
-            long indexFailureCount = isPermitted(INDICES_FAILURES) ? clusterService.getIndexerFailureCountLast24Hours() : -1;
-            String masterTimezone = nodeService.loadMasterNode().getTimezone();
+            long indexFailureCount;
+            String masterTimezone;
+            try {
+                indexFailureCount = isPermitted(INDICES_FAILURES) ? clusterService.getIndexerFailureCountLast24Hours() : -1;
+                masterTimezone = nodeService.loadMasterNode().getTimezone();
+            } catch (Graylog2ServerUnavailableException e) {
+                indexFailureCount = -1;
+                masterTimezone = "";
+            }
 
             return ok(views.html.system.index.render(
                     currentUser(),
