@@ -17,6 +17,7 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
@@ -77,9 +78,7 @@ public class FieldChartWidget extends ChartWidget {
 
     @Override
     protected ComputationResult compute() {
-        if (timeRange == null) {
-            throw new RuntimeException("Invalid time range provided");
-        }
+        Preconditions.checkArgument(timeRange != null, "Invalid time range provided");
 
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
