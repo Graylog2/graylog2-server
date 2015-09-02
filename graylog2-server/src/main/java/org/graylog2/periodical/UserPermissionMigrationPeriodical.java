@@ -19,6 +19,8 @@ package org.graylog2.periodical;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.graylog2.cluster.UserPermissionMigrationState;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.periodical.Periodical;
@@ -43,15 +45,28 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public UserPermissionMigrationPeriodical(final UserService userService, final RoleService roleService) {
+    public UserPermissionMigrationPeriodical(final UserService userService,
+                                             final RoleService roleService,
+                                             final ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.roleService = roleService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
     public void doRun() {
+
+        final UserPermissionMigrationState migrationState =
+                clusterConfigService.getOrDefault(UserPermissionMigrationState.class,
+                                                  UserPermissionMigrationState.create(false));
+        if (migrationState.migrationDone()) {
+            log.debug("User permission migration already done, not running migration again.");
+            return;
+        }
+
         final List<User> users = userService.loadAll();
         final String adminRoleId = roleService.getAdminRoleObjectId();
         final String readerRoleId = roleService.getReaderRoleObjectId();
@@ -117,6 +132,9 @@ public class UserPermissionMigrationPeriodical extends Periodical {
                 log.error("Unable to migrate user permissions for user " + user.getName(), e);
             }
         }
+
+        log.info("Marking user permission migration as done.");
+        clusterConfigService.write(UserPermissionMigrationState.create(true));
 
     }
 
