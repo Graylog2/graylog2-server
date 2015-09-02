@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
 import org.graylog2.restclient.lib.Tools;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.ESClusterHealth;
@@ -80,6 +81,12 @@ public class IndicesController extends AuthenticatedController {
                     clusterHealth,
                     deflector.currentTarget,
                     deflectorConfig
+            ));
+        } catch (Graylog2ServerUnavailableException e) {
+            return ok(views.html.system.indices.index_cluster_unavailable.render(
+                    currentUser(),
+                    bc,
+                    null
             ));
         } catch (APIException e) {
             String message = "Could not get indices. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";

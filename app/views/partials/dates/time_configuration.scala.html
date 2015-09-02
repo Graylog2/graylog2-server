@@ -19,5 +19,5 @@
     <dt>Web interface configuration:</dt>
     <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTools.getApplicationTimeZone()), false)</dd>
     <dt>Graylog master server:</dt>
-    <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTimeZone.forID(masterTimezone)), false)</dd>
+    <dd>@if(masterTimezone.equals("")) {Graylog master server currently unavailable} else {@DateHelper.timestampShortTZ(DateTime.now(DateTimeZone.forID(masterTimezone)), false)}</dd>
 </dl>

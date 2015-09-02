@@ -9,12 +9,17 @@
         </a>
     </div>
 } else {
-    <div class="alert alert-success">
-        <i class="fa fa-check-circle"></i> &nbsp;No failed indexing attempts in the last 24 hours.
+    @if(indexFailureCount == 0) {
+        <div class="alert alert-success">
+            <i class="fa fa-check-circle"></i> &nbsp;No failed indexing attempts in the last 24 hours.
 
-
-        <a href="@routes.IndicesController.failures()" class="btn btn-xs pull-right btn-info">
-            Show all errors
-        </a>
-    </div>
+            <a href="@routes.IndicesController.failures()" class="btn btn-xs pull-right btn-info">
+                Show all errors
+            </a>
+        </div>
+    } else {
+        <div class="alert alert-warning">
+            <i class="fa fa-warning"></i> &nbsp;<strong>Failed indexing attempts currently unavailable.</strong>
+        </div>
+    }
 }
