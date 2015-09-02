@@ -75,6 +75,10 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     protected ComputationResult computeInternal(String filter) {
+        if (timeRange == null) {
+            throw new RuntimeException("Invalid time range provided");
+        }
+
         CountResult cr = searches.count(query, timeRange, filter);
         if (trend && timeRange instanceof RelativeRange) {
             DateTime toPrevious = timeRange.getFrom();
