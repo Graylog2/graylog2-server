@@ -340,7 +340,7 @@ public class UsersController extends AuthenticatedController {
         user.update(changeRequest);
 
         flash("success", "User '" + user.getFullName() + "' was updated successfully");
-        return redirect(routes.UsersController.index());
+        return redirect(routes.UsersController.editUserForm(username));
     }
 
     private boolean checkRequireOldPassword(String username) {
