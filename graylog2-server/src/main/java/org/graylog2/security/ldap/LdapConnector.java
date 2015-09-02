@@ -204,7 +204,7 @@ public class LdapConnector {
                         memberAttribute = "member";
                     } else {
                         LOG.warn(
-                                "Unable to auto-detect the LDAP group object class, using assuming 'member' is the correct attribute.");
+                                "Unable to auto-detect the LDAP group object class, assuming 'member' is the correct attribute.");
                         memberAttribute = "member";
                     }
                     final Attribute members = e.get(memberAttribute);
