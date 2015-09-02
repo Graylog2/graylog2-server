@@ -125,11 +125,11 @@
                     <label class="col-sm-3 control-label" for="searchPattern">User Search Pattern</label>
                     <div class="col-sm-9">
                         <input type="text" id="searchPattern" name="searchPattern" class="form-control" placeholder="Search Pattern" value="@ldapForm("searchPattern").value()" required>
-                        <span class="help-block ldap-help">For example <code>(&(objectClass=inetOrgPerson)(uid={0}))</code>
+                        <span class="help-block ldap-help">For example <code>(&amp;(objectClass=inetOrgPerson)(uid={0}))</code>
                             . The string <code>{0}</code> will be replaced by the entered username.
                         </span>
                         <span class="help-block ad-help hidden">For example <code>
-                            (&(objectClass=user)(sAMAccountName={0}))</code>. The string <code>{0}</code>
+                            (&amp;(objectClass=user)(sAMAccountName={0}))</code>. The string <code>{0}</code>
                             will be replaced by the entered username.
                         </span>
                     </div>
@@ -168,13 +168,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-3 control-label" for="groupObjectClass">Group Object Class</label>
+                    <label class="col-sm-3 control-label" for="groupSearchPattern">Group Search Pattern</label>
                     <div class="col-sm-9">
-                        <input type="text" id="groupObjectClass" class="form-control" name="groupObjectClass" placeholder="Group Object Class" value="@ldapForm("groupObjectClass").value()">
-                        <span class="help-block ldap-help">The object class of the group entries in your LDAP directory, e.g. <code>groupOfUniqueNames</code>
+                        <input type="text" id="groupSearchPattern" class="form-control" name="groupSearchPattern" placeholder="Group Search Pattern" value="@ldapForm("groupSearchPattern").value()">
+                        <span class="help-block ldap-help">
+                            The search pattern used to find groups in LDAP for mapping to Graylog roles, e.g. <code>(objectClass=groupOfNames)</code> or <code>(&amp;(objectClass=groupOfNames)(cn=graylog*)</code>
                         </span>
                         <span class="help-block ad-help hidden">
-                            The object class of the group entries in your Active Directory, e.g. <code>group</code>
+                            The search pattern used to find groups in Active Directory for mapping to Graylog roles, e.g. <code>(objectClass=group)</code> or <code>(&amp;(objectClass=group)(cn=graylog*)</code>
                         </span>
                     </div>
                 </div>

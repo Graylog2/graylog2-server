@@ -90,9 +90,9 @@ public class LdapController extends AuthenticatedController {
             request.displayNameAttribute = settingsRequest.displayNameAttribute;
             request.defaultGroup = settingsRequest.defaultGroup;
             request.groupMapping = settingsRequest.groupMapping;
-            request.groupSearchBase= settingsRequest.groupSearchBase;
-            request.groupIdAttribute= settingsRequest.groupIdAttribute;
-            request.groupObjectClass= settingsRequest.groupObjectClass;
+            request.groupSearchBase = settingsRequest.groupSearchBase;
+            request.groupIdAttribute = settingsRequest.groupIdAttribute;
+            request.groupSearchPattern = settingsRequest.groupSearchPattern;
             request.additionalDefaultGroups = Lists.newArrayList(settingsRequest.additionalDefaultGroups == null ? Collections.<String>emptyList() : settingsRequest.additionalDefaultGroups);
 
             ldapSettingsForm = settingsForm.fill(request);
@@ -149,7 +149,7 @@ public class LdapController extends AuthenticatedController {
             request.password = formData.get("password");
             request.groupSearchBase = formData.get("groupSearchBase");
             request.groupIdAttribute = formData.get("groupIdAttribute");
-            request.groupObjectClass = formData.get("groupObjectClass");
+            request.groupSearchPattern = formData.get("groupSearchPattern");
             result = ldapSettingsService.testLdapConfiguration(request);
         } catch (APIException e) {
             log.error("Unable to test login: {}", e.getMessage());
@@ -197,7 +197,7 @@ public class LdapController extends AuthenticatedController {
         request.groupMapping = formValue.groupMapping;
         request.groupSearchBase= formValue.groupSearchBase;
         request.groupIdAttribute= formValue.groupIdAttribute;
-        request.groupObjectClass = formValue.groupObjectClass;
+        request.groupSearchPattern = formValue.groupSearchPattern;
         request.additionalDefaultGroups = safeAdditionalGroupsAsSet(formValue.additionalDefaultGroups);
 
         try {
@@ -266,9 +266,9 @@ public class LdapController extends AuthenticatedController {
         @Nullable
         public String groupIdAttribute;
 
-        @JsonProperty("group_object_class")
+        @JsonProperty("group_search_pattern")
         @Nullable
-        public String groupObjectClass;
+        public String groupSearchPattern;
 
         @JsonProperty("additional_default_groups")
         @Nullable

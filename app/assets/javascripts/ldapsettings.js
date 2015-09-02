@@ -178,7 +178,7 @@ $(document).ready(function() {
                 password: $("#ldap-test-password").val(),
                 groupSearchBase: $("#groupSearchBase").val(),
                 groupIdAttribute: $("#groupIdAttribute").val(),
-                groupObjectClass: $("#groupObjectClass").val()
+                groupSearchPattern: $("#groupSearchPattern").val()
             },
             success: function(loginResult) {
                 var isEmptyEntry = $.isEmptyObject(loginResult.entry);
