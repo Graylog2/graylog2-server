@@ -90,9 +90,9 @@ public class LdapController extends AuthenticatedController {
             request.displayNameAttribute = settingsRequest.displayNameAttribute;
             request.defaultGroup = settingsRequest.defaultGroup;
             request.groupMapping = settingsRequest.groupMapping;
-            request.groupSearchBase= settingsRequest.groupSearchBase;
-            request.groupIdAttribute= settingsRequest.groupIdAttribute;
-            request.groupSearchPattern= settingsRequest.groupSearchPattern;
+            request.groupSearchBase = settingsRequest.groupSearchBase;
+            request.groupIdAttribute = settingsRequest.groupIdAttribute;
+            request.groupSearchPattern = settingsRequest.groupSearchPattern;
             request.additionalDefaultGroups = Lists.newArrayList(settingsRequest.additionalDefaultGroups == null ? Collections.<String>emptyList() : settingsRequest.additionalDefaultGroups);
 
             ldapSettingsForm = settingsForm.fill(request);
