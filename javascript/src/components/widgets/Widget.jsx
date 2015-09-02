@@ -121,11 +121,12 @@ var Widget = React.createClass({
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {
+            var error = jqXHR.responseText === "" || jqXHR.responseText === "\"\"" ? errorThrown : jqXHR.responseText;
             var newResult = this.state.result === undefined ? "N/A" : this.state.result;
             this.setState({
                 result: newResult,
                 error: true,
-                errorMessage: "Error loading widget value: " + errorThrown
+                errorMessage: "Error loading widget value: " + error
             });
         });
         dataPromise.done((value) => {
