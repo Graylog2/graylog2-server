@@ -121,7 +121,9 @@ var Widget = React.createClass({
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {
+            var newResult = this.state.result === undefined ? "N/A" : this.state.result;
             this.setState({
+                result: newResult,
                 error: true,
                 errorMessage: "Error loading widget value: " + errorThrown
             });
@@ -158,6 +160,10 @@ var Widget = React.createClass({
             return <div className="loading">
                 <i className="fa fa-spin fa-3x fa-refresh spinner"></i>
             </div>;
+        }
+
+        if (this.state.result === "N/A") {
+            return <div className="not-available">{this.state.result}</div>;
         }
 
         var visualization;

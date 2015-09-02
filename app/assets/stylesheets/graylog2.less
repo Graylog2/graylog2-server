@@ -1270,7 +1270,7 @@ dl.metric-histogram dd {
 }
 
 .dashboard .widget .number .value {
-  line-height: 90px;
+  line-height: 100px;
   text-align: center;
   font-size: 70px;
   position: relative;
@@ -1331,8 +1331,19 @@ dl.metric-histogram dd {
   padding: 0 5px 0 5px;
 }
 
-.dashboard .widget .loading {
+.dashboard .widget .not-available {
+  font-size: 70px;
+}
+
+.dashboard .widget .loading,
+.dashboard .widget .not-available {
+  line-height: 100px;
   text-align: center;
+}
+
+.dashboard .widget .loading .spinner,
+.dashboard .widget .not-available .spinner {
+  vertical-align: middle;
 }
 
 /* End new widgets */
