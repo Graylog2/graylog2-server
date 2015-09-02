@@ -17,12 +17,14 @@
 
 package controllers.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
 import controllers.AuthenticatedController;
+import lib.ApiErrorMessage;
 import lib.json.Json;
 import lib.security.RestPermissions;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
@@ -69,10 +71,12 @@ import static views.helpers.Permissions.isPermitted;
 
 public class DashboardsApiController extends AuthenticatedController {
     private final DashboardService dashboardService;
+    private final ObjectMapper mapper;
 
     @Inject
-    public DashboardsApiController(DashboardService dashboardService) {
+    public DashboardsApiController(DashboardService dashboardService, ObjectMapper mapper) {
         this.dashboardService = dashboardService;
+        this.mapper = mapper;
     }
 
     public Result index() {
@@ -253,10 +257,14 @@ public class DashboardsApiController extends AuthenticatedController {
 
             return ok(Json.toJsonString(result)).as(MediaType.JSON_UTF_8.toString());
         } catch (APIException e) {
-            String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            try {
+                final ApiErrorMessage apiErrorMessage = mapper.readValue(e.getResponseBody(), ApiErrorMessage.class);
+                return status(e.getHttpCode(), apiErrorMessage.message);
+            } catch (IOException e1) {
+                return status(504, e.getMessage());
+            }
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+            return status(504, e.getMessage());
         }
     }
 
