@@ -170,7 +170,7 @@ var SourceOverview = React.createClass({
     // redirect old range format (as query parameter) to new format (deep link)
     _redirectToRange(range) {
         // if range is ill formatted, we take care of it in the deep link handling
-        window.location.replace("sources#/" + range);
+        window.location.replace("sources#" + range);
     },
     _getRangeFromOldQueryFormat() {
         var query = window.location.search;
@@ -187,7 +187,7 @@ var SourceOverview = React.createClass({
     },
     _applyRangeFromHash() {
         var range = this._getRangeFromHash();
-        this.changeRange(range);
+        this.changeRange(range, false);
     },
     applyRangeParameter() {
         var range = this._getRangeFromOldQueryFormat();
@@ -199,10 +199,18 @@ var SourceOverview = React.createClass({
     },
     _getRangeFromHash() {
         var hash = window.location.hash;
-        if (hash.indexOf("#/") !== 0) {
+        if (hash.indexOf("#") !== 0) {
             return DEFAULT_RANGE_IN_SECS;
         } else {
-            return hash.substring(2);
+            var hashContent = hash.substring(1);
+            if (hash.indexOf("&") < 0) {
+                // If there is only one param in the hash, return it
+                return hashContent;
+            } else {
+                // If there are more than one params in the hash, return the numeric one
+                var match = hashContent.match(/(\d+)=&/);
+                return (match && match.length > 0) ? match[1] : DEFAULT_RANGE_IN_SECS;
+            }
         }
     },
     resetSourcesFilters() {
@@ -241,7 +249,7 @@ var SourceOverview = React.createClass({
             $('#dc-sources-result-reset').hide();
         }
     },
-    changeRange(range) {
+    changeRange(range, keepChangeInHistory) {
         if (range !== undefined) {
             range = Number(range);
         }
@@ -258,12 +266,16 @@ var SourceOverview = React.createClass({
         this.valueDimension.filterAll();
         this.refs.sourceLineChart.clearFilters();
         this.syncRangeWithQuery();
-        window.location.hash = "#/" + range;
+        if (keepChangeInHistory) {
+            window.location.hash = `#${range}`;
+        } else {
+            window.location.replace(`#${range}`);
+        }
         this.setState({range: range, histogramDataAvailable: true, loading: true}, () => this.loadData());
     },
     _onRangeChanged(event) {
         var value = event.target.value;
-        this.changeRange(value);
+        this.changeRange(value, true);
     },
     _filterSources() {
         this.filterDimension.filter((name) => {
