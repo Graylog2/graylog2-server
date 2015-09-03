@@ -29,16 +29,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class SearchResultChartWidget extends ChartWidget {
 
     private final String query;
-    private final TimeRange timeRange;
-
     private final Searches searches;
 
     public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, description, cacheTime, config, creatorUserId);
+        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
         this.searches = searches;
-
         this.query = getNonEmptyQuery(query);
-        this.timeRange = timeRange;
     }
 
     // We need to ensure query is not empty, or the histogram calculation will fail
@@ -53,16 +49,11 @@ public class SearchResultChartWidget extends ChartWidget {
         return query;
     }
 
-    public TimeRange getTimeRange() {
-        return timeRange;
-    }
-
     @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .putAll(super.getPersistedConfig())
-                .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig());
+                .put("query", query);
 
         return persistedConfig.build();
     }
@@ -74,7 +65,7 @@ public class SearchResultChartWidget extends ChartWidget {
             filter = "streams:" + streamId;
         }
 
-        HistogramResult histogram = searches.histogram(query, interval, filter, timeRange);
+        HistogramResult histogram = searches.histogram(query, interval, filter, this.getTimeRange());
         return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
     }
 }

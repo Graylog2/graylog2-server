@@ -29,6 +29,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -38,6 +40,9 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DashboardWidgetCreator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DashboardWidgetCreator.class);
+
     private final MetricRegistry metricRegistry;
     private final WidgetCacheTime.Factory cacheTimeFactory;
 
@@ -104,28 +109,35 @@ public class DashboardWidgetCreator {
             throw new InvalidRangeParametersException("range type not set");
         }
 
-        TimeRange timeRange;
-        switch (rangeType) {
-            case "relative":
-                timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
-                break;
-            case "keyword":
-                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
-                break;
-            case "absolute":
-                String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-                String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+        final String widgetId = (String) fields.get(DashboardWidget.FIELD_ID);
 
-                timeRange = new AbsoluteRange(from, to);
-                break;
-            default:
-                throw new InvalidRangeParametersException("range_type not recognized");
+        TimeRange timeRange;
+        try {
+            switch (rangeType) {
+                case "relative":
+                    timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
+                    break;
+                case "keyword":
+                    timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
+                    break;
+                case "absolute":
+                    String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+                    String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+
+                    timeRange = new AbsoluteRange(from, to);
+                    break;
+                default:
+                    throw new InvalidRangeParametersException("range_type not recognized");
+            }
+        } catch (InvalidRangeParametersException e) {
+            LOG.error("Invalid time range provided on widget " + widgetId, e);
+            timeRange = null;
         }
 
         final String description = (String) fields.get(DashboardWidget.FIELD_DESCRIPTION);
         final int cacheTime = (int) firstNonNull(fields.get(DashboardWidget.FIELD_CACHE_TIME), 0);
 
-        return buildDashboardWidget(type, searches, (String) fields.get(DashboardWidget.FIELD_ID), description, cacheTime,
+        return buildDashboardWidget(type, searches, widgetId, description, cacheTime,
                 config, (String) config.get("query"), timeRange, (String) fields.get(DashboardWidget.FIELD_CREATOR_USER_ID));
     }
 

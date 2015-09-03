@@ -33,7 +33,6 @@ public class SearchResultCountWidget extends DashboardWidget {
 
     protected final Searches searches;
     protected final String query;
-    protected final TimeRange timeRange;
     protected final Boolean trend;
     protected final Boolean lowerIsBetter;
 
@@ -42,11 +41,10 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     protected SearchResultCountWidget(MetricRegistry metricRegistry, Type type, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, type, id, description, cacheTime, config, creatorUserId);
+        super(metricRegistry, type, id, timeRange, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 
         this.query = query;
-        this.timeRange = timeRange;
         this.trend = config.get("trend") != null && Boolean.parseBoolean(String.valueOf(config.get("trend")));
         this.lowerIsBetter = config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(config.get("lower_is_better")));
     }
@@ -55,15 +53,11 @@ public class SearchResultCountWidget extends DashboardWidget {
         return searches;
     }
 
-    public TimeRange getTimeRange() {
-        return timeRange;
-    }
-
     @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>builder()
+                .putAll(super.getPersistedConfig())
                 .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig())
                 .put("trend", trend)
                 .put("lower_is_better", lowerIsBetter)
                 .build();
@@ -75,6 +69,7 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     protected ComputationResult computeInternal(String filter) {
+        final TimeRange timeRange = this.getTimeRange();
         CountResult cr = searches.count(query, timeRange, filter);
         if (trend && timeRange instanceof RelativeRange) {
             DateTime toPrevious = timeRange.getFrom();

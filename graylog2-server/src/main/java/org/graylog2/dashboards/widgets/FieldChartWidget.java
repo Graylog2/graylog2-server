@@ -33,7 +33,6 @@ public class FieldChartWidget extends ChartWidget {
     private static final Logger LOG = LoggerFactory.getLogger(FieldChartWidget.class);
 
     private final String query;
-    private final TimeRange timeRange;
     private final String field;
     private final String statisticalFunction;
     private final String renderer;
@@ -41,7 +40,7 @@ public class FieldChartWidget extends ChartWidget {
     private final Searches searches;
 
     public FieldChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(metricRegistry, Type.FIELD_CHART, id, description, cacheTime, config, creatorUserId);
+        super(metricRegistry, Type.FIELD_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 
         if (!checkConfig(config)) {
@@ -54,7 +53,6 @@ public class FieldChartWidget extends ChartWidget {
             this.query = query;
         }
 
-        this.timeRange = timeRange;
         this.field = (String) config.get("field");
         this.statisticalFunction = (String) config.get("valuetype");
         this.renderer = (String) config.get("renderer");
@@ -66,7 +64,6 @@ public class FieldChartWidget extends ChartWidget {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .putAll(super.getPersistedConfig())
                 .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig())
                 .put("field", field)
                 .put("valuetype", statisticalFunction)
                 .put("renderer", renderer)
@@ -88,7 +85,7 @@ public class FieldChartWidget extends ChartWidget {
                     field,
                     Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase()),
                     filter,
-                    timeRange,
+                    this.getTimeRange(),
                     "cardinality".equalsIgnoreCase(statisticalFunction));
 
             return new ComputationResult(histogramResult.getResults(), histogramResult.took().millis(), histogramResult.getHistogramBoundaries());

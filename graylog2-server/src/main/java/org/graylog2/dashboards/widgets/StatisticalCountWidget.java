@@ -147,6 +147,9 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
             } else {
                 filter = null;
             }
+
+            final TimeRange timeRange = this.getTimeRange();
+
             boolean needsCardinality = statsFunction.equals(StatisticalFunction.CARDINALITY);
             boolean needsCount = statsFunction.equals(StatisticalFunction.COUNT);
             final FieldStatsResult fieldStatsResult =
