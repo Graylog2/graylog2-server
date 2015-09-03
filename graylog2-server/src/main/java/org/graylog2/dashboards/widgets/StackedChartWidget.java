@@ -18,7 +18,6 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.results.HistogramResult;
@@ -42,18 +41,16 @@ public class StackedChartWidget extends ChartWidget {
     private final String renderer;
     private final String interpolation;
     private final List<Series> chartSeries;
-    private final TimeRange timeRange;
     private final Searches searches;
 
     public StackedChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(metricRegistry, Type.STACKED_CHART, id, description, cacheTime, config, creatorUserId);
+        super(metricRegistry, Type.STACKED_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
 
-        this.timeRange = timeRange;
         this.renderer = (String) config.get("renderer");
         this.interpolation = (String) config.get("interpolation");
 
@@ -79,19 +76,17 @@ public class StackedChartWidget extends ChartWidget {
         }
 
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
+                .putAll(super.getPersistedConfig())
                 .put("renderer", renderer)
                 .put("interpolation", interpolation)
-                .put("series", seriesBuilder.build())
-                .put("timerange", timeRange.getPersistedConfig())
-                .putAll(super.getPersistedConfig());
+                .put("series", seriesBuilder.build());
+
 
         return persistedConfig.build();
     }
 
     @Override
     protected ComputationResult compute() {
-        Preconditions.checkArgument(timeRange != null, "Invalid time range provided");
-
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
@@ -109,7 +104,7 @@ public class StackedChartWidget extends ChartWidget {
                         series.field,
                         Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase()),
                         filter,
-                        timeRange,
+                        this.getTimeRange(),
                         "cardinality".equalsIgnoreCase(series.statisticalFunction));
 
                 if (from == null) {

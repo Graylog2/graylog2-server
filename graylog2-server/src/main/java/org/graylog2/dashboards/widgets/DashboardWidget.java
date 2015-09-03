@@ -19,9 +19,11 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 
 import java.util.Map;
@@ -49,16 +51,18 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     private final MetricRegistry metricRegistry;
     private final Type type;
     private final String id;
+    private final TimeRange timeRange;
     private final Map<String, Object> config;
     private final String creatorUserId;
     private int cacheTime;
     private String description;
     private Supplier<ComputationResult> cachedResult;
 
-    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
         this.metricRegistry = metricRegistry;
         this.type = type;
         this.id = id;
+        this.timeRange = timeRange;
         this.config = config;
         this.creatorUserId = creatorUserId;
         this.description = description;
@@ -91,6 +95,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         return cacheTime;
     }
 
+    public TimeRange getTimeRange() {
+        this.checkTimeRange();
+        return timeRange;
+    }
+
+    private void checkTimeRange() {
+        Preconditions.checkArgument(this.timeRange != null, "Invalid time range provided");
+    }
+
     public Map<String, Object> getConfig() {
         return config;
     }
@@ -114,7 +127,9 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         return cachedResult.get();
     }
 
-    public abstract Map<String, Object> getPersistedConfig();
+    public Map<String, Object> getPersistedConfig() {
+        return ImmutableMap.<String, Object>of("timerange", this.getTimeRange().getPersistedConfig());
+    }
 
     protected abstract ComputationResult compute();
 

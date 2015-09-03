@@ -17,7 +17,6 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
@@ -30,16 +29,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class SearchResultChartWidget extends ChartWidget {
 
     private final String query;
-    private final TimeRange timeRange;
-
     private final Searches searches;
 
     public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, description, cacheTime, config, creatorUserId);
+        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
         this.searches = searches;
-
         this.query = getNonEmptyQuery(query);
-        this.timeRange = timeRange;
     }
 
     // We need to ensure query is not empty, or the histogram calculation will fail
@@ -54,30 +49,23 @@ public class SearchResultChartWidget extends ChartWidget {
         return query;
     }
 
-    public TimeRange getTimeRange() {
-        return timeRange;
-    }
-
     @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .putAll(super.getPersistedConfig())
-                .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig());
+                .put("query", query);
 
         return persistedConfig.build();
     }
 
     @Override
     protected ComputationResult compute() {
-        Preconditions.checkArgument(timeRange != null, "Invalid time range provided");
-
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
-        HistogramResult histogram = searches.histogram(query, interval, filter, timeRange);
+        HistogramResult histogram = searches.histogram(query, interval, filter, this.getTimeRange());
         return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
     }
 }
