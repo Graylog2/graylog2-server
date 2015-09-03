@@ -56,7 +56,7 @@ class StreamRulesStore {
             url: url,
             contentType: "application/json",
             data: JSON.stringify(request)
-        }).done(callback).done(this._emitChange.bind(this)()).fail(failCallback);
+        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
     }
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
