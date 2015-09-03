@@ -132,11 +132,6 @@
                                 Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
                             } else {
                                 Contains messages from @DateHelper.readablePeriodFromNow(index.getRange.getBegin) up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
-                                @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
-                                    (@Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
-                                    <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span>
-                                    messages)
-                                }
                             }
                         }
 
