@@ -1,3 +1,4 @@
+@import org.joda.time.DateTime
 @(currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList,
         indices: List[org.graylog2.restclient.models.Index],
@@ -124,17 +125,19 @@
                     }
 
                     <small>
-                        @if(index.getRange.getBegin.isEqual(0L)) {
-                            Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
-                            @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
-                                , @Tools.byteToHuman(index.getInfo.getStoreSizeBytes)
-                            }
+                        @if(index.getName.equals(deflectorTarget)) {
+                            Contains messages up to @DateHelper.readablePeriodFromNow(DateTime.now)
                         } else {
-                            Contains messages from @DateHelper.readablePeriodFromNow(index.getRange.getBegin) up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
-                            @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
-                                (@Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
-                                <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages)
+                            @if(index.getRange.getBegin.isEqual(0L)) {
+                                Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
+                            } else {
+                                Contains messages from @DateHelper.readablePeriodFromNow(index.getRange.getBegin) up to @DateHelper.readablePeriodFromNow(index.getRange.getEnd)
                             }
+                        }
+
+                        @if(index != null && index.getInfo != null) {
+                            (@Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
+                            <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages)
                         }
 
                         @if(!index.getName.equals(deflectorTarget)) {
