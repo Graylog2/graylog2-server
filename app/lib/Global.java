@@ -137,6 +137,7 @@ public class Global extends GlobalSettings {
 
         // Dirty hack to disable the play2-graylog2 AccessLog if the plugin isn't there
         gelfAccessLog = app.configuration().getBoolean("graylog2.appender.send-access-log", false);
+        final boolean clientAcceptAnyCertificate = app.configuration().getBoolean("graylog2.client.accept-any-certificate", true);
 
         final ObjectMapper objectMapper = Json.buildObjectMapper();
         Json.setObjectMapper(objectMapper);
@@ -146,6 +147,7 @@ public class Global extends GlobalSettings {
             @Override
             protected void configure() {
                 bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
+                bind(Boolean.class).annotatedWith(Names.named("client.accept-any-certificate")).toInstance(clientAcceptAnyCertificate);
                 bind(Long.class).annotatedWith(Names.named("Default Timeout"))
                         .toInstance(org.graylog2.restclient.lib.Configuration.apiTimeout("DEFAULT"));
                 bind(ObjectMapper.class).toInstance(objectMapper);
