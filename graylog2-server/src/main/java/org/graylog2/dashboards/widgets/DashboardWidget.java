@@ -96,12 +96,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public TimeRange getTimeRange() {
-        this.checkTimeRange();
-        return timeRange;
-    }
-
-    private void checkTimeRange() {
         Preconditions.checkArgument(this.timeRange != null, "Invalid time range provided");
+        return timeRange;
     }
 
     public Map<String, Object> getConfig() {
