@@ -50,6 +50,7 @@ public class BaseApiTest {
             protected void configure() {
                 bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes.toArray(new URI[initialNodes.size()]));
                 bind(Long.class).annotatedWith(Names.named("Default Timeout")).toInstance(TimeUnit.SECONDS.toMillis(5));
+                bind(Boolean.class).annotatedWith(Names.named("client.accept-any-certificate")).toInstance(true);
             }
         });
         return Guice.createInjector(modules);

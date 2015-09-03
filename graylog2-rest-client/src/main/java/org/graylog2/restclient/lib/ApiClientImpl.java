@@ -83,12 +83,15 @@ class ApiClientImpl implements ApiClient {
     private AsyncHttpClient client;
     private final ServerNodes serverNodes;
     private final Long defaultTimeout;
+    private final boolean acceptAnyCertificate;
     private final ObjectMapper objectMapper;
     private Thread shutdownHook;
 
     @Inject
-    private ApiClientImpl(ServerNodes serverNodes, @Named("Default Timeout") Long defaultTimeout) {
-        this(serverNodes, defaultTimeout,
+    private ApiClientImpl(ServerNodes serverNodes,
+                          @Named("Default Timeout") Long defaultTimeout,
+                          @Named("client.accept-any-certificate") boolean acceptAnyCertificate) {
+        this(serverNodes, defaultTimeout, acceptAnyCertificate,
                 new ObjectMapper()
                         .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
                         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -97,9 +100,10 @@ class ApiClientImpl implements ApiClient {
                         .registerModule(new JodaModule()));
     }
 
-    private ApiClientImpl(ServerNodes serverNodes, Long defaultTimeout, ObjectMapper objectMapper) {
+    private ApiClientImpl(ServerNodes serverNodes, Long defaultTimeout, boolean acceptAnyCertificate, ObjectMapper objectMapper) {
         this.serverNodes = serverNodes;
         this.defaultTimeout = defaultTimeout;
+        this.acceptAnyCertificate = acceptAnyCertificate;
         this.objectMapper = objectMapper;
     }
 
@@ -107,6 +111,8 @@ class ApiClientImpl implements ApiClient {
     public void start() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnections(false);
+        builder.setAllowPoolingSslConnections(false);
+        builder.setAcceptAnyCertificate(acceptAnyCertificate);
         builder.setUserAgent("graylog2-web/" + Version.VERSION);
         client = new AsyncHttpClient(builder.build());
 
