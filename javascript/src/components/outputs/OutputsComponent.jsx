@@ -12,7 +12,7 @@ var Spinner = require('../common/Spinner');
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
 
-var OutputComponent = React.createClass({
+var OutputsComponent = React.createClass({
     mixins: [PermissionsMixin],
     componentDidMount() {
         this.loadData();
@@ -121,5 +121,5 @@ var OutputComponent = React.createClass({
         }
     }
 });
-module.exports = OutputComponent;
+module.exports = OutputsComponent;
 
