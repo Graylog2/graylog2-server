@@ -83,7 +83,7 @@ var TypeAheadDataFilter = React.createClass({
             return (
                 <li key={`li-${filter}`}>
                     <span className="pill label label-default">
-                        tag: {filter}
+                        {this.props.filterBy}: {filter}
                         <a className="tag-remove" data-target={filter} onClick={this._onFilterRemoved}/>
                     </span>
                 </li>
