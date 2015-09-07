@@ -43,7 +43,7 @@ var URLUtils = {
     replaceHashParam(name, newValue) {
         var origHash = URLUtils.getParsedHash(window.location);
         origHash[name] = newValue;
-        window.location.hash = Qs.stringify(origHash);
+        window.location.replace(`#${Qs.stringify(origHash)}`);
     }
 };
 
