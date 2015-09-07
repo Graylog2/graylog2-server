@@ -28,6 +28,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -576,6 +577,50 @@ public class StreamRouterEngineTest {
 
         assertThat(result).isEmpty();
         assertThat(result).doesNotContain(stream);
+    }
+
+    @Test
+    public void issue1396() throws Exception {
+        final StreamMock stream = getStreamMock("GitHub issue #1396");
+        stream.setMatchingType(Stream.MatchingType.AND);
+
+        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.<String, Object>builder()
+                .put("_id", new ObjectId())
+                .put("field", "custom1")
+                .put("value", "value1")
+                .put("type", StreamRuleType.EXACT.toInteger())
+                .put("inverted", false)
+                .put("stream_id", stream.getId())
+                .build()
+        );
+        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.<String, Object>builder()
+                .put("_id", new ObjectId())
+                .put("field", "custom2")
+                .put("value", "value2")
+                .put("type", StreamRuleType.EXACT.toInteger())
+                .put("inverted", false)
+                .put("stream_id", stream.getId())
+                .build()
+        );
+
+        stream.setStreamRules(Lists.<StreamRule>newArrayList(rule1, rule2));
+
+        final StreamRouterEngine engine = newEngine(Lists.<Stream>newArrayList(stream));
+
+        final Message message1 = getMessage();
+        message1.addFields(ImmutableMap.<String, Object>of("custom1", "value1"));
+
+        assertTrue("Message without \"custom2\" should not match conditions", engine.match(message1).isEmpty());
+
+        final Message message2 = getMessage();
+        message2.addFields(ImmutableMap.<String, Object>of(
+                        "custom1", "value1",
+                        "custom2", "value2"
+                )
+        );
+
+        assertEquals("Message with \"custom1\" and \"custom2\" should match conditions",
+                Lists.<Stream>newArrayList(stream), engine.match(message2));
     }
 
     private StreamMock getStreamMock(String title) {
