@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-interface",
-  "version": "1.2.0-rc.3-SNAPSHOT",
+  "version": "1.2.0-rc.3",
   "dependencies": {
     "awesome-typescript-loader": {
       "version": "0.9.3",
