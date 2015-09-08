@@ -17,12 +17,15 @@ var NumberField = React.createClass({
     componentWillReceiveProps(props) {
         this.setState(props);
     },
+    _getDefaultValidationSpecs() {
+        return {min: this.MIN_SAFE_INTEGER, max: this.MAX_SAFE_INTEGER};
+    },
     mapValidationAttribute(attribute) {
         switch(attribute.toLocaleUpperCase()) {
             case "ONLY_NEGATIVE": return {min: this.MIN_SAFE_INTEGER, max: -1};
             case "ONLY_POSITIVE": return {min: 0, max: this.MAX_SAFE_INTEGER};
             case "IS_PORT_NUMBER": return {min: 0, max: 65535};
-            default: return {};
+            default: return this._getDefaultValidationSpecs();
         }
     },
     validationSpec(field) {
@@ -32,7 +35,7 @@ var NumberField = React.createClass({
             // than one validation for a number field, so we return the first one
             return validationAttributes[0];
         } else {
-            return {};
+            return this._getDefaultValidationSpecs();
         }
     },
     handleChange(evt) {
