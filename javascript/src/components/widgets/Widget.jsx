@@ -26,7 +26,8 @@ var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 var Widget = React.createClass({
     WIDGET_DATA_REFRESH: 30 * 1000,
     DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
-    WIDGET_FOOTER_HEIGHT: 25,
+    WIDGET_HEADER_HEIGHT: 25,
+    WIDGET_FOOTER_HEIGHT: 20,
     statics: {
         Type: {
             SEARCH_RESULT_COUNT: "SEARCH_RESULT_COUNT",
@@ -148,7 +149,9 @@ var Widget = React.createClass({
     },
     _calculateWidgetSize() {
         var $widgetNode = $(this._getWidgetNode());
-        var availableHeight = $widgetNode.height() - this.WIDGET_FOOTER_HEIGHT;
+        // .height() give us the height of the whole widget without counting paddings, we need to remove the size
+        // of the header and footer from that.
+        var availableHeight = $widgetNode.height() - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
         var availableWidth = $widgetNode.width();
         this.setState({height: availableHeight, width: availableWidth});
     },
@@ -183,14 +186,11 @@ var Widget = React.createClass({
                                                         width={this.state.width}/>;
                 break;
             case this.constructor.Type.QUICKVALUES:
-                // We need to correct the size due to overflow on this DOM element
-                var quickValuesWidth = this.state.width * 0.85;
-                var quickValuesHeight = this.state.height * 0.85;
                 visualization = <QuickValuesVisualization id={this.props.widgetId}
                                                           config={this.state.config}
                                                           data={this.state.result}
-                                                          height={quickValuesHeight}
-                                                          width={quickValuesWidth}/>;
+                                                          height={this.state.height}
+                                                          width={this.state.width}/>;
                 break;
             case this.constructor.Type.FIELD_CHART:
                 visualization = <GraphVisualization id={this.props.widgetId}

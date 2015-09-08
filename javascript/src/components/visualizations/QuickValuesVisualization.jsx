@@ -18,6 +18,7 @@ var NumberUtils = require('../../util/NumberUtils');
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
     DEFAULT_PIE_CHART_SIZE: 200,
+    MARGIN_TOP: 15,
     getInitialState() {
         this.filters = [];
         this.triggerRender = true;
@@ -178,6 +179,7 @@ var QuickValuesVisualization = React.createClass({
                 computedSize = this.DEFAULT_PIE_CHART_SIZE;
             } else {
                 computedSize = Math.min(width, height);
+                computedSize -= this.MARGIN_TOP;
             }
 
             if (this.pieChart !== undefined && this.pieChart.width() !== computedSize) {
@@ -274,9 +276,9 @@ var QuickValuesVisualization = React.createClass({
         }
 
         return (
-            <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
+            <div id={"visualization-" + this.props.id} className="quickvalues-visualization" style={{height: this.props.height}}>
                 <div className="container-fluid">
-                    <div className="row">
+                    <div className="row" style={{marginBottom: 0}}>
                         <div className={pieChartClassName} style={pieChartStyle}>
                             {pieChart}
                         </div>
