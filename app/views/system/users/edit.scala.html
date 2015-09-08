@@ -289,37 +289,36 @@
                     </div>
                 } else {
                     @if(user.isExternal) {
-                        <div class="col-sm-offset-3 col-sm-9">
+                        <div class="col-sm-offset-3 col-sm-9" style="margin-bottom: 15px">
                             <div class="alert alert-warning" role="alert">
-                                This user was created from an external system and you can't change the roles here.
+                                This user was created from an external LDAP system, please consider mapping LDAP groups instead of manually editing roles here.
                                 Please update the LDAP group mapping to make changes or contact an administrator for more information.
                             </div>
                         </div>
-                    } else {
-                        <form class="form-horizontal" style="margin-top : 10 px ;" action="@routes.UsersController.updateRoles(user.getName)" method="POST">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">User Roles</label>
-
-                                <div class="col-sm-9">
-                                    <select id="edituserroles" name="roles[]" class="chosen-select" data-placeholder="Choose roles..." multiple>
-                                    @for(role <- roleNames.sorted) {
-                                        <option @if(user.getRoles.contains(role)) {selected} value="@role">@role </option>
-                                    }
-                                    </select>
-                                    <span class="help-block">
-                                        Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-sm-offset-3 col-sm-9">
-                                    <button class="btn btn-success" type="submit" data-confirm="Really update roles for @user.getName?">
-                                        Update role
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
                     }
+                    <form class="form-horizontal" style="margin-top : 10 px ;" action="@routes.UsersController.updateRoles(user.getName)" method="POST">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">User Roles</label>
+
+                            <div class="col-sm-9">
+                                <select id="edituserroles" name="roles[]" class="chosen-select" data-placeholder="Choose roles..." multiple>
+                                @for(role <- roleNames.sorted) {
+                                    <option @if(user.getRoles.contains(role)) {selected} value="@role">@role </option>
+                                }
+                                </select>
+                                <span class="help-block">
+                                    Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button class="btn btn-success" type="submit" data-confirm="Really update roles for @user.getName?">
+                                    Update role
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 }
             </div>
         </div>
