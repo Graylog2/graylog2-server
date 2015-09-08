@@ -183,6 +183,7 @@ public class InputsResource extends RestResource {
             else
                 nodeId = serverStatus.getNodeId().toString();
 
+            // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             input = messageInputFactory.create(lr, getCurrentUser().getName(), nodeId);
 
             input.checkConfiguration();
@@ -260,6 +261,7 @@ public class InputsResource extends RestResource {
         final MessageInput oldInput = persistedInputs.get(inputId);
         final MessageInput messageInput;
         try {
+            // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), oldInput.getNodeId());
             persistedInputs.update(inputId, messageInput);
         } catch (NoSuchInputTypeException e) {
