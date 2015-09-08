@@ -26,13 +26,11 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackConfigurationService {
     private final JacksonDBCollection<AlarmCallbackConfigurationAVImpl, String> coll;
@@ -68,15 +66,6 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
     @Override
     public long count() {
         return coll.count();
-    }
-
-    @Override
-    public AlarmCallbackConfiguration update(String streamId, String alarmCallbackId, Map<String, Object> deltas) {
-        DBUpdate.Builder update = new DBUpdate.Builder();
-        for (Map.Entry<String, Object> fields : deltas.entrySet())
-            update = update.set(fields.getKey(), fields.getValue());
-
-        return coll.findAndModify(DBQuery.is("_id", alarmCallbackId), update);
     }
 
     @Override

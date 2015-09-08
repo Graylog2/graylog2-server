@@ -16,8 +16,11 @@
  */
 package org.graylog2.rest.models.alarmcallbacks.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.util.Map;
 
+@JsonAutoDetect
 public class CreateAlarmCallbackRequest {
     public String type;
     public Map<String, Object> configuration;

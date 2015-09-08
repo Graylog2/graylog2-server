@@ -26,20 +26,24 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
+import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
-import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
-import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.graylog2.utilities.ConfigurationMapConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,14 +74,17 @@ public class AlarmCallbackResource extends RestResource {
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final StreamService streamService;
     private final Set<AlarmCallback> availableAlarmCallbacks;
+    private final AlarmCallbackFactory alarmCallbackFactory;
 
     @Inject
     public AlarmCallbackResource(AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                  StreamService streamService,
-                                 Set<AlarmCallback> availableAlarmCallbacks) {
+                                 Set<AlarmCallback> availableAlarmCallbacks,
+                                 AlarmCallbackFactory alarmCallbackFactory) {
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.streamService = streamService;
         this.availableAlarmCallbacks = availableAlarmCallbacks;
+        this.alarmCallbackFactory = alarmCallbackFactory;
     }
 
     // TODO: add permission checks
@@ -137,7 +144,8 @@ public class AlarmCallbackResource extends RestResource {
                            @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest cr) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        final Stream stream = streamService.load(streamid);
+        // make sure the values are correctly converted to the declared configuration types
+        cr.configuration = convertConfigurationValues(cr);
 
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
 
@@ -207,17 +215,55 @@ public class AlarmCallbackResource extends RestResource {
     @PUT
     @Path("/{alarmCallbackId}")
     @Timed
-    @ApiOperation(value = "Update an alarm callback",
-            response = CreateAlarmCallbackResponse.class)
+    @ApiOperation(value = "Update an alarm callback")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void update(@ApiParam(name = "streamid", value = "The stream id this alarm callback belongs to.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "alarmCallbackId", required = true)
                        @PathParam("alarmCallbackId") String alarmCallbackId,
-                       @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws NotFoundException {
+                       @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest alarmCallbackRequest) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        this.alarmCallbackConfigurationService.update(streamid, alarmCallbackId, deltas);
+        final AlarmCallbackConfiguration aCC = alarmCallbackConfigurationService.load(alarmCallbackId);
+        if (aCC == null) {
+            throw new NotFoundException("Unable to find alarm callback configuration " + alarmCallbackId);
+        }
+
+        final Map<String, Object> configuration = convertConfigurationValues(alarmCallbackRequest);
+
+        final AlarmCallbackConfigurationAVImpl newConfig = AlarmCallbackConfigurationAVImpl.create(
+                alarmCallbackId,
+                aCC.getStreamId(),
+                aCC.getType(),
+                configuration,
+                aCC.getCreatedAt(),
+                aCC.getCreatorUserId());
+
+        try {
+             alarmCallbackConfigurationService.save(newConfig);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Unable to save alarm callback configuration", e);
+        }
+    }
+
+    private Map<String, Object> convertConfigurationValues(final CreateAlarmCallbackRequest alarmCallbackRequest) {
+        final ConfigurationRequest requestedConfiguration;
+        try {
+            final AlarmCallback alarmCallback = alarmCallbackFactory.create(alarmCallbackRequest.type);
+            requestedConfiguration = alarmCallback.getRequestedConfiguration();
+        } catch (ClassNotFoundException e) {
+            throw new BadRequestException("Unable to load alarm callback of type " + alarmCallbackRequest.type, e);
+        }
+
+        // coerce the configuration to their correct types according to the alarmcallback's requested config
+        final Map<String, Object> configuration;
+        try {
+            configuration = ConfigurationMapConverter.convertValues(alarmCallbackRequest.configuration,
+                                                                    requestedConfiguration);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Invalid configuration map", e);
+        }
+        return configuration;
     }
 }

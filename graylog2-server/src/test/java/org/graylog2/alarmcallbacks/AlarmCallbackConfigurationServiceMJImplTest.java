@@ -16,7 +16,6 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.bson.types.ObjectId;
@@ -28,11 +27,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -171,15 +170,5 @@ public class AlarmCallbackConfigurationServiceMJImplTest extends MongoDBServiceT
         alarmCallbackConfigurationService.destroy(alarmCallback);
 
         assertEquals("After deletion, there should be only one document left in the collection", 1, alarmCallbackConfigurationService.count());
-    }
-
-    @Test
-    @UsingDataSet(locations = {"alarmCallbackConfigurationsSingleDocument.json", "alarmCallbackConfigurationsSingleDocument2.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    @ShouldMatchDataSet(location = "alarmCallbackConfigurationsSingleDocumentAfterUpdate.json")
-    public void testDocumentUpdate() throws Exception {
-        final Map<String, Object> configuration = new HashMap<String, Object>() {{ put("foo", "bar"); }};
-        final Map<String, Object> deltas = new HashMap<String, Object>() {{ put("configuration", configuration); }};
-
-        alarmCallbackConfigurationService.update("5400deadbeefdeadbeefaffe", "54e3deadbeefdeadbeefaffe", deltas);
     }
 }
