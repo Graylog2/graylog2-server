@@ -30,6 +30,7 @@ import static org.joda.time.DateTimeZone.UTC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class NetFlowV5PacketTest {
     @Test
@@ -56,7 +57,7 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message1.getField("nf_tos"));
         assertEquals("10.0.2.2", message1.getField("nf_src_address"));
         assertEquals("10.0.2.15", message1.getField("nf_dst_address"));
-        assertEquals("0.0.0.0", message1.getField("nf_next_hop"));
+        assertNull(message1.getField("nf_next_hop"));
         assertEquals(54435, message1.getField("nf_src_port"));
         assertEquals(22, message1.getField("nf_dst_port"));
         assertEquals(0, message1.getField("nf_src_mask"));
@@ -76,7 +77,7 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message2.getField("nf_tos"));
         assertEquals("10.0.2.15", message2.getField("nf_src_address"));
         assertEquals("10.0.2.2", message2.getField("nf_dst_address"));
-        assertEquals("0.0.0.0", message2.getField("nf_next_hop"));
+        assertNull(message2.getField("nf_next_hop"));
         assertEquals(22, message2.getField("nf_src_port"));
         assertEquals(54435, message2.getField("nf_dst_port"));
         assertEquals(0, message2.getField("nf_src_mask"));
