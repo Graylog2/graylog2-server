@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 
 @AutoValue
 @JsonAutoDetect
@@ -32,6 +33,6 @@ public abstract class AlarmCallbackError extends AlarmCallbackResult {
 
     @JsonCreator
     public static AlarmCallbackError create(@JsonProperty("error") String error) {
-        return new AutoValue_AlarmCallbackError(error);
+        return new AutoValue_AlarmCallbackError(Strings.nullToEmpty(error));
     }
 }

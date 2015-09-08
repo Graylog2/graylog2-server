@@ -19,9 +19,6 @@ package org.graylog2.alarmcallbacks;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface AlarmCallbackConfiguration {
     String getId();
     String getStreamId();
