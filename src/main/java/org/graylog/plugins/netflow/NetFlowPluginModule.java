@@ -17,7 +17,7 @@
 package org.graylog.plugins.netflow;
 
 import org.graylog.plugins.netflow.codecs.NetFlowCodec;
-import org.graylog.plugins.netflow.inputs.NetFlowInput;
+import org.graylog.plugins.netflow.inputs.NetFlowUdpInput;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -40,7 +40,7 @@ public class NetFlowPluginModule extends PluginModule {
 
     @Override
     protected void configure() {
-        addMessageInput(NetFlowInput.class);
+        addMessageInput(NetFlowUdpInput.class);
         addCodec("netflow", NetFlowCodec.class);
     }
 }

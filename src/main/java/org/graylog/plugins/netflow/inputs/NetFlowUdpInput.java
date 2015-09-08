@@ -29,26 +29,26 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import javax.inject.Inject;
 
-public class NetFlowInput extends MessageInput {
+public class NetFlowUdpInput extends MessageInput {
     private static final String NAME = "NetFlow UDP";
 
     @Inject
-    public NetFlowInput(MetricRegistry metricRegistry,
-                        @Assisted Configuration configuration,
-                        UdpTransport.Factory transportFactory,
-                        NetFlowCodec.Factory codecFactory,
-                        LocalMetricRegistry localMetricRegistry,
-                        Config config,
-                        Descriptor descriptor,
-                        ServerStatus serverStatus) {
+    public NetFlowUdpInput(MetricRegistry metricRegistry,
+                           @Assisted Configuration configuration,
+                           UdpTransport.Factory transportFactory,
+                           NetFlowCodec.Factory codecFactory,
+                           LocalMetricRegistry localMetricRegistry,
+                           Config config,
+                           Descriptor descriptor,
+                           ServerStatus serverStatus) {
         super(metricRegistry, configuration, transportFactory.create(configuration), localMetricRegistry,
                 codecFactory.create(configuration), config, descriptor, serverStatus);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<NetFlowInput> {
+    public interface Factory extends MessageInput.Factory<NetFlowUdpInput> {
         @Override
-        NetFlowInput create(Configuration configuration);
+        NetFlowUdpInput create(Configuration configuration);
 
         @Override
         Config getConfig();
