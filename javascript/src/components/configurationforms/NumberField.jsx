@@ -36,8 +36,9 @@ var NumberField = React.createClass({
         }
     },
     handleChange(evt) {
-        this.props.onChange(this.state.title, evt.target.value);
-        this.setState({value: evt.target.value});
+        const numericValue = Number(evt.target.value);
+        this.props.onChange(this.state.title, numericValue);
+        this.setState({value: numericValue});
     },
     render() {
         var typeName = this.state.typeName;
