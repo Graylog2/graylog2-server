@@ -247,7 +247,7 @@ public class AlarmCallbackResource extends RestResource {
         }
     }
 
-    private Map<String, Object> convertConfigurationValues(@ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest alarmCallbackRequest) {
+    private Map<String, Object> convertConfigurationValues(final CreateAlarmCallbackRequest alarmCallbackRequest) {
         final ConfigurationRequest requestedConfiguration;
         try {
             final AlarmCallback alarmCallback = alarmCallbackFactory.create(alarmCallbackRequest.type);
