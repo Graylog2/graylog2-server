@@ -11,8 +11,11 @@
     <div class="row content content-head">
         <div class="col-md-8">
             <h1>User accounts</h1>
-            <p class="description">Create as many users as you want next to the default administrator user here. You can also configure LDAP and make changes to already existing users.
-            </p>
+            <p class="description">Create as many users as you want next to the default administrator user here. You can also configure LDAP and make changes to already existing users.</p>
+
+            @views.html.partials.support.list_small() {
+                Read more about user management in the @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_USERS_ROLES, "documentation").
+            }
         </div>
 
         <div class="col-md-4" style="text-align: right; margin-top: 10px;">

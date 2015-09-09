@@ -21,7 +21,8 @@ public enum DocsHelper {
     PAGE_SEARCH_QUERY_LANGUAGE("queries.html"),
     PAGE_STANDARD_DATE_CONVERTER("extractors.html#the-standard-date-converter"),
     PAGE_STREAM_PROCESSING_RUNTIME_LIMITS("streams.html#stream-processing-runtime-limits"),
-    PAGE_STREAMS("streams.html");
+    PAGE_STREAMS("streams.html"),
+    PAGE_USERS_ROLES("users_roles.html");
 
     private static final String DOCS_URL = "http://docs.graylog.org/en/";
 
