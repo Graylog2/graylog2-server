@@ -169,6 +169,7 @@ public class LdapResource extends RestResource {
                         connection,
                         request.searchBase(),
                         request.searchPattern(),
+                        "*",
                         request.principal(),
                         request.activeDirectory(),
                         request.groupSearchBase(),
@@ -300,9 +301,10 @@ public class LdapResource extends RestResource {
         try {
             LdapNetworkConnection connection = ldapConnector.connect(config);
             final Set<String> groups = ldapConnector.listGroups(connection,
-                                                               ldapSettings.getGroupSearchBase(),
-                                                               ldapSettings.getGroupSearchPattern(),
-                                                               ldapSettings.getGroupIdAttribute());
+                                                                ldapSettings.getGroupSearchBase(),
+                                                                ldapSettings.getGroupSearchPattern(),
+                                                                ldapSettings.getGroupIdAttribute()
+            );
             return groups;
         } catch (LdapException e) {
             LOG.error("Unable to retrieve available LDAP groups", e);

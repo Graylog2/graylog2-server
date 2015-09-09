@@ -186,12 +186,12 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                 for (String ldapGroupName : userEntry.getGroups()) {
                     final String roleName = ldapSettings.getGroupMapping().get(ldapGroupName);
                     if (roleName == null) {
-                        LOG.warn("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
+                        LOG.debug("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
                         continue;
                     }
                     final Role role = roleNameToRole.get(roleName.toLowerCase());
                     if (role != null) {
-                        LOG.warn("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
+                        LOG.debug("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
                         translatedRoleIds.add(role.getId());
                     } else {
                         LOG.warn("User {}: No role found for ldap group <{}>", username, ldapGroupName);
