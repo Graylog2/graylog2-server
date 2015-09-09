@@ -37,7 +37,7 @@ const LdapGroupsComponent = React.createClass({
     });
     const content = this.state.groups.sortBy(group => group.toLocaleUpperCase()).map(group => {
       return (<li key={group}>
-        <Input label={group} data-group={group} type="select" value={this.state.mapping.get(group, '')} onChange={this._updateMapping} labelClassName="col-sm-3" wrapperClassName="col-sm-4">
+        <Input label={group} data-group={group} type="select" value={this.state.mapping.get(group, '')} onChange={this._updateMapping} labelClassName="col-sm-2" wrapperClassName="col-sm-5">
           <option value="">None</option>
           {options}
         </Input>
@@ -55,7 +55,7 @@ const LdapGroupsComponent = React.createClass({
     }
     if (content.size === 0) {
       return (<Row>
-        <Col md={12} push={1}>
+        <Col md={12} mdPush={1}>
           <Panel bsStyle="info">No LDAP/Active Directory groups found. Please verify that your <a href={jsRoutes.controllers.LdapController.index().url}>LDAP group mapping</a> settings are correct.</Panel>
         </Col>
       </Row>);
@@ -64,9 +64,9 @@ const LdapGroupsComponent = React.createClass({
         <form className='form-horizontal'>
           <Row>
             <Col md={12}>
-              <ul>{content}</ul>
+              <ul style={{padding: 0}}>{content}</ul>
             </Col>
-            <Col md={10} push={2}>
+            <Col md={10} mdPush={2}>
               <Button onClick={this._saveMapping} bsStyle="success">Save</Button>&nbsp;
               <Button href={jsRoutes.controllers.UsersController.index().url}>Cancel</Button>
             </Col>

@@ -152,7 +152,7 @@
                     </div>
                 </div>
 
-                <legend class="col-sm-offset-3 col-sm-9">Group Mapping</legend>
+                <legend class="col-sm-offset-3 col-sm-9">Group Mapping <small>(optional)</small></legend>
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="groupSearchBase">Group Search Base DN</label>
                     <div class="col-sm-9">
@@ -203,17 +203,16 @@
                         </div>
                         <span class="help-block ldap-help">
                             The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
-                            You can assign additional permissions by mapping LDAP groups to Graylog roles, or you can assign additional Graylog roles to LDAP users below.
+                            You can assign additional permissions by <a href="@routes.LdapController.groups()">mapping LDAP groups to Graylog roles</a>, or you can assign additional Graylog roles to LDAP users below.
                         </span>
                         <span class="help-block ad-help hidden">
                             The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
-                            You can assign additional permissions by mapping Active Directory groups to Graylog roles, or you can assign additional Graylog roles to Active Directory users below.
+                            You can assign additional permissions by <a href="@routes.LdapController.groups()">mapping Active Directory groups to Graylog roles</a>, or you can assign additional Graylog roles to Active Directory users below.
                         </span>
                         <div class="panel panel-info">
                             <div class="panel-body">
                                 <p>Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
-                                In order to change existing accounts, you need to edit their roles manually or delete them so they are recreated on the next login.<br/></p>
-                                <p>LDAP/Active Directory changes, such as group to role mapping will be performed whenever the user logs into Graylog.</p>
+                                Existing user accounts will be updated on their next login, or if you edit their roles manually.</p>
                             </div>
                         </div>
                     </div>
@@ -231,18 +230,23 @@
                             </div>
                         </div>
                         <span class="help-block ldap-help">
-                            Choose the additional roles each LDAP user will have by default, leave it empty if you only want to map LDAP groups to Graylog roles.
+                            Choose the additional roles each LDAP user will have by default, leave it empty if you want to map LDAP groups to Graylog roles.
                         </span>
                         <span class="help-block ad-help hidden">
-                            Choose the additional roles each Active Directory user will have by default, leave it empty if you only want to map Active Directory groups to Graylog roles.
+                            Choose the additional roles each Active Directory user will have by default, leave it empty if you want to map Active Directory groups to Graylog roles.
                         </span>
                         <div class="panel panel-info">
                             <div class="panel-body">
                                 <p>Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
-                                    In order to change existing accounts, you need to edit their roles manually or delete them so they are recreated on the next login.<br/></p>
-                                <p>LDAP/Active Directory changes, such as group to role mapping will be performed whenever the user logs into Graylog.</p>
+                                    Existing user accounts will be updated on their next login, or if you edit their roles manually.</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <hr/>
                     </div>
                 </div>
 

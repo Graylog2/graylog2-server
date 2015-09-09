@@ -5,11 +5,15 @@
         <div class="col-md-8">
             <h1>LDAP Group mapping</h1>
             <p class="description">Map LDAP groups to Graylog roles</p>
+
+            @views.html.partials.support.list_small() {
+                LDAP groups with no defined mapping will use the defaults set in your <a href="@routes.LdapController.index()">LDAP settings</a>.
+            }
         </div>
     </div>
 
     <div class="row content">
-        <div class="col-md-12">
+        <div class="col-lg-8">
             @if(!ldapEnabled) {
                 <div>LDAP is disabled, cannot edit LDAP group mapping. Please enable LDAP integration in the <a href="@routes.LdapController.index()">LDAP settings</a>.</div>
             } else {
