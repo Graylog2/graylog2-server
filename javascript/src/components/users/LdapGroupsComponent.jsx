@@ -50,7 +50,7 @@ const LdapGroupsComponent = React.createClass({
         </div>
       );
     }
-    if (this.state.loading < 3) {
+    if (this.state.loaded < 3) {
       return <Spinner />;
     }
     if (content.size === 0) {
