@@ -272,32 +272,42 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         final String indexName = indexRange.indexName();
-        final boolean readOnly = indices.isReadOnly(indexName);
 
-        if (readOnly) {
-            indices.setReadWrite(indexName);
+        IndexRange oldIndexRange = null;
+        try {
+            oldIndexRange = get(indexName);
+        } catch (NotFoundException ignored) {
         }
 
-        final IndexRequest request = client.prepareIndex()
-                .setIndex(indexName)
-                .setType(IndexMapping.TYPE_INDEX_RANGE)
-                .setId(indexName)
-                .setSource(source)
-                .request();
-        final IndexResponse response = client.index(request).actionGet();
-
-        if (readOnly) {
-            indices.setReadOnly(indexName);
-        }
-
-        if (response.isCreated()) {
-            LOG.debug("Successfully saved index range: {}", indexRange);
+        if (indexRange.equals(oldIndexRange)) {
+            LOG.debug("Index range is already up-to-date, skipping: {}", indexRange);
         } else {
-            LOG.debug("Successfully updated index range: {}", indexRange);
-        }
+            final boolean readOnly = indices.isReadOnly(indexName);
+            if (readOnly) {
+                indices.setReadWrite(indexName);
+            }
 
-        cache.put(indexName, indexRange);
-        clusterEventBus.post(IndexRangeUpdatedEvent.create(indexName));
+            final IndexRequest request = client.prepareIndex()
+                    .setIndex(indexName)
+                    .setType(IndexMapping.TYPE_INDEX_RANGE)
+                    .setId(indexName)
+                    .setSource(source)
+                    .request();
+            final IndexResponse response = client.index(request).actionGet();
+
+            if (readOnly) {
+                indices.setReadOnly(indexName);
+            }
+
+            if (response.isCreated()) {
+                LOG.debug("Successfully saved index range: {}", indexRange);
+            } else {
+                LOG.debug("Successfully updated index range: {}", indexRange);
+            }
+
+            cache.put(indexName, indexRange);
+            clusterEventBus.post(IndexRangeUpdatedEvent.create(indexName));
+        }
     }
 
     @Subscribe
