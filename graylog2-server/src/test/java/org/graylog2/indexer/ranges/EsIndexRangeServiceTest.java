@@ -44,6 +44,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
@@ -54,6 +55,11 @@ import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.Elasti
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EsIndexRangeServiceTest {
@@ -76,7 +82,10 @@ public class EsIndexRangeServiceTest {
     @Inject
     private Client client;
     private Indices indices;
-
+    @Mock
+    private EventBus localEventBus;
+    @Mock
+    private EventBus clusterEventBus;
     private EsIndexRangeService indexRangeService;
 
     public EsIndexRangeServiceTest() {
@@ -89,7 +98,7 @@ public class EsIndexRangeServiceTest {
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
         final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, indices);
         indexRangeService = new EsIndexRangeService(client, objectMapper, indices, deflector,
-                new EventBus("local"), new EventBus("cluster"), new MetricRegistry());
+                localEventBus, clusterEventBus, new MetricRegistry());
     }
 
     @Test
@@ -111,7 +120,7 @@ public class EsIndexRangeServiceTest {
 
     /**
      * Test the following constellation:
-     *                        [-        index range       -]
+     * [-        index range       -]
      * [- graylog_1 -][- graylog_2 -][- graylog_3 -][- graylog_4 -][- graylog_5 -]
      */
     @Test
@@ -187,6 +196,7 @@ public class EsIndexRangeServiceTest {
         indexRangeService.save(indexRange);
 
         final IndexRange result = indexRangeService.get(indexName);
+        verify(clusterEventBus, times(1)).post(IndexRangeUpdatedEvent.create(indexName));
         assertThat(result.indexName()).isEqualTo(indexName);
         assertThat(result.begin()).isEqualTo(begin);
         assertThat(result.end()).isEqualTo(end);
@@ -209,6 +219,7 @@ public class EsIndexRangeServiceTest {
             assumeTrue(indices.isReadOnly(indexName));
             indexRangeService.save(indexRange);
 
+            verify(clusterEventBus, times(1)).post(IndexRangeUpdatedEvent.create(indexName));
             assertThat(indices.isReadOnly(indexName)).isTrue();
 
             final IndexRange result = indexRangeService.get(indexName);
@@ -241,6 +252,21 @@ public class EsIndexRangeServiceTest {
 
         final IndexRange after = indexRangeService.get(indexName);
         assertThat(after.calculationDuration()).isEqualTo(2);
+
+        verify(clusterEventBus, times(2)).post(IndexRangeUpdatedEvent.create(indexName));
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void saveSkipsUpToDateExistingIndexRange() throws Exception {
+        final String indexName = "graylog_1";
+        final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
+        final DateTime calculatedAt = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        final IndexRange indexRange = IndexRange.create(indexName, begin, end, calculatedAt, 23);
+
+        indexRangeService.save(indexRange);
+        verify(clusterEventBus, never()).post(IndexRangeUpdatedEvent.create(indexName));
     }
 
 
