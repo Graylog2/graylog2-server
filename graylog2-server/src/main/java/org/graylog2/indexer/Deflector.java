@@ -55,28 +55,23 @@ public class Deflector { // extends Ablenkblech
 
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
-    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
-    private final ElasticsearchConfiguration configuration;
     private final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
                      final ElasticsearchConfiguration configuration,
                      final ActivityWriter activityWriter,
-                     final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices) {
-        this.configuration = configuration;
         this.indexPrefix = configuration.getIndexPrefix();
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
-        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
@@ -156,6 +151,7 @@ public class Deflector { // extends Ablenkblech
         } else {
             // Re-pointing from existing old index to the new one.
             pointTo(newTarget, oldTarget);
+            addSingleIndexRanges(oldTarget);
 
             // perform these steps after a delay, so we don't race with indexing into the alias
             // it can happen that an index request still writes to the old deflector target, while we cycled it above.
@@ -170,11 +166,7 @@ public class Deflector { // extends Ablenkblech
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
-        if (configuration.isDisableIndexRangeCalculation() && oldTargetNumber != -1) {
-            addSingleIndexRanges(oldTarget);
-            addSingleIndexRanges(newTarget);
-        } else
-            updateIndexRanges();
+        addSingleIndexRanges(newTarget);
 
         LOG.info("Done!");
 
@@ -260,17 +252,6 @@ public class Deflector { // extends Ablenkblech
 
     public void pointTo(final String newIndex) {
         indices.cycleAlias(getName(), newIndex);
-    }
-
-    private void updateIndexRanges() {
-        // Re-calculate index ranges.
-        try {
-            systemJobManager.submit(rebuildIndexRangesJobFactory.create(this));
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Could not re-calculate index ranges after cycling deflector: Maximum concurrency of job is reached.";
-            activityWriter.write(new Activity(msg, Deflector.class));
-            LOG.error(msg, e);
-        }
     }
 
     private void addSingleIndexRanges(String indexName) {

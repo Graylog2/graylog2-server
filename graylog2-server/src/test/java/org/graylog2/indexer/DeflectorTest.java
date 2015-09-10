@@ -24,7 +24,6 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
@@ -50,7 +49,6 @@ public class DeflectorTest {
                 mock(SystemJobManager.class),
                 new ElasticsearchConfiguration(),
                 mock(SystemMessageActivityWriter.class),
-                mock(RebuildIndexRangesJob.Factory.class),
                 mock(SetIndexReadOnlyJob.Factory.class),
                 mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
@@ -81,7 +79,6 @@ public class DeflectorTest {
         Deflector d = new Deflector(mock(SystemJobManager.class),
                 mock(ElasticsearchConfiguration.class),
                 mock(SystemMessageActivityWriter.class),
-                mock(RebuildIndexRangesJob.Factory.class),
                 mock(SetIndexReadOnlyJob.Factory.class),
                 mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
@@ -101,7 +98,6 @@ public class DeflectorTest {
         Deflector d = new Deflector(mock(SystemJobManager.class),
                 mock(ElasticsearchConfiguration.class),
                 mock(SystemMessageActivityWriter.class),
-                mock(RebuildIndexRangesJob.Factory.class),
                 mock(SetIndexReadOnlyJob.Factory.class),
                 mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
@@ -116,7 +112,6 @@ public class DeflectorTest {
         Deflector d = new Deflector(mock(SystemJobManager.class),
                 mock(ElasticsearchConfiguration.class),
                 mock(SystemMessageActivityWriter.class),
-                mock(RebuildIndexRangesJob.Factory.class),
                 mock(SetIndexReadOnlyJob.Factory.class),
                 mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
