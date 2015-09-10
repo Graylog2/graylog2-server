@@ -114,9 +114,6 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "disable_index_optimization")
     private boolean disableIndexOptimization = false;
 
-    @Parameter(value = "disable_index_range_calculation")
-    private boolean disableIndexRangeCalculation = true;
-
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
@@ -241,10 +238,6 @@ public class ElasticsearchConfiguration {
 
     public boolean isDisableIndexOptimization() {
         return disableIndexOptimization;
-    }
-
-    public boolean isDisableIndexRangeCalculation() {
-        return disableIndexRangeCalculation;
     }
 
     public String getPathData() {
