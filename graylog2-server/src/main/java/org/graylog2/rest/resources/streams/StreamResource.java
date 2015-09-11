@@ -50,6 +50,7 @@ import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -318,10 +319,11 @@ public class StreamResource extends RestResource {
 
         // Create stream.
         final Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put("title", cr.title());
-        streamData.put("description", cr.description());
-        streamData.put("creator_user_id", getCurrentUser().getName());
-        streamData.put("created_at", Tools.iso8601());
+        streamData.put(StreamImpl.FIELD_TITLE, cr.title());
+        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
+        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
+        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
+        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
 
         final Stream stream = streamService.create(streamData);
         streamService.pause(stream);
