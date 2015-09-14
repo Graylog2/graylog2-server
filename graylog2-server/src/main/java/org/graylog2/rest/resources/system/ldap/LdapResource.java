@@ -306,7 +306,7 @@ public class LdapResource extends RestResource {
             );
         } catch (IOException | LdapException e) {
             LOG.error("Unable to retrieve available LDAP groups", e);
-            throw new InternalServerErrorException(e);
+            throw new InternalServerErrorException("Unable to retrieve available LDAP groups", e);
         }
     }
 }
