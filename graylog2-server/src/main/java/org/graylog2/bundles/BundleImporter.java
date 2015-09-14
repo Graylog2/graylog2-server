@@ -452,6 +452,7 @@ public class BundleImporter {
         streamData.put(StreamImpl.FIELD_TITLE, streamDescription.getTitle());
         streamData.put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription());
         streamData.put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled());
+        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, streamDescription.getMatchingType());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);

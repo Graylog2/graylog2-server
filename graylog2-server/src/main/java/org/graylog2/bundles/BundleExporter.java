@@ -218,6 +218,7 @@ public class BundleExporter {
         streamDescription.setTitle(stream.getTitle());
         streamDescription.setDescription(stream.getDescription());
         streamDescription.setDisabled(stream.getDisabled());
+        streamDescription.setMatchingType(stream.getMatchingType());
         streamDescription.setOutputs(exportOutputReferences(stream.getOutputs()));
         streamDescription.setStreamRules(exportStreamRules(stream.getStreamRules()));
 
