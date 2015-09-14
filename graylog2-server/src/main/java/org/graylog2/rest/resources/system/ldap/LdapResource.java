@@ -298,17 +298,15 @@ public class LdapResource extends RestResource {
             config.setCredentials(ldapSettings.getSystemPassword());
         }
 
-        try {
-            LdapNetworkConnection connection = ldapConnector.connect(config);
-            final Set<String> groups = ldapConnector.listGroups(connection,
-                                                                ldapSettings.getGroupSearchBase(),
-                                                                ldapSettings.getGroupSearchPattern(),
-                                                                ldapSettings.getGroupIdAttribute()
+        try (LdapNetworkConnection connection = ldapConnector.connect(config)) {
+            return ldapConnector.listGroups(connection,
+                                            ldapSettings.getGroupSearchBase(),
+                                            ldapSettings.getGroupSearchPattern(),
+                                            ldapSettings.getGroupIdAttribute()
             );
-            return groups;
-        } catch (LdapException e) {
+        } catch (IOException | LdapException e) {
             LOG.error("Unable to retrieve available LDAP groups", e);
-            throw new InternalServerErrorException(e);
+            throw new InternalServerErrorException("Unable to retrieve available LDAP groups", e);
         }
     }
 }
