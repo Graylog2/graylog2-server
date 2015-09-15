@@ -1,6 +1,8 @@
 NetFlow Plugin for Graylog
 ==========================
 
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-netflow.svg)](https://travis-ci.org/Graylog2/graylog-plugin-netflow)
+
 This plugin provides a NetFlow UDP input to act as a Flow collector that receives data from Flow exporters. Each received Flow will be converted to a Graylog message.
 
 **Required Graylog version:** 1.2 and later
