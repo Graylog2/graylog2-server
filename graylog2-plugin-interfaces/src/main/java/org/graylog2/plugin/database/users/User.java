@@ -77,9 +77,9 @@ public interface User extends Persisted {
 
     String getHashedPassword();
 
-    void setPassword(String password, String passwordSecret);
+    void setPassword(String password);
 
-    boolean isUserPassword(String password, String passwordSecret);
+    boolean isUserPassword(String password);
 
     DateTimeZone getTimeZone();
 

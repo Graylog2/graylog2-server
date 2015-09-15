@@ -53,14 +53,17 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     private final Configuration configuration;
     private final RoleService roleService;
+    private final UserImpl.Factory userFactory;
 
     @Inject
     public UserServiceImpl(final MongoConnection mongoConnection,
                            final Configuration configuration,
-                           final RoleService roleService) {
+                           final RoleService roleService,
+                           final UserImpl.Factory userFactory) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
+        this.userFactory = userFactory;
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
     }
@@ -72,7 +75,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         // special case for the locally defined user, we don't store that in MongoDB.
         if (configuration.getRootUsername().equals(username)) {
             LOG.debug("User {} is the built-in admin user", username);
-            return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
+            return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
         }
 
         final DBObject query = new BasicDBObject();
@@ -93,7 +96,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         final Object userId = userObject.get("_id");
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
-        return new UserImpl((ObjectId) userId, userObject.toMap());
+        return userFactory.create((ObjectId) userId, userObject.toMap());
     }
 
     public int delete(final String username) {
@@ -110,7 +113,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User create() {
-        return new UserImpl(Maps.<String, Object>newHashMap());
+        return userFactory.create(Maps.<String, Object>newHashMap());
     }
 
     @Override
@@ -120,7 +123,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         final List<User> users = Lists.newArrayList();
         for (DBObject dbObject : result) {
-            users.add(new UserImpl((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
         }
 
         return users;
@@ -132,7 +135,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         // create new user object if necessary
         if (user == null) {
-            user = new UserImpl(Maps.<String, Object>newHashMap());
+            user = userFactory.create(Maps.<String, Object>newHashMap());
         }
 
         // update user attributes from ldap entry
@@ -225,7 +228,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User getAdminUser() {
-        return new UserImpl.LocalAdminUser(configuration, roleService.getAdminRoleObjectId());
+        return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
     }
 
     @Override
@@ -245,7 +248,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         final Set<User> users = Sets.newHashSetWithExpectedSize(result.size());
         for (DBObject dbObject : result) {
             //noinspection unchecked
-            users.add(new UserImpl((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
         }
         return users;
     }
