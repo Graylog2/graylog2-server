@@ -77,7 +77,9 @@ public class NetFlowV5PacketTest {
         assertNotNull(message2.getField("nf_flow_packet_id"));
         assertNotEquals(message2.getField("nf_id"), message2.getField("nf_flow_packet_id"));
         assertEquals(0, message2.getField("nf_tos"));
+        assertEquals("10.0.2.15:22", message2.getField("nf_src"));
         assertEquals("10.0.2.15", message2.getField("nf_src_address"));
+        assertEquals("10.0.2.2:54435", message2.getField("nf_dst"));
         assertEquals("10.0.2.2", message2.getField("nf_dst_address"));
         assertNull(message2.getField("nf_next_hop"));
         assertEquals(22, message2.getField("nf_src_port"));
