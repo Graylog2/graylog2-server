@@ -20,6 +20,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import org.graylog.plugins.netflow.utils.ByteBufUtils;
+import org.graylog.plugins.netflow.utils.Protocol;
 import org.graylog.plugins.netflow.utils.UUIDs;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
@@ -50,6 +51,7 @@ public class NetFlowV5 implements NetFlow {
     private static final String MF_SRC_MASK = "nf_src_mask";
     private static final String MF_DST_MASK = "nf_dst_mask";
     private static final String MF_PROTO = "nf_proto";
+    private static final String MF_PROTO_NAME = "nf_proto_name";
     private static final String MF_TCP_FLAGS = "nf_tcp_flags";
     private static final String MF_START = "nf_start";
     private static final String MF_STOP = "nf_stop";
@@ -220,6 +222,10 @@ public class NetFlowV5 implements NetFlow {
         message.addField(MF_SRC_MASK, srcMask);
         message.addField(MF_DST_MASK, dstMask);
         message.addField(MF_PROTO, proto);
+        final Protocol protocol = Protocol.getByNumber(proto);
+        if (protocol != null) {
+            message.addField(MF_PROTO_NAME, protocol.getAlias());
+        }
         message.addField(MF_TCP_FLAGS, tcpflags);
         if (start.isPresent()) {
             message.addField(MF_START, start.get());

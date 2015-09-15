@@ -65,6 +65,7 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message1.getField("nf_src_mask"));
         assertEquals(0, message1.getField("nf_dst_mask"));
         assertEquals(6, message1.getField("nf_proto"));
+        assertEquals("TCP", message1.getField("nf_proto_name"));
         assertEquals(16, message1.getField("nf_tcp_flags"));
         assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00", UTC), message1.getField("nf_start"));
         assertEquals(new DateTime("2015-05-02T18:38:07.196Z", UTC), message1.getField("nf_stop"));
@@ -87,6 +88,7 @@ public class NetFlowV5PacketTest {
         assertEquals(0, message2.getField("nf_src_mask"));
         assertEquals(0, message2.getField("nf_dst_mask"));
         assertEquals(6, message2.getField("nf_proto"));
+        assertEquals("TCP", message2.getField("nf_proto_name"));
         assertEquals(24, message2.getField("nf_tcp_flags"));
         assertEquals(new DateTime("2015-06-21T13:40:51.914+02:00", UTC), message2.getField("nf_start"));
         assertEquals(new DateTime("2015-05-02T18:38:07.196Z", UTC), message2.getField("nf_stop"));
