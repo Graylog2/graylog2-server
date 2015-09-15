@@ -1,0 +1,34 @@
+package org.graylog2.security.realm;
+
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
+import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.users.PasswordAlgorithmFactory;
+
+import javax.inject.Inject;
+
+public class PasswordAlgorithmCredentialsMatcher extends SimpleCredentialsMatcher {
+    private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+
+    @Inject
+    public PasswordAlgorithmCredentialsMatcher(PasswordAlgorithmFactory passwordAlgorithmFactory) {
+        this.passwordAlgorithmFactory = passwordAlgorithmFactory;
+    }
+
+    @Override
+    public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+        if (token instanceof UsernamePasswordToken) {
+            final UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken)token;
+            final String hashedPassword = String.valueOf(info.getCredentials());
+            final PasswordAlgorithm passwordAlgorithm = passwordAlgorithmFactory.forPassword(hashedPassword);
+            if (passwordAlgorithm == null)
+                return false;
+            final String requestPassword = String.valueOf(usernamePasswordToken.getPassword());
+            return passwordAlgorithm.matches(hashedPassword, requestPassword);
+        } else {
+            return false;
+        }
+    }
+}
