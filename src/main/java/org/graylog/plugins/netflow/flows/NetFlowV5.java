@@ -209,11 +209,11 @@ public class NetFlowV5 implements NetFlow {
         message.addField(MF_FLOW_PACKET_ID, fpId.toString());
         message.addField(MF_TOS, tos);
         message.addField(MF_SRC, srcAddress.getHostAddress() + ":" + srcPort);
-        message.addField(MF_SRC_ADDRESS, srcAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
+        message.addField(MF_SRC_ADDRESS, srcAddress.getHostAddress());
         message.addField(MF_DST, dstAddress.getHostAddress() + ":" + dstPort);
-        message.addField(MF_DST_ADDRESS, dstAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
+        message.addField(MF_DST_ADDRESS, dstAddress.getHostAddress());
         if (nextHop.isPresent()) {
-            message.addField(MF_NEXT_HOP, nextHop.get().getHostAddress()); // TODO Check if this does a DNS lookup!
+            message.addField(MF_NEXT_HOP, nextHop.get().getHostAddress());
         }
         message.addField(MF_SRC_PORT, srcPort);
         message.addField(MF_DST_PORT, dstPort);
