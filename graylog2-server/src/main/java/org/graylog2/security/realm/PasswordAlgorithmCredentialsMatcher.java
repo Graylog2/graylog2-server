@@ -20,6 +20,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.users.PasswordAlgorithmFactory;
 
@@ -35,14 +36,12 @@ public class PasswordAlgorithmCredentialsMatcher extends SimpleCredentialsMatche
 
     @Override
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
-        if (token instanceof UsernamePasswordToken) {
+        if (token instanceof UsernamePasswordToken && info instanceof UserAccount) {
             final UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken)token;
-            final String hashedPassword = String.valueOf(info.getCredentials());
-            final PasswordAlgorithm passwordAlgorithm = passwordAlgorithmFactory.forPassword(hashedPassword);
-            if (passwordAlgorithm == null)
-                return false;
-            final String requestPassword = String.valueOf(usernamePasswordToken.getPassword());
-            return passwordAlgorithm.matches(hashedPassword, requestPassword);
+            final UserAccount userAccount = (UserAccount)info;
+            final User user = userAccount.getUser();
+
+            return user.isUserPassword(String.valueOf(usernamePasswordToken.getPassword()));
         } else {
             return false;
         }

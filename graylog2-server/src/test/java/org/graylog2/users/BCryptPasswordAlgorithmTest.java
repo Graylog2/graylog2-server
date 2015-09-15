@@ -16,6 +16,7 @@
  */
 package org.graylog2.users;
 
+import org.graylog2.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +27,8 @@ public class BCryptPasswordAlgorithmTest {
 
     @Before
     public void setUp() throws Exception {
-        this.bCryptPasswordAlgorithm = new BCryptPasswordAlgorithm();
+        final Configuration configuration = new Configuration();
+        this.bCryptPasswordAlgorithm = new BCryptPasswordAlgorithm(configuration.getUserPasswordBCryptSaltSize());
     }
 
     @Test

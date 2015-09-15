@@ -261,8 +261,8 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), Service.class);
     }
 
-    protected Multibinder<PasswordAlgorithm> passwordAlgorithmBinder() {
-        return Multibinder.newSetBinder(binder(), PasswordAlgorithm.class);
+    protected MapBinder<String, PasswordAlgorithm> passwordAlgorithmBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

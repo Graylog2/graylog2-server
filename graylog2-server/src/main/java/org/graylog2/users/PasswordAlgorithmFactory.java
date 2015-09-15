@@ -20,14 +20,14 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.Set;
+import java.util.Map;
 
 public class PasswordAlgorithmFactory {
-    private final Set<PasswordAlgorithm> passwordAlgorithms;
+    private final Map<String, PasswordAlgorithm> passwordAlgorithms;
     private final PasswordAlgorithm defaultPasswordAlgorithm;
 
     @Inject
-    public PasswordAlgorithmFactory(Set<PasswordAlgorithm> passwordAlgorithms,
+    public PasswordAlgorithmFactory(Map<String, PasswordAlgorithm> passwordAlgorithms,
                                     @DefaultPasswordAlgorithm PasswordAlgorithm defaultPasswordAlgorithm) {
         this.passwordAlgorithms = passwordAlgorithms;
         this.defaultPasswordAlgorithm = defaultPasswordAlgorithm;
@@ -35,12 +35,17 @@ public class PasswordAlgorithmFactory {
 
     @Nullable
     public PasswordAlgorithm forPassword(String hashedPassword) {
-        for (PasswordAlgorithm passwordAlgorithm : passwordAlgorithms) {
+        for (PasswordAlgorithm passwordAlgorithm : passwordAlgorithms.values()) {
             if (passwordAlgorithm.supports(hashedPassword))
                 return passwordAlgorithm;
         }
 
         return null;
+    }
+
+    @Nullable
+    public PasswordAlgorithm forName(String name) {
+        return this.passwordAlgorithms.get(name);
     }
 
     public PasswordAlgorithm defaultPasswordAlgorithm() {

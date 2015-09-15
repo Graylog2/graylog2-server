@@ -122,7 +122,7 @@ public abstract class PluginModule extends Graylog2Module {
         installCodec(codecMapBinder(), name, codecClass, configClass, factoryClass);
     }
 
-    protected void addPasswordAlgorithm(Class<? extends PasswordAlgorithm> passwordAlgorithmClass) {
-        passwordAlgorithmBinder().addBinding().to(passwordAlgorithmClass);
+    protected void addPasswordAlgorithm(String passwordAlgorithmName, Class<? extends PasswordAlgorithm> passwordAlgorithmClass) {
+        passwordAlgorithmBinder().addBinding(passwordAlgorithmName).to(passwordAlgorithmClass);
     }
 }

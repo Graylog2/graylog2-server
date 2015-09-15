@@ -46,23 +46,22 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         LOG.debug("Retrieving authorization information for {}", principals);
-        final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         final User user = userService.load(principals.getPrimaryPrincipal().toString());
 
-        final List<String> permissions;
-        if (null == user) {
-            permissions = Collections.emptyList();
+        if (user == null) {
+            return new SimpleAuthorizationInfo();
         } else {
-            permissions = user.getPermissions();
+            final SimpleAuthorizationInfo info = new UserAuthorizationInfo(user);
+            final List<String> permissions = user.getPermissions();
 
             if (permissions != null) {
                 info.setStringPermissions(Sets.newHashSet(permissions));
             }
             info.setRoles(user.getRoleIds());
-        }
 
-        LOG.debug("User {} has permissions: {}", principals, permissions);
-        return info;
+            LOG.debug("User {} has permissions: {}", principals, permissions);
+            return info;
+        }
     }
 
 

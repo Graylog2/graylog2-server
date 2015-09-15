@@ -134,7 +134,7 @@ public class UserServiceImplTest {
 
         public UserImplFactory(Configuration configuration) {
             this.configuration = configuration;
-            this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<PasswordAlgorithm>emptySet(),
+            this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                     new SimpleHashPasswordAlgorithm("TESTSECRET"));
         }
 

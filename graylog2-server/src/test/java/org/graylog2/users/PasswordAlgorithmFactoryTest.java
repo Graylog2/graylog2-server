@@ -16,7 +16,7 @@
  */
 package org.graylog2.users;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -40,11 +40,14 @@ public class PasswordAlgorithmFactoryTest {
     @Mock
     private PasswordAlgorithm passwordAlgorithm2;
 
-    private Set<PasswordAlgorithm> passwordAlgorithmSet;
+    private Map<String, PasswordAlgorithm> passwordAlgorithms;
 
     @Before
     public void setUp() throws Exception {
-        this.passwordAlgorithmSet = ImmutableSet.of(passwordAlgorithm1, passwordAlgorithm2);
+        this.passwordAlgorithms = ImmutableMap.<String, PasswordAlgorithm>builder()
+                .put("algorithm1", passwordAlgorithm1)
+                .put("algorithm2", passwordAlgorithm2)
+                .build();
     }
 
     @Test
@@ -52,7 +55,7 @@ public class PasswordAlgorithmFactoryTest {
         when(passwordAlgorithm1.supports(anyString())).thenReturn(true);
         when(passwordAlgorithm2.supports(anyString())).thenReturn(false);
 
-        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithmSet, passwordAlgorithm2);
+        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithms, passwordAlgorithm2);
 
         assertThat(passwordAlgorithmFactory.forPassword("foobar")).isEqualTo(passwordAlgorithm1);
     }
@@ -62,9 +65,7 @@ public class PasswordAlgorithmFactoryTest {
         when(passwordAlgorithm1.supports(anyString())).thenReturn(false);
         when(passwordAlgorithm2.supports(anyString())).thenReturn(true);
 
-        final Set<PasswordAlgorithm> passwordAlgorithmSet = ImmutableSet.of(passwordAlgorithm1, passwordAlgorithm2);
-
-        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithmSet, passwordAlgorithm2);
+        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithms, passwordAlgorithm2);
 
         assertThat(passwordAlgorithmFactory.forPassword("foobar")).isEqualTo(passwordAlgorithm2);
     }
@@ -74,9 +75,7 @@ public class PasswordAlgorithmFactoryTest {
         when(passwordAlgorithm1.supports(anyString())).thenReturn(false);
         when(passwordAlgorithm2.supports(anyString())).thenReturn(false);
 
-        final Set<PasswordAlgorithm> passwordAlgorithmSet = ImmutableSet.of(passwordAlgorithm1, passwordAlgorithm2);
-
-        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithmSet, passwordAlgorithm2);
+        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithms, passwordAlgorithm2);
 
         assertThat(passwordAlgorithmFactory.forPassword("foobar")).isNull();
     }
@@ -85,7 +84,7 @@ public class PasswordAlgorithmFactoryTest {
     public void testDefaultPasswordAlgorithm() throws Exception {
         final PasswordAlgorithm defaultPasswordAlgorithm = mock(PasswordAlgorithm.class);
 
-        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<PasswordAlgorithm>emptySet(),
+        final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                 defaultPasswordAlgorithm);
 
         assertThat(passwordAlgorithmFactory.defaultPasswordAlgorithm()).isEqualTo(defaultPasswordAlgorithm);

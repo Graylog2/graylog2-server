@@ -20,11 +20,20 @@ import com.google.common.base.Splitter;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 
 public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
     private static final String PREFIX = "{bcrypt}";
     private static final String SALTPREFIX = "{salt}";
+
+    private final Integer saltSize;
+
+    @Inject
+    public BCryptPasswordAlgorithm(@Named("user_password_bcrypt_salt_size") Integer saltSize) {
+        this.saltSize = saltSize;
+    }
 
     @Override
     public boolean supports(String hashedPassword) {
@@ -37,7 +46,7 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public String hash(String password) {
-        return hash(password, BCrypt.gensalt(12));
+        return hash(password, BCrypt.gensalt(this.saltSize));
     }
 
     @Override

@@ -134,6 +134,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
 
+    @Parameter(value = "user_password_default_algorithm")
+    private String userPasswordDefaultAlgorithm = "bcrypt";
+
+    @Parameter(value = "user_password_bcrypt_salt_size")
+    private Integer userPasswordBCryptSaltSize = 10;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -269,5 +275,13 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getDashboardWidgetDefaultCacheTime() {
         return dashboardWidgetDefaultCacheTime;
+    }
+
+    public String getUserPasswordDefaultAlgorithm() {
+        return userPasswordDefaultAlgorithm;
+    }
+
+    public Integer getUserPasswordBCryptSaltSize() {
+        return userPasswordBCryptSaltSize;
     }
 }

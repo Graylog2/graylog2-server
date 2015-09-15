@@ -116,15 +116,6 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
-        bindPasswordAlgorithms();
-    }
-
-    private void bindPasswordAlgorithms() {
-        Multibinder<PasswordAlgorithm> passwordAlgorithms = Multibinder.newSetBinder(binder(), PasswordAlgorithm.class);
-        passwordAlgorithms.addBinding().to(SimpleHashPasswordAlgorithm.class);
-        passwordAlgorithms.addBinding().to(BCryptPasswordAlgorithm.class);
-
-        bind(PasswordAlgorithm.class).annotatedWith(DefaultPasswordAlgorithm.class).to(SimpleHashPasswordAlgorithm.class);
     }
 
     private void bindProviders() {
