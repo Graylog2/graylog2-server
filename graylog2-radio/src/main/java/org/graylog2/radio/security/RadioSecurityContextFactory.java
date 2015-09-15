@@ -39,10 +39,10 @@ public class RadioSecurityContextFactory implements SecurityContextFactory {
             super(subject, token, true, "radio");
         }
     }
-    public class RadioPrinipal implements Principal {
+    public class RadioPrincipal implements Principal {
         @Override
         public boolean equals(Object another) {
-            if (another instanceof RadioPrinipal)
+            if (another instanceof RadioPrincipal)
                 return true;
             else
                 return false;
@@ -67,7 +67,7 @@ public class RadioSecurityContextFactory implements SecurityContextFactory {
     public class RadioSubject implements Subject {
         @Override
         public Object getPrincipal() {
-            return new RadioPrinipal();
+            return new RadioPrincipal();
         }
 
         @Override
@@ -235,7 +235,7 @@ public class RadioSecurityContextFactory implements SecurityContextFactory {
         final AuthenticationToken authenticationToken = new AuthenticationToken() {
             @Override
             public Object getPrincipal() {
-                return new RadioPrinipal();
+                return new RadioPrincipal();
             }
 
             @Override
