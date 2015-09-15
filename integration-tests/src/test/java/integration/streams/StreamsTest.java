@@ -480,6 +480,54 @@ public class StreamsTest extends BaseRestTest {
                 .body("matching_type", equalTo("AND"));
     }
 
+    @Test
+    @MongoDbSeed(locations = "single-stream-with-rules")
+    public void testingMatchAndStreamRules() {
+        final String streamId = "552b92b2e4b0c055e41ffb8f";
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-both-rules.json"))
+                .assertThat()
+                .body("matches", equalTo(true))
+                .body("rules.55f6b285bee8968146a18911", equalTo(true))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(true));
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-one-rule.json"))
+                .assertThat()
+                .body("matches", equalTo(false))
+                .body("rules.55f6b285bee8968146a18911", equalTo(false))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(true));
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-no-rules.json"))
+                .assertThat()
+                .body("matches", equalTo(false))
+                .body("rules.55f6b285bee8968146a18911", equalTo(false))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(false));
+    }
+
+    @Test
+    @MongoDbSeed(locations = "single-or-stream-with-rules")
+    public void testingMatchOrStreamRules() {
+        final String streamId = "552b92b2e4b0c055e41ffb8f";
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-both-rules.json"))
+                .assertThat()
+                .body("matches", equalTo(true))
+                .body("rules.55f6b285bee8968146a18911", equalTo(true))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(true));
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-one-rule.json"))
+                .assertThat()
+                .body("matches", equalTo(true))
+                .body("rules.55f6b285bee8968146a18911", equalTo(false))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(true));
+
+        streamTestMatch(streamId, jsonResource("testMatch-message-matching-no-rules.json"))
+                .assertThat()
+                .body("matches", equalTo(false))
+                .body("rules.55f6b285bee8968146a18911", equalTo(false))
+                .body("rules.55f6b28bbee8968146a18918", equalTo(false));
+    }
+
     protected ValidatableResponse createStreamFromRequest(String request) {
         return given()
                 .when()
@@ -509,5 +557,15 @@ public class StreamsTest extends BaseRestTest {
                 .when()
                 .get("/streams/" + streamId)
                 .then();
+    }
+
+    protected ValidatableResponse streamTestMatch(String streamId, String request) {
+        return given()
+                .when()
+                .body(request)
+                .post("/streams/" + streamId + "/testMatch")
+                .then()
+                .contentType(ContentType.JSON)
+                .statusCode(200);
     }
 }
