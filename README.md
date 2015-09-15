@@ -36,7 +36,7 @@ This is an example NetFlow message in Graylog:
 
 This is an example of a dashboard with NetFlow data:
 
-![NetFlow example dashboard screenshot](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-dashboard)
+![NetFlow example dashboard screenshot](https://github.com/Graylog2/graylog-plugin-netflow/blob/master/images/netflow-dashboard.png)
 
 ## Credits
 
