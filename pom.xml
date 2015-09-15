@@ -4,7 +4,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-netflow</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -16,7 +16,7 @@
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-netflow.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-netflow.git</developerConnection>
         <url>https://github.com/Graylog2/graylog-plugin-netflow</url>
-        <tag>0.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
