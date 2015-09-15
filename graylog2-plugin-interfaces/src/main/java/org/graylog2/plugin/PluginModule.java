@@ -35,6 +35,7 @@ import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.security.PasswordAlgorithm;
 
 import java.util.Collections;
 import java.util.Set;
@@ -119,5 +120,9 @@ public abstract class PluginModule extends Graylog2Module {
                             Class<? extends Codec.Config> configClass,
                             Class<? extends Codec.Factory<? extends Codec>> factoryClass) {
         installCodec(codecMapBinder(), name, codecClass, configClass, factoryClass);
+    }
+
+    protected void addPasswordAlgorithm(Class<? extends PasswordAlgorithm> passwordAlgorithmClass) {
+        passwordAlgorithmBinder().addBinding().to(passwordAlgorithmClass);
     }
 }

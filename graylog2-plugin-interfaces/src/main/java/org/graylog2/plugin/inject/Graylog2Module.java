@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,6 +259,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected Multibinder<Service> serviceBinder() {
         return Multibinder.newSetBinder(binder(), Service.class);
+    }
+
+    protected Multibinder<PasswordAlgorithm> passwordAlgorithmBinder() {
+        return Multibinder.newSetBinder(binder(), PasswordAlgorithm.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
