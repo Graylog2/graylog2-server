@@ -86,8 +86,13 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
+import org.graylog2.users.BCryptPasswordAlgorithm;
+import org.graylog2.users.DefaultPasswordAlgorithm;
+import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
+import org.graylog2.users.SimpleHashPasswordAlgorithm;
+import org.graylog2.users.UserImpl;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -111,6 +116,15 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
+        bindPasswordAlgorithms();
+    }
+
+    private void bindPasswordAlgorithms() {
+        Multibinder<PasswordAlgorithm> passwordAlgorithms = Multibinder.newSetBinder(binder(), PasswordAlgorithm.class);
+        passwordAlgorithms.addBinding().to(SimpleHashPasswordAlgorithm.class);
+        passwordAlgorithms.addBinding().to(BCryptPasswordAlgorithm.class);
+
+        bind(PasswordAlgorithm.class).annotatedWith(DefaultPasswordAlgorithm.class).to(SimpleHashPasswordAlgorithm.class);
     }
 
     private void bindProviders() {
@@ -130,6 +144,7 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(MessageCountAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(FieldContentValueAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(WidgetCacheTime.Factory.class));
+        install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
     }
 
     private void bindSingletons() {
