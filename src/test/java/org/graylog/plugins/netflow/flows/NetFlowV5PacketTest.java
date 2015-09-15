@@ -55,7 +55,9 @@ public class NetFlowV5PacketTest {
         assertNotNull(message1.getField("nf_flow_packet_id"));
         assertNotEquals(message1.getField("nf_id"), message1.getField("nf_flow_packet_id"));
         assertEquals(0, message1.getField("nf_tos"));
+        assertEquals("10.0.2.2:54435", message1.getField("nf_src"));
         assertEquals("10.0.2.2", message1.getField("nf_src_address"));
+        assertEquals("10.0.2.15:22", message1.getField("nf_dst"));
         assertEquals("10.0.2.15", message1.getField("nf_dst_address"));
         assertNull(message1.getField("nf_next_hop"));
         assertEquals(54435, message1.getField("nf_src_port"));

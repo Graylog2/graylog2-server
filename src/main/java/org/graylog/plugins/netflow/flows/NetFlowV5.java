@@ -40,7 +40,9 @@ public class NetFlowV5 implements NetFlow {
     private static final String MF_ID = "nf_id";
     private static final String MF_FLOW_PACKET_ID = "nf_flow_packet_id";
     private static final String MF_TOS = "nf_tos";
+    private static final String MF_SRC = "nf_src";
     private static final String MF_SRC_ADDRESS = "nf_src_address";
+    private static final String MF_DST = "nf_dst";
     private static final String MF_DST_ADDRESS = "nf_dst_address";
     private static final String MF_NEXT_HOP = "nf_next_hop";
     private static final String MF_SRC_PORT = "nf_src_port";
@@ -206,7 +208,9 @@ public class NetFlowV5 implements NetFlow {
         message.addField(MF_ID, uuid.toString());
         message.addField(MF_FLOW_PACKET_ID, fpId.toString());
         message.addField(MF_TOS, tos);
+        message.addField(MF_SRC, srcAddress.getHostAddress() + ":" + srcPort);
         message.addField(MF_SRC_ADDRESS, srcAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
+        message.addField(MF_DST, dstAddress.getHostAddress() + ":" + dstPort);
         message.addField(MF_DST_ADDRESS, dstAddress.getHostAddress()); // TODO Check if this does a DNS lookup!
         if (nextHop.isPresent()) {
             message.addField(MF_NEXT_HOP, nextHop.get().getHostAddress()); // TODO Check if this does a DNS lookup!
