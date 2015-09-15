@@ -37,6 +37,7 @@ import org.graylog2.database.validators.ListValidator;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

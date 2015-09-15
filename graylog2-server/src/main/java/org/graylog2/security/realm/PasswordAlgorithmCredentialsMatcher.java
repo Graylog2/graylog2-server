@@ -21,8 +21,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.plugin.security.PasswordAlgorithm;
-import org.graylog2.users.PasswordAlgorithmFactory;
+import org.graylog2.security.PasswordAlgorithmFactory;
 
 import javax.inject.Inject;
 

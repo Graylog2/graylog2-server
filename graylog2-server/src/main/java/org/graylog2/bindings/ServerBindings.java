@@ -86,12 +86,8 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
-import org.graylog2.users.BCryptPasswordAlgorithm;
-import org.graylog2.users.DefaultPasswordAlgorithm;
-import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
-import org.graylog2.users.SimpleHashPasswordAlgorithm;
 import org.graylog2.users.UserImpl;
 
 import javax.ws.rs.container.DynamicFeature;

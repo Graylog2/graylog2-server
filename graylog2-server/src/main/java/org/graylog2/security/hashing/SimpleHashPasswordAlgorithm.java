@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.users;
+package org.graylog2.security.hashing;
 
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.graylog2.Configuration;

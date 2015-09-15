@@ -20,9 +20,9 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog2.bindings.providers.DefaultPasswordAlgorithmProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.security.PasswordAlgorithm;
-import org.graylog2.users.BCryptPasswordAlgorithm;
+import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 import org.graylog2.users.DefaultPasswordAlgorithm;
-import org.graylog2.users.SimpleHashPasswordAlgorithm;
+import org.graylog2.security.hashing.SimpleHashPasswordAlgorithm;
 
 public class PasswordAlgorithmBindings extends Graylog2Module {
     @Override
