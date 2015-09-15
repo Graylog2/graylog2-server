@@ -5,21 +5,22 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.regex.Pattern;
 
 public class SimpleHashPasswordAlgorithm implements PasswordAlgorithm {
     private static final String HASH_ALGORITHM = "SHA-1";
-    private static final Pattern prefixPattern = Pattern.compile("^\\{[\\w\\d]+\\}");
-    private final Configuration configuration;
+    private static final Pattern prefixPattern = Pattern.compile("^\\{.+\\}");
+    private final String passwordSecret;
 
     @Inject
-    public SimpleHashPasswordAlgorithm(Configuration configuration) {
-        this.configuration = configuration;
+    public SimpleHashPasswordAlgorithm(@Named("password_secret") String passwordSecret) {
+        this.passwordSecret = passwordSecret;
     }
 
     @Override
     public boolean supports(String hashedPassword) {
-        return !prefixPattern.matcher(hashedPassword).matches();
+        return !prefixPattern.matcher(hashedPassword).find();
     }
 
     private String hash(String password, String salt) {
@@ -28,7 +29,7 @@ public class SimpleHashPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public String hash(String password) {
-        return hash(password, configuration.getPasswordSecret());
+        return hash(password, passwordSecret);
     }
 
     @Override
