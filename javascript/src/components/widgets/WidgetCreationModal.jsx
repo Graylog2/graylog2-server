@@ -15,7 +15,7 @@ var WidgetCreationModal = React.createClass({
     getInitialState() {
         this.initialConfiguration = Immutable.Map();
         return {
-            title: this._getDefaultWidgetTitle(),
+            title: "",
             configuration: this.initialConfiguration
         };
     },
@@ -52,9 +52,12 @@ var WidgetCreationModal = React.createClass({
     getEffectiveConfiguration() {
         return this.initialConfiguration.merge(Immutable.Map(this.state.configuration));
     },
+    _getCurrentTitle() {
+        return this.state.title || this._getDefaultWidgetTitle();
+    },
     save(e) {
         var configuration = this.getEffectiveConfiguration();
-        this.props.onConfigurationSaved(this.state.title, configuration);
+        this.props.onConfigurationSaved(this._getCurrentTitle(), configuration);
     },
     saved() {
         this.setState(this.getInitialState());
@@ -211,7 +214,7 @@ var WidgetCreationModal = React.createClass({
                        label="Title"
                        ref="title"
                        required
-                       defaultValue={this.state.title}
+                       defaultValue={this._getCurrentTitle()}
                        onChange={this._onTitleChange}
                        help="Type a name that describes your widget."/>
                 {this._getSpecificWidgetInputs()}
