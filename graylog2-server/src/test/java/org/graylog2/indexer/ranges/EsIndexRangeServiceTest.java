@@ -55,8 +55,6 @@ import static com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule.Elasti
 import static com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -277,7 +275,6 @@ public class EsIndexRangeServiceTest {
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
-        assertThat(stats.avg()).isEqualTo(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC));
     }
 
     @Test
@@ -287,7 +284,6 @@ public class EsIndexRangeServiceTest {
 
         assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
-        assertThat(stats.avg()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 
     @Test(expected = IndexMissingException.class)
