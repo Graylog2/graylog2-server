@@ -27,18 +27,15 @@ public class TimestampStatsTest {
     public void testCreate() throws Exception {
         DateTime min = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         DateTime max = new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC);
-        DateTime avg = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
-        TimestampStats timestampStats = TimestampStats.create(min, max, avg);
+        TimestampStats timestampStats = TimestampStats.create(min, max);
 
         assertThat(timestampStats.min()).isEqualTo(min);
         assertThat(timestampStats.max()).isEqualTo(max);
-        assertThat(timestampStats.avg()).isEqualTo(avg);
     }
 
     @Test
     public void testEmptyInstance() throws Exception {
         assertThat(TimestampStats.EMPTY.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
         assertThat(TimestampStats.EMPTY.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
-        assertThat(TimestampStats.EMPTY.avg()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 }
