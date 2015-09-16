@@ -119,11 +119,11 @@ public class OutputServiceMJImpl implements OutputService {
 
     @Override
     public Map<String, Long> countByType() {
-        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
+        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputAVImpl.FIELD_TYPE, 1));
 
         final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());
         for (DBObject outputType : outputTypes) {
-            final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
+            final String type = (String) outputType.get(OutputAVImpl.FIELD_TYPE);
             if (type != null) {
                 final Long oldValue = outputsCountByType.get(type);
                 final Long newValue = (oldValue == null) ? 1 : oldValue + 1;

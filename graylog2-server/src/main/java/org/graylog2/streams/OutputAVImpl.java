@@ -32,44 +32,52 @@ import java.util.Map;
 @JsonAutoDetect
 @CollectionName("outputs")
 public abstract class OutputAVImpl implements Output {
+    static final String FIELD_ID = "_id";
+    static final String FIELD_TITLE = "title";
+    static final String FIELD_TYPE = "type";
+    static final String FIELD_CONFIGURATION = "configuration";
+    static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    static final String FIELD_CREATED_AT = "created_at";
+    static final String FIELD_CONTENT_PACK = "content_pack";
+
     @Override
-    @JsonProperty("_id")
+    @JsonProperty(FIELD_ID)
     @ObjectId
     public abstract String getId();
 
     @Override
-    @JsonProperty("title")
+    @JsonProperty(FIELD_TITLE)
     public abstract String getTitle();
 
     @Override
-    @JsonProperty("type")
+    @JsonProperty(FIELD_TYPE)
     public abstract String getType();
 
     @Override
-    @JsonProperty("creator_user_id")
+    @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String getCreatorUserId();
 
     @Override
-    @JsonProperty("configuration")
+    @JsonProperty(FIELD_CONFIGURATION)
     public abstract Map<String, Object> getConfiguration();
 
     @Override
-    @JsonProperty("created_at")
+    @JsonProperty(FIELD_CREATED_AT)
     public abstract Date getCreatedAt();
 
     @Override
-    @JsonProperty("content_pack")
+    @JsonProperty(FIELD_CONTENT_PACK)
     @Nullable
     public abstract String getContentPack();
 
     @JsonCreator
-    public static OutputAVImpl create(@JsonProperty("_id") String _id,
-                                    @JsonProperty("title") String title,
-                                    @JsonProperty("type") String type,
-                                    @JsonProperty("creator_user_id") String creator_user_id,
-                                    @JsonProperty("configuration") Map<String, Object> configuration,
-                                    @JsonProperty("created_at") Date created_at,
-                                    @JsonProperty("content_pack") @Nullable String content_pack) {
+    public static OutputAVImpl create(@JsonProperty(FIELD_ID) String _id,
+                                    @JsonProperty(FIELD_TITLE) String title,
+                                    @JsonProperty(FIELD_TYPE) String type,
+                                    @JsonProperty(FIELD_CREATOR_USER_ID) String creator_user_id,
+                                    @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
+                                    @JsonProperty(FIELD_CREATED_AT) Date created_at,
+                                    @JsonProperty(FIELD_CONTENT_PACK) @Nullable String content_pack) {
         return new AutoValue_OutputAVImpl(_id, title, type, creator_user_id, configuration, created_at, content_pack);
 
     }

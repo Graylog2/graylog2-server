@@ -35,6 +35,8 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StreamListFingerprintTest {
@@ -53,7 +55,7 @@ public class StreamListFingerprintTest {
     @Mock
     Output output2;
 
-    private final String expectedFingerprint = "944fc39a2e1db9d13ef7c7323a670ebd426e37c1";
+    private final String expectedFingerprint = "40b3c1b8565f0ac2569a04ecae6e89808ef2d92a";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @Before
@@ -82,20 +84,22 @@ public class StreamListFingerprintTest {
         return new StreamRuleImpl(new ObjectId(String.format("%024d", id)), fields);
     }
 
-    private static Output makeOutput(int id, String field) {
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(OutputImpl.FIELD_TITLE, field);
-        fields.put(OutputImpl.FIELD_TYPE, "foo");
-        fields.put(OutputImpl.FIELD_CREATED_AT, DateTime.parse("2015-01-01T00:00:00Z").toDate());
-        fields.put(OutputImpl.FIELD_CREATOR_USER_ID, "user1");
-        return new OutputImpl(new ObjectId(String.format("%024d", id)), fields);
+    private static Output makeOutput(int id, String title) {
+        final Output result = mock(Output.class);
+        when(result.getTitle()).thenReturn(title);
+        when(result.getType()).thenReturn("foo");
+        when(result.getCreatedAt()).thenReturn(DateTime.parse("2015-01-01T00:00:00Z").toDate());
+        when(result.getCreatorUserId()).thenReturn("user1");
+        when(result.getId()).thenReturn(String.format("%024d", id));
+
+        return result;
     }
 
     @Test
     public void testGetFingerprint() throws Exception {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
-        assertEquals(fingerprint.getFingerprint(), expectedFingerprint);
+        assertEquals(expectedFingerprint, fingerprint.getFingerprint());
     }
 
     @Test
