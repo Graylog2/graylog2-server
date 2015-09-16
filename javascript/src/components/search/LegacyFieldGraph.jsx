@@ -60,8 +60,8 @@ var LegacyFieldGraph = React.createClass({
                                     <li><a href="#" className="selected" data-type="mean">mean</a></li>
                                     <li><a href="#" data-type="max">maximum</a></li>
                                     <li><a href="#" data-type="min">minimum</a></li>
-                                    <li><a href="#" data-type="total">total</a></li>
-                                    <li><a href="#" data-type="count">count</a></li>
+                                    <li><a href="#" data-type="total">sum</a></li>
+                                    <li><a href="#" data-type="count">total</a></li>
                                     <li><a href="#" data-type="cardinality">cardinality</a></li>
                                 </ul>
                             </li>
