@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -53,7 +54,7 @@ public class StreamListFingerprintTest {
     @Mock
     Output output2;
 
-    private final String expectedFingerprint = "944fc39a2e1db9d13ef7c7323a670ebd426e37c1";
+    private final String expectedFingerprint = "2d0436f6d02566c5ab9657f4cee95ab2287a5868";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @Before
@@ -82,20 +83,22 @@ public class StreamListFingerprintTest {
         return new StreamRuleImpl(new ObjectId(String.format("%024d", id)), fields);
     }
 
-    private static Output makeOutput(int id, String field) {
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(OutputImpl.FIELD_TITLE, field);
-        fields.put(OutputImpl.FIELD_TYPE, "foo");
-        fields.put(OutputImpl.FIELD_CREATED_AT, DateTime.parse("2015-01-01T00:00:00Z").toDate());
-        fields.put(OutputImpl.FIELD_CREATOR_USER_ID, "user1");
-        return new OutputImpl(new ObjectId(String.format("%024d", id)), fields);
+    private static Output makeOutput(int id, String title) {
+        return OutputImpl.create(
+                String.format("%024d", id),
+                title,
+                "foo",
+                "user1",
+                Collections.<String, Object>emptyMap(),
+                DateTime.parse("2015-01-01T00:00:00Z").toDate(),
+                null);
     }
 
     @Test
     public void testGetFingerprint() throws Exception {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
-        assertEquals(fingerprint.getFingerprint(), expectedFingerprint);
+        assertEquals(expectedFingerprint, fingerprint.getFingerprint());
     }
 
     @Test

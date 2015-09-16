@@ -410,20 +410,21 @@ public class BundleImporter {
     private void createOutputs(final String bundleId, final Set<Output> outputs, final String userName)
             throws ValidationException {
         for (final Output outputDescription : outputs) {
-            final OutputImpl output = createOutput(bundleId, outputDescription, userName);
+            final org.graylog2.plugin.streams.Output output = createOutput(bundleId, outputDescription, userName);
             createdOutputs.put(output.getId(), output);
         }
     }
 
-    private OutputImpl createOutput(final String bundleId, final Output outputDescription, final String userName)
+    private org.graylog2.plugin.streams.Output createOutput(final String bundleId, final Output outputDescription, final String userName)
             throws ValidationException {
         final String referenceId = outputDescription.getId();
-        final OutputImpl output = (OutputImpl) outputService.create(new OutputImpl(
+        final org.graylog2.plugin.streams.Output output = outputService.create(OutputImpl.create(
+                outputDescription.getId(),
                 outputDescription.getTitle(),
                 outputDescription.getType(),
+                userName,
                 outputDescription.getConfiguration(),
                 Tools.iso8601().toDate(),
-                userName,
                 bundleId));
 
         if (!isNullOrEmpty(referenceId)) {
