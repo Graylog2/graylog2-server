@@ -55,7 +55,6 @@ public class ConfigurationBundle {
     @NotNull
     private Set<Dashboard> dashboards = Collections.emptySet();
     @JsonProperty
-    @NotNull
     private Set<GrokPattern> grokPatterns = Collections.emptySet();
 
     public String getId() {
