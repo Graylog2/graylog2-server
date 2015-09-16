@@ -16,108 +16,110 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
+import org.mongojack.DBQuery;
+import org.mongojack.DBUpdate;
+import org.mongojack.JacksonDBCollection;
+import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OutputServiceImpl extends PersistedServiceImpl implements OutputService {
+public class OutputServiceImpl implements OutputService {
+    private final JacksonDBCollection<OutputImpl, String> coll;
+    private final DBCollection dbCollection;
     private final StreamService streamService;
     private final OutputRegistry outputRegistry;
 
     @Inject
     public OutputServiceImpl(MongoConnection mongoConnection,
+                             MongoJackObjectMapperProvider mapperProvider,
                              StreamService streamService,
                              OutputRegistry outputRegistry) {
-        super(mongoConnection);
         this.streamService = streamService;
+        final String collectionName = OutputImpl.class.getAnnotation(CollectionName.class).value();
+        this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
+        this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
         this.outputRegistry = outputRegistry;
     }
 
     @Override
     public Output load(String streamOutputId) throws NotFoundException {
-        DBObject o = get(OutputImpl.class, streamOutputId);
-
-        if (o == null) {
-            throw new NotFoundException("Output <" + streamOutputId + "> not found!");
+        final Output output = coll.findOneById(streamOutputId);
+        if (output == null) {
+            throw new NotFoundException("Couldn't find output with id " + streamOutputId);
         }
 
-        return new OutputImpl((ObjectId) o.get("_id"), o.toMap());
+        return output;
     }
 
     @Override
     public Set<Output> loadAll() {
-        return loadAll(new HashMap<String, Object>());
+        return toAbstractSetType(coll.find().toArray());
     }
 
-    protected Set<Output> loadAll(Map<String, Object> additionalQueryOpts) {
-        Set<Output> outputs = new HashSet<>();
+    private Set<Output> toAbstractSetType(List<OutputImpl> outputs) {
+        final Set<Output> result = Sets.newHashSet();
+        result.addAll(outputs);
 
-        DBObject query = new BasicDBObject();
-
-        // putAll() is not working with BasicDBObject.
-        for (Map.Entry<String, Object> o : additionalQueryOpts.entrySet()) {
-            query.put(o.getKey(), o.getValue());
-        }
-
-        List<DBObject> results = query(OutputImpl.class, query);
-        for (DBObject o : results)
-            outputs.add(new OutputImpl((ObjectId) o.get("_id"), o.toMap()));
-
-        return outputs;
+        return result;
     }
 
     @Override
     public Output create(Output request) throws ValidationException {
-        OutputImpl impl = getImplOrFail(request);
-        final String id = save(impl);
-        impl.setId(id);
-        return request;
+        final OutputImpl outputImpl = implOrFail(request);
+        final WriteResult<OutputImpl, String> writeResult = coll.save(outputImpl);
+
+        return writeResult.getSavedObject();
     }
 
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
-        return create(new OutputImpl(request.title(), request.type(), request.configuration(),
-                Tools.iso8601().toDate(), userId, request.contentPack()));
+        return create(OutputImpl.create(new ObjectId().toHexString(), request.title(), request.type(), userId, request.configuration(),
+                Tools.iso8601().toDate(), request.contentPack()));
     }
 
     @Override
-    public void destroy(Output output) throws NotFoundException {
-        final OutputImpl impl = getImplOrFail(output);
-        streamService.removeOutputFromAllStreams(output);
-        outputRegistry.removeOutput(output);
-        super.destroy(impl);
+    public void destroy(Output model) throws NotFoundException {
+        coll.removeById(model.getId());
+        outputRegistry.removeOutput(model);
+        streamService.removeOutputFromAllStreams(model);
     }
 
     @Override
     public Output update(String id, Map<String, Object> deltas) {
-        return null;
+        DBUpdate.Builder update = new DBUpdate.Builder();
+        for (Map.Entry<String, Object> fields : deltas.entrySet())
+            update = update.set(fields.getKey(), fields.getValue());
+
+        return coll.findAndModify(DBQuery.is("_id", id), update);
     }
 
     @Override
     public long count() {
-        return totalCount(OutputImpl.class);
+        return coll.count();
     }
 
     @Override
     public Map<String, Long> countByType() {
-        final DBCursor outputTypes = collection(OutputImpl.class).find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
+        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
 
         final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());
         for (DBObject outputType : outputTypes) {
@@ -132,12 +134,13 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
         return outputsCountByType;
     }
 
-    OutputImpl getImplOrFail(Output output) {
+    private OutputImpl implOrFail(Output output) {
+        final OutputImpl outputImpl;
         if (output instanceof OutputImpl) {
-            final OutputImpl impl = (OutputImpl) output;
-            return impl;
+            outputImpl = (OutputImpl) output;
+            return outputImpl;
         } else {
-            throw new IllegalArgumentException("Passed object must be of OutputImpl class, not " + output.getClass());
+            throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + output.getClass());
         }
     }
 }
