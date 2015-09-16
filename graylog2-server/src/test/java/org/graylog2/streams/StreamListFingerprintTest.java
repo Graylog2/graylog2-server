@@ -20,6 +20,7 @@ package org.graylog2.streams;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -55,7 +56,7 @@ public class StreamListFingerprintTest {
     @Mock
     Output output2;
 
-    private final String expectedFingerprint = "40b3c1b8565f0ac2569a04ecae6e89808ef2d92a";
+    private final String expectedFingerprint = "2d0436f6d02566c5ab9657f4cee95ab2287a5868";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @Before
@@ -85,14 +86,14 @@ public class StreamListFingerprintTest {
     }
 
     private static Output makeOutput(int id, String title) {
-        final Output result = mock(Output.class);
-        when(result.getTitle()).thenReturn(title);
-        when(result.getType()).thenReturn("foo");
-        when(result.getCreatedAt()).thenReturn(DateTime.parse("2015-01-01T00:00:00Z").toDate());
-        when(result.getCreatorUserId()).thenReturn("user1");
-        when(result.getId()).thenReturn(String.format("%024d", id));
-
-        return result;
+        return OutputAVImpl.create(
+                String.format("%024d", id),
+                title,
+                "foo",
+                "user1",
+                Collections.<String, Object>emptyMap(),
+                DateTime.parse("2015-01-01T00:00:00Z").toDate(),
+                null);
     }
 
     @Test
