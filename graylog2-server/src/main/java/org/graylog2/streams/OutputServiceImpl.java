@@ -42,21 +42,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OutputServiceMJImpl implements OutputService {
-    private final JacksonDBCollection<OutputAVImpl, String> coll;
+public class OutputServiceImpl implements OutputService {
+    private final JacksonDBCollection<OutputImpl, String> coll;
     private final DBCollection dbCollection;
     private final StreamService streamService;
     private final OutputRegistry outputRegistry;
 
     @Inject
-    public OutputServiceMJImpl(MongoConnection mongoConnection,
-                               MongoJackObjectMapperProvider mapperProvider,
-                               StreamService streamService,
-                               OutputRegistry outputRegistry) {
+    public OutputServiceImpl(MongoConnection mongoConnection,
+                             MongoJackObjectMapperProvider mapperProvider,
+                             StreamService streamService,
+                             OutputRegistry outputRegistry) {
         this.streamService = streamService;
-        final String collectionName = OutputAVImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = OutputImpl.class.getAnnotation(CollectionName.class).value();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        this.coll = JacksonDBCollection.wrap(dbCollection, OutputAVImpl.class, String.class, mapperProvider.get());
+        this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
         this.outputRegistry = outputRegistry;
     }
 
@@ -75,7 +75,7 @@ public class OutputServiceMJImpl implements OutputService {
         return toAbstractSetType(coll.find().toArray());
     }
 
-    private Set<Output> toAbstractSetType(List<OutputAVImpl> outputs) {
+    private Set<Output> toAbstractSetType(List<OutputImpl> outputs) {
         final Set<Output> result = Sets.newHashSet();
         result.addAll(outputs);
 
@@ -84,15 +84,15 @@ public class OutputServiceMJImpl implements OutputService {
 
     @Override
     public Output create(Output request) throws ValidationException {
-        final OutputAVImpl outputImpl = implOrFail(request);
-        final WriteResult<OutputAVImpl, String> writeResult = coll.save(outputImpl);
+        final OutputImpl outputImpl = implOrFail(request);
+        final WriteResult<OutputImpl, String> writeResult = coll.save(outputImpl);
 
         return writeResult.getSavedObject();
     }
 
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
-        return create(OutputAVImpl.create(new ObjectId().toHexString(), request.title(), request.type(), userId, request.configuration(),
+        return create(OutputImpl.create(new ObjectId().toHexString(), request.title(), request.type(), userId, request.configuration(),
                 Tools.iso8601().toDate(), request.contentPack()));
     }
 
@@ -119,11 +119,11 @@ public class OutputServiceMJImpl implements OutputService {
 
     @Override
     public Map<String, Long> countByType() {
-        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputAVImpl.FIELD_TYPE, 1));
+        final DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
 
         final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());
         for (DBObject outputType : outputTypes) {
-            final String type = (String) outputType.get(OutputAVImpl.FIELD_TYPE);
+            final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
             if (type != null) {
                 final Long oldValue = outputsCountByType.get(type);
                 final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
@@ -134,10 +134,10 @@ public class OutputServiceMJImpl implements OutputService {
         return outputsCountByType;
     }
 
-    private OutputAVImpl implOrFail(Output output) {
-        final OutputAVImpl outputImpl;
-        if (output instanceof OutputAVImpl) {
-            outputImpl = (OutputAVImpl) output;
+    private OutputImpl implOrFail(Output output) {
+        final OutputImpl outputImpl;
+        if (output instanceof OutputImpl) {
+            outputImpl = (OutputImpl) output;
             return outputImpl;
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + output.getClass());

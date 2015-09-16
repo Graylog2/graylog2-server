@@ -84,7 +84,7 @@ public class StreamListFingerprintTest {
     }
 
     private static Output makeOutput(int id, String title) {
-        return OutputAVImpl.create(
+        return OutputImpl.create(
                 String.format("%024d", id),
                 title,
                 "foo",

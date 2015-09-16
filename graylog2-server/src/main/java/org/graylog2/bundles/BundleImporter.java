@@ -48,7 +48,7 @@ import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.streams.OutputAVImpl;
+import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
@@ -418,7 +418,7 @@ public class BundleImporter {
     private org.graylog2.plugin.streams.Output createOutput(final String bundleId, final Output outputDescription, final String userName)
             throws ValidationException {
         final String referenceId = outputDescription.getId();
-        final org.graylog2.plugin.streams.Output output = outputService.create(OutputAVImpl.create(
+        final org.graylog2.plugin.streams.Output output = outputService.create(OutputImpl.create(
                 outputDescription.getId(),
                 outputDescription.getTitle(),
                 outputDescription.getType(),
