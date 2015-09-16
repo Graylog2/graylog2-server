@@ -19,10 +19,14 @@ package org.graylog.plugins.netflow.flows;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.graylog2.plugin.journal.RawMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
 public class NetFlowParser {
+    private static final Logger LOG = LoggerFactory.getLogger(NetFlowParser.class);
+
     public static NetFlowPacket parse(RawMessage rawMessage) throws FlowException {
         final InetSocketAddress sender = rawMessage.getRemoteAddress() != null ? rawMessage.getRemoteAddress().getInetSocketAddress() : null;
         final ByteBuf buf = Unpooled.wrappedBuffer(rawMessage.getPayload());
@@ -31,6 +35,11 @@ public class NetFlowParser {
             case 5:
                 return NetFlowV5Packet.parse(sender, buf);
             default:
+                final RawMessage.SourceNode sourceNode = rawMessage.getSourceNodes().get(rawMessage.getSourceNodes().size() - 1);
+                final String inputId = sourceNode == null ? "<unknown>" : sourceNode.inputId;
+                LOG.warn("Unsupported NetFlow version {} on input {} (source: {})", buf.getUnsignedShort(0),
+                        inputId,
+                        rawMessage.getRemoteAddress().getInetSocketAddress());
                 return null;
         }
     }
