@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.periodical.AlarmCallbacksMigrationPeriodical;
 import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
@@ -62,5 +63,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(PurgeExpiredCollectorsThread.class);
         periodicalBinder.addBinding().to(IndexRangesMigrationPeriodical.class);
         periodicalBinder.addBinding().to(UserPermissionMigrationPeriodical.class);
+        periodicalBinder.addBinding().to(AlarmCallbacksMigrationPeriodical.class);
     }
 }
