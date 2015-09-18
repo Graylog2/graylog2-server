@@ -33,7 +33,7 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -81,11 +81,9 @@ public class Messages {
         this.deflectorName = Deflector.buildName(configuration.getIndexPrefix());
     }
 
-    public ResultMessage get(String messageId, String index) throws IndexMissingException, DocumentNotFoundException {
-        GetRequestBuilder grb = new GetRequestBuilder(c, index);
-        grb.setId(messageId);
-
-        GetResponse r = c.get(grb.request()).actionGet();
+    public ResultMessage get(String messageId, String index) throws DocumentNotFoundException {
+        final GetRequest request = c.prepareGet(index, IndexMapping.TYPE_MESSAGE, messageId).request();
+        final GetResponse r = c.get(request).actionGet();
 
         if (!r.isExists()) {
             throw new DocumentNotFoundException();
