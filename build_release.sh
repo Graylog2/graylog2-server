@@ -30,7 +30,7 @@ pushd javascript
 
 # Install same npm version as we use in travis
 rm -rf ./node_modules
-npm install --no-spin npm@latest
+npm install --no-spin npm@latest-2
 
 echo -n "Using npm "
 ./node_modules/.bin/npm --version
