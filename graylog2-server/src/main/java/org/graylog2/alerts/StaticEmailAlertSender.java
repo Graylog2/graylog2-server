@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
@@ -42,7 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -88,7 +88,7 @@ public class StaticEmailAlertSender implements AlertSender {
         }
 
         final Email email = new SimpleEmail();
-        email.setCharset(StandardCharsets.UTF_8.name());
+        email.setCharset(EmailConstants.UTF_8);
 
         if (Strings.isNullOrEmpty(configuration.getHostname())) {
             throw new TransportConfigurationException("No hostname configured for email transport while trying to send alert email!");
