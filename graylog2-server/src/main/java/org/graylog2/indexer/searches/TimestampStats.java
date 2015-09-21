@@ -22,16 +22,13 @@ import org.joda.time.DateTimeZone;
 
 @AutoValue
 public abstract class TimestampStats {
-    public static final TimestampStats EMPTY =
-            create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC));
+    public static final TimestampStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC));
 
     public abstract DateTime min();
 
     public abstract DateTime max();
 
-    public abstract DateTime avg();
-
-    public static TimestampStats create(DateTime min, DateTime max, DateTime avg) {
-        return new AutoValue_TimestampStats(min, max, avg);
+    public static TimestampStats create(DateTime min, DateTime max) {
+        return new AutoValue_TimestampStats(min, max);
     }
 }
