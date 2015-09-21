@@ -175,7 +175,7 @@ $(document).ready(function () {
                 lines.push(JSON.stringify(opts));
                 $graphContainer.attr("data-lines", lines);
 
-                $(".type-description", $graphContainer).text("[" + opts.valuetype + "] " + opts.field + ", ");
+                $(".type-description", $graphContainer).text("[" + getReadableFieldChartStatisticalFunction(opts.valuetype) + "] " + opts.field + ", ");
 
                 // Do not add from time when we search in all messages
                 var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
@@ -194,7 +194,7 @@ $(document).ready(function () {
                         data: data.values,
                         color: '#26ADE4',
                         gl2_query: opts.query,
-                        valuetype: opts.valuetype,
+                        valuetype: getReadableFieldChartStatisticalFunction(opts.valuetype),
                         field: opts.field
                     }]
                 });
@@ -456,7 +456,7 @@ $(document).ready(function () {
                 name: "value" + i,
                 color: lineColor,
                 gl2_query: query,
-                valuetype: series.valuetype,
+                valuetype: getReadableFieldChartStatisticalFunction(series.valuetype),
                 field: series.field
             };
 
@@ -476,3 +476,15 @@ $(document).ready(function () {
         targetChart.render();
     }
 });
+
+function getReadableFieldChartStatisticalFunction(statisticalFunction) {
+    "use strict";
+    switch (statisticalFunction) {
+        case "count":
+            return "total";
+        case "total":
+            return "sum";
+        default:
+            return statisticalFunction;
+    }
+}

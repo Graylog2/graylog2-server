@@ -1,3 +1,5 @@
+/* global getReadableFieldChartStatisticalFunction */
+
 'use strict';
 
 var React = require('react');
@@ -85,7 +87,7 @@ var WidgetCreationModal = React.createClass({
                 break;
             case Widget.Type.FIELD_CHART:
                 if (this.props.configuration['field'] !== undefined && this.props.configuration['valuetype'] !== undefined) {
-                    title = this.props.configuration['field'] + " " + this.props.configuration['valuetype'] + " value graph";
+                    title = this.props.configuration['field'] + " " + getReadableFieldChartStatisticalFunction(this.props.configuration['valuetype']) + " value graph";
                 } else {
                     title = "field graph";
                 }

@@ -1,4 +1,4 @@
-/* global graphHelper, momentHelper */
+/* global graphHelper, momentHelper, getReadableFieldChartStatisticalFunction */
 
 'use strict';
 
@@ -131,7 +131,7 @@ var GraphVisualization = React.createClass({
             formattedValue = d3.format(".2r")(d.y);
         }
 
-        var valueText = this.props.config.valuetype + " " + this.props.config.field + ": " + formattedValue + "<br>";
+        var valueText = getReadableFieldChartStatisticalFunction(this.props.config.valuetype) + " " + this.props.config.field + ": " + formattedValue + "<br>";
         var keyText = "<span class=\"date\">" + formattedKey + "</span>";
 
         return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";

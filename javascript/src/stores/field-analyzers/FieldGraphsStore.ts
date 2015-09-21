@@ -48,6 +48,15 @@ interface CreateStackedChartWidgetRequestParams {
 }
 
 class FieldGraphsStore {
+    static FUNCTIONS = Immutable.OrderedMap<string, string>({
+        count: 'Total',
+        mean: 'Mean',
+        min: 'Minimum',
+        max: 'Maximum',
+        total: 'Sum',
+        cardinality: 'Cardinality',
+    });
+
     private renderedGraphs: Immutable.Set<string>;
     private _fieldGraphs: Immutable.Map<string, Object>;
     private _stackedGraphs: Immutable.Map<string, Immutable.Set<string>>;

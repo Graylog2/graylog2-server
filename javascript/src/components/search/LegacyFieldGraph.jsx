@@ -1,3 +1,5 @@
+/* global getReadableFieldChartStatisticalFunction */
+
 'use strict';
 
 var React = require('react');
@@ -57,12 +59,12 @@ var LegacyFieldGraph = React.createClass({
                                 <a href="#">Value</a>
 
                                 <ul className="dropdown-menu valuetype-selector">
-                                    <li><a href="#" className="selected" data-type="mean">mean</a></li>
-                                    <li><a href="#" data-type="max">maximum</a></li>
-                                    <li><a href="#" data-type="min">minimum</a></li>
-                                    <li><a href="#" data-type="total">total</a></li>
-                                    <li><a href="#" data-type="count">count</a></li>
-                                    <li><a href="#" data-type="cardinality">cardinality</a></li>
+                                    <li><a href="#" className="selected" data-type="mean">{getReadableFieldChartStatisticalFunction('mean')}</a></li>
+                                    <li><a href="#" data-type="max">{getReadableFieldChartStatisticalFunction('max')}</a></li>
+                                    <li><a href="#" data-type="min">{getReadableFieldChartStatisticalFunction('min')}</a></li>
+                                    <li><a href="#" data-type="total">{getReadableFieldChartStatisticalFunction('total')}</a></li>
+                                    <li><a href="#" data-type="count">{getReadableFieldChartStatisticalFunction('count')}</a></li>
+                                    <li><a href="#" data-type="cardinality">{getReadableFieldChartStatisticalFunction('cardinality')}</a></li>
                                 </ul>
                             </li>
 

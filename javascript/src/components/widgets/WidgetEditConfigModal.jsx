@@ -6,6 +6,7 @@ var React = require('react');
 var Input = require('react-bootstrap').Input;
 
 var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
+var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 
 var WidgetEditConfigModal = React.createClass({
@@ -251,10 +252,10 @@ var WidgetEditConfigModal = React.createClass({
                            defaultValue={this.state.config["valuetype"]}
                            onChange={this._onStatisticalFunctionChange("valuetype")}
                            help="Statistical function applied to the data.">
-                        {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                        {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
                             return (
                                 <option key={statFunction} value={statFunction}>
-                                    {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                    {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
                                 </option>
                             );
                         })}
@@ -283,10 +284,10 @@ var WidgetEditConfigModal = React.createClass({
                                    defaultValue={series["statistical_function"]}
                                    onChange={this._onSeriesChange(seriesNo, "statistical_function")}
                                    help="Statistical function applied to the series.">
-                                {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+                                {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
                                     return (
                                         <option key={statFunction} value={statFunction}>
-                                            {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                                            {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
                                         </option>
                                     );
                                 })}
