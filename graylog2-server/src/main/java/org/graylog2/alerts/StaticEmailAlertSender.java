@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -87,6 +88,8 @@ public class StaticEmailAlertSender implements AlertSender {
         }
 
         final Email email = new SimpleEmail();
+        email.setCharset(StandardCharsets.UTF_8.name());
+
         if (Strings.isNullOrEmpty(configuration.getHostname())) {
             throw new TransportConfigurationException("No hostname configured for email transport while trying to send alert email!");
         } else {
