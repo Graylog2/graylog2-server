@@ -17,10 +17,7 @@
 package org.graylog2.alarmcallbacks;
 
 import com.google.common.collect.Lists;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
@@ -36,16 +33,13 @@ import java.util.Date;
 import java.util.List;
 
 public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackConfigurationService {
-    private final static String DUPLICATED_ID = "id";
-
     private final JacksonDBCollection<AlarmCallbackConfigurationAVImpl, String> coll;
-    private final DBCollection dbCollection;
 
     @Inject
     public AlarmCallbackConfigurationServiceMJImpl(MongoConnection mongoConnection,
                                                    MongoJackObjectMapperProvider mapperProvider) {
         final String collectionName = AlarmCallbackConfigurationAVImpl.class.getAnnotation(CollectionName.class).value();
-        this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
+        final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, AlarmCallbackConfigurationAVImpl.class, String.class, mapperProvider.get());
     }
 
@@ -99,14 +93,5 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type AlarmCallbackConfigurationAVImpl, not " + callback.getClass());
         }
-    }
-
-    // Remove duplicated ID stored in `id` field to avoid MongoJack fetching it instead of `_id`.
-    // See https://github.com/Graylog2/graylog2-server/issues/1428 for more details.
-    public void migrate() {
-        final DBObject selection = QueryBuilder.start("id").exists(true).get();
-        final DBObject modifications = new BasicDBObject("$unset", new BasicDBObject(DUPLICATED_ID, ""));
-
-        this.dbCollection.updateMulti(selection, modifications);
     }
 }
