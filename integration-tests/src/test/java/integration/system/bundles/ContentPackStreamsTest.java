@@ -26,28 +26,37 @@ import org.junit.Test;
 import java.net.URI;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 @RequiresVersion(">=1.2.0")
 @RequiresAuthentication
 public class ContentPackStreamsTest extends BaseRestTest {
 
-    URI uri;
-
     @Test
-    public void createContentPackWithStreams() {
+    public void createAndShowAndApplyAndDeleteTest() {
+        final URI uri = createContentPackWithStreams();
+        showContentPack(uri);
+        applyContentPack(uri);
+        deleteContentPack(uri);
+    }
+
+    private URI createContentPackWithStreams() {
         final ValidatableResponse validatableResponse = given().when()
                 .body(jsonResourceForMethod()).post("/system/bundles")
                 .then()
                 .statusCode(201)
                 .statusLine(notNullValue());
 
-        uri = URI.create(validatableResponse.extract().header(HttpHeaders.LOCATION));
+        final String locationHeader = validatableResponse.extract().header(HttpHeaders.LOCATION);
+        final URI uri = URI.create(locationHeader);
+
+        assertThat(uri.getPath()).startsWith("/system/bundles");
+
+        return uri;
     }
 
-    @Test
-    public void showContentPack() {
-        createContentPackWithStreams();
+    private void showContentPack(URI uri) {
         given().when()
                 .get(uri)
                 .then()
@@ -56,9 +65,7 @@ public class ContentPackStreamsTest extends BaseRestTest {
                 .body(".", containsKeys("id", "name", "description", "category", "streams"));
     }
 
-    @Test
-    public void applyContentPack() {
-        createContentPackWithStreams();
+    private void applyContentPack(URI uri) {
         final URI applyUri = URI.create(uri.toASCIIString() + "/apply");
         given().when()
                 .post(applyUri)
@@ -67,9 +74,7 @@ public class ContentPackStreamsTest extends BaseRestTest {
                 .statusLine(notNullValue());
     }
 
-    @Test
-    public void deleteContentPack() {
-        createContentPackWithStreams();
+    private void deleteContentPack(URI uri) {
         given().when()
                 .delete(uri)
                 .then()
