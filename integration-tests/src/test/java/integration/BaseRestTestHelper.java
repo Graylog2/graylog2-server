@@ -57,6 +57,32 @@ public class BaseRestTestHelper {
      */
 
     public static ResponseAwareMatcher<Response> containsAllKeys(String... keys) {
+        return new StrictKeysPresentMatcher(keys);
+    }
+
+    /**
+     * Returns a {@link com.jayway.restassured.matcher.ResponseAwareMatcher} which checks that the given keys are present.
+     * Given this JSON
+     * <pre>
+     *     {
+     *      "version": "2.0.0",
+     *      "codename": "foo"
+     *     }
+     * </pre>
+     * to validate that it contains the key <code>version</code>, use
+     * <pre>
+     *     given()
+     *        .when()
+     *          .get("/")
+     *        .then()
+     *          .body(".", containsKeys("version"));
+     * </pre>
+     * If any of the keys are missing from the JSON document, the matcher will fail.
+     * @param keys the keys that need to be present
+     * @return matcher
+     */
+
+    public static ResponseAwareMatcher<Response> containsKeys(String... keys) {
         return new KeysPresentMatcher(keys);
     }
 
@@ -101,6 +127,43 @@ public class BaseRestTestHelper {
     private static class KeysPresentMatcher extends ResponseAwareMatcher<Response> {
         private final Set<String> keys = Sets.newHashSet();
         public KeysPresentMatcher(String... keys) {
+            Collections.addAll(this.keys, keys);
+        }
+
+        @Override
+        public Matcher<?> matcher(Response response) throws Exception {
+            return new BaseMatcher<Response>() {
+
+                private Sets.SetView difference;
+
+                @Override
+                public boolean matches(Object item) {
+                    if (item instanceof Map) {
+                        final Set keySet = ((Map) item).keySet();
+                        difference = Sets.difference(keys, keySet);
+                        return difference.isEmpty();
+                    }
+
+                    return false;
+                }
+
+                @Override
+                public void describeTo(Description description) {
+                    description.appendText("JSON contains keys: ").appendValueList("[", ", ", "]", keys);
+                }
+
+                @Override
+                public void describeMismatch(Object item, Description description) {
+                    super.describeMismatch(item, description);
+                    description.appendValueList(" has extra or missing keys: [", ", ", "]", difference);
+                }
+            };
+        }
+    }
+
+    private static class StrictKeysPresentMatcher extends ResponseAwareMatcher<Response> {
+        private final Set<String> keys = Sets.newHashSet();
+        public StrictKeysPresentMatcher(String... keys) {
             Collections.addAll(this.keys, keys);
         }
 
