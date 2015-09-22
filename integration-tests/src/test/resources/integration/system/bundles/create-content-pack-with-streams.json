@@ -1,0 +1,24 @@
+{
+  "name": "Streams",
+  "description": "Test streams",
+  "category": "test",
+  "streams": [
+    {
+      "title": "Default stream matching type",
+      "description": "Default stream matching type",
+      "disabled": true
+    },
+    {
+      "title": "OR stream matching type",
+      "description": "OR stream matching type",
+      "matching_type": "OR",
+      "disabled": true
+    },
+    {
+      "title": "AND stream matching type",
+      "description": "AND stream matching type",
+      "matching_type": "AND",
+      "disabled": true
+    }
+  ]
+}
