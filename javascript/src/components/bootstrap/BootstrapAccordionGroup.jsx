@@ -9,7 +9,7 @@ var BootstrapAccordionGroup = React.createClass({
 
         if (this.props.name) {
             name = this.props.name;
-            id = name.replace(/ /g, "_").toLowerCase();
+            id = name.replace(/[^0-9a-zA-Z]/g, "-").toLowerCase();
         }
 
         return (
