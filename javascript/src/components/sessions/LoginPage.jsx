@@ -1,37 +1,35 @@
 import React from 'react';
-import { Row, Input, Button, ButtonInput } from 'react-bootstrap';
-import SessionActions from 'actions/SessionActions';
+import Reflux from 'reflux';
+import { Row, Input, Button, ButtonInput, Alert } from 'react-bootstrap';
+import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 
 const LoginPage = React.createClass({
-  getInitialState() {
-    return {
-      username: '',
-      password: '',
-    };
-  },
+  mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
+
   onSignInClicked() {
-    SessionActions.login(this.state.username, this.state.password, 'localhost:9000');
-  },
-  onChangeUsername(e) {
-    this.setState({username: e.target.value});
-  },
-  onChangePassword(e) {
-    this.setState({password: e.target.value});
+    const username = this.refs.username.getValue();
+    const password = this.refs.password.getValue();
+    SessionActions.login.triggerPromise(username, password, 'localhost:9000').catch((error) => {
+      this.setState({lastError: error.message});
+    });
   },
   render() {
+    const alert = this.formatLastError(this.state.lastError);
     return (
       <div className="container" id="login-box">
           <Row>
               <div className="col-md-4 col-md-offset-4 well" id="login-box-content">
                   <legend><i className="fa fa-group"></i> Welcome to Graylog</legend>
 
+                  {alert}
+
                   <div className="form-group">
-                      <Input type="text" placeholder="Username" value={this.state.username} onChange={this.onChangeUsername} autoFocus />
+                      <Input ref="username" type="text" placeholder="Username" autoFocus />
                   </div>
 
                   <div className="form-group">
-                      <Input type="password" placeholder="Password" value={this.state.password} onChange={this.onChangePassword} />
+                      <Input ref="password" type="password" placeholder="Password" />
                   </div>
 
                   <ButtonInput type="submit" bsStyle="info" onClick={this.onSignInClicked}>Sign in</ButtonInput>
@@ -47,6 +45,17 @@ const LoginPage = React.createClass({
           </Row>
       </div>
     );
+  },
+  formatLastError(error) {
+    if (error) {
+      return (<Alert bsStyle="danger">
+        <a className="close" onClick={this.resetLastError}>×</a>{error}
+      </Alert>);
+    }
+    return null;
+  },
+  resetLastError() {
+    this.setState({lastError: undefined});
   },
 });
 

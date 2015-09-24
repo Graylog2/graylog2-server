@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import SessionActions from 'actions/SessionActions';
+import SessionActions from 'actions/sessions/SessionActions';
 import { fetch, fetchUnauthenticated } from 'logic/rest/FetchProvider';
 
 const SessionStore = Reflux.createStore({
@@ -18,7 +18,7 @@ const SessionStore = Reflux.createStore({
   },
 
   login(username, password, host) {
-    fetchUnauthenticated(this.sourceUrl, {
+    const promise = fetchUnauthenticated(this.sourceUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,28 +31,31 @@ const SessionStore = Reflux.createStore({
       }),
     })
       .then((response) => { return response.json(); })
+      .catch((error) => {
+        console.log(error);
+      })
       .then((sessionInfo) => {
-        this.sessionId = sessionInfo.session_id;
-        SessionActions.loggedIn(this.sessionId);
+        return sessionInfo.session_id;
       });
+
+    SessionActions.login.promise(promise);
   },
   logout(sessionId) {
-    fetch(this.sourceUrl + '/' + sessionId, {
+    const promise = fetch(this.sourceUrl + '/' + sessionId, {
       method: 'DELETE',
-    })
-      .then(() => {
-        SessionActions.loggedOut();
-      });
+    });
+
+    SessionActions.logout.promise(promise);
   },
 
-  loggedIn(sessionId) {
+  loginCompleted(sessionId) {
     localStorage.setItem('sessionId', sessionId);
     this.sessionId = sessionId;
     this.trigger({sessionId: this.sessionId});
   },
-  loggedOut() {
+  logoutCompleted() {
     delete localStorage.sessionId;
-    this.sessionId = null;
+    this.sessionId = undefined;
     this.trigger({sessionId: this.sessionId});
   },
   isLoggedIn() {

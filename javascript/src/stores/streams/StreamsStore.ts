@@ -5,7 +5,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
-const FetchProvider = require('logic/rest/FetchProvider');
+const { fetchJson } = require('logic/rest/FetchProvider');
 
 interface Stream {
     id: string;
@@ -29,7 +29,7 @@ class StreamsStore {
 
     listStreams() {
         var url = "http://localhost:12900/streams";
-        var promise = FetchProvider(url);
+        var promise = fetchJson(url);
         /*promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading streams failed with status: " + errorThrown,
                 "Could not load streams");

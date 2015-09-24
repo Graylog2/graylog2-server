@@ -3,7 +3,7 @@ import React from 'react';
 import { NavDropdown } from 'react-bootstrap';
 import { MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import SessionActions from 'actions/SessionActions';
+import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 
 const UserMenu = React.createClass({
