@@ -5,6 +5,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
+const FetchProvider = require('logic/rest/FetchProvider');
 
 interface StreamRuleType {
     id: number;
@@ -27,12 +28,16 @@ class StreamRulesStore {
     private callbacks: Array<Callback> = [];
 
     types(callback: ((streamRuleTypes: Array<StreamRuleType>) => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
+        /*var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Stream Rule Types failed with status: " + errorThrown,
                 "Could not retrieve Stream Rule Types");
         };
 
-        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);
+        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);*/
+        var url = "http://localhost:12900/streams/rules/types";
+        var promise = FetchProvider(url);
+
+        return promise;
     }
     list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {

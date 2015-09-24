@@ -136,7 +136,6 @@ class MetricsStore {
 
         this.sock.send(JSON.stringify({"command":"metrics_subscribe", metrics:request.metricNames, nodeId: request.nodeId }));
     }
-
 }
 
 export = MetricsStore;

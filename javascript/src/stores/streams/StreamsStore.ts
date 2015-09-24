@@ -5,6 +5,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
+const FetchProvider = require('logic/rest/FetchProvider');
 
 interface Stream {
     id: string;
@@ -27,12 +28,12 @@ class StreamsStore {
     private callbacks: Array<Callback> = [];
 
     listStreams() {
-        var url = jsRoutes.controllers.api.StreamsApiController.list().url;
-        var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        var url = "http://localhost:12900/streams";
+        var promise = FetchProvider(url);
+        /*promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading streams failed with status: " + errorThrown,
                 "Could not load streams");
-        });
+        });*/
         return promise;
     }
     load(callback: ((streams: Array<Stream>) => void)) {
@@ -41,7 +42,7 @@ class StreamsStore {
                 "Could not retrieve Streams");
         };
 
-        this.listStreams().done(callback).fail(failCallback);
+        this.listStreams().then(callback); //.fail(failCallback);
     }
     get(streamId: string, callback: ((stream: Stream) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -164,7 +165,7 @@ class StreamsStore {
         };
         $.ajax(config);
     }
-    onChange(callback: () => void) {
+    onChange(callback: Callback) {
         this.callbacks.push(callback);
     }
     _emitChange() {
