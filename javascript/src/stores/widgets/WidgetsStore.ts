@@ -2,8 +2,7 @@
 
 'use strict';
 
-declare
-var jsRoutes: any;
+declare var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
 

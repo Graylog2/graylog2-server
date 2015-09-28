@@ -4,8 +4,7 @@
 
 'use strict';
 
-declare
-var jsRoutes: any;
+declare var jsRoutes: any;
 
 import Immutable = require('immutable');
 var Qs = require('qs');

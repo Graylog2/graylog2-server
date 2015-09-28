@@ -2,10 +2,8 @@
 
 'use strict';
 
-declare
-var $: any;
-declare
-var jsRoutes: any;
+declare var $: any;
+declare var jsRoutes: any;
 
 import SearchStore = require('../search/SearchStore');
 import UserNotification = require('../../util/UserNotification');

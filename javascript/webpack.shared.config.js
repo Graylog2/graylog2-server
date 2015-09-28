@@ -14,7 +14,7 @@ var webpackConfig = {
         loaders: [
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader?stage=0'], exclude: /node_modules|\.node_cache/ },
-            { test: /\.ts$/, loader: 'awesome-typescript-loader?emitRequireType=false&library=es6', exclude: /node_modules|\.node_cache/ }
+            { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ }
         ]
     },
     resolve: {

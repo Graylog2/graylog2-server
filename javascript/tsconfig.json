@@ -1,6 +1,7 @@
 {
   "compilerOptions" : {
-    "module" : "system",
+    "target": "es5",
     "sourceMap" : true
-  }
+  },
+  "files": []
 }

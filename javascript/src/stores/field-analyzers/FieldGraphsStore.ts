@@ -2,12 +2,9 @@
 
 'use strict';
 
-declare
-var $: any;
-declare
-var store: any;
-declare
-var generateId: ()=>string;
+declare var $: any;
+declare var store: any;
+declare var generateId: ()=>string;
 
 import Immutable = require('immutable');
 
