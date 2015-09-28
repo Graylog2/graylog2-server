@@ -26,24 +26,19 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
-import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
-import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
-import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
+import org.graylog2.MemoryAppender;
+import org.graylog2.rest.models.system.loggers.responses.*;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Enumeration;
-import java.util.Map;
+import java.util.*;
 
 @RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog loggers")
@@ -150,6 +145,43 @@ public class LoggersResource extends RestResource {
         Level newLevel = Level.toLevel(level.toUpperCase());
         logger.setLevel(newLevel);
     }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get recent log messages")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Memory appender not configured.")
+    })
+    @Path("/messages/recent")
+    @Produces(MediaType.APPLICATION_JSON)
+    public LogMessagesSummary messages(@ApiParam(name = "max", required = true) @QueryParam("max") int max) {
+        List<LogMessage> messages = new ArrayList<>();
+
+        Logger logger = Logger.getRootLogger();
+        if (logger.getAppender("memory") == null) {
+            throw new WebApplicationException(404);
+        }
+
+        MemoryAppender appender = (MemoryAppender) logger.getAppender("memory");
+        for (LoggingEvent loggingEvent : appender.getLogMessages(max)) {
+            List<String> throwable = new ArrayList<>();
+            if(loggingEvent.getThrowableStrRep() != null) {
+                throwable = Arrays.asList(loggingEvent.getThrowableStrRep());
+            }
+
+            messages.add(LogMessage.create(
+                    loggingEvent.getRenderedMessage(),
+                    loggingEvent.getLoggerName(),
+                    loggingEvent.getLevel().toString(),
+                    new DateTime(loggingEvent.getTimeStamp(), DateTimeZone.UTC).toString(),
+                    throwable
+            ));
+        }
+
+
+        return LogMessagesSummary.create(messages);
+    }
+
 
     private static class Subsystem {
 

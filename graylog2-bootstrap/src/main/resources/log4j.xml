@@ -10,6 +10,10 @@
         </layout>
     </appender>
 
+    <appender name="memory" class="org.graylog2.MemoryAppender">
+        <param name="BufferSize" value="500"/>
+    </appender>
+
     <!-- Application Loggers -->
     <logger name="org.graylog2">
         <level value="info"/>
@@ -48,5 +52,6 @@
     <root>
         <priority value="warn"/>
         <appender-ref ref="console"/>
+        <appender-ref ref="memory" />
     </root>
 </log4j:configuration>
