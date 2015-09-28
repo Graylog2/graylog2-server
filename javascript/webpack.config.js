@@ -12,6 +12,7 @@ webpackConfig.plugins.push(
   }),
   new webpack.optimize.UglifyJsPlugin({
     minimize: true,
+    sourceMap: false,
     compress: {
       warnings: false
     }
