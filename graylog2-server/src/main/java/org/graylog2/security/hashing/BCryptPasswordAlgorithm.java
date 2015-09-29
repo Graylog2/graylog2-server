@@ -26,7 +26,7 @@ import java.util.List;
 
 public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
     private static final String PREFIX = "{bcrypt}";
-    private static final String SALTPREFIX = "{salt}";
+    private static final String SALT_PREFIX = "{salt}";
 
     private final Integer saltSize;
 
@@ -41,7 +41,7 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
     }
 
     private String hash(String password, String salt) {
-        return PREFIX + BCrypt.hashpw(password, salt) + SALTPREFIX + salt;
+        return PREFIX + BCrypt.hashpw(password, salt) + SALT_PREFIX + salt;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
     @Override
     public boolean matches(String hashedPasswordAndSalt, String otherPassword) {
         if (supports(hashedPasswordAndSalt)) {
-            final Splitter splitter = Splitter.on(SALTPREFIX);
+            final Splitter splitter = Splitter.on(SALT_PREFIX);
             final List<String> splitted = splitter.splitToList(hashedPasswordAndSalt);
             final String salt = splitted.get(1);
 
