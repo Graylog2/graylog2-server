@@ -64,7 +64,7 @@ var SavedSearchControls = React.createClass({
     },
     _getEditSavedSearchControls() {
         return (
-            <DropdownButton bsSize='small' title='Saved search'>
+            <DropdownButton bsSize='small' title='Saved search' id="saved-search-actions-dropdown">
                 <MenuItem onClick={this._openModal}>Update search criteria</MenuItem>
                 <MenuItem divider/>
                 <MenuItem onClick={this._deleteSavedSearch}>Delete saved search</MenuItem>

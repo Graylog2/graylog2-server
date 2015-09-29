@@ -4,51 +4,10 @@
 
 var React = require('react');
 var Modal = require('react-bootstrap').Modal;
-var OverlayMixin = require('react-bootstrap').OverlayMixin;
+var BootstrapModalWrapper = require('./BootstrapModalWrapper');
 
 var $ = require('jquery');
 
-var BootstrapModalTrigger = React.createClass({
-    mixins: [OverlayMixin],
-
-    getInitialState() {
-        return {
-            isModalOpen: false
-        };
-    },
-    _modalShown() {
-        if (this.state.isModalOpen && typeof this.props.onShown === 'function') {
-            this.props.onShown();
-        }
-    },
-    open() {
-        this.setState({isModalOpen: true}, this._modalShown);
-    },
-    close() {
-        this.setState({isModalOpen: false});
-        if (typeof this.props.onRequestHide === 'function') {
-            this.props.onRequestHide();
-        }
-    },
-    render() {
-        return <span/>;
-    },
-    // This is called by the `OverlayMixin` when this component
-    // is mounted or updated and the return value is appended to the body.
-    renderOverlay() {
-        if (!this.state.isModalOpen) {
-            return <span/>;
-        }
-
-        return (
-            <Modal onRequestHide={this.close}>
-                {this.props.children}
-            </Modal>
-        );
-    }
-});
-
-// adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({
     close() {
         this.refs.modal.close();
@@ -106,47 +65,29 @@ var BootstrapModal = React.createClass({
                 </button>
             );
         }
-        var formContent = (
-            <div>
-                <div className="modal-header">
-                    <button
-                        type="button"
-                        className="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                        onClick={this.props.onCancel}
-                        dangerouslySetInnerHTML={{__html: '&times'}}
-                        />
-                    {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
-                </div>
-                <div ref="body" className="modal-body">
-                    <div className="container-fluid">
-                        {this.props.children[1]}
-                    </div>
-                </div>
-                <div ref="footer" className="modal-footer">
-                    {cancelButton}
-                    {confirmButton}
-                </div>
-            </div>
-        );
-        var form = (
-            <form ref="form"
-                  onSubmit={this._submit}
-                  className={this.props.formClass}
-                  encType={this.props.encType}
-                  method={this.props.method}
-                  action={this.props.action}>
-                {formContent}
-            </form>
-        );
 
         return (
-            <BootstrapModalTrigger ref="modal"
-                                   onShown={this._onModalShown}
-                                   onRequestHide={this.props.onHidden}>
-                {form}
-            </BootstrapModalTrigger>
+            <BootstrapModalWrapper ref="modal" onOpen={this._onModalShown} onClose={this.props.onHidden}>
+                <form ref="form"
+                      onSubmit={this._submit}
+                      className={this.props.formClass}
+                      encType={this.props.encType}
+                      method={this.props.method}
+                      action={this.props.action}>
+                    <Modal.Header closeButton>
+                        {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
+                    </Modal.Header>
+                    <Modal.Body ref="body">
+                        <div className="container-fluid">
+                            {this.props.children[1]}
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer ref="footer">
+                        {cancelButton}
+                        {confirmButton}
+                    </Modal.Footer>
+                </form>
+            </BootstrapModalWrapper>
         );
     }
 });

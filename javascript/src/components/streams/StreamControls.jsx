@@ -16,7 +16,6 @@ var StreamControls = React.createClass({
     _onDelete(event) {
         event.preventDefault();
         this.props.onDelete(this.props.stream);
-        this.refs.dropdownButton.setDropdownState(false);
     },
     _onEdit(event) {
         event.preventDefault();
@@ -40,12 +39,12 @@ var StreamControls = React.createClass({
         var menuItems = [];
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
-            menuItems.push(<MenuItem key={"editStreams-" + stream.id} onClick={this._onEdit}>Edit stream</MenuItem>);
-            menuItems.push(<MenuItem key={"quickAddRule-" + stream.id} onClick={this._onQuickAdd}>Quick add rule</MenuItem>);
+            menuItems.push(<MenuItem key={"editStreams-" + stream.id} onSelect={this._onEdit}>Edit stream</MenuItem>);
+            menuItems.push(<MenuItem key={"quickAddRule-" + stream.id} onSelect={this._onQuickAdd}>Quick add rule</MenuItem>);
         }
 
         if (this.isPermitted(permissions, ["streams:create", "streams:read:" + stream.id])) {
-            menuItems.push(<MenuItem key={"cloneStream-" + stream.id} onClick={this._onClone}>Clone this stream</MenuItem>);
+            menuItems.push(<MenuItem key={"cloneStream-" + stream.id} onSelect={this._onClone}>Clone this stream</MenuItem>);
         }
 
         if (this.props.user) {
@@ -57,12 +56,12 @@ var StreamControls = React.createClass({
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
             menuItems.push(<MenuItem key={'divider-' + stream.id} divider />);
-            menuItems.push(<MenuItem key={'deleteStream-' + stream.id} onClick={this._onDelete}>Delete this stream</MenuItem>);
+            menuItems.push(<MenuItem key={'deleteStream-' + stream.id} onSelect={this._onDelete}>Delete this stream</MenuItem>);
         }
 
         return (
             <span>
-                <DropdownButton title='More actions' ref='dropdownButton' pullRight={true}>
+                <DropdownButton title='More actions' ref='dropdownButton' pullRight={true} id={`more-actions-dropdown-${stream.id}`}>
                     {menuItems}
                 </DropdownButton>
                 <StreamForm ref='streamForm' title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream}/>

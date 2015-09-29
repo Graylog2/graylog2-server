@@ -54,7 +54,7 @@ var LegacyFieldGraph = React.createClass({
                                         bsStyle='default'
                                         pullRight={true}
                                         permissions={this.props.permissions}>
-                        <DropdownButton bsSize='small' className='graph-settings' title='Customize'>
+                        <DropdownButton bsSize='small' className='graph-settings' title='Customize' id="customize-field-graph-dropdown">
                             <li className="dropdown-submenu left-submenu hide-combined-chart">
                                 <a href="#">Value</a>
 

@@ -63,7 +63,8 @@ var AddToDashboardMenu = React.createClass({
                             bsSize="small"
                             title={this.props.title}
                             pullRight={this.props.pullRight}
-                            onSelect={this._selectDashboard}>
+                            onSelect={this._selectDashboard}
+                            id="dashboard-selector-dropdown">
                 {dashboards}
             </DropdownButton>
         );
@@ -83,7 +84,8 @@ var AddToDashboardMenu = React.createClass({
                                 bsSize="small"
                                 title={this.props.title}
                                 pullRight={this.props.pullRight}
-                                onSelect={canCreateDashboard ? this._createNewDashboard : () => {}}>
+                                onSelect={canCreateDashboard ? this._createNewDashboard : () => {}}
+                                id="no-dashboards-available-dropdown">
                     {option}
                 </DropdownButton>
                 <EditDashboardModal ref="createDashboardModal" onSaved={(id) => this._selectDashboard(id)}/>

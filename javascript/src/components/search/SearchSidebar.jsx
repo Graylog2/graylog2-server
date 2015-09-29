@@ -4,7 +4,6 @@ var $ = require('jquery');
 
 var React = require('react');
 var Modal = require('react-bootstrap').Modal;
-var ModalTrigger = require('react-bootstrap').ModalTrigger;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
 var Input = require('react-bootstrap').Input;
@@ -16,6 +15,7 @@ var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchControls = require('./SavedSearchControls');
 var ShowQueryModal = require('./ShowQueryModal');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
+var BootstrapModalWrapper = require('../bootstrap/BootstrapModalWrapper');
 
 var numeral = require('numeral');
 
@@ -70,7 +70,7 @@ var SearchSidebar = React.createClass({
     getInitialState() {
         return {
             fieldFilter: "",
-            maxFieldsHeight: 1000
+            maxFieldsHeight: 1000,
         };
     },
 
@@ -140,10 +140,17 @@ var SearchSidebar = React.createClass({
             this.props.togglePageFields();
         }
     },
+    _showIndicesModal(event) {
+        event.preventDefault();
+        this.refs.indicesModal.open();
+    },
     render() {
         var indicesModal =
-            <Modal title='Used Indices' onRequestHide={() => {}}>
-                <div className="modal-body">
+            <BootstrapModalWrapper ref="indicesModal">
+                <Modal.Header closeButton>
+                    <Modal.Title>Used indices</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                     <p>Graylog is intelligently selecting the indices it needs to search upon based on the time frame
                         you selected.
                         This list of indices is mainly useful for debugging purposes.</p>
@@ -152,8 +159,11 @@ var SearchSidebar = React.createClass({
                     <ul className="index-list">
                         {this.props.result['used_indices'].map((index) => <li key={index.index_name}> {index.index_name}</li>)}
                     </ul>
-                </div>
-            </Modal>;
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => this.refs.indicesModal.close()}>Close</Button>
+                </Modal.Footer>
+            </BootstrapModalWrapper>;
 
         var messageFields = this.props.fields
             .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
@@ -182,9 +192,7 @@ var SearchSidebar = React.createClass({
 
         // always add the debug query link as last elem
         moreActions.push(<MenuItem divider key="div2"/>);
-        moreActions.push(<ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
-            <MenuItem>Show query</MenuItem>
-        </ModalTrigger>);
+        moreActions.push(<MenuItem key="showQuery" onSelect={() => this.refs.showQueryModal.open()}>Show query</MenuItem>);
 
         return (
             <div className="content-col" ref='sidebar'>
@@ -196,11 +204,10 @@ var SearchSidebar = React.createClass({
                     <p style={{marginTop: 3}}>
                         Found <strong>{numeral(this.props.result['total_result_count']).format("0,0")} messages</strong>&nbsp;
                         in {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in&nbsp;
-                        <ModalTrigger modal={indicesModal}>
-                            <a href="#" onClick={event => event.preventDefault()}>
-                                {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
-                            </a>
-                        </ModalTrigger>.
+                        <a href="#" onClick={this._showIndicesModal}>
+                            {this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}
+                        </a>.
+                        {indicesModal}
                     </p>
 
                     <div className="actions">
@@ -211,9 +218,10 @@ var SearchSidebar = React.createClass({
                         <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
                         <div style={{display: 'inline-block'}}>
-                            <DropdownButton bsSize="small" title="More actions">
+                            <DropdownButton bsSize="small" title="More actions" id="search-more-actions-dropdown">
                                 {moreActions}
                             </DropdownButton>
+                            <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery} />
                         </div>
                     </div>
 

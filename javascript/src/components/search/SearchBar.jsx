@@ -68,7 +68,8 @@ const SearchBar = React.createClass({
                       <ButtonToolbar className="timerange-chooser pull-left">
                         <DropdownButton bsStyle="info"
                                         title={<i className="fa fa-clock-o"></i>}
-                                        onSelect={this._rangeTypeChanged}>
+                                        onSelect={this._rangeTypeChanged}
+                                        id="dropdown-timerange-selector">
                           <MenuItem eventKey="relative"
                                     className={this.state.rangeType === 'relative' ? 'selected' : null}>
                             Relative
@@ -174,7 +175,7 @@ const SearchBar = React.createClass({
   _queryChanged() {
     SearchStore.query = this.refs.query.getValue();
   },
-  _rangeTypeChanged(newRangeType) {
+  _rangeTypeChanged(event, newRangeType) {
     SearchStore.rangeType = newRangeType;
   },
   _rangeParamsChanged(key) {

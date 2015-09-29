@@ -1,7 +1,7 @@
 import React from 'react';
 import Immutable from 'immutable';
 
-import { TabbedArea, TabPane, Button, ButtonGroup } from 'react-bootstrap';
+import { Tabs, Tab, Button, ButtonGroup } from 'react-bootstrap';
 
 import TableList from '../common/TableList';
 
@@ -58,8 +58,8 @@ const PermissionSelector = React.createClass({
 
     return (
       <div>
-        <TabbedArea defaultActiveKey={1} animation={false}>
-          <TabPane eventKey={1} tab="Streams">
+        <Tabs defaultActiveKey={1} animation={false}>
+          <Tab eventKey={1} title="Streams">
             <div style={{marginTop: 10}}>
               <TableList
                 items={this.props.streams}
@@ -69,8 +69,8 @@ const PermissionSelector = React.createClass({
                 headerActionsFactory={multiStreamButtons}
               />
             </div>
-          </TabPane>
-          <TabPane eventKey={2} tab="Dashboards">
+          </Tab>
+          <Tab eventKey={2} title="Dashboards">
             <div style={{marginTop: 10}}>
               <TableList
                 items={this.props.dashboards}
@@ -80,8 +80,8 @@ const PermissionSelector = React.createClass({
                 headerActionsFactory={multiDashboardButtons}
               />
             </div>
-          </TabPane>
-        </TabbedArea>
+          </Tab>
+        </Tabs>
       </div>
     );
   },

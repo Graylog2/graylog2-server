@@ -53,7 +53,12 @@ var MessageFieldDescription = React.createClass({
     },
     render() {
         var fieldActions = (this.props.disableFieldActions ? null : <div className="message-field-actions pull-right">
-            <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1} onClick={this._addFieldToSearchBar}>
+            <SplitButton pullRight={true}
+                         bsSize="xsmall"
+                         title={<i className="fa fa-search-plus"></i>}
+                         key={1}
+                         onClick={this._addFieldToSearchBar}
+                         id={`more-actions-dropdown-field-${this.props.fieldName}`}>
                 <li className="dropdown-submenu left-submenu">
                     <a href="#">Create extractor for field {this.props.fieldName}</a>
                     <ul className="dropdown-menu">
@@ -66,7 +71,7 @@ var MessageFieldDescription = React.createClass({
                         <li><a href={this._getNewExtractorRoute("json")}>JSON</a></li>
                     </ul>
                 </li>
-                <MenuItem onClick={this._loadTerms(this.props.fieldName)}>Show terms of {this.props.fieldName}</MenuItem>
+                <MenuItem onSelect={this._loadTerms(this.props.fieldName)}>Show terms of {this.props.fieldName}</MenuItem>
             </SplitButton>
         </div>);
 
@@ -76,7 +81,6 @@ var MessageFieldDescription = React.createClass({
             <dd className={className} key={this.props.fieldName + "dd"}>
                 {fieldActions}
                 <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
-                {this._shouldShowTerms() && <br />}
                 {this._shouldShowTerms() && <Alert bsStyle='info' onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>Field terms: {this._getFormattedTerms()}</Alert>}
             </dd>
         );

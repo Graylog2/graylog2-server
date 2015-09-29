@@ -113,6 +113,10 @@ var SearchResult = React.createClass({
         var node = React.findDOMNode(this.refs.opa);
         this.setState({currentSidebarWidth: $(node).width()});
     },
+    _showQueryModal(event) {
+        event.preventDefault();
+        this.refs.showQueryModal.open();
+    },
 
     render() {
         var style = {};
@@ -144,9 +148,8 @@ var SearchResult = React.createClass({
 
                             <p className="description">
                                 Your search returned no results.&nbsp;
-                                <ModalTrigger key="debugQuery" modal={<ShowQueryModal builtQuery={this.props.builtQuery} />}>
-                                    <a href="#" onClick={(e) => e.preventDefault()}>Show the Elasticsearch query.</a>
-                                </ModalTrigger>
+                                <a href="#" onClick={this._showQueryModal}>Show the Elasticsearch query.</a>
+                                <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery} />
                                 <strong>&nbsp;Take a look at the&nbsp;<DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE} text="documentation"/>
                                     &nbsp;if you need help with the search syntax.</strong>
                             </p>

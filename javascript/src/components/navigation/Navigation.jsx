@@ -7,6 +7,7 @@ var Navbar = require('react-bootstrap').Navbar;
 var CollapsibleNav = require('react-bootstrap').CollapsibleNav;
 var Nav = require('react-bootstrap').Nav;
 var NavItem = require('react-bootstrap').NavItem;
+var NavDropdown = require('react-bootstrap').NavDropdown;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
@@ -48,7 +49,7 @@ var Navigation = React.createClass({
                             <NavItem href={jsRoutes.controllers.SourcesController.list().url}
                                        active={this._isActive("/sources")}>Sources</NavItem>
                         }
-                        <DropdownButton title={this._systemTitle()} active={this._isActive("/system")}>
+                        <NavDropdown title={this._systemTitle()} active={this._isActive("/system")} id="system-menu-dropdown">
                             <MenuItem href={jsRoutes.controllers.SystemController.index(0).url}>Overview</MenuItem>
                             <MenuItem href={jsRoutes.controllers.NodesController.nodes().url}>Nodes</MenuItem>
                             { this._isPermitted(['INPUTS_READ']) && <MenuItem href={jsRoutes.controllers.InputsController.index().url}>Inputs</MenuItem> }
@@ -60,7 +61,7 @@ var Navigation = React.createClass({
                             { this._isPermitted(['ROLES_EDIT']) && <MenuItem href={jsRoutes.controllers.UsersController.rolesPage().url}>Roles</MenuItem> }
                             { this._isPermitted(['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) && <MenuItem href={jsRoutes.controllers.BundlesController.index().url}>Content Packs</MenuItem> }
                             { this._isPermitted(['INPUTS_EDIT']) && <MenuItem href={jsRoutes.controllers.GrokPatternsController.index().url}>Grok Patterns</MenuItem> }
-                        </DropdownButton>
+                        </NavDropdown>
                     </Nav>
 
                     <Nav navbar>
