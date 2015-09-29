@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {
     private static final String HASH_ALGORITHM = "SHA-1";
-    private static final Pattern prefixPattern = Pattern.compile("^\\{.+\\}");
+    private static final Pattern prefixPattern = Pattern.compile("^[a-f0-9]{20}$");
     private final String passwordSecret;
 
     @Inject
@@ -36,7 +36,7 @@ public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public boolean supports(String hashedPassword) {
-        return !prefixPattern.matcher(hashedPassword).find();
+        return prefixPattern.matcher(hashedPassword).matches();
     }
 
     private String hash(String password, String salt) {
@@ -49,7 +49,11 @@ public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {
     }
 
     @Override
-    public boolean matches(String hashedPasswordAndSalt, String otherPassword) {
-        return hash(otherPassword).equals(hashedPasswordAndSalt);
+    public boolean matches(String hashedPassword, String otherPassword) {
+        if (supports(hashedPassword)) {
+            return hash(otherPassword).equals(hashedPassword);
+        } else {
+            throw new IllegalArgumentException("Supplied hashed password is not supported.");
+        }
     }
 }
