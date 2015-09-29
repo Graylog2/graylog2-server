@@ -51,10 +51,14 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public boolean matches(String hashedPasswordAndSalt, String otherPassword) {
-        final Splitter splitter = Splitter.on(SALTPREFIX);
-        final List<String> splitted = splitter.splitToList(hashedPasswordAndSalt);
-        final String salt = splitted.get(1);
+        if (supports(hashedPasswordAndSalt)) {
+            final Splitter splitter = Splitter.on(SALTPREFIX);
+            final List<String> splitted = splitter.splitToList(hashedPasswordAndSalt);
+            final String salt = splitted.get(1);
 
-        return hash(otherPassword, salt).equals(hashedPasswordAndSalt);
+            return hash(otherPassword, salt).equals(hashedPasswordAndSalt);
+        } else {
+            throw new IllegalArgumentException("Supplied hashed password is not supported, it does not start with "+ this.PREFIX);
+        }
     }
 }
