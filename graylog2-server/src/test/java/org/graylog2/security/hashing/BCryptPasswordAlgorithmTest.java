@@ -16,8 +16,6 @@
  */
 package org.graylog2.security.hashing;
 
-import org.graylog2.Configuration;
-import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,8 +26,7 @@ public class BCryptPasswordAlgorithmTest {
 
     @Before
     public void setUp() throws Exception {
-        final Configuration configuration = new Configuration();
-        this.bCryptPasswordAlgorithm = new BCryptPasswordAlgorithm(configuration.getUserPasswordBCryptSaltSize());
+        this.bCryptPasswordAlgorithm = new BCryptPasswordAlgorithm(10);
     }
 
     @Test
