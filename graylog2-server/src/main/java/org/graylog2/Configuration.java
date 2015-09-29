@@ -137,8 +137,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "user_password_default_algorithm")
     private String userPasswordDefaultAlgorithm = "bcrypt";
 
-    @Parameter(value = "user_password_bcrypt_salt_size")
-    private Integer userPasswordBCryptSaltSize = 10;
+    @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
+    private int userPasswordBCryptSaltSize = 10;
 
     public boolean isMaster() {
         return isMaster;
