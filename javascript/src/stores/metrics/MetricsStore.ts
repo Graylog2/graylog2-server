@@ -3,13 +3,9 @@
 
 'use strict';
 
-// this is global in top.scala.html
-declare var gl2UserSessionId: string;
-declare var sockJsWebSocketsEnabled: boolean;
-
 var SockJS = require("sockjs-client");
 import URLUtils = require("../../util/URLUtils");
-
+import AppConfig = require("util/AppConfig");
 
 interface NamedMetric {
     name: string;
@@ -45,7 +41,7 @@ interface Callback {
 class MetricsStore {
     public static instance: MetricsStore = null;
 
-    private METRICS_SOCKJS_URL: string = URLUtils.appPrefixed('/a/metrics');
+    private METRICS_SOCKJS_URL: string = URLUtils.qualifyUrl('/system/metrics');
 
     private sock: SockJS;
 
@@ -56,7 +52,8 @@ class MetricsStore {
     private queuedRequests: Array<ListenRequest> = [];
 
     connect() {
-        if (sockJsWebSocketsEnabled) {
+        const appConfig = new AppConfig();
+        if (appConfig.sockJsWebSocketsEnabled()) {
             this.sock = new SockJS(this.METRICS_SOCKJS_URL);
         } else {
             // only allow a subset of transport types.
@@ -68,7 +65,7 @@ class MetricsStore {
         this.sock.onopen = () => {
             this.isOpen = true;
 
-            this.sock.send(JSON.stringify({command:"create_session", sessionId:gl2UserSessionId}));
+            this.sock.send(JSON.stringify({command:"create_session", sessionId:appConfig.gl2UserSessionId()}));
 
             // callers where potentially queued when they ran before the sockjs connection had been established.
             // process those first before we continue

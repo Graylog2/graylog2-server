@@ -1,10 +1,11 @@
 import Reflux from 'reflux';
 import SessionActions from 'actions/sessions/SessionActions';
 import { fetch, fetchUnauthenticated } from 'logic/rest/FetchProvider';
+import URLUtils from 'util/URLUtils';
 
 const SessionStore = Reflux.createStore({
   listenables: [SessionActions],
-  sourceUrl: 'http://localhost:12900/system/sessions',
+  sourceUrl: '/system/sessions',
   sessionId: undefined,
 
   init() {
@@ -18,7 +19,7 @@ const SessionStore = Reflux.createStore({
   },
 
   login(username, password, host) {
-    const promise = fetchUnauthenticated(this.sourceUrl, {
+    const promise = fetchUnauthenticated(URLUtils.qualifyUrl(this.sourceUrl), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ const SessionStore = Reflux.createStore({
     SessionActions.login.promise(promise);
   },
   logout(sessionId) {
-    const promise = fetch(this.sourceUrl + '/' + sessionId, {
+    const promise = fetch(URLUtils.qualifyUrl(this.sourceUrl + '/' + sessionId), {
       method: 'DELETE',
     });
 
