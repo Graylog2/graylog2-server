@@ -3,12 +3,17 @@
 'use strict';
 
 var Qs = require('qs');
-
-declare var gl2AppPathPrefix: string;
+import AppConfig = require('util/AppConfig');
 
 var URLUtils = {
+    qualifyUrl(url) {
+      const appConfig = new AppConfig();
+      return appConfig.gl2ServerUrl() + this.appPrefixed(url);
+    },
+
     appPrefixed(url) {
-        return gl2AppPathPrefix + url;
+      const appConfig = new AppConfig();
+      return appConfig.gl2AppPathPrefix() + url;
     },
     openLink(url, newWindow) {
         if (newWindow) {
