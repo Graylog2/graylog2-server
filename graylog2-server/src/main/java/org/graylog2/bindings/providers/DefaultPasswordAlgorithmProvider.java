@@ -29,7 +29,12 @@ public class DefaultPasswordAlgorithmProvider implements Provider<PasswordAlgori
     @Inject
     public DefaultPasswordAlgorithmProvider(@Named("user_password_default_algorithm") String defaultPasswordAlgorithmName,
                                             Map<String, PasswordAlgorithm> passwordAlgorithms) {
-        this.defaultPasswordAlgorithm = passwordAlgorithms.get(defaultPasswordAlgorithmName);
+        if (passwordAlgorithms.containsKey(defaultPasswordAlgorithmName)) {
+            this.defaultPasswordAlgorithm = passwordAlgorithms.get(defaultPasswordAlgorithmName);
+        } else {
+            throw new IllegalArgumentException("Invalid default password hashing specified in config. Found: "
+                    + defaultPasswordAlgorithmName + ". Valid options: " + passwordAlgorithms.keySet());
+        }
     }
 
     @Override
