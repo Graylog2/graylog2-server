@@ -24,13 +24,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.regex.Pattern;
 
-public class SimpleHashPasswordAlgorithm implements PasswordAlgorithm {
+public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {
     private static final String HASH_ALGORITHM = "SHA-1";
     private static final Pattern prefixPattern = Pattern.compile("^\\{.+\\}");
     private final String passwordSecret;
 
     @Inject
-    public SimpleHashPasswordAlgorithm(@Named("password_secret") String passwordSecret) {
+    public SHA1HashPasswordAlgorithm(@Named("password_secret") String passwordSecret) {
         this.passwordSecret = passwordSecret;
     }
 

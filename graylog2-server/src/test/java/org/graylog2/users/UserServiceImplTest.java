@@ -28,7 +28,7 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
-import org.graylog2.security.hashing.SimpleHashPasswordAlgorithm;
+import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -137,7 +137,7 @@ public class UserServiceImplTest {
         public UserImplFactory(Configuration configuration) {
             this.configuration = configuration;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
-                    new SimpleHashPasswordAlgorithm("TESTSECRET"));
+                    new SHA1HashPasswordAlgorithm("TESTSECRET"));
         }
 
         @Override

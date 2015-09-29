@@ -22,7 +22,7 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 import org.graylog2.users.DefaultPasswordAlgorithm;
-import org.graylog2.security.hashing.SimpleHashPasswordAlgorithm;
+import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 
 public class PasswordAlgorithmBindings extends Graylog2Module {
     @Override
@@ -32,7 +32,7 @@ public class PasswordAlgorithmBindings extends Graylog2Module {
 
     private void bindPasswordAlgorithms() {
         MapBinder<String, PasswordAlgorithm> passwordAlgorithms = MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
-        passwordAlgorithms.addBinding("sha-1").to(SimpleHashPasswordAlgorithm.class);
+        passwordAlgorithms.addBinding("sha-1").to(SHA1HashPasswordAlgorithm.class);
         passwordAlgorithms.addBinding("bcrypt").to(BCryptPasswordAlgorithm.class);
 
         bind(PasswordAlgorithm.class).annotatedWith(DefaultPasswordAlgorithm.class).toProvider(DefaultPasswordAlgorithmProvider.class);
