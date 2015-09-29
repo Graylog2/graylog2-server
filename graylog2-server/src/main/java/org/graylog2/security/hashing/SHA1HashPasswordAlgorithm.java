@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 public class SHA1HashPasswordAlgorithm implements PasswordAlgorithm {
     private static final String HASH_ALGORITHM = "SHA-1";
-    private static final Pattern prefixPattern = Pattern.compile("^[a-f0-9]{20}$");
+    private static final Pattern prefixPattern = Pattern.compile("^[a-f0-9]{40}$");
     private final String passwordSecret;
 
     @Inject

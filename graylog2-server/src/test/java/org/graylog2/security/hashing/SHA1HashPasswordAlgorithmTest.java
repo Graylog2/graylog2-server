@@ -31,7 +31,7 @@ public class SHA1HashPasswordAlgorithmTest {
 
     @Test
     public void testSupports() throws Exception {
-        assertThat(SHA1HashPasswordAlgorithm.supports("foobar")).isTrue();
+        assertThat(SHA1HashPasswordAlgorithm.supports("deadbeefaffedeadbeefdeadbeefaffedeadbeef")).isTrue();
         assertThat(SHA1HashPasswordAlgorithm.supports("{bcrypt}foobar")).isFalse();
         assertThat(SHA1HashPasswordAlgorithm.supports("{foobar}foobar")).isFalse();
     }
