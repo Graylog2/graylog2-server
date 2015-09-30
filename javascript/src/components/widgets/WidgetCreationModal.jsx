@@ -6,7 +6,7 @@ var React = require('react');
 var Input = require('react-bootstrap').Input;
 var Immutable = require('immutable');
 
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Widget = require('./Widget');
 
 var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
@@ -209,31 +209,25 @@ var WidgetCreationModal = React.createClass({
         this._onConfigurationChange(ref, this.refs[ref].getValue());
     },
     render() {
-        var configModalHeader = <h2 className="modal-title">Create Dashboard Widget</h2>;
-        var configModalBody = (
-            <fieldset ref="inputFieldset">
-                <Input type="text"
-                       label="Title"
-                       ref="title"
-                       required
-                       defaultValue={this._getCurrentTitle()}
-                       onChange={this._onTitleChange}
-                       help="Type a name that describes your widget."/>
-                {this._getSpecificWidgetInputs()}
-            </fieldset>
-        );
-
         return (
-            <BootstrapModal ref="createModal"
-                            onCancel={this.hide}
-                            onConfirm={this.save}
-                            onShown={this._setInitialConfiguration}
-                            onHidden={this.props.onModalHidden}
-                            cancel="Cancel"
-                            confirm="Create">
-                {configModalHeader}
-                {configModalBody}
-            </BootstrapModal>
+            <BootstrapModalForm ref="createModal"
+                                title="Create Dashboard Widget"
+                                onModalOpen={this._setInitialConfiguration}
+                                onModalClose={this.props.onModalHidden}
+                                onSubmitForm={this.save}
+                                submitButtonText="Create">
+                <fieldset ref="inputFieldset">
+                    <Input type="text"
+                           label="Title"
+                           ref="title"
+                           required
+                           defaultValue={this._getCurrentTitle()}
+                           onChange={this._onTitleChange}
+                           help="Type a name that describes your widget."
+                           autoFocus />
+                    {this._getSpecificWidgetInputs()}
+                </fieldset>
+            </BootstrapModalForm>
         );
     }
 });

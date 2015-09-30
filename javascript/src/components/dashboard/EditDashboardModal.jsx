@@ -3,7 +3,7 @@ import $ from 'jquery';
 import React from 'react';
 import { Input } from 'react-bootstrap';
 
-import BootstrapModal from '../bootstrap/BootstrapModal';
+import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 import DashboardStore from '../../stores/dashboard/DashboardStore';
 
 const EditDashboardModal = React.createClass({
@@ -27,21 +27,16 @@ const EditDashboardModal = React.createClass({
     };
   },
   render() {
-    const header = (
-      <h2 className="modal-title">{this._isCreateModal() ? 'New Dashboard' : 'Edit Dashboard ' + this.props.title}</h2>
-    );
-    const body = (
-      <fieldset>
-        <Input id={`${this.props.id}-title`} type="text" label="Title:" onChange={this._onTitleChange} value={this.state.title} required/>
-        <Input type="text" label="Description:" onChange={this._onDescriptionChange} value={this.state.description} required/>
-      </fieldset>
-    );
-
     return (
-      <BootstrapModal ref="modal" onCancel={this.close} onConfirm={this._save} cancel="Cancel" confirm="Save">
-        {header}
-        {body}
-      </BootstrapModal>
+      <BootstrapModalForm ref="modal"
+                          title={this._isCreateModal() ? 'New Dashboard' : 'Edit Dashboard ' + this.props.title}
+                          onSubmitForm={this._save}
+                          submitButtonText="Save">
+        <fieldset>
+          <Input id={`${this.props.id}-title`} type="text" label="Title:" onChange={this._onTitleChange} value={this.state.title} autoFocus required/>
+          <Input type="text" label="Description:" onChange={this._onDescriptionChange} value={this.state.description} required/>
+        </fieldset>
+      </BootstrapModalForm>
     );
   },
   close() {

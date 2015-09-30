@@ -42,7 +42,7 @@ var TextField = React.createClass({
         } else {
             inputField = (
                 <input id={title} type={fieldType} className="form-control" name={"configuration["+title+"]"} value={this.state.value}
-                       onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)}/>
+                       onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)} autoFocus={this.props.autoFocus} />
             );
         }
 

@@ -1,6 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import {Modal} from 'react-bootstrap';
 
+/**
+ * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
+ */
 class BootstrapModalWrapper extends Component {
   static propTypes = {
     showModal: PropTypes.bool,
@@ -23,24 +26,24 @@ class BootstrapModalWrapper extends Component {
     };
   }
 
-  open() {
-    this.setState({showModal: true}, this.onOpen);
-  }
-
   onOpen() {
-    if (this.props.onOpen === 'function') {
+    if (typeof this.props.onOpen === 'function') {
       this.props.onOpen();
     }
   }
 
-  close() {
-    this.setState({showModal: false}, this.onClose);
-  }
-
   onClose() {
-    if (this.props.onClose === 'function') {
+    if (typeof this.props.onClose === 'function') {
       this.props.onClose();
     }
+  }
+
+  open() {
+    this.setState({showModal: true}, this.onOpen);
+  }
+
+  close() {
+    this.setState({showModal: false}, this.onClose);
   }
 
   render() {

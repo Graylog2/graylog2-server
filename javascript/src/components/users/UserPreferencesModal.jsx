@@ -2,7 +2,7 @@
 
 var React = require('react');
 var PreferencesStore = require('../../stores/users/PreferencesStore');
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 
 var UserPreferencesModal = React.createClass({
     getInitialState() {
@@ -17,38 +17,38 @@ var UserPreferencesModal = React.createClass({
         }
     },
     render() {
-        var header = <h2 className="modal-title">Preferences for user {this.props.userName}</h2>;
         // TODO: Add additional row where you can add a new preference
         // TODO: Add delete button
-        var body = (
-            <div>
-            {this.state.preferences.map((preference, index) => {
-                return (
-                    <div className="form-group" key={index}>
-                        <label htmlFor={preference.name+"-"+index}>{preference.name}</label>
-                        <input id={preference.name+"-"+index}
-                               onChange={this._onPreferenceChanged.bind(this, preference.name)}
-                               className="form-control"
-                               value={preference.value}
-                               type="text"
-                               required />
-                    </div>
-                );
-            }, this)}
-            </div>);
+        let shouldAutoFocus = true;
+
+        const formattedPreferences = this.state.preferences.map((preference, index) => {
+            const formattedPreference = (
+              <div className="form-group" key={index}>
+                  <label htmlFor={preference.name+"-"+index}>{preference.name}</label>
+                  <input id={preference.name+"-"+index}
+                         onChange={this._onPreferenceChanged.bind(this, preference.name)}
+                         className="form-control"
+                         value={preference.value}
+                         type="text"
+                         required
+                         autoFocus={shouldAutoFocus} />
+              </div>
+            );
+
+            if (shouldAutoFocus) {
+                shouldAutoFocus = false;
+            }
+
+            return formattedPreference;
+        });
         return (
-            <BootstrapModal ref="modal"
-                            onCancel={this._closeModal}
-                            onConfirm={this._save}
-                            cancel="Cancel"
-                            confirm="Save">
-               {header}
-               {body}
-            </BootstrapModal>
+            <BootstrapModalForm ref="modal"
+                                title={`Preferences for user ${this.props.userName}`}
+                                onSubmitForm={this._save}
+                                submitButtonText="Save">
+                <div>{formattedPreferences}</div>
+            </BootstrapModalForm>
         );
-    },
-    _closeModal() {
-        this.refs.modal.close();
     },
     openModal() {
         PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
@@ -57,7 +57,7 @@ var UserPreferencesModal = React.createClass({
         });
     },
     _save() {
-        PreferencesStore.saveUserPreferences(this.state.preferences, this._closeModal);
+        PreferencesStore.saveUserPreferences(this.state.preferences, this.refs.modal.close);
     }
 
 });

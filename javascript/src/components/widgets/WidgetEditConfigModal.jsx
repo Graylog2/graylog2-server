@@ -7,7 +7,7 @@ var Input = require('react-bootstrap').Input;
 
 var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 
 var WidgetEditConfigModal = React.createClass({
     getInitialState() {
@@ -301,37 +301,31 @@ var WidgetEditConfigModal = React.createClass({
         return controls;
     },
     render() {
-        var configModalHeader = <h2 className="modal-title">Edit widget "{this.state.title}"</h2>;
-        var configModalBody = (
-            <fieldset>
-                <Input type="text"
-                       label="Title"
-                       required
-                       defaultValue={this.state.title}
-                       onChange={this._onTitleChange}
-                       help="Type a name that describes your widget."/>
-                <Input type="number"
-                       min="1"
-                       required
-                       label="Cache time"
-                       defaultValue={this.state.cacheTime}
-                       onChange={this._onCacheTimeChange}
-                       help="Number of seconds the widget value will be cached."/>
-                {this._getTimeRangeFormControls()}
-                {this._getSpecificConfigurationControls()}
-            </fieldset>
-        );
-
         return (
-            <BootstrapModal ref="editModal"
-                            onCancel={this.hide}
-                            onConfirm={this.save}
-                            onHidden={this.props.onModalHidden}
-                            cancel="Cancel"
-                            confirm="Update">
-                {configModalHeader}
-                {configModalBody}
-            </BootstrapModal>
+            <BootstrapModalForm ref="editModal"
+                                title={`Edit widget "${this.state.title}"`}
+                                onSubmitForm={this.save}
+                                onModalClose={this.props.onModalHidden}
+                                submitButtonText="Update">
+                <fieldset>
+                    <Input type="text"
+                           label="Title"
+                           required
+                           defaultValue={this.state.title}
+                           onChange={this._onTitleChange}
+                           help="Type a name that describes your widget."
+                           autoFocus />
+                    <Input type="number"
+                           min="1"
+                           required
+                           label="Cache time"
+                           defaultValue={this.state.cacheTime}
+                           onChange={this._onCacheTimeChange}
+                           help="Number of seconds the widget value will be cached."/>
+                    {this._getTimeRangeFormControls()}
+                    {this._getSpecificConfigurationControls()}
+                </fieldset>
+            </BootstrapModalForm>
         );
     }
 });

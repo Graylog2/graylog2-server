@@ -1,10 +1,11 @@
 'use strict';
 
 var React = require('react');
-//noinspection JSUnusedGlobalSymbols
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var Input = require('react-bootstrap').Input;
 
-var EditDashboardModal = React.createClass({
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
+
+var EditPatternModal = React.createClass({
     getInitialState() {
         return {
             id: this.props.id,
@@ -30,27 +31,6 @@ var EditDashboardModal = React.createClass({
         return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
     },
     render() {
-        var header = <h2 className="modal-title">{this.props.create ? "Create" : "Edit"} Grok Pattern {this.state.name}</h2>;
-        var body = (
-            <fieldset>
-                <div className={this.state.error ? "form-group has-error" : "form-group"}>
-                    <label htmlFor={this._getId("pattern-name")}>Name:</label>
-                    <input type="text"
-                        className="form-control"
-                        onChange={this._onNameChange}
-                        value={this.state.name}
-                        id={this._getId("pattern-name")}
-                        required/>
-                    <span className="help-block">{this.state.error_message}</span>
-                </div>
-                <label htmlFor={this._getId("pattern")}>Pattern:</label>
-                <textarea id={this._getId("pattern")}
-                          className="form-control"
-                          onChange={this._onPatternChange}
-                          value={this.state.pattern}
-                          required></textarea>
-            </fieldset>
-        );
         var triggerButtonContent;
         if (this.props.create) {
             triggerButtonContent = "Create pattern";
@@ -62,10 +42,28 @@ var EditDashboardModal = React.createClass({
                 <button onClick={this.openModal} className={this.props.create ? "btn btn-success" : "btn btn-info btn-xs"}>
                     {triggerButtonContent}
                 </button>
-                <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
-                   {header}
-                   {body}
-                </BootstrapModal>
+                <BootstrapModalForm ref="modal"
+                                    title={`${this.props.create ? 'Create' : 'Edit'} Grok Pattern ${this.state.name}`}
+                                    onSubmitForm={this._save}
+                                    submitButtonText="Save">
+                    <fieldset>
+                        <Input type="text"
+                               id={this._getId('pattern-name')}
+                               label="Name"
+                               onChange={this._onNameChange}
+                               value={this.state.name}
+                               bsStyle={this.state.error ? 'error' : null}
+                               help={this.state.error ? this.state.error_message : null}
+                               autoFocus
+                               required />
+                        <Input type="textarea"
+                               id={this._getId('pattern')}
+                               label="Pattern"
+                               onChange={this._onPatternChange}
+                               value={this.state.pattern}
+                               required />
+                    </fieldset>
+                </BootstrapModalForm>
             </span>
         );
     },
@@ -90,4 +88,4 @@ var EditDashboardModal = React.createClass({
     }
 });
 
-module.exports = EditDashboardModal;
+module.exports = EditPatternModal;
