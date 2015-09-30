@@ -32,7 +32,7 @@ public class BCryptPasswordAlgorithmTest {
     @Test
     public void testSupports() throws Exception {
         assertThat(bCryptPasswordAlgorithm.supports("foobar")).isFalse();
-        assertThat(bCryptPasswordAlgorithm.supports("{bcrypt}foobar")).isTrue();
+        assertThat(bCryptPasswordAlgorithm.supports("{bcrypt}foobar")).isFalse();
         assertThat(bCryptPasswordAlgorithm.supports("{bcrypt}foobar{salt}pepper")).isTrue();
         assertThat(bCryptPasswordAlgorithm.supports("{foobar}foobar")).isFalse();
     }
