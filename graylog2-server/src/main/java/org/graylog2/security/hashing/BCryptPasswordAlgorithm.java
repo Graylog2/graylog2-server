@@ -16,13 +16,13 @@
  */
 package org.graylog2.security.hashing;
 
-import com.google.common.base.Splitter;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
     private static final String PREFIX = "{bcrypt}";
@@ -51,14 +51,11 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public boolean matches(String hashedPasswordAndSalt, String otherPassword) {
-        if (supports(hashedPasswordAndSalt)) {
-            final Splitter splitter = Splitter.on(SALT_PREFIX);
-            final List<String> splitted = splitter.splitToList(hashedPasswordAndSalt);
-            final String salt = splitted.get(1);
+        checkArgument(supports(hashedPasswordAndSalt), "Supplied hashed password is not supported, it does not start with "
+                + PREFIX + " or does not contain a salt.");
 
-            return hash(otherPassword, salt).equals(hashedPasswordAndSalt);
-        } else {
-            throw new IllegalArgumentException("Supplied hashed password is not supported, it does not start with "+ PREFIX);
-        }
+        final int saltIndex = hashedPasswordAndSalt.lastIndexOf(SALT_PREFIX);
+        final String salt = hashedPasswordAndSalt.substring(saltIndex + SALT_PREFIX.length());
+        return hash(otherPassword, salt).equals(hashedPasswordAndSalt);
     }
 }
