@@ -26,6 +26,9 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +62,8 @@ public class UserServiceImplTest {
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService);
+        final UserImpl.Factory userFactory = new UserImplFactory(configuration);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -99,7 +104,7 @@ public class UserServiceImplTest {
         user.setFullName("TEST");
         user.setEmail("test@example.com");
         user.setTimeZone(DateTimeZone.UTC);
-        user.setPassword("TEST", "SECRET");
+        user.setPassword("TEST");
         user.setPermissions(Collections.<String>emptyList());
 
         final String id = userService.save(user);
@@ -123,5 +128,31 @@ public class UserServiceImplTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCount() throws Exception {
         assertThat(userService.count()).isEqualTo(4L);
+    }
+
+    class UserImplFactory implements UserImpl.Factory {
+        private final Configuration configuration;
+        private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+
+        public UserImplFactory(Configuration configuration) {
+            this.configuration = configuration;
+            this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
+                    new SHA1HashPasswordAlgorithm("TESTSECRET"));
+        }
+
+        @Override
+        public UserImpl create(Map<String, Object> fields) {
+            return new UserImpl(passwordAlgorithmFactory, fields);
+        }
+
+        @Override
+        public UserImpl create(ObjectId id, Map<String, Object> fields) {
+            return new UserImpl(passwordAlgorithmFactory, id, fields);
+        }
+
+        @Override
+        public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, adminRoleObjectId);
+        }
     }
 }

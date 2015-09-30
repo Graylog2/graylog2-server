@@ -28,6 +28,7 @@ import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
@@ -110,7 +111,8 @@ public class Server extends ServerBootstrap {
                 new RotationStrategyBindings(),
                 new PeriodicalBindings(),
                 new ServerObjectMapperModule(),
-                new RestApiBindings()
+                new RestApiBindings(),
+                new PasswordAlgorithmBindings()
         );
     }
 

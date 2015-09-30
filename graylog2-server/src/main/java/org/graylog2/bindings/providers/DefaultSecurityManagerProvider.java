@@ -38,6 +38,7 @@ import org.graylog2.security.realm.AccessTokenAuthenticator;
 import org.graylog2.security.realm.GraylogSimpleAccountRealm;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.security.realm.MongoDbAuthorizationRealm;
+import org.graylog2.security.realm.PasswordAlgorithmCredentialsMatcher;
 import org.graylog2.security.realm.PasswordAuthenticator;
 import org.graylog2.security.realm.SessionAuthenticator;
 
@@ -58,7 +59,8 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
                                           AccessTokenAuthenticator accessTokenAuthenticator,
                                           Configuration configuration,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
-                                          MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager) {
+                                          MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager,
+                                          PasswordAlgorithmCredentialsMatcher passwordAlgorithmCredentialsMatcher) {
         final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
         inMemoryRealm.setCachingEnabled(false);
         inMemoryRealm.addRootAccount(
@@ -68,7 +70,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         inMemoryRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
 
         passwordAuthenticator.setCachingEnabled(false);
-        passwordAuthenticator.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
+        passwordAuthenticator.setCredentialsMatcher(passwordAlgorithmCredentialsMatcher);
         mongoDbAuthorizationRealm.setCachingEnabled(true);
         mongoDbAuthorizationRealm.setCacheManager(mongoDbAuthorizationCacheManager);
 

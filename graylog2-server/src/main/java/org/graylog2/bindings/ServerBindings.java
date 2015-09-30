@@ -88,6 +88,7 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
+import org.graylog2.users.UserImpl;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -130,6 +131,7 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(MessageCountAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(FieldContentValueAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(WidgetCacheTime.Factory.class));
+        install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
     }
 
     private void bindSingletons() {

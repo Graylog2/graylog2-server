@@ -60,9 +60,10 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found user {} to be authenticated with password.", user.getName());
         }
-        return new SimpleAccount(token.getPrincipal(),
+        return new UserAccount(token.getPrincipal(),
                 user.getHashedPassword(),
                 ByteSource.Util.bytes(configuration.getPasswordSecret()),
-                "graylog2MongoDbRealm");
+                "graylog2MongoDbRealm",
+                user);
     }
 }
