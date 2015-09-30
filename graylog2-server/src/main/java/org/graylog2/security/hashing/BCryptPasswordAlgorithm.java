@@ -37,7 +37,7 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
 
     @Override
     public boolean supports(String hashedPassword) {
-        return hashedPassword.startsWith(PREFIX);
+        return hashedPassword.startsWith(PREFIX) && hashedPassword.contains(SALT_PREFIX);
     }
 
     private String hash(String password, String salt) {
@@ -58,7 +58,7 @@ public class BCryptPasswordAlgorithm implements PasswordAlgorithm {
 
             return hash(otherPassword, salt).equals(hashedPasswordAndSalt);
         } else {
-            throw new IllegalArgumentException("Supplied hashed password is not supported, it does not start with "+ this.PREFIX);
+            throw new IllegalArgumentException("Supplied hashed password is not supported, it does not start with "+ PREFIX);
         }
     }
 }
