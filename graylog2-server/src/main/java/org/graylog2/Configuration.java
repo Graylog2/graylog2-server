@@ -281,7 +281,7 @@ public class Configuration extends BaseConfiguration {
         return userPasswordDefaultAlgorithm;
     }
 
-    public Integer getUserPasswordBCryptSaltSize() {
+    public int getUserPasswordBCryptSaltSize() {
         return userPasswordBCryptSaltSize;
     }
 }
