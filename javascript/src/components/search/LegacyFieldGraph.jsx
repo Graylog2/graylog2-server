@@ -14,9 +14,14 @@ var SearchStore = require('../../stores/search/SearchStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var StringUtils = require('../../util/StringUtils');
 
 var LegacyFieldGraph = React.createClass({
     mixins: [PureRenderMixin],
+    statisticalFunctions: ['mean', 'max', 'min', 'total', 'count', 'cardinality'],
+    renderers: ['area', 'bar', 'line', 'scatterplot'],
+    interpolations: ['linear', 'step-after', 'basis', 'bundle', 'cardinal', 'monotone'],
+    resolutions: ['minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'],
     componentDidMount() {
         var graphContainer = React.findDOMNode(this.refs.fieldGraphContainer);
         FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
@@ -38,14 +43,58 @@ var LegacyFieldGraph = React.createClass({
         return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId) :
             FieldGraphsStore.getFieldGraphAsCreateWidgetRequestParams(this.props.graphId);
     },
+    _submenuItemClassName(configKey, value) {
+        return this.props.graphOptions[configKey] === value ? 'selected' : '';
+    },
+    _getSubmenu(configKey, values) {
+        const submenuItems = values.map(value => {
+            const readableName = (configKey === 'valuetype') ? getReadableFieldChartStatisticalFunction(value) : value;
+            return (
+                <li key={`menu-item-${value}`}>
+                  <a href="#" className={this._submenuItemClassName(configKey, value)} data-type={value}>
+                      {StringUtils.capitalizeFirstLetter(readableName)}
+                  </a>
+                </li>
+            );
+        });
+
+        return <ul className={`dropdown-menu ${configKey}-selector`}>{submenuItems}</ul>;
+    },
     render() {
+        let submenus = [
+            <li key="renderer-submenu" className="dropdown-submenu left-submenu">
+                <a href="#">Type</a>
+                {this._getSubmenu('renderer', this.renderers)}
+            </li>,
+            <li key="interpolation-submenu" className="dropdown-submenu left-submenu">
+                <a href="#">Interpolation</a>
+                {this._getSubmenu('interpolation', this.interpolations)}
+            </li>
+        ];
+
+        if (!this.props.stacked) {
+            submenus.unshift(
+              <li key="valuetype-submenu" className="dropdown-submenu left-submenu">
+                  <a href="#">Value</a>
+                  {this._getSubmenu('valuetype', this.statisticalFunctions)}
+              </li>
+            );
+            submenus.push(
+              <li key="resolution-submenu" className="dropdown-submenu left-submenu">
+                  <a href="#">Resolution</a>
+                  {this._getSubmenu('interval', this.resolutions)}
+              </li>
+            );
+        }
+
         return (
             <div ref="fieldGraphContainer"
                  style={{display: this.props.hidden ? "none" : "block"}}
                  className="content-col field-graph-container"
                  data-chart-id={this.props.graphId}
                  data-from={this._getFirstGraphValue()}
-                 data-to={this.props.to}>
+                 data-to={this.props.to}
+                 data-field={this.props.graphOptions.field}>
                 <div className="pull-right">
                     <AddToDashboardMenu title='Add to dashboard'
                                         dashboards={this.props.dashboards}
@@ -55,57 +104,7 @@ var LegacyFieldGraph = React.createClass({
                                         pullRight={true}
                                         permissions={this.props.permissions}>
                         <DropdownButton bsSize='small' className='graph-settings' title='Customize' id="customize-field-graph-dropdown">
-                            <li className="dropdown-submenu left-submenu hide-combined-chart">
-                                <a href="#">Value</a>
-
-                                <ul className="dropdown-menu valuetype-selector">
-                                    <li><a href="#" className="selected" data-type="mean">{getReadableFieldChartStatisticalFunction('mean')}</a></li>
-                                    <li><a href="#" data-type="max">{getReadableFieldChartStatisticalFunction('max')}</a></li>
-                                    <li><a href="#" data-type="min">{getReadableFieldChartStatisticalFunction('min')}</a></li>
-                                    <li><a href="#" data-type="total">{getReadableFieldChartStatisticalFunction('total')}</a></li>
-                                    <li><a href="#" data-type="count">{getReadableFieldChartStatisticalFunction('count')}</a></li>
-                                    <li><a href="#" data-type="cardinality">{getReadableFieldChartStatisticalFunction('cardinality')}</a></li>
-                                </ul>
-                            </li>
-
-                            <li className="dropdown-submenu left-submenu">
-                                <a href="#">Type</a>
-
-                                <ul className="dropdown-menu type-selector">
-                                    <li><a href="#" data-type="area">Area</a></li>
-                                    <li><a href="#" className="selected" data-type="bar">Bar</a></li>
-                                    <li><a href="#" data-type="line">Line</a></li>
-                                    <li><a href="#" data-type="scatterplot">Scatterplot</a></li>
-                                </ul>
-                            </li>
-
-                            <li className="dropdown-submenu left-submenu">
-                                <a href="#">Interpolation</a>
-
-                                <ul className="dropdown-menu interpolation-selector">
-                                    <li><a href="#" className="selected" data-type="linear">linear</a></li>
-                                    <li><a href="#" data-type="step-after">step-after</a></li>
-                                    <li><a href="#" data-type="basis">basis</a></li>
-                                    <li><a href="#" data-type="bundle">bundle</a></li>
-                                    <li><a href="#" data-type="cardinal">cardinal</a></li>
-                                    <li><a href="#" data-type="monotone">monotone</a></li>
-                                </ul>
-                            </li>
-
-                            <li className="dropdown-submenu left-submenu hide-combined-chart">
-                                <a href="#">Resolution</a>
-
-                                <ul className="dropdown-menu interval-selector">
-                                    <li><a href="#" data-type="minute">Minute</a></li>
-                                    <li><a href="#" data-type="hour">Hour</a></li>
-                                    <li><a href="#" data-type="day">Day</a></li>
-                                    <li><a href="#" data-type="week">Week</a></li>
-                                    <li><a href="#" data-type="month">Month</a></li>
-                                    <li><a href="#" data-type="quarter">Quarter</a></li>
-                                    <li><a href="#" data-type="year">Year</a></li>
-                                </ul>
-                            </li>
-
+                            {submenus}
                             <MenuItem divider={true}/>
                             <MenuItem onSelect={this.props.onDelete}>Dismiss</MenuItem>
                         </DropdownButton>
