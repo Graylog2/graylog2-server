@@ -30,7 +30,7 @@ var AddToDashboardMenu = React.createClass({
     _setOriginalSearchParams(originalSearchParams) {
         this.searchParams = originalSearchParams;
     },
-    _selectDashboard(dashboardId) {
+    _selectDashboard(event, dashboardId) {
         this.setState({selectedDashboard: dashboardId});
         this.refs.widgetModal.open();
     },
