@@ -19,6 +19,7 @@ package org.graylog2.inputs.transports;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.Callables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -28,7 +29,6 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -39,16 +39,11 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandler;
+import org.jboss.netty.handler.codec.compression.ZlibDecoder;
+import org.jboss.netty.handler.codec.compression.ZlibWrapper;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
-import org.jboss.netty.handler.ssl.SslContext;
-import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
-import javax.net.ssl.SSLException;
-import java.io.File;
-import java.security.cert.CertificateException;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -56,7 +51,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.Strings.emptyToNull;
 import static org.jboss.netty.handler.codec.frame.Delimiters.lineDelimiter;
 import static org.jboss.netty.handler.codec.frame.Delimiters.nulDelimiter;
 
@@ -64,10 +58,12 @@ public class TcpTransport extends AbstractTcpTransport {
     public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
     private static final String CK_MAX_MESSAGE_SIZE = "max_message_size";
     private static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
+    private static final String CK_GZIP_COMPRESSION = "tcp_gzip_compression";
 
     protected final ChannelBuffer[] delimiter;
     protected final int maxFrameLength;
     private final boolean tcpKeepalive;
+    private final boolean gzipCompression;
 
     @AssistedInject
     public TcpTransport(@Assisted Configuration configuration,
@@ -95,6 +91,7 @@ public class TcpTransport extends AbstractTcpTransport {
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
         this.tcpKeepalive = configuration.getBoolean(CK_TCP_KEEPALIVE);
         this.maxFrameLength = configuration.getInt(CK_MAX_MESSAGE_SIZE, Config.DEFAULT_MAX_FRAME_LENGTH);
+        this.gzipCompression = configuration.getBoolean(CK_GZIP_COMPRESSION);
     }
 
     private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
@@ -111,6 +108,15 @@ public class TcpTransport extends AbstractTcpTransport {
         bootstrap.setOption("child.keepAlive", tcpKeepalive);
 
         return bootstrap;
+    }
+
+    @Override
+    protected LinkedHashMap<String, Callable< ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> h = Maps.newLinkedHashMap(super.getBaseChannelHandlers(input));
+        if (gzipCompression) {
+            h.put("gzip", Callables.returning(new ZlibDecoder(ZlibWrapper.GZIP)));
+        }
+        return h;
     }
 
     @Override
@@ -171,6 +177,7 @@ public class TcpTransport extends AbstractTcpTransport {
                             "Enable TCP keepalive packets"
                     )
             );
+            x.addField(new BooleanField(CK_GZIP_COMPRESSION, "GZip Compression", false, "Enable GZip Compression"));
 
             return x;
         }
