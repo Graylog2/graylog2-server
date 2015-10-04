@@ -10,7 +10,8 @@
         </layout>
     </appender>
 
-    <appender name="memory" class="org.graylog2.MemoryAppender">
+    <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
+    <appender name="graylog-internal-logs" class="org.graylog2.log4j.MemoryAppender">
         <param name="BufferSize" value="500"/>
     </appender>
 
@@ -52,6 +53,6 @@
     <root>
         <priority value="warn"/>
         <appender-ref ref="console"/>
-        <appender-ref ref="memory" />
+        <appender-ref ref="graylog-internal-logs" />
     </root>
 </log4j:configuration>

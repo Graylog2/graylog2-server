@@ -15,17 +15,16 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2;
+package org.graylog2.log4j;
 
-import com.google.common.collect.Lists;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
-import org.apache.commons.collections.iterators.ReverseListIterator;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A Log4J appender that keeps a configurable number of messages in memory. Used to make recent internal log messages
@@ -61,19 +60,13 @@ public class MemoryAppender extends AppenderSkeleton {
             throw new IllegalStateException("Cannot return log messages: Appender is not initialized.");
         }
 
-        List<LoggingEvent> messages = Lists.newArrayList();
-        ReverseListIterator iter = new ReverseListIterator(new ArrayList<LoggingEvent>(Arrays.asList(buffer.toArray())));
-        int i = 0;
-        while(iter.hasNext()) {
-            messages.add((LoggingEvent) iter.next());
-            if (i >= max-1) {
-                break;
-            }
-
-            i++;
+        final List<LoggingEvent> result = new ArrayList<>(max);
+        final Object[] messages = buffer.toArray();
+        for(int i = messages.length - 1; i >= 0 && i >= messages.length - max; i--) {
+            result.add((LoggingEvent) messages[i]);
         }
 
-        return messages;
+        return result;
     }
 
     public int getBufferSize() {
@@ -81,6 +74,8 @@ public class MemoryAppender extends AppenderSkeleton {
     }
 
     public void setBufferSize(int bufferSize) {
+        checkArgument(bufferSize >= 0);
+
         this.bufferSize = bufferSize;
     }
 

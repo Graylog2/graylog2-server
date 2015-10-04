@@ -29,10 +29,10 @@ import java.util.Collection;
 public abstract class LogMessagesSummary {
 
     @JsonProperty
-    public abstract Collection<LogMessage> messages();
+    public abstract Collection<InternalLogMessage> messages();
 
     @JsonCreator
-    public static LogMessagesSummary create(@JsonProperty("messages") Collection<LogMessage> messages) {
+    public static LogMessagesSummary create(@JsonProperty("messages") Collection<InternalLogMessage> messages) {
         return new AutoValue_LogMessagesSummary(messages);
     }
 

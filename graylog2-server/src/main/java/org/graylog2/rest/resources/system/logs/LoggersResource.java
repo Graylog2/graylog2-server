@@ -28,7 +28,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.MemoryAppender;
+import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.rest.models.system.loggers.responses.*;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -46,6 +46,8 @@ import java.util.*;
 public class LoggersResource extends RestResource {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(LoggersResource.class);
+
+    private static final String MEMORY_APPENDER_NAME = "graylog-internal-logs";
 
     private static final Map<String, Subsystem> SUBSYSTEMS = ImmutableMap.<String, Subsystem>of(
             "graylog2", new Subsystem("Graylog2", "org.graylog2", "All messages from graylog2-owned systems."),
@@ -150,30 +152,36 @@ public class LoggersResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get recent log messages")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Memory appender not configured.")
+            @ApiResponse(code = 404, message = "Memory appender is disabled or of wrong instance.")
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
-    public LogMessagesSummary messages(@ApiParam(name = "max", required = true) @QueryParam("max") int max) {
-        List<LogMessage> messages = new ArrayList<>();
+    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true) @QueryParam("limit") int limit) {
+        List<InternalLogMessage> messages = new ArrayList<>();
 
         Logger logger = Logger.getRootLogger();
-        if (logger.getAppender("memory") == null) {
-            throw new WebApplicationException(404);
+        if (logger.getAppender(MEMORY_APPENDER_NAME) == null) {
+            throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
         }
 
-        MemoryAppender appender = (MemoryAppender) logger.getAppender("memory");
-        for (LoggingEvent loggingEvent : appender.getLogMessages(max)) {
-            List<String> throwable = new ArrayList<>();
+        if(!(logger.getAppender(MEMORY_APPENDER_NAME) instanceof MemoryAppender)) {
+            throw new NotFoundException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
+        }
+
+        MemoryAppender appender = (MemoryAppender) logger.getAppender(MEMORY_APPENDER_NAME);
+        for (LoggingEvent loggingEvent : appender.getLogMessages(limit)) {
+            List<String> throwable;
             if(loggingEvent.getThrowableStrRep() != null) {
                 throwable = Arrays.asList(loggingEvent.getThrowableStrRep());
+            } else {
+                throwable = Collections.emptyList();
             }
 
-            messages.add(LogMessage.create(
+            messages.add(InternalLogMessage.create(
                     loggingEvent.getRenderedMessage(),
                     loggingEvent.getLoggerName(),
                     loggingEvent.getLevel().toString(),
-                    new DateTime(loggingEvent.getTimeStamp(), DateTimeZone.UTC).toString(),
+                    new DateTime(loggingEvent.getTimeStamp(), DateTimeZone.UTC),
                     throwable
             ));
         }
