@@ -19,6 +19,7 @@ package org.graylog2;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.graylog2.log4j.MemoryAppender;
 import org.junit.Before;
 import org.junit.Test;
 

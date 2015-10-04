@@ -36,7 +36,7 @@ public class MemoryAppender extends AppenderSkeleton {
     private int bufferSize;
 
     @Override
-    protected void append(LoggingEvent e) {
+    public void append(LoggingEvent e) {
         buffer.add(e);
     }
 
