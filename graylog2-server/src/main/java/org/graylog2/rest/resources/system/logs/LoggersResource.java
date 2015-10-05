@@ -36,9 +36,20 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog loggers")
@@ -156,9 +167,7 @@ public class LoggersResource extends RestResource {
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
-    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true) @QueryParam("limit") int limit) {
-        List<InternalLogMessage> messages = new ArrayList<>();
-
+    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true, defaultValue = "500") @QueryParam("limit") int limit) {
         Logger logger = Logger.getRootLogger();
         if (logger.getAppender(MEMORY_APPENDER_NAME) == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
@@ -169,6 +178,7 @@ public class LoggersResource extends RestResource {
         }
 
         MemoryAppender appender = (MemoryAppender) logger.getAppender(MEMORY_APPENDER_NAME);
+        List<InternalLogMessage> messages = new ArrayList<>(appender.getBufferSize());
         for (LoggingEvent loggingEvent : appender.getLogMessages(limit)) {
             List<String> throwable;
             if(loggingEvent.getThrowableStrRep() != null) {
