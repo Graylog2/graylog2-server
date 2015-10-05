@@ -39,7 +39,8 @@ var DropdownField = React.createClass({
                 </label>
 
                 <select id={field.title} defaultValue={field.default_value} value={this.state.value}
-                        className="input-xlarge form-control" onChange={this.handleChange}>
+                        className="input-xlarge form-control" onChange={this.handleChange}
+                        autoFocus={this.props.autoFocus} >
                     {options}
                 </select>
                 <p className="help-block">{field.description}</p>

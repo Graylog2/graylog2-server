@@ -32,7 +32,8 @@ var BooleanField = React.createClass({
                             type="checkbox"
                             checked={value}
                             name={"configuration[" + field.title + "]"}
-                            onChange={this.handleChange} />
+                            onChange={this.handleChange}
+                            autoFocus={this.props.autoFocus} />
 
                             {field.human_name}
 

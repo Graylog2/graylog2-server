@@ -1,5 +1,5 @@
 #!/bin/bash -e
-SBT_VERISON='0.13.9'
+SBT_VERSION='0.13.9'
 SBT_URL="https://dl.bintray.com/sbt/native-packages/sbt/${SBT_VERSION}/sbt-${SBT_VERSION}.tgz"
 
 SBT_BIN=$(which sbt)
@@ -30,14 +30,18 @@ pushd javascript
 
 # Install same npm version as we use in travis
 rm -rf ./node_modules
-npm install --no-spin npm@latest-2
+rm -rf ./node_globals
+
+# Install npm globally using the prefix argument, avoiding using some shared location to put the files,
+# and also avoiding pollution in the `node_modules` folder.
+npm install -g npm@latest --prefix=./node_globals --no-spin --progress=false
 
 echo -n "Using npm "
-./node_modules/.bin/npm --version
+./node_globals/bin/npm --version
 
-./node_modules/.bin/npm install --no-spin
-./node_modules/.bin/npm test
-./node_modules/.bin/npm run build
+./node_globals/bin/npm install --progress=false
+./node_globals/bin/npm test
+./node_globals/bin/npm run build
 popd
 
 

@@ -1,8 +1,10 @@
 'use strict';
 
 var React = require('react');
+var Modal = require('react-bootstrap').Modal;
+var Button = require('react-bootstrap').Button;
 
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalWrapper = require('../bootstrap/BootstrapModalWrapper');
 var StringUtils = require('../../util/StringUtils');
 
 var WidgetConfigModal = React.createClass({
@@ -69,31 +71,30 @@ var WidgetConfigModal = React.createClass({
         return configListElements;
     },
     render() {
-        var configModalHeader = <h2 className="modal-title">Widget "{this.props.widget.title}" configuration</h2>;
-        var configModalBody = (
-            <div className="configuration">
-                {this._getBasicConfiguration()}
-                <div>More details:
-                    <dl className="dl-horizontal">
-                        <dt>Widget ID:</dt>
-                        <dd>{this.props.widget.widgetId}</dd>
-                        <dt>Dashboard ID:</dt>
-                        <dd>{this.props.widget.dashboardId}</dd>
-                        {this._getConfigAsDescriptionList()}
-                    </dl>
-                </div>
-            </div>
-        );
-
         return (
-            <BootstrapModal ref="configModal"
-                            onCancel={this.hide}
-                            onConfirm={this.props.metricsAction}
-                            cancel="Cancel"
-                            confirm="Show widget metrics">
-               {configModalHeader}
-               {configModalBody}
-            </BootstrapModal>
+            <BootstrapModalWrapper ref="configModal">
+                <Modal.Header closeButton>
+                    <Modal.Title>{`Widget "${this.props.widget.title}" configuration`}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="configuration">
+                        {this._getBasicConfiguration()}
+                        <div>More details:
+                            <dl className="dl-horizontal">
+                                <dt>Widget ID:</dt>
+                                <dd>{this.props.widget.widgetId}</dd>
+                                <dt>Dashboard ID:</dt>
+                                <dd>{this.props.widget.dashboardId}</dd>
+                                {this._getConfigAsDescriptionList()}
+                            </dl>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button type="button" onClick={this.hide}>Close</Button>
+                    <Button type="button" bsStyle="info" onClick={this.props.metricsAction}>Show widget metrics</Button>
+                </Modal.Footer>
+            </BootstrapModalWrapper>
         );
     }
 });

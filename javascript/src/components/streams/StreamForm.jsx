@@ -2,7 +2,7 @@
 
 var React = require('react');
 var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Input = require('react-bootstrap').Input;
 
 var StreamForm = React.createClass({
@@ -37,15 +37,13 @@ var StreamForm = React.createClass({
     },
     render() {
         return (
-            <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
-                <div>
-                    <h2>{this.props.title}</h2>
-                </div>
-                <div>
-                    <Input type='text' required={true} label='Title' placeholder='A descriptive name of the new stream' valueLink={this.linkState('title')}/>
-                    <Input type='text' required={true} label='Description' placeholder='What kind of messages are routed into this stream?' valueLink={this.linkState('description')}/>
-                </div>
-            </BootstrapModal>
+            <BootstrapModalForm ref="modal"
+                                title={this.props.title}
+                                onSubmitForm={this._onSubmit}
+                                submitButtonText="Save">
+                <Input type='text' required={true} label='Title' placeholder='A descriptive name of the new stream' valueLink={this.linkState('title')} autoFocus />
+                <Input type='text' required={true} label='Description' placeholder='What kind of messages are routed into this stream?' valueLink={this.linkState('description')}/>
+            </BootstrapModalForm>
         );
     }
 });

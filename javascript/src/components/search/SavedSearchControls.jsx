@@ -6,7 +6,7 @@ var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 var Input = require('react-bootstrap').Input;
 
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
 
@@ -64,10 +64,10 @@ var SavedSearchControls = React.createClass({
     },
     _getEditSavedSearchControls() {
         return (
-            <DropdownButton bsSize='small' title='Saved search'>
-                <MenuItem onClick={this._openModal}>Update search criteria</MenuItem>
+            <DropdownButton bsSize='small' title='Saved search' id="saved-search-actions-dropdown">
+                <MenuItem onSelect={this._openModal}>Update search criteria</MenuItem>
                 <MenuItem divider/>
-                <MenuItem onClick={this._deleteSavedSearch}>Delete saved search</MenuItem>
+                <MenuItem onSelect={this._deleteSavedSearch}>Delete saved search</MenuItem>
             </DropdownButton>
         );
     },
@@ -75,12 +75,10 @@ var SavedSearchControls = React.createClass({
         return (
             <div style={{display: 'inline-block'}}>
                 {this._isSearchSaved() ? this._getEditSavedSearchControls() : this._getNewSavedSearchButtons()}
-                <BootstrapModal ref="saveSearchModal"
-                                onCancel={this._hide}
-                                onConfirm={this._save}
-                                cancel="Cancel"
-                                confirm="Save">
-                    <h2 className="modal-title">{this._isSearchSaved() ? 'Update saved search' : 'Save search criteria'}</h2>
+                <BootstrapModalForm ref="saveSearchModal"
+                                    title={this._isSearchSaved() ? 'Update saved search' : 'Save search criteria'}
+                                    onSubmitForm={this._save}
+                                    submitButtonText="Save">
                     <Input type="text"
                            label="Title"
                            ref="title"
@@ -88,8 +86,9 @@ var SavedSearchControls = React.createClass({
                            defaultValue={this.state.title}
                            onChange={this._titleChanged}
                            bsStyle={this.state.error ? 'error' : null}
-                           help={this.state.error ? 'Title was already taken.' : 'Type a name describing the current search.'}/>
-                </BootstrapModal>
+                           help={this.state.error ? 'Title was already taken.' : 'Type a name describing the current search.'}
+                           autoFocus />
+                </BootstrapModalForm>
             </div>
         );
     }

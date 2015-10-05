@@ -163,8 +163,6 @@ $(document).ready(function () {
             url: appPrefixed('/a/search/fieldhistogram'),
             data: params,
             success: function (data) {
-                $("ul", $graphContainer).attr("data-field", field);
-
                 if (opts.query.trim().length > 0) {
                     $(".field-graph-query", $graphContainer).text(opts.query);
                 } else {
@@ -237,19 +235,6 @@ $(document).ready(function () {
                 }
 
                 graph.render();
-
-                // Highlight menu items.
-                $("ul.interval-selector li a", $graphContainer).removeClass("selected");
-                $('ul.interval-selector li a[data-type="' + opts.interval + '"]', $graphContainer).addClass("selected");
-
-                $("ul.interpolation-selector li a", $graphContainer).removeClass("selected");
-                $('ul.interpolation-selector li a[data-type="' + opts.interpolation + '"]', $graphContainer).addClass("selected");
-
-                $("ul.type-selector li a", $graphContainer).removeClass("selected");
-                $('ul.type-selector li a[data-type="' + opts.renderer + '"]', $graphContainer).addClass("selected");
-
-                $("ul.valuetype-selector li a", $graphContainer).removeClass("selected");
-                $('ul.valuetype-selector li a[data-type="' + opts.valuetype + '"]', $graphContainer).addClass("selected");
 
                 fieldGraphs[opts.chartid] = graph;
 
@@ -324,13 +309,13 @@ $(document).ready(function () {
     }
 
     // Changing type of value graphs.
-    $(document).on("click", ".field-graph-container ul.type-selector li a", function (e) {
+    $(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
         e.preventDefault();
 
-        var field = $(this).closest("ul").attr("data-field");
         var type = $(this).attr("data-type");
 
         var graphContainer = $(this).closest(".field-graph-container");
+        var field = graphContainer.attr("data-field");
         var graphOpts = chartOptionsFromContainer(graphContainer);
         changeGraphConfig(graphContainer, "renderer", type);
 
@@ -350,19 +335,16 @@ $(document).ready(function () {
         graph.render();
 
         sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
-
-        $("a", $(this).closest("ul")).removeClass("selected");
-        $(this).addClass("selected");
     });
 
     // Changing interpolation of value graphs.
     $(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
         e.preventDefault();
 
-        var field = $(this).closest("ul").attr("data-field");
-        var interpolation = $(this).text();
+        var interpolation = $(this).attr('data-type');
 
         var graphContainer = $(this).closest(".field-graph-container");
+        var field = graphContainer.attr("data-field");
         var graphOpts = chartOptionsFromContainer(graphContainer);
         changeGraphConfig(graphContainer, "interpolation", interpolation);
 
@@ -371,16 +353,13 @@ $(document).ready(function () {
         graph.render();
 
         sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
-
-        $("a", $(this).closest("ul")).removeClass("selected");
-        $(this).addClass("selected");
     });
 
     // Changing interval of value graphs.
     $(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
         e.preventDefault();
-        var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
+        var field = graphContainer.attr("data-field");
 
         var interval = $(this).attr("data-type");
         var opts = chartOptionsFromContainer(graphContainer);
@@ -389,16 +368,13 @@ $(document).ready(function () {
 
         renderFieldChart(opts, graphContainer, {newGraph: false});
         changeGraphConfig(graphContainer, "interval", interval);
-
-        $("a", $(this).closest("ul")).removeClass("selected");
-        $(this).addClass("selected");
     });
 
     // Changing value type of value graphs.
     $(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
         e.preventDefault();
-        var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
+        var field = graphContainer.attr("data-field");
 
         var valuetype = $(this).attr("data-type");
         var opts = chartOptionsFromContainer(graphContainer);
@@ -407,9 +383,6 @@ $(document).ready(function () {
 
         renderFieldChart(opts, graphContainer, {newGraph: false});
         changeGraphConfig(graphContainer, "valuetype", valuetype);
-
-        $("a", $(this).closest("ul")).removeClass("selected");
-        $(this).addClass("selected");
     });
 
     function chartOptionsFromContainer(cc) {
@@ -468,8 +441,6 @@ $(document).ready(function () {
         targetChart.renderer.unstack = true;
 
         sendMergedGraphsEvent(targetId, draggedId);
-
-        $(".hide-combined-chart", targetElem).hide();
 
         // Reflect all the chart changes we made.
         targetChart.update();

@@ -1,8 +1,8 @@
 'use strict';
 
 var React = require('react');
-var TabbedArea = require('react-bootstrap').TabbedArea;
-var TabPane = require('react-bootstrap').TabPane;
+var Tabs = require('react-bootstrap').Tabs;
+var Tab = require('react-bootstrap').Tab;
 var RecentMessageLoader = require('./RecentMessageLoader');
 var MessageShow = require('../search/MessageShow');
 var InputsStore = require('../../stores/inputs/InputsStore');
@@ -56,18 +56,18 @@ var LoaderTabs = React.createClass({
         }
         return (
             <div>
-                <TabbedArea defaultActiveKey={defaultActiveKey}>
-                    <TabPane eventKey={1} tab='Recent' style={{marginBottom: "10px"}}>
+                <Tabs defaultActiveKey={defaultActiveKey} animation={false}>
+                    <Tab eventKey={1} title='Recent' style={{marginBottom: "10px"}}>
                         <RecentMessageLoader inputs={this.state.inputs} onMessageLoaded={this.onMessageLoaded}/>
-                    </TabPane>
-                    <TabPane eventKey={2} tab='Manual' style={{marginBottom: "10px"}}>
+                    </Tab>
+                    <Tab eventKey={2} title='Manual' style={{marginBottom: "10px"}}>
                         <div style={{marginTop: "5px", marginBottom: "15px"}}>
                             Please provide the id and index of the message that you want to load in this form:
                         </div>
 
                         <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText={true}/>
-                    </TabPane>
-                </TabbedArea>
+                    </Tab>
+                </Tabs>
                 {displayMessage}
             </div>
         );

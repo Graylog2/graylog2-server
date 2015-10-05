@@ -24,7 +24,7 @@ const Dashboard = React.createClass({
           <EditDashboardModalTrigger id={this.props.dashboard.id} action="edit" title={this.props.dashboard.title}
                                      description={this.props.dashboard.description} buttonClass="btn-info"/>
           &nbsp;
-          <DropdownButton title="More actions" pullRight>
+          <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
             <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
               as startpage</MenuItem>
             <MenuItem divider/>

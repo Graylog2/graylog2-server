@@ -2,7 +2,7 @@
 
 var React = require('react');
 var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Input = require('react-bootstrap').Input;
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
 var Col = require('react-bootstrap').Col;
@@ -37,9 +37,6 @@ var StreamRuleForm = React.createClass({
         return <option key={'streamRuleType'+streamRuleType.id}
                        value={streamRuleType.id}>{streamRuleType.short_desc}</option>;
     },
-    _focusInput() {
-        this.refs.modal.focusFirstInput();
-    },
     open() {
         this._resetValues();
         this.refs.modal.open();
@@ -52,10 +49,10 @@ var StreamRuleForm = React.createClass({
         var valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) ?
             <Input type='text' required={true} label='Value' valueLink={this.linkState('value')}/> : "");
         return (
-            <BootstrapModal ref='modal' onCancel={this.close} onConfirm={this._onSubmit} cancel="Cancel" confirm="Save">
-                <div>
-                    <h2>{this.props.title}</h2>
-                </div>
+            <BootstrapModalForm ref='modal'
+                                title={this.props.title}
+                                onSubmitForm={this._onSubmit}
+                                submitButtonText="Save">
                 <div>
                     <Col md={8}>
                         <TypeAheadFieldInput ref='fieldInput'
@@ -63,7 +60,7 @@ var StreamRuleForm = React.createClass({
                                              required={true}
                                              label='Field'
                                              valueLink={this.linkState('field')}
-                                             onTypeaheadLoaded={this._focusInput}/>
+                                             autoFocus />
                         <Input type='select' required={true} label='Type' valueLink={this.linkState('type')}>
                             {streamRuleTypes}
                         </Input>
@@ -94,7 +91,7 @@ var StreamRuleForm = React.createClass({
                         </div>
                     </Col>
                 </div>
-            </BootstrapModal>
+            </BootstrapModalForm>
         );
     }
 });

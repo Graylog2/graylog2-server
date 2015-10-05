@@ -1,20 +1,10 @@
 import React from 'react';
 import $ from 'jquery';
 
-import TrendConfigurationModal from './TrendConfigurationModal';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import DashboardListPage from './DashboardListPage';
 
 let component;
-
-const dialogConfigurationDiv = document.getElementById('react-dashboard-widget-configuration-dialog');
-if (dialogConfigurationDiv) {
-  component = React.render(<TrendConfigurationModal />, dialogConfigurationDiv);
-  // XXX: to make it accessible from jquery based code
-  if (window) {
-    window.trendDialogConfiguration = component;
-  }
-}
 
 $('.react-edit-dashboard').each(function () {
   const id = this.getAttribute('data-dashboard-id');

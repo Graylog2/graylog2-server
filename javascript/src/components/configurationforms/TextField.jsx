@@ -36,13 +36,13 @@ var TextField = React.createClass({
             inputField = (
                     <textarea id={title} className="form-control" rows={10}
                               name={"configuration["+title+"]"} required={isRequired} defaultValue={value} value={this.state.value}
-                              onChange={this.handleChange}>
+                              onChange={this.handleChange} autoFocus={this.props.autoFocus}>
                     </textarea>
             );
         } else {
             inputField = (
                 <input id={title} type={fieldType} className="form-control" name={"configuration["+title+"]"} value={this.state.value}
-                       onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)}/>
+                       onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)} autoFocus={this.props.autoFocus} />
             );
         }
 

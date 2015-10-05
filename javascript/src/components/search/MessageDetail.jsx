@@ -141,7 +141,7 @@ var MessageDetail = React.createClass({
             receivedBy = null;
         }
 
-        var testAgainstStream = (this.props.disableTestAgainstStream ? null : <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
+        var testAgainstStream = (this.props.disableTestAgainstStream ? null : <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream" id="select-stream-dropdown">
             { streamList }
             { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
             { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
@@ -157,7 +157,7 @@ var MessageDetail = React.createClass({
                         <OverlayTrigger
                             placement="top"
                             ref="copyBtnTooltip"
-                            overlay={<Tooltip>Message ID copied to clipboard.</Tooltip>}>
+                            overlay={<Tooltip id="message-id-copied-tooltip">Message ID copied to clipboard.</Tooltip>}>
                             <ReactZeroClipboard
                                 text={this.props.message.id}
                                 onAfterCopy={() => { this.refs['copyBtnTooltip'].toggle(); window.setTimeout(() => this.refs['copyBtnTooltip'].toggle(), 1000); } }>

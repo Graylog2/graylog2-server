@@ -25,8 +25,8 @@ var TypeAheadFieldInput = React.createClass({
                             source: substringMatcher(data.fields, 'value', 6)
                         });
 
-                    if (typeof this.props.onTypeaheadLoaded === 'function') {
-                        this.props.onTypeaheadLoaded();
+                    if (this.props.autoFocus) {
+                        fieldInput.focus();
                         fieldInput.typeahead('close');
                     }
                 }

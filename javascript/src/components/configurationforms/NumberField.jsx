@@ -58,7 +58,7 @@ var NumberField = React.createClass({
                 </label>
                 <input id={field.title} type="number" required={isRequired} onChange={this.handleChange} value={this.state.value}
                        defaultValue={defaultValue} className="input-xlarge validatable form-control"
-                       {...validationSpecs}/>
+                       {...validationSpecs} autoFocus={this.props.autoFocus} />
 
                 <p className="help-block">{field.description}</p>
             </div>
