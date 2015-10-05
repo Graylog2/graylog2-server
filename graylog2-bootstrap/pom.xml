@@ -61,8 +61,17 @@
             <artifactId>airline</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>apache-log4j-extras</artifactId>
+            <groupId>org.graylog.plugins</groupId>
+            <artifactId>usage-statistics</artifactId>
+        </dependency>
+        <!-- Logging dependencies -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
         </dependency>
     </dependencies>
 

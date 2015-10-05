@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %-5p: %c - %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <!-- Suppress crazy byte array dump of Drools -->
+        <Logger name="org.drools.compiler.kie.builder.impl.KieRepositoryImpl" level="warn"/>
+        <!-- Silence chatty natty -->
+        <Logger name="com.joestelmach.natty.Parser" level="warn"/>
+        <Root level="info">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>

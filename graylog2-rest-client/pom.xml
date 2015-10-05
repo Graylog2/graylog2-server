@@ -50,8 +50,14 @@
                                 <argument>${project.build.directory}/generated-sources</argument>
                             </arguments>
                             <classpathScope>compile</classpathScope>
+                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                            <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
                             <mainClass>org.graylog2.restroutes.GenerateRoutes</mainClass>
+                            <executableDependency>
+                                <groupId>org.graylog2</groupId>
+                                <artifactId>graylog2-rest-routes</artifactId>
+                            </executableDependency>
                         </configuration>
                     </execution>
                 </executions>
@@ -65,23 +71,11 @@
                         <groupId>org.graylog2</groupId>
                         <artifactId>graylog2-server</artifactId>
                         <version>${project.version}</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>org.slf4j</groupId>
-                                <artifactId>slf4j-log4j12</artifactId>
-                            </exclusion>
-                        </exclusions>
                     </dependency>
                     <dependency>
                         <groupId>org.graylog2</groupId>
                         <artifactId>graylog2-radio</artifactId>
                         <version>${project.version}</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>org.slf4j</groupId>
-                                <artifactId>slf4j-log4j12</artifactId>
-                            </exclusion>
-                        </exclusions>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -199,12 +193,6 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
