@@ -24,19 +24,28 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.log4j.MemoryAppender;
-import org.graylog2.rest.models.system.loggers.responses.*;
+import org.graylog2.rest.models.system.loggers.responses.InternalLogMessage;
+import org.graylog2.rest.models.system.loggers.responses.LogMessagesSummary;
+import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
+import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
+import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
+import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.Min;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -167,20 +176,21 @@ public class LoggersResource extends RestResource {
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
-    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true, defaultValue = "500") @QueryParam("limit") int limit) {
-        Logger logger = Logger.getRootLogger();
-        if (logger.getAppender(MEMORY_APPENDER_NAME) == null) {
+    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true, defaultValue = "500", allowableValues = "range[0, infinity]")
+                                       @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit) {
+        final Appender appender = Logger.getRootLogger().getAppender(MEMORY_APPENDER_NAME);
+        if (appender == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
         }
 
-        if(!(logger.getAppender(MEMORY_APPENDER_NAME) instanceof MemoryAppender)) {
-            throw new NotFoundException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
+        if (!(appender instanceof MemoryAppender)) {
+            throw new InternalServerErrorException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
         }
 
-        MemoryAppender appender = (MemoryAppender) logger.getAppender(MEMORY_APPENDER_NAME);
-        List<InternalLogMessage> messages = new ArrayList<>(appender.getBufferSize());
-        for (LoggingEvent loggingEvent : appender.getLogMessages(limit)) {
-            List<String> throwable;
+        final MemoryAppender memoryAppender = (MemoryAppender) appender;
+        final List<InternalLogMessage> messages = new ArrayList<>(memoryAppender.getBufferSize());
+        for (LoggingEvent loggingEvent : memoryAppender.getLogMessages(limit)) {
+            final List<String> throwable;
             if(loggingEvent.getThrowableStrRep() != null) {
                 throwable = Arrays.asList(loggingEvent.getThrowableStrRep());
             } else {
@@ -196,10 +206,8 @@ public class LoggersResource extends RestResource {
             ));
         }
 
-
         return LogMessagesSummary.create(messages);
     }
-
 
     private static class Subsystem {
 
