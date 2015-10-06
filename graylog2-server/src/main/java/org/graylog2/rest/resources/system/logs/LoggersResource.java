@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.logs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
@@ -60,6 +61,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog loggers")
@@ -171,13 +174,14 @@ public class LoggersResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get recent log messages")
+    @ApiOperation(value = "Get recent internal log messages")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Memory appender is disabled or of wrong instance.")
+            @ApiResponse(code = 404, message = "Memory appender is disabled."),
+            @ApiResponse(code = 500, message = "Memory appender is broken.")
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
-    public LogMessagesSummary messages(@ApiParam(name = "limit", required = true, defaultValue = "500", allowableValues = "range[0, infinity]")
+    public LogMessagesSummary messages(@ApiParam(name = "limit", defaultValue = "500", allowableValues = "range[0, infinity]")
                                        @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit) {
         final Appender appender = Logger.getRootLogger().getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
@@ -190,24 +194,35 @@ public class LoggersResource extends RestResource {
 
         final MemoryAppender memoryAppender = (MemoryAppender) appender;
         final List<InternalLogMessage> messages = new ArrayList<>(memoryAppender.getBufferSize());
-        for (LoggingEvent loggingEvent : memoryAppender.getLogMessages(limit)) {
-            final List<String> throwable;
-            if(loggingEvent.getThrowableStrRep() != null) {
-                throwable = Arrays.asList(loggingEvent.getThrowableStrRep());
-            } else {
-                throwable = Collections.emptyList();
-            }
+        for (LoggingEvent event : memoryAppender.getLogMessages(limit)) {
+            final String[] throwableStrRep = firstNonNull(event.getThrowableStrRep(), new String[0]);
+            final List<String> throwable = ImmutableList.copyOf(throwableStrRep);
 
             messages.add(InternalLogMessage.create(
-                    loggingEvent.getRenderedMessage(),
-                    loggingEvent.getLoggerName(),
-                    loggingEvent.getLevel().toString(),
-                    new DateTime(loggingEvent.getTimeStamp(), DateTimeZone.UTC),
-                    throwable
+                    event.getRenderedMessage(),
+                    event.getLoggerName(),
+                    event.getLevel().toString(),
+                    new DateTime(event.getTimeStamp(), DateTimeZone.UTC),
+                    throwable,
+                    event.getThreadName(),
+                    event.getNDC(),
+                    getMDC(event)
             ));
         }
 
         return LogMessagesSummary.create(messages);
+    }
+
+    private Map<String, String> getMDC(LoggingEvent event) {
+        event.getMDCCopy();
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> originalMDC = event.getProperties();
+        final ImmutableMap.Builder<String, String> mdc = ImmutableMap.builder();
+        for (Map.Entry<String, Object> entry : originalMDC.entrySet()) {
+            mdc.put(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+
+        return mdc.build();
     }
 
     private static class Subsystem {
