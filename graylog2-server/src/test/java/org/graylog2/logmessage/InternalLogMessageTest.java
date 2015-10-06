@@ -29,7 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class LogMessageTest {
+public class InternalLogMessageTest {
 
     @Test
     public void testIdGetsSet() {
@@ -110,7 +110,7 @@ public class LogMessageTest {
 
         assertEquals(6, lm.getFieldCount());
     }
-    
+
     @Test
     public void testRemoveFieldDoesNotDeleteReservedFields() {
         DateTime time = Tools.iso8601();

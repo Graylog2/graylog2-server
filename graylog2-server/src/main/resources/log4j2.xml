@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration packages="org.graylog2.log4j">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %-5p: %c - %m%n"/>
         </Console>
+
+        <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
+        <Memory name="graylog-internal-logs" bufferSize="500"/>
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
@@ -24,6 +27,7 @@
         <Logger name="kafka.log.OffsetIndex" level="warn"/>
         <Root level="warn">
             <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="graylog-internal-logs"/>
         </Root>
     </Loggers>
 </Configuration>
