@@ -181,8 +181,10 @@ public class LoggersResource extends RestResource {
     })
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
-    public LogMessagesSummary messages(@ApiParam(name = "limit", defaultValue = "500", allowableValues = "range[0, infinity]")
-                                       @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit) {
+    public LogMessagesSummary messages(@ApiParam(name = "limit", value = "How many log messages should be returned", defaultValue = "500", allowableValues = "range[0, infinity]")
+                                       @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit,
+                                       @ApiParam(name = "level", value = "Which log level (or higher) should the messages have", defaultValue = "ALL", allowableValues = "[OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL]")
+                                       @QueryParam("level") @DefaultValue("ALL") @NotEmpty String level) {
         final Appender appender = Logger.getRootLogger().getAppender(MEMORY_APPENDER_NAME);
         if (appender == null) {
             throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
@@ -192,9 +194,14 @@ public class LoggersResource extends RestResource {
             throw new InternalServerErrorException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
         }
 
+        final Level logLevel = Level.toLevel(level, Level.ALL);
         final MemoryAppender memoryAppender = (MemoryAppender) appender;
         final List<InternalLogMessage> messages = new ArrayList<>(memoryAppender.getBufferSize());
         for (LoggingEvent event : memoryAppender.getLogMessages(limit)) {
+            if(!event.getLevel().isGreaterOrEqual(logLevel)) {
+                continue;
+            }
+
             final String[] throwableStrRep = firstNonNull(event.getThrowableStrRep(), new String[0]);
             final List<String> throwable = ImmutableList.copyOf(throwableStrRep);
 
