@@ -133,7 +133,7 @@ public class JsonExtractor extends Extractor {
             final List values = (List) value;
             return Collections.singleton(Entry.create(key, Joiner.on(listSeparator).join(values)));
         } else if(value == null) {
-            return Collections.singleton(Entry.create(key, null));
+            return Collections.singleton(Entry.create(key, "null"));
         } else {
             LOG.debug("Unknown type \"{}\" in key \"{}\"", value.getClass(), key);
             return Collections.emptySet();
