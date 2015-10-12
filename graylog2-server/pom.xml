@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-rest-models</artifactId>
         </dependency>
 
@@ -163,6 +159,14 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-json</artifactId>
         </dependency>
 
         <dependency>
@@ -293,6 +297,29 @@
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>airline</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hdrhistogram</groupId>
+            <artifactId>HdrHistogram</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>guice-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-locator</artifactId>
         </dependency>
 
         <!-- Logging dependencies -->
