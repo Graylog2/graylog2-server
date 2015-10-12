@@ -18,7 +18,7 @@ package org.graylog2.periodical;
 
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.stats.ThroughputStats;
+import org.graylog2.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

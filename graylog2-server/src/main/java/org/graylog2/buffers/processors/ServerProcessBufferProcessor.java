@@ -26,8 +26,7 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

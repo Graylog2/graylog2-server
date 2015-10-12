@@ -24,7 +24,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.journal.Journal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

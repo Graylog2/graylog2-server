@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
-import org.graylog2.shared.users.Role;
+import org.graylog2.users.Role;
 import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

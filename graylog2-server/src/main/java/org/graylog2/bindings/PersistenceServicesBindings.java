@@ -44,7 +44,7 @@ import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDBSessionServiceImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
-import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.streams.StreamService;

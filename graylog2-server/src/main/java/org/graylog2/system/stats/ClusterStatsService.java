@@ -19,7 +19,7 @@ package org.graylog2.system.stats;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.inputs.InputService;
-import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;

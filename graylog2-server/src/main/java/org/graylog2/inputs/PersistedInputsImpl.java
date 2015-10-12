@@ -22,8 +22,6 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

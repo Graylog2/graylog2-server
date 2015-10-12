@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.inject.Module;
 import org.assertj.core.util.Lists;
 import org.graylog2.plugin.rest.ApiError;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
+import org.graylog2.bindings.GuiceInjectorHolder;
+import org.graylog2.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.junit.Before;
 import org.junit.Test;
 

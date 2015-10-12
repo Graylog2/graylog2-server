@@ -24,7 +24,7 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.journal.NoopJournal;
+import org.graylog2.journal.NoopJournal;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

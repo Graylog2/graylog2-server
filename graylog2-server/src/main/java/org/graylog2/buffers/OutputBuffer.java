@@ -29,7 +29,6 @@ import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
-import org.graylog2.shared.buffers.LoggingExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
-import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
+import static org.graylog2.metrics.MetricUtils.constantGauge;
+import static org.graylog2.metrics.MetricUtils.safelyRegister;
 
 @Singleton
 public class OutputBuffer extends Buffer {

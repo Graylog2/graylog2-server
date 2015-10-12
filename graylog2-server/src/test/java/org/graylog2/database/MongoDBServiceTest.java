@@ -25,8 +25,8 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.shared.jackson.SizeSerializer;
-import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.graylog2.jackson.SizeSerializer;
+import org.graylog2.rest.RangeJsonSerializer;
 import org.junit.ClassRule;
 import org.junit.Rule;
 

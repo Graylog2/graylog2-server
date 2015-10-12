@@ -24,7 +24,7 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 import org.graylog2.metrics.CacheStatsSet;
-import org.graylog2.shared.metrics.MetricUtils;
+import org.graylog2.metrics.MetricUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

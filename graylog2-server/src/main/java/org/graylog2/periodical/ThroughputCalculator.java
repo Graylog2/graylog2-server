@@ -34,7 +34,7 @@ import java.util.SortedMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static org.graylog2.shared.metrics.MetricUtils.filterSingleMetric;
+import static org.graylog2.metrics.MetricUtils.filterSingleMetric;
 
 public class ThroughputCalculator extends Periodical {
     private static final Logger log = LoggerFactory.getLogger(ThroughputCalculator.class);

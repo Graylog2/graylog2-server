@@ -26,7 +26,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
-import org.graylog2.shared.bindings.ValidatorModule;
+import org.graylog2.bindings.ValidatorModule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.jukito.JukitoRunner;

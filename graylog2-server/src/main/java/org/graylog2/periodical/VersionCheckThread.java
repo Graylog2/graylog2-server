@@ -29,7 +29,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.ServerVersion;
+import org.graylog2.ServerVersion;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.graylog2.versioncheck.VersionResponse;
 import org.slf4j.Logger;

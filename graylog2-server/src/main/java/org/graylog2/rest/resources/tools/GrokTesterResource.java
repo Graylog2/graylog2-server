@@ -26,7 +26,7 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.rest.models.tools.requests.GrokTestRequest;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;

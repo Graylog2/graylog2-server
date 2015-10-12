@@ -20,9 +20,9 @@ import com.google.inject.Module;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.CmdLineTool;
 import org.graylog2.plugin.KafkaJournalConfiguration;
-import org.graylog2.shared.bindings.SchedulerBindings;
-import org.graylog2.shared.journal.KafkaJournal;
-import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.bindings.SchedulerBindings;
+import org.graylog2.journal.KafkaJournal;
+import org.graylog2.journal.KafkaJournalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,8 +28,8 @@ import org.graylog2.grok.GrokPatterns;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

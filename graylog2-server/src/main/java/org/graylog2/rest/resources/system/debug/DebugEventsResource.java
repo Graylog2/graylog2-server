@@ -24,7 +24,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.graylog2.system.debug.DebugEvent;
 import org.graylog2.system.debug.DebugEventHolder;
 

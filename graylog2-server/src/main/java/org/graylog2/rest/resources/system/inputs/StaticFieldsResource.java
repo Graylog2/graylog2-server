@@ -29,13 +29,12 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.models.system.inputs.requests.CreateStaticFieldRequest;
-import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.system.activities.Activity;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.security.RestPermissions;
+import org.graylog2.inputs.InputRegistry;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

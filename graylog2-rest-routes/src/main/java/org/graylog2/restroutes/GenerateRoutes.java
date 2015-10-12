@@ -39,7 +39,7 @@ import org.graylog2.restroutes.internal.ResourceRoutesParser;
 import org.graylog2.restroutes.internal.RouteClass;
 import org.graylog2.restroutes.internal.RouteClassGenerator;
 import org.graylog2.restroutes.internal.RouterGenerator;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.resources.RestResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class GenerateRoutes {
             System.exit(-1);
         }
 
-        final List<RouteClass> sharedRouteClassList = new ResourceRoutesParser("org.graylog2.shared.rest.resources").buildClasses();
+        final List<RouteClass> sharedRouteClassList = new ResourceRoutesParser("org.graylog2.rest.resources").buildClasses();
 
         final ResourceRoutesParser parser = new ResourceRoutesParser("org.graylog2.rest.resources");
 

@@ -16,7 +16,6 @@
  */
 package org.graylog2.commands.journal;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
@@ -31,7 +30,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.util.ArrayList;

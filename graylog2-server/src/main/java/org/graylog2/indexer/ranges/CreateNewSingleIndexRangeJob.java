@@ -19,7 +19,7 @@ package org.graylog2.indexer.ranges;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

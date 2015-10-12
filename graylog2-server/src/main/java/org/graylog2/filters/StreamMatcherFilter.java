@@ -19,7 +19,7 @@ package org.graylog2.filters;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.stats.ThroughputStats;
+import org.graylog2.stats.ThroughputStats;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

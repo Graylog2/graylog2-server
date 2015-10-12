@@ -21,7 +21,6 @@ import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
 
 import java.util.List;
 import java.util.Map;
