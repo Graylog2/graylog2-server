@@ -124,7 +124,7 @@ public class BaseRestTestHelper {
         return jsonResource(filename + ".json");
     }
 
-    private static class KeysPresentMatcher extends ResponseAwareMatcher<Response> {
+    private static class KeysPresentMatcher implements ResponseAwareMatcher<Response> {
         private final Set<String> keys = Sets.newHashSet();
         public KeysPresentMatcher(String... keys) {
             Collections.addAll(this.keys, keys);
@@ -161,7 +161,7 @@ public class BaseRestTestHelper {
         }
     }
 
-    private static class StrictKeysPresentMatcher extends ResponseAwareMatcher<Response> {
+    private static class StrictKeysPresentMatcher implements ResponseAwareMatcher<Response> {
         private final Set<String> keys = Sets.newHashSet();
         public StrictKeysPresentMatcher(String... keys) {
             Collections.addAll(this.keys, keys);
