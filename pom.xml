@@ -44,7 +44,6 @@
         <module>graylog2-inputs</module>
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
-        <module>graylog2-bootstrap</module>
         <module>graylog2-rest-models</module>
         <module>integration-tests</module>
     </modules>
@@ -162,11 +161,6 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
