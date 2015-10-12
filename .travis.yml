@@ -1,7 +1,6 @@
 sudo: false
 language: java
 jdk:
-  - oraclejdk7
   - oraclejdk8
 cache:
   directories:
@@ -29,7 +28,7 @@ deploy:
   local-dir: target/assembly
   on:
     repo: Graylog2/graylog2-server
-    jdk: oraclejdk7
+    jdk: oraclejdk8
     branch:
       - master
       - 1.0
