@@ -570,7 +570,7 @@
             <dependency>
                 <groupId>com.joestelmach</groupId>
                 <artifactId>natty</artifactId>
-                <version>0.11</version>
+                <version>0.12</version>
                 <exclusions>
                     <!-- Getting rid of commons-logging in a transitive dependency of com.joestelmach:natty -->
                     <exclusion>
