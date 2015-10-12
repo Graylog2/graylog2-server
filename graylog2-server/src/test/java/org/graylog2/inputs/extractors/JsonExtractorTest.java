@@ -63,10 +63,10 @@ public class JsonExtractorTest {
                 new Extractor.Result("foobar", "text", -1, -1),
                 new Extractor.Result(1234.5678, "number", -1, -1),
                 new Extractor.Result(true, "bool", -1, -1),
-                new Extractor.Result(null, "null", -1, -1)
+                new Extractor.Result("null", "null", -1, -1)
         );
     }
-
+    
     @Test
     public void testRunWithArray() throws Exception {
         final String value = "{\"array\": [\"foobar\", \"foobaz\"]}";
