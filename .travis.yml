@@ -1,8 +1,6 @@
 sudo: false
 language: java
-jdk:
-  - oraclejdk7
-  - oraclejdk8
+jdk: oraclejdk8
 env:
   global:
   - secure: |-
@@ -31,12 +29,13 @@ deploy:
   local-dir: target/universal
   on:
     repo: Graylog2/graylog2-web-interface
-    jdk: oraclejdk7
+    jdk: oraclejdk8
     branch:
       - master
       - 1.0
       - 1.1
       - 1.2
+      - 1.3
 notifications:
   slack:
     on_success: change
