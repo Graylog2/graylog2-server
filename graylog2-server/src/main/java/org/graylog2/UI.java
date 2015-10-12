@@ -19,6 +19,8 @@ package org.graylog2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 public class UI {
 
     private static final String HELP_DOCS = "http://docs.graylog.org/";
@@ -37,6 +39,7 @@ public class UI {
     }
 
     public static String wallString(String msg, String... docLinks) {
+        HashMap<String, String> foo = new HashMap<String, String>() {{ }};
         StringBuilder sb = new StringBuilder("\n");
 
         sb.append("\n").append(wall("#")).append("\n");
