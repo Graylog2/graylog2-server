@@ -149,7 +149,6 @@
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
                     <includes>
                         <include>**/*Spec.class</include>
                         <include>**/*Test.class</include>
