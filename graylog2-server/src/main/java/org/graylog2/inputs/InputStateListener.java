@@ -25,9 +25,8 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.system.activities.Activity;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +50,7 @@ public class InputStateListener {
     @Subscribe public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
         final IOState<MessageInput> state = event.changedState();
         final MessageInput input = state.getStoppable();
+        LOG.debug("Input State of {} changed: {} -> {}", input.getTitle(), event.oldState(), event.newState());
         switch (event.newState()) {
             case FAILED:
                 activityWriter.write(new Activity(state.getDetailedMessage(), InputRegistry.class));
@@ -60,11 +60,11 @@ public class InputStateListener {
                 notification.addDetail("input_id", input.getId());
                 notification.addDetail("reason", state.getDetailedMessage());
                 notificationService.publishIfFirst(notification);
-                break;
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
             default:
                 final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
+                LOG.info(msg);
                 activityWriter.write(new Activity(msg, InputStateListener.class));
                 break;
         }
