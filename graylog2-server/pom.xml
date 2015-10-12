@@ -56,10 +56,6 @@
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-radio</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-inputs</artifactId>
         </dependency>
         <dependency>

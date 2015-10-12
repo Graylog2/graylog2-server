@@ -42,7 +42,6 @@
         <module>graylog2-shared</module>
         <module>graylog2-server</module>
         <module>graylog2-inputs</module>
-        <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
         <module>graylog2-bootstrap</module>
@@ -182,11 +181,6 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-radio</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
