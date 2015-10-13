@@ -1,43 +1,54 @@
-import ifetch from 'isomorphic-fetch';
+import request from 'superagent-bluebird-promise';
 import SessionStore from 'stores/sessions/SessionStore';
 
-const createBasicAuthHeader = (username, password) => {
-  return 'Basic ' + btoa(username + ':' + password);
-};
-export function fetch(url, options) {
-  if (options === undefined) {
-    options = {headers: {}};
+class FetchError extends Error {
+  constructor(message, additional) {
+    super(message);
+    this.additional = additional;
   }
-  if (options.headers === undefined) {
-    options.headers = {};
-  }
-
-  const token = SessionStore.getSessionId();
-
-  options.headers.Authorization = createBasicAuthHeader(token, 'session');
-  return ifetch(url, options);
 }
 
-export function fetchUnauthenticated(url, options) {
-  return ifetch(url, options);
+export class Builder {
+  constructor(method, url) {
+    this.request = request(method, url);
+  }
+
+  authenticated() {
+    const token = SessionStore.getSessionId();
+    this.request = this.request.auth(token, 'session');
+
+    return this;
+  }
+
+  json(body) {
+    this.request = this.request
+      .send(body)
+      .type('json')
+      .accept('json');
+
+    this.promise = (resp) => {
+      if (resp.ok) {
+        return resp.body;
+      }
+
+      throw new FetchError(resp.statusText, resp);
+    };
+
+    return this;
+  }
+
+  build() {
+    if (this.promise) {
+      return this.request.then(this.promise);
+    }
+    return this.request;
+  }
 }
 
-export function fetchJson(url, options, body) {
-  if (options === undefined) {
-    options = {headers: {}};
-  }
-  if (options.headers === undefined) {
-    options.headers = {};
-  }
+export default function fetch(method, url, body) {
+  const builder = new Builder(method, url)
+    .authenticated()
+    .json(body);
 
-  options.headers.Accept = 'application/json';
-  options.headers['Content-Type'] = 'application/json';
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
-  return fetch(url, options).then((response) => {
-    return response.json();
-  });
+  return builder.build();
 }
