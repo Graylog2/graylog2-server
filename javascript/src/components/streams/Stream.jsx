@@ -1,5 +1,3 @@
-/* global jsRoutes */
-
 import React, { PropTypes } from 'react';
 import StreamThroughput from './StreamThroughput';
 import StreamControls from './StreamControls';
@@ -10,6 +8,9 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import StreamRulesStore from 'stores/streams/StreamRulesStore';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import UserNotification from 'util/UserNotification';
+import { Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
 
 const Stream = React.createClass({
   propTypes() {
@@ -24,15 +25,19 @@ const Stream = React.createClass({
     const stream = this.props.stream;
     const permissions = this.props.permissions;
     const editRulesLink = (this.isPermitted(permissions, ['streams:edit:' + stream.id]) ?
-      <a href={jsRoutes.controllers.StreamRulesController.index(stream.id).url} className="btn btn-info">Edit rules</a> : null);
+      (<LinkContainer to={Routes.stream_edit(stream.id)}>
+        <Button bsStyle='info'>Edit rules</Button>
+      </LinkContainer>) : null);
 
     let manageOutputsLink = null;
     let manageAlertsLink = null;
     if (this.isPermitted(permissions, ['streams:edit:' + stream.id, 'stream_outputs:read'])) {
-      manageOutputsLink = (<a href={jsRoutes.controllers.StreamOutputsController.index(stream.id).url}
-                             className="btn btn-info">Manage outputs</a>);
-      manageAlertsLink = (<a href={jsRoutes.controllers.AlertsController.index(stream.id).url}
-                            className="btn btn-info">Manage alerts</a>);
+      manageOutputsLink = (<LinkContainer to={Routes.stream_outputs(stream.id)}>
+        <Button bsStyle="info">Manage Outputs</Button>
+      </LinkContainer>);
+      manageAlertsLink = (<LinkContainer to={Routes.stream_alerts(stream.id)}>
+        <Button bsStyle="info">Manage Alerts</Button>
+      </LinkContainer>);
     }
 
     let toggleStreamLink;
@@ -54,8 +59,9 @@ const Stream = React.createClass({
     return (
       <li className="stream">
         <h2>
-          <a
-            href={jsRoutes.controllers.StreamSearchController.index(stream.id, '*', 'relative', 300).url}>{stream.title}</a>
+          <LinkContainer to={Routes.stream_search(stream.id, "*", 'relative', 300)}>
+            <a>{stream.title}</a>
+          </LinkContainer>
 
           <StreamStateBadge stream={stream} onClick={this.props.onResume}/>
         </h2>
@@ -98,8 +104,8 @@ const Stream = React.createClass({
       default:
       case 'AND': verbalMatchingType = 'all'; break;
     }
-    return (stream.stream_rules.length > 0 ?
-      'Must match ' + verbalMatchingType + ' of the ' + stream.stream_rules.length + ' configured stream rule(s).' : 'No configured rules.');
+    return (stream.rules.length > 0 ?
+      'Must match ' + verbalMatchingType + ' of the ' + stream.rules.length + ' configured stream rule(s).' : 'No configured rules.');
   },
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
