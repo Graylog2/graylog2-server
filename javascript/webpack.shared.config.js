@@ -8,7 +8,7 @@ var webpackConfig = {
       config: './src/config.js',
     },
     output: {
-        path: './public/build/',
+        path: './build',
         filename: '[name].js',
     },
     module: {
@@ -19,8 +19,7 @@ var webpackConfig = {
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader?stage=0'], exclude: /node_modules|\.node_cache/ },
             { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
-            { test: /\.jpg$/, loader: 'file-loader' },
-            { test: /\.(woff(2)?|svg|eot|ttf)(\?.+)?$/, loader: 'file-loader' },
+            { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file-loader' },
             { test: /\.png$/, loader: 'url-loader' },
             { test: /\.less$/, loader: 'style!css!less' },
             { test: /\.css$/, loader: 'style!css' },
