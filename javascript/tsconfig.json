@@ -3,5 +3,7 @@
     "target": "es5",
     "sourceMap" : true
   },
-  "files": []
+  "files": [
+    "declarations/toastr/toastr.d.ts"
+  ]
 }
