@@ -249,27 +249,7 @@ public class ClusterService {
                 ioStats.writtenBytes += asLong(written_bytes, metrics);
                 ioStats.writtenBytesTotal += asLong(written_bytes_total, metrics);
             }
-
-            for (Radio radio : nodeService.radios().values()) {
-                try {
-                    final MetricsListResponse radioResponse = api
-                            .path(routes.radio().MetricsResource().multipleMetrics(), MetricsListResponse.class)
-                            .body(request)
-                            .radio(radio)
-                            .expect(200, 404)
-                            .execute();
-                    final Map<String, Metric> metrics = radioResponse.getMetrics();
-
-                    ioStats.readBytes += asLong(read_bytes, metrics);
-                    ioStats.readBytesTotal += asLong(read_bytes_total, metrics);
-                    ioStats.writtenBytes += asLong(written_bytes, metrics);
-                    ioStats.writtenBytesTotal += asLong(written_bytes_total, metrics);
-                } catch (APIException | IOException e) {
-                    LOG.error("Unable to load metrics for radio node {}", radio.getId());
-                }
-            }
-
-        } catch (APIException | IOException e) {
+        } catch (APIException e) {
             LOG.error("Unable to load master node", e);
         }
         return ioStats;

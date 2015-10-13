@@ -16,28 +16,22 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
-import org.graylog2.restclient.models.api.responses.cluster.RadioSummaryResponse;
-import org.graylog2.restclient.models.api.responses.cluster.RadiosResponse;
 import org.graylog2.restroutes.generated.routes;
 
+import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Map;
 
 public class NodeService {
     private final ApiClient api;
     private final Node.Factory nodeFactory;
-    private final Radio.Factory radioFactory;
 
     @Inject
-    public NodeService(ApiClient api, Node.Factory nodeFactory, Radio.Factory radioFactory) {
+    public NodeService(ApiClient api, Node.Factory nodeFactory) {
         this.api = api;
         this.nodeFactory = nodeFactory;
-        this.radioFactory = radioFactory;
     }
 
     public Node loadNode(String nodeId) throws NodeNotFoundException {
@@ -64,35 +58,6 @@ public class NodeService {
                 .execute();
 
         return nodeFactory.fromSummaryResponse(r);
-    }
-
-    public Radio loadRadio(String radioId) throws NodeNotFoundException {
-        RadioSummaryResponse r;
-
-        try {
-            r = api.path(routes.RadiosResource().radio(radioId), RadioSummaryResponse.class)
-                    .execute();
-            return radioFactory.fromSummaryResponse(r);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (APIException e) {
-            if (e.getHttpCode() == 404) {
-                throw new NodeNotFoundException();
-            }
-
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Map<String, Radio> radios() throws APIException, IOException {
-        Map<String, Radio> radios = Maps.newHashMap();
-
-        RadiosResponse r = api.path(routes.RadiosResource().radios(), RadiosResponse.class).execute();
-        for (RadioSummaryResponse radio : r.radios) {
-            radios.put(radio.nodeId, radioFactory.fromSummaryResponse(radio));
-        }
-
-        return radios;
     }
 
     public static class NodeNotFoundException extends Exception {

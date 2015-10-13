@@ -45,7 +45,6 @@ import com.ning.http.client.listener.TransferListener;
 import com.squareup.okhttp.HttpUrl;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
-import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
@@ -227,7 +226,6 @@ class ApiClientImpl implements ApiClient {
     public class ApiRequestBuilder<T> implements org.graylog2.restclient.lib.ApiRequestBuilder<T> {
         private String pathTemplate;
         private Node node;
-        private Radio radio;
         private Collection<Node> nodes;
         private final Method method;
         private Object body;
@@ -279,19 +277,11 @@ class ApiClientImpl implements ApiClient {
         }
 
         @Override
-        public org.graylog2.restclient.lib.ApiRequestBuilder<T> radio(Radio radio) {
-            this.radio = radio;
-            return this;
-        }
-
-        @Override
         public org.graylog2.restclient.lib.ApiRequestBuilder<T> clusterEntity(ClusterEntity entity) {
-            if (entity instanceof Radio) {
-                this.radio = (Radio) entity;
-            } else if (entity instanceof Node) {
+            if (entity instanceof Node) {
                 this.node = (Node) entity;
             } else {
-                LOG.warn("You passed a ClusterEntity that is not of type Node or Radio. Selected nothing.");
+                LOG.warn("You passed a ClusterEntity that is not of type Node. Selected nothing.");
             }
             return this;
         }
@@ -403,24 +393,16 @@ class ApiClientImpl implements ApiClient {
 
         @Override
         public T execute() throws APIException, IOException {
-            if (radio != null && (node != null || nodes != null)) {
-                throw new RuntimeException("You set both and a Node and a Radio as target. This is not possible.");
-            }
-
             final ClusterEntity target;
 
-            if (radio == null) {
-                if (node == null) {
-                    if (nodes != null) {
-                        LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
-                    }
-                    node(serverNodes.any());
+            if (node == null) {
+                if (nodes != null) {
+                    LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
                 }
-
-                target = node;
-            } else {
-                target = radio;
+                node(serverNodes.any());
             }
+
+            target = node;
 
             ensureAuthentication();
             final URL url = prepareUrl(target);
@@ -738,24 +720,16 @@ class ApiClientImpl implements ApiClient {
 
         @Override
         public InputStream executeStreaming() throws APIException, IOException {
-            if (radio != null && (node != null || nodes != null)) {
-                throw new RuntimeException("You set both and a Node and a Radio as target. This is not possible.");
-            }
-
             final ClusterEntity target;
 
-            if (radio == null) {
-                if (node == null) {
-                    if (nodes != null) {
-                        LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
-                    }
-                    node(serverNodes.any());
+            if (node == null) {
+                if (nodes != null) {
+                    LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
                 }
-
-                target = node;
-            } else {
-                target = radio;
+                node(serverNodes.any());
             }
+
+            target = node;
 
             ensureAuthentication();
             final URL url = prepareUrl(target);
