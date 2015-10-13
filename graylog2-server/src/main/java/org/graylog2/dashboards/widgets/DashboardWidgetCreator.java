@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -59,7 +60,7 @@ public class DashboardWidgetCreator {
     public DashboardWidget fromRequest(Searches searches, String widgetId, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         DashboardWidget.Type type;
         try {
-            type = DashboardWidget.Type.valueOf(awr.type().toUpperCase());
+            type = DashboardWidget.Type.valueOf(awr.type().toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new DashboardWidget.NoSuchWidgetTypeException("No such widget type <" + awr.type() + ">");
         }
@@ -94,7 +95,7 @@ public class DashboardWidgetCreator {
     public DashboardWidget fromPersisted(Searches searches, BasicDBObject fields) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         DashboardWidget.Type type;
         try {
-            type = DashboardWidget.Type.valueOf(((String) fields.get(DashboardWidget.FIELD_TYPE)).toUpperCase());
+            type = DashboardWidget.Type.valueOf(((String) fields.get(DashboardWidget.FIELD_TYPE)).toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new DashboardWidget.NoSuchWidgetTypeException();
         }

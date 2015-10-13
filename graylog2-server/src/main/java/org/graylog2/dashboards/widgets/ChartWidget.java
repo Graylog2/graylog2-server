@@ -24,6 +24,7 @@ import org.graylog2.indexer.searches.Searches.DateHistogramInterval;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -40,7 +41,7 @@ public abstract class ChartWidget extends DashboardWidget {
         this.streamId = (String) config.get("stream_id");
 
         if (config.containsKey("interval")) {
-            this.interval = Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase());
+            this.interval = Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase(Locale.ENGLISH));
         } else {
             this.interval = Searches.DateHistogramInterval.MINUTE;
         }
@@ -50,7 +51,7 @@ public abstract class ChartWidget extends DashboardWidget {
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .putAll(super.getPersistedConfig())
-                .put("interval", interval.toString().toLowerCase());
+                .put("interval", interval.toString().toLowerCase(Locale.ENGLISH));
 
         if (!isNullOrEmpty(streamId)) {
             persistedConfig.put("stream_id", streamId);

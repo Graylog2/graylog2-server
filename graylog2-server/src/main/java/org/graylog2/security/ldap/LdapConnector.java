@@ -47,6 +47,7 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -312,7 +313,7 @@ public class LdapConnector {
                 byte[] utf8bytes = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
 
                 for (byte b : utf8bytes) {
-                    s += String.format("\\%02x", b);
+                    s += String.format(Locale.ENGLISH, "\\%02x", b);
                 }
             }
         }

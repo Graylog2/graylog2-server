@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.lib.timeranges;
 
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class TimeRange {
@@ -40,7 +41,7 @@ public abstract class TimeRange {
     }
 
     public static TimeRange factory(String rangeType, int relative, String from, String to, String keyword) throws InvalidRangeParametersException {
-        switch (Type.valueOf(rangeType.toUpperCase())) {
+        switch (Type.valueOf(rangeType.toUpperCase(Locale.ENGLISH))) {
             case RELATIVE:
                 return new RelativeRange(relative);
             case ABSOLUTE:
@@ -78,7 +79,7 @@ public abstract class TimeRange {
     public static TimeRange factory(Map<String, Object> timerangeConfig) throws InvalidRangeParametersException {
         String rangeType = (String) timerangeConfig.get("type");
 
-        switch (Type.valueOf(rangeType.toUpperCase())) {
+        switch (Type.valueOf(rangeType.toUpperCase(Locale.ENGLISH))) {
             case RELATIVE:
                 return new RelativeRange(((Number) timerangeConfig.get("range")).intValue());
             case ABSOLUTE:

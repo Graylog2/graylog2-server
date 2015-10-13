@@ -26,6 +26,7 @@ import kafka.utils.FileLock;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.After;
@@ -205,7 +206,7 @@ public class KafkaJournalTest {
 
     @Test
     public void segmentAgeCleanup() throws Exception {
-        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.now());
+        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.now(DateTimeZone.UTC));
 
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {

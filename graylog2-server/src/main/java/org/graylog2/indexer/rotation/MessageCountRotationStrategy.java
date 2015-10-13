@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 
 public class MessageCountRotationStrategy implements RotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
@@ -55,9 +56,11 @@ public class MessageCountRotationStrategy implements RotationStrategy {
     private static class Result implements RotationStrategy.Result {
 
         public static final MessageFormat ROTATE_FORMAT = new MessageFormat(
-                "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!");
+                "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
+                Locale.ENGLISH);
         public static final MessageFormat NOT_ROTATE_FORMAT = new MessageFormat(
-                "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.");
+                "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
+                Locale.ENGLISH);
         private final String index;
         private final long actualCount;
         private final long maxDocs;

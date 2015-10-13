@@ -17,9 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -44,6 +42,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Api(value = "System/Cluster", description = "Node discovery")
@@ -108,7 +107,7 @@ public class ClusterResource extends RestResource {
 
     private NodeSummary nodeSummary(Node node) {
         return NodeSummary.create(node.getNodeId(),
-                node.getType().toString().toLowerCase(),
+                node.getType().toString().toLowerCase(Locale.ENGLISH),
                 node.isMaster(),
                 node.getTransportAddress(),
                 Tools.getISO8601String(node.getLastSeen()),

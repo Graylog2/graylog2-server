@@ -26,9 +26,11 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -137,7 +139,7 @@ public class MessageResult {
     }
 
     public Map<String, Object> getFormattedFields() {
-        final DecimalFormat doubleFormatter = new DecimalFormat("#.###");
+        final DecimalFormat doubleFormatter = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
         return Maps.transformEntries(getFilteredFields(), new Maps.EntryTransformer<String, Object, Object>() {
             @Override

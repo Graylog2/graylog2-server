@@ -39,14 +39,14 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class VersionCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
-    private static final String USER_AGENT = format("graylog2-server (%s, %s, %s, %s)",
+    private static final String USER_AGENT = String.format(Locale.ENGLISH, "graylog2-server (%s, %s, %s, %s)",
             System.getProperty("java.vendor"), System.getProperty("java.version"),
             System.getProperty("os.name"), System.getProperty("os.version"));
 

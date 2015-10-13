@@ -32,11 +32,11 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -56,6 +56,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 import java.util.Set;
 
 @RequiresAuthentication
@@ -246,7 +247,7 @@ public class IndicesResource extends RestResource {
 
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
         return ShardRouting.create(route.shardId().getId(),
-                route.state().name().toLowerCase(),
+                route.state().name().toLowerCase(Locale.ENGLISH),
                 route.active(),
                 route.primary(),
                 route.currentNodeId(),

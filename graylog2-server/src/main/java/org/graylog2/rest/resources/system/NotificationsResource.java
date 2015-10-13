@@ -41,6 +41,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
@@ -64,7 +65,7 @@ public class NotificationsResource extends RestResource {
     public Map<String, Object> listNotifications() {
         final List<Map<String, Object>> notifications = Lists.newArrayList();
         for (Notification n : notificationService.all()) {
-            final String notificationType = n.getType().toString().toLowerCase();
+            final String notificationType = n.getType().toString().toLowerCase(Locale.ENGLISH);
             if (!isPermitted(RestPermissions.NOTIFICATIONS_READ, notificationType)) {
                 continue;
             }
@@ -95,7 +96,7 @@ public class NotificationsResource extends RestResource {
         Notification.Type type;
         checkPermission(RestPermissions.NOTIFICATIONS_DELETE, notificationType);
         try {
-            type = Notification.Type.valueOf(notificationType.toUpperCase());
+            type = Notification.Type.valueOf(notificationType.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             LOG.warn("No such notification type: [" + notificationType + "]");
             throw new BadRequestException(e);

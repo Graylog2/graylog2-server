@@ -16,8 +16,7 @@
  */
 package org.graylog2.rest.models.configuration.responses;
 
-import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
-
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -44,7 +43,7 @@ public class NumberField extends RequestedConfigurationField {
 
     @Override
     public String attributeToJSValidation(String attribute) {
-        switch (Attribute.valueOf(attribute.toUpperCase())) {
+        switch (Attribute.valueOf(attribute.toUpperCase(Locale.ENGLISH))) {
             case ONLY_NEGATIVE:
                 return "negative_number";
             case ONLY_POSITIVE:

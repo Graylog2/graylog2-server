@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
@@ -82,7 +83,7 @@ public class TestHelper {
     }
 
     public static String toHex(String arg) {
-        return String.format("%x", new BigInteger(arg.getBytes(StandardCharsets.UTF_8)));
+        return String.format(Locale.ENGLISH, "%x", new BigInteger(arg.getBytes(StandardCharsets.UTF_8)));
     }
 
     public static Message simpleLogMessage() {

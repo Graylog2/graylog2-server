@@ -28,6 +28,7 @@ import javax.ws.rs.core.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class PrintModelProcessor implements ModelProcessor {
@@ -113,7 +114,7 @@ public class PrintModelProcessor implements ModelProcessor {
 
         @Override
         public String toString() {
-            return String.format("    %-7s %s (%s)", method, path, Joiner.on(", ").join(handlerClasses));
+            return String.format(Locale.ENGLISH, "    %-7s %s (%s)", method, path, Joiner.on(", ").join(handlerClasses));
         }
     }
 }

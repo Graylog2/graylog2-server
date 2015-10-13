@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class AlertServiceImpl extends PersistedServiceImpl implements AlertService {
@@ -135,7 +136,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type;
         try {
-            type = AbstractAlertCondition.Type.valueOf(((String) fields.get("type")).toUpperCase());
+            type = AbstractAlertCondition.Type.valueOf(((String) fields.get("type")).toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + fields.get("type") + "]");
         }
@@ -170,7 +171,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
         final AbstractAlertCondition.Type alertConditionType;
         try {
-            alertConditionType = AbstractAlertCondition.Type.valueOf(type.toUpperCase());
+            alertConditionType = AbstractAlertCondition.Type.valueOf(type.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
         }
@@ -231,7 +232,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
         return ImmutableMap.<String, Object>builder()
                 .put("id", alertCondition.getId())
-                .put("type", alertCondition.getTypeString().toLowerCase())
+                .put("type", alertCondition.getTypeString().toLowerCase(Locale.ENGLISH))
                 .put("creator_user_id", alertCondition.getCreatorUserId())
                 .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
                 .put("parameters", alertCondition.getParameters())

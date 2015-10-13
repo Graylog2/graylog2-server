@@ -24,6 +24,7 @@ import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -83,7 +84,7 @@ public class FieldChartWidget extends ChartWidget {
             final HistogramResult histogramResult = searches.fieldHistogram(
                     query,
                     field,
-                    Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase()),
+                    Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
                     filter,
                     this.getTimeRange(),
                     "cardinality".equalsIgnoreCase(statisticalFunction));

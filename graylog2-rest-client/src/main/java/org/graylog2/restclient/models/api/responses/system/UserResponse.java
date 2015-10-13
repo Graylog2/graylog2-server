@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.Startpage;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class UserResponse {
         }
 
         try {
-            return new Startpage(Startpage.Type.valueOf(startpage.type.toUpperCase()), startpage.id);
+            return new Startpage(Startpage.Type.valueOf(startpage.type.toUpperCase(Locale.ENGLISH)), startpage.id);
         } catch(IllegalArgumentException e) {
             return null;
         }

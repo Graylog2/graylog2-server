@@ -42,6 +42,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -193,7 +194,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                         LOG.debug("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
                         continue;
                     }
-                    final Role role = roleNameToRole.get(roleName.toLowerCase());
+                    final Role role = roleNameToRole.get(roleName.toLowerCase(Locale.ENGLISH));
                     if (role != null) {
                         LOG.debug("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
                         translatedRoleIds.add(role.getId());

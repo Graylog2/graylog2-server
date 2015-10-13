@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
 
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -55,7 +56,7 @@ public class KeywordRange implements TimeRange {
     @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>builder()
-                .put("type", getType().toString().toLowerCase())
+                .put("type", getType().toString().toLowerCase(Locale.ENGLISH))
                 .put("keyword", getKeyword())
                 .build();
     }

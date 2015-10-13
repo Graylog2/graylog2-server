@@ -33,6 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -73,19 +74,19 @@ public class StreamListFingerprintTest {
     private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {
         final HashMap<String, Object> fields = Maps.newHashMap();
         fields.put(StreamImpl.FIELD_TITLE, title);
-        return new StreamImpl(new ObjectId(String.format("%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
+        return new StreamImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
                 outputs));
     }
 
     private static StreamRule makeStreamRule(int id, String field) {
         final HashMap<String, Object> fields = Maps.newHashMap();
         fields.put(StreamRuleImpl.FIELD_FIELD, field);
-        return new StreamRuleImpl(new ObjectId(String.format("%024d", id)), fields);
+        return new StreamRuleImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields);
     }
 
     private static Output makeOutput(int id, String title) {
         return OutputImpl.create(
-                String.format("%024d", id),
+                String.format(Locale.ENGLISH, "%024d", id),
                 title,
                 "foo",
                 "user1",

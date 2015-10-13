@@ -16,15 +16,16 @@
  */
 package org.graylog2.indexer.rotation;
 
-import javax.inject.Inject;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 @Singleton
 public class SizeBasedRotationStrategy implements RotationStrategy {
@@ -52,8 +53,8 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
         final boolean shouldRotate = sizeInBytes > maxSize;
 
         return new Result() {
-            public final MessageFormat ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.");
-            public final MessageFormat NOT_ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.");
+            public final MessageFormat ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH);
+            public final MessageFormat NOT_ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
 
             @Override
             public String getDescription() {

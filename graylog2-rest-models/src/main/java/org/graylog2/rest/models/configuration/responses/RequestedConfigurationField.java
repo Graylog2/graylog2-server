@@ -17,6 +17,7 @@
 package org.graylog2.rest.models.configuration.responses;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -74,7 +75,7 @@ public abstract class RequestedConfigurationField {
     }
 
     public boolean hasAttribute(String attribute) {
-        return attributes.contains(attribute.toLowerCase());
+        return attributes.contains(attribute.toLowerCase(Locale.ENGLISH));
     }
 
     public String getAttributesAsJSValidationSpec() {
