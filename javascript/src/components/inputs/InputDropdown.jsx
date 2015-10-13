@@ -25,7 +25,7 @@ var InputDropdown = React.createClass({
     },
     render() {
         if (this.props.inputs) {
-            var inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).map(this._formatInput));
+            var inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).values()).map(this._formatInput);
             return (
                 <div>
                         <Input type='select' style={{float: "left", width: "400px", marginRight: "10px"}} valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>

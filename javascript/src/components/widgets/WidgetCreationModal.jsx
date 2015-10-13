@@ -13,6 +13,20 @@ var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatistics
 
 var StringUtils = require('../../util/StringUtils');
 
+class Fieldset extends React.Component {
+  static propTypes = {
+    children: React.PropTypes.any,
+  };
+
+  render() {
+    return (
+      <fieldset>
+        {this.props.children}
+      </fieldset>
+    );
+  }
+}
+
 var WidgetCreationModal = React.createClass({
     getInitialState() {
         this.initialConfiguration = Immutable.Map();
@@ -24,8 +38,8 @@ var WidgetCreationModal = React.createClass({
     // We need to set the default configuration in case some inputs are never changed
     _setInitialConfiguration() {
         var initialConfiguration = this.initialConfiguration;
-        if (this.refs['inputFieldset'] !== undefined) {
-            var fieldsetChildren = this.refs['inputFieldset'].props.children;
+        if (this.refs.inputFieldset !== undefined) {
+            var fieldsetChildren = this.refs.inputFieldset.props.children;
             React.Children.forEach(fieldsetChildren, (child) => {
                 // We only care about children with refs, as all inputs have one
                 if (child.ref !== undefined && child.ref !== 'title') {
@@ -216,7 +230,7 @@ var WidgetCreationModal = React.createClass({
                                 onModalClose={this.props.onModalHidden}
                                 onSubmitForm={this.save}
                                 submitButtonText="Create">
-                <fieldset ref="inputFieldset">
+                <Fieldset ref="inputFieldset">
                     <Input type="text"
                            label="Title"
                            ref="title"
@@ -226,7 +240,7 @@ var WidgetCreationModal = React.createClass({
                            help="Type a name that describes your widget."
                            autoFocus />
                     {this._getSpecificWidgetInputs()}
-                </fieldset>
+                </Fieldset>
             </BootstrapModalForm>
         );
     }
