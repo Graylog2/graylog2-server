@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -102,7 +103,7 @@ public class StackedChartWidget extends ChartWidget {
                 final HistogramResult histogramResult = searches.fieldHistogram(
                         series.query,
                         series.field,
-                        Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase()),
+                        Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
                         filter,
                         this.getTimeRange(),
                         "cardinality".equalsIgnoreCase(series.statisticalFunction));

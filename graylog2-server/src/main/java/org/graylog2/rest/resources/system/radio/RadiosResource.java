@@ -37,9 +37,9 @@ import org.graylog2.rest.models.radio.requests.PingRequest;
 import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
 import org.graylog2.rest.models.radio.responses.PersistedInputsSummaryResponse;
 import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.models.system.radio.responses.RadioSummary;
 import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
+import org.graylog2.rest.models.system.radio.responses.RadioSummary;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +59,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Api(value = "System/Radios", description = "Management of graylog2-radio nodes.")
@@ -264,7 +265,7 @@ public class RadiosResource extends RestResource {
     private RadioSummary radioSummary(Node node) {
         return RadioSummary.create(
                 node.getNodeId(),
-                node.getType().toString().toLowerCase(),
+                node.getType().toString().toLowerCase(Locale.ENGLISH),
                 node.getTransportAddress(),
                 Tools.getISO8601String(node.getLastSeen()),
                 node.getShortNodeId());

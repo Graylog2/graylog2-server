@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.inputs;
 
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -53,7 +54,7 @@ public abstract class Converter {
     }
 
     public String getType() {
-        return this.type.toString().toLowerCase();
+        return this.type.toString().toLowerCase(Locale.ENGLISH);
     }
 
     public Map<String, Object> getConfig() {

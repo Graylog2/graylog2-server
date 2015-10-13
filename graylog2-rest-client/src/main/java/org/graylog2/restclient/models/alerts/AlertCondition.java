@@ -24,6 +24,8 @@ import org.graylog2.restclient.models.api.responses.alerts.AlertConditionSummary
 import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.Map;
 
 public class AlertCondition {
@@ -48,7 +50,7 @@ public class AlertCondition {
     @AssistedInject
     private AlertCondition(UserService userService, @Assisted AlertConditionSummaryResponse acsr) {
         this.id = acsr.id;
-        this.type = Type.valueOf(acsr.type.toUpperCase());
+        this.type = Type.valueOf(acsr.type.toUpperCase(Locale.ENGLISH));
         this.parameters = acsr.parameters;
         this.inGrace = acsr.inGrace;
         this.createdAt = DateTime.parse(acsr.createdAt);
@@ -190,7 +192,7 @@ public class AlertCondition {
     private String buildFieldValueDescription() {
         StringBuilder sb = new StringBuilder();
         double threshold = ((Number) parameters.get("threshold")).doubleValue();
-        String thresholdFormatted = new DecimalFormat("#.###").format(threshold);
+        String thresholdFormatted = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH)).format(threshold);
         int time = (int) ((Number) parameters.get("time")).longValue();
 
         sb.append("Alert is triggered when the field ")

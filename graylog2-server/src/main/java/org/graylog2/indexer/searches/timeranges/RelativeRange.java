@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class RelativeRange implements TimeRange {
@@ -45,7 +46,7 @@ public class RelativeRange implements TimeRange {
     @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>of(
-                "type", getType().toString().toLowerCase(),
+                "type", getType().toString().toLowerCase(Locale.ENGLISH),
                 "range", getRange());
     }
 

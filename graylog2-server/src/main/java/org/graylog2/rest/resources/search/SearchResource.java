@@ -36,12 +36,12 @@ import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
-import org.graylog2.rest.resources.search.responses.QueryParseError;
-import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
+import org.graylog2.rest.resources.search.responses.QueryParseError;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -55,6 +55,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -195,7 +196,7 @@ public abstract class SearchResource extends RestResource {
     protected HistogramResult buildHistogramResult(org.graylog2.indexer.results.HistogramResult histogram) {
         final AbsoluteRange histogramBoundaries = histogram.getHistogramBoundaries();
         return HistogramResult.create(
-                histogram.getInterval().toString().toLowerCase(),
+                histogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
                 histogram.getResults(),
                 histogram.took().millis(),
                 histogram.getBuiltQuery(),

@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -111,7 +112,7 @@ public abstract class PersistedImpl implements Persisted {
         final Map<String, Object> result = new HashMap<>();
         for (Method method : this.getClass().getMethods()) {
             if (method.getName().startsWith("get") && method.getParameterTypes().length == 0) {
-                final String fieldName = method.getName().substring(3).toLowerCase();
+                final String fieldName = method.getName().substring(3).toLowerCase(Locale.ENGLISH);
                 try {
                     result.put(fieldName, method.invoke(this));
                 } catch (IllegalAccessException | InvocationTargetException e) {

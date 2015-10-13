@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +67,7 @@ public class Extractor {
         }
 
         public static Type fromString(String name) {
-            return valueOf(name.toUpperCase());
+            return valueOf(name.toUpperCase(Locale.ENGLISH));
         }
     }
 
@@ -75,7 +76,7 @@ public class Extractor {
         COPY;
 
         public static CursorStrategy fromString(String name) {
-            return valueOf(name.toUpperCase());
+            return valueOf(name.toUpperCase(Locale.ENGLISH));
         }
 
     }
@@ -86,7 +87,7 @@ public class Extractor {
         REGEX;
 
         public static ConditionType fromString(String name) {
-            return valueOf(name.toUpperCase());
+            return valueOf(name.toUpperCase(Locale.ENGLISH));
         }
     }
 
@@ -159,8 +160,8 @@ public class Extractor {
             converterList.put(converter.getType(), converter.getConfig());
         }
 
-        final CreateExtractorRequest request = CreateExtractorRequest.create(title, cursorStrategy.toString().toLowerCase(), sourceField, targetField,
-                extractorType.toString().toLowerCase(), extractorConfig, converterList, conditionType.toString().toLowerCase(), conditionValue, order);
+        final CreateExtractorRequest request = CreateExtractorRequest.create(title, cursorStrategy.toString().toLowerCase(Locale.ENGLISH), sourceField, targetField,
+                extractorType.toString().toLowerCase(Locale.ENGLISH), extractorConfig, converterList, conditionType.toString().toLowerCase(Locale.ENGLISH), conditionValue, order);
 
         return request;
     }
@@ -205,7 +206,7 @@ public class Extractor {
         }
 
         for (String name : extractSelectedConverters(form)) {
-            Converter.Type converterType = Converter.Type.valueOf(name.toUpperCase());
+            Converter.Type converterType = Converter.Type.valueOf(name.toUpperCase(Locale.ENGLISH));
             Map<String, Object> converterConfig = extractConverterConfig(converterType, form);
 
             converters.add(new Converter(converterType, converterConfig));
@@ -219,7 +220,7 @@ public class Extractor {
         }
 
         for (Map<String, Object> imp : imports) {
-            final Converter.Type type = Converter.Type.valueOf(((String) imp.get("type")).toUpperCase());
+            final Converter.Type type = Converter.Type.valueOf(((String) imp.get("type")).toUpperCase(Locale.ENGLISH));
             converters.add(new Converter(type, (Map<String, Object>) imp.get("config")));
         }
     }
@@ -461,10 +462,10 @@ public class Extractor {
         export.put("order", order);
         export.put("source_field", sourceField);
         export.put("target_field", targetField);
-        export.put("cursor_strategy", cursorStrategy.toString().toLowerCase());
-        export.put("condition_type", conditionType.toString().toLowerCase());
+        export.put("cursor_strategy", cursorStrategy.toString().toLowerCase(Locale.ENGLISH));
+        export.put("condition_type", conditionType.toString().toLowerCase(Locale.ENGLISH));
         export.put("condition_value", conditionValue);
-        export.put("extractor_type", extractorType.toString().toLowerCase());
+        export.put("extractor_type", extractorType.toString().toLowerCase(Locale.ENGLISH));
         export.put("extractor_config", extractorConfig);
         export.put("converters", converterConfigList);
 

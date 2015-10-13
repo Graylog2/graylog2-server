@@ -153,7 +153,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
                 any(Sorting.class))).thenReturn(searchResult);
 
         final FieldContentValueAlertCondition alertCondition = new FieldContentValueAlertCondition(searches, configuration, stream,
-                null, DateTime.now(), "mockuser", ImmutableMap.<String,Object>of("field", "test", "value", "test"));
+                null, DateTime.now(DateTimeZone.UTC), "mockuser", ImmutableMap.<String,Object>of("field", "test", "value", "test"));
 
         final AbstractAlertCondition.CheckResult result = alertCondition.runCheck();
     }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +73,7 @@ public class Buffers {
         try {
             retryer.call(checkForEmptyBuffers);
         } catch (RetryException e) {
-            LOG.info("Buffers not empty after {} {}. Giving up.", maxWait, timeUnit.name().toLowerCase());
+            LOG.info("Buffers not empty after {} {}. Giving up.", maxWait, timeUnit.name().toLowerCase(Locale.ENGLISH));
             return;
         } catch (ExecutionException e) {
             LOG.error("Error while waiting for empty buffers.", e);

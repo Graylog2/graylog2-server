@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -126,7 +127,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put("id", id)
-                .put("type", type.toString().toLowerCase())
+                .put("type", type.toString().toLowerCase(Locale.ENGLISH))
                 .put("creator_user_id", creatorUserId)
                 .put("created_at", Tools.getISO8601String(createdAt))
                 .put("parameters", parameters)

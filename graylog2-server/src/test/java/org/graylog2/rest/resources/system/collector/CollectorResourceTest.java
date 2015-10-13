@@ -27,6 +27,7 @@ import org.graylog2.rest.models.collector.responses.CollectorList;
 import org.graylog2.rest.models.collector.responses.CollectorSummary;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -105,9 +106,9 @@ public class CollectorResourceTest extends RestResourceBaseTest {
     }
 
     private List<Collector> getDummyCollectorList() {
-        final Collector collector1 = getDummyCollector("collector1id", "collector1nodeid", DateTime.now(), "DummyOS 1.0");
-        final Collector collector2 = getDummyCollector("collector2id", "collector2nodeid", DateTime.now(), "DummyOS 1.0");
-        final Collector collector3 = getDummyCollector("collector3id", "collector3nodeid", DateTime.now(), "DummyOS 1.0");
+        final Collector collector1 = getDummyCollector("collector1id", "collector1nodeid", DateTime.now(DateTimeZone.UTC), "DummyOS 1.0");
+        final Collector collector2 = getDummyCollector("collector2id", "collector2nodeid", DateTime.now(DateTimeZone.UTC), "DummyOS 1.0");
+        final Collector collector3 = getDummyCollector("collector3id", "collector3nodeid", DateTime.now(DateTimeZone.UTC), "DummyOS 1.0");
 
         return Lists.newArrayList(collector1, collector2, collector3);
     }

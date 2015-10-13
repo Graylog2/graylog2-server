@@ -89,7 +89,7 @@ public class DateTools {
             tz = currentUser.getTimeZone();
         }
 
-        int offset = tz.getOffset(new DateTime().getMillis());
+        int offset = tz.getOffset(new DateTime(DateTimeZone.UTC).getMillis());
 
         return ((offset / 1000) / 60) * -1;
     }

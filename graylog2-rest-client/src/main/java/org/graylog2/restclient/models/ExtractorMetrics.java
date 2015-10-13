@@ -16,11 +16,11 @@
  */
 package org.graylog2.restclient.models;
 
+import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 import org.graylog2.restclient.lib.metrics.Meter;
 import org.graylog2.restclient.lib.metrics.Timer;
-import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 
-import java.util.Map;
+import java.util.Locale;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -34,11 +34,11 @@ public class ExtractorMetrics {
 
     public ExtractorMetrics(TimerRateMetricsResponse total, TimerRateMetricsResponse converters) {
         if (total.durationUnit != null) {
-            this.totalTiming = new Timer(total.time, Timer.Unit.valueOf(total.durationUnit.toUpperCase()));
+            this.totalTiming = new Timer(total.time, Timer.Unit.valueOf(total.durationUnit.toUpperCase(Locale.ENGLISH)));
         }
 
         if (converters.durationUnit != null) {
-            this.converterTiming = new Timer(converters.time, Timer.Unit.valueOf(converters.durationUnit.toUpperCase()));
+            this.converterTiming = new Timer(converters.time, Timer.Unit.valueOf(converters.durationUnit.toUpperCase(Locale.ENGLISH)));
         }
 
         if (total.rate == null) {

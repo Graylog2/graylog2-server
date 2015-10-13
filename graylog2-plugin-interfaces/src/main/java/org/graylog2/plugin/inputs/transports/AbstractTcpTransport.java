@@ -58,6 +58,7 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -152,7 +153,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 tlsCertFile = ssc.certificate();
                 tlsKeyFile = ssc.privateKey();
             } catch (CertificateException e) {
-                LOG.error(String.format("Problem creating a self-signed certificate for input [%s/%s].", input.getName(), input.getId()), e);
+                LOG.error(String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].",
+                        input.getName(), input.getId()), e);
                 return baseChannelHandlers;
             }
         }

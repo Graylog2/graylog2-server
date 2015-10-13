@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -80,7 +81,7 @@ public abstract class Extractor implements EmbeddedPersistable {
          */
         public static Type fuzzyValueOf(String s) {
             try {
-                return valueOf(s.toUpperCase());
+                return valueOf(s.toUpperCase(Locale.ENGLISH));
             } catch (Exception e) {
                 return null;
             }
@@ -162,8 +163,8 @@ public abstract class Extractor implements EmbeddedPersistable {
             this.regexConditionPattern = Pattern.compile(conditionValue, Pattern.DOTALL);
         }
 
-        this.totalTimerName = name(getClass(), getType().toString().toLowerCase(), getId(), "executionTime");
-        this.converterTimerName = name(getClass(), getType().toString().toLowerCase(), getId(), "converterExecutionTime");
+        this.totalTimerName = name(getClass(), getType().toString().toLowerCase(Locale.ENGLISH), getId(), "executionTime");
+        this.converterTimerName = name(getClass(), getType().toString().toLowerCase(Locale.ENGLISH), getId(), "converterExecutionTime");
     }
 
     public void runExtractor(Message msg) {
@@ -333,13 +334,13 @@ public abstract class Extractor implements EmbeddedPersistable {
                 .put(FIELD_ID, id)
                 .put(FIELD_TITLE, title)
                 .put(FIELD_ORDER, order)
-                .put(FIELD_TYPE, superType.toString().toLowerCase())
-                .put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase())
+                .put(FIELD_TYPE, superType.toString().toLowerCase(Locale.ENGLISH))
+                .put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase(Locale.ENGLISH))
                 .put(FIELD_TARGET_FIELD, targetField)
                 .put(FIELD_SOURCE_FIELD, sourceField)
                 .put(FIELD_CREATOR_USER_ID, creatorUserId)
                 .put(FIELD_EXTRACTOR_CONFIG, extractorConfig)
-                .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase())
+                .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase(Locale.ENGLISH))
                 .put(FIELD_CONDITION_VALUE, conditionValue)
                 .put(FIELD_CONVERTERS, converterConfigMap())
                 .build();
@@ -354,7 +355,7 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         for (Converter converter : converters) {
             final Map<String, Object> config = ImmutableMap.of(
-                    FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(),
+                    FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(Locale.ENGLISH),
                     FIELD_CONVERTER_CONFIG, converter.getConfig()
             );
             listBuilder.add(config);

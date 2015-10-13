@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -494,7 +495,7 @@ public final class Tools {
     public static String bytesToHex(byte[] a) {
         StringBuilder sb = new StringBuilder(a.length * 2);
         for(byte b: a)
-            sb.append(String.format("%02x", b & 0xff)).append(' ');
+            sb.append(String.format(Locale.ENGLISH, "%02x", b & 0xff)).append(' ');
         return sb.toString().trim();
     }
     /**

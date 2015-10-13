@@ -19,7 +19,11 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.*;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.database.NotFoundException;
@@ -27,11 +31,6 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorCreated;
-import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorMetrics;
-import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
-import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
-import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
@@ -39,11 +38,16 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.rest.models.system.inputs.extractors.requests.OrderExtractorsRequest;
-import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorCreated;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorMetrics;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.PersistedInputs;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -52,11 +56,20 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
@@ -303,9 +316,9 @@ public class ExtractorsResource extends RestResource {
         final ExtractorMetrics metrics = ExtractorMetrics.create(MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())),
                 MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
 
-        return ExtractorSummary.create(extractor.getId(), extractor.getTitle(), extractor.getType().toString().toLowerCase(), extractor.getCursorStrategy().toString().toLowerCase(),
+        return ExtractorSummary.create(extractor.getId(), extractor.getTitle(), extractor.getType().toString().toLowerCase(Locale.ENGLISH), extractor.getCursorStrategy().toString().toLowerCase(Locale.ENGLISH),
                 extractor.getSourceField(), extractor.getTargetField(), extractor.getExtractorConfig(), extractor.getCreatorUserId(), extractor.converterConfigMap(),
-                extractor.getConditionType().toString().toLowerCase(), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
+                extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
                 extractor.getConverterExceptionCount(), metrics);
     }
 
@@ -314,7 +327,7 @@ public class ExtractorsResource extends RestResource {
 
         for (Map.Entry<String, Map<String, Object>> c : requestConverters.entrySet()) {
             try {
-                converters.add(ConverterFactory.factory(Converter.Type.valueOf(c.getKey().toUpperCase()), c.getValue()));
+                converters.add(ConverterFactory.factory(Converter.Type.valueOf(c.getKey().toUpperCase(Locale.ENGLISH)), c.getValue()));
             } catch (ConverterFactory.NoSuchConverterException e) {
                 LOG.warn("No such converter [" + c.getKey() + "]. Skipping.", e);
             } catch (ConfigurationException e) {
@@ -332,14 +345,14 @@ public class ExtractorsResource extends RestResource {
                     id,
                     cer.title(),
                     cer.order(),
-                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase()),
-                    Extractor.Type.valueOf(cer.extractorType().toUpperCase()),
+                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase(Locale.ENGLISH)),
+                    Extractor.Type.valueOf(cer.extractorType().toUpperCase(Locale.ENGLISH)),
                     cer.sourceField(),
                     cer.targetField(),
                     cer.extractorConfig(),
                     getCurrentUser().getName(),
                     loadConverters(cer.converters()),
-                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase()),
+                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase(Locale.ENGLISH)),
                     cer.conditionValue()
             );
         } catch (ExtractorFactory.NoSuchExtractorException e) {

@@ -19,6 +19,8 @@ package org.graylog2.restclient.models;
 import org.graylog2.restclient.lib.ClusterHealthStatus;
 import org.graylog2.restclient.models.api.responses.system.ESClusterHealthResponse;
 
+import java.util.Locale;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -31,7 +33,7 @@ public class ESClusterHealth {
     private final int initializingShards;
 
     public ESClusterHealth(ESClusterHealthResponse r) {
-        this.status = ClusterHealthStatus.valueOf(r.status.toUpperCase());
+        this.status = ClusterHealthStatus.valueOf(r.status.toUpperCase(Locale.ENGLISH));
         this.activeShards = r.shards.active;
         this.initializingShards = r.shards.initializing;
         this.relocatingShards = r.shards.relocating;

@@ -22,6 +22,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.twirl.api.Html;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -151,7 +152,7 @@ public class Tools {
         int exp = (int) (Math.log(bytes) / Math.log(1024));
 
         String pre = "kMGTPE".charAt(exp-1) + "i";
-        return String.format("%.1f%sB", bytes / Math.pow(1024, exp), pre);
+        return String.format(Locale.ENGLISH, "%.1f%sB", bytes / Math.pow(1024, exp), pre);
     }
 
     public static <T> T firstNonNull(T defaultValue, T... objects) {

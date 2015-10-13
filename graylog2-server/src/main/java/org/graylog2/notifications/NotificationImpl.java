@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @CollectionName("notifications")
@@ -45,8 +46,8 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     protected NotificationImpl(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
 
-        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
-        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
+        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase(Locale.ENGLISH));
+        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get("timestamp"), DateTimeZone.UTC);
         this.node_id = (String) fields.get("node_id");
     }
@@ -54,8 +55,8 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     protected NotificationImpl(Map<String, Object> fields) {
         super(fields);
 
-        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
-        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
+        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase(Locale.ENGLISH));
+        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get("timestamp"), DateTimeZone.UTC);
         this.node_id = (String) fields.get("node_id");
     }
@@ -67,7 +68,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Notification addType(Type type) {
         this.type = type;
-        fields.put("type", type.toString().toLowerCase());
+        fields.put("type", type.toString().toLowerCase(Locale.ENGLISH));
         return this;
     }
 
@@ -82,7 +83,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Notification addSeverity(Severity severity) {
         this.severity = severity;
-        fields.put("severity", severity.toString().toLowerCase());
+        fields.put("severity", severity.toString().toLowerCase(Locale.ENGLISH));
         return this;
     }
 

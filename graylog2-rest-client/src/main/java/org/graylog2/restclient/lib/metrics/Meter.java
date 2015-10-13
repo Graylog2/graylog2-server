@@ -20,10 +20,12 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.rest.models.metrics.responses.RateMetricsResponse;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.Map;
 
 public class Meter extends Metric {
-    private static final DecimalFormat DF = new DecimalFormat("#.##");
+    private static final DecimalFormat DF = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     public final double total;
     public final double mean;
