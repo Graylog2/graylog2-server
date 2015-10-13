@@ -7,6 +7,8 @@ var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 var StreamForm = require('./StreamForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
 
 var StreamControls = React.createClass({
     mixins: [PermissionsMixin],
@@ -48,10 +50,11 @@ var StreamControls = React.createClass({
         }
 
         if (this.props.user) {
-            menuItems.push(<MenuItem key={"setAsStartpage-" + stream.id} className={this.props.user.readonly ? "disabled" : ""}
-                                     href={this.props.user.readonly ? null : jsRoutes.controllers.StartpageController.set("stream", stream.id).url}>
+            menuItems.push(<LinkContainer key={'setAsStartpage-' + stream.id} to={Routes.startpage_set('stream', stream.id)}>
+              <MenuItem disabled={this.props.user.readonly}>
                 Set as startpage
-            </MenuItem>);
+              </MenuItem>
+            </LinkContainer>);
         }
 
         if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
