@@ -2,7 +2,7 @@
 
 declare var $: any;
 
-declare var toastr: any;
+import toastr = require('toastr');
 
 var UserNotification = {
     error(message: string, title?: string) {
@@ -10,8 +10,8 @@ var UserNotification = {
             "debug": false,
             "positionClass": "toast-bottom-full-width",
             "onclick": null,
-            "fadeIn": 300,
-            "fadeOut": 1000,
+            "showDuration": 300,
+            "hideDuration": 1000,
             "timeOut": 10000,
             "extendedTimeOut": 1000
         });
@@ -21,8 +21,8 @@ var UserNotification = {
             "debug": false,
             "positionClass": "toast-bottom-full-width",
             "onclick": null,
-            "fadeIn": 300,
-            "fadeOut": 1000,
+            "showDuration": 300,
+            "hideDuration": 1000,
             "timeOut": 7000,
             "extendedTimeOut": 1000
         });
@@ -32,8 +32,8 @@ var UserNotification = {
             "debug": false,
             "positionClass": "toast-bottom-full-width",
             "onclick": null,
-            "fadeIn": 300,
-            "fadeOut": 1000,
+            "showDuration": 300,
+            "hideDuration": 1000,
             "timeOut": 7000,
             "extendedTimeOut": 1000
         });
