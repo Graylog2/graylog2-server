@@ -5,7 +5,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
-const { fetchJson } = require('logic/rest/FetchProvider');
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface StreamRuleType {
     id: number;
@@ -34,8 +34,8 @@ class StreamRulesStore {
         };
 
         $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);*/
-        var url = "http://localhost:12900/streams/rules/types";
-        var promise = fetchJson(url);
+        var url = "/streams/null/rules/types";
+        var promise = fetch('GET', URLUtils.qualifyUrl(url));
 
         return promise;
     }

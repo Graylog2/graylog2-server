@@ -5,7 +5,7 @@ declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
-const { fetchJson } = require('logic/rest/FetchProvider');
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface Stream {
     id: string;
@@ -24,12 +24,17 @@ interface Callback {
     (): void;
 }
 
+interface StreamSummaryResponse {
+  total: number;
+  streams: Array<Stream>;
+}
+
 class StreamsStore {
     private callbacks: Array<Callback> = [];
 
     listStreams() {
         var url = "http://localhost:12900/streams";
-        var promise = fetchJson(url);
+        var promise = fetch('GET', url);
         /*promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading streams failed with status: " + errorThrown,
                 "Could not load streams");
@@ -42,7 +47,9 @@ class StreamsStore {
                 "Could not retrieve Streams");
         };
 
-        this.listStreams().then(callback); //.fail(failCallback);
+        this.listStreams().then((result:StreamSummaryResponse) => {
+          callback(result.streams);
+        });
     }
     get(streamId: string, callback: ((stream: Stream) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -51,7 +58,7 @@ class StreamsStore {
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
-        $.getJSON(url).done(callback).fail(failCallback);
+        $.getJSON(url).then(callback).catch(failCallback);
     }
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {

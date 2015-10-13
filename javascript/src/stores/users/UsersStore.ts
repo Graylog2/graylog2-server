@@ -1,10 +1,8 @@
 /// <reference path="../../../declarations/jquery/jquery.d.ts" />
 
-declare var $: any;
-declare var jsRoutes: any;
-
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
+const fetch = require('logic/rest/FetchProvider').default;
 
 export interface StartPage {
     id: string;
@@ -46,8 +44,8 @@ export var UsersStore = {
     },
 
     load(username: string): JQueryPromise<User> {
-        var promise = $.getJSON(jsRoutes.controllers.api.UsersApiController.loadUser(username).url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        const promise = fetch('GET', URLUtils.qualifyUrl('/users/' + username));
+        promise.catch((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading user failed with status: " + errorThrown,
                 "Could not load user " + username);
         });

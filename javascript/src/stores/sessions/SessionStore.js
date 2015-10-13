@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import SessionActions from 'actions/sessions/SessionActions';
-import { fetch, fetchUnauthenticated } from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
+import fetch, { Builder } from 'logic/rest/FetchProvider';
 
 const SessionStore = Reflux.createStore({
   listenables: [SessionActions],
@@ -19,22 +19,9 @@ const SessionStore = Reflux.createStore({
   },
 
   login(username, password, host) {
-    const promise = fetchUnauthenticated(URLUtils.qualifyUrl(this.sourceUrl), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        host: host,
-      }),
-    })
-      .then((response) => { return response.json(); })
-      .catch((error) => {
-        console.log(error);
-      })
+    const builder = new Builder('POST', URLUtils.qualifyUrl(this.sourceUrl))
+      .json({username: username, password: password, host: host});
+    const promise = builder.build()
       .then((sessionInfo) => {
         return sessionInfo.session_id;
       });
@@ -42,9 +29,16 @@ const SessionStore = Reflux.createStore({
     SessionActions.login.promise(promise);
   },
   logout(sessionId) {
-    const promise = fetch(URLUtils.qualifyUrl(this.sourceUrl + '/' + sessionId), {
-      method: 'DELETE',
-    });
+    const promise = new Builder('DELETE', URLUtils.qualifyUrl(this.sourceUrl + '/' + sessionId))
+      .authenticated()
+      .build()
+      .then((resp) => {
+        if (resp.ok) {
+          delete localStorage.sessionId;
+          this.sessionId = undefined;
+          this.trigger({sessionId: this.sessionId});
+        }
+      });
 
     SessionActions.logout.promise(promise);
   },
@@ -52,11 +46,6 @@ const SessionStore = Reflux.createStore({
   loginCompleted(sessionId) {
     localStorage.setItem('sessionId', sessionId);
     this.sessionId = sessionId;
-    this.trigger({sessionId: this.sessionId});
-  },
-  logoutCompleted() {
-    delete localStorage.sessionId;
-    this.sessionId = undefined;
     this.trigger({sessionId: this.sessionId});
   },
   isLoggedIn() {
