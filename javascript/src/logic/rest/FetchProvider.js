@@ -24,23 +24,19 @@ export class Builder {
     this.request = this.request
       .send(body)
       .type('json')
-      .accept('json');
+      .accept('json')
+      .then((resp) => {
+        if (resp.ok) {
+          return resp.body;
+        }
 
-    this.promise = (resp) => {
-      if (resp.ok) {
-        return resp.body;
-      }
-
-      throw new FetchError(resp.statusText, resp);
-    };
+        throw new FetchError(resp.statusText, resp);
+      });
 
     return this;
   }
 
   build() {
-    if (this.promise) {
-      return this.request.then(this.promise);
-    }
     return this.request;
   }
 }
