@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -52,6 +53,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiresAuthentication
@@ -191,5 +193,20 @@ public class StreamRuleResource extends RestResource {
         } else {
             throw new NotFoundException();
         }
+    }
+
+    @GET
+    @Path("/types")
+    @Timed
+    @ApiOperation(value = "Get all available stream types")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StreamRuleType> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+                                          @PathParam("streamid") String streamid) {
+        final List<StreamRuleType> result = new ArrayList<>(StreamRuleType.values().length);
+        for (StreamRuleType type : StreamRuleType.values()) {
+            result.add(type);
+        }
+
+        return result;
     }
 }
