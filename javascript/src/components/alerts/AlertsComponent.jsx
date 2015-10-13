@@ -1,6 +1,7 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var LinkedStateMixin = require('react-addons-linked-state-mixin');
 var AlertsStore = require('../../stores/alerts/AlertsStore');
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
@@ -10,7 +11,7 @@ var AlertsTable = require('./AlertsTable');
 var Input = require('react-bootstrap').Input;
 
 var AlertsComponent = React.createClass({
-    mixins: [React.addons.LinkedStateMixin],
+    mixins: [LinkedStateMixin],
     getInitialState() {
         return {
             skip: 0,

@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var LinkedStateMixin = require('react/addons').addons.LinkedStateMixin;
+var LinkedStateMixin = require('react-addons-linked-state-mixin');
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Input = require('react-bootstrap').Input;
 

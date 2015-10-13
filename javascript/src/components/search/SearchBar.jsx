@@ -3,6 +3,7 @@
 import $ from 'jquery';
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
 
@@ -34,7 +35,7 @@ const SearchBar = React.createClass({
     SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
     SearchStore.onSubmitSearch = () => {
       this._prepareSearch();
-      React.findDOMNode(this.refs.searchForm).submit();
+      ReactDOM.findDOMNode(this.refs.searchForm).submit();
     };
     SearchStore.onAddQueryTerm = this._animateQueryChange;
     SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => this.setState({savedSearches: newSavedSearches}));
@@ -128,7 +129,7 @@ const SearchBar = React.createClass({
       const queryInput = new QueryInput(this.refs.query.getInputDOMNode());
       queryInput.display();
       // We need to update on changes made on typeahead
-      const queryDOMElement = React.findDOMNode(this.refs.query);
+      const queryDOMElement = ReactDOM.findDOMNode(this.refs.query);
       $(queryDOMElement).on('typeahead:change', (event) => {
         SearchStore.query = event.target.value;
       });
@@ -136,7 +137,7 @@ const SearchBar = React.createClass({
   },
   _removeSearchQueryInput() {
     if (userPreferences.enableSmartSearch) {
-      const queryDOMElement = React.findDOMNode(this.refs.query);
+      const queryDOMElement = ReactDOM.findDOMNode(this.refs.query);
       $(queryDOMElement).off('typeahead:change');
     }
   },
@@ -169,8 +170,8 @@ const SearchBar = React.createClass({
     this.datepickerInitialized = true;
   },
   _animateQueryChange() {
-    UIUtils.scrollToHint(React.findDOMNode(this.refs.universalSearch));
-    $(React.findDOMNode(this.refs.query)).effect('bounce');
+    UIUtils.scrollToHint(ReactDOM.findDOMNode(this.refs.universalSearch));
+    $(ReactDOM.findDOMNode(this.refs.query)).effect('bounce');
   },
   _queryChanged() {
     SearchStore.query = this.refs.query.getValue();

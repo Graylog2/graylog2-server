@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
 
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
@@ -19,7 +20,7 @@ $('.react-edit-dashboard').each(function () {
     </EditDashboardModalTrigger>
   );
 
-  React.render(component, this);
+  ReactDOM.render(component, this);
 });
 
 const dashboardListPage = document.getElementById('react-dashboard-list-page');
@@ -28,5 +29,5 @@ if (dashboardListPage) {
   const username = dashboardListPage.getAttribute('data-user-name');
   component = <DashboardListPage permissions={permissions} username={username}/>;
 
-  React.render(component, dashboardListPage);
+  ReactDOM.render(component, dashboardListPage);
 }

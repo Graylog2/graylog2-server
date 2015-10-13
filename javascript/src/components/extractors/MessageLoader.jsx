@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var MessagesStore = require('../../stores/messages/MessagesStore');
 
@@ -20,12 +21,12 @@ var MessageLoader = React.createClass({
     },
     _focusMessageLoaderForm() {
         if (!this.state.hidden) {
-            this.refs.messageId.getDOMNode().focus();
+            this.refs.messageId.focus();
         }
     },
     loadMessage(e) {
-        var messageId = React.findDOMNode(this.refs.messageId).value;
-        var index = React.findDOMNode(this.refs.index).value;
+        var messageId = ReactDOM.findDOMNode(this.refs.messageId).value;
+        var index = ReactDOM.findDOMNode(this.refs.index).value;
         if (messageId === "" || index === "") {
             return;
         }
@@ -35,9 +36,9 @@ var MessageLoader = React.createClass({
         e.preventDefault();
     },
     submit(messageId, index) {
-        React.findDOMNode(this.refs.messageId).value = messageId;
-        React.findDOMNode(this.refs.index).value = index;
-        React.findDOMNode(this.refs.submitButton).click();
+        ReactDOM.findDOMNode(this.refs.messageId).value = messageId;
+        ReactDOM.findDOMNode(this.refs.index).value = index;
+        ReactDOM.findDOMNode(this.refs.submitButton).click();
     },
     render() {
         var explanatoryText = (this.props.hideText ? null :

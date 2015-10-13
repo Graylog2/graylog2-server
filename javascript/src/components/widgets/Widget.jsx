@@ -2,6 +2,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var $ = require("jquery");
 
@@ -72,7 +73,7 @@ var Widget = React.createClass({
         };
     },
     _getWidgetNode() {
-        return React.findDOMNode(this.refs.widget);
+        return ReactDOM.findDOMNode(this.refs.widget);
     },
     componentDidMount() {
         this._calculateWidgetSize();
@@ -118,7 +119,7 @@ var Widget = React.createClass({
             return;
         }
 
-        var width = this.refs.widget.getDOMNode().clientWidth;
+        var width = this.refs.widget.clientWidth;
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {

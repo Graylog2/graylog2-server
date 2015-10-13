@@ -1,6 +1,7 @@
 /* global validate */
 
 import React, {Component, PropTypes} from 'react';
+import ReactDOM from 'react-dom';
 import {Modal, Button} from 'react-bootstrap';
 import $ from 'jquery';
 
@@ -62,7 +63,7 @@ class BootstrapModalForm extends Component {
   }
 
   _submit(event) {
-    const formDOMNode = React.findDOMNode(this.refs.form);
+    const formDOMNode = ReactDOM.findDOMNode(this.refs.form);
     const $formDOMNode = $(formDOMNode);
 
     if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||

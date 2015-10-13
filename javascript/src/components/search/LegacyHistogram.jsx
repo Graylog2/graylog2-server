@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var Widget = require('../widgets/Widget');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
@@ -19,7 +20,7 @@ var LegacyHistogram = React.createClass({
         return {};
     },
     componentDidMount() {
-        resultHistogram.resetContainerElements(React.findDOMNode(this));
+        resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
         resultHistogram.setData(this.props.formattedHistogram);
         resultHistogram.drawResultGraph();
     },

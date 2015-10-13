@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var numeral = require('numeral');
 var crossfilter = require('crossfilter');
 var dc = require('dc');
@@ -33,7 +34,7 @@ var HistogramVisualization = React.createClass({
         this.setState({dataPoints: nextProps.data}, this.drawData);
     },
     renderHistogram() {
-        var histogramDomNode = React.findDOMNode(this);
+        var histogramDomNode = ReactDOM.findDOMNode(this);
 
         this.histogram = dc.barChart(histogramDomNode);
         this.histogram

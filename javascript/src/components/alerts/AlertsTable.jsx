@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Alert = require('./Alert');
 
 var AlertsTable = React.createClass({

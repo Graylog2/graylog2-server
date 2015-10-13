@@ -3,6 +3,7 @@
 var $ = require('jquery');
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var PageItem = require('react-bootstrap').PageItem;
 
 var SearchStore = require('../../stores/search/SearchStore');
@@ -42,7 +43,7 @@ var MessageTablePaginator = React.createClass({
     },
     _initializeAffix() {
         if (this.props.position === 'bottom') {
-            $(React.findDOMNode(this.refs.paginatorAffix)).affix({
+            $(ReactDOM.findDOMNode(this.refs.paginatorAffix)).affix({
                 offset: {
                     top: 500,
                     bottom: 10
@@ -52,7 +53,7 @@ var MessageTablePaginator = React.createClass({
     },
     _setPaginationWidth() {
         if (this.props.position === 'bottom') {
-            this.setState({paginationWidth: React.findDOMNode(this.refs.paginatorContainer).clientWidth});
+            this.setState({paginationWidth: ReactDOM.findDOMNode(this.refs.paginatorContainer).clientWidth});
         }
     },
     _numberOfPages() {

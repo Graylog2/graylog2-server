@@ -232,7 +232,7 @@ var SourceOverview = React.createClass({
         dc.renderAll();
     },
     syncRangeWithQuery() {
-        var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
+        var rangeSelectBox = this.refs.rangeSelector;
         if (Number(rangeSelectBox.value) === 0) {
             SearchStore.changeTimeRange('relative', {relative: 0});
         } else {

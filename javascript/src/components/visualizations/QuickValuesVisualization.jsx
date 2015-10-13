@@ -107,7 +107,7 @@ var QuickValuesVisualization = React.createClass({
         return columns;
     },
     _renderDataTable() {
-        var tableDomNode = this.refs.table.getDOMNode();
+        var tableDomNode = this.refs.table;
 
         this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
         this.dataTable
@@ -132,7 +132,7 @@ var QuickValuesVisualization = React.createClass({
         this.dataTable.render();
     },
     _renderPieChart() {
-        var graphDomNode = this.refs.graph.getDOMNode();
+        var graphDomNode = this.refs.graph;
 
         this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
         this.pieChart

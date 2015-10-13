@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var StreamThroughput = require('./StreamThroughput');
 var StreamComponent = require('./StreamComponent');
 var $ = require('jquery');
@@ -10,7 +11,7 @@ if (streamThroughput) {
     for (var i = 0; i < streamThroughput.length; i++) {
         var elem = streamThroughput[i];
         var id = elem.getAttribute('data-stream-id');
-        React.render(<StreamThroughput streamId={id}/>, elem);
+        ReactDOM.render(<StreamThroughput streamId={id}/>, elem);
     }
 }
 
@@ -19,5 +20,5 @@ $(".react-stream-component").each(function() {
     var username = this.getAttribute('data-user-name');
     var component = <StreamComponent permissions={permissions} username={username}/>;
 
-    React.render(component, this);
+    ReactDOM.render(component, this);
 });
