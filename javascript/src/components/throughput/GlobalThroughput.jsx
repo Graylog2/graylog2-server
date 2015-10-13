@@ -14,33 +14,37 @@ var GlobalThroughput = React.createClass({
   },
   componentDidMount() {
     const metricsStore = MetricsStore.instance;
-    metricsStore.listen({
-      nodeId: null, // across all nodes
-      metricNames: ['org.graylog2.throughput.input.1-sec-rate', 'org.graylog2.throughput.output.1-sec-rate'],
-      callback: (update, hasError) => {
-        if (hasError) {
-          this.setState({hasError: hasError});
-          return;
-        }
-        // update is [{nodeId, values: [{name, value: {metric}}]} ...]
-        // metric can be various different things, depending on metric {type: 'GAUGE'|'COUNTER'|'METER'|'TIMER'}
-        const nodeCount = update.length;
+    if (metricsStore) {
+      metricsStore.listen({
+        nodeId: null, // across all nodes
+        metricNames: ['org.graylog2.throughput.input.1-sec-rate', 'org.graylog2.throughput.output.1-sec-rate'],
+        callback: (update, hasError) => {
+          if (hasError) {
+            this.setState({hasError: hasError});
+            return;
+          }
+          // update is [{nodeId, values: [{name, value: {metric}}]} ...]
+          // metric can be various different things, depending on metric {type: 'GAUGE'|'COUNTER'|'METER'|'TIMER'}
+          const nodeCount = update.length;
 
-        let throughIn = 0;
-        let throughOut = 0;
-        // not using filter.map.reduce because that's even worse to read than this code...
-        update.forEach((perNode) => {
-          perNode.values.forEach((namedMetric) => {
-            if (namedMetric.name === 'org.graylog2.throughput.input.1-sec-rate') {
-              throughIn += namedMetric.metric.value;
-            } else if (namedMetric.name === 'org.graylog2.throughput.output.1-sec-rate') {
-              throughOut += namedMetric.metric.value;
-            }
+          let throughIn = 0;
+          let throughOut = 0;
+          // not using filter.map.reduce because that's even worse to read than this code...
+          update.forEach((perNode) => {
+            perNode.values.forEach((namedMetric) => {
+              if (namedMetric.name === 'org.graylog2.throughput.input.1-sec-rate') {
+                throughIn += namedMetric.metric.value;
+              } else if (namedMetric.name === 'org.graylog2.throughput.output.1-sec-rate') {
+                throughOut += namedMetric.metric.value;
+              }
+            });
           });
-        });
-        this.setState({nodeCount: nodeCount, totalIn: throughIn, totalOut: throughOut, hasError: hasError});
-      }
-    });
+          this.setState({nodeCount: nodeCount, totalIn: throughIn, totalOut: throughOut, hasError: hasError});
+        }
+      });
+    } else {
+      this.setState({hasError: 'MetricsStore instance is unavailable!'});
+    }
   },
 
   render() {
