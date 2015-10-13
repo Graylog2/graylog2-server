@@ -207,6 +207,7 @@ public class LoggersResource extends RestResource {
                     event.getRenderedMessage(),
                     event.getLoggerName(),
                     event.getLevel().toString(),
+                    null,
                     new DateTime(event.getTimeStamp(), DateTimeZone.UTC),
                     throwable,
                     event.getThreadName(),
