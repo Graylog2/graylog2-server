@@ -51,6 +51,7 @@ public class Extractor {
     public enum Type {
         SUBSTRING("Substring"),
         REGEX("Regular expression"),
+        REGEX_REPLACE("Replace with regular expression"),
         SPLIT_AND_INDEX("Split & Index"),
         COPY_INPUT("Copy Input"),
         GROK("Grok pattern"),
@@ -175,6 +176,9 @@ public class Extractor {
                 break;
             case SPLIT_AND_INDEX:
                 loadSplitAndIndexConfig(form);
+                break;
+            case REGEX_REPLACE:
+                loadRegexReplaceConfig(form);
                 break;
             case GROK:
                 loadGrokConfig(form);
@@ -338,6 +342,19 @@ public class Extractor {
 
         extractorConfig.put("split_by", form.get("split_by")[0]);
         extractorConfig.put("index", Integer.parseInt(form.get("index")[0]));
+    }
+
+    private void loadRegexReplaceConfig(Map<String, String[]> form) {
+        if (!formFieldSet(form, "regex")) {
+            throw new RuntimeException("Missing extractor config: regex.");
+        }
+
+        extractorConfig.put("regex", form.get("regex")[0]);
+        extractorConfig.put("replace_all", form.containsKey("replace_all"));
+
+        if (formFieldSet(form, "replacement")) {
+            extractorConfig.put("replacement", form.get("replacement")[0]);
+        }
     }
 
     private void loadGrokConfig(Map<String, String[]> form) {
