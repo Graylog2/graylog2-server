@@ -22,10 +22,10 @@ var StreamComponent = React.createClass({
     },
     componentDidMount() {
         this.loadData();
-        StreamRulesStore.types((types) => {
+        StreamRulesStore.types().then((types) => {
             this.setState({streamRuleTypes: types});
         });
-        UsersStore.load(this.props.username).done((user) => {
+        UsersStore.load(this.props.username).then((user) => {
             this.setState({user: user});
         });
         StreamsStore.onChange(this.loadData);
