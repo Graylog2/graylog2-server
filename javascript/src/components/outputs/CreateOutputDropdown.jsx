@@ -31,7 +31,7 @@ var CreateOutputDropdown = React.createClass({
                 </div>
 
                 <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
-                                   helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
+                                   helpBlock={"Select a name of your new output that describes it."}
                                    typeName={this.state.typeName}
                                    submitAction={this.props.onSubmit} />
             </div>

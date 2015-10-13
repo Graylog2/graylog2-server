@@ -3,6 +3,7 @@
 var $ = require('jquery');
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var SearchSidebar = require('./SearchSidebar');
 var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
@@ -100,7 +101,7 @@ var SearchResult = React.createClass({
         $(window).off("resize", this._resizeCallback);
     },
     _initializeAffix() {
-        $(React.findDOMNode(this.refs.oma)).affix({
+        $(ReactDOM.findDOMNode(this.refs.oma)).affix({
             offset: { top: 111 }
         });
     },
@@ -110,7 +111,7 @@ var SearchResult = React.createClass({
         resizeMutex = setTimeout(() => this._updateWidth(), 100);
     },
     _updateWidth() {
-        var node = React.findDOMNode(this.refs.opa);
+        var node = ReactDOM.findDOMNode(this.refs.opa);
         this.setState({currentSidebarWidth: $(node).width()});
     },
     _showQueryModal(event) {

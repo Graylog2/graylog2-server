@@ -1,6 +1,7 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var ReactDOM = require('react-dom');
 var AlertsComponent = require('./AlertsComponent');
 var $ = require('jquery'); // excluded and shimed
 
@@ -9,5 +10,5 @@ $(".react-alerts-component").each(function() {
     var permissions = JSON.parse(this.getAttribute('data-permissions'));
     var component = <AlertsComponent streamId={streamId} permissions={permissions}/>;
 
-    React.render(component, this);
+    ReactDOM.render(component, this);
 });

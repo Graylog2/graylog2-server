@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Immutable = require('immutable');
 var Input = require('react-bootstrap').Input;
 var $ = require('jquery');
@@ -32,7 +33,7 @@ var TypeAheadFieldInput = React.createClass({
                 }
             });
 
-            var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
+            var fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
             $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
                 if (this.props.valueLink) {
                     this.props.valueLink.requestChange(event.target.value);
@@ -44,7 +45,7 @@ var TypeAheadFieldInput = React.createClass({
         if (this.refs.fieldInput) {
             var fieldInput = $(this.refs.fieldInput.getInputDOMNode());
             fieldInput.typeahead('destroy');
-            var fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
+            var fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
             $(fieldFormGroup).off('typeahead:change typeahead:selected');
         }
     },

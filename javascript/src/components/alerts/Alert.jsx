@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var Button = require('react-bootstrap').Button;
 var AlarmCallbackHistoryOverview = require('../alarmcallbacks/AlarmCallbackHistoryOverview');
 

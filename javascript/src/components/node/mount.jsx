@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var JvmHeapUsage = require('./JvmHeapUsage');
 var BufferUsage = require('./BufferUsage');
 var JournalDetails = require('./JournalDetails');
@@ -11,7 +12,7 @@ if (heapUsage) {
     for (var i = 0; i < heapUsage.length; i++) {
         var elem = heapUsage[i];
         var id = elem.getAttribute('data-node-id');
-        React.render(<JvmHeapUsage nodeId={id}/>, elem);
+        ReactDOM.render(<JvmHeapUsage nodeId={id}/>, elem);
     }
 }
 
@@ -22,7 +23,7 @@ if (buffers) {
         var id = elem.getAttribute('data-node-id');
         var title = elem.getAttribute('data-title');
         var bufferType = elem.getAttribute('data-buffer-type');
-        React.render(<BufferUsage nodeId={id} title={title} bufferType={bufferType}/>, elem);
+        ReactDOM.render(<BufferUsage nodeId={id} title={title} bufferType={bufferType}/>, elem);
     }
 }
 
@@ -36,7 +37,7 @@ if (journal) {
     var flushInterval = journal.getAttribute('data-journal-flush-interval');
     var flushAge = journal.getAttribute('data-journal-flush-age');
 
-    React.render(<JournalDetails nodeId={id} directory={dir} enabled={enabled} maxSize={maxSize} maxAge={maxAge}
+    ReactDOM.render(<JournalDetails nodeId={id} directory={dir} enabled={enabled} maxSize={maxSize} maxAge={maxAge}
                                  flushInterval={flushInterval} flushAge={flushAge}/>, journal);
 }
 
@@ -45,6 +46,6 @@ if (journalStates) {
     for (var i = 0; i < journalStates.length; i++) {
         var elem = journalStates[i];
         var id = elem.getAttribute('data-node-id');
-        React.render(<JournalState nodeId={id}/>, elem);
+        ReactDOM.render(<JournalState nodeId={id}/>, elem);
     }
 }

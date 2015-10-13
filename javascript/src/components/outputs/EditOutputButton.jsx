@@ -28,7 +28,7 @@ var EditOutputButton = React.createClass({
             <ConfigurationForm ref="configurationForm" key={"configuration-form-output-"+output.id} configFields={this.state.typeDefinition}
                                title={"Editing Output " + output.title}
                                typeName={output.type}
-                               helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
+                               helpBlock={"Select a name of your new output that describes it."}
                                submitAction={this._handleSubmit} values={output.configuration} titleValue={output.title}/>
             : ""
         );

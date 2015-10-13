@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Button = require('react-bootstrap').Button;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
@@ -13,7 +14,7 @@ var Widget = require('../widgets/Widget');
 var SearchStore = require('../../stores/search/SearchStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 
-var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var PureRenderMixin = require('react-addons-pure-render-mixin');
 var StringUtils = require('../../util/StringUtils');
 
 var LegacyFieldGraph = React.createClass({
@@ -23,7 +24,7 @@ var LegacyFieldGraph = React.createClass({
     interpolations: ['linear', 'step-after', 'basis', 'bundle', 'cardinal', 'monotone'],
     resolutions: ['minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'],
     componentDidMount() {
-        var graphContainer = React.findDOMNode(this.refs.fieldGraphContainer);
+        var graphContainer = ReactDOM.findDOMNode(this.refs.fieldGraphContainer);
         FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
     },
     _getFirstGraphValue() {

@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var StreamRulesEditor = require('./StreamRulesEditor');
 var $ = require('jquery');
 
@@ -18,5 +19,5 @@ $(".react-streamrules-editor").each(function() {
     }
     var component = <StreamRulesEditor permissions={permissions} streamId={streamId} messageId={messageId} index={index}/>;
 
-    React.render(component, this);
+    ReactDOM.render(component, this);
 });

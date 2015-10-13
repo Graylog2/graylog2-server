@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var AlarmCallbackHistoryStore = require('../../stores/alarmcallbacks/AlarmCallbackHistoryStore');
 var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var Spinner = require('../common/Spinner');

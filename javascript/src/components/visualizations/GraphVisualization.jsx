@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var numeral = require('numeral');
 var crossfilter = require('crossfilter');
 var dc = require('dc');
@@ -84,7 +85,7 @@ var GraphVisualization = React.createClass({
         });
     },
     renderGraph() {
-        var graphDomNode = React.findDOMNode(this);
+        var graphDomNode = ReactDOM.findDOMNode(this);
 
         this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
         this.graph

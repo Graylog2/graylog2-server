@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Input = require('react-bootstrap').Input;
 var $ = require('jquery');
 
@@ -14,7 +15,7 @@ var TypeAheadInput = React.createClass({
     },
     _updateTypeahead(props) {
         this.fieldInput = this.refs.fieldInput.getInputDOMNode();
-        this.fieldFormGroup = React.findDOMNode(this.refs.fieldInput);
+        this.fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
 
         var $fieldInput = $(this.fieldInput);
 

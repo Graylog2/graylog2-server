@@ -3,6 +3,7 @@
 var $ = require('jquery');
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Modal = require('react-bootstrap').Modal;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
@@ -105,13 +106,13 @@ var SearchSidebar = React.createClass({
         resizeMutex = setTimeout(() => this._updateHeight(), 100);
     },
     _updateHeight() {
-        var header = React.findDOMNode(this.refs.header);
+        var header = ReactDOM.findDOMNode(this.refs.header);
 
-        var footer = React.findDOMNode(this.refs.footer);
+        var footer = ReactDOM.findDOMNode(this.refs.footer);
 
-        var sidebar = React.findDOMNode(this.refs.sidebar);
+        var sidebar = ReactDOM.findDOMNode(this.refs.sidebar);
         var sidebarTop = sidebar.getBoundingClientRect().top;
-        var sidebarCss = window.getComputedStyle(React.findDOMNode(this.refs.sidebar));
+        var sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(this.refs.sidebar));
         var sidebarPaddingTop = parseFloat(sidebarCss.getPropertyValue('padding-top'));
         var sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 

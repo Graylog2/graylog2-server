@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var LegacyFieldGraph = require('./LegacyFieldGraph');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
@@ -23,7 +24,7 @@ var FieldGraphs = React.createClass({
         FieldGraphsStore.onFieldGraphsMerged = (newStackedGraphs) => this.setState({ stackedGraphs: newStackedGraphs });
         FieldGraphsStore.onFieldGraphCreated = (graphId) => {
             if (this.notifyOnNewGraphs && !this.initialFieldGraphs.has(graphId)) {
-                var element = React.findDOMNode(this.refs[graphId]);
+                var element = ReactDOM.findDOMNode(this.refs[graphId]);
                 UIUtils.scrollToHint(element);
             }
         };

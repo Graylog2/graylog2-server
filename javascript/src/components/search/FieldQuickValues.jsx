@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Button = require('react-bootstrap').Button;
 
 var QuickValuesVisualization = require('../visualizations/QuickValuesVisualization');
@@ -25,7 +26,7 @@ var FieldQuickValues = React.createClass({
     },
     componentDidUpdate(oldProps, oldState) {
         if (this.state.field !== oldState.field) {
-            var element = React.findDOMNode(this);
+            var element = ReactDOM.findDOMNode(this);
             UIUtils.scrollToHint(element);
         }
     },

@@ -4,6 +4,7 @@
 
 var React = require('react');
 var Navbar = require('react-bootstrap').Navbar;
+var NavBrand = require('react-bootstrap').NavBrand;
 var CollapsibleNav = require('react-bootstrap').CollapsibleNav;
 var Nav = require('react-bootstrap').Nav;
 var NavItem = require('react-bootstrap').NavItem;
@@ -32,7 +33,8 @@ var Navigation = React.createClass({
             <img src={logoUrl}/>
         </a>);
         return (
-            <Navbar brand={brand} inverse fluid fixedTop toggleNavKey={0}>
+            <Navbar inverse fluid fixedTop toggleNavKey={0}>
+                <NavBrand>{brand}</NavBrand>
                 <CollapsibleNav eventKey={0}>
                     <Nav navbar>
                         {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&

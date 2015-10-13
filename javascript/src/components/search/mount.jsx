@@ -4,6 +4,7 @@ var SearchBar = require('./SearchBar');
 var MessageShow = require('./MessageShow');
 var SearchResult = require('./SearchResult');
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Immutable = require('immutable');
 var SearchStore = require('../../stores/search/SearchStore');
 var SavedSearchesStore = require('../../stores/search/SavedSearchesStore');
@@ -17,7 +18,7 @@ if (searchBarElem) {
         SearchStore.searchInStream = searchInStream;
     }
     SavedSearchesStore.updateSavedSearches();
-    React.render(<SearchBar />, searchBarElem);
+    ReactDOM.render(<SearchBar />, searchBarElem);
 }
 
 var messageDetails = document.getElementById('react-message-details');
@@ -42,7 +43,7 @@ if (messageDetails) {
         streams = JSON.parse(streams);
     }
 
-    React.render(<MessageShow message={message} inputs={Immutable.Map(inputs)} nodes={Immutable.Map(nodes)} streams={Immutable.Map(streams)} />, messageDetails);
+    ReactDOM.render(<MessageShow message={message} inputs={Immutable.Map(inputs)} nodes={Immutable.Map(nodes)} streams={Immutable.Map(streams)} />, messageDetails);
 }
 
 var searchResultElem = document.getElementById('react-search-result');
@@ -88,7 +89,7 @@ if (searchResultElem) {
 
     var permissions = JSON.parse(searchResultElem.getAttribute('data-permissions'));
 
-    React.render(<SearchResult query={query}
+    ReactDOM.render(<SearchResult query={query}
                                builtQuery={builtQuery}
                                result={searchResult}
                                histogram={histogram}

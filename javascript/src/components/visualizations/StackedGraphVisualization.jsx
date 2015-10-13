@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Immutable = require('immutable');
 var numeral = require('numeral');
 var c3 = require('c3');
@@ -99,7 +100,7 @@ var StackedGraphVisualization = React.createClass({
         }
     },
     renderGraph() {
-        var graphDomNode = React.findDOMNode(this);
+        var graphDomNode = ReactDOM.findDOMNode(this);
         var colourPalette = D3Utils.glColourPalette();
 
         var i = 0;
