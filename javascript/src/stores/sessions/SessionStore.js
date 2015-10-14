@@ -33,14 +33,18 @@ const SessionStore = Reflux.createStore({
       .authenticated()
       .build()
       .then((resp) => {
-        if (resp.ok) {
-          delete localStorage.sessionId;
-          this.sessionId = undefined;
-          this.trigger({sessionId: this.sessionId});
+        if (resp.ok || resp.status == 401) {
+          this._removeSession();
         }
-      });
+      }, this._removeSession);
 
     SessionActions.logout.promise(promise);
+  },
+
+  _removeSession() {
+    delete localStorage.sessionId;
+    this.sessionId = undefined;
+    this.trigger({sessionId: this.sessionId});
   },
 
   loginCompleted(sessionId) {
