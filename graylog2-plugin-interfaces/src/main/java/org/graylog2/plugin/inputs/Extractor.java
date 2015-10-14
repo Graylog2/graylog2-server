@@ -67,6 +67,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     public enum Type {
         SUBSTRING,
         REGEX,
+        REGEX_REPLACE,
         SPLIT_AND_INDEX,
         COPY_INPUT,
         GROK,
