@@ -93,6 +93,18 @@ public class ExtractorTest {
     }
 
     @Test
+    public void loadConfigFromImportSucceedsWithValidConfigForRegexReplaceExtractor() throws Exception {
+        extractor.loadConfigFromImport(
+                Extractor.Type.REGEX_REPLACE,
+                ImmutableMap.<String, Object>of(
+                        "regex", "foobar",
+                        "replacement", "***"
+                ));
+        assertEquals(extractor.getExtractorConfig().get("regex"), "foobar");
+        assertEquals(extractor.getExtractorConfig().get("replacement"), "***");
+    }
+
+    @Test
     public void loadConfigFromImportSucceedsWithValidConfigForSubstringExtractor() throws Exception {
         extractor.loadConfigFromImport(
                 Extractor.Type.SUBSTRING,
@@ -134,6 +146,14 @@ public class ExtractorTest {
         expectedException.expectMessage("Missing extractor config:");
 
         extractor.loadConfigFromImport(Extractor.Type.SUBSTRING, Collections.<String, Object>emptyMap());
+    }
+
+    @Test
+    public void loadConfigFromImportFailsWithEmptyConfigForRegexReplaceExtractor() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Missing extractor config:");
+
+        extractor.loadConfigFromImport(Extractor.Type.REGEX_REPLACE, Collections.<String, Object>emptyMap());
     }
 
     @Test
