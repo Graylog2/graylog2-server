@@ -5,15 +5,15 @@
 var Qs = require('qs');
 import AppConfig = require('util/AppConfig');
 
+const appConfig = new AppConfig();
+
 var URLUtils = {
     qualifyUrl(url) {
-      const appConfig = new AppConfig();
-      return appConfig.gl2ServerUrl() + this.appPrefixed(url);
+      return appConfig.gl2ServerUrl() + '/' + this.appPrefixed(url);
     },
 
     appPrefixed(url) {
-      const appConfig = new AppConfig();
-      return appConfig.gl2AppPathPrefix() + url;
+      return appConfig.gl2AppPathPrefix() + '/' + url;
     },
     openLink(url, newWindow) {
         if (newWindow) {
