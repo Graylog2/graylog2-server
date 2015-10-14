@@ -18,7 +18,7 @@ const UserMenu = React.createClass({
           <MenuItem>Edit profile</MenuItem>
         </LinkContainer>
         <MenuItem divider />
-        <MenuItem onClick={this.onLogoutClicked}><i className="fa fa-sign-out"></i> Log out</MenuItem>
+        <MenuItem onSelect={this.onLogoutClicked}><i className="fa fa-sign-out"></i> Log out</MenuItem>
       </NavDropdown>
     );
   }
