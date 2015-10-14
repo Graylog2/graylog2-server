@@ -9,6 +9,10 @@ import PermissionsMixin from '../../util/PermissionsMixin';
 
 import DashboardStore from '../../stores/dashboard/DashboardStore';
 
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
+import jsRoutes from 'routing/jsRoutes';
+
 const Dashboard = React.createClass({
   propTypes: {
     dashboard: React.PropTypes.object,
@@ -25,8 +29,9 @@ const Dashboard = React.createClass({
                                      description={this.props.dashboard.description} buttonClass="btn-info"/>
           &nbsp;
           <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
-            <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
-              as startpage</MenuItem>
+            <LinkContainer to={Routes.startpage_set('dashboard', this.props.dashboard.id)}>
+              <MenuItem>Set as startpage</MenuItem>
+            </LinkContainer>
             <MenuItem divider/>
             <MenuItem onSelect={this._onDashboardDelete}>Delete this dashboard</MenuItem>
           </DropdownButton>
