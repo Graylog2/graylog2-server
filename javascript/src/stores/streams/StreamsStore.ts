@@ -33,8 +33,8 @@ class StreamsStore {
     private callbacks: Array<Callback> = [];
 
     listStreams() {
-        var url = "http://localhost:12900/streams";
-        var promise = fetch('GET', url);
+        var url = "/streams";
+        var promise = fetch('GET', URLUtils.qualifyUrl(url));
         /*promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading streams failed with status: " + errorThrown,
                 "Could not load streams");
