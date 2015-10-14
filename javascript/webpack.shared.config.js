@@ -37,7 +37,7 @@ var webpackConfig = {
 
 webpackConfig.plugins = [
     new Clean([webpackConfig.output.path]),
-    new HtmlWebpackPlugin({title: 'Graylog', filename: '../index.html'}),
+    new HtmlWebpackPlugin({title: 'Graylog', filename: '../index.html', template: 'templates/index.html.template' }),
 ];
 
 module.exports = webpackConfig;
