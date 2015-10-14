@@ -1,14 +1,15 @@
 /// <reference path="../../../declarations/jquery/jquery.d.ts" />
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
+/// <reference path='../../routing/jsRoutes.d.ts' />
 
 'use strict';
 
-declare var $: any;
-declare var jsRoutes: any;
-
 import Immutable = require('immutable');
-
-import UserNotification = require("../../util/UserNotification");
+import $ = require('jquery');
+import UserNotification = require("util/UserNotification");
+import jsRoutes = require('routing/jsRoutes');
+import URLUtils = require("../../util/URLUtils");
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface Dashboard {
     id: string;
@@ -76,30 +77,24 @@ class DashboardStore {
 
     listDashboards(): JQueryPromise<Immutable.List<Dashboard>> {
         var url = jsRoutes.controllers.api.DashboardsApiController.index().url;
-        var promise = $.getJSON(url);
-        promise = promise.then((dashboards) => {
-            var dashboardMap = Immutable.Map<string, Dashboard>(dashboards);
-            var dashboardList = Immutable.List<Dashboard>();
-
-            dashboardMap.forEach((dashboard: Dashboard, id: string) => {
-                dashboard.id = id;
-                dashboardList = dashboardList.push(dashboard);
-            });
+        var promise = fetch('GET', URLUtils.qualifyUrl(url))
+          .then((response) => {
+            const dashboardList = Immutable.List<Dashboard>(response.dashboards);
 
             return dashboardList;
-        });
-        promise = promise.fail((jqXHR, textStatus, errorThrown) => {
+          })
+          .catch((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading dashboard list failed with status: " + errorThrown,
                     "Could not load dashboards");
             }
-        });
+          });
         return promise;
     }
 
     getWritableDashboardList(): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.api.DashboardsApiController.listWritable().url;
-        var promise = $.getJSON(url);
+        var promise = fetch(URLUtils.qualifyUrl(url));
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading your dashboard list failed with status: " + errorThrown,
