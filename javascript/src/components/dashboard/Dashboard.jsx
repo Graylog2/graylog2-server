@@ -40,7 +40,7 @@ const Dashboard = React.createClass({
     }
 
     const createdFromContentPack = (this.props.dashboard.content_pack ?
-      <i className="fa fa-cube" title="Created from content pack"></i> : null);
+      <i className="fa fa-cube" title="Created from content pack"/> : null);
 
     return (
       <li className="stream">
