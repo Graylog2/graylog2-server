@@ -1,7 +1,7 @@
 /* global jsRoutes */
 
 import React from 'react';
-import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
@@ -36,14 +36,14 @@ const Navigation = React.createClass({
                 <NavItem>Sources</NavItem>
               </LinkContainer>
             }
-            <DropdownButton>
+            <NavDropdown navItem title="System" id="system-menu-dropdown">
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.NODES}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
-            </DropdownButton>
+            </NavDropdown>
           </Nav>
 
           <Nav navbar>
