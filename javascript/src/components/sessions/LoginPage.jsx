@@ -37,7 +37,7 @@ const LoginPage = React.createClass({
         <div className="container" id="login-box">
             <Row>
                 <div className="col-md-4 col-md-offset-4 well" id="login-box-content">
-                    <legend><i className="fa fa-group"></i> Welcome to Graylog</legend>
+                    <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
 
                     {alert}
 
@@ -54,7 +54,7 @@ const LoginPage = React.createClass({
                     <div className="login-advanced">
                         <div className="footer pull-right">
                             <span id="total-count-zero" className="hidden">No configured node was ever reached.</span>
-                            <span id="total-count-nonzero"><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
+                            <span id="total-count-nonzero"><span id="connected-count"/> of <span id="total-count"/> nodes connected.</span>
                         </div>
                         <br style={{clear: 'both'}} />
                     </div>
@@ -66,9 +66,13 @@ const LoginPage = React.createClass({
   },
   formatLastError(error) {
     if (error) {
-      return (<Alert bsStyle="danger">
-        <a className="close" onClick={this.resetLastError}>×</a>{error}
-      </Alert>);
+      return (
+        <div className="form-group">
+          <Alert bsStyle="danger">
+            <a className="close" onClick={this.resetLastError}>×</a>{error}
+          </Alert>
+        </div>
+      );
     }
     return null;
   },
