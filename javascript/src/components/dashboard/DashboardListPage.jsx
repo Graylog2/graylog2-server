@@ -75,7 +75,7 @@ const DashboardListPage = React.createClass({
 
     let dashboardList;
 
-    if (this.state.dashboards.count() > 0 && this.state.filteredDashboards.isEmpty()) {
+    if (this.state.dashboards && this.state.dashboards.count() > 0 && this.state.filteredDashboards.isEmpty()) {
       dashboardList = <div>No dashboards matched your filter criteria.</div>;
     } else {
       dashboardList = (
@@ -98,7 +98,11 @@ const DashboardListPage = React.createClass({
     );
   },
   _onDashboardsChange(dashboards) {
-    this.setState({dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true});
+    if (dashboards) {
+      this.setState({dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true});
+    } else {
+      this.setState({dashboardsLoaded: false});
+    }
   },
 });
 
