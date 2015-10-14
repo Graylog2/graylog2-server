@@ -53,6 +53,7 @@ public abstract class RegexTesterResponse {
     @AutoValue
     public static abstract class Match {
         @JsonProperty
+        @Nullable
         public abstract String match();
 
         @JsonProperty
@@ -62,7 +63,7 @@ public abstract class RegexTesterResponse {
         public abstract int end();
 
         @JsonCreator
-        public static Match create(@JsonProperty("match") String match,
+        public static Match create(@JsonProperty("match") @Nullable String match,
                                    @JsonProperty("start") int start,
                                    @JsonProperty("end") int end) {
             return new AutoValue_RegexTesterResponse_Match(match, start, end);
