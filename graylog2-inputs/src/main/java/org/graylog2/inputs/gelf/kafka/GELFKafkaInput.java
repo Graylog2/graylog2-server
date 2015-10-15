@@ -52,12 +52,12 @@ public class GELFKafkaInput extends MessageInput {
 
     protected GELFKafkaInput(MetricRegistry metricRegistry,
                              Configuration configuration,
-                             KafkaTransport radioKafkaTransport,
+                             KafkaTransport kafkaTransport,
                              GelfCodec codec,
                              LocalMetricRegistry localRegistry,
                              MessageInput.Config config,
                              MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, configuration, radioKafkaTransport, localRegistry, codec, config, descriptor, serverStatus);
+        super(metricRegistry, configuration, kafkaTransport, localRegistry, codec, config, descriptor, serverStatus);
     }
 
     @FactoryClass

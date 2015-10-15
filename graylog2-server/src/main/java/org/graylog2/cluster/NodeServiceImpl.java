@@ -17,17 +17,17 @@
 package org.graylog2.cluster;
 
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,21 +49,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         fields.put("type", Node.Type.SERVER.toString());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restTransportUri.toString());
-
-        try {
-            return save(new NodeImpl(fields));
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
-        }
-    }
-
-    @Override
-    public String registerRadio(String nodeId, String restTransportUri) {
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("last_seen", Tools.getUTCTimestamp());
-        fields.put("node_id", nodeId);
-        fields.put("type", Node.Type.RADIO.toString());
-        fields.put("transport_address", restTransportUri);
 
         try {
             return save(new NodeImpl(fields));

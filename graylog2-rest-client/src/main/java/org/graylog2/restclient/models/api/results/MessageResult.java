@@ -173,10 +173,6 @@ public class MessageResult {
         return sourceInputId;
     }
 
-    public boolean viaRadio() {
-        return sourceRadioId != null;
-    }
-
     public String getSourceRadioId() {
         return sourceRadioId;
     }

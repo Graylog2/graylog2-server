@@ -62,13 +62,7 @@ public class SystemResource extends RestResource {
     public SystemOverviewResponse system() {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-        final String facility;
-        if (serverStatus.hasCapability(ServerStatus.Capability.RADIO))
-            facility = "graylog2-radio";
-        else
-            facility = "graylog2-server";
-
-        return SystemOverviewResponse.create(facility,
+        return SystemOverviewResponse.create("graylog2-server",
                 ServerVersion.CODENAME,
                 serverStatus.getNodeId().toString(),
                 ServerVersion.VERSION.toString(),
