@@ -8,6 +8,10 @@ const jsRoutes = {
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId }; },
       },
+      InputsApiController: {
+        list: () => { return {url: '/system/inputs'}; },
+        globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
+      },
     },
     DashboardsController: {
       show: (id) => { return {url: '/dashboards/' + id }; },

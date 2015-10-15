@@ -1,10 +1,8 @@
-'use strict';
-
-declare var jsRoutes: any;
-declare var $: any;
-
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
+
+import jsRoutes = require('routing/jsRoutes');
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface Input {
     id: string;
@@ -21,7 +19,7 @@ var InputsStore = {
                 "Could not retrieve Inputs");
         };
 
-        $.getJSON(jsRoutes.controllers.api.InputsApiController.list().url, callback).fail(failCallback);
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.list().url)).then(callback, failCallback);
     },
     globalRecentMessage(input: any, callback: ((message: any) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -29,7 +27,7 @@ var InputsStore = {
                 "Could not retrieve recent message from input \"" + input.title + "\"");
         };
 
-        $.getJSON(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.id).url, callback).fail(failCallback);
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.id).url)).then(callback, failCallback);
     }
 };
 
