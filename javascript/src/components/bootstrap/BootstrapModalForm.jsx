@@ -1,11 +1,11 @@
-/* global validate */
-
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import {Modal, Button} from 'react-bootstrap';
 import $ from 'jquery';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+
+import { validate } from 'legacy/validations.js';
 
 /**
  * Encapsulates a form element inside a bootstrap modal, hiding some custom logic that this kind of component
