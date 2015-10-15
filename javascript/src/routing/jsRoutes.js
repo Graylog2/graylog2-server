@@ -10,10 +10,12 @@ const jsRoutes = {
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
       StreamsApiController: {
-        get: (streamId) => { return {url: '/streams/' + streamId }; },
+        get: (streamId) => { return {url: '/streams/' + streamId}; },
+        update: (streamId) => { return {url: '/streams/' + streamId}; },
       },
       StreamRulesApiController: {
         delete: (streamId, streamRuleId) => { return {url: '/streams/' + streamId + '/rules/' + streamRuleId}; },
+        update: (streamId, streamRuleId) => { return {url: '/streams/' + streamId + '/rules/' + streamRuleId}; },
       },
       SystemApiController: {
         fields: () => { return {url: '/system/fields'}; },
