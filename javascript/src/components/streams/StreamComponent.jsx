@@ -1,22 +1,25 @@
-'use strict';
-
 import React from 'react';
-import StreamsStore from '../../stores/streams/StreamsStore';
+import { Row, Col } from 'react-bootstrap';
+
+import StreamsStore from 'stores/streams/StreamsStore';
+import StreamRulesStore from 'stores/streams/StreamRulesStore';
+import UsersStore from 'stores/users/UsersStore';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+import UserNotification from 'util/UserNotification';
+import DocsHelper from 'util/DocsHelper';
+
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
-import SupportLink from '../support/SupportLink';
-import PermissionsMixin from '../../util/PermissionsMixin';
-import StreamRulesStore from '../../stores/streams/StreamRulesStore';
-import UsersStore from 'stores/users/UsersStore';
-import { Col } from 'react-bootstrap';
-import UserNotification from '../../util/UserNotification';
-import Spinner from '../common/Spinner';
-
-import DocsHelper from '../../util/DocsHelper';
-import DocumentationLink from '../support/DocumentationLink';
+import Spinner from 'components/common/Spinner';
+import DocumentationLink from 'components/support/DocumentationLink';
 import PageHeader from 'components/common/PageHeader';
 
-var StreamComponent = React.createClass({
+const StreamComponent = React.createClass({
+  propTypes: {
+    username: React.PropTypes.string.isRequired,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+  },
   mixins: [PermissionsMixin],
   getInitialState() {
     return {};
@@ -39,12 +42,12 @@ var StreamComponent = React.createClass({
   },
   _onSave(streamId, stream) {
     StreamsStore.save(stream, () => {
-      UserNotification.success("Stream has been successfully created.", "Success");
+      UserNotification.success('Stream has been successfully created.', 'Success');
     });
   },
   render() {
-    var createStreamButton = (this.isPermitted(this.props.permissions, ["streams:create"]) ?
-      <CreateStreamButton ref='createStreamButton' bsSize="large" bsStyle="success" onSave={this._onSave} /> :
+    const createStreamButton = (this.isPermitted(this.props.permissions, ['streams:create']) ?
+      <CreateStreamButton ref="createStreamButton" bsSize="large" bsStyle="success" onSave={this._onSave} /> :
       null);
 
     const pageHeader = (
@@ -73,25 +76,29 @@ var StreamComponent = React.createClass({
         <div>
           {pageHeader}
 
-          <div className="row content">
+          <Row className="content">
             <Col md={12}>
               <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
                           permissions={this.props.permissions} user={this.state.user}
                           onStreamCreated={this._onSave}/>
             </Col>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          {pageHeader}
-
-          <div className="row content"><div style={{marginLeft: 10}}><Spinner/></div></div>
+          </Row>
         </div>
       );
     }
-  }
+
+    return (
+      <div>
+        {pageHeader}
+
+        <Row className="content">
+          <div style={{marginLeft: 10}}>
+            <Spinner/>
+          </div>
+        </Row>
+      </div>
+    );
+  },
 });
 
 module.exports = StreamComponent;
