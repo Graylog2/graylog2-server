@@ -68,7 +68,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
         final DateTime calculatedAt = new DateTime(firstNonNull((Integer) dbo.get("calculated_at"), 0) * 1000L, DateTimeZone.UTC);
         final int calculationDuration = firstNonNull((Integer) dbo.get("took_ms"), 0);
 
-        return IndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
+        return MongoIndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
     }
 
     @Override

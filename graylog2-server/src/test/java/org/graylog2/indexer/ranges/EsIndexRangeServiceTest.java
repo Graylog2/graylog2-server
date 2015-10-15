@@ -129,9 +129,9 @@ public class EsIndexRangeServiceTest {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
 
         assertThat(indexRanges).containsExactly(
-                IndexRange.create("graylog_2", new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), 42),
-                IndexRange.create("graylog_3", new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), 42),
-                IndexRange.create("graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42)
+                EsIndexRange.create("graylog_2", new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), 42),
+                EsIndexRange.create("graylog_3", new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), 42),
+                EsIndexRange.create("graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42)
         );
     }
 
@@ -189,7 +189,7 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final IndexRange indexRange = IndexRange.create(indexName, begin, end, now, 42);
+        final IndexRange indexRange = EsIndexRange.create(indexName, begin, end, now, 42);
 
         indexRangeService.save(indexRange);
 
@@ -209,7 +209,7 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final IndexRange indexRange = IndexRange.create(indexName, begin, end, now, 42);
+        final IndexRange indexRange = EsIndexRange.create(indexName, begin, end, now, 42);
 
         try {
             indices.create(indexName);
@@ -238,8 +238,8 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final IndexRange indexRangeBefore = IndexRange.create(indexName, begin, end, now, 1);
-        final IndexRange indexRangeAfter = IndexRange.create(indexName, begin, end, now, 2);
+        final IndexRange indexRangeBefore = EsIndexRange.create(indexName, begin, end, now, 1);
+        final IndexRange indexRangeAfter = EsIndexRange.create(indexName, begin, end, now, 2);
 
         indexRangeService.save(indexRangeBefore);
 
@@ -261,7 +261,7 @@ public class EsIndexRangeServiceTest {
         final DateTime begin = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC);
         final DateTime calculatedAt = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        final IndexRange indexRange = IndexRange.create(indexName, begin, end, calculatedAt, 23);
+        final IndexRange indexRange = EsIndexRange.create(indexName, begin, end, calculatedAt, 23);
 
         indexRangeService.save(indexRange);
         verify(clusterEventBus, never()).post(IndexRangeUpdatedEvent.create(indexName));

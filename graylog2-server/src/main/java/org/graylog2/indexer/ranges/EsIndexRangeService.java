@@ -58,12 +58,9 @@ import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.metrics.CacheStatsSet;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,12 +164,12 @@ public class EsIndexRangeService implements IndexRangeService {
     @Nullable
     private IndexRange parseSource(String index, Map<String, Object> fields) {
         try {
-            return IndexRange.create(
+            return EsIndexRange.create(
                     index,
-                    parseFromDateString((String) fields.get(IndexRange.FIELD_BEGIN)),
-                    parseFromDateString((String) fields.get(IndexRange.FIELD_END)),
-                    parseFromDateString((String) fields.get(IndexRange.FIELD_CALCULATED_AT)),
-                    (int) fields.get(IndexRange.FIELD_TOOK_MS)
+                    parseFromDateString((String) fields.get(EsIndexRange.FIELD_BEGIN)),
+                    parseFromDateString((String) fields.get(EsIndexRange.FIELD_END)),
+                    parseFromDateString((String) fields.get(EsIndexRange.FIELD_CALCULATED_AT)),
+                    (int) fields.get(EsIndexRange.FIELD_TOOK_MS)
             );
         } catch (Exception e) {
             LOG.debug("Couldn't create index range from fields: " + fields);
@@ -218,7 +215,7 @@ public class EsIndexRangeService implements IndexRangeService {
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
-        return IndexRange.create(index, stats.min(), stats.max(), now, duration);
+        return EsIndexRange.create(index, stats.min(), stats.max(), now, duration);
     }
 
     /**

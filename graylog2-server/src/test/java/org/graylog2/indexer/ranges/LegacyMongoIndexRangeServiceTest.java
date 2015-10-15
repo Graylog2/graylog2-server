@@ -56,7 +56,7 @@ public class LegacyMongoIndexRangeServiceTest {
     public void testGetExistingIndexRange() throws Exception {
         final IndexRange indexRange = indexRangeService.get("graylog_0");
         final DateTime end = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        final IndexRange expected = IndexRange.create("graylog_0", EPOCH, end, end, 0);
+        final IndexRange expected = MongoIndexRange.create("graylog_0", EPOCH, end, end, 0);
         assertThat(indexRange).isEqualTo(expected);
     }
 
@@ -77,7 +77,7 @@ public class LegacyMongoIndexRangeServiceTest {
     public void testGetIncompleteIndexRange() throws Exception {
         final IndexRange indexRange = indexRangeService.get("graylog_99");
         final DateTime end = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        final IndexRange expected = IndexRange.create("graylog_99", EPOCH, end, EPOCH, 0);
+        final IndexRange expected = MongoIndexRange.create("graylog_99", EPOCH, end, EPOCH, 0);
         assertThat(indexRange).isEqualTo(expected);
     }
 
@@ -95,9 +95,9 @@ public class LegacyMongoIndexRangeServiceTest {
         final DateTime end2 = new DateTime(2015, 1, 3, 0, 0, 0, 0, DateTimeZone.UTC);
         final DateTime end99 = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         assertThat(indexRanges).containsExactly(
-                IndexRange.create("graylog_99", EPOCH, end99, EPOCH, 0),
-                IndexRange.create("graylog_1", EPOCH, end1, end1, 1),
-                IndexRange.create("graylog_2", EPOCH, end2, end2, 2)
+                MongoIndexRange.create("graylog_99", EPOCH, end99, EPOCH, 0),
+                MongoIndexRange.create("graylog_1", EPOCH, end1, end1, 1),
+                MongoIndexRange.create("graylog_2", EPOCH, end2, end2, 2)
         );
     }
 
