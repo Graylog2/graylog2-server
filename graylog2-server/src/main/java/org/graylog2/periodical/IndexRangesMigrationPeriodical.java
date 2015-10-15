@@ -24,7 +24,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.ranges.MongoIndexRangeService;
+import org.graylog2.indexer.ranges.LegacyMongoIndexRangeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -51,19 +51,19 @@ public class IndexRangesMigrationPeriodical extends Periodical {
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final NotificationService notificationService;
-    private final MongoIndexRangeService mongoIndexRangeService;
+    private final LegacyMongoIndexRangeService legacyMongoIndexRangeService;
 
     @Inject
     public IndexRangesMigrationPeriodical(final Cluster cluster,
                                           final Deflector deflector,
                                           final IndexRangeService indexRangeService,
                                           final NotificationService notificationService,
-                                          final MongoIndexRangeService mongoIndexRangeService) {
+                                          final LegacyMongoIndexRangeService legacyMongoIndexRangeService) {
         this.cluster = checkNotNull(cluster);
         this.deflector = checkNotNull(deflector);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.notificationService = checkNotNull(notificationService);
-        this.mongoIndexRangeService = checkNotNull(mongoIndexRangeService);
+        this.legacyMongoIndexRangeService = checkNotNull(legacyMongoIndexRangeService);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
         final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllDeflectorIndexNames());
         final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
         final SortedSet<IndexRange> mongoIndexRanges = Sets.filter(
-                mongoIndexRangeService.findAll(),
+                legacyMongoIndexRangeService.findAll(),
                 new Predicate<IndexRange>() {
                     @Override
                     public boolean apply(IndexRange input) {
@@ -95,7 +95,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
         for (IndexRange indexRange : mongoIndexRanges) {
             LOG.info("Migrating index range from MongoDB: {}", indexRange);
             indexRangeService.save(indexRange);
-            mongoIndexRangeService.markAsMigrated(indexRange.indexName());
+            legacyMongoIndexRangeService.markAsMigrated(indexRange.indexName());
         }
 
         final int numberOfIndices = indexNames.size();

@@ -36,7 +36,7 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoR
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MongoIndexRangeServiceTest {
+public class LegacyMongoIndexRangeServiceTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     private static final DateTime EPOCH = new DateTime(0L, DateTimeZone.UTC);
@@ -44,11 +44,11 @@ public class MongoIndexRangeServiceTest {
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
-    private MongoIndexRangeService indexRangeService;
+    private LegacyMongoIndexRangeService indexRangeService;
 
     @Before
     public void setUp() throws Exception {
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection());
+        indexRangeService = new LegacyMongoIndexRangeService(mongoRule.getMongoConnection());
     }
 
     @Test

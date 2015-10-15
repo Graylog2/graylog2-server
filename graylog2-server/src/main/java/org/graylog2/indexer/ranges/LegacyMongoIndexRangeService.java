@@ -36,13 +36,13 @@ import java.util.SortedSet;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-public class MongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
-    private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
+public class LegacyMongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyMongoIndexRangeService.class);
     private static final String COLLECTION_NAME = "index_ranges";
     private static final String FIELD_MIGRATED = "migrated";
 
     @Inject
-    public MongoIndexRangeService(final MongoConnection mongoConnection) {
+    public LegacyMongoIndexRangeService(final MongoConnection mongoConnection) {
         super(mongoConnection);
     }
 
