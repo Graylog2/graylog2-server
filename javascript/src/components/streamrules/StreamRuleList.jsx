@@ -17,7 +17,7 @@ var StreamRuleList = React.createClass({
     },
     render() {
         if (this.props.stream) {
-            var streamRules = this._formatStreamRules(this.props.stream.stream_rules);
+            var streamRules = this._formatStreamRules(this.props.stream.rules);
             return (
                 <ul className="streamrules-list">
                     {streamRules}
