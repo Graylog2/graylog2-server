@@ -1,10 +1,10 @@
 'use strict';
 
-declare var jsRoutes: any;
 declare var $: any;
 
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+import UserNotification = require('util/UserNotification');
+import URLUtils = require('util/URLUtils');
+import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface Stream {
@@ -58,7 +58,7 @@ class StreamsStore {
         };
 
         var url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
-        $.getJSON(url).then(callback).catch(failCallback);
+        fetch('GET', URLUtils.qualifyUrl(url)).then(callback).catch(failCallback);
     }
     remove(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
