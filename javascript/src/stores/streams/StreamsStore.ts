@@ -1,7 +1,3 @@
-'use strict';
-
-declare var $: any;
-
 import UserNotification = require('util/UserNotification');
 import URLUtils = require('util/URLUtils');
 import jsRoutes = require('routing/jsRoutes');
@@ -66,11 +62,8 @@ class StreamsStore {
                 "Could not remove Stream");
         };
 
-        var url = jsRoutes.controllers.api.StreamsApiController.delete(streamId).url;
-        $.ajax({
-            type: "DELETE",
-            url: url
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamsApiController.delete(streamId).url);
+        fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     pause(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -78,11 +71,8 @@ class StreamsStore {
                 "Could not pause Stream");
         };
 
-        var url = jsRoutes.controllers.api.StreamsApiController.pause(streamId).url;
-        $.ajax({
-            type: "POST",
-            url: url
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamsApiController.pause(streamId).url);
+        fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     resume(streamId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -116,13 +106,9 @@ class StreamsStore {
                 "Could not update Stream");
         };
 
-        var url = jsRoutes.controllers.api.StreamsApiController.update(streamId).url;
-        $.ajax({
-            type: "PUT",
-            url: url,
-            contentType: "application/json",
-            data: JSON.stringify(data)
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamsApiController.update(streamId).url);
+        fetch('PUT', url, data)
+          .then(callback, failCallback).then(this._emitChange.bind(this));
     }
     cloneStream(streamId: string, data: any, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
