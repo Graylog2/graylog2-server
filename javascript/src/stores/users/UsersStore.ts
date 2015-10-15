@@ -26,7 +26,7 @@ export interface User {
     startpage?: StartPage;
 }
 
-export var UsersStore = {
+const UsersStore = {
     editUserFormUrl(username: string) {
         return URLUtils.appPrefixed("/system/users/edit/" + username);
     },
@@ -72,3 +72,5 @@ export var UsersStore = {
         return promise;
     }
 };
+
+export default UsersStore;
