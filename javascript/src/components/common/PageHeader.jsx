@@ -6,6 +6,7 @@ import SupportLink from 'components/support/SupportLink';
 const PageHeader = React.createClass({
   propTypes: {
     title: React.PropTypes.string.isRequired,
+    children: React.PropTypes.array,
   },
   render() {
     return (
@@ -29,7 +30,7 @@ const PageHeader = React.createClass({
         </Row>
       </span>
     );
-  }
+  },
 });
 
 export default PageHeader;
