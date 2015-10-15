@@ -2,14 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input } from 'react-bootstrap';
-import $ from 'jquery';
 import UniversalSearch from 'logic/search/UniversalSearch';
 
 import jsRoutes from 'routing/jsRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-var TypeAheadFieldInput = React.createClass({
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/typeahead.jquery.min.js');
+
+const TypeAheadFieldInput = React.createClass({
   componentDidMount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
@@ -50,7 +52,7 @@ var TypeAheadFieldInput = React.createClass({
   },
 
   _getFilteredProps() {
-    var props = Immutable.fromJS(this.props);
+    let props = Immutable.fromJS(this.props);
 
     if (props.has('valueLink')) {
       props = props.delete('valueLink');
