@@ -1,7 +1,4 @@
-'use strict';
-
-declare var jsRoutes: any;
-declare var $: any;
+import jsRoutes = require('routing/jsRoutes');
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
@@ -45,7 +42,7 @@ class StreamRulesStore {
                 "Could not retrieve Stream Rules");
         };
 
-        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url, callback).fail(failCallback);
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url)).then(callback, failCallback);
     }
     update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -53,15 +50,10 @@ class StreamRulesStore {
                 "Could not update Stream Rule");
         };
 
-        var url = jsRoutes.controllers.api.StreamRulesApiController.update(streamId, streamRuleId).url;
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.update(streamId, streamRuleId).url);
         var request = {field: data.field, type: data.type, value: data.value, inverted: data.inverted};
 
-        $.ajax({
-            type: "PUT",
-            url: url,
-            contentType: "application/json",
-            data: JSON.stringify(request)
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        fetch('PUT', url, request).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -69,11 +61,8 @@ class StreamRulesStore {
                 "Could not delete Stream Rule");
         };
 
-        var url = jsRoutes.controllers.api.StreamRulesApiController.delete(streamId, streamRuleId).url;
-        $.ajax({
-            type: "DELETE",
-            url: url
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.delete(streamId, streamRuleId).url);
+        fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     create(streamId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -81,14 +70,9 @@ class StreamRulesStore {
                 "Could not create Stream Rule");
         };
 
-        var url = jsRoutes.controllers.api.StreamRulesApiController.create(streamId).url;
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.create(streamId).url);
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            contentType: "application/json",
-            data: JSON.stringify(data)
-        }).done(callback).done(this._emitChange.bind(this)).fail(failCallback);
+        fetch('POST', url, data).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     onChange(callback) {
         this.callbacks.push(callback);
