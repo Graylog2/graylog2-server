@@ -1,20 +1,27 @@
 /* global jsRoutes */
 
-import React from 'react';
-import { PropTypes } from 'react';
-import LoaderTabs from '../messageloaders/LoaderTabs';
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Alert, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import Routes from 'routing/Routes';
+
+import LoaderTabs from 'components/messageloaders/LoaderTabs';
+import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from './StreamRuleList';
-import StreamsStore from '../../stores/streams/StreamsStore';
-import StreamRulesStore from '../../stores/streams/StreamRulesStore';
-import { Alert } from 'react-bootstrap';
 import StreamRuleForm from './StreamRuleForm';
-import Spinner from '../common/Spinner';
-import MatchingTypeSwitcher from '../streams/MatchingTypeSwitcher';
+import Spinner from 'components/common/Spinner';
+
+import StreamsStore from 'stores/streams/StreamsStore';
+import StreamRulesStore from 'stores/streams/StreamRulesStore';
+import CurrentUserStore from 'stores/users/CurrentUserStore';
 
 const StreamRulesEditor = React.createClass({
+  mixins: [Reflux.connect(CurrentUserStore)],
   propTypes() {
     return {
-      streamId: PropTypes.string.isRequired,
+      params: PropTypes.object,
     };
   },
   componentDidMount() {
@@ -27,7 +34,7 @@ const StreamRulesEditor = React.createClass({
   },
   onMessageLoaded(message) {
     this.setState({message: message});
-    StreamsStore.testMatch(this.props.streamId, {message: message.fields}, (resultData) => {
+    StreamsStore.testMatch(this.props.params.streamId, {message: message.fields}, (resultData) => {
       this.setState({matchData: resultData});
     });
   },
@@ -73,12 +80,13 @@ const StreamRulesEditor = React.createClass({
             <MatchingTypeSwitcher stream={this.state.stream} onChange={this.loadData}/>
             <Alert ref="well" bsStyle={styles}>
               <StreamRuleList stream={this.state.stream} streamRuleTypes={this.state.streamRuleTypes}
-                              permissions={this.props.permissions} matchData={this.state.matchData}/>
+                              permissions={this.state.currentUser.permissions} matchData={this.state.matchData}/>
             </Alert>
 
             <p style={{marginTop: '10px'}}>
-              <a href={jsRoutes.controllers.StreamsController.index().url} className="btn btn-success">I'm
-                done!</a>
+              <LinkContainer to={Routes.STREAMS}>
+                <Button bsStyle="success">I'm done!</Button>
+              </LinkContainer>
             </p>
           </div>
         </div>
@@ -88,11 +96,11 @@ const StreamRulesEditor = React.createClass({
     }
   },
   loadData() {
-    StreamRulesStore.types((types) => {
+    StreamRulesStore.types().then((types) => {
       this.setState({streamRuleTypes: types});
     });
 
-    StreamsStore.get(this.props.streamId, (stream) => {
+    StreamsStore.get(this.props.params.streamId, (stream) => {
       this.setState({stream: stream});
     });
 
@@ -101,7 +109,7 @@ const StreamRulesEditor = React.createClass({
     }
   },
   _onStreamRuleFormSubmit(streamRuleId, data) {
-    StreamRulesStore.create(this.props.streamId, data, () => {});
+    StreamRulesStore.create(this.props.params.streamId, data, () => {});
   },
   _onAddStreamRule(event) {
     event.preventDefault();
