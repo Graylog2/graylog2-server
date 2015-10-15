@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.search;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,12 +38,12 @@ import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
-import org.graylog2.rest.resources.search.responses.QueryParseError;
-import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
+import org.graylog2.rest.resources.search.responses.QueryParseError;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -63,10 +65,13 @@ public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     protected final Searches searches;
+    private final Counter emptySearchResults;
 
     @Inject
-    public SearchResource(Searches searches) {
+    public SearchResource(Searches searches, MetricRegistry metricRegistry) {
         this.searches = searches;
+        emptySearchResults = metricRegistry.counter(MetricRegistry.name(SearchResource.class,
+                                                                        "empty-search-results"));
     }
 
     protected void validateInterval(String interval) {
@@ -149,6 +154,9 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected SearchResponse buildSearchResponse(SearchResult sr, org.graylog2.indexer.searches.timeranges.TimeRange timeRange) {
+        if (sr.getTotalResults() == 0) {
+            emptySearchResults.inc();
+        }
         return SearchResponse.create(sr.getOriginalQuery(),
                 sr.getBuiltQuery(),
                 indexRangeListToValueList(sr.getUsedIndices()),

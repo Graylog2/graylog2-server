@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.search;
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -60,8 +61,9 @@ public class SavedSearchesResource extends SearchResource {
 
     @Inject
     public SavedSearchesResource(Searches searches,
-                                 SavedSearchService savedSearchService) {
-        super(searches);
+                                 SavedSearchService savedSearchService,
+                                 MetricRegistry metricRegistry) {
+        super(searches, metricRegistry);
         this.savedSearchService = savedSearchService;
     }
 

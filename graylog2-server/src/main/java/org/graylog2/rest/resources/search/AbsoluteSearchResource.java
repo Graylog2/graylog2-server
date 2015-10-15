@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.search;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -58,10 +60,13 @@ import java.util.List;
 @Path("/search/universal/absolute")
 public class AbsoluteSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
+    private final Counter searchQueryException;
 
     @Inject
-    public AbsoluteSearchResource(Searches searches) {
-        super(searches);
+    public AbsoluteSearchResource(Searches searches, MetricRegistry metricRegistry) {
+        super(searches, metricRegistry);
+        searchQueryException = metricRegistry.counter(MetricRegistry.name(SearchResource.class,
+                                                                          "search-query-exceptions"));
     }
 
     @GET
@@ -102,6 +107,7 @@ public class AbsoluteSearchResource extends SearchResource {
         try {
             return buildSearchResponse(searches.search(searchesConfig), timeRange);
         } catch (SearchPhaseExecutionException e) {
+            searchQueryException.inc();
             throw createRequestExceptionForParseFailure(query, e);
         }
     }
