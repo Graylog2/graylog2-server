@@ -1,6 +1,8 @@
 import React from 'react';
+import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import { Row, Col } from 'react-bootstrap';
+import Spinner from 'components/common/Spinner';
 
 import 'javascripts/shims/styles/shim.css';
 import 'stylesheets/bootstrap.min.css';
@@ -19,11 +21,17 @@ import 'stylesheets/graylog2.less';
 import 'c3/c3.css';
 import 'dc/dc.css';
 
+import CurrentUserStore from 'stores/users/CurrentUserStore';
+
 const App = React.createClass({
+  mixins: [Reflux.connect(CurrentUserStore)],
   render() {
+    if (!this.state.currentUser) {
+      return <Spinner />;
+    }
     return (
       <div>
-        <Navigation requestPath="/" fullName="John Doe" loginName="johndoe"/>
+        <Navigation requestPath="/" fullName={this.state.currentUser.full_name} loginName={this.state.currentUser.username}/>
         <div className="container-fluid">
           <Row id="main-row">
             <Col md={12} id="main-content">

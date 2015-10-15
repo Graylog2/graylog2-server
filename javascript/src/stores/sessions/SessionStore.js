@@ -19,7 +19,7 @@ const SessionStore = Reflux.createStore({
     this._propagateState();
   },
   getInitialState() {
-    return { sessionId: this.sessionId, username: this.username };
+    return this.getSessionInfo();
   },
 
   login(username, password, host) {
@@ -27,10 +27,8 @@ const SessionStore = Reflux.createStore({
       .json({username: username, password: password, host: host});
     const promise = builder.build()
       .then((sessionInfo) => {
-        return sessionInfo.session_id;
+        return { sessionId: sessionInfo.session_id, username: username };
       });
-
-    this.username = username;
 
     SessionActions.login.promise(promise);
   },
@@ -56,12 +54,14 @@ const SessionStore = Reflux.createStore({
   },
 
   _propagateState() {
-    this.trigger({sessionId: this.sessionId, username: this.username});
+    this.trigger(this.getSessionInfo());
   },
 
-  loginCompleted(sessionId) {
-    localStorage.setItem('sessionId', sessionId);
-    this.sessionId = sessionId;
+  loginCompleted(sessionInfo) {
+    localStorage.setItem('sessionId', sessionInfo.sessionId);
+    localStorage.setItem('username', sessionInfo.username);
+    this.sessionId = sessionInfo.sessionId;
+    this.username = sessionInfo.username;
     this._propagateState();
   },
   isLoggedIn() {
@@ -69,6 +69,9 @@ const SessionStore = Reflux.createStore({
   },
   getSessionId() {
     return this.sessionId;
+  },
+  getSessionInfo() {
+    return {sessionId: this.sessionId, username: this.username};
   },
 });
 
