@@ -7,15 +7,19 @@ const SessionStore = Reflux.createStore({
   listenables: [SessionActions],
   sourceUrl: '/system/sessions',
   sessionId: undefined,
+  username: undefined,
 
   init() {
     if (localStorage.getItem('sessionId') !== undefined) {
       this.sessionId = localStorage.getItem('sessionId');
-      this.trigger({sessionId: this.sessionId});
     }
+    if (localStorage.getItem('username') !== undefined) {
+      this.username = localStorage.getItem('username');
+    }
+    this._propagateState();
   },
   getInitialState() {
-    return { sessionId: this.sessionId };
+    return { sessionId: this.sessionId, username: this.username };
   },
 
   login(username, password, host) {
@@ -25,6 +29,8 @@ const SessionStore = Reflux.createStore({
       .then((sessionInfo) => {
         return sessionInfo.session_id;
       });
+
+    this.username = username;
 
     SessionActions.login.promise(promise);
   },
@@ -43,14 +49,20 @@ const SessionStore = Reflux.createStore({
 
   _removeSession() {
     delete localStorage.sessionId;
+    delete localStorage.username;
     this.sessionId = undefined;
-    this.trigger({sessionId: this.sessionId});
+    this.username = undefined;
+    this._propagateState();
+  },
+
+  _propagateState() {
+    this.trigger({sessionId: this.sessionId, username: this.username});
   },
 
   loginCompleted(sessionId) {
     localStorage.setItem('sessionId', sessionId);
     this.sessionId = sessionId;
-    this.trigger({sessionId: this.sessionId});
+    this._propagateState();
   },
   isLoggedIn() {
     return this.sessionId !== undefined && this.sessionId !== null;
