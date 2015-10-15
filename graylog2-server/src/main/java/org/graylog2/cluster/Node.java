@@ -21,7 +21,7 @@ import org.joda.time.DateTime;
 
 public interface Node extends Persisted {
     enum Type {
-        SERVER, RADIO
+        SERVER
     }
 
     String getNodeId();

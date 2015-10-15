@@ -54,9 +54,6 @@ public class ProcessBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
-    public static String SOURCE_INPUT_ATTR_NAME;
-    public static String SOURCE_NODE_ATTR_NAME;
-
     private final ExecutorService executor;
 
     private final Meter incomingMessages;
@@ -84,14 +81,6 @@ public class ProcessBuffer extends Buffer {
             }
         });
         safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_SIZE, constantGauge(ringBufferSize));
-
-        if (serverStatus.hasCapability(ServerStatus.Capability.RADIO)) {
-            SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
-            SOURCE_NODE_ATTR_NAME = "gl2_source_radio";
-        } else {
-            SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
-            SOURCE_NODE_ATTR_NAME = "gl2_source_node";
-        }
 
         final WaitStrategy waitStrategy = getWaitStrategy(waitStrategyName, "processor_wait_strategy");
         final Disruptor<MessageEvent> disruptor = new Disruptor<>(

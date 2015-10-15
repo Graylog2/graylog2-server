@@ -55,8 +55,6 @@ public class MessageResult {
     private final DateTime timestamp;
     private final String sourceNodeId;
     private final String sourceInputId;
-    private final String sourceRadioId;
-    private final String sourceRadioInputId;
     private final List<String> streamIds;
     private final Map<String, List<HighlightRange>> highlightRanges;
     private final FieldMapper fieldMapper;
@@ -96,14 +94,6 @@ public class MessageResult {
         this.sourceInputId = (String) message.get("gl2_source_input");
         this.index = index;
         this.streamIds = (List<String>) message.get("streams");
-
-        if (message.containsKey("gl2_source_radio")) {
-            sourceRadioId = (String) message.get("gl2_source_radio");
-            sourceRadioInputId = (String) message.get("gl2_source_radio_input");
-        } else {
-            sourceRadioId = null;
-            sourceRadioInputId = null;
-        }
     }
 
     private DateTime timestampToDateTime(final Object timestamp) {
@@ -171,14 +161,6 @@ public class MessageResult {
 
     public String getSourceInputId() {
         return sourceInputId;
-    }
-
-    public String getSourceRadioId() {
-        return sourceRadioId;
-    }
-
-    public String getSourceRadioInputId() {
-        return sourceRadioInputId;
     }
 
     public List<String> getStreamIds() {

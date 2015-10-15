@@ -33,7 +33,6 @@ import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
@@ -103,7 +102,6 @@ public class Server extends ServerBootstrap {
         return Arrays.<Module>asList(
                 new ServerBindings(configuration),
                 new PersistenceServicesBindings(),
-                new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
                 new AlarmCallbackBindings(),
                 new InitializerBindings(),
