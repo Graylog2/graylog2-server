@@ -31,10 +31,10 @@ class StreamsStore {
   listStreams() {
     const url = "/streams";
     const promise = fetch('GET', URLUtils.qualifyUrl(url));
-    /*promise.fail((jqXHR, textStatus, errorThrown) => {
-     UserNotification.error("Loading streams failed with status: " + errorThrown,
-     "Could not load streams");
-     });*/
+    promise.catch((jqXHR, textStatus, errorThrown) => {
+      UserNotification.error("Loading streams failed with status: " + errorThrown,
+        "Could not load streams");
+    });
     return promise;
   }
   load(callback: ((streams: Array<Stream>) => void)) {
@@ -54,7 +54,7 @@ class StreamsStore {
     };
 
     const url = jsRoutes.controllers.api.StreamsApiController.get(streamId).url;
-    fetch('GET', URLUtils.qualifyUrl(url)).then(callback).catch(failCallback);
+    fetch('GET', URLUtils.qualifyUrl(url)).then(callback, failCallback);
   }
   remove(streamId: string, callback: (() => void)) {
     const failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -115,25 +115,19 @@ class StreamsStore {
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   removeOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
-    
-    $.ajax({
-      url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
-      type: 'DELETE',
-      error: (jqXHR, textStatus, errorThrown) => {
-        UserNotification.error("Removing output from stream failed with status: " + errorThrown,
-          "Could not remove output from stream");
-      }
-    }).done(callback).done(this._emitChange.bind(this));
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url);
+
+    fetch('DELETE', url).then(callback, (jqXHR, textStatus, errorThrown) => {
+      UserNotification.error("Removing output from stream failed with status: " + errorThrown,
+        "Could not remove output from stream");
+    }).then(this._emitChange.bind(this));
   }
   addOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
-    $.ajax({
-      url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
-      type: 'PUT',
-      error: (jqXHR, textStatus, errorThrown) => {
-        UserNotification.error("Adding output to stream failed with status: " + errorThrown,
-          "Could not add output to stream");
-      }
-    }).done(callback).done(this._emitChange.bind(this));
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamOutputsApiController.add(streamId, outputId).url);
+    fetch('POST', url, {outputs: [outputId]}).then(callback, (jqXHR, textStatus, errorThrown) => {
+      UserNotification.error("Adding output to stream failed with status: " + errorThrown,
+        "Could not add output to stream");
+    }).then(this._emitChange.bind(this));
   }
   testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
     const config = {

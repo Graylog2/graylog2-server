@@ -1,10 +1,9 @@
-'use strict';
+import React from 'react';
+import $ from 'jquery';
 
-var React = require('react');
-var ConfigurationForm = require('../configurationforms/ConfigurationForm');
-var $ = require('jquery');
+import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
 
-var CreateOutputDropdown = React.createClass({
+const CreateOutputDropdown = React.createClass({
     PLACEHOLDER: "placeholder",
     getInitialState() {
         return {
@@ -42,8 +41,8 @@ var CreateOutputDropdown = React.createClass({
             this.refs.configurationForm.open();
         }
     },
-    _formatOutputType(title, typeName) {
-        return (<option key={typeName} value={typeName}>{title}</option>);
+    _formatOutputType(type, typeName) {
+        return (<option key={typeName} value={typeName}>{type.name}</option>);
     },
     _onTypeChange(evt) {
         var outputType = evt.target.value;
@@ -54,4 +53,4 @@ var CreateOutputDropdown = React.createClass({
     },
 });
 
-module.exports = CreateOutputDropdown;
+export default CreateOutputDropdown;
