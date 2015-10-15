@@ -105,17 +105,25 @@ class DashboardStore {
     return promise;
   }
 
-  createDashboard(title: string, description: string): JQueryPromise<string[]> {
-    const url = jsRoutes.controllers.api.DashboardsApiController.create().url;
-    const promise = $.ajax({
-      type: "POST",
-      url: url,
-      data: JSON.stringify({title: title, description: description}),
-      dataType: 'json',
-      contentType: 'application/json'
+  get(id : string): JQueryPromise<Dashboard> {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
+    const promise = fetch('GET', url);
+
+    promise.catch((jqXHR, textStatus, errorThrown) => {
+      if (jqXHR.status !== 404) {
+        UserNotification.error("Loading your dashboard failed with status: " + errorThrown,
+          "Could not load your dashboard");
+      }
     });
 
-    promise.done(() => {
+    return promise;
+  }
+
+  createDashboard(title: string, description: string): JQueryPromise<string[]> {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.create().url);
+    const promise = fetch('POST', url, {title: title, description: description})
+
+    promise.then(() => {
       UserNotification.success("Dashboard successfully created");
 
       if (this._onDashboardsChanged.length > 0) {
@@ -123,8 +131,7 @@ class DashboardStore {
       } else if (this._onWritableDashboardsChanged.length > 0) {
         this.updateWritableDashboards();
       }
-    });
-    promise.fail((jqXHR, textStatus, errorThrown) => {
+    }, (jqXHR, textStatus, errorThrown) => {
       UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + errorThrown,
         "Could not create dashboard");
     });
@@ -153,13 +160,10 @@ class DashboardStore {
   }
 
   remove(dashboard: Dashboard): JQueryPromise<string[]> {
-    const url = jsRoutes.controllers.api.DashboardsApiController.delete(dashboard.id).url;
-    const promise = $.ajax({
-      type: "DELETE",
-      url: url
-    });
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.delete(dashboard.id).url);
+    const promise = fetch('DELETE', url)
 
-    promise.done(() => {
+    promise.then(() => {
       UserNotification.success("Dashboard successfully deleted");
 
       if (this._onDashboardsChanged.length > 0) {
@@ -167,9 +171,7 @@ class DashboardStore {
       } else if (this._onWritableDashboardsChanged.length > 0) {
         this.updateWritableDashboards();
       }
-    });
-
-    promise.fail((jqXHR, textStatus, errorThrown) => {
+    }, (jqXHR, textStatus, errorThrown) => {
       UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
         "Could not delete dashboard");
     });

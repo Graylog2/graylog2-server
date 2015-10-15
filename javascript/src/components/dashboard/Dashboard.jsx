@@ -45,9 +45,9 @@ const Dashboard = React.createClass({
     return (
       <li className="stream">
         <h2>
-          <a href={jsRoutes.controllers.DashboardsController.show(this.props.dashboard.id).url}>
-            <span ref="dashboardTitle">{this.props.dashboard.title}</span>
-          </a>
+          <LinkContainer to={Routes.dashboard_show(this.props.dashboard.id)}>
+            <a><span ref="dashboardTitle">{this.props.dashboard.title}</span></a>
+          </LinkContainer>
         </h2>
 
         <div className="stream-data">

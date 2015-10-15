@@ -13,6 +13,8 @@ const Routes = {
   stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',
   stream_search: (streamId, query, type, range) => '/streams/' + streamId + '/search' + '?query=' + query + "&type=" + range + '&range=' + range,
   startpage_set: (type, id) => '/startpage/set/' + type + '/' + id,
+
+  dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
 };
 
 export default Routes;

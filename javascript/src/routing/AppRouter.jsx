@@ -1,11 +1,14 @@
 import React from 'react';
 import App from 'routing/App';
 import { Router, Route } from 'react-router';
+
+import Routes from 'routing/Routes';
+import DebugHandler from './DebugHandler';
+
 import StreamsPage from 'components/streams/StreamsPage';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import DashboardsPage from 'components/dashboard/DashboardsPage';
-import Routes from 'routing/Routes';
-import DebugHandler from './DebugHandler';
+import ShowDashboardPage from 'components/dashboard/ShowDashboardPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -15,6 +18,7 @@ const AppRouter = React.createClass({
           <Route path={Routes.STREAMS} component={StreamsPage}/>
           <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
           <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
+          <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
           <Route path="system">
             <Route path="nodes" component={DebugHandler}/>
           </Route>

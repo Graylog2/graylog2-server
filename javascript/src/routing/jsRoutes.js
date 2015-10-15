@@ -2,7 +2,9 @@ const jsRoutes = {
   controllers: {
     api: {
       DashboardsApiController: {
+        create: () => { return {url: '/dashboards' }; },
         index: () => { return {url: '/dashboards' }; },
+        get: (id) => { return {url: '/dashboards/' + id }; },
         delete: (id) => { return {url: '/dashboards/' + id }; },
         update: (id) => { return {url: '/dashboards/' + id }; },
       },
