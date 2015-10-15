@@ -4,6 +4,7 @@ const jsRoutes = {
       DashboardsApiController: {
         index: () => { return {url: '/dashboards' }; },
         delete: (id) => { return {url: '/dashboards/' + id }; },
+        update: (id) => { return {url: '/dashboards/' + id }; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },
