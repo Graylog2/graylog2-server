@@ -72,11 +72,6 @@
                         <artifactId>graylog2-server</artifactId>
                         <version>${project.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.graylog2</groupId>
-                        <artifactId>graylog2-radio</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
                 </dependencies>
             </plugin>
             <plugin>

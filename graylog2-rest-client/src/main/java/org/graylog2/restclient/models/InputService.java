@@ -73,16 +73,6 @@ public class InputService {
             log.error("Unable to fetch server input list", e);
             return result;
         }
-        try {
-            for(Radio radio : nodeService.radios().values()) {
-                result.put(radio,
-                        api.path(routes.radio().InputsResource().list(), InputsResponse.class).radio(radio).execute());
-            }
-        } catch (APIException e) {
-            log.error("Unable to fetch radio list: " + e);
-        } catch (IOException e) {
-            log.error("Unable to fetch radio list: " + e);
-        }
         return result;
     }
 
@@ -209,13 +199,6 @@ public class InputService {
             if (!serverNode.isMaster())
                 serverNode.launchExistingInput(ilr.id);
         }
-        try {
-            for (Radio radio : nodeService.radios().values()) {
-                radio.launchExistingInput(ilr.id);
-            }
-        } catch (APIException | IOException e) {
-            log.error("Unable to fetch list of radios: " + e);
-        }
 
         return ilr.id;
     }
@@ -226,15 +209,6 @@ public class InputService {
         for (Node serverNode : serverNodes.all())
             if (!serverNode.isMaster())
                 results.put(serverNode, serverNode.terminateInput(inputId));
-
-        try {
-            for (Radio radio : nodeService.radios().values())
-                results.put(radio, radio.terminateInput(inputId));
-        } catch (APIException e) {
-            log.error("Unable to fetch list of radios: " + e);
-        } catch (IOException e) {
-            log.error("Unable to fetch list of radios: " + e);
-        }
 
         Node master = serverNodes.master();
         results.put(master, master.terminateInput(inputId));
@@ -273,11 +247,6 @@ public class InputService {
         final List<ClusterEntity> targetNodes = Lists.newArrayList();
         if (target.getValue().getInput().getGlobal()) {
             targetNodes.addAll(serverNodes.all());
-            try {
-                targetNodes.addAll(nodeService.radios().values());
-            } catch (APIException | IOException e) {
-                log.error("Unable to fetch list of radios: " + e);
-            }
         } else {
             targetNodes.add(target.getKey());
         }

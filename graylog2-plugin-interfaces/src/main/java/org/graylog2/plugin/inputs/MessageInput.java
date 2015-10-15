@@ -55,7 +55,6 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_NODE_ID = "node_id";
-    public static final String FIELD_RADIO_ID = "radio_id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_CONFIGURATION = "configuration";

@@ -25,7 +25,6 @@ import org.graylog2.restclient.models.Input;
 import org.graylog2.restclient.models.InputState;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Output;
-import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.SavedSearch;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamRule;
@@ -52,7 +51,6 @@ public class ModelFactoryModule extends AbstractModule {
         install(new FactoryModuleBuilder().build(LdapSettings.Factory.class));
         install(new FactoryModuleBuilder().build(Stream.Factory.class));
         install(new FactoryModuleBuilder().build(StreamRule.Factory.class));
-        install(new FactoryModuleBuilder().build(Radio.Factory.class));
         install(new FactoryModuleBuilder().build(Index.Factory.class));
         install(new FactoryModuleBuilder().build(SavedSearch.Factory.class));
         install(new FactoryModuleBuilder().build(AlertCondition.Factory.class));

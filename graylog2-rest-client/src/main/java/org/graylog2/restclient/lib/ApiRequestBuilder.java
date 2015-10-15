@@ -19,7 +19,6 @@ package org.graylog2.restclient.lib;
 import com.google.common.net.MediaType;
 import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
-import org.graylog2.restclient.models.Radio;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +38,6 @@ public interface ApiRequestBuilder<T> {
     ApiRequestBuilder<T> pathParam(Object param);
 
     ApiRequestBuilder<T> node(Node node);
-
-    ApiRequestBuilder<T> radio(Radio radio);
 
     ApiRequestBuilder<T> clusterEntity(ClusterEntity entity);
 

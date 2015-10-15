@@ -26,9 +26,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
-import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -46,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -77,21 +74,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
-            inputs.add(new InputImpl((ObjectId) o.get("_id"), o.toMap()));
-        }
-
-        return inputs.build();
-    }
-
-    @Override
-    public List<Input> allOfRadio(Node radio) {
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_RADIO_ID, radio.getNodeId()),
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, radio.getNodeId()),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
-
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        for (DBObject o : query(InputImpl.class, new BasicDBObject("$or", query))) {
             inputs.add(new InputImpl((ObjectId) o.get("_id"), o.toMap()));
         }
 
@@ -132,25 +114,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public Input findForThisRadioOrGlobal(final String radioId, String id) throws NotFoundException {
-        final List<DBObject> radioIdOrGlobal = ImmutableList.<DBObject>of(
-                new BasicDBObject(MessageInput.FIELD_RADIO_ID, radioId),
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, radioId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
-
-        final List<DBObject> query = ImmutableList.<DBObject>of(
-                new BasicDBObject("_id", new ObjectId(id)),
-                new BasicDBObject("$or", radioIdOrGlobal));
-
-        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        if (o == null) {
-            throw new NotFoundException();
-        } else {
-            return new InputImpl((ObjectId) o.get("_id"), o.toMap());
-        }
-    }
-
-    @Override
     public Input findForThisNode(String nodeId, String id) throws NotFoundException, IllegalArgumentException {
         final List<BasicDBObject> forThisNode = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
@@ -159,26 +122,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject("_id", new ObjectId(id)),
                 new BasicDBObject("$and", forThisNode));
-
-        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        if (o == null) {
-            throw new NotFoundException();
-        } else {
-            return new InputImpl((ObjectId) o.get("_id"), o.toMap());
-        }
-    }
-
-    @Override
-    public Input findForThisRadio(String radioId, String id) throws NotFoundException {
-        final List<Object> list = new ArrayList<Object>() {{
-            add(false);
-            add(null);
-        }};
-
-        final List<DBObject> query = ImmutableList.of(
-                new BasicDBObject("_id", new ObjectId(id)),
-                new BasicDBObject(MessageInput.FIELD_RADIO_ID, radioId),
-                QueryBuilder.start(MessageInput.FIELD_GLOBAL).in(list).get());
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         if (o == null) {
@@ -380,9 +323,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public long localCountForNode(String nodeId) {
-        final List<BasicDBObject> forThisNode = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+        final List<BasicDBObject> forThisNode = ImmutableList.of(new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
 
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
@@ -395,8 +336,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     public long totalCountForNode(String nodeId) {
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
 
         return count(InputImpl.class, new BasicDBObject("$or", query));
     }

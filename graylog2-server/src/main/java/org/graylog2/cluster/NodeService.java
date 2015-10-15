@@ -22,15 +22,11 @@ import org.graylog2.plugin.system.NodeId;
 import java.net.URI;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface NodeService extends PersistedService {
     String registerServer(String nodeId, boolean isMaster, URI restTransportUri);
 
-    String registerRadio(String nodeId, String restTransportUri);
-
     Node byNodeId(String nodeId) throws NodeNotFoundException;
+
     Node byNodeId(NodeId nodeId) throws NodeNotFoundException;
 
     Map<String, Node> allActive(Node.Type type);
