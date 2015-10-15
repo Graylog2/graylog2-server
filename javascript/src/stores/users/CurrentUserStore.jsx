@@ -7,12 +7,14 @@ import SessionStore from 'stores/sessions/SessionStore';
 const CurrentUserStore = Reflux.createStore({
   listenable: [SessionActions],
   sourceUrl: '/users',
+  currentUser: undefined,
 
   init() {
-    this.listenTo(SessionStore, this.update);
-    if (SessionStore.getSessionId()) {
-      this.update(SessionStore.getSessionInfo());
-    }
+    this.listenTo(SessionStore, this.update, this.update);
+  },
+
+  getInitialState() {
+    return {currentUser: this.currentUser};
   },
 
   update(sessionInfo) {
@@ -21,7 +23,8 @@ const CurrentUserStore = Reflux.createStore({
 
       const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
         .then((resp) => {
-          this.trigger({currentUser: resp});
+          this.currentUser = resp;
+          this.trigger({currentUser: this.currentUser});
         });
     }
   }
