@@ -9,7 +9,7 @@ require('!script!../../../public/javascripts/typeahead.jquery.min.js');
 const TypeAheadInput = React.createClass({
   propTypes: {
     label: React.PropTypes.string.isRequired,
-    onKeyPress: React.PropTypes.func.isRequired,
+    onKeyPress: React.PropTypes.func,
   },
 
   componentDidMount() {
