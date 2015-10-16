@@ -2,8 +2,11 @@ import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
 
+import DocsHelper from 'util/DocsHelper';
+
 import PageHeader from 'components/common/PageHeader';
 import CollectorList from 'components/collectors/CollectorList';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 const CollectorsPage = React.createClass({
   render() {
@@ -16,7 +19,7 @@ const CollectorsPage = React.createClass({
 
           <span>
             Read more about collectors and how to set them up in the
-            @views.html.partials.links.docs(views.helpers.DocsHelper.PAGE_COLLECTOR, "Graylog documentation").
+            {' '}<DocumentationLink page={DocsHelper.PAGES.COLLECTOR} text="Graylog documentation"/>.
           </span>
         </PageHeader>
 
