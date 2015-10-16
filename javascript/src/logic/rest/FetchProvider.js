@@ -1,5 +1,6 @@
 import request from 'superagent-bluebird-promise';
 import SessionStore from 'stores/sessions/SessionStore';
+import SessionActions from 'actions/sessions/SessionActions';
 
 class FetchError extends Error {
   constructor(message, additional) {
@@ -31,6 +32,12 @@ export class Builder {
         }
 
         throw new FetchError(resp.statusText, resp);
+      }, (error) => {
+        if (error.status === 401) {
+          SessionActions.logout(SessionStore.getSessionId());
+        }
+
+        throw new FetchError(error.statusText, error);
       });
 
     return this;

@@ -23,10 +23,10 @@ const LoginPage = React.createClass({
     const password = this.refs.password.getValue();
     const location = document.location.host;
     SessionActions.login.triggerPromise(username, password, location).catch((error) => {
-      if (error.status === 401) {
+      if (error.additional.status === 401) {
         this.setState({lastError: 'The server rejected your credentials. Please verity them and retry.'});
       } else {
-        this.setState({lastError: 'Error - the server returned: ' + error.status + ' - ' + error.message});
+        this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.additional.message});
       }
     });
   },
