@@ -5,11 +5,11 @@ import { Router, Route } from 'react-router';
 import Routes from 'routing/Routes';
 import DebugHandler from './DebugHandler';
 
-import StreamsPage from 'components/streams/StreamsPage';
+import StreamsPage from 'pages/StreamsPage';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
 import StreamAlertsPage from 'pages/StreamAlertsPage';
-import DashboardsPage from 'components/dashboard/DashboardsPage';
+import DashboardsPage from 'pages/DashboardsPage';
 import ShowDashboardPage from 'components/dashboard/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
 import CollectorsPage from 'pages/CollectorsPage';
