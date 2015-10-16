@@ -25,7 +25,7 @@ const jsRoutes = {
         createRole: () => { return {url: '/roles'}; },
         updateRole: (rolename) => { return {url: '/roles/' + rolename}; },
         deleteRole: (rolename) => { return {url: '/roles/' + rolename}; },
-        loadMembers: (rolename) => { return {url: '/roles/' + rolename}; },
+        loadMembers: (rolename) => { return {url: '/roles/' + rolename + '/members'}; },
       },
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId}; },

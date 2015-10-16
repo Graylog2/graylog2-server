@@ -29,12 +29,12 @@ var RolesComponent = React.createClass({
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({streams: Immutable.List(streams)}));
-    DashboardStore.listDashboards().done(dashboards => this.setState({dashboards: dashboards}));
+    DashboardStore.listDashboards().then(dashboards => this.setState({dashboards: dashboards}));
   },
 
   loadRoles() {
     var promise = RolesStore.loadRoles();
-    promise.done((resp) => {
+    promise.then((resp) => {
       this.setState({roles: Immutable.Set(resp.roles), rolesLoaded: true});
     });
   },
@@ -46,21 +46,21 @@ var RolesComponent = React.createClass({
     this.setState({showEditRole: true, editRole: role});
   },
   _deleteRole(role) {
-    if (window.confirm("Do you really want to delete role " + role.name + "?")) {
-      RolesStore.getMembers(role.name).done((membership) => {
+    if (window.confirm('Do you really want to delete role ' + role.name + '?')) {
+      RolesStore.getMembers(role.name).then((membership) => {
         if (membership.users.length != 0) {
-          UserNotification.error("Cannot delete role " + role.name + ". It is still assigned to " + membership.users.length + " users.");
+          UserNotification.error('Cannot delete role ' + role.name + '. It is still assigned to ' + membership.users.length + ' users.');
         } else {
-          RolesStore.deleteRole(role.name).done(this.loadRoles);
+          RolesStore.deleteRole(role.name).then(this.loadRoles);
         }
       });
     }
   },
   _saveRole(initialName, role) {
     if (initialName === null) {
-      RolesStore.createRole(role).done(this._clearEditRole).done(this.loadRoles);
+      RolesStore.createRole(role).then(this._clearEditRole).then(this.loadRoles);
     } else {
-      RolesStore.updateRole(initialName, role).done(this._clearEditRole).done(this.loadRoles);
+      RolesStore.updateRole(initialName, role).then(this._clearEditRole).then(this.loadRoles);
     }
   },
   _clearEditRole() {
@@ -92,4 +92,4 @@ var RolesComponent = React.createClass({
 });
 
 
-module.exports = RolesComponent;
+export default RolesComponent;
