@@ -40,14 +40,17 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
                 <MenuItem>Collectors</MenuItem>
               </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.NODES}>
+                <MenuItem>Nodes</MenuItem>
+              </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
                 <MenuItem>Outputs</MenuItem>
               </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.NODES}>
-                <MenuItem>Nodes</MenuItem>
+              <LinkContainer to={Routes.SYSTEM.ROLES}>
+                <MenuItem>Roles</MenuItem>
               </LinkContainer>
             </NavDropdown>
           </Nav>

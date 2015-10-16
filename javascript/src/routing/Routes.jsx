@@ -8,6 +8,7 @@ const Routes = {
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
+    ROLES: '/system/roles',
   },
   USER_EDIT: '/user/edit',
   stream_edit: (streamId) => '/streams/' + streamId + '/edit',

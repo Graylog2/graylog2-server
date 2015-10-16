@@ -20,6 +20,13 @@ const jsRoutes = {
         availableType: (type) => { return {url: '/system/outputs/available/' + type}; },
         availableTypes: () => { return {url: '/system/outputs/available'}; },
       },
+      RolesApiController: {
+        listRoles: () => { return {url: '/roles'}; },
+        createRole: () => { return {url: '/roles'}; },
+        updateRole: (rolename) => { return {url: '/roles/' + rolename}; },
+        deleteRole: (rolename) => { return {url: '/roles/' + rolename}; },
+        loadMembers: (rolename) => { return {url: '/roles/' + rolename}; },
+      },
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId}; },
         create: (streamId) => { return {url: '/streams'}; },
