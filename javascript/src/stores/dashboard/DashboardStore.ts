@@ -1,11 +1,7 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 /// <reference path='../../routing/jsRoutes.d.ts' />
 
-'use strict';
-
 import Immutable = require('immutable');
-import $ = require('jquery');
 import UserNotification = require("util/UserNotification");
 import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require("../../util/URLUtils");
