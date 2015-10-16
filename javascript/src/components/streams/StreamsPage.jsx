@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
-import StreamComponent from './StreamComponent';
+
+import StreamComponent from 'components/streams/StreamComponent';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
 const StreamsPage = React.createClass({
