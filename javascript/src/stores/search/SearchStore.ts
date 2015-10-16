@@ -4,9 +4,9 @@
 
 'use strict';
 
-declare var jsRoutes: any;
-
+import $ = require('jquery');
 import Immutable = require('immutable');
+import jsRoutes = require('routing/jsRoutes');
 var Qs = require('qs');
 var URLUtils = require('../../util/URLUtils');
 
@@ -135,7 +135,8 @@ class SearchStore {
     }
 
     set fields(newFields: Immutable.Set<string>) {
-        URLUtils.replaceHashParam('fields', newFields.join(','));
+        // TODO: Add parameters once we know how to handle them
+        //URLUtils.replaceHashParam('fields', newFields.join(','));
         this._fields = newFields;
     }
 

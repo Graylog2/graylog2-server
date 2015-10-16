@@ -1,21 +1,16 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+import jsRoutes = require('routing/jsRoutes');
+import URLUtils = require('util/URLUtils');
+import UserNotification = require("util/UserNotification");
+const fetch = require('logic/rest/FetchProvider').default;
 
-'use strict';
-
-declare var $: any;
-declare var jsRoutes: any;
-
-import UserNotification = require("../../util/UserNotification");
-
-var ToolsStore = {
+const ToolsStore = {
     testNaturalDate(text: string): JQueryPromise<string[]> {
-        var url = jsRoutes.controllers.api.ToolsApiController.naturalDateTest(text).url;
+        const url = jsRoutes.controllers.api.ToolsApiController.naturalDateTest(text).url;
+        const promise = fetch('GET', URLUtils.qualifyUrl(url));
 
-        var promise = $.getJSON(url);
-
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            if (jqXHR.status !== 422) {
-                UserNotification.error("Loading keyword preview failed with status: " + errorThrown,
+        promise.catch((errorThrown) => {
+            if (errorThrown.additional.status !== 422) {
+                UserNotification.error("Loading keyword preview failed with status: " + errorThrown.additional.message,
                     "Could not load keyword preview");
             }
         });

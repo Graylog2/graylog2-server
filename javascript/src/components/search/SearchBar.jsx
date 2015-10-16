@@ -1,6 +1,4 @@
-/* global momentHelper, userPreferences */
-
-import $ from 'jquery';
+/* global $ */
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -17,6 +15,11 @@ import SavedSearchesStore from 'stores/search/SavedSearchesStore';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import UIUtils from 'util/UIUtils';
+
+import { momentHelper } from 'legacy/moment-helper.js';
+
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/bootstrap-datepicker.js');
 
 const SearchBar = React.createClass({
   getInitialState() {
@@ -125,7 +128,7 @@ const SearchBar = React.createClass({
     );
   },
   _initializeSearchQueryInput() {
-    if (userPreferences.enableSmartSearch) {
+    if (this.props.userPreferences.enableSmartSearch) {
       const queryInput = new QueryInput(this.refs.query.getInputDOMNode());
       queryInput.display();
       // We need to update on changes made on typeahead
@@ -136,7 +139,7 @@ const SearchBar = React.createClass({
     }
   },
   _removeSearchQueryInput() {
-    if (userPreferences.enableSmartSearch) {
+    if (this.props.userPreferences.enableSmartSearch) {
       const queryDOMElement = ReactDOM.findDOMNode(this.refs.query);
       $(queryDOMElement).off('typeahead:change');
     }
@@ -192,9 +195,9 @@ const SearchBar = React.createClass({
     if (value === '') {
       this._resetKeywordPreview();
     } else {
-      const promise = ToolsStore.testNaturalDate(value);
-      promise.fail(() => this._resetKeywordPreview());
-      promise.done((data) => this._onKeywordPreviewLoaded(data));
+      ToolsStore.testNaturalDate(value)
+        .then((data) => this._onKeywordPreviewLoaded(data))
+        .catch(() => this._resetKeywordPreview());
     }
   },
   _resetKeywordPreview() {
@@ -331,7 +334,7 @@ const SearchBar = React.createClass({
                 <Input type="text"
                        ref="keyword"
                        name="keyword"
-                       value={this.state.rangeParams.get('keyword')}
+                       defaultValue={this.state.rangeParams.get('keyword')}
                        onChange={this._keywordSearchChanged}
                        placeholder="Last week"
                        className="input-sm"

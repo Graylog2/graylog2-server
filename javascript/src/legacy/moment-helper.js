@@ -1,4 +1,6 @@
-momentHelper = {
+import moment from 'moment-timezone';
+
+export const momentHelper = {
     DATE_FORMAT_NO_MS: "YYYY-MM-DD HH:mm:ss",
     DATE_FORMAT: "YYYY-MM-DD HH:mm:ss.SSS",
     DATE_FORMAT_TZ_NO_MS: "YYYY-MM-DD HH:mm:ss Z",
@@ -19,10 +21,10 @@ momentHelper = {
             date = moment.utc(momentDate);
         }
 
-        if (gl2UserTimeZone !== null) {
-            date.tz(gl2UserTimeZone);
-        } else if (gl2UserTimeZoneOffset != null) {
-            date.zone(gl2UserTimeZoneOffset);
+        if (appConfig.gl2UserTimeZone !== null) {
+            date.tz(appConfig.gl2UserTimeZone);
+        } else if (appConfig.gl2UserTimeZoneOffset != null) {
+            date.zone(appConfig.gl2UserTimeZoneOffset);
         }
 
         return date;
@@ -57,7 +59,7 @@ momentHelper = {
 
     /* Parse the given string against the list of accepted formats and return a moment in the users' local timezone. */
     parseUserLocalFromString: function(dateString) {
-        return moment.tz(this._cleanDateString(dateString), this._getAcceptedFormats(), true, gl2UserTimeZone);
+        return moment.tz(this._cleanDateString(dateString), this._getAcceptedFormats(), true, appConfig.gl2UserTimeZone);
     },
 
     getFormattedResolution: function(resolution) {

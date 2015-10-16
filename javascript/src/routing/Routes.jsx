@@ -1,5 +1,6 @@
 const Routes = {
   HOME: '/',
+  SEARCH: '/search',
   STREAMS: '/streams',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',

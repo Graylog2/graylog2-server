@@ -21,7 +21,9 @@ const Navigation = React.createClass({
         <CollapsibleNav eventKey={0}>
           <Nav navbar>
             {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
-              <NavItem to="search">Search</NavItem>
+              <LinkContainer to={Routes.SEARCH}>
+                <NavItem to="search">Search</NavItem>
+              </LinkContainer>
             }
             <LinkContainer to={Routes.STREAMS}>
               <NavItem>Streams</NavItem>

@@ -1,10 +1,13 @@
 import React from 'react';
 import App from 'routing/App';
-import { Router, Route } from 'react-router';
+import AppWithSearchBar from 'routing/AppWithSearchBar';
+import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
+import { Router, Route, IndexRoute } from 'react-router';
 
 import Routes from 'routing/Routes';
 import DebugHandler from './DebugHandler';
 
+import SearchPage from 'pages/SearchPage';
 import StreamsPage from 'pages/StreamsPage';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
@@ -21,16 +24,21 @@ const AppRouter = React.createClass({
     return (
       <Router>
         <Route path="/" component={App}>
-          <Route path={Routes.STREAMS} component={StreamsPage}/>
-          <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
-          <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
-          <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
-          <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
-          <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
-          <Route path={Routes.SOURCES} component={SourcesPage}/>
-          <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
-          <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
-          <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
+          <Route component={AppWithSearchBar}>
+            <Route path={Routes.SEARCH} component={SearchPage}/>
+          </Route>
+          <Route component={AppWithoutSearchBar}>
+            <Route path={Routes.STREAMS} component={StreamsPage}/>
+            <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
+            <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
+            <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
+            <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
+            <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
+            <Route path={Routes.SOURCES} component={SourcesPage}/>
+            <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
+            <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
+            <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
+          </Route>
         </Route>
       </Router>
     );

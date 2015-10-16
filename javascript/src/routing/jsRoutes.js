@@ -48,10 +48,16 @@ const jsRoutes = {
       },
       SystemApiController: {
         fields: () => { return {url: '/system/fields'}; },
-      }
+      },
+      ToolsApiController: {
+        naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
+      },
     },
     DashboardsController: {
       show: (id) => { return {url: '/dashboards/' + id }; },
+    },
+    SearchController: {
+      index: () => { return {url: '/search'}; },
     },
   },
 };
