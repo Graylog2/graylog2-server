@@ -1,22 +1,16 @@
-'use strict';
+import React from 'react';
+import Immutable from 'immutable';
+import { Row, Col } from 'react-bootstrap';
 
-var React = require('react');
-var Immutable = require('immutable');
+import StreamsStore from 'stores/streams/StreamsStore';
+import DashboardStore from 'stores/dashboard/DashboardStore';
+import RolesStore from 'stores/users/RolesStore';
 
-var Row = require('react-bootstrap').Row;
-var Col = require('react-bootstrap').Col;
+import UserNotification from 'util/UserNotification';
+import RoleList from 'components/users/RoleList';
+import EditRole from 'components/users/EditRole';
 
-var RoleList = require('./RoleList');
-var EditRole = require('./EditRole');
-
-var RolesStore = require('../../stores/users/RolesStore').RolesStore;
-var UserNotification = require('../../util/UserNotification');
-
-var StreamsStore = require('../../stores/streams/StreamsStore');
-var DashboardStore = require('../../stores/dashboard/DashboardStore');
-
-var RolesComponent = React.createClass({
-
+const RolesComponent = React.createClass({
   getInitialState() {
     return {
       roles: Immutable.Set(),
@@ -33,7 +27,7 @@ var RolesComponent = React.createClass({
   },
 
   loadRoles() {
-    var promise = RolesStore.loadRoles();
+    const promise = RolesStore.loadRoles();
     promise.then((resp) => {
       this.setState({roles: Immutable.Set(resp.roles), rolesLoaded: true});
     });
@@ -48,7 +42,7 @@ var RolesComponent = React.createClass({
   _deleteRole(role) {
     if (window.confirm('Do you really want to delete role ' + role.name + '?')) {
       RolesStore.getMembers(role.name).then((membership) => {
-        if (membership.users.length != 0) {
+        if (membership.users.length !== 0) {
           UserNotification.error('Cannot delete role ' + role.name + '. It is still assigned to ' + membership.users.length + ' users.');
         } else {
           RolesStore.deleteRole(role.name).then(this.loadRoles);
@@ -68,7 +62,7 @@ var RolesComponent = React.createClass({
   },
 
   render() {
-    var content = null;
+    let content = null;
     if (!this.state.rolesLoaded) {
       content = <span>Loading roles...</span>;
     } else if (this.state.showEditRole) {
@@ -88,8 +82,7 @@ var RolesComponent = React.createClass({
         </Col>
       </Row>
     );
-  }
+  },
 });
-
 
 export default RolesComponent;
