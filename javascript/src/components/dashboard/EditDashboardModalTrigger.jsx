@@ -16,20 +16,19 @@ var EditDashboardModalTrigger = React.createClass({
         this.refs['modal'].open();
     },
     render() {
-        var triggerButtonContent;
+        let triggerButtonContent;
 
-        if (this.props.children === undefined || this.props.children.trim() === "") {
-            var buttonText = this._isCreateModal() ? "Create dashboard" : "Edit dashboard";
-            triggerButtonContent = {__html: buttonText};
+        if (this.props.children === undefined || this.props.children.length === 0) {
+            triggerButtonContent = this._isCreateModal() ? 'Create dashboard' : 'Edit dashboard';
         } else {
-            triggerButtonContent = {__html: this.props.children};
+            triggerButtonContent = this.props.children;
         }
 
         return (
             <span>
                 <button onClick={this.openModal}
-                    className={"btn " + this.props.buttonClass}
-                    dangerouslySetInnerHTML={triggerButtonContent}>
+                    className={"btn " + this.props.buttonClass}>
+                  {triggerButtonContent}
                 </button>
                 <EditDashboardModal ref="modal" {...this.props}/>
             </span>
