@@ -1,10 +1,7 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
-
-'use strict';
-
-declare var jsRoutes: any;
-
-import UserNotification = require("../../util/UserNotification");
+import UserNotification = require("util/UserNotification");
+import jsRoutes = require('routing/jsRoutes');
+import URLUtils = require("../../util/URLUtils");
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface SerializedWidget {
     id: string;
@@ -24,7 +21,7 @@ interface Widget {
     config: {};
 }
 
-var WidgetsStore = {
+const WidgetsStore = {
     _deserializeWidget(widget: SerializedWidget): Widget {
         return {
             id: widget.id,
@@ -48,17 +45,11 @@ var WidgetsStore = {
 
     addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): JQueryPromise<string[]> {
         var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
-        var url = jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url;
-        var promise = $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify(widgetData),
-            dataType: 'json',
-            contentType: 'application/json'
-        });
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url);
+        var promise = fetch('POST', url, widgetData);
 
-        promise.done(() => UserNotification.success("Widget created successfully"));
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        promise.then(() => UserNotification.success("Widget created successfully"),
+        (jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Creating widget failed with status: " + errorThrown,
                     "Could not create widget");
@@ -69,9 +60,9 @@ var WidgetsStore = {
     },
 
     loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
-        var url = jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url;
-        var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
+        var promise = fetch('GET', url);
+        promise.catch((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading widget information failed with status: " + errorThrown,
                     "Could not load widget information");
@@ -81,17 +72,11 @@ var WidgetsStore = {
     },
 
     updateWidget(dashboardId: string, widget: Widget) {
-        var url = jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url;
-        var promise = $.ajax({
-            type: "PUT",
-            url: url,
-            data: JSON.stringify(this._serializeWidget(widget)),
-            dataType: 'json',
-            contentType: 'application/json'
-        });
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
+        var promise = fetch('PUT', url, this._serializeWidget(widget));
 
-        promise.done(() => UserNotification.success("Widget updated successfully"));
-        promise.fail((jqXHR, textStatus, errorThrown) => {
+        promise.then(() => UserNotification.success("Widget updated successfully"),
+        (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Updating widget \"" + widget.title + "\" failed with status: " + errorThrown,
                 "Could not update widget");
         });
@@ -100,7 +85,7 @@ var WidgetsStore = {
     },
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
-        var url = jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url;
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
         return $.getJSON(url);
     }
 };
