@@ -12,6 +12,7 @@ import StreamAlertsPage from 'pages/StreamAlertsPage';
 import DashboardsPage from 'components/dashboard/DashboardsPage';
 import ShowDashboardPage from 'components/dashboard/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
+import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 
 const AppRouter = React.createClass({
@@ -26,6 +27,7 @@ const AppRouter = React.createClass({
           <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
           <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
           <Route path={Routes.SOURCES} component={SourcesPage}/>
+          <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
           <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
         </Route>
       </Router>

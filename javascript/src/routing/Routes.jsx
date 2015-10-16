@@ -4,9 +4,10 @@ const Routes = {
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   SYSTEM: {
-    OVERVIEW: '/system/overview',
+    COLLECTORS: '/system/collectors',
     NODES: '/system/nodes',
-    OUTPUTS: '/system/outputs'
+    OUTPUTS: '/system/outputs',
+    OVERVIEW: '/system/overview',
   },
   USER_EDIT: '/user/edit',
   stream_edit: (streamId) => '/streams/' + streamId + '/edit',

@@ -37,6 +37,9 @@ const Navigation = React.createClass({
               </LinkContainer>
             }
             <NavDropdown navItem title="System" id="system-menu-dropdown">
+              <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
+                <MenuItem>Collectors</MenuItem>
+              </LinkContainer>
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
