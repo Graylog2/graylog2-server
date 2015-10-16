@@ -10,7 +10,7 @@ import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
 import StreamAlertsPage from 'pages/StreamAlertsPage';
 import DashboardsPage from 'pages/DashboardsPage';
-import ShowDashboardPage from 'components/dashboard/ShowDashboardPage';
+import ShowDashboardPage from 'pages/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
 import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
