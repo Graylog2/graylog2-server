@@ -81,3 +81,5 @@ export const RolesStore = {
     return promise;
   }
 };
+
+export default RolesStore;
