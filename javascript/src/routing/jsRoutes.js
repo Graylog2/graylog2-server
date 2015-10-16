@@ -7,6 +7,10 @@ const jsRoutes = {
         get: (id) => { return {url: '/dashboards/' + id }; },
         delete: (id) => { return {url: '/dashboards/' + id }; },
         update: (id) => { return {url: '/dashboards/' + id }; },
+        addWidget: (id) => { return {url: '/dashboards/' + id + '/widgets'}; },
+        widget: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId}; },
+        updateWidget: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId}; },
+        widgetValue: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },
