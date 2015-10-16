@@ -35,31 +35,31 @@ const LoginPage = React.createClass({
     return (
       <div>
         <div className="container" id="login-box">
-            <Row>
-                <div className="col-md-4 col-md-offset-4 well" id="login-box-content">
-                    <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
+          <Row>
+            <div className="col-md-4 col-md-offset-4 well" id="login-box-content">
+              <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
 
-                    {alert}
+              {alert}
 
-                    <div className="form-group">
-                        <Input ref="username" type="text" placeholder="Username" autoFocus />
-                    </div>
+              <div className="form-group">
+                <Input ref="username" type="text" placeholder="Username" autoFocus />
+              </div>
 
-                    <div className="form-group">
-                        <Input ref="password" type="password" placeholder="Password" />
-                    </div>
+              <div className="form-group">
+                <Input ref="password" type="password" placeholder="Password" />
+              </div>
 
-                    <ButtonInput type="submit" bsStyle="info" onClick={this.onSignInClicked}>Sign in</ButtonInput>
+              <ButtonInput type="submit" bsStyle="info" onClick={this.onSignInClicked}>Sign in</ButtonInput>
 
-                    <div className="login-advanced">
-                        <div className="footer pull-right">
-                            <span id="total-count-zero" className="hidden">No configured node was ever reached.</span>
-                            <span id="total-count-nonzero"><span id="connected-count"/> of <span id="total-count"/> nodes connected.</span>
-                        </div>
-                        <br style={{clear: 'both'}} />
-                    </div>
+              <div className="login-advanced">
+                <div className="footer pull-right">
+                  <span id="total-count-zero" className="hidden">No configured node was ever reached.</span>
+                  <span id="total-count-nonzero"><span id="connected-count"/> of <span id="total-count"/> nodes connected.</span>
                 </div>
-            </Row>
+                <br style={{clear: 'both'}} />
+              </div>
+            </div>
+          </Row>
         </div>
       </div>
     );
