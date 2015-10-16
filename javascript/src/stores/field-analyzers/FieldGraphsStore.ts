@@ -3,12 +3,13 @@
 'use strict';
 
 declare var $: any;
-declare var store: any;
 declare var generateId: ()=>string;
 
 import Immutable = require('immutable');
 
 import UserNotification = require("../../util/UserNotification");
+
+const store = localStorage;
 
 interface CreateFieldChartWidgetRequestParams {
     widgetType: string;
@@ -63,9 +64,9 @@ class FieldGraphsStore {
 
     constructor() {
         this.renderedGraphs = Immutable.Set<string>();
-        this._fieldGraphs = Immutable.Map<string, Object>(store.get("pinned-field-charts"));
+        this._fieldGraphs = Immutable.Map<string, Object>(store.getItem("pinned-field-charts"));
         // We need a custom function to deserialize the array in the localStorage as a Set
-        this._stackedGraphs = Immutable.fromJS(store.get("stacked-graphs") || {}, (key, value) => {
+        this._stackedGraphs = Immutable.fromJS(store.getItem("stacked-graphs") || {}, (key, value) => {
             var isIndexed = Immutable.Iterable.isIndexed(value);
             return isIndexed ? value.toSet() : value.toMap();
         });
@@ -99,7 +100,7 @@ class FieldGraphsStore {
 
     set fieldGraphs(newFieldGraphs: Immutable.Map<string, Object>) {
         this._fieldGraphs = newFieldGraphs;
-        store.set("pinned-field-charts", newFieldGraphs.toJS());
+        store.setItem("pinned-field-charts", newFieldGraphs.toJS());
         if (typeof this.onFieldGraphsUpdated === 'function') {
             this.onFieldGraphsUpdated(newFieldGraphs);
         }
@@ -111,7 +112,7 @@ class FieldGraphsStore {
 
     set stackedGraphs(newStackedGraphs: Immutable.Map<string, Immutable.Set<string>>) {
         this._stackedGraphs = newStackedGraphs;
-        store.set("stacked-graphs", newStackedGraphs.toJS());
+        store.setItem("stacked-graphs", newStackedGraphs.toJS());
         if (typeof this.onFieldGraphsMerged === 'function') {
             this.onFieldGraphsMerged(newStackedGraphs);
         }
