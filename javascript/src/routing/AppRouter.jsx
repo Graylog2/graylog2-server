@@ -8,8 +8,11 @@ import DebugHandler from './DebugHandler';
 import StreamsPage from 'components/streams/StreamsPage';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
+import StreamAlertsPage from 'pages/StreamAlertsPage';
 import DashboardsPage from 'components/dashboard/DashboardsPage';
 import ShowDashboardPage from 'components/dashboard/ShowDashboardPage';
+import SourcesPage from 'pages/SourcesPage';
+import SystemOutputsPage from 'pages/SystemOutputsPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -19,11 +22,11 @@ const AppRouter = React.createClass({
           <Route path={Routes.STREAMS} component={StreamsPage}/>
           <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
           <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
+          <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
           <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
           <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
-          <Route path="system">
-            <Route path="nodes" component={DebugHandler}/>
-          </Route>
+          <Route path={Routes.SOURCES} component={SourcesPage}/>
+          <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
         </Route>
       </Router>
     );
