@@ -166,11 +166,18 @@ public class LdapConnector {
                         LOG.trace("Looking up group {}", groupDn);
                         try {
                             Entry group = connection.lookup(groupDn, groupIdAttribute);
-                            final Attribute groupId = group.get(groupIdAttribute);
-                            LOG.trace("Resolved {} to group {}", groupDn, groupId);
-                            if (groupId != null) {
-                                final String string = groupId.getString();
-                                ldapEntry.addGroups(Collections.singleton(string));
+                            // The groupDn lookup can return null if the group belongs to a different domain and the
+                            // connection user does not have the permissions to lookup details.
+                            // See: https://github.com/Graylog2/graylog2-server/issues/1453
+                            if (group != null) {
+                                final Attribute groupId = group.get(groupIdAttribute);
+                                LOG.trace("Resolved {} to group {}", groupDn, groupId);
+                                if (groupId != null) {
+                                    final String string = groupId.getString();
+                                    ldapEntry.addGroups(Collections.singleton(string));
+                                }
+                            } else {
+                                LOG.debug("Unable to lookup group: {}", groupDn);
                             }
                         } catch (LdapException e) {
                             LOG.warn("Error while looking up group " + groupDn, e);
