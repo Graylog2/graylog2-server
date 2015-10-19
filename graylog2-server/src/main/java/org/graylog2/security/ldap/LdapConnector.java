@@ -241,7 +241,11 @@ public class LdapConnector {
                     } else if (e.hasObjectClass("groupOfNames") || e.hasObjectClass("group")) {
                         memberAttribute = ATTRIBUTE_MEMBER;
                     } else {
-                        memberAttribute = ATTRIBUTE_MEMBER;
+                        if (e.containsAttribute(ATTRIBUTE_UNIQUE_MEMBER)) {
+                            memberAttribute = ATTRIBUTE_UNIQUE_MEMBER;
+                        } else {
+                            memberAttribute = ATTRIBUTE_MEMBER;
+                        }
                         LOG.warn(
                                 "Unable to auto-detect the LDAP group object class, assuming '{}' is the correct attribute.",
                                 memberAttribute);
