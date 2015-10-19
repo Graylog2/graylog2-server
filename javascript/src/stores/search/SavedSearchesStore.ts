@@ -1,3 +1,4 @@
+/// <reference path='../../../declarations/bluebird/bluebird.d.ts'/>
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 
 import $ = require('jquery');
@@ -44,7 +45,7 @@ class SavedSearchesStore {
         promise.then((savedSearches) => this.savedSearches = Immutable.List<SavedSearch>(savedSearches));
     }
 
-    _createOrUpdate(title: string, stringId?: string): JQueryPromise<string[]> {
+    _createOrUpdate(title: string, stringId?: string): Promise<string[]> {
         var originalSearchParams = SearchStore.getOriginalSearchParamsWithFields();
         var queryParams = originalSearchParams.set('rangeType', originalSearchParams.get('range_type')).delete('range_type');
         var params = {title: title, query: queryParams.toJS()};
@@ -63,7 +64,7 @@ class SavedSearchesStore {
         return fetch(verb, URLUtils.qualifyUrl(url), JSON.stringify(params));
     }
 
-    create(title: string): JQueryPromise<string[]> {
+    create(title: string): Promise<string[]> {
         var promise = this._createOrUpdate(title);
 
         promise
@@ -79,7 +80,7 @@ class SavedSearchesStore {
         return promise;
     }
 
-    update(stringId: string, title: string): JQueryPromise<string[]> {
+    update(stringId: string, title: string): Promise<string[]> {
         var promise = this._createOrUpdate(title, stringId);
 
         promise
@@ -95,7 +96,7 @@ class SavedSearchesStore {
         return promise;
     }
 
-    list(): JQueryPromise<string[]> {
+    list(): Promise<string[]> {
         var url = jsRoutes.controllers.api.SavedSearchesApiController.list().url;
         const promise = fetch('GET', URLUtils.qualifyUrl(url));
 
@@ -120,7 +121,7 @@ class SavedSearchesStore {
         URLUtils.openLink(url, false);
     }
 
-    delete(searchId: string): JQueryPromise<string[]> {
+    delete(searchId: string): Promise<string[]> {
         var url = jsRoutes.controllers.SavedSearchesController.delete(searchId).url;
         var promise = fetch('DELETE', URLUtils.qualifyUrl(url));
 
