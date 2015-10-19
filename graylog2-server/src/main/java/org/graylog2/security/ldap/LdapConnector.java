@@ -57,6 +57,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class LdapConnector {
     private static final Logger LOG = LoggerFactory.getLogger(LdapConnector.class);
 
+    private static final String ATTRIBUTE_UNIQUE_MEMBER = "uniqueMember";
+    private static final String ATTRIBUTE_MEMBER = "member";
+
     private final int connectionTimeout;
 
     @Inject
@@ -216,7 +219,7 @@ public class LdapConnector {
                     groupSearchBase,
                     groupSearchPattern,
                     SearchScope.SUBTREE,
-                    "objectClass", "uniqueMember", "member", groupIdAttribute);
+                    "objectClass", ATTRIBUTE_UNIQUE_MEMBER, ATTRIBUTE_MEMBER, groupIdAttribute);
             LOG.trace("LDAP search for groups: {} starting at {}", groupSearchPattern, groupSearchBase);
             for (Entry e : groupSearch) {
                 if (LOG.isTraceEnabled()) {
@@ -234,13 +237,14 @@ public class LdapConnector {
                     // test if the given dn parameter is actually member of any of the found groups
                     String memberAttribute;
                     if (e.hasObjectClass("groupOfUniqueNames")) {
-                        memberAttribute = "uniqueMember";
+                        memberAttribute = ATTRIBUTE_UNIQUE_MEMBER;
                     } else if (e.hasObjectClass("groupOfNames") || e.hasObjectClass("group")) {
-                        memberAttribute = "member";
+                        memberAttribute = ATTRIBUTE_MEMBER;
                     } else {
+                        memberAttribute = ATTRIBUTE_MEMBER;
                         LOG.warn(
-                                "Unable to auto-detect the LDAP group object class, assuming 'member' is the correct attribute.");
-                        memberAttribute = "member";
+                                "Unable to auto-detect the LDAP group object class, assuming '{}' is the correct attribute.",
+                                memberAttribute);
                     }
                     final Attribute members = e.get(memberAttribute);
                     if (members != null) {
