@@ -19,6 +19,7 @@ package org.graylog2.indexer.ranges;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
 import org.joda.time.DateTime;
@@ -56,7 +57,7 @@ public class LegacyMongoIndexRangeServiceTest {
     public void testGetExistingIndexRange() throws Exception {
         final IndexRange indexRange = indexRangeService.get("graylog_0");
         final DateTime end = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        final IndexRange expected = MongoIndexRange.create("graylog_0", EPOCH, end, end, 0);
+        final IndexRange expected = MongoIndexRange.create(new ObjectId("56250da2d400000000000001"), "graylog_0", EPOCH, end, end, 0);
         assertThat(indexRange).isEqualTo(expected);
     }
 
@@ -77,7 +78,7 @@ public class LegacyMongoIndexRangeServiceTest {
     public void testGetIncompleteIndexRange() throws Exception {
         final IndexRange indexRange = indexRangeService.get("graylog_99");
         final DateTime end = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
-        final IndexRange expected = MongoIndexRange.create("graylog_99", EPOCH, end, EPOCH, 0);
+        final IndexRange expected = MongoIndexRange.create(new ObjectId("56250da2d400000000000099"), "graylog_99", EPOCH, end, EPOCH, 0);
         assertThat(indexRange).isEqualTo(expected);
     }
 
@@ -91,13 +92,15 @@ public class LegacyMongoIndexRangeServiceTest {
     public void testFindAll() throws Exception {
         final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
 
+        final DateTime end0 = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         final DateTime end1 = new DateTime(2015, 1, 2, 0, 0, 0, 0, DateTimeZone.UTC);
         final DateTime end2 = new DateTime(2015, 1, 3, 0, 0, 0, 0, DateTimeZone.UTC);
         final DateTime end99 = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         assertThat(indexRanges).containsExactly(
-                MongoIndexRange.create("graylog_99", EPOCH, end99, EPOCH, 0),
-                MongoIndexRange.create("graylog_1", EPOCH, end1, end1, 1),
-                MongoIndexRange.create("graylog_2", EPOCH, end2, end2, 2)
+                MongoIndexRange.create(new ObjectId("56250da2d400000000000001"), "graylog_0", EPOCH, end0, end0, 0),
+                MongoIndexRange.create(new ObjectId("56250da2d400000000000099"), "graylog_99", EPOCH, end99, EPOCH, 0),
+                MongoIndexRange.create(new ObjectId("56250da2d400000000000002"), "graylog_1", EPOCH, end1, end1, 1),
+                MongoIndexRange.create(new ObjectId("56250da2d400000000000003"), "graylog_2", EPOCH, end2, end2, 2)
         );
     }
 
@@ -113,31 +116,11 @@ public class LegacyMongoIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testMarkAsMigratedIsIdempotent() throws Exception {
-        assertThat(indexRangeService.isMigrated("graylog_0")).isTrue();
+    public void testDelete() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(4);
 
-        assertThat(indexRangeService.markAsMigrated("graylog_0")).isTrue();
+        indexRangeService.delete("graylog_1");
 
-        assertThat(indexRangeService.isMigrated("graylog_0")).isTrue();
-    }
-
-    @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testMarkAsMigrated() throws Exception {
-        assertThat(indexRangeService.isMigrated("graylog_1")).isFalse();
-        assertThat(indexRangeService.isMigrated("graylog_2")).isFalse();
-
-        assertThat(indexRangeService.markAsMigrated("graylog_1")).isTrue();
-
-        assertThat(indexRangeService.isMigrated("graylog_1")).isTrue();
-        assertThat(indexRangeService.isMigrated("graylog_2")).isFalse();
-    }
-
-    @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testIsMigrated() throws Exception {
-        assertThat(indexRangeService.isMigrated("graylog_0")).isTrue();
-        assertThat(indexRangeService.isMigrated("graylog_1")).isFalse();
-        assertThat(indexRangeService.isMigrated("graylog_2")).isFalse();
+        assertThat(indexRangeService.findAll()).hasSize(3);
     }
 }

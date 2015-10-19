@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 
 import javax.annotation.Nullable;
@@ -32,30 +33,55 @@ import javax.annotation.Nullable;
 public abstract class MongoIndexRange implements IndexRange {
     @Id
     @Nullable
+    @JsonProperty("_id")
     public abstract ObjectId id();
 
     @JsonProperty(FIELD_INDEX_NAME)
     public abstract String indexName();
 
-    @JsonProperty(FIELD_BEGIN)
     public abstract DateTime begin();
 
-    @JsonProperty(FIELD_END)
     public abstract DateTime end();
 
-    @JsonProperty(FIELD_CALCULATED_AT)
     public abstract DateTime calculatedAt();
 
     @JsonProperty(FIELD_TOOK_MS)
     public abstract int calculationDuration();
 
+    @JsonProperty(FIELD_BEGIN)
+    private long beginMillis() {
+        return begin().getMillis();
+    }
+
+    @JsonProperty(FIELD_END)
+    private long endMillis() {
+        return end().getMillis();
+    }
+
+    @JsonProperty(FIELD_CALCULATED_AT)
+    private long calculatedAtMillis() {
+        return calculatedAt().getMillis();
+    }
+
+    public static MongoIndexRange create(ObjectId id,
+                                         String indexName,
+                                         DateTime begin,
+                                         DateTime end,
+                                         DateTime calculatedAt,
+                                         int calculationDuration) {
+        return new AutoValue_MongoIndexRange(id, indexName, begin, end, calculatedAt, calculationDuration);
+    }
+
     @JsonCreator
-    public static MongoIndexRange create(@Id @Nullable ObjectId id,
+    public static MongoIndexRange create(@JsonProperty("_id") @Id @Nullable ObjectId id,
                                          @JsonProperty(FIELD_INDEX_NAME) String indexName,
-                                         @JsonProperty(FIELD_BEGIN) DateTime begin,
-                                         @JsonProperty(FIELD_END) DateTime end,
-                                         @JsonProperty(FIELD_CALCULATED_AT) DateTime calculatedAt,
+                                         @JsonProperty(FIELD_BEGIN) long beginMillis,
+                                         @JsonProperty(FIELD_END) long endMillis,
+                                         @JsonProperty(FIELD_CALCULATED_AT) long calculatedAtMillis,
                                          @JsonProperty(FIELD_TOOK_MS) int calculationDuration) {
+        final DateTime begin = new DateTime(beginMillis, DateTimeZone.UTC);
+        final DateTime end = new DateTime(endMillis, DateTimeZone.UTC);
+        final DateTime calculatedAt = new DateTime(calculatedAtMillis, DateTimeZone.UTC);
         return new AutoValue_MongoIndexRange(id, indexName, begin, end, calculatedAt, calculationDuration);
     }
 
@@ -65,5 +91,14 @@ public abstract class MongoIndexRange implements IndexRange {
                                          DateTime calculatedAt,
                                          int calculationDuration) {
         return create(null, indexName, begin, end, calculatedAt, calculationDuration);
+    }
+
+    public static MongoIndexRange create(IndexRange indexRange) {
+        return create(
+                indexRange.indexName(),
+                indexRange.begin(),
+                indexRange.end(),
+                indexRange.calculatedAt(),
+                indexRange.calculationDuration());
     }
 }

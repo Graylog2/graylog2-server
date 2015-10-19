@@ -28,9 +28,13 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsReques
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
+import org.graylog2.indexer.searches.TimestampStats;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -50,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class IndicesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog";
     private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
@@ -133,5 +138,28 @@ public class IndicesTest {
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
         assertThat(indices.aliasTarget("graylog_alias")).isEqualTo(INDEX_NAME);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndex() throws Exception {
+        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+
+        assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
+        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+
+        assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+        assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+    }
+
+    @Test(expected = IndexMissingException.class)
+    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
+        indices.timestampStatsOfIndex("does-not-exist");
     }
 }

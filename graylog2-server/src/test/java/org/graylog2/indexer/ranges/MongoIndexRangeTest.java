@@ -57,9 +57,9 @@ public class MongoIndexRangeTest {
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
 
         assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
-        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
-        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_END)).isEqualTo(end.toString());
-        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
+        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_BEGIN)).isEqualTo(begin.getMillis());
+        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_END)).isEqualTo(end.getMillis());
+        assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.getMillis());
         assertThat(JsonPath.read(document, "$." + MongoIndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
     }
 }

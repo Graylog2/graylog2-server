@@ -17,11 +17,7 @@
 package org.graylog2.indexer.ranges;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -30,29 +26,15 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.Index;
-import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.max.Max;
-import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
@@ -72,31 +54,28 @@ import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.requireNonNull;
+
 @Singleton
+@Deprecated
 public class EsIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(EsIndexRangeService.class);
 
     private final LoadingCache<String, IndexRange> cache;
     private final Client client;
-    private final ObjectMapper objectMapper;
-    private final Indices indices;
     private final Deflector deflector;
-    private final EventBus clusterEventBus;
-
+    private final Indices indices;
 
     @Inject
     public EsIndexRangeService(Client client,
-                               ObjectMapper objectMapper,
-                               Indices indices,
                                Deflector deflector,
+                               Indices indices,
                                EventBus eventBus,
                                @ClusterEventBus EventBus clusterEventBus,
                                MetricRegistry metricRegistry) {
-        this.client = client;
-        this.objectMapper = objectMapper;
-        this.indices = indices;
-        this.deflector = deflector;
-        this.clusterEventBus = clusterEventBus;
+        this.client = requireNonNull(client);
+        this.deflector = requireNonNull(deflector);
+        this.indices = requireNonNull(indices);
 
         final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
             @Override
@@ -138,7 +117,7 @@ public class EsIndexRangeService implements IndexRangeService {
 
     private IndexRange loadIndexRange(String index) throws NotFoundException {
         final GetRequest request = new GetRequestBuilder(client, index)
-                .setType(IndexMapping.TYPE_INDEX_RANGE)
+                .setType("index_range")
                 .setId(index)
                 .request();
 
@@ -211,101 +190,16 @@ public class EsIndexRangeService implements IndexRangeService {
     public IndexRange calculateRange(String index) {
         final Stopwatch sw = Stopwatch.createStarted();
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final TimestampStats stats = timestampStatsOfIndex(index);
+        final TimestampStats stats = indices.timestampStatsOfIndex(index);
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
         return EsIndexRange.create(index, stats.min(), stats.max(), now, duration);
     }
 
-    /**
-     * Calculate stats (min, max, avg) about the message timestamps in the given index.
-     *
-     * @param index Name of the index to query.
-     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
-     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
-     */
-    @VisibleForTesting
-    protected TimestampStats timestampStatsOfIndex(String index) {
-        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
-                .filter(FilterBuilders.existsFilter("timestamp"))
-                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
-                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
-        final SearchRequestBuilder srb = client.prepareSearch()
-                .setIndices(index)
-                .setSearchType(SearchType.COUNT)
-                .addAggregation(builder);
-
-        final SearchResponse response;
-        try {
-            response = client.search(srb.request()).actionGet();
-        } catch (IndexMissingException e) {
-            throw e;
-        } catch (ElasticsearchException e) {
-            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
-            throw new IndexMissingException(new Index(index));
-        }
-
-        final Filter f = response.getAggregations().get("agg");
-        if (f.getDocCount() == 0L) {
-            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
-            return TimestampStats.EMPTY;
-        }
-
-        final Min minAgg = f.getAggregations().get("ts_min");
-        final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
-        final Max maxAgg = f.getAggregations().get("ts_max");
-        final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
-
-        return TimestampStats.create(min, max);
-    }
-
     @Override
     public void save(IndexRange indexRange) {
-        final byte[] source;
-        try {
-            source = objectMapper.writeValueAsBytes(indexRange);
-        } catch (JsonProcessingException e) {
-            throw Throwables.propagate(e);
-        }
-
-        final String indexName = indexRange.indexName();
-
-        IndexRange oldIndexRange = null;
-        try {
-            oldIndexRange = get(indexName);
-        } catch (NotFoundException ignored) {
-        }
-
-        if (indexRange.equals(oldIndexRange)) {
-            LOG.debug("Index range is already up-to-date, skipping: {}", indexRange);
-        } else {
-            final boolean readOnly = indices.isReadOnly(indexName);
-            if (readOnly) {
-                indices.setReadWrite(indexName);
-            }
-
-            final IndexRequest request = client.prepareIndex()
-                    .setIndex(indexName)
-                    .setType(IndexMapping.TYPE_INDEX_RANGE)
-                    .setId(indexName)
-                    .setSource(source)
-                    .request();
-            final IndexResponse response = client.index(request).actionGet();
-
-            if (readOnly) {
-                indices.setReadOnly(indexName);
-            }
-
-            if (response.isCreated()) {
-                LOG.debug("Successfully saved index range: {}", indexRange);
-            } else {
-                LOG.debug("Successfully updated index range: {}", indexRange);
-            }
-
-            cache.put(indexName, indexRange);
-            clusterEventBus.post(IndexRangeUpdatedEvent.create(indexName));
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Subscribe

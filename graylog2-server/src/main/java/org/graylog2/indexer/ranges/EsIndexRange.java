@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 
 @AutoValue
 @JsonAutoDetect
+@Deprecated
 public abstract class EsIndexRange implements IndexRange {
     public static final String PREFIX = "gl2_index_range_";
     public static final String FIELD_TOOK_MS = PREFIX + "took_ms";

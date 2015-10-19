@@ -17,11 +17,10 @@
 package org.graylog2.indexer.ranges;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -39,7 +38,8 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class LegacyMongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(LegacyMongoIndexRangeService.class);
     private static final String COLLECTION_NAME = "index_ranges";
-    private static final String FIELD_MIGRATED = "migrated";
+    private static final String FIELD_START = "start";
+    private static final String FIELD_INDEX = "index";
 
     @Inject
     public LegacyMongoIndexRangeService(final MongoConnection mongoConnection) {
@@ -48,7 +48,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
-        final DBObject dbo = findOne(new BasicDBObject("index", index), COLLECTION_NAME);
+        final DBObject dbo = findOne(new BasicDBObject(FIELD_INDEX, index), COLLECTION_NAME);
 
         if (dbo == null) {
             throw new NotFoundException("Index range for index <" + index + "> not found.");
@@ -62,13 +62,14 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
     }
 
     private IndexRange buildIndexRange(DBObject dbo) {
-        final String indexName = (String) dbo.get("index");
+        final ObjectId id = (ObjectId) dbo.get("_id");
+        final String indexName = (String) dbo.get(FIELD_INDEX);
         final DateTime begin = new DateTime(0L, DateTimeZone.UTC);
         final DateTime end = new DateTime((Integer) dbo.get("start") * 1000L, DateTimeZone.UTC);
         final DateTime calculatedAt = new DateTime(firstNonNull((Integer) dbo.get("calculated_at"), 0) * 1000L, DateTimeZone.UTC);
         final int calculationDuration = firstNonNull((Integer) dbo.get("took_ms"), 0);
 
-        return MongoIndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
+        return MongoIndexRange.create(id, indexName, begin, end, calculatedAt, calculationDuration);
     }
 
     @Override
@@ -78,7 +79,12 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        final List<DBObject> result = query(new BasicDBObject(FIELD_MIGRATED, new BasicDBObject("$ne", true)), COLLECTION_NAME);
+        final BasicDBList subQueries = new BasicDBList();
+        subQueries.add(new BasicDBObject(FIELD_INDEX, new BasicDBObject("$exists", true)));
+        subQueries.add(new BasicDBObject(FIELD_START, new BasicDBObject("$exists", true)));
+        final DBObject query = new BasicDBObject("$and", subQueries);
+
+        final List<DBObject> result = query(query, COLLECTION_NAME);
 
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (DBObject dbo : result) {
@@ -102,24 +108,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
         throw new UnsupportedOperationException();
     }
 
-    public boolean markAsMigrated(String index) {
-        final DB db = mongoConnection.getDatabase();
-        final DBCollection collection = db.getCollection(COLLECTION_NAME);
-
-        final DBObject updatedData = new BasicDBObject("$set", new BasicDBObject(FIELD_MIGRATED, true));
-        final DBObject searchQuery = new BasicDBObject("index", index);
-        final WriteResult result = collection.update(searchQuery, updatedData);
-
-        return result.isUpdateOfExisting();
-    }
-
-    public boolean isMigrated(String index) {
-        final DBObject dbo = findOne(new BasicDBObject("index", index), COLLECTION_NAME);
-
-        if (dbo == null) {
-            return false;
-        }
-
-        return firstNonNull((Boolean) dbo.get(FIELD_MIGRATED), false);
+    public int delete(String index) {
+        return destroy(new BasicDBObject(FIELD_INDEX, index), COLLECTION_NAME);
     }
 }

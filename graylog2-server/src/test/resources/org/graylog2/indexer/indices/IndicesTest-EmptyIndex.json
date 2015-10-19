@@ -1,0 +1,15 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog",
+            "indexType": "message",
+            "indexId": "0"
+          }
+        }
+      ]
+    }
+  ]
+}
