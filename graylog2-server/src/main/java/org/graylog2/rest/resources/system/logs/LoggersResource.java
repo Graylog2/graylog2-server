@@ -168,7 +168,10 @@ public class LoggersResource extends RestResource {
         checkPermission(RestPermissions.LOGGERS_EDITSUBSYSTEM, subsystemTitle);
 
         final Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
-        setLoggerLevel(subsystem.getCategory(), Level.toLevel(level.toUpperCase(Locale.ENGLISH)));
+        final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
+        setLoggerLevel(subsystem.getCategory(), newLevel);
+
+        LOG.debug("Successfully set log level for subsystem \"{}\" to \"{}\"", subsystem.getTitle(), newLevel);
     }
 
     @PUT
@@ -180,7 +183,10 @@ public class LoggersResource extends RestResource {
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
             @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
-        setLoggerLevel(loggerName, Level.toLevel(level.toUpperCase(Locale.ENGLISH)));
+        final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
+        setLoggerLevel(loggerName, newLevel);
+
+        LOG.debug("Successfully set log level for logger \"{}\" to \"{}\"", loggerName, newLevel);
     }
 
     @GET
