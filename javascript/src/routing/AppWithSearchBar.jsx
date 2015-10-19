@@ -4,6 +4,7 @@ import {Row, Col} from 'react-bootstrap';
 
 import SearchBar from 'components/search/SearchBar';
 import SearchStore from 'stores/search/SearchStore';
+import SavedSearchesStore from 'stores/search/SavedSearchesStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
 const AppWithSearchBar = React.createClass({
@@ -24,7 +25,7 @@ const AppWithSearchBar = React.createClass({
     //  searchInStream = JSON.parse(searchInStream);
     //  SearchStore.searchInStream = searchInStream;
     //}
-    //SavedSearchesStore.updateSavedSearches();
+    SavedSearchesStore.updateSavedSearches();
 
     return (
       <div className="container-fluid">

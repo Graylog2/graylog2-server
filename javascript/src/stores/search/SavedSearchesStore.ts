@@ -1,16 +1,13 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 
-'use strict';
-
-declare var $: any;
-declare var jsRoutes: any;
-
+import $ = require('jquery');
 import Immutable = require('immutable');
+import jsRoutes = require('routing/jsRoutes');
+const fetch = require('logic/rest/FetchProvider').default;
 
-import SearchStore = require('../search/SearchStore');
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require('../../util/URLUtils');
+import SearchStore = require('stores/search/SearchStore');
+import UserNotification = require("util/UserNotification");
+import URLUtils = require('util/URLUtils');
 
 interface SavedSearch {
     id: string;
@@ -44,7 +41,7 @@ class SavedSearchesStore {
 
     updateSavedSearches() {
         var promise = this.list();
-        promise.done((savedSearches) => this.savedSearches = Immutable.List<SavedSearch>(savedSearches));
+        promise.then((savedSearches) => this.savedSearches = Immutable.List<SavedSearch>(savedSearches));
     }
 
     _createOrUpdate(title: string, stringId?: string): JQueryPromise<string[]> {
@@ -63,26 +60,21 @@ class SavedSearchesStore {
             verb = 'PUT';
         }
 
-        return $.ajax({
-            type: verb,
-            url: url,
-            data: JSON.stringify(params),
-            dataType: 'json',
-            contentType: 'application/json'
-        });
+        return fetch(verb, URLUtils.qualifyUrl(url), JSON.stringify(params));
     }
 
     create(title: string): JQueryPromise<string[]> {
         var promise = this._createOrUpdate(title);
 
-        promise.done(() => {
-            UserNotification.success("Search criteria saved as '" + title + "'.");
-            this.updateSavedSearches();
-        });
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Saving search criteria failed with status: " + errorThrown,
-                "Could not save search criteria");
-        });
+        promise
+            .then(() => {
+                UserNotification.success("Search criteria saved as '" + title + "'.");
+                this.updateSavedSearches();
+            })
+            .catch((errorThrown) => {
+                UserNotification.error("Saving search criteria failed with status: " + errorThrown.additional.message,
+                    "Could not save search criteria");
+            });
 
         return promise;
     }
@@ -90,28 +82,29 @@ class SavedSearchesStore {
     update(stringId: string, title: string): JQueryPromise<string[]> {
         var promise = this._createOrUpdate(title, stringId);
 
-        promise.done(() => {
-            UserNotification.success("Saved search \"" + title + "\" was updated.");
-            this.updateSavedSearches();
-        });
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating saved search \"" + title + "\" failed with status: " + errorThrown,
-                "Could not update saved search");
-        });
+        promise
+            .then(() => {
+                UserNotification.success("Saved search \"" + title + "\" was updated.");
+                this.updateSavedSearches();
+            })
+            .catch((errorThrown) => {
+                UserNotification.error("Updating saved search \"" + title + "\" failed with status: " + errorThrown.additional.message,
+                    "Could not update saved search");
+            });
 
         return promise;
     }
 
     list(): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.api.SavedSearchesApiController.list().url;
-        var promise = $.getJSON(url);
+        const promise = fetch('GET', URLUtils.qualifyUrl(url));
 
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Fetching saved searches failed with status: " + errorThrown,
-                "Could not get saved searches");
-        });
-
-        return promise;
+        return promise
+            .then(response => response.searches)
+            .catch(errorThrown => {
+                UserNotification.error("Fetching saved searches failed with status: " + errorThrown.additional.message,
+                    "Could not get saved searches");
+            });
     }
 
     getSavedSearch(searchId: string): SavedSearch {
@@ -129,19 +122,17 @@ class SavedSearchesStore {
 
     delete(searchId: string): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.SavedSearchesController.delete(searchId).url;
-        var promise = $.ajax({
-            type: 'DELETE',
-            url: url
-        });
+        var promise = fetch('DELETE', URLUtils.qualifyUrl(url));
 
-        promise.done(() => {
-            UserNotification.success("Saved search '" + this.savedSearches[searchId] + "' was deleted successfully.");
-            $(document).trigger('deleted.graylog.saved-search', {savedSearchId: searchId});
-        });
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Deleting saved search \"" + this.savedSearches[searchId] + "\" failed with status: " + errorThrown,
-                "Could not delete saved search");
-        });
+        promise
+            .then(() => {
+                UserNotification.success("Saved search '" + this.savedSearches[searchId] + "' was deleted successfully.");
+                $(document).trigger('deleted.graylog.saved-search', {savedSearchId: searchId});
+            })
+            .catch((errorThrown) => {
+                UserNotification.error("Deleting saved search \"" + this.savedSearches[searchId] + "\" failed with status: " + errorThrown.additional.message,
+                    "Could not delete saved search");
+            });
 
         return promise;
     }

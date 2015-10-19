@@ -31,6 +31,12 @@ const jsRoutes = {
         deleteRole: (rolename) => { return {url: '/roles/' + rolename}; },
         loadMembers: (rolename) => { return {url: '/roles/' + rolename + '/members'}; },
       },
+      SavedSearchesApiController: {
+        create: () => { return {url: '/search/saved'}; },
+        delete: (savedSearchId) => { return {url: `/search/saved/${savedSearchId}`}; },
+        list: () => { return {url: '/search/saved'}; },
+        update: (savedSearchId) => { return {url: `/search/saved/${savedSearchId}`}; },
+      },
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId}; },
         create: (streamId) => { return {url: '/streams'}; },
