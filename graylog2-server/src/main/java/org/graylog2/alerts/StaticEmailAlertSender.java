@@ -16,8 +16,9 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -214,7 +216,7 @@ public class StaticEmailAlertSender implements AlertSender {
             throw new RuntimeException("Stream [" + stream + "] has no alert receivers.");
         }
 
-        final List<String> recipients = Lists.newArrayList();
+        final Set<String> recipients = Sets.newHashSet();
 
         // Send emails to subscribed users.
         if(stream.getAlertReceivers().get("users") != null) {
@@ -222,7 +224,11 @@ public class StaticEmailAlertSender implements AlertSender {
                 final User user = userService.load(username);
 
                 if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
-                    recipients.add(user.getEmail());
+                    // LDAP users might have multiple email addresses defined.
+                    // See: https://github.com/Graylog2/graylog2-server/issues/1439
+                    final List<String> addresses = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(user.getEmail());
+
+                    recipients.addAll(addresses);
                 }
             }
         }
