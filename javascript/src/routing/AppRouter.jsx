@@ -28,6 +28,7 @@ const AppRouter = React.createClass({
         <Route path="/" component={App}>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>
+            <Route path={Routes.SOURCES} component={SourcesPage}/>
           </Route>
           <Route component={AppWithoutSearchBar}>
             <Route path={Routes.STREAMS} component={StreamsPage}/>
@@ -36,7 +37,6 @@ const AppRouter = React.createClass({
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
-            <Route path={Routes.SOURCES} component={SourcesPage}/>
             <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
