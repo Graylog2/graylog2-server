@@ -37,10 +37,10 @@ const App = React.createClass({
     }
     return (
       <div>
-        <Navigation requestPath="/" fullName={this.state.currentUser.full_name}
-                    loginName={this.state.currentUser.username}/>
+        <Navigation requestPath={this.props.location.pathname} fullName={this.state.currentUser.full_name}
+                    loginName={this.state.currentUser.username} permissions={this.state.currentUser.permissions}/>
         <div id="scroll-to-hint" style={{display: 'none'}} className="alpha80">
-          <i className="fa fa-arrow-up"></i>
+          <i className="fa fa-arrow-up"/>
         </div>
         {this.props.children}
       </div>

@@ -1,5 +1,3 @@
-/* global jsRoutes */
-
 import React from 'react';
 import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -7,75 +5,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from './UserMenu';
 import Routes from 'routing/Routes';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 const Navigation = React.createClass({
-  render() {
-    const logoUrl = require('images/toplogo.png');
-    const brand = (
-      <LinkContainer to={Routes.HOME}>
-        <img src={logoUrl}/>
-      </LinkContainer>);
-    return (
-      <Navbar inverse fluid fixedTop toggleNavKey={0}>
-        <NavBrand>{brand}</NavBrand>
-        <CollapsibleNav eventKey={0}>
-          <Nav navbar>
-            {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
-              <LinkContainer to={Routes.SEARCH}>
-                <NavItem to="search">Search</NavItem>
-              </LinkContainer>
-            }
-            <LinkContainer to={Routes.STREAMS}>
-              <NavItem>Streams</NavItem>
-            </LinkContainer>
+  mixins: [PermissionsMixin],
 
-            <LinkContainer to={Routes.DASHBOARDS}>
-              <NavItem >Dashboards</NavItem>
-            </LinkContainer>
-
-            {this._isPermitted(['SOURCES_READ']) &&
-              <LinkContainer to={Routes.SOURCES}>
-                <NavItem>Sources</NavItem>
-              </LinkContainer>
-            }
-            <NavDropdown navItem title="System" id="system-menu-dropdown">
-              <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
-                <MenuItem>Collectors</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.NODES}>
-                <MenuItem>Nodes</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-                <MenuItem>Overview</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
-                <MenuItem>Outputs</MenuItem>
-              </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.ROLES}>
-                <MenuItem>Roles</MenuItem>
-              </LinkContainer>
-            </NavDropdown>
-          </Nav>
-
-          <Nav navbar>
-            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-              <NavItem className="notification-badge-link">
-                <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge"></span>
-              </NavItem>
-            </LinkContainer>
-          </Nav>
-
-          <Nav navbar right>
-            <LinkContainer to={Routes.SYSTEM.NODES}>
-              <NavItem>
-                <GlobalThroughput />
-              </NavItem>
-            </LinkContainer>
-            <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
-          </Nav>
-        </CollapsibleNav>
-      </Navbar>
-    );
+  propTypes: {
+    requestPath: React.PropTypes.string.isRequired,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
 
   _isActive(prefix) {
@@ -121,9 +58,80 @@ const Navigation = React.createClass({
 
     return 'System' + suffix;
   },
-  _isPermitted(permissions) {
-    //return this.props.permissions.every((p) => this.state.permissions[p]);
-    return true;
+
+  render() {
+    const logoUrl = require('images/toplogo.png');
+    const brand = (
+      <LinkContainer to={Routes.HOME}>
+        <img src={logoUrl}/>
+      </LinkContainer>);
+    return (
+      <Navbar inverse fluid fixedTop toggleNavKey={0}>
+        <NavBrand>{brand}</NavBrand>
+        <CollapsibleNav eventKey={0}>
+          <Nav navbar>
+            {this.isPermitted(this.props.permissions, ['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
+              <LinkContainer to={Routes.SEARCH}>
+                <NavItem to="search">Search</NavItem>
+              </LinkContainer>
+            }
+            <LinkContainer to={Routes.STREAMS}>
+              <NavItem>Streams</NavItem>
+            </LinkContainer>
+
+            <LinkContainer to={Routes.DASHBOARDS}>
+              <NavItem >Dashboards</NavItem>
+            </LinkContainer>
+
+            {this.isPermitted(this.props.permissions, ['SOURCES_READ']) &&
+              <LinkContainer to={Routes.SOURCES}>
+                <NavItem>Sources</NavItem>
+              </LinkContainer>
+            }
+            <NavDropdown navItem title={this._systemTitle()} id="system-menu-dropdown">
+              <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+                <MenuItem>Overview</MenuItem>
+              </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.NODES}>
+                <MenuItem>Nodes</MenuItem>
+              </LinkContainer>
+              {this.isPermitted(this.props.permissions, ['COLLECTORS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
+                  <MenuItem>Collectors</MenuItem>
+                </LinkContainer>
+              }
+              {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
+                  <MenuItem>Outputs</MenuItem>
+                </LinkContainer>
+              }
+              {this.isPermitted(this.props.permissions, ['ROLES_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.ROLES}>
+                  <MenuItem>Roles</MenuItem>
+                </LinkContainer>
+              }
+            </NavDropdown>
+          </Nav>
+
+          <Nav navbar>
+            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+              <NavItem className="notification-badge-link">
+                <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge"></span>
+              </NavItem>
+            </LinkContainer>
+          </Nav>
+
+          <Nav navbar right>
+            <LinkContainer to={Routes.SYSTEM.NODES}>
+              <NavItem>
+                <GlobalThroughput />
+              </NavItem>
+            </LinkContainer>
+            <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
+          </Nav>
+        </CollapsibleNav>
+      </Navbar>
+    );
   },
 });
 
