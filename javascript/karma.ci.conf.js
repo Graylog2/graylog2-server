@@ -10,6 +10,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     files: [
+      'src/config.js',
       'test/shim/es5-shim.js',
       'test/shim/server-side-global-vars.js',
       'test/src/*.js',
