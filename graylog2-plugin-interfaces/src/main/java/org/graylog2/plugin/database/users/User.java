@@ -55,6 +55,14 @@ public interface User extends Persisted {
 
     void setName(String username);
 
+    /**
+     * Returns the email address of the user.
+     *
+     * Depending on how the user has been created, it is possible that the returned string contains multiple email
+     * addresses separated by a "," character. (i.e. LDAP users)
+     *
+     * @return the email address
+     */
     String getEmail();
 
     List<String> getPermissions();
