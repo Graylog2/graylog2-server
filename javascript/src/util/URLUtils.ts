@@ -9,11 +9,10 @@ const appConfig = new AppConfig();
 
 var URLUtils = {
     qualifyUrl(url) {
-      return appConfig.gl2ServerUrl() + '/' + this.appPrefixed(url);
+        return appConfig.gl2ServerUrl() + this.appPrefixed(url);
     },
-
     appPrefixed(url) {
-      return appConfig.gl2AppPathPrefix() + '/' + url;
+        return this.concatURLPath(appConfig.gl2AppPathPrefix(), url);
     },
     openLink(url, newWindow) {
         if (newWindow) {
@@ -49,7 +48,16 @@ var URLUtils = {
         var origHash = URLUtils.getParsedHash(window.location);
         origHash[name] = newValue;
         window.location.replace(`#${Qs.stringify(origHash)}`);
-    }
+    },
+    concatURLPath() {
+        const args = Array(arguments.length);
+        for (let i = 0; i < arguments.length; i++) {
+            args[i] = arguments[i];
+        }
+
+        const joinedPath = '/' + args.join('/');
+        return joinedPath.replace(/[\/]+/g, '/');
+    },
 };
 
 export = URLUtils;
