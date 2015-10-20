@@ -18,7 +18,7 @@ package org.graylog2.alerts;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -216,19 +216,19 @@ public class StaticEmailAlertSender implements AlertSender {
             throw new RuntimeException("Stream [" + stream + "] has no alert receivers.");
         }
 
-        final Set<String> recipients = Sets.newHashSet();
+        final ImmutableSet.Builder<String> recipientsBuilder = ImmutableSet.builder();
 
         // Send emails to subscribed users.
-        if(stream.getAlertReceivers().get("users") != null) {
-            for (String username : stream.getAlertReceivers().get("users")) {
+        final List<String> userNames = stream.getAlertReceivers().get("users");
+        if(userNames != null) {
+            for (String username : userNames) {
                 final User user = userService.load(username);
 
-                if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
+                if(user != null && !isNullOrEmpty(user.getEmail())) {
                     // LDAP users might have multiple email addresses defined.
                     // See: https://github.com/Graylog2/graylog2-server/issues/1439
-                    final List<String> addresses = Splitter.on(",").omitEmptyStrings().trimResults().splitToList(user.getEmail());
-
-                    recipients.addAll(addresses);
+                    final Iterable<String> addresses = Splitter.on(",").omitEmptyStrings().trimResults().split(user.getEmail());
+                    ImmutableSet.builder().addAll(addresses);
                 }
             }
         }
@@ -237,11 +237,12 @@ public class StaticEmailAlertSender implements AlertSender {
         if(stream.getAlertReceivers().get("emails") != null) {
             for (String email : stream.getAlertReceivers().get("emails")) {
                 if(!email.isEmpty()) {
-                    recipients.add(email);
+                    recipientsBuilder.add(email);
                 }
             }
         }
 
+        final Set<String> recipients = recipientsBuilder.build();
         if (recipients.size() == 0) {
             final Notification notification = notificationService.buildNow()
                     .addNode(nodeId.toString())
@@ -252,7 +253,8 @@ public class StaticEmailAlertSender implements AlertSender {
             notificationService.publishIfFirst(notification);
         }
 
-        for (String email : recipients)
+        for (String email : recipients) {
             sendEmail(email, stream, checkResult, backlog);
+        }
     }
 }
