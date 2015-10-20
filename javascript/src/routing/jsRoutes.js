@@ -1,6 +1,9 @@
 const jsRoutes = {
   controllers: {
     api: {
+      BundlesApiController: {
+        list: () => { return {url: '/system/bundles'}; },
+      },
       DashboardsApiController: {
         create: () => { return {url: '/dashboards' }; },
         index: () => { return {url: '/dashboards' }; },

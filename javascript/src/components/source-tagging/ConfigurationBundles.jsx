@@ -1,12 +1,12 @@
-'use strict';
+import React from 'react';
+import { Accordion, Panel } from 'react-bootstrap';
+import SourceType from './SourceType';
+import ConfigurationBundlePreview from './ConfigurationBundlePreview';
+import URLUtils from "../../util/URLUtils";
+import $ from 'jquery';
 
-var React = require('react');
-var BootstrapAccordion = require('../bootstrap/BootstrapAccordion');
-var BootstrapAccordionGroup = require('../bootstrap/BootstrapAccordionGroup');
-var SourceType = require('./SourceType');
-var ConfigurationBundlePreview = require('./ConfigurationBundlePreview');
-var URLUtils = require("../../util/URLUtils");
-var $ = require('jquery');
+const fetch = require('logic/rest/FetchProvider').default;
+import jsRoutes from 'routing/jsRoutes';
 
 var ConfigurationBundles = React.createClass({
     getInitialState() {
@@ -21,7 +21,8 @@ var ConfigurationBundles = React.createClass({
     },
     // TODO: next time we touch this, we should create a store for this and preprocess the data
     componentDidMount() {
-        $.get(URLUtils.appPrefixed('/a/system/contentpacks'), (result) => {
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.list().url))
+          .then((result) => {
             if (this.isMounted()) {
                 this.setState({
                     bundles: result
@@ -33,28 +34,28 @@ var ConfigurationBundles = React.createClass({
         // TODO: the mocking framework will mock the $.map function, replace with foreach.
         var categories = $.map(this.state.bundles, (bundles, category) => category);
         categories.sort();
-        return categories.map((category) => this._getSourceTypeHtml(category), this);
+        return categories.map((category, idx) => this._getSourceTypeHtml(category, idx), this);
     },
-    _getSourceTypeHtml(category) {
-        var bundles = this._getSortedBundles(category);
-        var bundlesJsx = bundles.map((bundle) => {
-            return (
-                <li key={bundle.id}>
-                    <SourceType id={bundle.id}
+    _getSourceTypeHtml(category, idx) {
+      var bundles = this._getSortedBundles(category);
+      var bundlesJsx = bundles.map((bundle) => {
+        return (
+          <li key={bundle.id}>
+            <SourceType id={bundle.id}
                         name={bundle.name}
                         description={bundle.description}
                         onSelect={this.handleSourceTypeChange}/>
-                </li>
-            );
-        }, this);
-
-        return (
-            <BootstrapAccordionGroup key={category} name={category}>
-                <ul>
-                    {bundlesJsx}
-                </ul>
-            </BootstrapAccordionGroup>
+          </li>
         );
+      }, this);
+
+      return (
+        <Panel key={category} header={category} eventKey={idx}>
+          <ul>
+            {bundlesJsx}
+          </ul>
+        </Panel>
+      );
     },
     _getSortedBundles(category) {
         var bundles = this.state.bundles[category];
@@ -73,16 +74,16 @@ var ConfigurationBundles = React.createClass({
         return (
             <div className="configuration-bundles row">
                 <div className="col-md-6">
-                    <BootstrapAccordion>
-                            {this._getCategoriesHtml()}
-                        <BootstrapAccordionGroup name="Import content pack">
+                    <Accordion>
+                        {this._getCategoriesHtml()}
+                        <Panel header="Import content pack" eventKey={-1}>
                             <form method="POST" action={URLUtils.appPrefixed('/a/system/contentpacks')} className="form-inline upload" encType="multipart/form-data">
                                 <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
                                 <input type="file" name="bundle" />
                                 <button type="submit" className="btn btn-success">Upload</button>
                             </form>
-                        </BootstrapAccordionGroup>
-                    </BootstrapAccordion>
+                        </Panel>
+                    </Accordion>
                 </div>
                 <div className="col-md-6">
                     <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>

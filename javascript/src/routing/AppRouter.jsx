@@ -18,6 +18,7 @@ import SourcesPage from 'pages/SourcesPage';
 import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 import RolesPage from 'pages/RolesPage';
+import ContentPacksPage from 'pages/ContentPacksPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -36,6 +37,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
             <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
+            <Route path={Routes.SYSTEM.CONTENTPACKS} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
           </Route>

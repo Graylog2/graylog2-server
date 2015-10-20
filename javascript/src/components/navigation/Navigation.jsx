@@ -110,6 +110,11 @@ const Navigation = React.createClass({
                   <MenuItem>Roles</MenuItem>
                 </LinkContainer>
               }
+              {this.isPermitted(this.props.permissions, ['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) &&
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS}>
+                <MenuItem>Content Packs</MenuItem>
+              </LinkContainer>
+              }
             </NavDropdown>
           </Nav>
 

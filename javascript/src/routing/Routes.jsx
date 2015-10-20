@@ -6,6 +6,7 @@ const Routes = {
   DASHBOARDS: '/dashboards',
   SYSTEM: {
     COLLECTORS: '/system/collectors',
+    CONTENTPACKS: '/system/contentpacks',
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
