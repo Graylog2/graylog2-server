@@ -131,7 +131,7 @@ public class LdapConnector {
             entryCursor = connection.search(searchBase,
                                             filter,
                                             SearchScope.SUBTREE,
-                                            groupIdAttribute, displayNameAttribute, "dn", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf");
+                                            groupIdAttribute, displayNameAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf");
             final Iterator<Entry> it = entryCursor.iterator();
             if (it.hasNext()) {
                 final Entry e = it.next();
