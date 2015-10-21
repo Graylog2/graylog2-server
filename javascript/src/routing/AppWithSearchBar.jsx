@@ -29,7 +29,7 @@ const AppWithSearchBar = React.createClass({
 
     return (
       <div className="container-fluid">
-        <SearchBar userPreferences={this.state.currentUser.permissions}/>
+        <SearchBar userPreferences={this.state.currentUser.preferences}/>
         <Row id="main-row">
           <Col md={12} id="main-content">
             {this.props.children}
