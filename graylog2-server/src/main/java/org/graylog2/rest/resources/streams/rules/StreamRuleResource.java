@@ -55,6 +55,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")
@@ -200,11 +201,11 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all available stream types")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StreamRuleType> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public List<Map<String, Object>> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
                                           @PathParam("streamid") String streamid) {
-        final List<StreamRuleType> result = new ArrayList<>(StreamRuleType.values().length);
+        final List<Map<String, Object>> result = new ArrayList<>(StreamRuleType.values().length);
         for (StreamRuleType type : StreamRuleType.values()) {
-            result.add(type);
+            result.add(type.toMap());
         }
 
         return result;
