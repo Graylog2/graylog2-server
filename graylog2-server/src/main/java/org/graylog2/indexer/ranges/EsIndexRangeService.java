@@ -95,8 +95,6 @@ public class EsIndexRangeService implements IndexRangeService {
 
         MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(MetricRegistry.name(this.getClass(), "cache"), cache));
 
-        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
-        IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
         clusterEventBus.register(this);
     }
@@ -210,11 +208,5 @@ public class EsIndexRangeService implements IndexRangeService {
         }
 
         cache.cleanUp();
-    }
-
-    @Subscribe
-    @AllowConcurrentEvents
-    public void handleIndexRangeUpdate(IndexRangeUpdatedEvent event) {
-        cache.refresh(event.indexName());
     }
 }

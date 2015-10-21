@@ -29,6 +29,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.esplugin.IndexChangeMonitor;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
@@ -67,6 +68,8 @@ public class MongoIndexRangeService implements IndexRangeService {
                 objectMapperProvider.get());
         this.clusterEventBus = clusterEventBus;
 
+        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
+        IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
         clusterEventBus.register(this);
 
