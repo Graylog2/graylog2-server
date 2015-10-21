@@ -1,12 +1,9 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-'use strict';
-
-declare var $: any;
-declare var jsRoutes: any;
-
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+import jsRoutes = require('routing/jsRoutes');
+const fetch = require('logic/rest/FetchProvider').default;
+import UserNotification = require("util/UserNotification");
+import URLUtils = require("util/URLUtils");
 
 interface Field {
     name: string;
@@ -20,13 +17,21 @@ interface Message {
 }
 
 var MessagesStore = {
-    loadMessage(index: string, messageId: string): JQueryPromise<Message> {
+    loadMessage(index: string, messageId: string): Promise<Message> {
         var url = jsRoutes.controllers.MessagesController.single(index.trim(), messageId.trim()).url;
-        var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading message information failed with status: " + errorThrown,
-                "Could not load message information");
-        });
+        const promise = fetch('GET', URLUtils.qualifyUrl(url))
+            .then(response => {
+                // TODO: We need to fix this
+                const tempMessage = response.message;
+                tempMessage.id = tempMessage._id;
+                tempMessage.index = response.index;
+                tempMessage.fields = [];
+                return tempMessage;
+            })
+            .catch(errorThrown => {
+                UserNotification.error("Loading message information failed with status: " + errorThrown,
+                    "Could not load message information");
+            });
         return promise;
     },
 

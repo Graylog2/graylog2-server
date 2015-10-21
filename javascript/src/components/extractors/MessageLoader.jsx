@@ -31,7 +31,7 @@ var MessageLoader = React.createClass({
             return;
         }
         var promise = MessagesStore.loadMessage(index, messageId);
-        promise.done((d) => this.props.onMessageLoaded(d));
+        promise.then((d) => this.props.onMessageLoaded(d));
 
         e.preventDefault();
     },

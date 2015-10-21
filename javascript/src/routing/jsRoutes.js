@@ -69,6 +69,10 @@ const jsRoutes = {
     DashboardsController: {
       show: (id) => { return {url: '/dashboards/' + id }; },
     },
+    MessagesController: {
+      single: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
+      analyze: (index, string) => { return {url: `/messages/${index}/analyze?string=${string}`}; },
+    },
     SearchController: {
       index: () => { return {url: '/search'}; },
     },
