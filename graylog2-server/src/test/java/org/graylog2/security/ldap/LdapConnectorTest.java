@@ -21,7 +21,7 @@ import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifs;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
 import org.apache.directory.server.core.annotations.ContextEntry;
 import org.apache.directory.server.core.annotations.CreateDS;
 import org.apache.directory.server.core.annotations.CreateIndex;
@@ -71,50 +71,7 @@ import static org.assertj.core.api.Assertions.assertThat;
                 @LoadSchema(name = "nis", enabled = true)
         }
 )
-@ApplyLdifs(
-        {
-                "dn: ou=users,dc=example,dc=com",
-                "objectClass: organizationalUnit",
-                "objectClass: top",
-                "ou: users",
-
-                "dn: ou=groups,dc=example,dc=com",
-                "objectClass: organizationalUnit",
-                "objectClass: top",
-                "ou: groups",
-
-                "dn: cn=John Doe,ou=users,dc=example,dc=com",
-                "gidNumber: 1001",
-                "objectClass: posixAccount",
-                "objectClass: top",
-                "objectClass: person",
-                "uidNumber: 1001",
-                "uid: john",
-                "homeDirectory: /home/john",
-                "sn: Doe",
-                "cn: John Doe",
-                "userPassword:: dGVzdA==",
-
-                "dn: cn=Developers,ou=groups,dc=example,dc=com",
-                "gidNumber: 2000",
-                "objectClass: posixGroup",
-                "objectClass: top",
-                "cn: Developers",
-                "memberUid: john",
-
-                "dn: cn=Engineers,ou=groups,dc=example,dc=com",
-                "objectClass: groupOfUniqueNames",
-                "objectClass: top",
-                "cn: Engineers",
-                "uniqueMember: cn=John Doe,ou=users,dc=example,dc=com",
-
-                "dn: cn=QA,ou=groups,dc=example,dc=com",
-                "objectClass: groupOfNames",
-                "objectClass: top",
-                "cn: QA",
-                "member: cn=John Doe,ou=users,dc=example,dc=com"
-        }
-)
+@ApplyLdifFiles("org/graylog2/security/ldap/base.ldif")
 public class LdapConnectorTest extends AbstractLdapTestUnit {
     private static final String ADMIN_DN = "uid=admin,ou=system";
     private static final String ADMIN_PASSWORD = "secret";
