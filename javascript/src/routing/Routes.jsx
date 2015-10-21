@@ -16,6 +16,7 @@ const Routes = {
     ROLES: '/system/roles',
   },
   USER_EDIT: '/user/edit',
+  message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => '/streams/' + streamId + '/edit',
   stream_outputs: (streamId) => '/streams/' + streamId + '/outputs',
   stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',

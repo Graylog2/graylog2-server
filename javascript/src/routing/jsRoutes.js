@@ -73,8 +73,18 @@ const jsRoutes = {
       single: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
       analyze: (index, string) => { return {url: `/messages/${index}/analyze?string=${string}`}; },
     },
+    NodesController: {
+      node: (nodeId) => { return {url: `/system/nodes/${nodeId}`}; },
+    },
+    RadiosController: {
+      show: (nodeId) => { return {url: `/system/radios/${nodeId}`}; },
+    },
+    StreamRulesController: {
+      index: (streamId) => { return {url: `/streams/${streamId}/rules`}; },
+    },
     SearchController: {
       index: () => { return {url: '/search'}; },
+      showMessage: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
     },
   },
 };

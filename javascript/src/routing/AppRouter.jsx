@@ -8,6 +8,7 @@ import Routes from 'routing/Routes';
 import DebugHandler from './DebugHandler';
 
 import SearchPage from 'pages/SearchPage';
+import ShowMessagePage from 'pages/ShowMessagePage';
 import StreamsPage from 'pages/StreamsPage';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
@@ -28,6 +29,7 @@ const AppRouter = React.createClass({
         <Route path="/" component={App}>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>
+            <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
           </Route>
           <Route component={AppWithoutSearchBar}>
