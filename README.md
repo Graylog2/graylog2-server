@@ -3,25 +3,6 @@
 
 ## Development Setup
 
-* Make sure Java 7 is installed
-* Install [Typesafe Activator](https://typesafe.com/activator) version 1.2.x and ensure the `activator` binary is in `$PATH`
-
-* Run the server
-
-```
-$ activator run
-[...]
-
---- (Running the application from SBT, auto-reloading is enabled) ---
-
-[info] play - Listening for HTTP on /0:0:0:0:0:0:0:0:9000
-
-(Server started, use Ctrl+D to stop and go back to the console...)
-
-```
-
-### Javascript
-
 * Install [node.js](http://nodejs.org/) and npm.
 * `cd javascript/`
 * `npm install`
@@ -29,6 +10,8 @@ $ activator run
 
 **_or_**
 * `npm run hot` for hot reloading.
+
+* open http://localhost:8080
 
 The `npm run watch` command will run the `webpack --watch` task, which is continuously bundling JS whenever a source
 file changes.
