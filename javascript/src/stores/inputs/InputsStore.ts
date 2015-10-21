@@ -14,7 +14,7 @@ interface Input {
 
 var InputsStore = {
     list(callback: ((inputs: Array<Input>) => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
+        var failCallback = (errorThrown) => {
             UserNotification.error("Fetching Inputs failed with status: " + errorThrown,
                 "Could not retrieve Inputs");
         };
@@ -22,7 +22,7 @@ var InputsStore = {
         fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.list().url)).then(callback, failCallback);
     },
     globalRecentMessage(input: any, callback: ((message: any) => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
+        var failCallback = (errorThrown) => {
             UserNotification.error("Loading recent message failed with status: " + errorThrown,
                 "Could not retrieve recent message from input \"" + input.title + "\"");
         };
