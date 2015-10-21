@@ -1,4 +1,4 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 /// <reference path="../../../declarations/typeahead/typeahead.d.ts" />
 
 'use strict';
@@ -24,7 +24,7 @@ class QueryInput {
     private typeAheadConfig: any;
     private typeAheadSource: any;
     private fields: string[];
-    private fieldsPromise: JQueryPromise<string[]>;
+    private fieldsPromise: Promise<string[]>;
     private limit: number;
     private displayKey: string;
 
