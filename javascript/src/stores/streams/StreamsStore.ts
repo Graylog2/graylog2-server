@@ -30,21 +30,17 @@ class StreamsStore {
 
   listStreams() {
     const url = "/streams";
-    const promise = fetch('GET', URLUtils.qualifyUrl(url));
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Loading streams failed with status: " + errorThrown,
-        "Could not load streams");
-    });
+    const promise = fetch('GET', URLUtils.qualifyUrl(url))
+        .then((result: StreamSummaryResponse) => result.streams)
+        .catch((errorThrown) => {
+          UserNotification.error("Loading streams failed with status: " + errorThrown,
+              "Could not load streams");
+        });
     return promise;
   }
   load(callback: ((streams: Array<Stream>) => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Fetching Streams failed with status: " + errorThrown,
-        "Could not retrieve Streams");
-    };
-
-    this.listStreams().then((result:StreamSummaryResponse) => {
-      callback(result.streams);
+    this.listStreams().then(streams => {
+      callback(streams);
     });
   }
   get(streamId: string, callback: ((stream: Stream) => void)) {
