@@ -102,6 +102,7 @@
         <!-- The HK2 version should match the version being used by Jersey -->
         <glassfish-hk2.version>2.4.0-b25</glassfish-hk2.version>
         <apache-directory-version>1.0.0-M29</apache-directory-version>
+        <apacheds-server.version>2.0.0-M20</apacheds-server.version>
         <surefire.version>2.18.1</surefire.version>
         <guice.version>4.0</guice.version>
         <drools.version>6.2.0.Final</drools.version>
@@ -723,6 +724,32 @@
                 <artifactId>awaitility</artifactId>
                 <version>1.6.3</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-test-framework</artifactId>
+                <version>${apacheds-server.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- Exclude api-ldap-schema-data to avoid startup error with the embedded apache-ds -->
+                    <exclusion>
+                        <groupId>org.apache.directory.api</groupId>
+                        <artifactId>api-ldap-schema-data</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>ldap-client-test</artifactId>
+                <version>${apacheds-server.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- Exclude api-ldap-schema-data to avoid startup error with the embedded apache-ds -->
+                    <exclusion>
+                        <groupId>org.apache.directory.api</groupId>
+                        <artifactId>api-ldap-schema-data</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.graylog.plugins</groupId>
