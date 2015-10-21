@@ -1,7 +1,0 @@
-@(node: org.graylog2.restclient.models.Node)
-
-@if(node.isMaster()) {
-    <i class="fa fa-star master-node" title="Master Node"></i>
-}
-
-<a href="@routes.NodesController.node(node.getNodeId())">@node.getShortNodeId() / @node.getHostname()</a>

@@ -1,8 +1,0 @@
-@(currentUser: org.graylog2.restclient.models.User)
-
-@import lib.json.Json
-
-@main("Streams", null, "", currentUser, false) {
-    <div class="react-stream-component" data-permissions='@Json.toJsonString(currentUser.getPermissions)' data-user-name="@currentUser.getName">
-    </div>
-}

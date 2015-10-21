@@ -1,9 +1,0 @@
-@(currentUser: org.graylog2.restclient.models.User,
-        breadcrumbs: lib.BreadcrumbList,
-        patterns: java.util.TreeSet[org.graylog2.rest.models.system.responses.GrokPatternSummary])
-
-@main("Grok patterns", null, "", currentUser, false) {
-    @views.html.partials.breadcrumbs(breadcrumbs)
-
-    <div id="react-grok-patterns"></div>
-}

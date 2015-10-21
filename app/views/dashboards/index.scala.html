@@ -1,8 +1,0 @@
-@(currentUser: org.graylog2.restclient.models.User)
-
-@import lib.json.Json
-
-@main("Dashboards", null, "", currentUser, false) {
-    <div id="react-dashboard-list-page" data-permissions='@Json.toJsonString(currentUser.getPermissions)' data-user-name="@currentUser.getName">
-    </div>
-}
