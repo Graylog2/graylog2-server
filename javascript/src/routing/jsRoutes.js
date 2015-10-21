@@ -42,7 +42,7 @@ const jsRoutes = {
       },
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId}; },
-        create: (streamId) => { return {url: '/streams'}; },
+        create: () => { return {url: '/streams'}; },
         update: (streamId) => { return {url: '/streams/' + streamId}; },
         cloneStream: (streamId) => { return {url: '/streams/' + streamId + '/clone'}; },
         delete: (streamId) => { return {url: '/streams/' + streamId}; },
