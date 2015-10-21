@@ -3,12 +3,11 @@
 var React = require('react');
 //noinspection JSUnusedGlobalSymbols
 var MetricsStore = require('../../stores/metrics/MetricsStore');
-var NodesStore = require('../../stores/nodes/NodesStore');
+var NodesStore = require('stores/nodes/NodesStore');
 var Immutable = require('immutable');
 var numeral = require('numeral');
 
 var metricsStore = MetricsStore.instance;
-var nodesStore = NodesStore.instance;
 
 var InputIOMetrics = React.createClass({
     getInitialState() {
@@ -50,9 +49,9 @@ var InputIOMetrics = React.createClass({
             this._prefix('read_bytes_total')
         ];
 
-        // We currently only need the NodeStore if we are rendering a global input.
+        // We currently only need the NodesStore if we are rendering a global input.
         if (this._isGlobalInput()) {
-            nodesStore.load();
+            NodesStore.load();
         }
 
         metricsStore.listen({
@@ -175,13 +174,13 @@ var InputIOMetrics = React.createClass({
 
         nodesState.forEach((state, nodeId) => {
             var nodeName = nodeId;
-            var nodeDetails = nodesStore.get(nodeId);
+            var nodeDetails = NodesStore.getNode(nodeId);
 
             if (nodeDetails) {
                 nodeName = nodeDetails.short_node_id + " / " + nodeDetails.hostname;
             } else {
                 // Trigger load to eventually get the node details.
-                nodesStore.load();
+                NodesStore.load();
             }
 
             nodes.push(
