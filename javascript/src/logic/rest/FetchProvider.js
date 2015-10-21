@@ -5,6 +5,7 @@ import SessionActions from 'actions/sessions/SessionActions';
 class FetchError extends Error {
   constructor(message, additional) {
     super(message);
+    this.message = message ? message : additional.message;
     this.additional = additional;
   }
 }
