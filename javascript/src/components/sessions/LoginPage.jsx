@@ -17,16 +17,17 @@ const LoginPage = React.createClass({
     this.disconnectedStyle.unuse();
     this.authStyle.unuse();
   },
-  onSignInClicked() {
+  onSignInClicked(event) {
+    event.preventDefault();
     this.resetLastError();
     const username = this.refs.username.getValue();
     const password = this.refs.password.getValue();
     const location = document.location.host;
     SessionActions.login.triggerPromise(username, password, location).catch((error) => {
       if (error.additional.status === 401) {
-        this.setState({lastError: 'The server rejected your credentials. Please verity them and retry.'});
+        this.setState({lastError: 'Invalid credentials, please verify them and retry.'});
       } else {
-        this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.additional.message});
+        this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.message});
       }
     });
   },
@@ -36,20 +37,16 @@ const LoginPage = React.createClass({
       <div>
         <div className="container" id="login-box">
           <Row>
-            <div className="col-md-4 col-md-offset-4 well" id="login-box-content">
+            <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
               <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
 
               {alert}
 
-              <div className="form-group">
-                <Input ref="username" type="text" placeholder="Username" autoFocus />
-              </div>
+              <Input ref="username" type="text" placeholder="Username" autoFocus />
 
-              <div className="form-group">
-                <Input ref="password" type="password" placeholder="Password" />
-              </div>
+              <Input ref="password" type="password" placeholder="Password" />
 
-              <ButtonInput type="submit" bsStyle="info" onClick={this.onSignInClicked}>Sign in</ButtonInput>
+              <ButtonInput type="submit" bsStyle="info">Sign in</ButtonInput>
 
               <div className="login-advanced">
                 <div className="footer pull-right">
@@ -58,7 +55,7 @@ const LoginPage = React.createClass({
                 </div>
                 <br style={{clear: 'both'}} />
               </div>
-            </div>
+            </form>
           </Row>
         </div>
       </div>
