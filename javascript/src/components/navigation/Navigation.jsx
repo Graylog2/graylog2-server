@@ -111,7 +111,7 @@ const Navigation = React.createClass({
                 </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) &&
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS}>
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                 <MenuItem>Content Packs</MenuItem>
               </LinkContainer>
               }

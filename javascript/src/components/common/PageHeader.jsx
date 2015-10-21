@@ -6,9 +6,10 @@ import SupportLink from 'components/support/SupportLink';
 const PageHeader = React.createClass({
   propTypes: {
     title: React.PropTypes.string.isRequired,
-    children: React.PropTypes.array,
+    children: React.PropTypes.oneOfType([React.PropTypes.array, React.PropTypes.node]),
   },
   render() {
+    const children = (this.props.children.length !== undefined ? this.props.children : [this.props.children]);
     return (
       <span>
         <Row className="content content-head">
@@ -17,16 +18,20 @@ const PageHeader = React.createClass({
               {this.props.title}
             </h1>
             <p className="description">
-              {this.props.children[0]}
+              {children[0]}
             </p>
 
+            {children[1] &&
             <SupportLink>
-              {this.props.children[1]}
+              {children[1]}
             </SupportLink>
+            }
           </Col>
+          {children[2] &&
           <Col md={2} style={{textAlign: 'center', marginTop: '35px'}}>
-            {this.props.children[2]}
+            {children[2]}
           </Col>
+          }
         </Row>
       </span>
     );

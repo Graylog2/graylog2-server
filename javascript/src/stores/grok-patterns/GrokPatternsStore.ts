@@ -18,12 +18,13 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
-    fetch('GET', this.URL).then((patterns: Array<GrokPattern>) => {
+    fetch('GET', this.URL).then((resp: any) => {
+      const patterns = resp.patterns;
       patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
         return pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase());
       });
       callback(patterns);
-    }).catch(failCallback);
+    }, failCallback);
   },
 
   savePattern(pattern: GrokPattern, callback: () => void) {

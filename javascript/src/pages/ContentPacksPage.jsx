@@ -1,5 +1,8 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import Routes from 'routing/Routes';
 
 import PageHeader from 'components/common/PageHeader';
 import ConfigurationBundles from 'components/source-tagging/ConfigurationBundles';
@@ -18,6 +21,10 @@ const ContentPacksPage = React.createClass({
             Find more content packs in {' '}
             <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
           </span>
+
+          <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.EXPORT}>
+            <Button bsStyle="success" bsSize="large">Create a content pack</Button>
+          </LinkContainer>
         </PageHeader>
 
         <Row className="content">
