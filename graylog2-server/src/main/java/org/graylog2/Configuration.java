@@ -62,9 +62,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter(value = "dead_letters_enabled")
-    private boolean deadLettersEnabled = false;
-
     @Parameter("rules_file")
     private String droolsRulesFile;
 
@@ -215,10 +212,6 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isMetricsCollectionEnabled() {
         return metricsCollectionEnabled;
-    }
-
-    public boolean isDeadLettersEnabled() {
-        return deadLettersEnabled;
     }
 
     public int getLoadBalancerRecognitionPeriodSeconds() {

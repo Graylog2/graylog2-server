@@ -41,7 +41,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.DeadLetter;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ResultMessage;
@@ -55,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -76,17 +74,11 @@ public class Messages {
 
     private final Client c;
     private final String deflectorName;
-    private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
 
     @Inject
     public Messages(Client client, ElasticsearchConfiguration configuration) {
         this.c = client;
-        this.deadLetterQueue = new LinkedBlockingQueue<>(1000);
         this.deflectorName = Deflector.buildName(configuration.getIndexPrefix());
-    }
-
-    public LinkedBlockingQueue<List<DeadLetter>> getDeadLetterQueue() {
-        return deadLetterQueue;
     }
 
     public ResultMessage get(String messageId, String index) throws IndexMissingException, DocumentNotFoundException {
@@ -129,7 +121,7 @@ public class Messages {
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
                 response.getItems().length, response.getTookInMillis(), response.hasFailures());
         if (response.hasFailures()) {
-            propagateFailure(response.getItems(), messages, response.buildFailureMessage());
+            propagateFailure(response.getItems(), response.buildFailureMessage());
         }
 
         return !response.hasFailures();
@@ -149,21 +141,18 @@ public class Messages {
         }
     }
 
-    private void propagateFailure(BulkItemResponse[] items, List<Message> messages, String errorMessage) {
+    private void propagateFailure(BulkItemResponse[] items, String errorMessage) {
         // Get all failed messages.
-        final List<DeadLetter> deadLetters = Lists.newArrayList();
+        long failedMessages = 0L;
         for (BulkItemResponse item : items) {
             if (item.isFailed()) {
-                deadLetters.add(new DeadLetter(item, messages.get(item.getItemId())));
+                LOG.trace("Failed to index message: {}", item.getFailureMessage());
+                failedMessages++;
             }
         }
 
         LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
-                deadLetters.size(), errorMessage);
-
-        if (!deadLetterQueue.offer(deadLetters)) {
-            LOG.debug("Could not propagate failure to failure queue. Queue is full.");
-        }
+                failedMessages, errorMessage);
     }
 
     private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
