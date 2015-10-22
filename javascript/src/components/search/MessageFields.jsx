@@ -1,33 +1,37 @@
-'use strict';
+import React, {PropTypes} from 'react';
+import Immutable from 'immutable';
+import MessageFieldDescription from './MessageFieldDescription';
 
-var React = require('react');
-var Immutable = require('immutable');
-var MessageFieldDescription = require('./MessageFieldDescription');
+const MessageFields = React.createClass({
+  propTypes: {
+    message: PropTypes.object.isRequired,
+    possiblyHighlight: PropTypes.func.isRequired,
+    disableFieldActions: PropTypes.bool,
+  },
+  SPECIAL_FIELDS: ['full_message', 'level'],
+  render() {
+    const fields = [];
+    const formattedFields = Immutable.Map(this.props.message.formatted_fields).sortBy((value, key) => key, (fieldA, fieldB) => fieldA.localeCompare(fieldB));
+    formattedFields.forEach((value, key) => {
+      let innerValue = value;
+      if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
+        innerValue = this.props.message.fields[key];
+      }
+      fields.push(<dt key={key + 'Title'}>{key}</dt>);
+      fields.push(<MessageFieldDescription key={key + 'Description'}
+                                           message={this.props.message}
+                                           fieldName={key}
+                                           fieldValue={innerValue}
+                                           possiblyHighlight={this.props.possiblyHighlight}
+                                           disableFieldActions={this.props.disableFieldActions}/>);
+    });
 
-var MessageFields = React.createClass({
-    SPECIAL_FIELDS: ["full_message", "level"],
-    render() {
-        var fields = [];
-        var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a, b) => a.localeCompare(b));
-        formattedFields.forEach((value, key) => {
-            if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
-                value = this.props.message['fields'][key];
-            }
-            fields.push(<dt key={key + "Title"}>{key}</dt>);
-            fields.push(<MessageFieldDescription key={key + "Description"}
-                                                 message={this.props.message}
-                                                 fieldName={key}
-                                                 fieldValue={value}
-                                                 possiblyHighlight={this.props.possiblyHighlight}
-                                                 disableFieldActions={this.props.disableFieldActions}/>);
-        });
-
-        return (
-            <dl className="message-details message-details-fields">
-                {fields}
-            </dl>
-        );
-    }
+    return (
+      <dl className="message-details message-details-fields">
+        {fields}
+      </dl>
+    );
+  },
 });
 
-module.exports = MessageFields;
+export default MessageFields;

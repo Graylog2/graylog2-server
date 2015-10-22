@@ -116,7 +116,9 @@ const MessageDetail = React.createClass({
     let viaRadio = this.props.message.source_radio_id;
     if (viaRadio) {
       viaRadio = (
-        <span> via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on radio {this._nodeName(this.props.message.source_radio_id)}</span>
+        <span>
+          via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on radio {this._nodeName(this.props.message.source_radio_id)}
+        </span>
       );
     }
 
