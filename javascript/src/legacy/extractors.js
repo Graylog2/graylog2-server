@@ -1,33 +1,5 @@
 $(document).ready(function () {
 
-    $("div.xtrc-select-message").sampleMessageLoader({
-        subcontainer: $('div.subcontainer', $('div.xtrc-select-message')),
-        selector: $('div.manual-selector', $('div.xtrc-select-message')),
-        message: $('div.xtrc-message', $('div.xtrc-select-message')),
-        spinner: $('div.spinner', $('div.xtrc-select-message')),
-        recentButton: $('button.xtrc-load-recent', $('div.subcontainer', $('div.xtrc-select-message'))),
-        selectorButton: $('button.xtrc-load-manual', $('div.subcontainer', $('div.xtrc-select-message')))
-    });
-
-    $("div.xtrc-message").on("click", "dt.xtrc-message-field", function () {
-        var field = $(this).attr("data-field");
-        var value = $(this).attr("data-value");
-        var message = $("div.xtrc-message");
-        var messageId = message.data("id");
-        var messageIndex = message.data("index");
-
-        $(".xtrc-select-message").remove();
-
-        var wizard = $(".xtrc-wizard");
-        $(".xtrc-wizard-field", wizard).html(field);
-        $(".xtrc-wizard-example", wizard).html(htmlEscape(value));
-
-        $("input[name=field]", wizard).val(field);
-        $("input[name=example_id]", wizard).val(messageId);
-        $("input[name=example_index]", wizard).val(messageIndex);
-        wizard.show();
-    });
-
     var testExtractor = function (url, data) {
         return $.ajax({
             type: "POST",
