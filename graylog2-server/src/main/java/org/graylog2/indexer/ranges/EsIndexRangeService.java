@@ -35,7 +35,6 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.esplugin.IndexChangeMonitor;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
@@ -177,7 +176,12 @@ public class EsIndexRangeService implements IndexRangeService {
             try {
                 indexRanges.add(cache.get(index));
             } catch (ExecutionException e) {
-                LOG.warn("Couldn't load index range for index " + index);
+                final Throwable cause = e.getCause();
+                if (cause instanceof NotFoundException) {
+                    LOG.debug("Couldn't find index range for index " + index);
+                } else {
+                    LOG.warn("Couldn't load index range for index " + index, cause);
+                }
             }
         }
 
