@@ -1,7 +1,9 @@
 import Reflux from 'reflux';
-import SessionActions from 'actions/sessions/SessionActions';
+
 import URLUtils from 'util/URLUtils';
-import fetch, { Builder } from 'logic/rest/FetchProvider';
+import fetch from 'logic/rest/FetchProvider';
+
+import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 
 const CurrentUserStore = Reflux.createStore({
@@ -27,6 +29,7 @@ const CurrentUserStore = Reflux.createStore({
           this.trigger({currentUser: this.currentUser});
         });
     }
-  }
+  },
 });
+
 export default CurrentUserStore;

@@ -37,7 +37,7 @@ const SessionStore = Reflux.createStore({
       .authenticated()
       .build()
       .then((resp) => {
-        if (resp.ok || resp.status == 401) {
+        if (resp.ok || resp.status === 401) {
           this._removeSession();
         }
       }, this._removeSession);

@@ -1,39 +1,32 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Accordion, Panel, Row, Col } from 'react-bootstrap';
 import $ from 'jquery';
 
-import jsRoutes from 'routing/jsRoutes';
-import URLUtils from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import UserNotification from 'util/UserNotification';
+
+import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
+import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
 
 import SourceType from './SourceType';
 import ConfigurationBundlePreview from './ConfigurationBundlePreview';
+import Spinner from 'components/common/Spinner';
 
 const ConfigurationBundles = React.createClass({
+  mixins: [Reflux.connect(ConfigurationBundlesStore)],
+
   getInitialState() {
     return {
       sourceTypeId: '',
       sourceTypeDescription: '',
-      bundles: [],
     };
   },
-  // TODO: next time we touch this, we should create a store for this and preprocess the data
   componentDidMount() {
-    fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.list().url))
-      .then((result) => {
-        if (this.isMounted()) {
-          this.setState({
-            bundles: result,
-          });
-        }
-      });
-  },
-  handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
-    this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
+    ConfigurationBundlesActions.list();
   },
   _getCategoriesHtml() {
     // TODO: the mocking framework will mock the $.map function, replace with foreach.
-    const categories = $.map(this.state.bundles, (bundles, category) => category);
+    const categories = $.map(this.state.configurationBundles, (bundles, category) => category);
     categories.sort();
     return categories.map((category, idx) => this._getSourceTypeHtml(category, idx), this);
   },
@@ -59,7 +52,7 @@ const ConfigurationBundles = React.createClass({
     );
   },
   _getSortedBundles(category) {
-    const bundles = this.state.bundles[category];
+    const bundles = this.state.configurationBundles[category];
     bundles.sort((bundle1, bundle2) => {
       if (bundle1.name > bundle2.name) {
         return 1;
@@ -71,20 +64,41 @@ const ConfigurationBundles = React.createClass({
     });
     return bundles;
   },
+  onSubmit(evt) {
+    const reader = new FileReader();
+
+    reader.onload = (evt) => {
+      const request = evt.target.result;
+      ConfigurationBundlesActions.create.triggerPromise(request)
+        .then(() => {
+          UserNotification.success('Bundle added successfully', 'Success!');
+          ConfigurationBundlesActions.list();
+        });
+    };
+
+    reader.readAsText(this.refs.uploadedFile.files[0]);
+  },
+  handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
+    this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
+  },
   render() {
     return (
       <Row className="configuration-bundles">
         <Col md={6}>
+          {this.state.configurationBundles ?
           <Accordion>
             {this._getCategoriesHtml()}
             <Panel header="Import content pack" eventKey={-1}>
-              <form method="POST" action={URLUtils.appPrefixed('/a/system/contentpacks')} className="form-inline upload" encType="multipart/form-data">
+              <form onSubmit={this.onSubmit} className="form-inline upload" encType="multipart/form-data">
                 <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
-                <input type="file" name="bundle" />
+                <input ref="uploadedFile" type="file" name="bundle"/>
                 <button type="submit" className="btn btn-success">Upload</button>
               </form>
             </Panel>
           </Accordion>
+            :
+          <Spinner />
+            }
         </Col>
         <Col md={6}>
           <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>

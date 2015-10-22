@@ -2,6 +2,10 @@ const jsRoutes = {
   controllers: {
     api: {
       BundlesApiController: {
+        apply: (bundleId) => { return {url: '/system/bundles/' + bundleId + '/apply'}; },
+        create: () => { return {url: '/system/bundles'}; },
+        delete: (bundleId) => { return {url: '/system/bundles/' + bundleId}; },
+        export: () => { return {url: '/system/bundles/export'}; },
         list: () => { return {url: '/system/bundles'}; },
       },
       DashboardsApiController: {
