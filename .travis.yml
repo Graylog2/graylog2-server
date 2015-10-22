@@ -26,7 +26,6 @@ deploy:
   on:
     repo: Graylog2/graylog2-web-interface
     branch:
-      - master
       - 1.0
       - 1.1
       - 1.2
