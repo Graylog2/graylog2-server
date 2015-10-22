@@ -73,6 +73,11 @@ const jsRoutes = {
     DashboardsController: {
       show: (id) => { return {url: '/dashboards/' + id }; },
     },
+    ExtractorsController: {
+      newExtractor: (nodeId, inputId, extractorType, fieldName, index, messageId) => {
+        return {url: `/system/inputs/${nodeId}/${inputId}/extractors/new?extractor_type=${extractorType}&field=${fieldName}&example_index=${index}&example_id=${messageId}`};
+      },
+    },
     MessagesController: {
       single: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
       analyze: (index, string) => { return {url: `/messages/${index}/analyze?string=${string}`}; },
