@@ -16,6 +16,8 @@
  */
 package org.graylog2.security.realm;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
@@ -36,14 +38,23 @@ public class SessionAuthenticator extends AuthenticatingRealm {
 
     private final UserService userService;
     private final LdapUserAuthenticator ldapAuthenticator;
+    private final Counter sessionsAuthenticated;
+    private final Counter sessionsExtended;
+    private final Counter sessionsExpired;
 
     @Inject
-    public SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
+    public SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator, MetricRegistry metricRegistry) {
         this.userService = userService;
         this.ldapAuthenticator = ldapAuthenticator;
         // this realm either rejects a session, or allows the associated user implicitly
         setAuthenticationTokenClass(SessionIdToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        sessionsAuthenticated = metricRegistry.counter(MetricRegistry.name(SessionAuthenticator.class,
+                                                                           "sessions-authenticated"));
+        sessionsExtended = metricRegistry.counter(MetricRegistry.name(SessionAuthenticator.class,
+                                                                      "sessions-extended"));
+        sessionsExpired = metricRegistry.counter(MetricRegistry.name(SessionAuthenticator.class,
+                                                                     "sessions-expired"));
     }
 
     @Override
@@ -60,6 +71,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final User user = userService.load(String.valueOf(username));
         if (user == null) {
             LOG.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
+            sessionsExpired.inc();
             return null;
         }
         if (user.isExternalUser() && !ldapAuthenticator.isEnabled()) {
@@ -75,12 +87,14 @@ public class SessionAuthenticator extends AuthenticatingRealm {
                 "REQUEST_HEADERS");
         // extend session unless the relevant header was passed.
         if (requestHeaders == null || !"true".equalsIgnoreCase(requestHeaders.getFirst("X-Graylog2-No-Session-Extension"))) {
+            sessionsExtended.inc();
             session.touch();
         } else {
             LOG.debug("Not extending session because the request indicated not to.");
         }
         ThreadContext.bind(subject);
 
+        sessionsAuthenticated.inc();
         return new SimpleAccount(user.getName(), null, "session authenticator");
     }
 }
