@@ -2,7 +2,7 @@ import request from 'superagent-bluebird-promise';
 import SessionStore from 'stores/sessions/SessionStore';
 import SessionActions from 'actions/sessions/SessionActions';
 
-class FetchError extends Error {
+export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
     this.message = message ? message : additional.message;
