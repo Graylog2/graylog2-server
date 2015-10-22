@@ -9,12 +9,13 @@ const InputDropdown = React.createClass({
   propTypes: {
     inputs: PropTypes.object,
     title: PropTypes.string,
+    preselectedInputId: PropTypes.string,
     onLoadMessage: PropTypes.func,
   },
   mixins: [LinkedStateMixin],
   getInitialState() {
     return {
-      selectedInput: this.PLACEHOLDER,
+      selectedInput: this.props.preselectedInputId || this.PLACEHOLDER,
     };
   },
   PLACEHOLDER: 'placeholder',
@@ -27,23 +28,43 @@ const InputDropdown = React.createClass({
   _onLoadMessage() {
     this.props.onLoadMessage(this.state.selectedInput);
   },
-  render() {
-    if (!this.props.inputs) {
-      return <Spinner />;
-    }
-    const inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).values()).map(this._formatInput);
+  _formatStaticInput(input) {
     return (
-      <div>
-        <Input type="select" style={{float: 'left', width: 400, marginRight: 10}}
-               valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
-          <option value={this.PLACEHOLDER}>Select an input</option>
-          {inputs}
-        </Input>
-
-        <a className="btn btn-info" disabled={this.state.selectedInput === this.PLACEHOLDER}
-           onClick={this._onLoadMessage}>{this.props.title}</a>
-      </div>
+      <Input type="select" style={{float: 'left', width: 400, marginRight: 10}} disabled>
+        <option>{`${input.title} (${input.type})`}</option>
+      </Input>
     );
+  },
+  render() {
+    // When an input is pre-selected, show a static dropdown
+    if (this.props.inputs && this.props.preselectedInputId) {
+      return (
+        <div>
+          {this._formatStaticInput(this.props.inputs.get(this.props.preselectedInputId))}
+
+          <a className="btn btn-info" disabled={this.state.selectedInput === this.PLACEHOLDER}
+             onClick={this._onLoadMessage}>{this.props.title}</a>
+        </div>
+      );
+    }
+
+    if (this.props.inputs) {
+      const inputs = Immutable.List(this.props.inputs.sort(this._sortByTitle).map(this._formatInput));
+      return (
+        <div>
+          <Input type="select" style={{float: 'left', width: 400, marginRight: 10}}
+                 valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
+            <option value={this.PLACEHOLDER}>Select an input</option>
+            {inputs}
+          </Input>
+
+          <a className="btn btn-info" disabled={this.state.selectedInput === this.PLACEHOLDER}
+             onClick={this._onLoadMessage}>{this.props.title}</a>
+        </div>
+      );
+    }
+
+    return <Spinner/>;
   },
 });
 

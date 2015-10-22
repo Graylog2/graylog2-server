@@ -1,12 +1,17 @@
-'use strict';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ExtractorExampleMessage from './ExtractorExampleMessage';
+import AddExtractor from './AddExtractor';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var ExtractorExampleMessage = require('./ExtractorExampleMessage');
-
-var extractorExampleMessage = document.getElementById('react-extractor-example-message');
+const extractorExampleMessage = document.getElementById('react-extractor-example-message');
 if (extractorExampleMessage) {
-    var example = extractorExampleMessage.getAttribute('data-example');
-    var field = extractorExampleMessage.getAttribute('data-field');
-    ReactDOM.render(<ExtractorExampleMessage field={field} example={example}/>, extractorExampleMessage);
+  const example = extractorExampleMessage.getAttribute('data-example');
+  const field = extractorExampleMessage.getAttribute('data-field');
+  ReactDOM.render(<ExtractorExampleMessage field={field} example={example}/>, extractorExampleMessage);
+}
+
+const addExtractorElement = document.getElementById('react-add-extractor');
+if (addExtractorElement) {
+  const inputId = addExtractorElement.getAttribute('data-input-id');
+  ReactDOM.render(<AddExtractor inputId={inputId}/>, addExtractorElement);
 }

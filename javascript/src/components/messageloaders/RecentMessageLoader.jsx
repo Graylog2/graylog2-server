@@ -7,6 +7,7 @@ const RecentMessageLoader = React.createClass({
   propTypes: {
     inputs: PropTypes.object,
     onMessageLoaded: PropTypes.func.isRequired,
+    selectedInputId: PropTypes.string,
   },
   onClick(inputId) {
     const input = this.props.inputs.get(inputId);
@@ -15,15 +16,21 @@ const RecentMessageLoader = React.createClass({
         'Could not load message from invalid Input ' + inputId);
     }
     InputsStore.globalRecentMessage(input, (message) => {
-      message.source_input_id = input.id;
+      message.source_input_id = input.input_id;
       this.props.onMessageLoaded(message);
     });
   },
   render() {
+    let helpMessage;
+    if (this.props.selectedInputId) {
+      helpMessage = 'Click on "Load Message" to load the most recent message from this input.';
+    } else {
+      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message from this input.';
+    }
     return (
       <div style={{marginTop: 5}}>
-        Select an Input from the list below and click "Load Message" to load the most recent message from this input.
-        <InputDropdown inputs={this.props.inputs} onLoadMessage={this.onClick} title="Load Message"/>
+        {helpMessage}
+        <InputDropdown inputs={this.props.inputs} preselectedInputId={this.props.selectedInputId} onLoadMessage={this.onClick} title="Load Message"/>
       </div>
     );
   }

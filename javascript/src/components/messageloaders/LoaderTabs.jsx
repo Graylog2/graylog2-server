@@ -13,6 +13,7 @@ const LoaderTabs = React.createClass({
     messageId: PropTypes.string,
     index: PropTypes.string,
     onMessageLoaded: PropTypes.func,
+    selectedInputId: PropTypes.string,
   },
   getInitialState() {
     return {
@@ -27,7 +28,10 @@ const LoaderTabs = React.createClass({
     }
   },
   onMessageLoaded(message) {
-    message.formatted_fields.timestamp = message.fields.timestamp;
+    if (!message.formatted_fields) {
+      message.formatted_fields = {};
+    }
+    message.formatted_fields.timestamp = message.timestamp;
     message.fields._id = message.id;
     this.setState({message: message});
     if (this.props.onMessageLoaded) {
@@ -64,7 +68,9 @@ const LoaderTabs = React.createClass({
       <div>
         <Tabs defaultActiveKey={defaultActiveKey} animation={false}>
           <Tab eventKey={1} title="Recent" style={{marginBottom: 10}}>
-            <RecentMessageLoader inputs={this.state.inputs} onMessageLoaded={this.onMessageLoaded}/>
+            <RecentMessageLoader inputs={this.state.inputs}
+                                 selectedInputId={this.props.selectedInputId}
+                                 onMessageLoaded={this.onMessageLoaded}/>
           </Tab>
           <Tab eventKey={2} title="Manual" style={{marginBottom: 10}}>
             <div style={{marginTop: 5, marginBottom: 15}}>
