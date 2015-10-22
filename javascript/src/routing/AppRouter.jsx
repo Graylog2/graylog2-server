@@ -16,6 +16,8 @@ import StreamAlertsPage from 'pages/StreamAlertsPage';
 import DashboardsPage from 'pages/DashboardsPage';
 import ShowDashboardPage from 'pages/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
+import InputsPage from 'pages/InputsPage';
+import ExtractorsPage from 'pages/ExtractorsPage';
 import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 import RolesPage from 'pages/RolesPage';
@@ -39,6 +41,9 @@ const AppRouter = React.createClass({
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
+            <Route path={Routes.SYSTEM.INPUTS} component={InputsPage}/>
+            <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage}/>
+            <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>

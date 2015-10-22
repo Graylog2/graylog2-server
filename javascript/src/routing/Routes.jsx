@@ -10,6 +10,7 @@ const Routes = {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
     },
+    INPUTS: '/system/inputs',
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
@@ -24,6 +25,9 @@ const Routes = {
   startpage_set: (type, id) => '/startpage/set/' + type + '/' + id,
 
   dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
+
+  global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
+  local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
 };
 
 export default Routes;

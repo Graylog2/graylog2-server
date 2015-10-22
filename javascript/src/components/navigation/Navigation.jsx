@@ -95,6 +95,11 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.NODES}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
+              {this.isPermitted(this.props.permissions, ['INPUTS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                  <MenuItem>Inputs</MenuItem>
+                </LinkContainer>
+              }
               {this.isPermitted(this.props.permissions, ['COLLECTORS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
                   <MenuItem>Collectors</MenuItem>
