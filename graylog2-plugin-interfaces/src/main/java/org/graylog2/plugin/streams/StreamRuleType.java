@@ -72,14 +72,15 @@ public enum StreamRuleType {
         throw new IllegalArgumentException("Invalid Stream Rule Type specified: " + name);
     }
 
-    public Map<String, Object> toMap() {
-        final Map<String, Object> result = ImmutableMap.<String, Object>of(
-                "id", value,
-                "name", name(),
-                "short_desc", shortDesc,
-                "long_desc", longDesc
-        );
+    public int getValue() {
+        return value;
+    }
 
-        return result;
+    public String getShortDesc() {
+        return shortDesc;
+    }
+
+    public String getLongDesc() {
+        return longDesc;
     }
 }

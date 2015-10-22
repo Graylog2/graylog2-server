@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -29,10 +28,11 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamRuleTypeResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -55,7 +55,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")
@@ -201,11 +200,11 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all available stream types")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Map<String, Object>> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public List<StreamRuleTypeResponse> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
                                           @PathParam("streamid") String streamid) {
-        final List<Map<String, Object>> result = new ArrayList<>(StreamRuleType.values().length);
+        final List<StreamRuleTypeResponse> result = new ArrayList<>(StreamRuleType.values().length);
         for (StreamRuleType type : StreamRuleType.values()) {
-            result.add(type.toMap());
+            result.add(StreamRuleTypeResponse.create(type.getValue(), type.name(), type.getShortDesc(), type.getLongDesc()));
         }
 
         return result;
