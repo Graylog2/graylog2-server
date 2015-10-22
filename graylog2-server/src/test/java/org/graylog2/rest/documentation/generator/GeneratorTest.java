@@ -19,8 +19,7 @@ package org.graylog2.rest.documentation.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.graylog2.shared.ServerVersion;
-import org.graylog2.shared.rest.documentation.generator.Generator;
+import org.graylog2.ServerVersion;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

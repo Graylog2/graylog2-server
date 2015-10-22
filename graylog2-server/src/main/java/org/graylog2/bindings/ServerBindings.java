@@ -69,14 +69,14 @@ import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.inputs.PersistedInputs;
-import org.graylog2.shared.journal.JournalReaderModule;
-import org.graylog2.shared.journal.KafkaJournalModule;
-import org.graylog2.shared.journal.NoopJournalModule;
-import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.shared.security.RestrictToMasterFeature;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.inputs.PersistedInputs;
+import org.graylog2.journal.JournalReaderModule;
+import org.graylog2.journal.KafkaJournalModule;
+import org.graylog2.journal.NoopJournalModule;
+import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.security.RestrictToMasterFeature;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -163,7 +163,7 @@ public class ServerBindings extends Graylog2Module {
 
         bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.rest.resources",
-                "org.graylog2.shared.rest.resources"
+                "org.graylog2.rest.resources"
         });
     }
 

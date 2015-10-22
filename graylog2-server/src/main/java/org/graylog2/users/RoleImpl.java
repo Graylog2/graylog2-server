@@ -18,7 +18,6 @@ package org.graylog2.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.shared.users.Role;
 
 import javax.annotation.Nullable;
 import javax.persistence.Id;

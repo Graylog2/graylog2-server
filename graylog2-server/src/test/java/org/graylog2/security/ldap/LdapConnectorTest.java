@@ -31,7 +31,6 @@ import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.directory.server.core.partition.impl.avl.AvlPartition;
 import org.apache.directory.server.ldap.LdapServer;
-import org.graylog2.shared.security.ldap.LdapEntry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

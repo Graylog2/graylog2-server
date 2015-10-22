@@ -48,22 +48,6 @@
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-bootstrap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-inputs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-rest-models</artifactId>
         </dependency>
 
@@ -167,6 +151,14 @@
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-json</artifactId>
         </dependency>
 
         <dependency>
@@ -294,6 +286,57 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>airline</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hdrhistogram</groupId>
+            <artifactId>HdrHistogram</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>guice-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-locator</artifactId>
+        </dependency>
+
+        <!-- Inputs dependencies -->
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>syslog4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
+
         <!-- Logging dependencies -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -351,6 +394,21 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <!-- git-commit-id-plugin depends on resource filtering to write the
+                    git.properties and version.properties files-->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -400,6 +458,28 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <prefix>git</prefix>
+                    <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
+                    <verbose>false</verbose>
+                    <useNativeGit>true</useNativeGit>
+                    <dotGitDirectory>${project.parent.relativePath}/.git</dotGitDirectory>
+                    <skipPoms>true</skipPoms>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <abbrevLength>7</abbrevLength>
+                    <skip>false</skip>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

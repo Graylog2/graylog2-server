@@ -44,11 +44,11 @@ import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
-import org.graylog2.shared.users.UserService;
+import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
+import org.graylog2.users.Role;
+import org.graylog2.users.Roles;
+import org.graylog2.users.UserService;
 import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -78,8 +78,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
-import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static org.graylog2.security.RestPermissions.USERS_EDIT;
+import static org.graylog2.security.RestPermissions.USERS_PERMISSIONSEDIT;
 
 @RequiresAuthentication
 @Path("/users")

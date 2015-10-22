@@ -32,7 +32,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.utilities.AutoValueUtils;
+import org.graylog2.utilities.AutoValueUtils;
 import org.mongojack.DBCursor;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;

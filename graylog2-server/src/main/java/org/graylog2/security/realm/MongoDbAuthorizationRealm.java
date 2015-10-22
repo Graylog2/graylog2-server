@@ -25,12 +25,11 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {

@@ -19,7 +19,7 @@ package org.graylog2.commands.journal;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import kafka.log.LogSegment;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.journal.KafkaJournal;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 

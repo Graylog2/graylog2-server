@@ -40,8 +40,8 @@ import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackReque
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
 import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.graylog2.utilities.ConfigurationMapConverter;
 import org.slf4j.Logger;

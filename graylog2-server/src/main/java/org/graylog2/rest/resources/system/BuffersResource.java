@@ -28,9 +28,9 @@ import org.graylog2.rest.models.system.buffers.responses.BufferClasses;
 import org.graylog2.rest.models.system.buffers.responses.BuffersUtilizationSummary;
 import org.graylog2.rest.models.system.buffers.responses.RingSummary;
 import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
-import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

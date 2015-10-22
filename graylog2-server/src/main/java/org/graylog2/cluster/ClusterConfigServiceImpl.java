@@ -26,7 +26,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.utilities.AutoValueUtils;
+import org.graylog2.utilities.AutoValueUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;

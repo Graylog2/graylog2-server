@@ -18,7 +18,6 @@ package org.graylog2.users;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.shared.users.Role;
 
 import javax.validation.ConstraintViolation;
 import java.util.Map;

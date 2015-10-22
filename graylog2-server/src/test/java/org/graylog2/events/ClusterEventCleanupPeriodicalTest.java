@@ -33,8 +33,8 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.ObjectIdSerializer;
-import org.graylog2.shared.jackson.SizeSerializer;
-import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.graylog2.jackson.SizeSerializer;
+import org.graylog2.rest.RangeJsonSerializer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -47,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;

@@ -22,7 +22,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -27,16 +27,16 @@ import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.journal.Journal;
-import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.journal.Journal;
+import org.graylog2.journal.KafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
+import static org.graylog2.metrics.MetricUtils.safelyRegister;
 
 /**
  * The ThrottleStateUpdater publishes the current state buffer state of the journal to other interested parties,

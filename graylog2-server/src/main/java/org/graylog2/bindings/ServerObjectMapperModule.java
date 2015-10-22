@@ -18,7 +18,6 @@ package org.graylog2.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.bindings.providers.ServerObjectMapperProvider;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 
 public class ServerObjectMapperModule extends ObjectMapperModule {
     @Override

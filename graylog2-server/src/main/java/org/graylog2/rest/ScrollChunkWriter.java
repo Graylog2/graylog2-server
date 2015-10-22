@@ -19,7 +19,6 @@ package org.graylog2.rest;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
-import org.graylog2.shared.rest.AdditionalMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

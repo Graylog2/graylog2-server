@@ -27,7 +27,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.journal.Journal;
+import org.graylog2.journal.Journal;
 
 import java.io.File;
 import java.util.List;

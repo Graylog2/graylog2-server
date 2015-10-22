@@ -21,12 +21,12 @@ import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.shared.initializers.InputSetupService;
-import org.graylog2.shared.initializers.PeriodicalsService;
-import org.graylog2.shared.initializers.RestApiService;
-import org.graylog2.shared.journal.JournalReader;
-import org.graylog2.shared.system.activities.Activity;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.initializers.InputSetupService;
+import org.graylog2.initializers.PeriodicalsService;
+import org.graylog2.initializers.RestApiService;
+import org.graylog2.journal.JournalReader;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
