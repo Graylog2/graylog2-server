@@ -14,6 +14,7 @@ const LoaderTabs = React.createClass({
     index: PropTypes.string,
     onMessageLoaded: PropTypes.func,
     selectedInputId: PropTypes.string,
+    customFieldActions: PropTypes.node,
   },
   getInitialState() {
     return {
@@ -53,8 +54,10 @@ const LoaderTabs = React.createClass({
       displayMessage = (
         <Col md={12}>
           <MessageShow message={this.state.message} inputs={this.state.inputs}
-                       disableTestAgainstStream disableFieldActions/>
-        </Col>
+                       disableTestAgainstStream
+                       disableFieldActions={!this.props.customFieldActions}
+                       customFieldActions={this.props.customFieldActions}/>
+        </div>
       );
     }
 

@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import {Row, Col, Button} from 'react-bootstrap';
 
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
+import MessageFieldExtractorActions from 'components/search/MessageFieldExtractorActions';
 
 const AddExtractor = React.createClass({
   propTypes: {
@@ -19,9 +20,11 @@ const AddExtractor = React.createClass({
     let extractorForm;
 
     if (this.state.showExtractorForm) {
+      // Components using this component, will give it a proper fieldName and message
+      const extractorFieldActions = <MessageFieldExtractorActions fieldName="" message={{}}/>;
       extractorForm = (
         <div className="stream-loader">
-          <LoaderTabs selectedInputId={this.props.inputId} />
+          <LoaderTabs selectedInputId={this.props.inputId} customFieldActions={extractorFieldActions} />
         </div>
       );
     }

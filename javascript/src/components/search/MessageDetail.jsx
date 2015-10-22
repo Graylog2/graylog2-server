@@ -23,6 +23,7 @@ const MessageDetail = React.createClass({
     nodes: PropTypes.object,
     message: PropTypes.object,
     streams: PropTypes.object,
+    customFieldActions: PropTypes.node,
   },
 
   getInitialState() {
@@ -204,7 +205,8 @@ const MessageDetail = React.createClass({
         <Col md={9}>
           <div ref="messageList">
             <MessageFields message={this.props.message} possiblyHighlight={this.props.possiblyHighlight}
-                           disableFieldActions={this.props.disableFieldActions}/>
+                           disableFieldActions={this.props.disableFieldActions}
+                           customFieldActions={this.props.customFieldActions}/>
           </div>
         </Col>
       </Row>
