@@ -19,7 +19,11 @@ var InputsStore = {
                 "Could not retrieve Inputs");
         };
 
-        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.list().url)).then(callback, failCallback);
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.list().url))
+            .then(response => {
+                const inputs = response.inputs.map((input) => input.message_input);
+                callback(inputs);
+            }, failCallback);
     },
     globalRecentMessage(input: any, callback: ((message: any) => void)) {
         var failCallback = (errorThrown) => {
@@ -27,7 +31,8 @@ var InputsStore = {
                 "Could not retrieve recent message from input \"" + input.title + "\"");
         };
 
-        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.id).url)).then(callback, failCallback);
+        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.globalRecentMessage(input.input_id).url))
+            .then(callback, failCallback);
     }
 };
 

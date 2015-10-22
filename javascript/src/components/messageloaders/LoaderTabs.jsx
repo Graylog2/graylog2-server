@@ -38,7 +38,7 @@ const LoaderTabs = React.createClass({
     InputsStore.list((inputsList) => {
       const inputs = {};
       inputsList.forEach(input => {
-        inputs[input.id] = input.message_input;
+        inputs[input.input_id] = input;
       });
       this.setState({inputs: Immutable.Map(inputs)});
     });
