@@ -50,6 +50,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -126,10 +127,5 @@ public class SessionsResource extends RestResource {
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
-
-        final org.apache.shiro.session.Session session = subject.getSession(false);
-        if (session == null || !session.getId().equals(sessionId)) {
-            throw new NotFoundException();
-        }
     }
 }

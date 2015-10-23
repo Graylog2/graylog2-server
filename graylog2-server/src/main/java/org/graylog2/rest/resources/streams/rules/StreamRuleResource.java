@@ -28,10 +28,11 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamRuleTypeResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -52,6 +53,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiresAuthentication
@@ -191,5 +193,21 @@ public class StreamRuleResource extends RestResource {
         } else {
             throw new NotFoundException();
         }
+    }
+
+    @GET
+    @Path("/types")
+    @Timed
+    @ApiOperation(value = "Get all available stream types")
+    @Produces(MediaType.APPLICATION_JSON)
+    // TODO: Move this to a better place. This method is not related to a context that is bound to the instance of a stream.
+    public List<StreamRuleTypeResponse> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+                                          @PathParam("streamid") String streamid) {
+        final List<StreamRuleTypeResponse> result = new ArrayList<>(StreamRuleType.values().length);
+        for (StreamRuleType type : StreamRuleType.values()) {
+            result.add(StreamRuleTypeResponse.create(type.getValue(), type.name(), type.getShortDesc(), type.getLongDesc()));
+        }
+
+        return result;
     }
 }
