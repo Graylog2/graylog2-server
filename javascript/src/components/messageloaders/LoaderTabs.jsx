@@ -57,7 +57,7 @@ const LoaderTabs = React.createClass({
                        disableTestAgainstStream
                        disableFieldActions={!this.props.customFieldActions}
                        customFieldActions={this.props.customFieldActions}/>
-        </div>
+        </Col>
       );
     }
 
