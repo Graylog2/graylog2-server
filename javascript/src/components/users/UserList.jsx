@@ -1,38 +1,40 @@
 import React from 'react';
+import Reflux from 'reflux';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import UsersStore from 'stores/users/UsersStore';
 import RolesStore from 'stores/users/RolesStore';
+
 import DataTable from 'components/common/DataTable';
+import Spinner from 'components/common/Spinner';
 
 const UserList = React.createClass({
   propTypes: {
     currentUsername: React.PropTypes.string.isRequired,
+    currentUser: React.PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],
 
   getInitialState() {
     return {
-      currentUsername: this.props.currentUsername,
-      currentUser: null,
-      users: [],
-      roles: [],
+      users: undefined,
+      roles: undefined,
     };
   },
   componentDidMount() {
     this.loadUsers();
-    RolesStore.loadRoles().done((roles) => {
+    RolesStore.loadRoles().done((response) => {
+      const roles = response.roles;
       this.setState({roles: roles.map(role => role.name)});
     });
   },
   loadUsers() {
     const promise = UsersStore.loadUsers();
-    promise.done((users) => {
-      const currentUser = users.filter((user) => user.username === this.state.currentUsername)[0];
+    promise.done((response) => {
+      const users = response.users;
       this.setState({
-        currentUser: currentUser,
         users: users,
       });
     });
@@ -71,7 +73,7 @@ const UserList = React.createClass({
     return formattedHeaderCell;
   },
   _userInfoFormatter(user) {
-    const rowClass = user.username === this.state.currentUsername ? 'active' : null;
+    const rowClass = user.username === this.props.currentUsername ? 'active' : null;
     let userBadge = null;
     if (user.read_only) {
       userBadge = <span><i title="System User" className="fa fa-lock"/></span>;
@@ -100,9 +102,9 @@ const UserList = React.createClass({
 
       actions = (
         <div>
-          {this.isPermitted(this.state.currentUser.permissions, ['users:edit']) ? deleteAction : null}
+          {this.isPermitted(this.props.currentUser.permissions, ['users:edit']) ? deleteAction : null}
           &nbsp;
-          {this.isPermitted(this.state.currentUser.permissions, ['users:edit:' + user.username]) ? editAction : null}
+          {this.isPermitted(this.props.currentUser.permissions, ['users:edit:' + user.username]) ? editAction : null}
         </div>
       );
     }
@@ -122,21 +124,25 @@ const UserList = React.createClass({
     const filterKeys = ['username', 'full_name', 'email'];
     const headers = ['', 'Name', 'Username', 'Email Address', 'Role', 'Actions'];
 
-    return (
-      <div>
-        <DataTable id="user-list"
-                   className="table-hover"
-                   headers={headers}
-                   headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={"full_name"}
-                   rows={this.state.users}
-                   filterBy="role"
-                   filterSuggestions={this.state.roles}
-                   dataRowFormatter={this._userInfoFormatter}
-                   filterLabel="Filter Users"
-                   filterKeys={filterKeys}/>
-      </div>
-    );
+    if (this.state.users && this.state.roles) {
+      return (
+        <div>
+          <DataTable id="user-list"
+                     className="table-hover"
+                     headers={headers}
+                     headerCellFormatter={this._headerCellFormatter}
+                     sortByKey={"full_name"}
+                     rows={this.state.users}
+                     filterBy="role"
+                     filterSuggestions={this.state.roles}
+                     dataRowFormatter={this._userInfoFormatter}
+                     filterLabel="Filter Users"
+                     filterKeys={filterKeys}/>
+        </div>
+      );
+    }
+
+    return <Spinner />;
   },
 });
 

@@ -38,7 +38,7 @@ const UsersPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <UserList currentUserName={this.state.currentUser.username} />
+            <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser}/>
           </Col>
         </Row>
       </span>

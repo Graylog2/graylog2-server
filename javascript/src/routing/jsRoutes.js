@@ -69,6 +69,11 @@ const jsRoutes = {
       ToolsApiController: {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
       },
+      UsersApiController: {
+        list: () => { return {url: '/users'}; },
+        load: (username) => { return {url: '/users/' + username}; },
+        delete: (username) => { return {url: '/users/' + username}; },
+      },
     },
     DashboardsController: {
       show: (id) => { return {url: '/dashboards/' + id }; },
