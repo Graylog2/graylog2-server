@@ -6,9 +6,10 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import StreamsStore from 'stores/streams/StreamsStore';
 import DashboardStore from 'stores/dashboard/DashboardStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
+import RolesStore from 'stores/users/RolesStore';
 
 import Spinner from 'components/common/Spinner';
-import ChosenSelectInput from 'components/common/ChosenSelectInput';
+import MultiSelect from 'components/common/MultiSelect';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -19,21 +20,27 @@ const UserForm = React.createClass({
     return {
       streams: undefined,
       dashboards: undefined,
+      roles: undefined,
     };
   },
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({streams: streams});
+      this.setState({
+        streams: streams,
+      });
     });
     DashboardStore.listDashboards().then((dashboards) => {
-      this.setState({dashboards: dashboards});
+      this.setState({dashboards: dashboards.toArray()});
+    });
+    RolesStore.loadRoles().then((response) => {
+      this.setState({roles: response.roles});
     });
   },
   formatPermissionOptions(permissions, permission, streams) {
     return streams
       .sort((s1, s2) => s1.title.localeCompare(s2.title))
       .map((stream) => {
-        return <option key={stream.id} selected={this.isPermitted(permissions, permission + ':' + stream.id)} value={stream.id}>{stream.title}</option>;
+        return <option key={permissions + stream.id} value={stream.id}>{stream.title}</option>;
       });
   },
   formatTimezoneOptions() {
@@ -51,32 +58,41 @@ const UserForm = React.createClass({
      }
      */
   },
-  formatRoleOptions() {
-    /*
-     @for(role &lt;- roleNames.sorted) {
-     <option @if(user.getroles.contains(role)) {selected} value="@role">@role </option>
-     }
-
-     */
+  formatMultiselectOptions(collection) {
+    return collection.map((item) => {
+      return {value: item.id, label: item.title};
+    });
+  },
+  formatSelectedOptions(permissions, permission, collection) {
+    return collection
+      .filter((item) => this.isPermitted(permissions, [permission + ':' + item.id]))
+      .map((item) => item.id)
+      .join(',');
+  },
+  handleMultiselectChange(foo, bar, baz) {
+    console.log([foo, bar, baz]);
   },
   render() {
-    if (!this.state.streams || !this.state.dashboards) {
+    if (!this.state.streams || !this.state.dashboards || !this.state.roles) {
       return <Spinner />;
     }
 
     const user = this.props.user;
+    const userPermissions = user.permissions;
     const permissions = this.state.currentUser.permissions;
     const requiresOldPassword = !this.isPermitted(permissions, 'users:passwordchange:*');
 
-    const streamReadOptions = this.formatPermissionOptions(permissions, 'STREAMS_READ', this.state.streams);
-    const streamEditOptions = this.formatPermissionOptions(permissions, 'STREAMS_EDIT', this.state.streams)
+    const streamReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:read', this.state.streams);
+    const streamEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:edit', this.state.streams);
 
-    const dashboardReadOptions = this.formatPermissionOptions(permissions, 'DASHBOARDS_READ', this.state.dashboards);
-    const dashboardEditOptions = this.formatPermissionOptions(permissions, 'DASHBOARDS_EDIT', this.state.dashboards);
+    const dashboardReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:read', this.state.dashboards);
+    const dashboardEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:edit', this.state.dashboards);
 
     const timezoneOptions = null;
 
-    const rolesOptions = null;
+    const rolesOptions = this.state.roles.map((role) => {
+      return {value: role.name, label: role.name};
+    });
 
     return (
       <div>
@@ -99,14 +115,14 @@ const UserForm = React.createClass({
                 <div className="form-group">
                   <label htmlFor="fullname" className="col-sm-3 control-label">Full Name</label>
                   <div className="col-sm-9">
-                    <input name="fullname" id="fullname" className="form-control" type="text" defaultValue={user.full_name} maxLength={200} required />
+                    <input ref="fullname" name="fullname" id="fullname" className="form-control" type="text" defaultValue={user.full_name} maxLength={200} required />
                     <span className="help-block">Give a descriptive name for this account, e.g. the full name.</span>
                   </div>
                 </div>
                 <div className="form-group">
                   <label htmlFor="email" className="col-sm-3 control-label">Email Address</label>
                   <div className="col-sm-9">
-                    <input name="email" id="email" className="form-control" type="email" defaultValue={user.email} maxLength={254} required />
+                    <input ref="email" name="email" id="email" className="form-control" type="email" defaultValue={user.email} maxLength={254} required />
                     <span className="help-block">Give the contact email address.</span>
                   </div>
                 </div>
@@ -124,14 +140,20 @@ const UserForm = React.createClass({
                       </div>
                       <label className="col-sm-3 control-label" htmlFor="streampermissions">Streams Permissions</label>
                       <div className="col-sm-9">
-                        <select id="streampermissions" name="streampermissions[]" className="chosen-select" data-placeholder="Choose read permissions..." multiple>
-                          {streamReadOptions}
-                        </select>
+                        <MultiSelect
+                          ref="streamReadOptions"
+                          options={this.formatMultiselectOptions(this.state.streams)}
+                          value={streamReadOptions}
+                          placeholder="Choose read permissions..."
+                        />
                         <span className="help-block">Choose streams the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <select className="streameditpermissions" name="streameditpermissions[]" id="streameditpermissions" data-placeholder="Choose edit permissions..." multiple>
-                          {streamEditOptions}
-                        </select>
+                        <MultiSelect
+                          ref="streamEditOptions"
+                          options={this.formatMultiselectOptions(this.state.streams)}
+                          value={streamEditOptions}
+                          placeholder="Choose edit permissions..."
+                        />
                         <span className="help-block">Choose the streams the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </div>
@@ -139,14 +161,20 @@ const UserForm = React.createClass({
                     <div className="form-group">
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <div className="col-sm-9">
-                        <select id="dashboardpermissions" name="dashboardpermissions[]" data-placeholder="Choose read permissions..." multiple>
-                          {dashboardReadOptions}
-                        </select>
+                        <MultiSelect
+                          ref="dashboardReadOptions"
+                          options={this.formatMultiselectOptions(this.state.dashboards)}
+                          value={dashboardReadOptions}
+                          placeholder="Choose read permissions..."
+                        />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <select className="dashboardeditpermissions" id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
-                          {dashboardEditOptions}
-                        </select>
+                        <MultiSelect
+                          ref="dashboardEditOptions"
+                          options={this.formatMultiselectOptions(this.state.dashboards)}
+                          value={dashboardEditOptions}
+                          placeholder="Choose edit permissions..."
+                        />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </div>
@@ -159,7 +187,7 @@ const UserForm = React.createClass({
                       <div className="col-sm-offset-3 col-sm-9">
                         <div className="checkbox">
                           <label>
-                            <input type="checkbox" id="session-timeout-never" name="session_timeout_never" checked={user.sessions_never_timeout} />
+                            <input ref="session_timeout_never" type="checkbox" id="session-timeout-never" name="session_timeout_never" checked={user.sessions_never_timeout} />
                             Sessions do not time out
                           </label>
                         </div>
@@ -171,14 +199,14 @@ const UserForm = React.createClass({
                       <div className="col-sm-9">
                         <div className="row">
                           <div className="col-sm-3">
-                            <input type="number" id="timeout" className="session-timeout-fields validatable form-control" name="timeout" min={1} data-validate="positive_number" defaultValue={user.timeout} />
+                            <input ref="session_timeout" type="number" id="timeout" className="session-timeout-fields validatable form-control" name="timeout" min={1} data-validate="positive_number" defaultValue={user.timeout} />
                           </div>
                           <div className="col-sm-3">
-                            <select name="timeout_unit" id="timeout_unit" className="session-timeout-fields form-control">
-                              <option value="seconds">Seconds</option>
-                              <option value="minutes">Minutes</option>
-                              <option value="hours">Hours</option>
-                              <option value="days">Days</option>
+                            <select ref="session_timeout_unit" name="timeout_unit" id="timeout_unit" className="session-timeout-fields form-control">
+                              <option value={1000}>Seconds</option>
+                              <option value={60*1000}>Minutes</option>
+                              <option value={60*60*1000}>Hours</option>
+                              <option value={24*60*60*1000}>Days</option>
                             </select>
                           </div>
                         </div>
@@ -194,7 +222,7 @@ const UserForm = React.createClass({
                   <div className="col-sm-9">
                     <div className="row">
                       <div className="col-sm-5">
-                        <select name="timezone" id="timezone" data-placeholder="Pick your time zone" className="timezone-select">
+                        <select ref="timezone" name="timezone" id="timezone" data-placeholder="Pick your time zone" className="timezone-select">
                           {timezoneOptions}
                         </select>
                       </div>
@@ -238,14 +266,14 @@ const UserForm = React.createClass({
                   <div className="form-group">
                     <label className="col-sm-3 control-label" htmlFor="old-password">Old Password</label>
                     <div className="col-sm-9">
-                      <input type="password" id="old-password" name="old_password" className="form-control" required/>
+                      <input ref="old_password" type="password" id="old-password" name="old_password" className="form-control" required/>
                     </div>
                   </div>
                 }
                 <div className="form-group">
                   <label className="col-sm-3 control-label" htmlFor="password">New Password</label>
                   <div className="col-sm-9">
-                    <input type="password" id="password" name="password" className="form-control" required />
+                    <input ref="password" type="password" id="password" name="password" className="form-control" required />
                     <span className="help-block">
                       Passwords must be at least 6 characters long. We recommend using a strong password.
                     </span>
@@ -254,7 +282,7 @@ const UserForm = React.createClass({
                 <div className="form-group">
                   <label className="col-sm-3 control-label" htmlFor="password-repeat">Repeat Password</label>
                   <div className="col-sm-9">
-                    <input type="password" id="password-repeat" className="form-control" required />
+                    <input ref="password_repeat" type="password" id="password-repeat" className="form-control" required />
                   </div>
                 </div>
                 <div className="form-group">
@@ -292,9 +320,12 @@ const UserForm = React.createClass({
                     <div className="form-group">
                       <label className="col-sm-3 control-label">User Roles</label>
                       <div className="col-sm-9">
-                        <select id="edituserroles" name="roles[]" className="chosen-select" data-placeholder="Choose roles..." multiple>
-                          {rolesOptions}
-                        </select>
+                        <MultiSelect
+                          ref="rolesOptions"
+                          options={rolesOptions}
+                          value={user.roles.join(',')}
+                          placeholder="Choose roles..."
+                        />
                         <span className="help-block">
                           Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
                       </div>
