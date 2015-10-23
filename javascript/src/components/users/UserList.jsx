@@ -1,7 +1,10 @@
 import React from 'react';
 import Reflux from 'reflux';
+import { LinkContainer } from 'react-router-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
+import Routes from 'routing/Routes';
 
 import UsersStore from 'stores/users/UsersStore';
 import RolesStore from 'stores/users/RolesStore';
@@ -94,10 +97,11 @@ const UserList = React.createClass({
       );
 
       const editAction = (
-        <a id="edit-user" href={UsersStore.editUserFormUrl(user.username)}
-           className="btn btn-info btn-xs" title={'Edit user ' + user.username}>
-          Edit
-        </a>
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(user.username)}>
+          <Button bsStyle="info" bsSize="xs" title={'Edit user ' + user.username}>
+            Edit
+          </Button>
+        </LinkContainer>
       );
 
       actions = (

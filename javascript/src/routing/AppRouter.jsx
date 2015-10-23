@@ -24,6 +24,7 @@ import RolesPage from 'pages/RolesPage';
 import ContentPacksPage from 'pages/ContentPacksPage';
 import ExportContentPackPage from 'pages/ExportContentPackPage';
 import UsersPage from 'pages/UsersPage';
+import EditUsersPage from 'pages/EditUsersPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -50,7 +51,8 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
-            <Route path={Routes.SYSTEM.USERS} component={UsersPage}/>
+            <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
+            <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
           </Route>
         </Route>
       </Router>
