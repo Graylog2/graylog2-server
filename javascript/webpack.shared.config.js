@@ -13,7 +13,7 @@ var webpackConfig = {
     },
     module: {
         preLoaders: [
-            //{ test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules/ }
+            // { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
         ],
         loaders: [
             { test: /\.json$/, loader: 'json-loader' },

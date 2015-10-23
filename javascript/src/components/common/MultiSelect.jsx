@@ -8,7 +8,7 @@ const MultiSelect = React.createClass({
   componentWillUnmount() {
     this.reactSelectStyles.unuse();
   },
-  reactSelectStyles: require('react-select/dist/default.css'),
+  reactSelectStyles: require('!style/useable!css!react-select/dist/default.css'),
   render() {
     return <Select multi={true} {...this.props} />;
   }
