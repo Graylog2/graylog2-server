@@ -15,6 +15,7 @@ const Routes = {
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     ROLES: '/system/roles',
+    USERS: '/system/users',
   },
   USER_EDIT: '/user/edit',
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,

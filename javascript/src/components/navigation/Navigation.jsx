@@ -110,6 +110,11 @@ const Navigation = React.createClass({
                   <MenuItem>Outputs</MenuItem>
                 </LinkContainer>
               }
+              {this.isPermitted(this.props.permissions, ['USERS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.USERS}>
+                  <MenuItem>Users</MenuItem>
+                </LinkContainer>
+              }
               {this.isPermitted(this.props.permissions, ['ROLES_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.ROLES}>
                   <MenuItem>Roles</MenuItem>
