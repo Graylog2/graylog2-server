@@ -40,7 +40,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
-    public static final String TYPE_INDEX_RANGE = "index_range";
 
     private final Client client;
 
@@ -58,36 +57,6 @@ public class IndexMapping {
                 .setType(type)
                 .setSource(ImmutableMap.of(type, mapping))
                 .request();
-    }
-
-    public Map<String, Object> metaMapping() {
-        final ImmutableMap<String, ? extends Serializable> stringProperty = ImmutableMap.of(
-                "type", "string",
-                "index", "not_analyzed",
-                "doc_values", true);
-        final ImmutableMap<String, ? extends Serializable> dateProperty = ImmutableMap.of(
-                "type", "date",
-                "format", "date_time",
-                "index", "not_analyzed",
-                "doc_values", true);
-        final ImmutableMap<String, ? extends Serializable> intProperty = ImmutableMap.of(
-                "type", "integer",
-                "index", "no",
-                "doc_values", true);
-        final Map<String, ? extends Serializable> properties = ImmutableMap.of(
-                IndexRange.FIELD_INDEX_NAME, stringProperty,
-                IndexRange.FIELD_BEGIN, dateProperty,
-                IndexRange.FIELD_END, dateProperty,
-                IndexRange.FIELD_CALCULATED_AT, dateProperty,
-                IndexRange.FIELD_TOOK_MS, intProperty
-        );
-
-        return ImmutableMap.<String, Object>of(
-                "properties", properties,
-                "_source", enabled(),
-                "_timestamp", ImmutableMap.of(
-                        "enabled", true,
-                        "format", "date_time"));
     }
 
     public Map<String, Object> messageMapping(final String analyzer) {

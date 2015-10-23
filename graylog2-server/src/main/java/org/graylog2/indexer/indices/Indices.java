@@ -49,6 +49,7 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -61,11 +62,20 @@ import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.Index;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.Max;
+import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -209,11 +219,8 @@ public class Indices implements IndexManagement {
         final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
         final PutMappingResponse messageMappingResponse =
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
-        final Map<String, Object> metaMapping = indexMapping.metaMapping();
-        final PutMappingResponse metaMappingResponse =
-                indexMapping.createMapping(indexName, IndexMapping.TYPE_INDEX_RANGE, metaMapping).actionGet();
 
-        return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
+        return messageMappingResponse.isAcknowledged();
     }
 
     public Set<String> getAllMessageFields() {
@@ -446,5 +453,46 @@ public class Indices implements IndexManagement {
             LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
             return null;
         }
+    }
+
+    /**
+     * Calculate min and max message timestamps in the given index.
+     *
+     * @param index Name of the index to query.
+     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
+     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
+     */
+    public TimestampStats timestampStatsOfIndex(String index) {
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
+                .filter(FilterBuilders.existsFilter("timestamp"))
+                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
+                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
+        final SearchRequestBuilder srb = c.prepareSearch()
+                .setIndices(index)
+                .setSearchType(SearchType.COUNT)
+                .addAggregation(builder);
+
+        final SearchResponse response;
+        try {
+            response = c.search(srb.request()).actionGet();
+        } catch (IndexMissingException e) {
+            throw e;
+        } catch (ElasticsearchException e) {
+            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
+            throw new IndexMissingException(new Index(index));
+        }
+
+        final Filter f = response.getAggregations().get("agg");
+        if (f.getDocCount() == 0L) {
+            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
+            return TimestampStats.EMPTY;
+        }
+
+        final Min minAgg = f.getAggregations().get("ts_min");
+        final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
+        final Max maxAgg = f.getAggregations().get("ts_max");
+        final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
+
+        return TimestampStats.create(min, max);
     }
 }

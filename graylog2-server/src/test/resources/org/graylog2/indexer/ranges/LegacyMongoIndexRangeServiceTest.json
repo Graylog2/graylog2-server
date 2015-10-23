@@ -1,0 +1,58 @@
+{
+  "index_ranges": [
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000001"
+      },
+      "index": "graylog_0",
+      "start": 1420070400,
+      "took_ms": 0,
+      "calculated_at": 1420070400,
+      "migrated": true
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000002"
+      },
+      "index": "graylog_1",
+      "start": 1420156800,
+      "took_ms": 1,
+      "calculated_at": 1420156800
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000003"
+      },
+      "index": "graylog_2",
+      "start": 1420243200,
+      "took_ms": 2,
+      "calculated_at": 1420243200
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000004"
+      },
+      "index": "invalid",
+      "start": "HAHA",
+      "took_ms": 42,
+      "calculated_at": 1420329600
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000099"
+      },
+      "index": "graylog_99",
+      "start": 1420070400
+    },
+    {
+      "_id": {
+        "$oid": "56250da2d400000000000006"
+      },
+      "index_name": "graylog_1",
+      "calculated_at": "2015-01-02T00:00:00.000Z",
+      "begin": "2015-01-01T00:00:00.000Z",
+      "end": "2015-01-02T00:00:00.000Z",
+      "took_ms": 42
+    }
+  ]
+}

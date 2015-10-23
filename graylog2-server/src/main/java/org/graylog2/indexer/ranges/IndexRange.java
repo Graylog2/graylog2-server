@@ -16,44 +16,25 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
 import java.util.Comparator;
 
-@AutoValue
-@JsonAutoDetect
-public abstract class IndexRange {
-    public static final String PREFIX = "gl2_index_range_";
-    public static final String FIELD_TOOK_MS = PREFIX + "took_ms";
-    public static final String FIELD_CALCULATED_AT = PREFIX + "calculated_at";
-    public static final String FIELD_END = PREFIX + "end";
-    public static final String FIELD_BEGIN = PREFIX + "begin";
-    public static final String FIELD_INDEX_NAME = PREFIX + "index_name";
-    public static final Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
+public interface IndexRange {
+    String FIELD_TOOK_MS = "took_ms";
+    String FIELD_CALCULATED_AT = "calculated_at";
+    String FIELD_END = "end";
+    String FIELD_BEGIN = "begin";
+    String FIELD_INDEX_NAME = "index_name";
+    Comparator<IndexRange> COMPARATOR = new IndexRangeComparator();
 
-    @JsonProperty(FIELD_INDEX_NAME)
-    public abstract String indexName();
+    String indexName();
 
-    @JsonProperty(FIELD_BEGIN)
-    public abstract DateTime begin();
+    DateTime begin();
 
-    @JsonProperty(FIELD_END)
-    public abstract DateTime end();
+    DateTime end();
 
-    @JsonProperty(FIELD_CALCULATED_AT)
-    public abstract DateTime calculatedAt();
+    DateTime calculatedAt();
 
-    @JsonProperty(FIELD_TOOK_MS)
-    public abstract int calculationDuration();
-
-    public static IndexRange create(String indexName,
-                                    DateTime begin,
-                                    DateTime end,
-                                    DateTime calculatedAt,
-                                    int calculationDuration) {
-        return new AutoValue_IndexRange(indexName, begin, end, calculatedAt, calculationDuration);
-    }
+    int calculationDuration();
 }

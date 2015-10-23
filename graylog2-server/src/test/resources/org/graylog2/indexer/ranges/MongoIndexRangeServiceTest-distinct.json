@@ -1,0 +1,54 @@
+{
+  "index_ranges": [
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000001"
+      },
+      "index_name": "graylog_1",
+      "calculated_at": 1420156800000,
+      "begin": 1420070400000,
+      "end": 1420156800000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000002"
+      },
+      "index_name": "graylog_2",
+      "calculated_at": 1420243200000,
+      "begin": 1420156800000,
+      "end": 1420243200000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000003"
+      },
+      "index_name": "graylog_3",
+      "calculated_at": 1420329600000,
+      "begin": 1420243200000,
+      "end": 1420329600000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000004"
+      },
+      "index_name": "graylog_4",
+      "calculated_at": 1420416000000,
+      "begin": 1420329600000,
+      "end": 1420416000000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000005"
+      },
+      "index_name": "graylog_5",
+      "calculated_at": 1420502400000,
+      "begin": 1420416000000,
+      "end": 1420502400000,
+      "took_ms": 42
+    }
+  ]
+}

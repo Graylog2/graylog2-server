@@ -16,110 +16,125 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.mongodb.BasicDBObjectBuilder;
+import org.bson.types.ObjectId;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.esplugin.IndexChangeMonitor;
+import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.searches.TimestampStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
+import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.List;
+import java.util.Iterator;
 import java.util.SortedSet;
+import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
-public class MongoIndexRangeService extends PersistedServiceImpl implements IndexRangeService {
+public class MongoIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
     private static final String COLLECTION_NAME = "index_ranges";
-    private static final String FIELD_MIGRATED = "migrated";
+
+    private final Indices indices;
+    private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
+    private final EventBus clusterEventBus;
 
     @Inject
-    public MongoIndexRangeService(final MongoConnection mongoConnection) {
-        super(mongoConnection);
+    public MongoIndexRangeService(MongoConnection mongoConnection,
+                                  MongoJackObjectMapperProvider objectMapperProvider,
+                                  Indices indices,
+                                  EventBus eventBus,
+                                  @ClusterEventBus EventBus clusterEventBus) {
+        this.indices = indices;
+        this.collection = JacksonDBCollection.wrap(
+                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                MongoIndexRange.class,
+                ObjectId.class,
+                objectMapperProvider.get());
+        this.clusterEventBus = clusterEventBus;
+
+        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
+        IndexChangeMonitor.setEventBus(eventBus);
+        eventBus.register(this);
+        clusterEventBus.register(this);
+
+        collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
+        collection.createIndex(BasicDBObjectBuilder.start()
+                .add(MongoIndexRange.FIELD_BEGIN, 1)
+                .add(MongoIndexRange.FIELD_END, 1)
+                .get());
     }
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
-        final DBObject dbo = findOne(new BasicDBObject("index", index), COLLECTION_NAME);
-
-        if (dbo == null) {
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.notExists("start"),
+                DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
+        final MongoIndexRange indexRange = collection.findOne(query);
+        if (indexRange == null) {
             throw new NotFoundException("Index range for index <" + index + "> not found.");
         }
 
-        try {
-            return buildIndexRange(dbo);
-        } catch (Exception e) {
-            throw new NotFoundException("Index range for index <" + index + "> not valid.");
-        }
-    }
-
-    private IndexRange buildIndexRange(DBObject dbo) {
-        final String indexName = (String) dbo.get("index");
-        final DateTime begin = new DateTime(0L, DateTimeZone.UTC);
-        final DateTime end = new DateTime((Integer) dbo.get("start") * 1000L, DateTimeZone.UTC);
-        final DateTime calculatedAt = new DateTime(firstNonNull((Integer) dbo.get("calculated_at"), 0) * 1000L, DateTimeZone.UTC);
-        final int calculationDuration = firstNonNull((Integer) dbo.get("took_ms"), 0);
-
-        return IndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
+        return indexRange;
     }
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        throw new UnsupportedOperationException();
+        final DBCursor<MongoIndexRange> indexRanges = collection.find(
+                DBQuery.and(
+                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
+                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
+                )
+        );
+
+        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) indexRanges);
     }
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        final List<DBObject> result = query(new BasicDBObject(FIELD_MIGRATED, new BasicDBObject("$ne", true)), COLLECTION_NAME);
-
-        final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (DBObject dbo : result) {
-            try {
-                indexRanges.add(buildIndexRange(dbo));
-            } catch (Exception e) {
-                LOG.debug("Couldn't add index range to result set: " + dbo, e);
-            }
-        }
-
-        return indexRanges.build();
-    }
-
-    @Override
-    public void save(IndexRange indexRange) {
-        throw new UnsupportedOperationException();
+        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) collection.find(DBQuery.notExists("start")));
     }
 
     @Override
     public IndexRange calculateRange(String index) {
-        throw new UnsupportedOperationException();
+        final Stopwatch sw = Stopwatch.createStarted();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final TimestampStats stats = indices.timestampStatsOfIndex(index);
+        final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
+
+        LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
+        return MongoIndexRange.create(index, stats.min(), stats.max(), now, duration);
     }
 
-    public boolean markAsMigrated(String index) {
-        final DB db = mongoConnection.getDatabase();
-        final DBCollection collection = db.getCollection(COLLECTION_NAME);
+    @Override
+    public void save(IndexRange indexRange) {
+        collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, indexRange.indexName()));
+        collection.save(MongoIndexRange.create(indexRange));
 
-        final DBObject updatedData = new BasicDBObject("$set", new BasicDBObject(FIELD_MIGRATED, true));
-        final DBObject searchQuery = new BasicDBObject("index", index);
-        final WriteResult result = collection.update(searchQuery, updatedData);
-
-        return result.isUpdateOfExisting();
+        clusterEventBus.post(IndexRangeUpdatedEvent.create(indexRange.indexName()));
     }
 
-    public boolean isMigrated(String index) {
-        final DBObject dbo = findOne(new BasicDBObject("index", index), COLLECTION_NAME);
-
-        if (dbo == null) {
-            return false;
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexDeletion(IndicesDeletedEvent event) {
+        for (String index : event.indices()) {
+            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
         }
-
-        return firstNonNull((Boolean) dbo.get(FIELD_MIGRATED), false);
     }
 }
