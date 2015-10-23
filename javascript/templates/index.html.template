@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>{%=o.htmlWebpackPlugin.options.title || 'Webpack App'%}</title>
+    <link rel="shortcut icon" href="/images/favicon.png">
     {% if (o.htmlWebpackPlugin.files.favicon) { %}
     <link rel="shortcut icon" href="{%=o.htmlWebpackPlugin.files.favicon%}">
     {% } %}
