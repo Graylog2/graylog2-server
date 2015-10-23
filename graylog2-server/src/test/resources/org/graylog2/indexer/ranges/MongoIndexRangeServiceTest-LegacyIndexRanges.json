@@ -1,0 +1,33 @@
+{
+  "index_ranges": [
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000001"
+      },
+      "index": "graylog_0",
+      "start": 1420070400,
+      "took_ms": 0,
+      "calculated_at": 1420070400,
+      "migrated": true
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000002"
+      },
+      "index": "graylog_1",
+      "start": 1420156800,
+      "took_ms": 1,
+      "calculated_at": 1420156800
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000003"
+      },
+      "index_name": "graylog_1",
+      "calculated_at": 1420156800000,
+      "begin": 1420070400000,
+      "end": 1420156800000,
+      "took_ms": 42
+    }
+  ]
+}
