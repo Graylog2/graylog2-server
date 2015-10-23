@@ -200,6 +200,7 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all available stream types")
     @Produces(MediaType.APPLICATION_JSON)
+    // TODO: Move this to a better place. This method is not related to a context that is bound to the instance of a stream.
     public List<StreamRuleTypeResponse> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
                                           @PathParam("streamid") String streamid) {
         final List<StreamRuleTypeResponse> result = new ArrayList<>(StreamRuleType.values().length);
