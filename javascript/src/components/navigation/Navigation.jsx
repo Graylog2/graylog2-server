@@ -125,6 +125,11 @@ const Navigation = React.createClass({
                 <MenuItem>Content Packs</MenuItem>
               </LinkContainer>
               }
+              {this.isPermitted(this.props.permissions, ['INPUTS_EDIT']) &&
+              <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
+                <MenuItem>Grok Patterns</MenuItem>
+              </LinkContainer>
+              }
             </NavDropdown>
           </Nav>
 

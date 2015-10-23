@@ -33,13 +33,22 @@ const GrokPatternsStore = {
         "Could not save Grok pattern");
     };
 
-    var url;
+    const requestPatterb = {
+      id: pattern.id,
+      pattern: pattern.pattern,
+      name: pattern.name,
+      'content_pack': pattern['content_pack'],
+    };
+
+    let url = this.URL;
+    let method;
     if (pattern.id === "") {
-      url = this.URL + '/create';
+      method = 'POST';
     } else {
-      url = this.URL + '/update';
+      url += '/' + pattern.id;
+      method = 'PUT';
     }
-    fetch('POST', url, pattern).then(() => {
+    fetch(method, url, requestPatterb).then(() => {
       callback();
       var action = pattern.id === "" ? "created" : "updated";
       var message = "Grok pattern \"" + pattern.name + "\" successfully " + action;

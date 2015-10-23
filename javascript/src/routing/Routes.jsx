@@ -10,6 +10,7 @@ const Routes = {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
     },
+    GROKPATTERNS: '/system/grokpatterns',
     INPUTS: '/system/inputs',
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
