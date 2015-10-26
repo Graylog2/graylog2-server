@@ -1,17 +1,15 @@
 import React from 'react';
-import Select from 'react-select';
+
+import Select from 'components/common/Select';
 
 const MultiSelect = React.createClass({
-  componentDidMount() {
-    this.reactSelectStyles.use();
+  propTypes: Select.propTypes,
+  getValue() {
+    return this.refs.select.getValue();
   },
-  componentWillUnmount() {
-    this.reactSelectStyles.unuse();
-  },
-  reactSelectStyles: require('!style/useable!css!react-select/dist/default.css'),
   render() {
-    return <Select multi={true} {...this.props} />;
-  }
+    return <Select ref="select" multi={true} {...this.props} />;
+  },
 });
 
 export default MultiSelect;
