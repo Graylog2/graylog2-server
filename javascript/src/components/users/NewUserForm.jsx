@@ -3,7 +3,7 @@ import React from 'react';
 import { Row, Col, Input, Button, FormControls } from 'react-bootstrap';
 
 import RolesSelect from 'components/users/RolesSelect';
-import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
+import TimeoutInput from 'components/users/TimeoutInput';
 import TimezoneSelect from 'components/users/TimezoneSelect';
 
 const NewUserForm = React.createClass({
@@ -19,6 +19,8 @@ const NewUserForm = React.createClass({
         result[ref] = (this.refs[ref].getValue ? this.refs[ref].getValue() : this.refs[ref].value);
       }
     });
+
+    this.props.onSubmit(result);
   },
   render() {
     const rolesHelp = (
@@ -34,7 +36,7 @@ const NewUserForm = React.createClass({
                labelClassName="col-sm-2" wrapperClassName="col-sm-10"
                label="Username" help="Select a unique user name used to log in with." required />
 
-        <Input ref="fullname" name="fullname" id="fullname" type="text" maxLength={200}
+        <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200}
                labelClassName="col-sm-2" wrapperClassName="col-sm-10"
                label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
 
@@ -56,7 +58,7 @@ const NewUserForm = React.createClass({
 
         <Input label="Roles" help={rolesHelp}
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-          <RolesSelect ref="roles" availableRoles={this.props.roles} className="form-control"/>
+          <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']} className="form-control"/>
         </Input>
 
         <Input ref="session-timeout-never" type="checkbox" id="session-timeout-never" name="session_timeout_never"
@@ -65,29 +67,13 @@ const NewUserForm = React.createClass({
 
         <Input label="Timeout" help="Session automatically end after this amount of time, unless they are actively used."
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-          <Row className="row">
-            <Col sm={2}>
-              <input ref="timeout" type="number" id="timeout" className="session-timeout-fields validatable form-control" name="timeout" min={1} data-validate="positive_number" />
-            </Col>
-            <Col sm={3}>
-              <TimeoutUnitSelect ref="session_timeout_unit" className="form-control session-timeout-fields" />
-            </Col>
-          </Row>
+          <TimeoutInput ref="session_timeout_ms" />
         </Input>
 
-        <div className="form-group">
-          <label htmlFor="timezone" className="col-sm-2 control-label">Time Zone</label>
-          <Col sm={10}>
-            <Row>
-              <Col sm={5}>
+        <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
+               labelClassName="col-sm-2" wrapperClassName="col-sm-10">
                 <TimezoneSelect ref="timezone" className="timezone-select"/>
-              </Col>
-            </Row>
-            <span className="help-block">
-              Choose your local time zone or leave it as it is to use the system's default.
-            </span>
-          </Col>
-        </div>
+        </Input>
 
         <div className="form-group">
           <Col smOffset={2} sm={10}>

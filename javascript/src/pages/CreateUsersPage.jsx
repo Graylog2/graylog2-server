@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import RolesStore from 'stores/users/RolesStore';
+import UsersStore from 'stores/users/UsersStore';
 
 import Spinner from 'components/common/Spinner';
 import PageHeader from 'components/common/PageHeader';
@@ -18,8 +19,10 @@ const CreateUsersPage = React.createClass({
       roles: undefined,
     };
   },
-  _onSubmit(evt) {
-    console.log(evt);
+  _onSubmit(request) {
+    request.permissions = [];
+    delete request['session-timeout-never'];
+    UsersStore.create(request).then((result) => { console.log(result); }, (error) => { console.log('Failed: ', error);});
   },
   render() {
     if (!this.state.roles) {

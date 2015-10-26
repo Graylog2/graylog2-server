@@ -13,7 +13,7 @@ const RolesSelect = React.createClass({
     };
   },
   getValue() {
-    return this.refs.select.getValue();
+    return this.refs.select.getValue().split(',');
   },
   render() {
     const rolesValue = this.props.userRoles.join(',');
