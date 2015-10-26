@@ -2,16 +2,21 @@ import React from 'react';
 import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import GlobalThroughput from 'components/throughput/GlobalThroughput';
-import UserMenu from './UserMenu';
-import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
+import Routes from 'routing/Routes';
+
+import GlobalThroughput from 'components/throughput/GlobalThroughput';
+import UserMenu from 'components/navigation/UserMenu';
 
 const Navigation = React.createClass({
   mixins: [PermissionsMixin],
 
   propTypes: {
     requestPath: React.PropTypes.string.isRequired,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+
+    loginName: React.PropTypes.string.isRequired,
+    fullName: React.PropTypes.string.isRequired,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
 
