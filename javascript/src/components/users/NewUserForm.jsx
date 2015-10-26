@@ -61,14 +61,7 @@ const NewUserForm = React.createClass({
           <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']} className="form-control"/>
         </Input>
 
-        <Input ref="session-timeout-never" type="checkbox" id="session-timeout-never" name="session_timeout_never"
-               labelClassName="col-sm-10" wrapperClassName="col-sm-offset-2 col-sm-10"
-               label="Sessions do not time out" help="When checked sessions never time out due to inactivity."/>
-
-        <Input label="Timeout" help="Session automatically end after this amount of time, unless they are actively used."
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-          <TimeoutInput ref="session_timeout_ms" />
-        </Input>
+        <TimeoutInput ref="session_timeout_ms" />
 
         <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
