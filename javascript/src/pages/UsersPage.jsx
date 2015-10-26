@@ -1,9 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
+import Routes from 'routing/Routes';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
@@ -31,7 +33,9 @@ const UsersPage = React.createClass({
             }
             {' '}
             {this.isPermitted(permissions, 'USERS_CREATE') &&
-              <Button bsStyle="success">Add new user</Button>
+              <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+                <Button bsStyle="success">Add new user</Button>
+              </LinkContainer>
             }
           </span>
         </PageHeader>

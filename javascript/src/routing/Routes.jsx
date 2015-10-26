@@ -17,8 +17,9 @@ const Routes = {
     OVERVIEW: '/system/overview',
     ROLES: '/system/roles',
     USERS: {
-      LIST: '/system/users',
+      CREATE: '/system/users/new',
       edit: (username) => '/system/users/edit/' + username,
+      LIST: '/system/users',
     },
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,

@@ -24,6 +24,7 @@ import RolesPage from 'pages/RolesPage';
 import ContentPacksPage from 'pages/ContentPacksPage';
 import ExportContentPackPage from 'pages/ExportContentPackPage';
 import UsersPage from 'pages/UsersPage';
+import CreateUsersPage from 'pages/CreateUsersPage';
 import EditUsersPage from 'pages/EditUsersPage';
 import GrokPatternsPage from 'pages/GrokPatternsPage';
 
@@ -53,8 +54,9 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
-            <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
+            <Route path={Routes.SYSTEM.USERS.CREATE} component={CreateUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
+            <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
           </Route>
         </Route>
       </Router>

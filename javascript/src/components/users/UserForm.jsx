@@ -10,6 +10,7 @@ import RolesStore from 'stores/users/RolesStore';
 
 import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
+import RolesSelect from 'components/users/RolesSelect';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -89,10 +90,6 @@ const UserForm = React.createClass({
     const dashboardEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:edit', this.state.dashboards);
 
     const timezoneOptions = null;
-
-    const rolesOptions = this.state.roles.map((role) => {
-      return {value: role.name, label: role.name};
-    });
 
     return (
       <div>
@@ -320,12 +317,7 @@ const UserForm = React.createClass({
                     <div className="form-group">
                       <label className="col-sm-3 control-label">User Roles</label>
                       <div className="col-sm-9">
-                        <MultiSelect
-                          ref="rolesOptions"
-                          options={rolesOptions}
-                          value={user.roles.join(',')}
-                          placeholder="Choose roles..."
-                        />
+                        <RolesSelect userRoles={user.roles} availableRoles={this.state.roles} />
                         <span className="help-block">
                           Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
                       </div>
