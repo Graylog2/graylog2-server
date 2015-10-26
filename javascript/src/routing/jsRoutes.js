@@ -70,6 +70,7 @@ const jsRoutes = {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
       },
       UsersApiController: {
+        create: () => { return {url: '/users'}; },
         list: () => { return {url: '/users'}; },
         load: (username) => { return {url: '/users/' + username}; },
         delete: (username) => { return {url: '/users/' + username}; },

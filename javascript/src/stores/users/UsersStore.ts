@@ -32,6 +32,12 @@ const UsersStore = {
     return URLUtils.qualifyUrl("/system/users/edit/" + username);
   },
 
+  create(request: any): JQueryPromise<string[]> {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.create().url);
+    const promise = fetch('POST', url, request);
+    return promise;
+  },
+
   loadUsers(): JQueryPromise<User[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.list().url);
     const promise = fetch('GET', url);
