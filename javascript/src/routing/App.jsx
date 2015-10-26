@@ -28,6 +28,7 @@ const App = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(CurrentUserStore)],
