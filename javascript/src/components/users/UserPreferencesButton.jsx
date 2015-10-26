@@ -1,13 +1,23 @@
-'use strict';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
-var React = require('react');
+import UserPreferencesModal from 'components/users/UserPreferencesModal';
 
-var UserPreferencesButton = React.createClass({
-    render() {
-        return (
-            <button onClick={this.props.modal.openModal} className="btn btn-success">User preferences</button>
-        );
-    }
+const UserPreferencesButton = React.createClass({
+  propTypes: {
+    userName: React.PropTypes.string.isRequired,
+  },
+  onClick() {
+    this.refs.userPreferencesModal.openModal();
+  },
+  render() {
+    return (
+      <span>
+        <Button onClick={this.onClick} bsStyle="success">User preferences</Button>
+        <UserPreferencesModal ref="userPreferencesModal" userName={this.props.userName} />
+      </span>
+    );
+  },
 });
 
-module.exports = UserPreferencesButton;
+export default UserPreferencesButton;

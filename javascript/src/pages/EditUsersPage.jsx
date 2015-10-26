@@ -6,6 +6,9 @@ import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 import UserForm from 'components/users/UserForm';
 
+import UserPreferencesModal from 'components/users/UserPreferencesModal';
+import UserPreferencesButton from 'components/users/UserPreferencesButton';
+
 const EditUsersPage = React.createClass({
   getInitialState() {
     return {
@@ -30,7 +33,7 @@ const EditUsersPage = React.createClass({
       : null;
     const userPreferencesButton = !user.read_only ?
       <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
-        <button className="btn btn-success">User preferences</button>
+        <UserPreferencesButton userName={user.username}/>
       </span>
       : null;
 
