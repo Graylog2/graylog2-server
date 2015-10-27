@@ -3,11 +3,13 @@ import Reflux from 'reflux';
 import { Input, Button, Row, Col } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
+import UserNotification from 'util/UserNotification';
 
 import StreamsStore from 'stores/streams/StreamsStore';
 import DashboardStore from 'stores/dashboard/DashboardStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import RolesStore from 'stores/users/RolesStore';
+import UsersStore from 'stores/users/UsersStore';
 
 import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
@@ -60,6 +62,33 @@ const UserForm = React.createClass({
   },
   handleMultiselectChange(foo, bar, baz) {
     console.log([foo, bar, baz]);
+  },
+  _updateRoles(evt) {
+    evt.preventDefault();
+    UsersStore.updateRoles(this.props.user.username, this.refs.roles.getValue()).then(() => {
+      UserNotification.success('Roles updated successfully.', 'Success!');
+    }, () => {
+      UserNotification.error('Updating roles failed.', 'Error!');
+    });
+  },
+  _changePassword(evt) {
+    evt.preventDefault();
+    const request = {};
+
+    if (this.refs['old_password']) {
+      request['old_password'] = this.refs['old_password'].getValue();
+    }
+    request.password = this.refs.password.getValue();
+
+    UsersStore.changePassword(this.props.user.username, request).then(() => {
+      UserNotification.success('Password updated successfully.', 'Success!');
+    }, () => {
+      UserNotification.error('Updating password failed.', 'Error!');
+    });
+  },
+  _updateUser(evt) {
+    evt.preventDefault();
+    const request = {};
   },
   render() {
     if (!this.state.streams || !this.state.dashboards || !this.state.roles) {
@@ -196,30 +225,20 @@ const UserForm = React.createClass({
                 </div>
               </div>
               :
-              <form className="form-horizontal" style={{marginTop: 10}}>
+              <form className="form-horizontal" style={{marginTop: 10}} onSubmit={this._changePassword}>
                 {requiresOldPassword &&
-                  <div className="form-group">
-                    <label className="col-sm-3 control-label" htmlFor="old-password">Old Password</label>
-                    <div className="col-sm-9">
-                      <input ref="old_password" type="password" id="old-password" name="old_password" className="form-control" required/>
-                    </div>
-                  </div>
+                  <Input ref="old_password" name="old_password" id="old_password" type="password" maxLength={100}
+                         labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                         label="Old Password" required />
                 }
-                <div className="form-group">
-                  <label className="col-sm-3 control-label" htmlFor="password">New Password</label>
-                  <div className="col-sm-9">
-                    <input ref="password" type="password" id="password" name="password" className="form-control" required />
-                    <span className="help-block">
-                      Passwords must be at least 6 characters long. We recommend using a strong password.
-                    </span>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="col-sm-3 control-label" htmlFor="password-repeat">Repeat Password</label>
-                  <div className="col-sm-9">
-                    <input ref="password_repeat" type="password" id="password-repeat" className="form-control" required />
-                  </div>
-                </div>
+                <Input ref="password" name="password" id="password" type="password" maxLength={100}
+                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="New Password" help="Passwords must be at least 6 characters long. We recommend using a strong password." required />
+
+                <Input ref="password_repeat" name="password_repeat" id="password_repeat" type="password" maxLength={100}
+                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="Repeat Password" required />
+
                 <div className="form-group">
                   <div className="col-sm-offset-3 col-sm-9">
                     <button className="btn btn-success" type="submit">
@@ -251,10 +270,10 @@ const UserForm = React.createClass({
                       </div>
                     </div>
                   }
-                  <form className="form-horizontal" style={{marginTop : '10 px'}}>
+                  <form className="form-horizontal" style={{marginTop : '10 px'}} onSubmit={this._updateRoles}>
                     <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
                            labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-                      <RolesSelect userRoles={user.roles} availableRoles={this.state.roles} />
+                      <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} />
                     </Input>
                     <div className="form-group">
                       <div className="col-sm-offset-3 col-sm-9">

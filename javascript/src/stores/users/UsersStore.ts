@@ -27,6 +27,11 @@ export interface User {
   startpage?: StartPage;
 }
 
+export interface ChangePasswordRequest {
+  old_password: string;
+  password: string;
+}
+
 const UsersStore = {
   editUserFormUrl(username: string) {
     return URLUtils.qualifyUrl("/system/users/edit/" + username);
@@ -75,7 +80,21 @@ const UsersStore = {
     });
 
     return promise;
-  }
+  },
+
+  updateRoles(username: string, roles: string[]): void {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.updateRoles(username).url);
+    const promise = fetch('PUT', url, {roles: roles});
+
+    return promise;
+  },
+
+  changePassword(username: string, request: ChangePasswordRequest): void {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.changePassword(username).url);
+    const promise = fetch('PUT', url, request);
+
+    return promise;
+  },
 };
 
 export default UsersStore;

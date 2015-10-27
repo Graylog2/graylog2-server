@@ -70,10 +70,12 @@ const jsRoutes = {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
       },
       UsersApiController: {
+        changePassword: (username) => { return {url: '/users/' + username + '/password'}; },
         create: () => { return {url: '/users'}; },
         list: () => { return {url: '/users'}; },
         load: (username) => { return {url: '/users/' + username}; },
         delete: (username) => { return {url: '/users/' + username}; },
+        updateRoles: (username) => { return {url: '/users/' + username + '/roles'}; },
       },
     },
     DashboardsController: {
