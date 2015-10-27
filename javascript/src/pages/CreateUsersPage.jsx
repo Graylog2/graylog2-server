@@ -1,5 +1,8 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import Routes from 'routing/Routes';
+
+import UserNotification from 'util/UserNotification';
 
 import RolesStore from 'stores/users/RolesStore';
 import UsersStore from 'stores/users/UsersStore';
@@ -22,7 +25,12 @@ const CreateUsersPage = React.createClass({
   _onSubmit(request) {
     request.permissions = [];
     delete request['session-timeout-never'];
-    UsersStore.create(request).then((result) => { console.log(result); }, (error) => { console.log('Failed: ', error);});
+    UsersStore.create(request).then((result) => {
+      UserNotification.success('User ' + request.username + ' was created successfully.', 'Success!');
+      this.props.history.replaceState(null, Routes.SYSTEM.USERS.LIST);
+    }, (error) => {
+      UserNotification.error('Failed to create user!', 'Error!');
+    });
   },
   render() {
     if (!this.state.roles) {
