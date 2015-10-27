@@ -1,3 +1,5 @@
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
+
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
 
@@ -24,6 +26,16 @@ var InputsStore = {
                 const inputs = (filtered ? response.inputs.map((input) => input.message_input) : response.inputs);
                 callback(inputs);
             }, failCallback);
+    },
+    get(inputId: string): Promise<Input> {
+        const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.get(inputId).url));
+
+        promise.catch(errorThrown => {
+            UserNotification.error(`Fetching input ${inputId} failed with status: ${errorThrown}`,
+                "Could not retrieve input");
+        });
+
+        return promise;
     },
     globalRecentMessage(input: any, callback: ((message: any) => void)) {
         var failCallback = (errorThrown) => {

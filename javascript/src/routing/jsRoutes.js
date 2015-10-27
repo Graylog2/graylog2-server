@@ -21,6 +21,7 @@ const jsRoutes = {
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },
+        get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
       OutputsApiController: {
