@@ -1,15 +1,15 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import SupportLink from 'components/support/SupportLink';
 
 const PageHeader = React.createClass({
   propTypes: {
-    title: React.PropTypes.string.isRequired,
-    children: React.PropTypes.oneOfType([React.PropTypes.array, React.PropTypes.node]),
-    titleSize: React.PropTypes.number,
-    buttonSize: React.PropTypes.number,
-    buttonStyle: React.PropTypes.object,
+    title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
+    titleSize: PropTypes.number,
+    buttonSize: PropTypes.number,
+    buttonStyle: PropTypes.object,
   },
   getDefaultProps() {
     return {
