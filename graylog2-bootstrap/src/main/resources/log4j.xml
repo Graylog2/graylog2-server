@@ -19,12 +19,6 @@
     <logger name="org.graylog2">
         <level value="info"/>
     </logger>
-    <logger name="org.graylog2.rest.accesslog">
-        <level value="info"/>
-    </logger>
-    <logger name="org.graylog.plugins.usagestatistics">
-        <level value="warn"/>
-    </logger>
     <logger name="com.github.joschi.jadconfig">
         <level value="warn"/>
     </logger>
