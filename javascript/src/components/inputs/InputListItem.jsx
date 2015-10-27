@@ -26,15 +26,38 @@ const InputListItem = React.createClass({
     }
   },
 
+  _getMoreActionsItems() {
+    const items = [];
+
+    if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
+      items.push(<MenuItem key={`edit-input-${this.props.input.id}`}>Edit input</MenuItem>);
+    }
+    if (!this.props.input.message_input.global) {
+      items.push(<MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>);
+    }
+    if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
+      items.push(<MenuItem key={`add-static-field-${this.props.input.id}`}>Add static field</MenuItem>);
+    }
+    if (this.isPermitted(this.props.permissions, [`inputs:terminate`])) {
+      items.push(<MenuItem key={`divider-${this.props.input.id}`} divider/>);
+      items.push(<MenuItem key={`delete-input-${this.props.input.id}`}>Delete input</MenuItem>);
+    }
+
+    return items;
+  },
+
   _getConfigurationOptions(inputAttributes) {
     const attributes = Object.keys(inputAttributes);
-    return attributes.map(attribute => <li>{attribute}: {inputAttributes[attribute]}</li>);
+    return attributes.map(attribute => {
+      return <li key={`${attribute}-${this.props.input.id}`}>{attribute}: {inputAttributes[attribute]}</li>;
+    });
   },
 
   render() {
     // TODO:
     // - Input state controls
     // - Input metrics
+    // - Show number of nodes where global input is running
 
     const inputLabel = (
       <Label bsStyle={this._labelClassForState(this.props.input.state)}
@@ -67,22 +90,23 @@ const InputListItem = React.createClass({
                       id={`more-actions-dropdown-${this.props.input.id}`}
                       className="more-actions"
                       pullRight>
-        {this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`]) && <MenuItem>Edit input</MenuItem>}
-        {!this.props.input.message_input.global && <MenuItem href="">Show metrics</MenuItem>}
-        {this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`]) && <MenuItem>Add static field</MenuItem>}
-        {this.isPermitted(this.props.permissions, [`inputs:terminate`]) && <MenuItem>Delete input</MenuItem>}
+        {this._getMoreActionsItems()}
       </DropdownButton>
     );
 
-    const subtitle = (
-      <span title={this.props.currentNode.node_id}>
-        On node{' '}
-        {this.props.currentNode.is_master && <i className="fa fa-star master-node" title="Master Node"></i>}
-        <LinkContainer to={Routes.node(this.props.currentNode.node_id)}>
-          <a>{this.props.currentNode.short_node_id}</a>
-        </LinkContainer>
-      </span>
-    );
+    let subtitle;
+
+    if (!this.props.input.message_input.global) {
+      subtitle = (
+        <span title={this.props.currentNode.node_id}>
+          On node{' '}
+          {this.props.currentNode.is_master && <i className="fa fa-star master-node" title="Master Node"></i>}
+          <LinkContainer to={Routes.node(this.props.currentNode.node_id)}>
+            <a>{this.props.currentNode.short_node_id}</a>
+          </LinkContainer>
+        </span>
+      );
+    }
 
     const additionalContent = (
       <div>

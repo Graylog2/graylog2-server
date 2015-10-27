@@ -38,14 +38,6 @@ const InputsList = React.createClass({
       return <Spinner/>;
     }
 
-    let globalInputs;
-
-    if (this.state.globalInputs) {
-      globalInputs = <div>Global inputs go here!</div>;
-    } else {
-      globalInputs = <div className="alert alert-info" role="alert">No global inputs running.</div>;
-    }
-
     return (
       <div>
         <div className="row content">Cannot create inputs at the moment</div>
@@ -56,7 +48,8 @@ const InputsList = React.createClass({
               &nbsp;
               <small>{this.state.globalInputs.length} configured on this node</small>
             </h2>
-            {globalInputs}
+            <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
+                        items={this.state.globalInputs.map(input => this._formatInput(input))} />
           </div>
         </div>
         <div className="row content input-list">
