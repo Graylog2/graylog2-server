@@ -13,7 +13,7 @@ interface Input {
 }
 
 var InputsStore = {
-    list(callback: ((inputs: Array<Input>) => void)) {
+    list(callback: ((inputs: Array<Input>) => void), filtered: boolean = true) {
         var failCallback = (errorThrown) => {
             UserNotification.error("Fetching Inputs failed with status: " + errorThrown,
                 "Could not retrieve Inputs");
@@ -21,7 +21,7 @@ var InputsStore = {
 
         fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.InputsApiController.list().url))
             .then(response => {
-                const inputs = response.inputs.map((input) => input.message_input);
+                const inputs = (filtered ? response.inputs.map((input) => input.message_input) : response.inputs);
                 callback(inputs);
             }, failCallback);
     },
