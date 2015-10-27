@@ -3,6 +3,7 @@ import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import { Router, Route, IndexRoute } from 'react-router';
+import {createHistory} from 'history';
 
 import Routes from 'routing/Routes';
 import DebugHandler from './DebugHandler';
@@ -31,7 +32,7 @@ import GrokPatternsPage from 'pages/GrokPatternsPage';
 const AppRouter = React.createClass({
   render() {
     return (
-      <Router>
+      <Router history={createHistory()}>
         <Route path="/" component={App}>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>
