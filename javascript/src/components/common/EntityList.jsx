@@ -24,7 +24,7 @@ const EntityList = React.createClass({
     }
 
     return (
-      <ul className="streams">
+      <ul className="entity-list">
         {this.props.items}
       </ul>
     );

@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import {Row, Col} from 'react-bootstrap';
 
 const EntityListItem = React.createClass({
   propTypes: {
@@ -7,6 +8,7 @@ const EntityListItem = React.createClass({
     description: PropTypes.any,
     actions: PropTypes.array,
     createdFromContentPack: PropTypes.bool,
+    contentRow: PropTypes.node,
   },
   getDefaultProps() {
     return {
@@ -19,18 +21,26 @@ const EntityListItem = React.createClass({
       titleSuffix = <small>{this.props.titleSuffix}</small>;
     }
     return (
-      <li className="stream">
-        <h2>{this.props.title} {titleSuffix}</h2>
+      <li className="entity-list-item">
+        <Row className="row-sm">
+          <Col md={6}>
+            <h2>{this.props.title} {titleSuffix}</h2>
+            <div className="item-description">
+              {this.props.createdFromContentPack && <i className="fa fa-cube" title="Created from content pack"/>}
+              <span>{this.props.description}</span>
+            </div>
+          </Col>
 
-        <div className="stream-data">
-          <div className="stream-actions pull-right">
-            {this.props.actions}
-          </div>
-          <div className="stream-description">
-            {this.props.createdFromContentPack && <i className="fa fa-cube" title="Created from content pack"/>}
-            <span>{this.props.description}</span>
-          </div>
-        </div>
+          <Col md={6}>
+            <div className="item-actions pull-right">
+              {this.props.actions}
+            </div>
+          </Col>
+        </Row>
+
+        <Row className="row-sm">
+          {this.props.contentRow}
+        </Row>
       </li>
     );
   },

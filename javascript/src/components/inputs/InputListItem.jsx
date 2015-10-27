@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import {Label, Button, DropdownButton, MenuItem} from 'react-bootstrap';
+import {Label, Button, DropdownButton, MenuItem, Col, Well} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
 import EntityListItem from 'components/common/EntityListItem';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -26,14 +26,14 @@ const InputListItem = React.createClass({
     }
   },
 
-  _getMoreActionsOption(condition, component) {
-    return (condition ? component : null);
+  _getConfigurationOptions(inputAttributes) {
+    const attributes = Object.keys(inputAttributes);
+    return attributes.map(attribute => <li>{attribute}: {inputAttributes[attribute]}</li>);
   },
 
   render() {
     // TODO:
     // - Input state controls
-    // - Input configuration
     // - Input metrics
 
     const inputLabel = (
@@ -65,6 +65,7 @@ const InputListItem = React.createClass({
       <DropdownButton key={`more-actions-${this.props.input.id}`}
                       title="More actions"
                       id={`more-actions-dropdown-${this.props.input.id}`}
+                      className="more-actions"
                       pullRight>
         {this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`]) && <MenuItem>Edit input</MenuItem>}
         {!this.props.input.message_input.global && <MenuItem href="">Show metrics</MenuItem>}
@@ -83,13 +84,33 @@ const InputListItem = React.createClass({
       </span>
     );
 
+    const additionalContent = (
+      <div>
+        <Col md={8}>
+          <Well bsSize="small" className="configuration-well">
+            <ul>
+              {this._getConfigurationOptions(this.props.input.message_input.attributes)}
+            </ul>
+          </Well>
+        </Col>
+        <Col md={4}>
+          <div className="graylog-input-metrics">
+            <h3>Throughput / Metrics</h3>
+            <div className="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType"
+                 data-node-id="@inputState.getNode.getNodeId"></div>
+          </div>
+        </Col>
+      </div>
+    );
+
     return (
       <EntityListItem key={`entry-list-${this.props.input.id}`}
                       title={`${this.props.input.message_input.title} (${this.props.input.message_input.name})`}
                       titleSuffix={inputLabel}
                       description={subtitle}
                       createdFromContentPack={!!this.props.input.message_input.content_pack}
-                      actions={actions}/>
+                      actions={actions}
+                      contentRow={additionalContent}/>
     );
   },
 });
