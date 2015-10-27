@@ -31,6 +31,7 @@ const Routes = {
 
   dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
 
+  node: (nodeId) => `system/nodes/${nodeId}`,
   global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
 };
