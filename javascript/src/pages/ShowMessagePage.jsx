@@ -11,10 +11,10 @@ import InputsStore from 'stores/inputs/InputsStore';
 import MessagesStore from 'stores/messages/MessagesStore';
 
 const ShowMessagePage = React.createClass({
-  mixins: [Reflux.connect(NodesStore), Reflux.ListenerMethods],
   propTypes: {
     params: PropTypes.object,
   },
+  mixins: [Reflux.connect(NodesStore), Reflux.ListenerMethods],
   getInitialState() {
     return {
       streams: undefined,
