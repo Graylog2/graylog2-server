@@ -42,17 +42,19 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final SecurityContext securityContext = requestContext.getSecurityContext();
-        if (!(securityContext instanceof ShiroSecurityContext)) {
-            return;
-        }
-        final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
-        final Subject subject = context.getSubject();
-        try {
-            LOG.debug("Checking authorization for user {}, needs permissions {}", subject, annotation.value());
-            new ContextAwarePermissionAnnotationHandler(context).assertAuthorized(annotation);
-        } catch (AuthorizationException e) {
-            LOG.info("User not authorized.", e);
-            throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+        if (securityContext instanceof ShiroSecurityContext) {
+            final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
+            final Subject subject = context.getSubject();
+            final ContextAwarePermissionAnnotationHandler annotationHandler = new ContextAwarePermissionAnnotationHandler(context);
+            try {
+                LOG.debug("Checking authorization for user {}, needs permissions {}", subject, annotation.value());
+                annotationHandler.assertAuthorized(annotation);
+            } catch (AuthorizationException e) {
+                LOG.info("User " + subject + "not authorized.", e);
+                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+            }
+        } else {
+            throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
         }
     }
 }

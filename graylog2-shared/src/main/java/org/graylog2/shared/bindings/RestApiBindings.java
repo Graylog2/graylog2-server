@@ -42,7 +42,6 @@ public class RestApiBindings extends Graylog2Module {
 
     private void bindContainerResponseFilters() {
         Multibinder<Class<? extends ContainerResponseFilter>> setBinder = jerseyContainerResponseFilterBinder();
-        setBinder.addBinding().toInstance(RestAccessLogFilter.class);
     }
 
 }

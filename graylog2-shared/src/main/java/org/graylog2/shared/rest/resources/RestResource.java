@@ -28,7 +28,7 @@ import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,12 +83,12 @@ public abstract class RestResource {
         }
 
         final Principal p = securityContext.getUserPrincipal();
-        if (!(p instanceof ShiroSecurityContext.ShiroPrincipal)) {
+        if (!(p instanceof ShiroPrincipal)) {
             LOG.error("Unknown SecurityContext class {}, cannot continue.", securityContext);
             throw new IllegalStateException();
         }
 
-        final ShiroSecurityContext.ShiroPrincipal principal = (ShiroSecurityContext.ShiroPrincipal) p;
+        final ShiroPrincipal principal = (ShiroPrincipal) p;
         return principal.getSubject();
     }
 

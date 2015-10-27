@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.rest;
 
-import org.graylog2.jersey.container.netty.NettyContainer;
+import org.glassfish.grizzly.http.server.Response;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,37 +24,46 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.Date;
+
+import static java.util.Objects.requireNonNull;
 
 public class RestAccessLogFilter implements ContainerResponseFilter {
     private static final Logger LOG = LoggerFactory.getLogger("org.graylog2.rest.accesslog");
-    @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        if (!LOG.isDebugEnabled()) return;
-        try {
-            final InetSocketAddress remoteAddr = (InetSocketAddress) requestContext.getProperty(NettyContainer.REQUEST_PROPERTY_REMOTE_ADDR);
 
-            final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
+    private final Response response;
 
-            final String remoteUser = ((ShiroSecurityContext)requestContext.getSecurityContext()).getUsername();
-            final Date requestDate = requestContext.getDate();
-            LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}", new Object[]{
-                    remoteAddr.getAddress().getHostAddress(),
-                    (remoteUser == null ? "-" : remoteUser),
-                    (requestDate == null ? "-" : requestDate),
-                    requestContext.getMethod(),
-                    requestContext.getUriInfo().getPath(),
-                    (rawQuery == null ? "" : "?" + rawQuery),
-                    requestContext.getHeaderString(HttpHeaders.USER_AGENT),
-                    responseContext.getStatus(),
-                    responseContext.getLength()
-            });
-        } catch (Exception ignored) {
-            LOG.error(":(", ignored);
-        }
+    public RestAccessLogFilter(@Context Response response) {
+        this.response = requireNonNull(response);
     }
 
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        if (LOG.isDebugEnabled()) {
+            try {
+                final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
+                final SecurityContext securityContext = requestContext.getSecurityContext();
+                final String remoteUser = securityContext instanceof ShiroSecurityContext ?
+                        ((ShiroSecurityContext) securityContext).getUsername() : null;
+                final Date requestDate = requestContext.getDate();
+
+                LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
+                        response.getRequest().getRemoteAddr(),
+                        (remoteUser == null ? "-" : remoteUser),
+                        (requestDate == null ? "-" : requestDate),
+                        requestContext.getMethod(),
+                        requestContext.getUriInfo().getPath(),
+                        (rawQuery == null ? "" : "?" + rawQuery),
+                        requestContext.getHeaderString(HttpHeaders.USER_AGENT),
+                        responseContext.getStatus(),
+                        responseContext.getLength());
+            } catch (Exception e) {
+                LOG.error("Error while processing REST API access log", e);
+            }
+        }
+    }
 }

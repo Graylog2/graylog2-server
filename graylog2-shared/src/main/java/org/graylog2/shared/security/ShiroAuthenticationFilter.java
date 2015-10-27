@@ -18,6 +18,7 @@ package org.graylog2.shared.security;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,22 +37,26 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final SecurityContext securityContext = requestContext.getSecurityContext();
-        if (!(securityContext instanceof ShiroSecurityContext)) {
-            return;
-        }
-        final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
-        LOG.trace("Authenticating... {}", context.getSubject());
-        if (!context.getSubject().isAuthenticated()) {
-            try {
-                LOG.trace("Logging in {}", context.getSubject());
-                context.loginSubject();
-            } catch (LockedAccountException e) {
-                LOG.debug("Unable to authenticate user, account is locked.", e);
-                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
-            } catch (AuthenticationException e) {
-                LOG.debug("Unable to authenticate user.", e);
-                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+        if (securityContext instanceof ShiroSecurityContext) {
+            final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
+            final Subject subject = context.getSubject();
+
+            LOG.trace("Authenticating... {}", subject);
+            if (!subject.isAuthenticated()) {
+                try {
+                    LOG.trace("Logging in {}", subject);
+                    context.loginSubject();
+                } catch (LockedAccountException e) {
+                    LOG.debug("Unable to authenticate user, account is locked.", e);
+                    throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+                } catch (AuthenticationException e) {
+                    LOG.debug("Unable to authenticate user.", e);
+                    throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+                }
             }
+        } else {
+            throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
         }
+
     }
 }

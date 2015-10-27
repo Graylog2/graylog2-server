@@ -14,22 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.security;
+package org.graylog2.shared.security.tls;
 
-import org.apache.shiro.authz.aop.PermissionAnnotationHandler;
-import org.apache.shiro.subject.Subject;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 
-import static java.util.Objects.requireNonNull;
-
-public class ContextAwarePermissionAnnotationHandler extends PermissionAnnotationHandler {
-    private final ShiroSecurityContext context;
-
-    public ContextAwarePermissionAnnotationHandler(ShiroSecurityContext context) {
-        this.context = requireNonNull(context);
+public final class KeyStoreUtils {
+    private KeyStoreUtils() {
     }
 
-    @Override
-    protected Subject getSubject() {
-        return context.getSubject();
+    public static byte[] getBytes(KeyStore keyStore, char[] password) throws GeneralSecurityException, IOException {
+        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        keyStore.store(stream, password);
+
+        return stream.toByteArray();
     }
 }

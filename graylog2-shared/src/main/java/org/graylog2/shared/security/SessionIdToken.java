@@ -14,25 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.security;
+package org.graylog2.shared.security;
 
 import com.google.common.base.MoreObjects;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
 import java.util.Objects;
 
-public class AccessTokenAuthToken implements HostAuthenticationToken {
-    private final String token;
+public class SessionIdToken implements HostAuthenticationToken {
+
+    private final String sessionId;
     private final String host;
 
-    public AccessTokenAuthToken(String token, String host) {
-        this.token = token;
+    public SessionIdToken(String sessionId, String host) {
+        this.sessionId = sessionId;
         this.host = host;
     }
 
     @Override
     public Object getPrincipal() {
-        return token;
+        return sessionId;
     }
 
     @Override
@@ -40,8 +41,8 @@ public class AccessTokenAuthToken implements HostAuthenticationToken {
         return null;
     }
 
-    public String getToken() {
-        return token;
+    public String getSessionId() {
+        return sessionId;
     }
 
     @Override
@@ -53,20 +54,20 @@ public class AccessTokenAuthToken implements HostAuthenticationToken {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AccessTokenAuthToken that = (AccessTokenAuthToken) o;
-        return Objects.equals(token, that.token) &&
+        SessionIdToken that = (SessionIdToken) o;
+        return Objects.equals(sessionId, that.sessionId) &&
                 Objects.equals(host, that.host);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token, host);
+        return Objects.hash(sessionId, host);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("token", token)
+                .add("sessionId", sessionId)
                 .add("host", host)
                 .toString();
     }
