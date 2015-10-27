@@ -12,13 +12,6 @@ const TimezoneSelect = React.createClass({
     return this.refs.timezone.getValue();
   },
   _formatTimezones(timezones) {
-    /*return Object.keys(timezones).sort().map((continent) => {
-      return (
-        <optgroup key={'timezone-group-' + continent} label={continent}>
-          {timezones[continent].sort().map((timezone) => <option key={'timezone-' + continent + '-' + timezone} value={continent + '/' + timezone}>{timezone}</option>)}
-        </optgroup>
-      );
-    });*/
     return [].concat.apply([], Object.keys(timezones).sort().map((continent) => {
       return [{label: continent, disabled: true, value: continent}]
         .concat(timezones[continent]
