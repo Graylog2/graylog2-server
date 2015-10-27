@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Input, Button, Row, Col } from 'react-bootstrap';
+import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
@@ -60,9 +60,6 @@ const UserForm = React.createClass({
       .map((item) => item.id)
       .join(',');
   },
-  handleMultiselectChange(foo, bar, baz) {
-    console.log([foo, bar, baz]);
-  },
   _updateRoles(evt) {
     evt.preventDefault();
     UsersStore.updateRoles(this.props.user.username, this.refs.roles.getValue()).then(() => {
@@ -75,8 +72,8 @@ const UserForm = React.createClass({
     evt.preventDefault();
     const request = {};
 
-    if (this.refs['old_password']) {
-      request['old_password'] = this.refs['old_password'].getValue();
+    if (this.refs.old_password) {
+      request.old_password = this.refs.old_password.getValue();
     }
     request.password = this.refs.password.getValue();
 
@@ -96,7 +93,6 @@ const UserForm = React.createClass({
     }
 
     const user = this.props.user;
-    const userPermissions = user.permissions;
     const permissions = this.state.currentUser.permissions;
     const requiresOldPassword = !this.isPermitted(permissions, 'users:passwordchange:*');
 
@@ -115,9 +111,9 @@ const UserForm = React.createClass({
               {user.read_only &&
                 <span>
                   <Col smOffset={3} sm={9}>
-                    <div className="alert alert-warning" role="alert">
+                    <Alert bsStyle="warning" role="alert">
                       The admin user can only be modified in your Graylog server configuration file.
-                    </div>
+                    </Alert>
                   </Col>
                   <div className="clearfix" />
                   <br />
@@ -135,17 +131,14 @@ const UserForm = React.createClass({
                 {this.isPermitted(permissions, 'USERS_EDIT') &&
                   <span>
                     <div className="form-group">
-                      <div className="col-sm-9 col-sm-offset-3">
-                        <div className="panel panel-danger">
-                          <div className="panel-heading">Setting individual permissions is deprecated, please consider migrating to roles instead.</div>
-                          <div className="panel-body">
-                            The permissions listed here are the result of combining all granted permissions by the roles assigned to a user,
-                            which you can edit at the bottom of this page, as well as legacy, individual permissions which were assigned to the user before.
-                          </div>
-                        </div>
-                      </div>
+                      <Col sm={9} smOffset={3}>
+                        <Panel bsStyle="danger" header="Setting individual permissions is deprecated, please consider migrating to roles instead.">
+                          The permissions listed here are the result of combining all granted permissions by the roles assigned to a user,
+                          which you can edit at the bottom of this page, as well as legacy, individual permissions which were assigned to the user before.
+                        </Panel>
+                      </Col>
                       <label className="col-sm-3 control-label" htmlFor="streampermissions">Streams Permissions</label>
-                      <div className="col-sm-9">
+                      <Col sm={9}>
                         <MultiSelect
                           ref="streamReadOptions"
                           options={this.formatMultiselectOptions(this.state.streams)}
@@ -162,11 +155,11 @@ const UserForm = React.createClass({
                         />
                         <span className="help-block">Choose the streams the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
-                      </div>
+                      </Col>
                     </div>
                     <div className="form-group">
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
-                      <div className="col-sm-9">
+                      <Col sm={9}>
                         <MultiSelect
                           ref="dashboardReadOptions"
                           options={this.formatMultiselectOptions(this.state.dashboards)}
@@ -183,7 +176,7 @@ const UserForm = React.createClass({
                         />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
-                      </div>
+                      </Col>
                     </div>
                   </span>
                 }
@@ -197,11 +190,11 @@ const UserForm = React.createClass({
                 </Input>
 
                 <div className="form-group">
-                  <div className="col-sm-offset-3 col-sm-9">
-                    <button type="submit" className="btn btn-success create-user">
+                  <Col smOffset={3} sm={9}>
+                    <Button type="submit" bsStyle="success" className="create-user">
                       Update User
-                    </button>
-                  </div>
+                    </Button>
+                  </Col>
                 </div>
               </fieldset>
             </form>
@@ -211,19 +204,19 @@ const UserForm = React.createClass({
           <div className="col-lg-8">
             <h2>Change password</h2>
             {user.read_only ?
-            <div className="col-sm-offset-3 col-sm-9">
-              <div className="alert alert-warning" role="alert">
+            <Col smOffset={3} sm={9}>
+              <Alert bsStyle="warning" role="alert">
                 Please edit your Graylog server configuration file to change the admin password.
-              </div>
-            </div>
+              </Alert>
+            </Col>
             :
               user.external ?
-              <div className="col-sm-offset-3 col-sm-9">
-                <div className="alert alert-warning" role="alert">
+              <Col smOffset={3} sm={9}>
+                <Alert bsStyle="warning" role="alert">
                   This user was created from an external system and you can't change the password here.
                   Please contact an administrator for more information.
-                </div>
-              </div>
+                </Alert>
+              </Col>
               :
               <form className="form-horizontal" style={{marginTop: 10}} onSubmit={this._changePassword}>
                 {requiresOldPassword &&
@@ -240,53 +233,53 @@ const UserForm = React.createClass({
                        label="Repeat Password" required />
 
                 <div className="form-group">
-                  <div className="col-sm-offset-3 col-sm-9">
-                    <button className="btn btn-success" type="submit">
+                  <Col smOffset={3} sm={9}>
+                    <Button bsStyle="success" type="submit">
                       Update Password
-                    </button>
-                  </div>
+                    </Button>
+                  </Col>
                 </div>
               </form>
             }
           </div>
         </div>
         {this.isPermitted(permissions, 'USERS_ROLESEDIT') &&
-          <div className="row content">
-            <div className="col-lg-8">
+          <Row className="content">
+            <Col lg={8}>
               <h2>Change user role</h2>
               {user.read_only ?
-                <div className="col-sm-offset-3 col-sm-9">
-                  <div className="alert alert-warning" role="alert">
+                <Col smOffset={3} sm={9}>
+                  <Alert bsStyle="warning" role="alert">
                     You cannot edit the admin's user role.
-                  </div>
-                </div>
+                  </Alert>
+                </Col>
               :
                 <span>
                   {user.external &&
-                    <div className="col-sm-offset-3 col-sm-9" style={{marginBottom: 15}}>
-                      <div className="alert alert-warning" role="alert">
+                    <Col smOffset={3} sm={9} style={{marginBottom: 15}}>
+                      <Alert bsStyle="warning" role="alert">
                         This user was created from an external LDAP system, please consider mapping LDAP groups instead of manually editing roles here.
                         Please update the LDAP group mapping to make changes or contact an administrator for more information.
-                      </div>
-                    </div>
+                      </Alert>
+                    </Col>
                   }
-                  <form className="form-horizontal" style={{marginTop : '10 px'}} onSubmit={this._updateRoles}>
+                  <form className="form-horizontal" style={{marginTop: '10px'}} onSubmit={this._updateRoles}>
                     <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
                            labelClassName="col-sm-3" wrapperClassName="col-sm-9">
                       <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} />
                     </Input>
                     <div className="form-group">
-                      <div className="col-sm-offset-3 col-sm-9">
-                        <button className="btn btn-success" type="submit" data-confirm={'Really update roles for ' + user.username + '?'}>
+                      <Col smOffset={3} sm={9}>
+                        <Button bsStyle="success" type="submit" data-confirm={'Really update roles for ' + user.username + '?'}>
                           Update role
-                        </button>
-                      </div>
+                        </Button>
+                      </Col>
                     </div>
                   </form>
                 </span>
               }
-            </div>
-          </div>
+            </Col>
+          </Row>
         }
       </div>
     );
