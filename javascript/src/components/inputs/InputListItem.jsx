@@ -76,9 +76,16 @@ const InputListItem = React.createClass({
     }
 
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
+      let extractorRoute;
+
+      if (this.props.input.message_input.global) {
+        extractorRoute = Routes.global_input_extractors(this.props.input.id);
+      } else {
+        extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+      }
+
       actions.push(
-        <LinkContainer key={`manage-extractors-${this.props.input.id}`}
-                       to={Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id)}>
+        <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
           <Button bsStyle="info">Manage extractors</Button>
         </LinkContainer>
       );
