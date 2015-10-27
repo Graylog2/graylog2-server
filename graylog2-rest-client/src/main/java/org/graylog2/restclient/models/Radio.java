@@ -60,6 +60,7 @@ public class Radio extends ClusterEntity {
     private final Input.Factory inputFactory;
     private final URI transportAddress;
 
+    private String clusterId;
     private String id;
     private String shortNodeId;
 
@@ -73,6 +74,7 @@ public class Radio extends ClusterEntity {
         this.inputFactory = inputFactory;
 
         transportAddress = normalizeUriPath(r.transportAddress);
+        clusterId = r.clusterId;
         id = r.nodeId;
         shortNodeId = r.shortNodeId;
     }
@@ -114,6 +116,10 @@ public class Radio extends ClusterEntity {
         } catch (Exception e) {
             LOG.error("Unable to load buffer information for radio " + this, e);
         }
+    }
+
+    public String getClusterId() {
+        return clusterId;
     }
 
     public String getNodeId() {
@@ -348,6 +354,7 @@ public class Radio extends ClusterEntity {
         }
 
         b.append("Node {");
+        b.append("'").append(clusterId).append("'");
         b.append("'").append(id).append("'");
         b.append(", ").append(transportAddress);
         b.append("}");

@@ -82,6 +82,7 @@ public class Node extends ClusterEntity {
     private DateTime lastSeen;
     private DateTime lastContact;
     private String nodeId;
+    private String clusterId;
     private boolean isMaster;
     private String shortNodeId;
     private AtomicBoolean active = new AtomicBoolean();
@@ -107,6 +108,7 @@ public class Node extends ClusterEntity {
 
         transportAddress = normalizeUriPath(r.transportAddress);
         lastSeen = new DateTime(r.lastSeen, DateTimeZone.UTC);
+        clusterId = r.clusterId;
         nodeId = r.nodeId;
         shortNodeId = r.shortNodeId;
         isMaster = r.isMaster;
@@ -124,6 +126,7 @@ public class Node extends ClusterEntity {
 
         this.transportAddress = normalizeUriPath(transportAddress);
         lastSeen = null;
+        clusterId = null;
         nodeId = null;
         shortNodeId = "unresolved";
         isMaster = false;
@@ -383,6 +386,10 @@ public class Node extends ClusterEntity {
 
     public DateTime getLastSeen() {
         return lastSeen;
+    }
+
+    public String getClusterId() {
+        return clusterId;
     }
 
     public String getNodeId() {

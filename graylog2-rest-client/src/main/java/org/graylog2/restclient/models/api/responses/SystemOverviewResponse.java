@@ -32,6 +32,9 @@ public class SystemOverviewResponse {
 
     public String hostname;
 
+    @JsonProperty("operating_system")
+    public String operatingSystem;
+
     public String lifecycle;
 
     @JsonProperty("is_processing")
@@ -49,6 +52,7 @@ public class SystemOverviewResponse {
         response.version = "unknown";
         response.lifecycle = "unknown";
         response.lbStatus = "unknown";
+        response.operatingSystem = "unknown";
 
         return response;
     }

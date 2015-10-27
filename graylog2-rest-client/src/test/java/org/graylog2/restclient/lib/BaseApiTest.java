@@ -61,6 +61,7 @@ public class BaseApiTest {
         for (AddressNodeId n : nodeDesc) {
             NodeSummaryResponse r = new NodeSummaryResponse();
             r.transportAddress = n.address;
+            r.clusterId = n.clusterId;
             r.nodeId = n.nodeId;
             final Node node = factory.fromSummaryResponse(r);
             node.touch();
@@ -90,10 +91,12 @@ public class BaseApiTest {
     public static class AddressNodeId {
         public String address;
         public String nodeId;
+        public String clusterId;
 
-        public AddressNodeId(String address, String nodeId) {
+        public AddressNodeId(String address, String nodeId, String clusterId) {
             this.address = address;
             this.nodeId = nodeId;
+            this.clusterId = clusterId;
         }
 
         public URI getUri() {
@@ -101,11 +104,11 @@ public class BaseApiTest {
         }
 
         public static AddressNodeId create(String address, String nodeId) {
-            return new AddressNodeId(address, nodeId);
+            return new AddressNodeId(address, nodeId, "00000000-0000-0000-0000-000000000000");
         }
 
         public static AddressNodeId create(String address) {
-            return new AddressNodeId(address, UUID.randomUUID().toString());
+            return new AddressNodeId(address, UUID.randomUUID().toString(), "00000000-0000-0000-0000-000000000000");
         }
     }
 }
