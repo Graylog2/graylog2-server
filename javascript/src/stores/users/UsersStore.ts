@@ -95,6 +95,13 @@ const UsersStore = {
 
     return promise;
   },
+
+  update(username: string, request: any): void {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.update(username).url);
+    const promise = fetch('PUT', url, request);
+
+    return promise;
+  },
 };
 
 export default UsersStore;

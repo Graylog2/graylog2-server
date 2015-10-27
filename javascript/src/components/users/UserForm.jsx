@@ -32,22 +32,15 @@ const UserForm = React.createClass({
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       this.setState({
-        streams: streams,
+        streams: streams.sort((s1, s2) => s1.title.localeCompare(s2.title)),
       });
     });
     DashboardStore.listDashboards().then((dashboards) => {
-      this.setState({dashboards: dashboards.toArray()});
+      this.setState({dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title))});
     });
     RolesStore.loadRoles().then((response) => {
-      this.setState({roles: response.roles});
+      this.setState({roles: response.roles.sort((r1, r2) => r1.name.localeCompare(r2.name))});
     });
-  },
-  formatPermissionOptions(permissions, permission, streams) {
-    return streams
-      .sort((s1, s2) => s1.title.localeCompare(s2.title))
-      .map((stream) => {
-        return <option key={permissions + stream.id} value={stream.id}>{stream.title}</option>;
-      });
   },
   formatMultiselectOptions(collection) {
     return collection.map((item) => {
@@ -62,7 +55,8 @@ const UserForm = React.createClass({
   },
   _updateRoles(evt) {
     evt.preventDefault();
-    UsersStore.updateRoles(this.props.user.username, this.refs.roles.getValue()).then(() => {
+    const roles = this.refs.roles.getValue().filter((value) => value !== "");
+    UsersStore.updateRoles(this.props.user.username, roles).then(() => {
       UserNotification.success('Roles updated successfully.', 'Success!');
     }, () => {
       UserNotification.error('Updating roles failed.', 'Error!');
@@ -86,6 +80,17 @@ const UserForm = React.createClass({
   _updateUser(evt) {
     evt.preventDefault();
     const request = {};
+    ['full_name',
+      'email',
+      'session_timeout_ms',
+      'timezone'].forEach((field) => {
+      request[field] = this.refs[field].getValue();
+    });
+    UsersStore.update(this.props.user.username, request).then(() => {
+      UserNotification.success('User updated successfully.', 'Success!');
+    }, () => {
+      UserNotification.error('Updating user failed.', 'Error!');
+    });
   },
   render() {
     if (!this.state.streams || !this.state.dashboards || !this.state.roles) {
@@ -104,10 +109,10 @@ const UserForm = React.createClass({
 
     return (
       <div>
-        <div className="row content">
-          <div className="col-lg-8">
+        <Row className="row content">
+          <Col lg={8}>
             <h2>User information</h2>
-            <form className="form-horizontal user-form" id="edit-user-form">
+            <form className="form-horizontal user-form" id="edit-user-form" onSubmit={this._updateUser}>
               {user.read_only &&
                 <span>
                   <Col smOffset={3} sm={9}>
@@ -120,11 +125,11 @@ const UserForm = React.createClass({
                 </span>
               }
               <fieldset disabled={user.read_only}>
-                <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200} value={user.full_name}
+                <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200} defaultValue={user.full_name}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
 
-                <Input ref="email" name="email" id="email" type="email" maxLength={254} value={user.email}
+                <Input ref="email" name="email" id="email" type="email" maxLength={254} defaultValue={user.email}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Email Address" help="Give the contact email address." required />
 
@@ -181,7 +186,7 @@ const UserForm = React.createClass({
                   </span>
                 }
                 {this.isPermitted(permissions, '*') &&
-                  <TimeoutInput value={user.session_timeout_ms} labelSize={3} controlSize={9} />
+                  <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9} />
                 }
 
                 <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
@@ -198,10 +203,10 @@ const UserForm = React.createClass({
                 </div>
               </fieldset>
             </form>
-          </div>
-        </div>
-        <div className="row content">
-          <div className="col-lg-8">
+          </Col>
+        </Row>
+        <Row className="content">
+          <Col lg={8}>
             <h2>Change password</h2>
             {user.read_only ?
             <Col smOffset={3} sm={9}>
@@ -241,8 +246,8 @@ const UserForm = React.createClass({
                 </div>
               </form>
             }
-          </div>
-        </div>
+          </Col>
+        </Row>
         {this.isPermitted(permissions, 'USERS_ROLESEDIT') &&
           <Row className="content">
             <Col lg={8}>
