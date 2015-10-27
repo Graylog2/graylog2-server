@@ -43,15 +43,15 @@ const DashboardListPage = React.createClass({
     const pageHeader = (
       <PageHeader title="Dashboards">
         <span>
-            Use dashboards to create specific views on your messages. Create a new dashboard here and add
-            any graph or chart you create in other parts of Graylog with one click.
-          </span>
+          Use dashboards to create specific views on your messages. Create a new dashboard here and add
+          any graph or chart you create in other parts of Graylog with one click.
+        </span>
 
-          <span>
-            Take a look at the
-            {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial"/>{' '}
-            for lots of other useful tips.
-          </span>
+        <span>
+          Take a look at the
+          {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial"/>{' '}
+          for lots of other useful tips.
+        </span>
 
         {createDashboardButton}
       </PageHeader>
