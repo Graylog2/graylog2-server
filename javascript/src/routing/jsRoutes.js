@@ -98,7 +98,16 @@ const jsRoutes = {
       index: (streamId) => { return {url: `/streams/${streamId}/rules`}; },
     },
     SearchController: {
-      index: () => { return {url: '/search'}; },
+      index: (query, rangetype, timerange) => {
+        let route;
+        if (query && rangetype && timerange) {
+          route = {url: `/search?q=${query}&${rangetype}=${timerange}`};
+        } else {
+          route = {url: '/search'};
+        }
+
+        return route;
+      },
       showMessage: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
     },
   },
