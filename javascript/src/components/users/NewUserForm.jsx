@@ -65,12 +65,12 @@ const NewUserForm = React.createClass({
 
         <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-                <TimezoneSelect ref="timezone" className="timezone-select"/>
+          <TimezoneSelect ref="timezone" className="timezone-select"/>
         </Input>
 
         <div className="form-group">
           <Col smOffset={2} sm={10}>
-            <Button type="submit" bsStyle="success" className="create-user" onClick={this._onSubmit} wrapperClassName="col-sm-offset-2 col-sm-10">
+            <Button type="submit" bsStyle="success" className="create-user" onClick={this._onSubmit}>
               Create User
             </Button>
           </Col>
