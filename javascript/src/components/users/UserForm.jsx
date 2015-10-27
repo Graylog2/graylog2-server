@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+import { Input, Button, Row, Col } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
@@ -11,6 +12,8 @@ import RolesStore from 'stores/users/RolesStore';
 import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
 import RolesSelect from 'components/users/RolesSelect';
+import TimeoutInput from 'components/users/TimeoutInput';
+import TimezoneSelect from 'components/users/TimezoneSelect';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -44,21 +47,6 @@ const UserForm = React.createClass({
         return <option key={permissions + stream.id} value={stream.id}>{stream.title}</option>;
       });
   },
-  formatTimezoneOptions() {
-    /*                           @for(group &lt;- ImmutableList.copyOf(timezones.keys).sorted) {
-     <option />
-     <optgroup label="@group">
-     @for(zone &lt;- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
-     @if(form("timezone").valueOr("").equals(group + "/" + zone)) {
-     <option value="@group/@zone" selected>@zone</option>
-     } else {
-     <option value="@group/@zone">@zone</option>
-     }
-     }
-     </optgroup>
-     }
-     */
-  },
   formatMultiselectOptions(collection) {
     return collection.map((item) => {
       return {value: item.id, label: item.title};
@@ -89,40 +77,32 @@ const UserForm = React.createClass({
     const dashboardReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:read', this.state.dashboards);
     const dashboardEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:edit', this.state.dashboards);
 
-    const timezoneOptions = null;
-
     return (
       <div>
         <div className="row content">
           <div className="col-lg-8">
             <h2>User information</h2>
-            <form className="form-horizontal user-form" id="edit-user-form" action="@routes.UsersController.saveChanges(username)" method="POST">
+            <form className="form-horizontal user-form" id="edit-user-form">
               {user.read_only &&
                 <span>
-                  <div className="col-sm-offset-3 col-sm-9">
+                  <Col smOffset={3} sm={9}>
                     <div className="alert alert-warning" role="alert">
                       The admin user can only be modified in your Graylog server configuration file.
                     </div>
-                  </div>
+                  </Col>
                   <div className="clearfix" />
                   <br />
                 </span>
               }
               <fieldset disabled={user.read_only}>
-                <div className="form-group">
-                  <label htmlFor="fullname" className="col-sm-3 control-label">Full Name</label>
-                  <div className="col-sm-9">
-                    <input ref="fullname" name="fullname" id="fullname" className="form-control" type="text" defaultValue={user.full_name} maxLength={200} required />
-                    <span className="help-block">Give a descriptive name for this account, e.g. the full name.</span>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email" className="col-sm-3 control-label">Email Address</label>
-                  <div className="col-sm-9">
-                    <input ref="email" name="email" id="email" className="form-control" type="email" defaultValue={user.email} maxLength={254} required />
-                    <span className="help-block">Give the contact email address.</span>
-                  </div>
-                </div>
+                <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200} value={user.full_name}
+                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
+
+                <Input ref="email" name="email" id="email" type="email" maxLength={254} value={user.email}
+                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="Email Address" help="Give the contact email address." required />
+
                 {this.isPermitted(permissions, 'USERS_EDIT') &&
                   <span>
                     <div className="form-group">
@@ -179,56 +159,14 @@ const UserForm = React.createClass({
                   </span>
                 }
                 {this.isPermitted(permissions, '*') &&
-                  <span>
-                    <div className="form-group">
-                      <div className="col-sm-offset-3 col-sm-9">
-                        <div className="checkbox">
-                          <label>
-                            <input ref="session_timeout_never" type="checkbox" id="session-timeout-never" name="session_timeout_never" checked={user.sessions_never_timeout} />
-                            Sessions do not time out
-                          </label>
-                        </div>
-                        <span className="help-block">When checked sessions never time out due to inactivity.</span>
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="timeout" className="col-sm-3 control-label">Timeout</label>
-                      <div className="col-sm-9">
-                        <div className="row">
-                          <div className="col-sm-3">
-                            <input ref="session_timeout" type="number" id="timeout" className="session-timeout-fields validatable form-control" name="timeout" min={1} data-validate="positive_number" defaultValue={user.timeout} />
-                          </div>
-                          <div className="col-sm-3">
-                            <select ref="session_timeout_unit" name="timeout_unit" id="timeout_unit" className="session-timeout-fields form-control">
-                              <option value={1000}>Seconds</option>
-                              <option value={60*1000}>Minutes</option>
-                              <option value={60*60*1000}>Hours</option>
-                              <option value={24*60*60*1000}>Days</option>
-                            </select>
-                          </div>
-                        </div>
-                        <span className="help-block">
-                          Session automatically end after this amount of time, unless they are actively used.
-                        </span>
-                      </div>
-                    </div>
-                  </span>
+                  <TimeoutInput value={user.session_timeout_ms} labelSize={3} controlSize={9} />
                 }
-                <div className="form-group">
-                  <label htmlFor="timezone" className="col-sm-3 control-label">Time Zone</label>
-                  <div className="col-sm-9">
-                    <div className="row">
-                      <div className="col-sm-5">
-                        <select ref="timezone" name="timezone" id="timezone" data-placeholder="Pick your time zone" className="timezone-select">
-                          {timezoneOptions}
-                        </select>
-                      </div>
-                    </div>
-                    <span className="help-block">
-                      Choose your local time zone or leave it as it is to use the system's default.
-                    </span>
-                  </div>
-                </div>
+
+                <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
+                       labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+                  <TimezoneSelect ref="timezone" className="timezone-select"/>
+                </Input>
+
                 <div className="form-group">
                   <div className="col-sm-offset-3 col-sm-9">
                     <button type="submit" className="btn btn-success create-user">
@@ -258,7 +196,7 @@ const UserForm = React.createClass({
                 </div>
               </div>
               :
-              <form className="form-horizontal" style={{marginTop: 10}} action="@routes.UsersController.changePassword(username)" method="POST">
+              <form className="form-horizontal" style={{marginTop: 10}}>
                 {requiresOldPassword &&
                   <div className="form-group">
                     <label className="col-sm-3 control-label" htmlFor="old-password">Old Password</label>
@@ -313,15 +251,11 @@ const UserForm = React.createClass({
                       </div>
                     </div>
                   }
-                  <form className="form-horizontal" style={{marginTop : '10 px'}} action="@routes.UsersController.updateRoles(user.getName)" method="POST">
-                    <div className="form-group">
-                      <label className="col-sm-3 control-label">User Roles</label>
-                      <div className="col-sm-9">
-                        <RolesSelect userRoles={user.roles} availableRoles={this.state.roles} />
-                        <span className="help-block">
-                          Choose the roles the user should be a member of. All the granted permissions will be combined.</span>
-                      </div>
-                    </div>
+                  <form className="form-horizontal" style={{marginTop : '10 px'}}>
+                    <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
+                           labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+                      <RolesSelect userRoles={user.roles} availableRoles={this.state.roles} />
+                    </Input>
                     <div className="form-group">
                       <div className="col-sm-offset-3 col-sm-9">
                         <button className="btn btn-success" type="submit" data-confirm={'Really update roles for ' + user.username + '?'}>

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Input } from 'react-bootstrap';
 
 const TimeoutUnitSelect = React.createClass({
   getValue() {
@@ -15,7 +14,7 @@ const TimeoutUnitSelect = React.createClass({
         <option value={24*60*60*1000}>Days</option>
       </select>
     );
-  }
+  },
 });
 
 export default TimeoutUnitSelect;
