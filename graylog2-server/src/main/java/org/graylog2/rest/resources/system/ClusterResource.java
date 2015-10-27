@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.eaio.uuid.UUID;
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -63,7 +62,7 @@ public class ClusterResource extends RestResource {
     public ClusterResource(NodeService nodeService,
                            ClusterConfigService clusterConfigService,
                            NodeId nodeId) {
-        clusterId = MoreObjects.firstNonNull(clusterConfigService.get(ClusterId.class), ClusterId.create(UUID.nilUUID().toString()));
+        clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.nodeService = nodeService;
         this.nodeId = nodeId;
     }
