@@ -81,7 +81,7 @@ const GrokPatterns = React.createClass({
         <div className="row content content-head">
           <div className="col-md-12">
             <div className="pull-right actions">
-              <BulkLoadPatternModal />
+              <BulkLoadPatternModal onSuccess={this.loadData}/>
               <EditPatternModal id={""} name={""} pattern={""} create={true}
                                 reload={this.loadData}
                                 savePattern={this.savePattern}

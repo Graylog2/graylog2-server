@@ -65,7 +65,20 @@ const GrokPatternsStore = {
       callback();
       UserNotification.success("Grok pattern \"" + pattern.name + "\" successfully deleted");
     }).catch(failCallback);
-  }
+  },
+
+  bulkImport(patterns: string[], replaceAll: boolean) {
+    var failCallback = (jqXHR, textStatus, errorThrown) => {
+      UserNotification.error("Importing Grok pattern file failed with status: " + errorThrown,
+        "Could not load Grok patterns");
+    };
+
+    const promise = fetch('PUT', this.URL, {patterns: patterns});
+
+    promise.catch(failCallback);
+
+    return promise;
+  },
 };
 
 export default GrokPatternsStore;
