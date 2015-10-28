@@ -32,10 +32,13 @@ const Routes = {
   dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
 
   node: (nodeId) => `/system/nodes/${nodeId}`,
+
   global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
+
+  edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 };
 
 export default Routes;

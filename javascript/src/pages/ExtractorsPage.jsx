@@ -4,7 +4,7 @@ import {DropdownButton, MenuItem} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PageHeader from 'components/common/PageHeader';
-import AddExtractor from 'components/extractors/AddExtractor';
+import ExtractorsList from 'components/extractors/ExtractorsList';
 import Spinner from 'components/common/Spinner';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -69,7 +69,7 @@ const ExtractorsPage = React.createClass({
             {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
           </span>
 
-          <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions">
+          <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
             <LinkContainer to={Routes.import_extractors(this.state.node.node_id, this.state.input.input_id)}>
               <MenuItem>Import extractors</MenuItem>
             </LinkContainer>
@@ -78,7 +78,7 @@ const ExtractorsPage = React.createClass({
             </LinkContainer>
           </DropdownButton>
         </PageHeader>
-        <AddExtractor inputId={this.props.params.inputId}/>
+        <ExtractorsList input={this.state.input} />
       </div>
     );
   },
