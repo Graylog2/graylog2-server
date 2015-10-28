@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
+import {Row, Col} from 'react-bootstrap';
 
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
@@ -40,9 +41,9 @@ const InputsList = React.createClass({
 
     return (
       <div>
-        <div className="row content">Cannot create inputs at the moment</div>
-        <div className="row content input-list">
-          <div className="col-md-12">
+        <Row className="content">Cannot create inputs at the moment</Row>
+        <Row className="content input-list">
+          <Col md={12}>
             <h2>
               Global inputs
               &nbsp;
@@ -50,10 +51,10 @@ const InputsList = React.createClass({
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
                         items={this.state.globalInputs.map(input => this._formatInput(input))} />
-          </div>
-        </div>
-        <div className="row content input-list">
-          <div className="col-md-12">
+          </Col>
+        </Row>
+        <Row className="content input-list">
+          <Col md={12}>
             <h2>
               Local inputs
               &nbsp;
@@ -61,8 +62,8 @@ const InputsList = React.createClass({
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no local inputs."
                         items={this.state.localInputs.map(input => this._formatInput(input))} />
-          </div>
-        </div>
+          </Col>
+        </Row>
       </div>
     );
   },
