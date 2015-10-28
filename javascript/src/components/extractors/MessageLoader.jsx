@@ -1,5 +1,4 @@
 import React, {PropTypes} from 'react';
-import ReactDOM from 'react-dom';
 import MessagesStore from 'stores/messages/MessagesStore';
 
 const MessageLoader = React.createClass({
@@ -28,8 +27,8 @@ const MessageLoader = React.createClass({
     }
   },
   loadMessage(event) {
-    const messageId = React.findDOMNode(this.refs.messageId).value;
-    const index = React.findDOMNode(this.refs.index).value;
+    const messageId = this.refs.messageId.value;
+    const index = this.refs.index.value;
     if (messageId === '' || index === '') {
       return;
     }
@@ -39,9 +38,9 @@ const MessageLoader = React.createClass({
     event.preventDefault();
   },
   submit(messageId, index) {
-    ReactDOM.findDOMNode(this.refs.messageId).value = messageId;
-    ReactDOM.findDOMNode(this.refs.index).value = index;
-    ReactDOM.findDOMNode(this.refs.submitButton).click();
+    this.refs.messageId.value = messageId;
+    this.refs.index.value = index;
+    this.refs.submitButton.click();
   },
   render() {
     let explanatoryText;
