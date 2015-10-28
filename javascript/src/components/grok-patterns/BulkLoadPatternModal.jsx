@@ -60,4 +60,4 @@ const BulkLoadPatternModal = React.createClass({
   },
 });
 
-module.exports = BulkLoadPatternModal;
+export default BulkLoadPatternModal;
