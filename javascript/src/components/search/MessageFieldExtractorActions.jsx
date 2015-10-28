@@ -7,7 +7,7 @@ const MessageFieldExtractorActions = React.createClass({
     fieldName: PropTypes.string.isRequired,
     message: PropTypes.object.isRequired,
   },
-  getInitialState() {
+  componentWillMount() {
     this._refreshExtractorRoutes(this.props);
   },
   componentWillReceiveProps(nextProps) {
