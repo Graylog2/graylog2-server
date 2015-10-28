@@ -16,6 +16,8 @@ const ExtractorUtils = {
     switch (extractorType) {
     case 'regex':
       return 'Regular expression';
+    case 'regex_replace':
+      return 'Replace with regular expression';
     case 'substring':
       return 'Substring';
     case 'split_and_index':
