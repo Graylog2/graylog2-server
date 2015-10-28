@@ -59,9 +59,13 @@ const InputListItem = React.createClass({
     // - Input metrics
     // - Show number of nodes where global input is running
 
-    const inputLabel = (
-      <Label bsStyle={this._labelClassForState(this.props.input.state)}
-             bsSize="xsmall">{this.props.input.state.toLowerCase()}</Label>
+    const titleSuffix = (
+      <span>
+        {this.props.input.message_input.name}
+        &nbsp;
+        <Label bsStyle={this._labelClassForState(this.props.input.state)}
+               bsSize="xsmall">{this.props.input.state.toLowerCase()}</Label>
+      </span>
     );
 
     const actions = [];
@@ -136,8 +140,8 @@ const InputListItem = React.createClass({
 
     return (
       <EntityListItem key={`entry-list-${this.props.input.id}`}
-                      title={`${this.props.input.message_input.title} (${this.props.input.message_input.name})`}
-                      titleSuffix={inputLabel}
+                      title={this.props.input.message_input.title}
+                      titleSuffix={titleSuffix}
                       description={subtitle}
                       createdFromContentPack={!!this.props.input.message_input.content_pack}
                       actions={actions}
