@@ -2,7 +2,6 @@ import React from 'react';
 import { Input, Button } from 'react-bootstrap';
 
 import UserNotification from 'util/UserNotification';
-import URLUtils from 'util/URLUtils';
 
 import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
 
@@ -18,8 +17,8 @@ const BulkLoadPatternModal = React.createClass({
     const reader = new FileReader();
     const replaceAll = this.refs['replace-patterns'].checked;
 
-    reader.onload = (evt) => {
-      const request = evt.target.result.split('\n').map((line) => {
+    reader.onload = (loaded) => {
+      const request = loaded.target.result.split('\n').map((line) => {
         if (!line.startsWith('#')) {
           const splitted = line.split(/\s+/, 2);
           if (splitted.length > 1) {
