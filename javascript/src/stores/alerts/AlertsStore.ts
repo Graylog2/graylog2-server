@@ -1,10 +1,7 @@
-'use strict';
-
-declare var $: any;
-declare var jsRoutes: any;
-
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+import UserNotification = require('util/UserNotification');
+import URLUtils = require('util/URLUtils');
+import jsRoutes = require('routing/jsRoutes');
+const fetch = require('logic/rest/FetchProvider').default;
 
 class AlertsStore {
     list(streamId: String, skip: Number, limit: Number) {
@@ -12,8 +9,8 @@ class AlertsStore {
             UserNotification.error("Fetching alerts failed with status: " + errorThrown,
                 "Could not retrieve alerts.");
         };
-        var url = jsRoutes.controllers.api.AlertsApiController.list(streamId, skip, limit).url;
-        return $.getJSON(url).fail(failCallback);
+        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlertsApiController.list(streamId, skip, limit).url);
+        return fetch('GET', url).catch(failCallback);
     }
 }
 var alertsStore = new AlertsStore();

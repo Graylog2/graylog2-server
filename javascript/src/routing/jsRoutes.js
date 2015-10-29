@@ -1,6 +1,19 @@
 const jsRoutes = {
   controllers: {
     api: {
+      AlarmCallbacksApiController: {
+        available: (streamId) => { return {url: '/streams/' + streamId + '/alarmcallbacks/available'}; },
+        create: (streamId) => { return {url: '/streams/' + streamId + '/alarmcallbacks'}; },
+        delete: (streamId, alarmCallbackId) => { return {url: '/streams/' + streamId + '/alarmcallbacks/' + alarmCallbackId}; },
+        list: (streamId) => { return {url: '/streams/' + streamId + '/alarmcallbacks'}; },
+        update: (streamId, alarmCallbackId) => { return {url: '/streams/' + streamId + '/alarmcallbacks/' + alarmCallbackId}; },
+      },
+      AlarmCallbackHistoryApiController: {
+        list: (streamId, alertId) => { return {url: '/streams/' + streamId + '/alerts/' + alertId + '/history'}; },
+      },
+      AlertsApiController: {
+        list: (streamId, skip, limit) => { return {url: '/streams/' + streamId + '/alerts/paginated?skip=' + skip + '&limit=' + limit}; },
+      },
       BundlesApiController: {
         apply: (bundleId) => { return {url: '/system/bundles/' + bundleId + '/apply'}; },
         create: () => { return {url: '/system/bundles'}; },

@@ -1,35 +1,34 @@
-'use strict';
+import React from 'react';
 
-var React = require('react');
-var Alert = require('./Alert');
+import Alert from 'components/alerts/Alert';
 
-var AlertsTable = React.createClass({
-    render() {
-        if (this.props.alerts.length > 0) {
-            var alerts = this.props.alerts.map((alert) => {
-                return <Alert key={alert.id} alert={alert}/>;
-            });
-            return (
-                <table className="alerts table table-hover table-condensed">
-                    <thead>
-                    <tr>
-                        <th style={{width: 150}}>Triggered</th>
-                        <th>Condition</th>
-                        <th>Reason</th>
-                        <th style={{width: 120}}>&nbsp;</th>
-                    </tr>
-                    </thead>
-                    {alerts}
-                </table>
-            );
-        } else {
-            return (
-                <div style={{marginTop: 10}} className="alert alert-info">
-                    This stream has never triggered an alert.
-                </div>
-            );
-        }
+const AlertsTable = React.createClass({
+  propTypes: {
+    alerts: React.PropTypes.array.isRequired,
+  },
+  render() {
+    if (this.props.alerts.length > 0) {
+      return (
+        <table className="alerts table table-hover table-condensed">
+          <thead>
+          <tr>
+            <th style={{width: 150}}>Triggered</th>
+            <th>Condition</th>
+            <th>Reason</th>
+            <th style={{width: 120}}>&nbsp;</th>
+          </tr>
+          </thead>
+          {this.props.alerts.map((alert) => <Alert key={alert.id} alert={alert}/>)}
+        </table>
+      );
+    } else {
+      return (
+        <div style={{marginTop: 10}} className="alert alert-info">
+          This stream has never triggered an alert.
+        </div>
+      );
     }
+  },
 });
 
-module.exports = AlertsTable;
+export default AlertsTable;
