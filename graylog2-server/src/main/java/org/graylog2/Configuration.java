@@ -17,7 +17,7 @@
 package org.graylog2;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.converters.TrimmedStringListConverter;
+import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
@@ -30,7 +30,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import static org.graylog2.plugin.Tools.getUriWithDefaultPath;
 import static org.graylog2.plugin.Tools.getUriWithPort;
@@ -146,8 +146,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "content_packs_dir", validators = DirectoryPathReadableValidator.class)
     private Path contentPacksDir = Paths.get("data", "contentpacks");
 
-    @Parameter(value = "content_packs_auto_load", converter = TrimmedStringListConverter.class)
-    private List<String> contentPacksAutoLoad = Collections.emptyList();
+    @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
+    private Set<String> contentPacksAutoLoad = Collections.emptySet();
 
     public boolean isMaster() {
         return isMaster;
@@ -294,7 +294,7 @@ public class Configuration extends BaseConfiguration {
         return contentPacksDir;
     }
 
-    public List<String> getContentPacksAutoLoad() {
+    public Set<String> getContentPacksAutoLoad() {
         return contentPacksAutoLoad;
     }
 }
