@@ -142,8 +142,9 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 continue;
             }
 
-            final ConfigurationBundle existingContentPack = contentPackExists(contentPack);
+            final ConfigurationBundle existingContentPack = bundleService.findByNameAndCategory(contentPack.getName(), contentPack.getCategory());
             if (existingContentPack != null) {
+                LOG.debug("Content pack {}/{} already exists in database. Skipping.", contentPack.getCategory(), contentPack.getName());
                 contentPacks.put(fileName, existingContentPack);
                 continue;
             }
@@ -188,16 +189,6 @@ public class ContentPackLoaderPeriodical extends Periodical {
         if (!contentPackLoaderConfig.equals(changedContentPackLoaderConfig)) {
             clusterConfigService.write(changedContentPackLoaderConfig);
         }
-    }
-
-    private ConfigurationBundle contentPackExists(final ConfigurationBundle contentPack) {
-        final ConfigurationBundle bundle = bundleService.findByNameAndCategory(contentPack.getName(), contentPack.getCategory());
-
-        if (bundle != null) {
-            LOG.debug("Content pack {}/{} already exists in database. Skipping.", contentPack.getCategory(), contentPack.getName());
-        }
-
-        return bundle;
     }
 
     private List<Path> getFiles(final Path rootPath, final String glob) {
