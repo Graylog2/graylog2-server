@@ -49,8 +49,11 @@ const GettingStarted = React.createClass({
         minHeight: this.state.minHeight,
         height: this.state.minHeight,
         width: '100%',
-        display: this.state.guideLoaded ? 'block' : 'none',
       };
+      // hide iframe if there's no content loaded yet
+      if (!this.state.guideLoaded) {
+        iframeStyles.display = 'none';
+      }
 
       const url = this.props.gettingStartedUrl + '?' + query;
       let spinner = null;
@@ -80,15 +83,15 @@ const GettingStarted = React.createClass({
   timeoutId: null,
   _onMessage(messageEvent) {
     // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
-    if (this.props.gettingStartedUrl.startsWith(messageEvent.origin)) {
+    if (this.props.gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
       if (this.timeoutId !== null) {
         window.clearTimeout(Number(this.timeoutId));
         this.timeoutId = null;
       }
       this.setState({
         guideLoaded: messageEvent.data.guideLoaded,
-        minHeight: messageEvent.data.height}
-      );
+        minHeight: messageEvent.data.height === 0 ? this.state.minHeight : messageEvent.data.height,
+      });
     }
   },
   _displayFallbackContent() {
