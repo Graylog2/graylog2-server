@@ -56,10 +56,10 @@ public class EsIndexRangeTest {
         String json = objectMapper.writeValueAsString(indexRange);
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
 
-        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
-        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
-        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_END)).isEqualTo(end.toString());
-        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
-        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
+        assertThat((String) JsonPath.read(document, "$." + EsIndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
+        assertThat((String) JsonPath.read(document, "$." + EsIndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
+        assertThat((String) JsonPath.read(document, "$." + EsIndexRange.FIELD_END)).isEqualTo(end.toString());
+        assertThat((String) JsonPath.read(document, "$." + EsIndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
+        assertThat((int) JsonPath.read(document, "$." + EsIndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
     }
 }
