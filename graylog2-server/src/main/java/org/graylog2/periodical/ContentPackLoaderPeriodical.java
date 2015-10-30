@@ -51,7 +51,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
     private final UserService userService;
     private final boolean contentPacksLoaderEnabled;
     private final Path contentPacksDir;
-    private final List<String> contentPacksAutoLoad;
+    private final Set<String> contentPacksAutoLoad;
 
     @Inject
     public ContentPackLoaderPeriodical(ObjectMapper objectMapper,
@@ -60,14 +60,14 @@ public class ContentPackLoaderPeriodical extends Periodical {
                                        UserService userService,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
                                        @Named("content_packs_dir") Path contentPacksDir,
-                                       @Named("content_packs_auto_load") List<String> contentPacksAutoLoad) {
+                                       @Named("content_packs_auto_load") Set<String> contentPacksAutoLoad) {
         this.objectMapper = objectMapper;
         this.bundleService = bundleService;
         this.clusterConfigService = clusterConfigService;
         this.userService = userService;
         this.contentPacksLoaderEnabled = contentPacksLoaderEnabled;
         this.contentPacksDir = contentPacksDir;
-        this.contentPacksAutoLoad = ImmutableList.copyOf(contentPacksAutoLoad);
+        this.contentPacksAutoLoad = ImmutableSet.copyOf(contentPacksAutoLoad);
     }
 
     @Override
