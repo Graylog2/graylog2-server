@@ -31,7 +31,7 @@ var AlarmCallbackComponent = React.createClass({
     });
   },
   _deleteAlarmCallback(alarmCallback) {
-    AlarmCallbacksActions.remove.triggerPromise(this.props.streamId, alarmCallback.id).then(() => {
+    AlarmCallbacksActions.delete.triggerPromise(this.props.streamId, alarmCallback.id).then(() => {
       this.loadData();
     });
   },
