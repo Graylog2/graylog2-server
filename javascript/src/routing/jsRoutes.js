@@ -58,6 +58,15 @@ const jsRoutes = {
         list: () => { return {url: '/search/saved'}; },
         update: (savedSearchId) => { return {url: `/search/saved/${savedSearchId}`}; },
       },
+      StreamAlertsApiController: {
+        create: (streamId) => { return {url: '/streams/' + streamId + '/alerts/conditions'}; },
+        delete: (streamId, alertConditionId) => { return {url: '/streams/' + streamId + '/alerts/conditions/' + alertConditionId}; },
+        list: (streamId) => { return {url: '/streams/' + streamId + '/alerts/conditions'}; },
+        update: (streamId, alertConditionId) => { return {url: '/streams/' + streamId + '/alerts/conditions/' + alertConditionId}; },
+        addReceiver: (streamId, type, entity) => { return {url: '/streams/' + streamId + '/alerts/receivers?entity=' + entity + '&type=' + type}; },
+        deleteReceiver: (streamId, type, entity) => { return {url: '/streams/' + streamId + '/alerts/receivers?entity=' + entity + '&type=' + type}; },
+        sendDummyAlert: (streamId) => { return {url: '/streams/' + streamId + '/alerts/sendDummyAlert'}; },
+      },
       StreamsApiController: {
         get: (streamId) => { return {url: '/streams/' + streamId}; },
         create: () => { return {url: '/streams'}; },
@@ -68,7 +77,7 @@ const jsRoutes = {
         resume: (streamId) => { return {url: '/streams/' + streamId + '/resume'}; },
       },
       StreamOutputsApiController: {
-        add: (streamId, outputId) => { return {url: '/streams/' + streamId + '/outputs'}; },
+        add: (streamId) => { return {url: '/streams/' + streamId + '/outputs'}; },
         index: (streamId) => { return {url: '/streams/' + streamId + '/outputs'}; },
         delete: (streamId, outputId) => { return {url: '/streams/' + streamId + '/outputs/' + outputId}; },
       },

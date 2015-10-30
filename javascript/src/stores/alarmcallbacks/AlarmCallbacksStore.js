@@ -82,7 +82,7 @@ const AlarmCallbacksStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
 
-    fetch('PUT', url, deltas).catch(failCallback);
+    const promise = fetch('PUT', url, deltas).catch(failCallback);
 
     AlarmCallbacksActions.update.promise(promise);
   },
