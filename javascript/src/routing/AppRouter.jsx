@@ -2,11 +2,10 @@ import React from 'react';
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { Router, Route, IndexRoute } from 'react-router';
+import { Router, Route } from 'react-router';
 import {createHistory} from 'history';
 
 import Routes from 'routing/Routes';
-import DebugHandler from './DebugHandler';
 
 import SearchPage from 'pages/SearchPage';
 import ShowMessagePage from 'pages/ShowMessagePage';
