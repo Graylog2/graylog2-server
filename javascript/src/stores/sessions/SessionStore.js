@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import SessionActions from 'actions/sessions/SessionActions';
 import URLUtils from 'util/URLUtils';
-import fetch, { Builder } from 'logic/rest/FetchProvider';
+import { Builder } from 'logic/rest/FetchProvider';
 
 const SessionStore = Reflux.createStore({
   listenables: [SessionActions],
