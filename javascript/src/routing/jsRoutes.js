@@ -37,6 +37,9 @@ const jsRoutes = {
         get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
+      NotificationsApiController: {
+        list: () => { return {url: '/system/notifications'}; },
+      },
       OutputsApiController: {
         index: () => { return {url: '/system/outputs'}; },
         create: () => { return {url: '/system/outputs'}; },

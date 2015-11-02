@@ -27,6 +27,7 @@ import UsersPage from 'pages/UsersPage';
 import CreateUsersPage from 'pages/CreateUsersPage';
 import EditUsersPage from 'pages/EditUsersPage';
 import GrokPatternsPage from 'pages/GrokPatternsPage';
+import SystemOverviewPage from 'pages/SystemOverviewPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -57,6 +58,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.USERS.CREATE} component={CreateUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
+            <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
           </Route>
         </Route>
       </Router>

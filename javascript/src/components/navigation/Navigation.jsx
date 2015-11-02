@@ -1,15 +1,18 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
+import NotificationsStore from 'stores/notifications/NotificationsStore';
+
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 
 const Navigation = React.createClass({
-  mixins: [PermissionsMixin],
+  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
 
   propTypes: {
     requestPath: React.PropTypes.string.isRequired,
@@ -141,7 +144,7 @@ const Navigation = React.createClass({
           <Nav navbar>
             <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
               <NavItem className="notification-badge-link">
-                <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge"></span>
+                <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge">{this.state.total}</span>
               </NavItem>
             </LinkContainer>
           </Nav>
