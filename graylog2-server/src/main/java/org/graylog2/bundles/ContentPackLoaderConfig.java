@@ -22,12 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class ContentPackLoaderConfig {
-    public static final ContentPackLoaderConfig EMPTY = create(Collections.<String>emptySet(), Collections.<String>emptySet());
+    public static final ContentPackLoaderConfig EMPTY =
+            create(Collections.<String>emptySet(), Collections.<String>emptySet(), Collections.<String, String>emptyMap());
 
     @JsonProperty("loaded_content_packs")
     public abstract Set<String> loadedContentPacks();
@@ -35,9 +37,13 @@ public abstract class ContentPackLoaderConfig {
     @JsonProperty("applied_content_packs")
     public abstract Set<String> appliedContentPacks();
 
+    @JsonProperty("checksums")
+    public abstract Map<String, String> checksums();
+
     @JsonCreator
     public static ContentPackLoaderConfig create(@JsonProperty("loaded_content_packs") Set<String> loadedContentPacks,
-                                                 @JsonProperty("applied_content_packs") Set<String> appliedContentPacks) {
-        return new AutoValue_ContentPackLoaderConfig(loadedContentPacks, appliedContentPacks);
+                                                 @JsonProperty("applied_content_packs") Set<String> appliedContentPacks,
+                                                 @JsonProperty("checksums") Map<String, String> checksums) {
+        return new AutoValue_ContentPackLoaderConfig(loadedContentPacks, appliedContentPacks, checksums);
     }
 }

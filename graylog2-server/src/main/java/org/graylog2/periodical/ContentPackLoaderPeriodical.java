@@ -19,6 +19,8 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import com.mongodb.MongoException;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.bundles.ConfigurationBundle;
@@ -43,6 +45,7 @@ import java.util.Set;
 
 public class ContentPackLoaderPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackLoaderPeriodical.class);
+    private static final HashFunction HASH_FUNCTION = Hashing.sha256();
     private static final String FILENAME_GLOB = "*.json";
 
     private final ObjectMapper objectMapper;
@@ -117,12 +120,13 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
         final List<Path> files = getFiles(contentPacksDir, FILENAME_GLOB);
         final Map<String, ConfigurationBundle> contentPacks = new HashMap<>(files.size());
+
+        final Set<String> loadedContentPacks = new HashSet<>(contentPackLoaderConfig.loadedContentPacks());
+        final Set<String> appliedContentPacks = new HashSet<>(contentPackLoaderConfig.appliedContentPacks());
+        final Map<String, String> checksums = new HashMap<>(contentPackLoaderConfig.checksums());
+
         for (Path file : files) {
             final String fileName = file.getFileName().toString();
-            if (contentPackLoaderConfig.loadedContentPacks().contains(fileName)) {
-                LOG.debug("Skipping already loaded content pack {}", file);
-                continue;
-            }
 
             LOG.debug("Reading content pack from {}", file);
             final byte[] bytes;
@@ -130,6 +134,21 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 bytes = Files.readAllBytes(file);
             } catch (IOException e) {
                 LOG.warn("Couldn't read " + file + ". Skipping.", e);
+                continue;
+            }
+
+            final String encodedFileName = encodeFileNameForMongo(fileName);
+            final String checksum = HASH_FUNCTION.hashBytes(bytes).toString();
+            final String storedChecksum = checksums.get(encodedFileName);
+            if (storedChecksum == null) {
+                checksums.put(encodedFileName, checksum);
+            } else if (!checksum.equals(storedChecksum)) {
+                LOG.info("Checksum of {} changed (expected: {}, actual: {})", file, storedChecksum, checksum);
+                continue;
+            }
+
+            if (contentPackLoaderConfig.loadedContentPacks().contains(fileName)) {
+                LOG.debug("Skipping already loaded content pack {} (SHA-256: {})", file, storedChecksum);
                 continue;
             }
 
@@ -159,13 +178,8 @@ public class ContentPackLoaderPeriodical extends Periodical {
             }
 
             contentPacks.put(fileName, insertedContentPack);
+            loadedContentPacks.add(fileName);
         }
-
-        final Set<String> loadedContentPacks = ImmutableSet.<String>builder()
-                .addAll(contentPackLoaderConfig.loadedContentPacks())
-                .addAll(contentPacks.keySet())
-                .build();
-        final Set<String> appliedContentPacks = new HashSet<>(contentPackLoaderConfig.appliedContentPacks());
 
         LOG.debug("Applying selected content packs");
         for (Map.Entry<String, ConfigurationBundle> entry : contentPacks.entrySet()) {
@@ -185,10 +199,14 @@ public class ContentPackLoaderPeriodical extends Periodical {
         }
 
         final ContentPackLoaderConfig changedContentPackLoaderConfig =
-                ContentPackLoaderConfig.create(loadedContentPacks, appliedContentPacks);
+                ContentPackLoaderConfig.create(loadedContentPacks, appliedContentPacks, checksums);
         if (!contentPackLoaderConfig.equals(changedContentPackLoaderConfig)) {
             clusterConfigService.write(changedContentPackLoaderConfig);
         }
+    }
+
+    private String encodeFileNameForMongo(String fileName) {
+        return fileName.replace('.', '*');
     }
 
     private List<Path> getFiles(final Path rootPath, final String glob) {
