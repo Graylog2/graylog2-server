@@ -9,6 +9,17 @@ import Notification from 'components/notifications/Notification';
 
 const NotificationsList = React.createClass({
   mixins: [Reflux.connect(NotificationsStore)],
+  _formatNotificationCount(count) {
+    if (count === 0) {
+      return 'is no notification'
+    }
+    if (count === 1) {
+      return 'is one notification';
+    }
+
+    return 'are ' + count + ' notifications';
+
+  },
   render() {
     if (!this.state.notifications) {
       return <Spinner />;
@@ -28,7 +39,7 @@ const NotificationsList = React.createClass({
     return (
       <Row className="content">
         <Col md={12}>
-          <h2>There are {count} notifications</h2>
+          <h2>There {this._formatNotificationCount(count)}</h2>
           <p className="description">
             Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification
             types will also provide a link to the Graylog documentation if you need more information or assistance.
