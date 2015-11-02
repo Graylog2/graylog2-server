@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import NotificationsStore from 'stores/notifications/NotificationsStore';
 
-import Spinner from 'components/common/Spinner';
+import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 
 const NotificationsList = React.createClass({

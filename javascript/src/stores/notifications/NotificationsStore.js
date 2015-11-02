@@ -5,10 +5,10 @@ import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import NotificationsAction from 'actions/notifications/NotificationsActions';
+import NotificationsActions from 'actions/notifications/NotificationsActions';
 
 const NotificationsStore = Reflux.createStore({
-  listenables: [NotificationsAction],
+  listenables: [NotificationsActions],
   notifications: undefined,
 
   init() {
@@ -25,14 +25,20 @@ const NotificationsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.NotificationsApiController.list().url);
     const promise = fetch('GET', url);
 
-    NotificationsAction.list.promise(promise);
+    NotificationsActions.list.promise(promise);
   },
   listCompleted(response) {
     this.notifications = response;
     this.trigger(response);
   },
-  delete(notificationId) {
+  delete(type) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.NotificationsApiController.delete(type).url);
+    const promise = fetch('DELETE', url);
 
+    NotificationsActions.delete.promise(promise);
+  },
+  deleteCompleted() {
+    this.list();
   },
 });
 

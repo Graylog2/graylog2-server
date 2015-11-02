@@ -38,6 +38,7 @@ const jsRoutes = {
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
       NotificationsApiController: {
+        delete: (type) => { return {url: '/system/notifications/' + type}; },
         list: () => { return {url: '/system/notifications'}; },
       },
       OutputsApiController: {
