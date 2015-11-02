@@ -5,8 +5,8 @@ const fetch = require('logic/rest/FetchProvider').default;
 
 class AlertsStore {
     list(streamId: String, skip: Number, limit: Number) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Fetching alerts failed with status: " + errorThrown,
+        var failCallback = (error) => {
+            UserNotification.error("Fetching alerts failed with status: " + error.message,
                 "Could not retrieve alerts.");
         };
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlertsApiController.list(streamId, skip, limit).url);

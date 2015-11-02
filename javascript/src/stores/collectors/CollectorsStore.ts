@@ -17,8 +17,8 @@ const CollectorsStore = {
   URL: URLUtils.qualifyUrl('/system/collectors'),
 
   load(callback: (collectors: Array<Collector>) => void) {
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Loading collectors failed with status: " + errorThrown,
+    var failCallback = (error) => {
+      UserNotification.error("Loading collectors failed with status: " + error.message,
         "Could not load collectors");
     };
     fetch('GET', this.URL).then(callback, failCallback);

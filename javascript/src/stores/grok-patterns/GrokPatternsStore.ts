@@ -13,8 +13,8 @@ const GrokPatternsStore = {
   URL: URLUtils.qualifyUrl('/system/grok'),
 
   loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Loading Grok patterns failed with status: " + errorThrown,
+    var failCallback = (error) => {
+      UserNotification.error("Loading Grok patterns failed with status: " + error.message,
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
@@ -28,8 +28,8 @@ const GrokPatternsStore = {
   },
 
   savePattern(pattern: GrokPattern, callback: () => void) {
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + errorThrown,
+    var failCallback = (error) => {
+      UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
         "Could not save Grok pattern");
     };
 
@@ -57,8 +57,8 @@ const GrokPatternsStore = {
   },
 
   deletePattern(pattern: GrokPattern, callback: () => void) {
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Deleting Grok pattern \"" + pattern.name + "\" failed with status: " + errorThrown,
+    var failCallback = (error) => {
+      UserNotification.error("Deleting Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
         "Could not delete Grok pattern");
     };
     fetch('DELETE', this.URL + "/" + pattern.id).then(() => {
@@ -68,8 +68,8 @@ const GrokPatternsStore = {
   },
 
   bulkImport(patterns: string[], replaceAll: boolean) {
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Importing Grok pattern file failed with status: " + errorThrown,
+    var failCallback = (error) => {
+      UserNotification.error("Importing Grok pattern file failed with status: " + error.message,
         "Could not load Grok patterns");
     };
 

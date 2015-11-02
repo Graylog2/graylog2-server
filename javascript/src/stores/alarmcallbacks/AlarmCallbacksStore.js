@@ -25,8 +25,8 @@ const AlarmCallbacksStore = Reflux.createStore({
   },
 
   available(streamId) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Fetching available AlarmCallback types failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Fetching available AlarmCallback types failed with status: ' + error.message,
         'Could not retrieve available AlarmCallbacks');
     };
 
@@ -40,8 +40,8 @@ const AlarmCallbacksStore = Reflux.createStore({
     return promise;
   },
   list(streamId) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Fetching AlarmCallbacks failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Fetching AlarmCallbacks failed with status: ' + error.message,
         'Could not retrieve AlarmCallbacks');
     };
 
@@ -51,8 +51,8 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.list.promise(promise);
   },
   save(streamId, alarmCallback) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Saving AlarmCallback failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Saving AlarmCallback failed with status: ' + error.message,
         'Could not save AlarmCallback');
     };
 
@@ -63,8 +63,8 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.save.promise(promise);
   },
   delete(streamId, alarmCallbackId) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Removing AlarmCallback failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Removing AlarmCallback failed with status: ' + error.message,
         'Could not remove AlarmCallback');
     };
 
@@ -75,8 +75,8 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.delete.promise(promise);
   },
   update(streamId, alarmCallbackId, deltas) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Updating Alarm Callback \'' + alarmCallbackId + '\' failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Updating Alarm Callback \'' + alarmCallbackId + '\' failed with status: ' + error.message,
         'Could not update Alarm Callback');
     };
 
