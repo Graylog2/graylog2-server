@@ -1,10 +1,8 @@
-'use strict';
-
-declare var $: any;
-
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
-import StringUtils = require("../../util/StringUtils");
+import $ = require('jquery');
+import UserNotification = require('util/UserNotification');
+import URLUtils = require('util/URLUtils');
+import StringUtils = require('util/StringUtils');
+const fetch = require('logic/rest/FetchProvider').default;
 
 interface Source {
     name: string;
@@ -12,33 +10,36 @@ interface Source {
     percentage: number;
 }
 
-var processSourcesData = (sources: Array<Source>): Array<Source> => {
-    var total = 0;
-    sources.forEach((d) => total += d.message_count);
-    sources.forEach((d) => {
-        d.name = StringUtils.escapeHTML(d.name);
+const processSourcesData = (sources: Object): Array<Source> => {
+    let total = 0;
+    let sourcesArray = [];
+    $.each(sources, (name, count) => {
+        total += count;
+        sourcesArray.push({name: StringUtils.escapeHTML(name), message_count: count})
+    });
+    sourcesArray.forEach((d) => {
         d.percentage = d.message_count / total * 100;
     });
-    return sources;
+    return sourcesArray;
 };
 
-var SourcesStore = {
-    SOURCES_URL: URLUtils.appPrefixed('/a/sources'),
+const SourcesStore = {
+    SOURCES_URL: URLUtils.appPrefixed('/sources'),
 
     loadSources(range: number, callback: (sources: Array<Source>) => void) {
-        var url = this.SOURCES_URL;
+        let url = URLUtils.qualifyUrl(this.SOURCES_URL);
         if (typeof range !== 'undefined') {
-            url += "?range="+range;
+            url += "?range=" + range;
         }
-        var successCallback = (data) => {
-            var sources = processSourcesData(data);
-            callback(sources);
-        };
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading of sources data failed with status: " + errorThrown + ". Try reloading the page.",
-                "Could not load sources data");
-        };
-        $.getJSON(url, successCallback).fail(failCallback);
+        fetch('GET', url)
+            .then(response => {
+                var sources = processSourcesData(response.sources);
+                callback(sources);
+            })
+            .catch((errorThrown) => {
+                UserNotification.error("Loading of sources data failed with status: " + errorThrown + ". Try reloading the page.",
+                    "Could not load sources data");
+            });
     }
 };
 

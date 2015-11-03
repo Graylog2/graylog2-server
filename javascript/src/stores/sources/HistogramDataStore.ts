@@ -1,23 +1,27 @@
-'use strict';
+import $ = require('jquery');
+import UserNotification = require('util/UserNotification');
+import URLUtils = require('util/URLUtils');
+const fetch = require('logic/rest/FetchProvider').default;
 
-declare var $: any;
+const DEFAULT_MAX_DATA_POINTS = 4000;
 
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+// search/histogram?maxDataPoints=1680&q=&rangetype=relative&relative=3600&interval=minute
 
-var DEFAULT_MAX_DATA_POINTS = 4000;
-var HISTOGRAM_URL = '/a/search/histogram';
-
-var HistogramDataStore = {
+const HistogramDataStore = {
+    HISTOGRAM_URL: URLUtils.appPrefixed('/search/universal/relative/histogram'),
     loadHistogramData(range: number, sourceNames: Array<string>, maxDataPoints: number, callback: (histogramData: any) => void) {
-        var url = URLUtils.appPrefixed(HISTOGRAM_URL);
-        if (typeof maxDataPoints === 'undefined') {
-            maxDataPoints = DEFAULT_MAX_DATA_POINTS;
-        }
-        url += "?maxDataPoints=" + maxDataPoints;
-        var q = "";
+        var url = URLUtils.qualifyUrl(this.HISTOGRAM_URL);
+        // TODO: Handle max data points
+        // if (typeof maxDataPoints === 'undefined') {
+        //     maxDataPoints = DEFAULT_MAX_DATA_POINTS;
+        // }
+        // url += "?maxDataPoints=" + maxDataPoints;
+
+        var query = "";
         if (typeof sourceNames !== 'undefined' && sourceNames instanceof Array) {
-            q = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
+            query = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
+        } else {
+            query = "*";
         }
         if (typeof range !== 'undefined') {
             var interval = 'minute';
@@ -29,13 +33,22 @@ var HistogramDataStore = {
                 // for months interval will be day
                 interval = 'hour';
             }
-            url += "&q=" + q + "&rangetype=relative&relative=" + range + "&interval=" + interval;
+            url += "?query=" + query + "&range=" + range + "&interval=" + interval;
         }
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.warning("Loading of histogram data failed with status: " + errorThrown,
-                "Could not load histogram data");
-        };
-        $.getJSON(url, callback).fail(failCallback);
+        fetch('GET', url)
+            .then(response => {
+                const formattedResults = $.map(response.results, (value, timestamp) => {
+                    return {x: Number(timestamp), y: value};
+                })
+
+                response.values = formattedResults;
+                return response;
+            })
+            .then(callback)
+            .catch((errorThrown) => {
+                UserNotification.warning("Loading of histogram data failed with status: " + errorThrown,
+                    "Could not load histogram data");
+            });
     }
 };
 
