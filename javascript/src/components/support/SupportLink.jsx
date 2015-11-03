@@ -1,22 +1,31 @@
-'use strict';
+import React from 'react';
 
-var React = require('react');
-
-var SupportLink = React.createClass({
-    render() {
-        return (
-            <p className="description-tooltips">
-                <span className="fa-stack fa-lg">
-                    <i className="fa fa-circle fa-stack-2x"></i>
-                    <i className="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
+const SupportLink = React.createClass({
+  propTypes: {
+    small: React.PropTypes.bool,
+  },
+  render() {
+    const classNames = (this.props.small ? 'fa-stack' : 'fa-stack fa-lg');
+    return (
+      <table className="description-tooltips" style={{marginBottom: '10px'}}>
+        <tbody>
+          <tr>
+            <td style={{width: '40px'}}>
+                <span className={classNames}>
+                    <i className="fa fa-circle fa-stack-2x"/>
+                    <i className="fa fa-lightbulb-o fa-stack-1x fa-inverse"/>
                 </span>
-
-                <strong>
-                    {this.props.children}
-                </strong>
-            </p>
-        );
-    }
+            </td>
+            <td>
+              <strong>
+                {this.props.children}
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
 });
 
-module.exports = SupportLink;
+export default SupportLink;
