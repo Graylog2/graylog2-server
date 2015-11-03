@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import { Alert, Row, Col } from 'react-bootstrap';
 
 import NotificationsStore from 'stores/notifications/NotificationsStore';
 
@@ -11,7 +11,7 @@ const NotificationsList = React.createClass({
   mixins: [Reflux.connect(NotificationsStore)],
   _formatNotificationCount(count) {
     if (count === 0) {
-      return 'is no notification'
+      return 'is no notification';
     }
     if (count === 1) {
       return 'is one notification';
