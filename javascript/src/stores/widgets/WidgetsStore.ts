@@ -1,6 +1,6 @@
-import UserNotification = require("util/UserNotification");
+import UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require("../../util/URLUtils");
+import URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface SerializedWidget {
@@ -86,7 +86,7 @@ const WidgetsStore = {
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
-        return $.getJSON(url);
+        return fetch('GET', url);
     }
 };
 
