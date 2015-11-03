@@ -66,7 +66,7 @@ const ExportContentPackPage = React.createClass({
       });
   },
   isEmpty(obj) {
-    return (obj === undefined || obj.length === 0);
+    return ((obj === undefined) || (typeof obj.count === 'function' ? obj.count() === 0 : obj.length === 0));
   },
   inputDetails(input) {
     let details = input.name;
