@@ -1,3 +1,4 @@
+const userPreferences = {};
 (function (exports, userPreferences) {
     'use strict';
 

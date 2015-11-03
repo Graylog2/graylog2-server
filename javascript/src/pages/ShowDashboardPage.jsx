@@ -12,9 +12,14 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
 import Widget from 'components/widgets/Widget';
+import SupportLink from 'components/support/SupportLink';
+
+import { initializeDashboard } from 'legacy/dashboards/dashboards';
 
 const ShowDashboardPage = React.createClass({
-  DASHBOARDS_EDIT: 'dashboards:edit',
+  propTypes: {
+    dashboardId: React.PropTypes.string.isRequired,
+  },
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   componentDidMount() {
@@ -23,6 +28,10 @@ const ShowDashboardPage = React.createClass({
         this.setState({dashboard: dashboard});
       });
   },
+  componentDidUpdate() {
+    initializeDashboard();
+  },
+  DASHBOARDS_EDIT: 'dashboards:edit',
   updateUnFocussed() {
     return this.state.currentUser.preferences.updateUnfocussed;
   },
@@ -49,8 +58,9 @@ const ShowDashboardPage = React.createClass({
 
       return d1.col < d2.col;
     }).map((widget) => {
+      const position = dashboard.positions[widget.id] || {row: 0, col: 0, width: 1, height: 1};
       return (
-        <li key={'li-' + widget.id} data-row={widget.row} data-col={widget.col} data-sizex={widget.width} data-sizey={widget.height}>
+        <li key={'li-' + widget.id} data-row={position.row} data-col={position.col} data-sizex={position.width} data-sizey={position.height}>
           <Widget key={'widget-' + widget.id} widgetId={widget.id} dashboardId={dashboard.id} />
         </li>
       );
@@ -84,6 +94,7 @@ const ShowDashboardPage = React.createClass({
         <Button className="toggle-fullscreen" bsStyle="info">Fullscreen</Button>
         {this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id) &&
           <span>
+            {' '}
             <Button id="toggle-dashboard-lock" bsStyle="success" data-locked="true">Unlock / Edit</Button>
             &nbsp;
           </span>}
@@ -91,9 +102,10 @@ const ShowDashboardPage = React.createClass({
 
     const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id) ?
       (<div id="drag-widgets-description">
+        <SupportLink small={true}>
           Drag widgets to any position you like in <a id="unlock-dashboard" href="#" role="button">
             unlock / edit</a>{' '}
-          mode.
+          mode.</SupportLink>
         </div>) : null;
 
     return (

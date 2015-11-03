@@ -9,11 +9,13 @@ var ListGroupItem = require('react-bootstrap').ListGroupItem;
 var crossfilter = require('crossfilter');
 var dc = require('dc');
 var d3 = require('d3');
-var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
 var StringUtils = require('../../util/StringUtils');
 var NumberUtils = require('../../util/NumberUtils');
+
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/bootstrap.min.js');
 
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,

@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 
-export const momentHelper = {
+export default {
     DATE_FORMAT_NO_MS: "YYYY-MM-DD HH:mm:ss",
     DATE_FORMAT: "YYYY-MM-DD HH:mm:ss.SSS",
     DATE_FORMAT_TZ_NO_MS: "YYYY-MM-DD HH:mm:ss Z",

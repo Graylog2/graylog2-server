@@ -15,6 +15,8 @@ var UniversalSearch = require('../../logic/search/UniversalSearch');
 var SourceTitle = require('./SourceTitle');
 var D3Utils = require('../../util/D3Utils');
 
+import graphHelper from 'legacy/graphHelper';
+
 var SourceLineChart = React.createClass({
     getInitialState() {
         return {
