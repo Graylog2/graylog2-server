@@ -16,7 +16,6 @@
  */
 package org.graylog2.restclient.models;
 
-import org.graylog2.rest.models.system.usagestats.UsageStatsOptOutState;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restroutes.PathMethod;
