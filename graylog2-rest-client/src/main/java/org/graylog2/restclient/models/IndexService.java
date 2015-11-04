@@ -87,6 +87,12 @@ public class IndexService {
                 .execute();
     }
 
+    public void recalculateIndexRange(String index) throws APIException, IOException {
+        api.path(routes.IndexRangesResource().rebuildIndex(index))
+                .expect(202)
+                .execute();
+    }
+
     public void cycleDeflector() throws APIException, IOException {
         api.path(routes.DeflectorResource().cycle())
                 .timeout(apiTimeout("cycle_deflector", 60, TimeUnit.SECONDS))
@@ -117,5 +123,4 @@ public class IndexService {
                 .expect(204)
                 .execute();
     }
-
 }
