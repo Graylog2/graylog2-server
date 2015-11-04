@@ -28,7 +28,8 @@ import java.io.IOException;
 
 public class UsageStatsService {
     private static final Logger LOG = LoggerFactory.getLogger(UsageStatsService.class);
-    private static final String PATH = "/plugins/org.graylog.plugins.usagestatistics/opt-out";
+    private static final String CONFIG_PATH = "/plugins/org.graylog.plugins.usagestatistics/config";
+    private static final String OPT_OUT_PATH = "/plugins/org.graylog.plugins.usagestatistics/opt-out";
 
     private final ApiClient api;
 
@@ -38,14 +39,31 @@ public class UsageStatsService {
     }
 
     @Nullable
+    public UsageStatsConfigurationResponse getConfig() {
+        try {
+            return api.path(new PathMethod("GET", CONFIG_PATH), UsageStatsConfigurationResponse.class).execute();
+        } catch (IOException e) {
+            LOG.error("Unable to load usage stats configuration", e);
+        } catch (APIException e) {
+            if (e.getHttpCode() == 404) {
+                LOG.debug("Usage stats configuration does not exist. Plugin not loaded?");
+            } else {
+                LOG.error("Unable to load usage stats configuration", e);
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
     public UsageStatsOptOutState getOptOutState() {
         try {
-            return api.path(new PathMethod("GET", PATH), UsageStatsOptOutState.class).execute();
+            return api.path(new PathMethod("GET", OPT_OUT_PATH), UsageStatsOptOutState.class).execute();
         } catch (IOException e) {
             LOG.error("Unable to load usage stats opt-out state", e);
         } catch (APIException e) {
             if (e.getHttpCode() == 404) {
-                LOG.debug("Opt-out state does not exist.");
+                LOG.debug("Opt-out state does not exist. Plugin not loaded?");
             } else {
                 LOG.error("Unable to load usage stats opt-out state", e);
             }
@@ -56,11 +74,18 @@ public class UsageStatsService {
 
     public boolean setOptOutState(UsageStatsOptOutState optOutState) {
         try {
-            api.path(new PathMethod("POST", PATH)).body(optOutState).execute();
+            api.path(new PathMethod("POST", OPT_OUT_PATH)).body(optOutState).execute();
             return true;
-        } catch (APIException | IOException e) {
+        } catch (IOException e) {
             LOG.error("Unable to set usage stats opt-out state", e);
-            return false;
+        } catch (APIException e) {
+            if (e.getHttpCode() == 404) {
+                LOG.debug("Opt-out resource does not exist. Plugin not loaded?");
+            } else {
+                LOG.error("Unable to set usage stats opt-out state", e);
+            }
         }
+
+        return false;
     }
 }
