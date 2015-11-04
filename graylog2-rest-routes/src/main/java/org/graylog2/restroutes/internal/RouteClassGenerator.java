@@ -32,7 +32,12 @@
  */
 package org.graylog2.restroutes.internal;
 
-import com.sun.codemodel.*;
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClassAlreadyExistsException;
+import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 import org.graylog2.restroutes.PathMethod;
 
 import javax.ws.rs.PathParam;
@@ -66,8 +71,7 @@ public class RouteClassGenerator {
             for (Map.Entry<PathParam, Class<?>> entry : route.getPathParams().entrySet()) {
                 String fieldName = entry.getKey().value();
                 method.param(entry.getValue(), fieldName);
-                path = path.replace("{" + fieldName + "}", "\"+com.google.common.net.UrlEscapers.urlPathSegmentEscaper().escape("+fieldName+")+\"");
-
+                path = path.replaceAll("\\{" + fieldName + "(:?[^}]*)\\}", "\"+com.google.common.net.UrlEscapers.urlPathSegmentEscaper().escape(" + fieldName + ")+\"");
             }
             JBlock block = method.body();
             block.directStatement("return new PathMethod(\"" + route.getHttpMethod() + "\", \"" + path + "\");");
