@@ -105,9 +105,9 @@ class DashboardStore {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
     const promise = fetch('GET', url);
 
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Loading your dashboard failed with status: " + errorThrown,
+    promise.catch((error) => {
+      if (error.status !== 404) {
+        UserNotification.error("Loading your dashboard failed with status: " + error.message,
           "Could not load your dashboard");
       }
     });
@@ -170,6 +170,16 @@ class DashboardStore {
     }, (jqXHR, textStatus, errorThrown) => {
       UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
         "Could not delete dashboard");
+    });
+
+    return promise;
+  }
+
+  updatePositions(dashboard: Dashboard, positions: any) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updatePositions(dashboard.id).url);
+    const promise = fetch('PUT', url, {positions: positions}).catch((error) => {
+      UserNotification.error("Updating widget positions for dashboard \"" + dashboard.title + "\" failed with status: " + error.message,
+          "Could not update dashboard");
     });
 
     return promise;

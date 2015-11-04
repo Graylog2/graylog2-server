@@ -1,6 +1,6 @@
-/* global assertUpdateEnabled, dashboardGrid */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Reflux from 'reflux';
 import $ from 'jquery';
 import Qs from 'qs';
 
@@ -20,10 +20,15 @@ import GraphVisualization from 'components/visualizations/GraphVisualization';
 import StackedGraphVisualization from 'components/visualizations/StackedGraphVisualization';
 
 import WidgetsStore from 'stores/widgets/WidgetsStore';
+import WidgetsActions from 'actions/widgets/WidgetsActions';
 
-require('!script!legacy/updateManager.js');
-
-var Widget = React.createClass({
+const Widget = React.createClass({
+  propTypes: {
+    widgetId: React.PropTypes.string.isRequired,
+    dashboardId: React.PropTypes.string.isRequired,
+    shouldUpdate: React.PropTypes.bool.isRequired,
+    locked: React.PropTypes.bool.isRequired,
+  },
   WIDGET_DATA_REFRESH: 30 * 1000,
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
   WIDGET_HEADER_HEIGHT: 25,
@@ -43,7 +48,6 @@ var Widget = React.createClass({
   getInitialState() {
     return {
       deleted: false,
-      locked: true,
       type: '',
       title: '',
       cacheTime: 10,
@@ -80,18 +84,18 @@ var Widget = React.createClass({
   componentDidMount() {
     this._loadData();
     this._loadValue();
+    this.loadDataInterval = setInterval(this._loadData, this.WIDGET_DATA_REFRESH);
+    this.loadValueInterval = setInterval(this._loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
 
-    $(this._getWidgetNode()).on('unlocked.graylog.dashboard', this._dashboardUnlocked);
-    $(this._getWidgetNode()).on('locked.graylog.dashboard', this._dashboardLocked);
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentWillUnmount() {
-    $(this._getWidgetNode()).off('unlocked.graylog.dashboard', this._dashboardUnlocked);
-    $(this._getWidgetNode()).off('locked.graylog.dashboard', this._dashboardLocked);
+    clearInterval(this.loadDataInterval);
+    clearInterval(this.loadValueInterval);
     $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
   _loadData() {
-    if (!assertUpdateEnabled(this._loadData) || this.state.deleted) {
+    if (!this.props.shouldUpdate) {
       return;
     }
 
@@ -111,14 +115,13 @@ var Widget = React.createClass({
         this.setState({deleted: true});
       }
     });
-    setTimeout(this._loadData, this.WIDGET_DATA_REFRESH);
   },
   _loadValue() {
-    if (!assertUpdateEnabled(this._loadValue) || this.state.deleted) {
+    if (!this.props.shouldUpdate) {
       return;
     }
 
-    var width = this.refs.widget.clientWidth;
+    const width = this.refs.widget.clientWidth;
 
     WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width).then((value) => {
       this.setState({
@@ -128,29 +131,21 @@ var Widget = React.createClass({
         errorMessage: undefined
       });
     }, (jqXHR, textStatus, errorThrown) => {
-      var error = jqXHR.responseText === "" || jqXHR.responseText === "\"\"" ? errorThrown : jqXHR.responseText;
-      var newResult = this.state.result === undefined ? "N/A" : this.state.result;
+      const error = jqXHR.responseText === "" || jqXHR.responseText === "\"\"" ? errorThrown : jqXHR.responseText;
+      const newResult = this.state.result === undefined ? "N/A" : this.state.result;
       this.setState({
         result: newResult,
         error: true,
         errorMessage: "Error loading widget value: " + error
       });
     });
-
-    setTimeout(this._loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
-  },
-  _dashboardLocked() {
-    this.setState({locked: true});
-  },
-  _dashboardUnlocked() {
-    this.setState({locked: false});
   },
   _calculateWidgetSize() {
-    var $widgetNode = $(this._getWidgetNode());
+    const $widgetNode = $(this._getWidgetNode());
     // .height() give us the height of the whole widget without counting paddings, we need to remove the size
     // of the header and footer from that.
-    var availableHeight = $widgetNode.height() - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
-    var availableWidth = $widgetNode.width();
+    const availableHeight = $widgetNode.height() - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
+    const availableWidth = $widgetNode.width();
     if (availableHeight !== this.state.height || availableWidth !== this.state.width) {
       this.setState({height: availableHeight, width: availableWidth});
     }
@@ -220,9 +215,9 @@ var Widget = React.createClass({
     }
   },
   _getUrlQueryString() {
-    var rangeType = this.state.config['range_type'];
+    const rangeType = this.state.config['range_type'];
 
-    var query = {
+    const query = {
       q: this.state.config.query,
       rangetype: rangeType,
       interval: this.state.config.interval
@@ -243,14 +238,16 @@ var Widget = React.createClass({
     return Qs.stringify(query);
   },
   replayUrl() {
-    var path = this._getUrlPath();
-    var queryString = this._getUrlQueryString();
+    // TODO: replace with react router link
+    const path = this._getUrlPath();
+    const queryString = this._getUrlQueryString();
 
     return URLUtils.appPrefixed(path + "?" + queryString);
   },
   metricsUrl() {
-    var url = "/system/metrics/master";
-    var query = {
+    // TODO: replace with react router link
+    const url = "/system/metrics/master";
+    const query = {
       prefilter: "org.graylog2.dashboards.widgets.*." + this.props.widgetId
     };
 
@@ -272,10 +269,10 @@ var Widget = React.createClass({
     this._disableGridster();
   },
   _disableGridster() {
-    dashboardGrid.disable();
+    this.props.dashboardGrid.disable();
   },
   _enableGridster() {
-    dashboardGrid.enable();
+    this.props.dashboardGrid.enable();
   },
   updateWidget(newWidgetData) {
     newWidgetData.id = this.props.widgetId;
@@ -290,18 +287,21 @@ var Widget = React.createClass({
   deleteWidget() {
     if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
       this.setState({deleted: true});
-      $(".dashboard").trigger("delete.graylog.widget", {widgetId: this.props.widgetId});
+      WidgetsActions.removeWidget(this.props.dashboardId, this.props.widgetId);
     }
   },
   render() {
-    var showConfigModal = (
+    if (this.state.deleted) {
+      return <span></span>;
+    }
+    const showConfigModal = (
       <WidgetConfigModal ref="configModal"
                          widget={this._getWidgetData()}
                          boundToStream={this._isBoundToStream()}
                          metricsAction={this._goToWidgetMetrics}/>
     );
 
-    var editConfigModal = (
+    const editConfigModal = (
       <WidgetEditConfigModal ref="editModal"
                              widgetTypes={this.constructor.Type}
                              widget={this._getWidgetData()}
@@ -320,12 +320,12 @@ var Widget = React.createClass({
         {this._getVisualization()}
 
         <WidgetFooter ref="widgetFooter"
-                      locked={this.state.locked}
+                      locked={this.props.locked}
                       onReplaySearch={this._replaySearch}
                       onShowConfig={this._showConfig}
                       onEditConfig={this._showEditConfig}
                       onDelete={this.deleteWidget}/>
-        {this.state.locked ? showConfigModal : editConfigModal}
+        {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );
   }

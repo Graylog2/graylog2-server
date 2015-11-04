@@ -1,9 +1,5 @@
-var dashboard = $(".dashboard");
-var toggleDashboardLock = $("#toggle-dashboard-lock");
-var unlockDashboardLink = $("#unlock-dashboard");
-var dragWidgetsDescription = $("#drag-widgets-description");
-var toggleUpdateUnfocussed = $("#update-unfocussed");
-var toggleFullscreen = $(".toggle-fullscreen");
+const dashboard = $(".dashboard");
+const toggleDashboardLock = $("#toggle-dashboard-lock");
 let dashboardGrid;
 
 // Load all writable dashboards in the global registry first.
@@ -18,30 +14,7 @@ let dashboardGrid;
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/jquery.gridster.min.js');
 
-function updateWidgetPositions() {
-  var positions = dashboardGrid.serialize();
-  var dashboardId = $(".gridster").attr("data-dashboard-id");
-
-  var payload = {
-    positions: positions
-  };
-
-  $.ajax({
-    url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
-    type: 'POST',
-    data: JSON.stringify(payload),
-    processData: false,
-    contentType: 'application/json',
-    success: function (data) {
-      // not doing anything here for now. no need to notify user about success IMO
-    },
-    error: function (data) {
-      showError("Could not save widget positions.");
-    }
-  });
-}
-
-export const initializeDashboard = function() {
+export const initializeDashboard = function(updateWidgetCallback) {
   /* ducksboard/gridster.js#147 Hotfix - Part 1 */
   var items = $(".gridster ul li");
   items.detach();
@@ -52,12 +25,12 @@ export const initializeDashboard = function() {
     resize: {
       enabled: true,
       stop: function() {
-        updateWidgetPositions();
+        updateWidgetCallback(dashboardGrid);
       }
     },
     draggable: {
       stop: function() {
-        updateWidgetPositions();
+        updateWidgetCallback(dashboardGrid);
       }
     },
     serialize_params: function(widgetListItem, pos) {
@@ -72,9 +45,10 @@ export const initializeDashboard = function() {
       }
     }
   }).data('gridster');
-  dashboardGrid.disable();
-  dashboardGrid.disable_resize();
 
+  if (dashboardGrid) {
+    lockDashboard();
+  }
 
   /* ducksboard/gridster.js#147 Hotfix - Part 2 */
   $.each(items , function (i, e) {
@@ -85,6 +59,8 @@ export const initializeDashboard = function() {
     var row = parseInt(item.attr("data-row"));
     dashboardGrid.add_widget(item, columns, rows, col, row);
   });
+
+  return dashboardGrid;
 };
 
 const reloadDashboard = function() {
@@ -100,25 +76,6 @@ const reloadDashboard = function() {
     unlockDashboard();
   }
 };
-
-function hideDashboardControls() {
-  "use strict";
-  toggleUpdateUnfocussed.hide();
-  toggleFullscreen.hide();
-  toggleDashboardLock.hide();
-  dragWidgetsDescription.hide();
-}
-
-function showEmptyDashboardMessage() {
-  "use strict";
-  var $parent = dashboard.parent();
-  var $emptyDashboardAlert = $("<div/>", {
-    class: "alert alert-info no-widgets",
-    text: "No more widgets to display"
-  });
-  var $emptyDashboardHelper = $("<div/>", { class: "content col-md-12" }).append($emptyDashboardAlert);
-  $parent.prepend($emptyDashboardHelper);
-}
 
 /*var resizeTimeout;
  $(window).on("resize", function(e) {
@@ -156,46 +113,14 @@ function applyDashboardsToAllSelectors() {
   });
 }
 
-const updateInBackground = function() {
-  setUpdateUnfocussedMode(true);
-  alert("Graphs will be updated even when the browser is in the background");
-};
-
-const updateInFocus = function() {
-  setUpdateUnfocussedMode(false);
-  alert("Graphs will be updated only when the browser is in the foreground");
-};
-
-const unlockDashboard = function() {
+export const unlockDashboard = function() {
   dashboardGrid.enable();
   dashboardGrid.enable_resize();
-  dashboard.addClass("unlocked");
-  $(this).hide();
-  $(".only-unlocked").show();
-  $(".hidden-unlocked").hide();
-
-  $(".dashboard .widget").each(function() {
-    $(this).trigger("unlocked.graylog.dashboard");
-  });
-
-  toggleDashboardLock.text("Lock");
-  toggleDashboardLock.data('locked', false);
 };
 
-const lockDashboard = function() {
+export const lockDashboard = function() {
   dashboardGrid.disable();
   dashboardGrid.disable_resize();
-  dashboard.removeClass("unlocked");
-  $(this).hide();
-  $(".hidden-unlocked").show();
-  $(".only-unlocked").hide();
-
-  $(".dashboard .widget").each(function() {
-    $(this).trigger("locked.graylog.dashboard");
-  });
-
-  toggleDashboardLock.text("Unlock / Edit");
-  toggleDashboardLock.data('locked', true);
 };
 
 function isDashboardLocked() {

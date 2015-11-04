@@ -28,9 +28,11 @@ const jsRoutes = {
         delete: (id) => { return {url: '/dashboards/' + id }; },
         update: (id) => { return {url: '/dashboards/' + id }; },
         addWidget: (id) => { return {url: '/dashboards/' + id + '/widgets'}; },
+        removeWidget: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId}; },
         widget: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId}; },
         updateWidget: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId}; },
         widgetValue: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'}; },
+        updatePositions: (dashboardId) => { return {url: '/dashboards/' + dashboardId + '/positions'}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },

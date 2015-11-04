@@ -4,36 +4,63 @@ import { Row, Col, Button, Alert } from 'react-bootstrap';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import DashboardStore from 'stores/dashboard/DashboardStore';
+import FocusStore from 'stores/tools/FocusStore';
+import WidgetsStore from 'stores/widgets/WidgetsStore';
 
 import DocsHelper from 'util/DocsHelper';
+import UserNotification from 'util/UserNotification';
 
 import Spinner from 'components/common/Spinner';
+import PageHeader from 'components/common/PageHeader';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
 import Widget from 'components/widgets/Widget';
 import SupportLink from 'components/support/SupportLink';
 
-import { initializeDashboard } from 'legacy/dashboards/dashboards';
+import { initializeDashboard, lockDashboard, unlockDashboard } from 'legacy/dashboards/dashboards';
 
 const ShowDashboardPage = React.createClass({
-  propTypes: {
-    dashboardId: React.PropTypes.string.isRequired,
-  },
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
+  didInitialize: false,
 
   componentDidMount() {
+    this.loadData();
+    this.listenTo(WidgetsStore, this.removeWidget);
+  },
+  componentDidUpdate() {
+    if (!this.didInitialize && this.refs.gridster) {
+      this.didInitialize = true;
+      const dashboardGrid = initializeDashboard(this._onPositionsChanged);
+      this.setState({dashboardGrid: dashboardGrid});
+    }
+  },
+  getInitialState() {
+    return {
+      locked: true,
+      dashboardGrid: undefined,
+      forceUpdateInBackground: false,
+    };
+  },
+  loadData() {
     DashboardStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
         this.setState({dashboard: dashboard});
       });
   },
-  componentDidUpdate() {
-    initializeDashboard();
-  },
   DASHBOARDS_EDIT: 'dashboards:edit',
   updateUnFocussed() {
     return this.state.currentUser.preferences.updateUnfocussed;
+  },
+  shouldUpdate() {
+    return this.updateUnFocussed() || this.state.forceUpdateInBackground || this.state.focus;
+  },
+  removeWidget(props) {
+    if (props.delete) {
+      const gridsterWidget = this.refs['widget-' + props.delete];
+      this.state.dashboardGrid.remove_widget(gridsterWidget);
+      this.loadData();
+    }
   },
   emptyDashboard() {
     return (
@@ -60,15 +87,15 @@ const ShowDashboardPage = React.createClass({
     }).map((widget) => {
       const position = dashboard.positions[widget.id] || {row: 0, col: 0, width: 1, height: 1};
       return (
-        <li key={'li-' + widget.id} data-row={position.row} data-col={position.col} data-sizex={position.width} data-sizey={position.height}>
-          <Widget key={'widget-' + widget.id} widgetId={widget.id} dashboardId={dashboard.id} />
+        <li ref={'widget-' + widget.id} key={'li-' + widget.id} data-row={position.row} data-col={position.col} data-sizex={position.width} data-sizey={position.height}>
+          <Widget key={'widget-' + widget.id} widgetId={widget.id} dashboardId={dashboard.id} locked={this.state.locked} dashboardGrid={this.state.dashboardGrid} shouldUpdate={this.shouldUpdate()}/>
         </li>
       );
     });
     return (
       <Row>
         <div className="dashboard">
-          <div className="gridster" data-dashboard-id={dashboard.id}>
+          <div ref="gridster" className="gridster" data-dashboard-id={dashboard.id}>
             <ul>
               {widgets}
             </ul>
@@ -76,6 +103,42 @@ const ShowDashboardPage = React.createClass({
         </div>
       </Row>
     );
+  },
+  _onUnlock() {
+    const locked = !this.state.locked;
+    this.setState({locked: locked});
+
+    if (locked) {
+      lockDashboard();
+    } else {
+      unlockDashboard();
+    }
+  },
+  _onPositionsChanged(dashboardGrid) {
+    const positions = dashboardGrid.serialize().map((position) => {
+      return {id: position.id, col: position.col, row: position.row, width: position.size_x, height: position.size_y};
+    });
+    const dashboard = this.state.dashboard;
+
+    DashboardStore.updatePositions(dashboard, positions);
+  },
+  _toggleFullscreen() {
+    const element = document.documentElement;
+    if(element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if(element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if(element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if(element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
+  },
+  _toggleUpdateInBackground() {
+    const forceUpdate = this.state.forceUpdateInBackground;
+    this.setState({forceUpdateInBackground: !forceUpdate});
+    UserNotification.success('Graphs will be updated ' + (forceUpdate ? 'even' : 'only')
+      + ' when the browser is in the ' + (forceUpdate ? 'background' : 'foreground'), '');
   },
   render() {
     if (!this.state.dashboard) {
@@ -86,55 +149,49 @@ const ShowDashboardPage = React.createClass({
     const currentUser = this.state.currentUser;
 
     const actions = dashboard.widgets.length > 0 ? (
-      <span>
-        <Button id="update-unfocussed" bsStyle="info" data-update-unfocussed={this.updateUnFocussed()}>
-          Update in foreground
+      <span className="pull-right">
+        <Button id="update-unfocussed" bsStyle="info" onClick={this._toggleUpdateInBackground}>
+          Update in {this.state.forceUpdateInBackground ? 'foreground' : 'background'}
         </Button>
         {' '}
-        <Button className="toggle-fullscreen" bsStyle="info">Fullscreen</Button>
+        <Button className="toggle-fullscreen" bsStyle="info" onClick={this._toggleFullscreen}>Fullscreen</Button>
         {this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id) &&
-          <span>
+        <span>
             {' '}
-            <Button id="toggle-dashboard-lock" bsStyle="success" data-locked="true">Unlock / Edit</Button>
-            &nbsp;
+          <Button bsStyle="success" onClick={this._onUnlock}>{this.state.locked ? <span>Unlock / Edit</span> : <span>Lock</span>}</Button>
+          &nbsp;
           </span>}
       </span>) : null;
 
-    const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id) ?
+    const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id)
+      && dashboard.widgets.length > 0 ?
       (<div id="drag-widgets-description">
-        <SupportLink small={true}>
-          Drag widgets to any position you like in <a id="unlock-dashboard" href="#" role="button">
-            unlock / edit</a>{' '}
-          mode.</SupportLink>
-        </div>) : null;
+          Drag widgets to any position you like in <a role="button" onClick={() => this.setState({locked: false})}>
+          unlock / edit</a>{' '}
+          mode.
+      </div>) : null;
 
+    const dashboardTitle = (
+      <span>
+        <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
+        {!this.state.locked &&
+        <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
+                                   description={dashboard.description} buttonClass="btn-info btn-xs">
+          <i className="fa fa-pencil"/>
+        </EditDashboardModalTrigger>}
+      </span>
+    );
     return (
       <span>
-        <Row className="content content-head" style={{marginBottom: '5px'}}>
-          <Col md={12}>
-            <div className="pull-right actions">
-              {actions}
-            </div>
-            <h1>
-              <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
-              <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
-                                         description={dashboard.description} buttonClass="btn-info btn-xs">
-                <i className="fa fa-pencil"/>
-              </EditDashboardModalTrigger>
-            </h1>
-
-            <p className="description">
-              <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
-            </p>
-
-            {supportText}
-
-          </Col>
-        </Row>
+        <PageHeader title={dashboardTitle} titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'center'}}>
+          <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
+          {supportText}
+          {actions}
+        </PageHeader>
         {this.formatDashboard(dashboard)}
       </span>
     );
-  }
+  },
 });
 
 export default ShowDashboardPage;

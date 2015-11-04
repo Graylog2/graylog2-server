@@ -8,6 +8,7 @@ var Input = require('react-bootstrap').Input;
 var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
+import S from 'string';
 
 var WidgetEditConfigModal = React.createClass({
     getInitialState() {
@@ -113,20 +114,20 @@ var WidgetEditConfigModal = React.createClass({
             <Input type="text"
                    label="Time range type"
                    disabled
-                   value={this.state.config.range_type.capitalize()}
+                   value={S(this.state.config.timerange.type).capitalize()}
                    help="Type of time range to use in the widget."/>
         );
 
         var rangeValueInput;
 
-        switch (this.state.config.range_type) {
+        switch (this.state.config.timerange.type) {
             case 'relative':
                 rangeValueInput = (
                     <Input type="number"
                            label="Search relative time"
                            required
                            min="0"
-                           defaultValue={this.state.config.range}
+                           defaultValue={this.state.config.timerange.range}
                            onChange={this._onRelativeTimeRangeChange}
                            help="Number of seconds relative to the moment the search executes. 0 searches in all messages."/>
                 );

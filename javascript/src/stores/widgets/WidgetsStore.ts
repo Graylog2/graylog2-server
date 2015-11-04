@@ -1,7 +1,10 @@
+const Reflux = require('reflux');
+
 import UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
+const WidgetsActions = require('actions/widgets/WidgetsActions');
 
 interface SerializedWidget {
     id: string;
@@ -21,7 +24,8 @@ interface Widget {
     config: {};
 }
 
-const WidgetsStore = {
+const WidgetsStore = Reflux.createStore({
+    listenables: [WidgetsActions],
     _deserializeWidget(widget: SerializedWidget): Widget {
         return {
             id: widget.id,
@@ -40,6 +44,15 @@ const WidgetsStore = {
             cache_time: widget.cacheTime,
             creator_user_id: widget.creatorUserId,
             config: widget.config
+        };
+    },
+    _serializeWidgetForUpdate(widget: Widget): any {
+        return {
+            description: widget.title,
+            type: widget.type,
+            cache_time: widget.cacheTime,
+            creator_user_id: widget.creatorUserId,
+            config: widget.config,
         };
     },
 
@@ -73,11 +86,11 @@ const WidgetsStore = {
 
     updateWidget(dashboardId: string, widget: Widget) {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
-        var promise = fetch('PUT', url, this._serializeWidget(widget));
+        var promise = fetch('PUT', url, this._serializeWidgetForUpdate(widget));
 
         promise.then(() => UserNotification.success("Widget updated successfully"),
-        (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating widget \"" + widget.title + "\" failed with status: " + errorThrown,
+        (error) => {
+            UserNotification.error("Updating widget \"" + widget.title + "\" failed with status: " + error.message,
                 "Could not update widget");
         });
 
@@ -87,7 +100,18 @@ const WidgetsStore = {
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
         return fetch('GET', url);
-    }
-};
+    },
 
-export = WidgetsStore;
+    removeWidget(dashboardId: string, widgetId: string): void {
+        const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.removeWidget(dashboardId, widgetId).url);
+
+        const promise = fetch('DELETE', url).then(() => {
+            this.trigger({delete: widgetId});
+        });
+        WidgetsActions.removeWidget.promise(promise);
+
+        return promise;
+    },
+});
+
+export default WidgetsStore;
