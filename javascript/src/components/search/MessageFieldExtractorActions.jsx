@@ -14,8 +14,8 @@ const MessageFieldExtractorActions = React.createClass({
     this._refreshExtractorRoutes(nextProps);
   },
   _refreshExtractorRoutes(props) {
-    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.source_node_id,
-      props.message.source_input_id, props.fieldName, props.message.index, props.message.id);
+    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.gl2_source_node,
+      props.message.gl2_source_input, props.fieldName, props.message.index, props.message.id);
   },
   _formatExtractorMenuItem(extractorType) {
     return (

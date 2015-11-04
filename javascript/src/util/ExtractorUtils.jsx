@@ -1,7 +1,7 @@
 import jsRoutes from 'routing/jsRoutes';
 
 const ExtractorUtils = {
-  EXTRACTOR_TYPES: ['regex', 'substring', 'split_and_index', 'copy_input', 'grok', 'json'],
+  EXTRACTOR_TYPES: ['copy_input', 'grok', 'json', 'regex', 'regex_replace', 'split_and_index', 'substring'],
 
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
     const routes = {};

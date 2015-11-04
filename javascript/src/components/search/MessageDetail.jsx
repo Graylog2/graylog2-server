@@ -8,7 +8,7 @@ import MessageFields from './MessageFields';
 import Spinner from 'components/common/Spinner';
 
 import jsRoutes from 'routing/jsRoutes';
-import { momentHelper } from 'legacy/moment-helper.js';
+import momentHelper from 'legacy/moment-helper.js';
 
 const MessageDetail = React.createClass({
   propTypes: {
