@@ -17,6 +17,7 @@ const UsersPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   render() {
     const permissions = this.state.currentUser.permissions;
+    // TODO: fix permission names
     return (
       <span>
         <PageHeader title="User accounts" titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>

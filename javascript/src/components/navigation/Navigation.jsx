@@ -73,6 +73,7 @@ const Navigation = React.createClass({
       <LinkContainer to={Routes.HOME}>
         <img src={logoUrl}/>
       </LinkContainer>);
+    // TODO: fix permission names
     return (
       <Navbar inverse fluid fixedTop toggleNavKey={0}>
         <NavBrand>{brand}</NavBrand>
