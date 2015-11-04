@@ -34,6 +34,24 @@ const ExtractorsListItem = React.createClass({
       </span>
     );
   },
+  _formatCondition() {
+    if (this.props.extractor.condition_type === 'none') {
+      return <div></div>;
+    }
+
+    return (
+      <div className="configuration-section">
+        <h4>Condition</h4>
+        <ul>
+          <li>
+            Will only attempt to run if the message{' '}
+            {this.props.extractor.condition_type === 'string' ? 'includes the string' : 'matches the regular expression'}{' '}
+            <em>{this.props.extractor.condition_value}</em>
+          </li>
+        </ul>
+      </div>
+    );
+  },
   _formatActions() {
     const actions = [];
 
@@ -61,11 +79,11 @@ const ExtractorsListItem = React.createClass({
   _formatConfiguration(extractorConfig) {
     let formattedOptions = this._formatOptions(extractorConfig);
     if (formattedOptions.length === 0) {
-      formattedOptions = <div>No configuration options</div>;
+      formattedOptions = <li>No configuration options</li>;
     }
 
     return (
-      <div>
+      <div className="configuration-section">
         <h4>Configuration</h4>
         <ul>
           {formattedOptions}
@@ -89,7 +107,7 @@ const ExtractorsListItem = React.createClass({
     }
 
     return (
-      <div style={{marginTop: 10}}>
+      <div className="configuration-section">
         <h4>Converters</h4>
         <ul>
           {formattedConverters}
@@ -171,18 +189,9 @@ const ExtractorsListItem = React.createClass({
   _formatDetails() {
     return (
       <div>
-        <Col md={12}>
-          {this.props.extractor.condition_type !== 'none' &&
-            <span>
-              <strong>Condition:</strong>{' '}
-              Will only attempt to run if the message{' '}
-              {this.props.extractor.condition_type === 'string' ? 'includes the string' : 'matches the regular expression'}{' '}
-              <em>{this.props.extractor.condition_value}</em>.
-            </span>
-          }
-        </Col>
         <Col md={8}>
           <Well bsSize="small" className="configuration-well">
+            {this._formatCondition()}
             {this._formatConfiguration(this.props.extractor.extractor_config)}
             {this._formatConverters(this.props.extractor.converters)}
           </Well>

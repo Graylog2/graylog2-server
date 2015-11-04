@@ -25,7 +25,6 @@ const ConfigurationBundles = React.createClass({
     ConfigurationBundlesActions.list();
   },
   _getCategoriesHtml() {
-    // TODO: the mocking framework will mock the $.map function, replace with foreach.
     const categories = $.map(this.state.configurationBundles, (bundles, category) => category);
     categories.sort();
     return categories.map((category, idx) => this._getSourceTypeHtml(category, idx), this);
