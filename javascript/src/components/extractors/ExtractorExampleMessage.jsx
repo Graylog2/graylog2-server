@@ -1,52 +1,54 @@
-'use strict';
+import React, {PropTypes} from 'react';
+import MessageLoader from './MessageLoader';
 
-var React = require('react');
-var MessageLoader = require('./MessageLoader');
+const ExtractorExampleMessage = React.createClass({
+  propTypes: {
+    field: PropTypes.string.isRequired,
+    example: PropTypes.string.isRequired,
+  },
+  getInitialState() {
+    return {
+      example: '',
+      field: '',
+    };
+  },
+  componentWillMount() {
+    this.setState({example: this.props.example});
+  },
+  onExampleLoaded(message) {
+    const newExample = message.fields[this.props.field];
 
-var ExtractorExampleMessage = React.createClass({
-    getInitialState() {
-        return ({
-            example: "",
-            field: ""
-        });
-    },
-    componentWillMount() {
-        this.setState({example: this.props.example});
-    },
-    onExampleLoaded(message) {
-        var newExample = message.fields[this.props.field];
-
-        if (newExample !== null && newExample !== undefined && newExample !== "") {
-            this.setState({example: newExample});
-        }
-    },
-    render() {
-        var originalMessage = <span id="xtrc-original-example" style={{display:"none"}}>{this.state.example}</span>;
-        var messagePreview;
-
-        if(this.state.example === "") {
-            messagePreview = (
-                <div className="alert alert-warning xtrc-no-example">
-                    Could not load an example of field '{this.props.field}'. It is not possible to test
-                    the extractor before updating it.
-                </div>
-            );
-        } else {
-            messagePreview = (
-                <div className="well well-sm xtrc-new-example">
-                    <span id="xtrc-example">{this.state.example}</span>
-                </div>
-            );
-        }
-
-        return (
-            <div>
-                {originalMessage}
-                {messagePreview}
-                <MessageLoader onMessageLoaded={this.onExampleLoaded}/>
-            </div>
-        );
+    if (newExample) {
+      this.setState({example: newExample});
     }
+  },
+  render() {
+    const originalMessage = <span id="xtrc-original-example" style={{display: 'none'}}>{this.state.example}</span>;
+    let messagePreview;
+
+    if (this.state.example) {
+      messagePreview = (
+        <div className="well well-sm xtrc-new-example">
+          <span id="xtrc-example">{this.state.example}</span>
+        </div>
+      );
+    } else {
+      messagePreview = (
+        <div className="alert alert-warning xtrc-no-example">
+          Could not load an example of field '{this.props.field}'. It is not possible to test
+          the extractor before updating it.
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {originalMessage}
+        {messagePreview}
+        <MessageLoader onMessageLoaded={this.onExampleLoaded}/>
+      </div>
+    );
+  },
 });
 
-module.exports = ExtractorExampleMessage;
+export default ExtractorExampleMessage;
