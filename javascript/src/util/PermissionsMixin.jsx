@@ -15,8 +15,10 @@ const PermissionsMixin = {
     if (this._isWildCard(permissionSet)) {
       return true;
     }
-    const result = permissions.every((p) => this._permissionPredicate(permissionSet, p));
-    return result;
+    if (permissions.every) {
+      return permissions.every((p) => this._permissionPredicate(permissionSet, p));
+    }
+    return this._permissionPredicate(permissionSet, permissions);
   },
 
   isAnyPermitted: function(permissionSet, permissions) {
