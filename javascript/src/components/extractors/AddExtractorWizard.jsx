@@ -4,7 +4,7 @@ import {Row, Col, Button} from 'react-bootstrap';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MessageFieldExtractorActions from 'components/search/MessageFieldExtractorActions';
 
-const AddExtractor = React.createClass({
+const AddExtractorWizard = React.createClass({
   propTypes: {
     inputId: PropTypes.string,
   },
@@ -51,4 +51,4 @@ const AddExtractor = React.createClass({
   },
 });
 
-export default AddExtractor;
+export default AddExtractorWizard;

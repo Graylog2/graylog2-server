@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import {Row, Col} from 'react-bootstrap';
 
 import Spinner from 'components/common/Spinner';
-import AddExtractor from 'components/extractors/AddExtractor';
+import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
 import ExtractorsListItem from './ExtractorsListItem';
 
@@ -31,7 +31,7 @@ const ExtractorsList = React.createClass({
 
     return (
       <div>
-        <AddExtractor inputId={this.props.input.input_id}/>
+        <AddExtractorWizard inputId={this.props.input.input_id}/>
         <Row className="content extractor-list">
           <Col md={12}>
             <h2>Configured extractors</h2>
