@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import {Button, Row, Col, Well} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
+import numeral from 'numeral';
 
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -100,25 +101,25 @@ const ExtractorsListItem = React.createClass({
     return (
       <dl className="metric-def metric-timer">
         <dt>95th percentile:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing['95th_percentile']}</span>&#956;s</dd>
+        <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
         <dt>98th percentile:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing['98th_percentile']}</span>&#956;s</dd>
+        <dd>{numeral(timing['98th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
         <dt>99th percentile:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing['99th_percentile']}</span>&#956;s</dd>
+        <dd>{numeral(timing['99th_percentile']).format('0,0.[00]')}&#956;s</dd>
 
         <dt>Standard deviation:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing.std_dev}</span>&#956;s</dd>
+        <dd>{numeral(timing.std_dev).format('0,0.[00]')}&#956;s</dd>
 
         <dt>Mean:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing.mean}</span>&#956;s</dd>
+        <dd>{numeral(timing.mean).format('0,0.[00]')}&#956;s</dd>
 
         <dt>Minimum:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing.min}</span>&#956;s</dd>
+        <dd>{numeral(timing.min).format('0,0.[00]')}&#956;s</dd>
 
         <dt>Maximum:</dt>
-        <dd><span className="number-format" data-format="0,0.[00]">{timing.max}</span>&#956;s</dd>
+        <dd>{numeral(timing.max).format('0,0.[00]')}&#956;s</dd>
       </dl>
     );
   },
@@ -127,9 +128,11 @@ const ExtractorsListItem = React.createClass({
     if (metrics.total.rate) {
       totalRate = (
         <div className="meter" style={{marginBottom: 10}}>
-          {metrics.total.rate.total} total invocations since boot,{' '}
+          {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
           averages:{' '}
-          {metrics.total.rate.one_minute}, {metrics.total.rate.five_minute}, {metrics.total.rate.fifteen_minute}.
+          {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
+          {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
+          {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
         </div>
       );
     }
@@ -197,7 +200,6 @@ const ExtractorsListItem = React.createClass({
     // TODO:
     // - Delete extractors
     // - Edit extractors
-    // - Format metrics
 
     return (
       <EntityListItem key={`entry-list-${this.props.extractor.id}`}
