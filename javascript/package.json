@@ -41,6 +41,7 @@
     "react-zeroclipboard": "^2.0.1",
     "reflux": "^0.2.12",
     "sockjs-client": "1.0.x",
+    "string": "^3.3.1",
     "superagent": "^1.4.0",
     "superagent-bluebird-promise": "^2.1.0",
     "toastr": "^2.1.2"
