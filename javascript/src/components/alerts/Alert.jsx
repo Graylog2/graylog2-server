@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import $ from 'jquery';
-import { momentHelper } from 'legacy/moment-helper';
+import momentHelper from 'legacy/moment-helper';
 
 import AlarmCallbackHistoryOverview from 'components/alarmcallbacks/AlarmCallbackHistoryOverview';
 
