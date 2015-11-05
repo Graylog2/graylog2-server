@@ -26,8 +26,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
-import org.mongojack.Aggregation;
-import org.mongojack.AggregationResult;
+import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
@@ -77,10 +76,13 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
     public Map<String, Long> countPerType() {
         final HashMap<String, Long> result = Maps.newHashMap();
 
-        final Aggregation.Pipeline<?> perTypeCount = Aggregation.group("type").set("total", Aggregation.Group.count());
-        final AggregationResult<CountAggrType> aggregationResult = coll.aggregate(perTypeCount, CountAggrType.class);
-        for (CountAggrType type : aggregationResult.results()) {
-            result.put(type._id, type.total);
+        final DBCursor<AlarmCallbackConfigurationAVImpl> avs = coll.find();
+        for (AlarmCallbackConfigurationAVImpl av : avs) {
+            Long count = result.get(av.getType());
+            if (count == null) {
+                count = 0L;
+            }
+            result.put(av.getType(), count + 1);
         }
 
         return result;
