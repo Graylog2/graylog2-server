@@ -1,7 +1,8 @@
 import React from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
 
-import PermissionsMixin from '../../util/PermissionsMixin';
+import { IfPermitted } from 'components/common';
+
 import DeleteAlarmCallbackButton from 'components/alarmcallbacks/DeleteAlarmCallbackButton';
 import ConfigurationWell from 'components/configurationforms/ConfigurationWell';
 import EditAlarmCallbackButton from 'components/alarmcallbacks/EditAlarmCallbackButton';
@@ -11,14 +12,12 @@ const AlarmCallback = React.createClass({
     alarmCallback: React.PropTypes.object.isRequired,
     concise: React.PropTypes.bool.isRequired,
     deleteAlarmCallback: React.PropTypes.func.isRequired,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
     streamId: React.PropTypes.string.isRequired,
     subtitle: React.PropTypes.string.isRequired,
     titleAnnotation: React.PropTypes.string.isRequired,
     types: React.PropTypes.object.isRequired,
     updateAlarmCallback: React.PropTypes.func.isRequired,
   },
-  mixins: [PermissionsMixin],
   getDefaultProps() {
     return {
       hideButtons: false,
@@ -38,18 +37,18 @@ const AlarmCallback = React.createClass({
   },
   _formatActionButtons() {
     const alarmCallback = this.props.alarmCallback;
-    const editAlarmCallbackButton = (this.isPermitted(this.props.permissions, ['streams:edit:' + this.props.streamId]) ?
-      <EditAlarmCallbackButton disabled={this._typeNotAvailable()} alarmCallback={alarmCallback} types={this.props.types}
-                               streamId={this.props.streamId} onUpdate={this.props.updateAlarmCallback} /> : null);
-    const deleteAlarmCallbackButton = (this.isPermitted(this.props.permissions, ['streams:edit:' + this.props.streamId]) ?
-      <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.props.deleteAlarmCallback} /> : null);
     return (
       <span>
-                {' '}
-        {editAlarmCallbackButton}
         {' '}
-        {deleteAlarmCallbackButton}
-            </span>
+        <IfPermitted permissions={'streams:edit:' + this.props.streamId}>
+          <EditAlarmCallbackButton disabled={this._typeNotAvailable()} alarmCallback={alarmCallback} types={this.props.types}
+                                   streamId={this.props.streamId} onUpdate={this.props.updateAlarmCallback} />
+        </IfPermitted>
+        {' '}
+        <IfPermitted permissions={'streams:edit:' + this.props.streamId}>
+          <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.props.deleteAlarmCallback} />
+        </IfPermitted>
+      </span>
     );
   },
   _renderToggleConfigurationLink() {
