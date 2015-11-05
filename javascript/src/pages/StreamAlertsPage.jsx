@@ -1,8 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
+import UserNotification from 'util/UserNotification';
 
 import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
 
@@ -10,9 +11,8 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import AlertConditionsStore from 'stores/alertconditions/AlertConditionsStore';
 
-import PageHeader from 'components/common/PageHeader';
+import { IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import Spinner from 'components/common/Spinner';
 
 import AlarmCallbackComponent from 'components/alarmcallbacks/AlarmCallbackComponent';
 import AlertsComponent from 'components/alerts/AlertsComponent';
@@ -30,6 +30,10 @@ const StreamAlertsPage = React.createClass({
       stream: undefined,
     };
   },
+  componentDidMount() {
+    StreamsStore.onChange(this.loadData);
+    this.loadData();
+  },
   loadData() {
     StreamsStore.get(this.props.params.streamId, (stream) => {
       this.setState({stream: stream});
@@ -37,12 +41,17 @@ const StreamAlertsPage = React.createClass({
 
     AlertConditionsActions.list(this.props.params.streamId);
   },
-  componentDidMount() {
-    StreamsStore.onChange(this.loadData);
-    this.loadData();
-  },
   onAlertConditionsList(response) {
     this.setState({alertConditions: response.alertConditions.sort((a1, a2) => a1.id.localeCompare(a2.id))});
+  },
+  _onSendDummyAlert() {
+    const stream = this.state.stream;
+    StreamsStore.sendDummyAlert(stream.id).then(() => {
+      UserNotification.success('Sent dummy alert for stream »' + stream.title + '«', "Success!");
+    }, (error) => {
+      UserNotification.error('Unable to send dummy alert for stream »' + stream.title + '«: ' + error.message,
+        'Sendin dummy alert failed!');
+    });
   },
   render() {
     if (!this.state.stream || !this.state.alertConditions) {
@@ -80,6 +89,12 @@ const StreamAlertsPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
+            <IfPermitted permissions={'streams:edit:' + stream.id}>
+              <div className="sendDummyAlert">
+                <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
+              </div>
+            </IfPermitted>
+
             <h2>Receivers</h2>
 
             <p className="description">

@@ -37,21 +37,26 @@ const AlertReceiversList = React.createClass({
     StreamsStore.addReceiver(this.props.streamId, 'emails', this.refs.email.getValue());
     this.setState({emailReceiver: ''});
   },
-  render() {
-    if (this.props.receivers.users.length === 0 && this.props.receivers.emails.length === 0) {
+  _formatReceiverList(receivers) {
+    if (!receivers || (receivers.users.length === 0 && receivers.emails.length === 0)) {
       return <Alert bsStyle="info">No configured alert receivers.</Alert>;
     }
 
-    const userReceivers = this.props.receivers.users.map((receiver) => <AlertReceiver key={'users-' + receiver} type="users"
-                                                                                      receiver={receiver} streamId={this.props.streamId}/>);
-    const emailReceivers = this.props.receivers.emails.map((receiver) => <AlertReceiver key={'email-' + receiver} type="emails"
-                                                                                        receiver={receiver} streamId={this.props.streamId}/>);
+    const userReceivers = this.props.receivers.users ? this.props.receivers.users
+      .map((receiver) => <AlertReceiver key={'users-' + receiver} type="users" receiver={receiver} streamId={this.props.streamId}/>) : null;
+    const emailReceivers = this.props.receivers.emails ? this.props.receivers.emails
+      .map((receiver) => <AlertReceiver key={'email-' + receiver} type="emails" receiver={receiver} streamId={this.props.streamId}/>) : null;
+    return (
+      <ul className="alert-receivers">
+        {userReceivers}
+        {emailReceivers}
+      </ul>
+    );
+  },
+  render() {
     return (
       <span>
-        <ul className="alert-receivers">
-          {userReceivers}
-          {emailReceivers}
-        </ul>
+        {this._formatReceiverList(this.props.receivers)}
         {this.isPermitted(this.state.currentUser.permissions, 'streams:edit:' + this.props.streamId) &&
           <Row id="add-alert-receivers" className="row-sm">
 

@@ -146,6 +146,11 @@ class StreamsStore {
           "Could not delete stream alert receiver");
     }).then(this._emitChange.bind(this));
   }
+  sendDummyAlert(streamId: string) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.sendDummyAlert(streamId).url);
+    const promise = fetch('POST', url);
+    return promise;
+  }
   onChange(callback: Callback) {
     this.callbacks.push(callback);
   }
