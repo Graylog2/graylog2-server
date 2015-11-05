@@ -3,6 +3,7 @@ import DataFilter from './DataFilter';
 import DataTable from './DataTable';
 import EntityList from './EntityList';
 import EntityListItem from './EntityListItem';
+import IfPermitted from './IfPermitted';
 import MultiSelect from './MultiSelect';
 import PageHeader from './PageHeader';
 import Select from './Select';
@@ -18,6 +19,7 @@ export {
   DataTable,
   EntityList,
   EntityListItem,
+  IfPermitted,
   MultiSelect,
   PageHeader,
   Spinner,
