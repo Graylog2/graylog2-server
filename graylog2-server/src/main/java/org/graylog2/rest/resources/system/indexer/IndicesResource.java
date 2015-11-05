@@ -32,7 +32,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
@@ -69,7 +69,7 @@ public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
     @Inject
-    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private CreateNewSingleIndexRangeJob.Factory rebuildIndexRangesJobFactory;
     @Inject
     private Indices indices;
     @Inject
@@ -157,7 +157,7 @@ public class IndicesResource extends RestResource {
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
-    
+
     @GET
     @Timed
     @Path("/reopened")
@@ -177,7 +177,7 @@ public class IndicesResource extends RestResource {
             throw new InternalServerErrorException(e);
         }
 
-        return ClosedIndices.create(reopenedIndices, reopenedIndices.size()); 
+        return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
 
     @POST
@@ -196,7 +196,7 @@ public class IndicesResource extends RestResource {
         indices.reopenIndex(index);
 
         // Trigger index ranges rebuild job.
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
+        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector, index);
         try {
             systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
@@ -223,21 +223,11 @@ public class IndicesResource extends RestResource {
         }
 
         if (index.equals(deflector.getCurrentActualTargetIndex())) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("The current deflector target index (" + index + ") cannot be closed");
         }
 
         // Close index.
         indices.close(index);
-
-        // Trigger index ranges rebuild job.
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
-        try {
-            systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg);
-        }
     }
 
     @DELETE
@@ -258,21 +248,11 @@ public class IndicesResource extends RestResource {
         }
 
         if (index.equals(deflector.getCurrentActualTargetIndex())) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("The current deflector target index (" + index + ") cannot be deleted");
         }
 
         // Delete index.
         indices.delete(index);
-
-        // Trigger index ranges rebuild job.
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
-        try {
-            systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg);
-        }
     }
 
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
