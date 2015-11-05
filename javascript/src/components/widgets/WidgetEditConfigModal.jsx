@@ -8,7 +8,7 @@ var Input = require('react-bootstrap').Input;
 var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
-import S from 'string';
+import S from 'jquery';
 
 var WidgetEditConfigModal = React.createClass({
     getInitialState() {
