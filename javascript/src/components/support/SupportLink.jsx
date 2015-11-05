@@ -3,6 +3,10 @@ import React from 'react';
 const SupportLink = React.createClass({
   propTypes: {
     small: React.PropTypes.bool,
+    children: React.PropTypes.oneOfType([
+      React.PropTypes.element,
+      React.PropTypes.arrayOf(React.PropTypes.element),
+    ]).isRequired,
   },
   render() {
     const classNames = (this.props.small ? 'fa-stack' : 'fa-stack fa-lg');
@@ -11,10 +15,10 @@ const SupportLink = React.createClass({
         <tbody>
           <tr>
             <td style={{width: '40px'}}>
-                <span className={classNames}>
-                    <i className="fa fa-circle fa-stack-2x"/>
-                    <i className="fa fa-lightbulb-o fa-stack-1x fa-inverse"/>
-                </span>
+              <span className={classNames}>
+                <i className="fa fa-circle fa-stack-2x"/>
+                <i className="fa fa-lightbulb-o fa-stack-1x fa-inverse"/>
+              </span>
             </td>
             <td>
               <strong>
@@ -25,7 +29,7 @@ const SupportLink = React.createClass({
         </tbody>
       </table>
     );
-  }
+  },
 });
 
 export default SupportLink;
