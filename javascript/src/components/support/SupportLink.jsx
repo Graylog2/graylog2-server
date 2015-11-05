@@ -3,10 +3,7 @@ import React from 'react';
 const SupportLink = React.createClass({
   propTypes: {
     small: React.PropTypes.bool,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.arrayOf(React.PropTypes.element),
-    ]).isRequired,
+    children: React.PropTypes.node.isRequired,
   },
   render() {
     const classNames = (this.props.small ? 'fa-stack' : 'fa-stack fa-lg');
