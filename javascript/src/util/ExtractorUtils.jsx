@@ -1,7 +1,17 @@
 import jsRoutes from 'routing/jsRoutes';
 
+const ExtractorTypes = {
+  COPY_INPUT: 'Copy Input',
+  GROK: 'Grok pattern',
+  JSON: 'JSON',
+  REGEX: 'Regular expression',
+  REGEX_REPLACE: 'Replace with regular expression',
+  SPLIT_AND_INDEX: 'Split & Index',
+  SUBSTRING: 'Substring',
+};
+
 const ExtractorUtils = {
-  EXTRACTOR_TYPES: ['copy_input', 'grok', 'json', 'regex', 'regex_replace', 'split_and_index', 'substring'],
+  EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map(type => type.toLocaleLowerCase()),
 
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
     const routes = {};
@@ -13,24 +23,7 @@ const ExtractorUtils = {
   },
 
   getReadableExtractorTypeName(extractorType) {
-    switch (extractorType) {
-    case 'regex':
-      return 'Regular expression';
-    case 'regex_replace':
-      return 'Replace with regular expression';
-    case 'substring':
-      return 'Substring';
-    case 'split_and_index':
-      return 'Split & Index';
-    case 'copy_input':
-      return 'Copy Input';
-    case 'grok':
-      return 'Grok pattern';
-    case 'json':
-      return 'JSON';
-    default:
-      return extractorType;
-    }
+    return extractorType ? ExtractorTypes[extractorType.toLocaleUpperCase()] : extractorType;
   },
 };
 
