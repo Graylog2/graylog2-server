@@ -17,6 +17,7 @@
 package org.graylog2.alarmcallbacks;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mongodb.DBCollection;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -25,12 +26,16 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
+import org.mongojack.Aggregation;
+import org.mongojack.AggregationResult;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackConfigurationService {
     private final JacksonDBCollection<AlarmCallbackConfigurationAVImpl, String> coll;
@@ -69,6 +74,19 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
     }
 
     @Override
+    public Map<String, Long> countPerType() {
+        final HashMap<String, Long> result = Maps.newHashMap();
+
+        final Aggregation.Pipeline<?> perTypeCount = Aggregation.group("type").set("total", Aggregation.Group.count());
+        final AggregationResult<CountAggrType> aggregationResult = coll.aggregate(perTypeCount, CountAggrType.class);
+        for (CountAggrType type : aggregationResult.results()) {
+            result.put(type._id, type.total);
+        }
+
+        return result;
+    }
+
+    @Override
     public String save(AlarmCallbackConfiguration model) throws ValidationException {
         return coll.save(implOrFail(model)).getSavedId();
     }
@@ -93,5 +111,10 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type AlarmCallbackConfigurationAVImpl, not " + callback.getClass());
         }
+    }
+
+    private static class CountAggrType {
+        public String _id;
+        public long total;
     }
 }
