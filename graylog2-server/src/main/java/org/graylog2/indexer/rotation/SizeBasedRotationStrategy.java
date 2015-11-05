@@ -47,7 +47,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
             return null;
         }
 
-        final long sizeInBytes = indexStats.getPrimaries().store.getSizeInBytes();
+        final long sizeInBytes = indexStats.primaries().getStore().getSizeInBytes();
 
         final boolean shouldRotate = sizeInBytes > maxSize;
 

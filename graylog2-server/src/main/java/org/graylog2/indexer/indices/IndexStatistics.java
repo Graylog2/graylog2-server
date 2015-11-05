@@ -16,43 +16,26 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.google.common.collect.Lists;
+import com.google.auto.value.AutoValue;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
 
 import java.util.List;
 
-public class IndexStatistics {
-    private CommonStats primaries;
-    private CommonStats total;
+@AutoValue
+public abstract class IndexStatistics {
+    public abstract String indexName();
 
-    private List<ShardRouting> shardRoutingList;
+    public abstract CommonStats primaries();
 
-    public IndexStatistics() {
-        shardRoutingList = Lists.newArrayList();
-    }
+    public abstract CommonStats total();
 
-    public void setPrimaries(CommonStats primaries) {
-        this.primaries = primaries;
-    }
+    public abstract List<ShardRouting> shardRoutings();
 
-    public CommonStats getPrimaries() {
-        return primaries;
-    }
-
-    public void setTotal(CommonStats total) {
-        this.total = total;
-    }
-
-    public CommonStats getTotal() {
-        return total;
-    }
-
-    public void addShardRouting(ShardRouting shardRouting) {
-        shardRoutingList.add(shardRouting);
-    }
-
-    public List<ShardRouting> getShardRoutings() {
-        return shardRoutingList;
+    public static IndexStatistics create(String indexName,
+                                         CommonStats primaries,
+                                         CommonStats total,
+                                         List<ShardRouting> shardRoutings) {
+        return new AutoValue_IndexStatistics(indexName, primaries, total, shardRoutings);
     }
 }

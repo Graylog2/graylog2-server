@@ -17,70 +17,73 @@
 package org.graylog2.rest.models.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class IndexStats {
-    @JsonProperty
+    @JsonProperty("flush")
     public abstract TimeAndTotalStats flush();
 
-    @JsonProperty
+    @JsonProperty("get")
     public abstract TimeAndTotalStats get();
 
-    @JsonProperty
+    @JsonProperty("index")
     public abstract TimeAndTotalStats index();
 
-    @JsonProperty
+    @JsonProperty("merge")
     public abstract TimeAndTotalStats merge();
 
-    @JsonProperty
+    @JsonProperty("refresh")
     public abstract TimeAndTotalStats refresh();
 
-    @JsonProperty
+    @JsonProperty("search_query")
     public abstract TimeAndTotalStats searchQuery();
 
-    @JsonProperty
+    @JsonProperty("search_fetch")
     public abstract TimeAndTotalStats searchFetch();
 
-    @JsonProperty
+    @JsonProperty("open_search_contexts")
     public abstract long openSearchContexts();
 
-    @JsonProperty
-    public abstract long store_size_bytes();
+    @JsonProperty("store_size_bytes")
+    public abstract long storeSizeBytes();
 
-    @JsonProperty
+    @JsonProperty("segments")
     public abstract long segments();
 
-    @JsonProperty
+    @JsonProperty("documents")
     public abstract DocsStats documents();
 
-    public static IndexStats create(TimeAndTotalStats flush,
-                                    TimeAndTotalStats get,
-                                    TimeAndTotalStats index,
-                                    TimeAndTotalStats merge,
-                                    TimeAndTotalStats refresh,
-                                    TimeAndTotalStats searchQuery,
-                                    TimeAndTotalStats searchFetch,
-                                    long openSearchContexts,
-                                    long store_size_bytes,
-                                    long segments,
-                                    DocsStats documents) {
+    @JsonCreator
+    public static IndexStats create(@JsonProperty("flush") TimeAndTotalStats flush,
+                                    @JsonProperty("get") TimeAndTotalStats get,
+                                    @JsonProperty("index") TimeAndTotalStats index,
+                                    @JsonProperty("merge") TimeAndTotalStats merge,
+                                    @JsonProperty("refresh") TimeAndTotalStats refresh,
+                                    @JsonProperty("search_query") TimeAndTotalStats searchQuery,
+                                    @JsonProperty("search_fetch") TimeAndTotalStats searchFetch,
+                                    @JsonProperty("open_search_contexts") long openSearchContexts,
+                                    @JsonProperty("store_size_bytes") long storeSizeBytes,
+                                    @JsonProperty("segments") long segments,
+                                    @JsonProperty("documents") DocsStats documents) {
         return new AutoValue_IndexStats(flush, get, index, merge, refresh, searchQuery, searchFetch,
-                openSearchContexts, store_size_bytes, segments, documents);
+                openSearchContexts, storeSizeBytes, segments, documents);
     }
 
     @JsonAutoDetect
     @AutoValue
     public static abstract class DocsStats {
-        @JsonProperty
+        @JsonProperty("count")
         public abstract long count();
 
-        @JsonProperty
+        @JsonProperty("deleted")
         public abstract long deleted();
 
-        public static DocsStats create(long count, long deleted) {
+        @JsonCreator
+        public static DocsStats create(@JsonProperty("count") long count, @JsonProperty("deleted") long deleted) {
             return new AutoValue_IndexStats_DocsStats(count, deleted);
         }
     }
@@ -88,13 +91,14 @@ public abstract class IndexStats {
     @JsonAutoDetect
     @AutoValue
     public static abstract class TimeAndTotalStats {
-        @JsonProperty
+        @JsonProperty("total")
         public abstract long total();
 
-        @JsonProperty
+        @JsonProperty("time_seconds")
         public abstract long timeSeconds();
 
-        public static TimeAndTotalStats create(long total, long timeSeconds) {
+        @JsonCreator
+        public static TimeAndTotalStats create(@JsonProperty("total") long total, @JsonProperty("time_seconds") long timeSeconds) {
             return new AutoValue_IndexStats_TimeAndTotalStats(total, timeSeconds);
         }
     }

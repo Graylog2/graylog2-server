@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
@@ -57,6 +59,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.collect.UnmodifiableIterator;
 import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -139,11 +142,11 @@ public class Indices implements IndexManagement {
                 BulkResponse response = c.bulk(request.request()).actionGet();
 
                 LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                         source,
-                         target,
-                         response.getItems().length,
-                         response.getTookInMillis(),
-                         response.hasFailures());
+                        source,
+                        target,
+                        response.getItems().length,
+                        response.getTookInMillis(),
+                        response.hasFailures());
 
                 if (response.hasFailures()) {
                     throw new RuntimeException("Failed to move a message. Check your indexer log.");
@@ -162,9 +165,7 @@ public class Indices implements IndexManagement {
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        Map<String, IndexStats> indices = getAll();
-        IndexStats index = indices.get(indexName);
-
+        final IndexStats index = indexStats(indexName);
         if (index == null) {
             throw new IndexNotFoundException();
         }
@@ -173,9 +174,18 @@ public class Indices implements IndexManagement {
     }
 
     public Map<String, IndexStats> getAll() {
-        ActionFuture<IndicesStatsResponse> isr = c.admin().indices().stats(new IndicesStatsRequest().all());
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).request();
+        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
-        return isr.actionGet().getIndices();
+        return response.getIndices();
+    }
+
+    @Nullable
+    public IndexStats indexStats(final String indexName) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexName).request();
+        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
+
+        return response.getIndex(indexName);
     }
 
     public String allIndicesAlias() {
@@ -375,25 +385,56 @@ public class Indices implements IndexManagement {
         return reopenedIndices;
     }
 
+    @Nullable
     public IndexStatistics getIndexStats(String index) {
-        final IndexStatistics stats = new IndexStatistics();
+        if (index.startsWith(configuration.getIndexPrefix())) {
+            return null;
+        }
+
+        final IndexStats indexStats;
         try {
-            IndicesStatsResponse indicesStatsResponse = c.admin().indices().stats(new IndicesStatsRequest().all()).actionGet();
-            IndexStats indexStats = indicesStatsResponse.getIndex(index);
-
-            if (indexStats == null) {
-                return null;
-            }
-            stats.setPrimaries(indexStats.getPrimaries());
-            stats.setTotal(indexStats.getTotal());
-
-            for (ShardStats shardStats : indexStats.getShards()) {
-                stats.addShardRouting(shardStats.getShardRouting());
-            }
+            indexStats = indexStats(index);
         } catch (ElasticsearchException e) {
             return null;
         }
-        return stats;
+
+        if (indexStats == null) {
+            return null;
+        }
+
+        final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
+        for (ShardStats shardStats : indexStats.getShards()) {
+            shardRouting.add(shardStats.getShardRouting());
+        }
+
+        return IndexStatistics.create(indexStats.getIndex(), indexStats.getPrimaries(), indexStats.getTotal(), shardRouting.build());
+    }
+
+    public Set<IndexStatistics> getIndicesStats() {
+        final Map<String, IndexStats> responseIndices;
+        try {
+            responseIndices = getAll();
+        } catch (ElasticsearchException e) {
+            return Collections.emptySet();
+        }
+
+        final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
+        for (IndexStats indexStats : responseIndices.values()) {
+            final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
+            for (ShardStats shardStats : indexStats.getShards()) {
+                shardRouting.add(shardStats.getShardRouting());
+            }
+
+            final IndexStatistics stats = IndexStatistics.create(
+                    indexStats.getIndex(),
+                    indexStats.getPrimaries(),
+                    indexStats.getTotal(),
+                    shardRouting.build());
+
+            result.add(stats);
+        }
+
+        return result.build();
     }
 
     public boolean cycleAlias(String aliasName, String targetIndex) {
