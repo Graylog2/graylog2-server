@@ -1,16 +1,19 @@
-'use strict';
+import React from 'react';
+import DocsHelper from 'util/DocsHelper';
 
-var React = require('react');
-var DocsHelper = require('../../util/DocsHelper');
-
-var DocumentationLink = React.createClass({
-    render() {
-        return (
-            <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank">
-                {this.props.text}
-            </a>
-        );
-    }
+const DocumentationLink = React.createClass({
+  propTypes: {
+    page: React.PropTypes.object.isRequired,
+    title: React.PropTypes.string.isRequired,
+    text: React.PropTypes.node.isRequired,
+  },
+  render() {
+    return (
+      <a href={DocsHelper.toString(this.props.page)} title={this.props.title} target="_blank">
+        {this.props.text}
+      </a>
+    );
+  },
 });
 
-module.exports = DocumentationLink;
+export default DocumentationLink;
