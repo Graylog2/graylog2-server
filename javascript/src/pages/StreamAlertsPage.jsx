@@ -14,7 +14,7 @@ import AlertConditionsStore from 'stores/alertconditions/AlertConditionsStore';
 import { IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import AlarmCallbackComponent from 'components/alarmcallbacks/AlarmCallbackComponent';
+import { AlarmCallbackComponent } from 'components/alarmcallbacks';
 import AlertsComponent from 'components/alerts/AlertsComponent';
 import CreateAlertConditionInput from 'components/alertconditions/CreateAlertConditionInput';
 import AlertConditionsList from 'components/alertconditions/AlertConditionsList';

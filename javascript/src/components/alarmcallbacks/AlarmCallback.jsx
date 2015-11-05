@@ -3,18 +3,17 @@ import { Row, Col, Alert, Button } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
 
-import DeleteAlarmCallbackButton from 'components/alarmcallbacks/DeleteAlarmCallbackButton';
+import { DeleteAlarmCallbackButton, EditAlarmCallbackButton } from 'components/alarmcallbacks';
 import ConfigurationWell from 'components/configurationforms/ConfigurationWell';
-import EditAlarmCallbackButton from 'components/alarmcallbacks/EditAlarmCallbackButton';
 
 const AlarmCallback = React.createClass({
   propTypes: {
     alarmCallback: React.PropTypes.object.isRequired,
-    concise: React.PropTypes.bool.isRequired,
+    concise: React.PropTypes.bool,
     deleteAlarmCallback: React.PropTypes.func.isRequired,
     streamId: React.PropTypes.string.isRequired,
-    subtitle: React.PropTypes.string.isRequired,
-    titleAnnotation: React.PropTypes.string.isRequired,
+    subtitle: React.PropTypes.string,
+    titleAnnotation: React.PropTypes.string,
     types: React.PropTypes.object.isRequired,
     updateAlarmCallback: React.PropTypes.func.isRequired,
   },

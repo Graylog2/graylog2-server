@@ -1,14 +1,13 @@
 import React from 'react';
 
-import AlarmCallback from 'components/alarmcallbacks//AlarmCallback';
-import Spinner from 'components/common/Spinner';
+import { AlarmCallback } from 'components/alarmcallbacks';
+import { Spinner } from 'components/common';
 
 const AlarmCallbackList = React.createClass({
   propTypes: {
     alarmCallbacks: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     types: React.PropTypes.object.isRequired,
     streamId: React.PropTypes.string.isRequired,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
     onUpdate: React.PropTypes.func.isRequired,
     onDelete: React.PropTypes.func.isRequired,
   },
@@ -25,10 +24,9 @@ const AlarmCallbackList = React.createClass({
     return <Spinner />;
   },
   render() {
-    var alarmCallbacks = this.props.alarmCallbacks.map((alarmCallback) => {
+    const alarmCallbacks = this.props.alarmCallbacks.map((alarmCallback) => {
       return (<AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback} streamId={this.props.streamId}
-                            types={this.props.types} permissions={this.props.permissions}
-                            deleteAlarmCallback={this.props.onDelete} updateAlarmCallback={this.props.onUpdate} />);
+                            types={this.props.types} deleteAlarmCallback={this.props.onDelete} updateAlarmCallback={this.props.onUpdate} />);
     });
 
     if (alarmCallbacks.length > 0) {

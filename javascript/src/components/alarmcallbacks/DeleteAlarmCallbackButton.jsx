@@ -1,20 +1,22 @@
-'use strict';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
-var React = require('react');
-
-var DeleteAlarmCallbackButton = React.createClass({
-    handleClick(evt) {
-        if(window.confirm("Really delete alarm destination?")) {
-            this.props.onClick(this.props.alarmCallback);
-        }
-    },
-    render() {
-        return (
-            <button className="btn btn-danger" onClick={this.handleClick}>
-                Delete callback
-            </button>
-        );
+const DeleteAlarmCallbackButton = React.createClass({
+  propTypes: {
+    onClick: React.PropTypes.func.isRequired,
+  },
+  handleClick(evt) {
+    if(window.confirm('Really delete alarm destination?')) {
+      this.props.onClick(this.props.alarmCallback);
     }
+  },
+  render() {
+    return (
+      <Button bsStyle="danger" onClick={this.handleClick}>
+        Delete callback
+      </Button>
+    );
+  },
 });
 
-module.exports = DeleteAlarmCallbackButton;
+export default DeleteAlarmCallbackButton;

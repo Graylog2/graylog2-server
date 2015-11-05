@@ -7,8 +7,8 @@ import AlarmCallbacksStore from 'stores/alarmcallbacks/AlarmCallbacksStore';
 
 import AlarmCallbacksActions from 'actions/alarmcallbacks/AlarmCallbacksActions';
 
-import Spinner from 'components/common/Spinner';
-import AlarmCallbackHistory from 'components/alarmcallbacks/AlarmCallbackHistory';
+import { Spinner } from 'components/common';
+import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
 const AlarmCallbackHistoryOverview = React.createClass({
   mixins: [Reflux.connect(AlarmCallbacksStore)],

@@ -1,21 +1,16 @@
 import React from 'react';
 
 import AlarmCallbacksActions from 'actions/alarmcallbacks/AlarmCallbacksActions';
-import PermissionsMixin from 'util/PermissionsMixin';
 
-import Spinner from 'components/common/Spinner';
-import AlarmCallbackList from 'components/alarmcallbacks/AlarmCallbackList';
-import CreateAlarmCallbackButton from 'components/alarmcallbacks/CreateAlarmCallbackButton';
+import { IfPermitted, Spinner } from 'components/common';
+import { AlarmCallbackList, CreateAlarmCallbackButton } from 'components/alarmcallbacks';
 
-var AlarmCallbackComponent = React.createClass({
+const AlarmCallbackComponent = React.createClass({
   propTypes: {
     streamId: React.PropTypes.string.isRequired,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
-  mixins: [PermissionsMixin],
   getInitialState() {
-    return {
-    };
+    return {};
   },
   componentDidMount() {
     this.loadData();
@@ -26,8 +21,6 @@ var AlarmCallbackComponent = React.createClass({
     });
     AlarmCallbacksActions.available.triggerPromise(this.props.streamId).then((available) => {
       this.setState({availableAlarmCallbacks: available});
-    }, (error) => {
-      console.log(error);
     });
   },
   _deleteAlarmCallback(alarmCallback) {
@@ -46,22 +39,21 @@ var AlarmCallbackComponent = React.createClass({
     });
   },
   render() {
-    var permissions = this.props.permissions;
-    if (this.state.alarmCallbacks && this.state.availableAlarmCallbacks) {
-      const createAlarmCallbackButton = (this.isPermitted(permissions, ['streams:edit:' + this.props.streamId]) ?
-        <CreateAlarmCallbackButton streamId={this.props.streamId} types={this.state.availableAlarmCallbacks} onCreate={this._createAlarmCallback} /> : null);
-      return (
-        <div className="alarm-callback-component">
-          {createAlarmCallbackButton}
-
-          <AlarmCallbackList alarmCallbacks={this.state.alarmCallbacks}
-                             streamId={this.props.streamId} permissions={permissions} types={this.state.availableAlarmCallbacks}
-                             onUpdate={this._updateAlarmCallback} onDelete={this._deleteAlarmCallback} onCreate={this._createAlarmCallback} />
-        </div>
-      );
+    if (!this.state.alarmCallbacks || !this.state.availableAlarmCallbacks) {
+      return <Spinner />;
     }
 
-    return <Spinner />;
+    return (
+      <div className="alarm-callback-component">
+        <IfPermitted permissions={'streams:edit:' + this.props.streamId}>
+          <CreateAlarmCallbackButton streamId={this.props.streamId} types={this.state.availableAlarmCallbacks} onCreate={this._createAlarmCallback} />
+        </IfPermitted>
+
+        <AlarmCallbackList alarmCallbacks={this.state.alarmCallbacks}
+                           streamId={this.props.streamId} types={this.state.availableAlarmCallbacks}
+                           onUpdate={this._updateAlarmCallback} onDelete={this._deleteAlarmCallback} onCreate={this._createAlarmCallback} />
+      </div>
+    );
   },
 });
 

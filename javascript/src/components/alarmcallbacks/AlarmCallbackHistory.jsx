@@ -1,5 +1,5 @@
 import React from 'react';
-import AlarmCallback from 'components/alarmcallbacks/AlarmCallback';
+import { AlarmCallback } from 'components/alarmcallbacks';
 
 const AlarmCallbackHistory = React.createClass({
   propTypes: {
