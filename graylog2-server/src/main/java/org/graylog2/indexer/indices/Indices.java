@@ -387,7 +387,7 @@ public class Indices implements IndexManagement {
 
     @Nullable
     public IndexStatistics getIndexStats(String index) {
-        if (index.startsWith(configuration.getIndexPrefix())) {
+        if (!index.startsWith(configuration.getIndexPrefix())) {
             return null;
         }
 
