@@ -10,6 +10,8 @@ import Routes from 'routing/Routes';
 const ExtractorsListItem = React.createClass({
   propTypes: {
     extractor: PropTypes.object.isRequired,
+    inputId: PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
   },
   getInitialState() {
     return {
@@ -62,7 +64,7 @@ const ExtractorsListItem = React.createClass({
     );
     actions.push(
       <LinkContainer key={`edit-extractor-${this.props.extractor.id}`}
-                     to={Routes.edit_input_extractor('', '', this.props.extractor.id)}>
+                     to={Routes.edit_input_extractor(this.props.nodeId, this.props.inputId, this.props.extractor.id)}>
         <Button bsStyle="info">Edit</Button>
       </LinkContainer>
     );

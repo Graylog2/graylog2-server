@@ -13,13 +13,14 @@ import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 const ExtractorsList = React.createClass({
   propTypes: {
     input: PropTypes.object.isRequired,
+    node: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
   componentDidMount() {
     ExtractorsActions.list.triggerPromise(this.props.input.input_id);
   },
   _formatExtractor(extractor) {
-    return <ExtractorsListItem key={extractor.id} extractor={extractor}/>;
+    return <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.input_id} nodeId={this.props.node.node_id}/>;
   },
   _isLoading() {
     return !this.state.extractors;

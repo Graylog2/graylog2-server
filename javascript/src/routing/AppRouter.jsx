@@ -18,6 +18,7 @@ import ShowDashboardPage from 'pages/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
 import InputsPage from 'pages/InputsPage';
 import ExtractorsPage from 'pages/ExtractorsPage';
+import EditExtractorsPage from 'pages/EditExtractorsPage';
 import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 import RolesPage from 'pages/RolesPage';
@@ -49,6 +50,8 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage}/>
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage}/>
+            <Route path={Routes.new_extractor(':nodeId', ':inputId')} component={EditExtractorsPage}/>
+            <Route path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')} component={EditExtractorsPage}/>
             <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>

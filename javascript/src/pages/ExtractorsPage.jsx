@@ -78,7 +78,7 @@ const ExtractorsPage = React.createClass({
             </LinkContainer>
           </DropdownButton>
         </PageHeader>
-        <ExtractorsList input={this.state.input} />
+        <ExtractorsList input={this.state.input} node={this.state.node} />
       </div>
     );
   },
