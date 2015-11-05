@@ -16,6 +16,8 @@
  */
 package org.graylog2.system.stats;
 
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.database.NotFoundException;
@@ -34,6 +36,7 @@ import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Map;
 
 @Singleton
 public class ClusterStatsService {
@@ -48,6 +51,8 @@ public class ClusterStatsService {
     private final BundleService bundleService;
     private final LdapSettingsService ldapSettingsService;
     private final RoleService roleService;
+    private final AlertService alertService;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public ClusterStatsService(ElasticsearchProbe elasticsearchProbe,
@@ -60,7 +65,9 @@ public class ClusterStatsService {
                                DashboardService dashboardService,
                                BundleService bundleService,
                                LdapSettingsService ldapSettingsService,
-                               RoleService roleService) {
+                               RoleService roleService,
+                               AlertService alertService,
+                               AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         this.elasticsearchProbe = elasticsearchProbe;
         this.mongoProbe = mongoProbe;
         this.userService = userService;
@@ -72,6 +79,8 @@ public class ClusterStatsService {
         this.bundleService = bundleService;
         this.ldapSettingsService = ldapSettingsService;
         this.roleService = roleService;
+        this.alertService = alertService;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
     public ClusterStats clusterStats() {
@@ -91,7 +100,8 @@ public class ClusterStatsService {
                 inputService.totalExtractorCount(),
                 inputService.totalExtractorCountByType(),
                 bundleService.count(),
-                ldapStats()
+                ldapStats(),
+                alarmStats()
         );
     }
 
@@ -122,5 +132,11 @@ public class ClusterStatsService {
                                 ldapSettings.isActiveDirectory(),
                                 ldapSettings.getGroupMapping().size(),
                                 numberOfRoles);
+    }
+
+    public AlarmStats alarmStats() {
+        final long totalCount = alertService.totalCount();
+        final Map<String, Long> counterPerType = alarmCallbackConfigurationService.countPerType();
+        return AlarmStats.create(totalCount, counterPerType);
     }
 }
