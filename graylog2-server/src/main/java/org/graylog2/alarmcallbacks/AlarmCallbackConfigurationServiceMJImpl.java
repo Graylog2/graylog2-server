@@ -114,9 +114,4 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
             throw new IllegalArgumentException("Supplied output must be of implementation type AlarmCallbackConfigurationAVImpl, not " + callback.getClass());
         }
     }
-
-    private static class CountAggrType {
-        public String _id;
-        public long total;
-    }
 }
