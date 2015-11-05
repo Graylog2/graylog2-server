@@ -10,21 +10,21 @@ const EditAlarmCallbackButton = React.createClass({
     onUpdate: React.PropTypes.func.isRequired,
     types: React.PropTypes.object.isRequired,
   },
+  getDefaultProps() {
+    return {
+      disabled: false,
+    };
+  },
   _handleClick() {
     this.refs.configurationForm.open();
   },
   _handleSubmit(data) {
     this.props.onUpdate(this.props.alarmCallback, data);
   },
-  getDefaultProps() {
-    return {
-      disabled: false
-    };
-  },
   render() {
     const alarmCallback = this.props.alarmCallback;
     const definition = this.props.types[alarmCallback.type];
-    const configurationForm = (definition ? <ConfigurationForm ref="configurationForm" key={"configuration-form-alarm-callback-"+alarmCallback.id}
+    const configurationForm = (definition ? <ConfigurationForm ref="configurationForm" key={'configuration-form-alarm-callback-' + alarmCallback.id}
                                                                configFields={definition.requested_configuration}
                                                                title={"Editing Alarm Callback "}
                                                                typeName={alarmCallback.type} includeTitleField={false}

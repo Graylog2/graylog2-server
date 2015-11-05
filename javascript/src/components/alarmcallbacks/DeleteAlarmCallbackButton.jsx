@@ -3,10 +3,11 @@ import { Button } from 'react-bootstrap';
 
 const DeleteAlarmCallbackButton = React.createClass({
   propTypes: {
+    alarmCallback: React.PropTypes.object.isRequired,
     onClick: React.PropTypes.func.isRequired,
   },
-  handleClick(evt) {
-    if(window.confirm('Really delete alarm destination?')) {
+  handleClick() {
+    if (window.confirm('Really delete alarm destination?')) {
       this.props.onClick(this.props.alarmCallback);
     }
   },

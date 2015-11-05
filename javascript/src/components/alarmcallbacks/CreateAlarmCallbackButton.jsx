@@ -1,15 +1,19 @@
 import React from 'react';
 import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
-import $ from 'jquery';
+import jQuery from 'jquery';
 
 const CreateAlarmCallbackButton = React.createClass({
+  propTypes: {
+    onCreate: React.PropTypes.func.isRequired,
+    types: React.PropTypes.object.isRequired,
+  },
   getInitialState() {
     return {
       typeName: this.PLACEHOLDER,
       typeDefinition: {},
     };
   },
-  PLACEHOLDER: "placeholder",
+  PLACEHOLDER: 'placeholder',
   _openModal() {
     this.refs.configurationForm.open();
   },
@@ -33,10 +37,10 @@ const CreateAlarmCallbackButton = React.createClass({
     this.setState({typeName: this.PLACEHOLDER});
   },
   render() {
-    const alarmCallbackTypes = $.map(this.props.types, this._formatOutputType);
-    const humanTypeName = (this.state.typeName && this.props.types[this.state.typeName] ? this.props.types[this.state.typeName].name : "Alarm Callback");
+    const alarmCallbackTypes = jQuery.map(this.props.types, this._formatOutputType);
+    const humanTypeName = (this.state.typeName && this.props.types[this.state.typeName] ? this.props.types[this.state.typeName].name : 'Alarm Callback');
     const configurationForm = (this.state.typeName !== this.PLACEHOLDER ? <ConfigurationForm ref="configurationForm"
-                                                                                           key="configuration-form-output" configFields={this.state.typeDefinition} title={"Create new " + humanTypeName}
+                                                                                           key="configuration-form-output" configFields={this.state.typeDefinition} title={'Create new ' + humanTypeName}
                                                                                            typeName={this.state.typeName} includeTitleField={false}
                                                                                            submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
 
