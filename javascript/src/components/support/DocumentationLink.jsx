@@ -3,9 +3,9 @@ import DocsHelper from 'util/DocsHelper';
 
 const DocumentationLink = React.createClass({
   propTypes: {
-    page: React.PropTypes.object.isRequired,
-    title: React.PropTypes.string.isRequired,
+    page: React.PropTypes.string.isRequired,
     text: React.PropTypes.node.isRequired,
+    title: React.PropTypes.string,
   },
   render() {
     return (
