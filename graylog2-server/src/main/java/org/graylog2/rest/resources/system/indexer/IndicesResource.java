@@ -26,12 +26,14 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
@@ -57,6 +59,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @RequiresAuthentication
@@ -98,12 +102,39 @@ public class IndicesResource extends RestResource {
         }
 
         final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-        for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.getShardRoutings()) {
+        for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.shardRoutings()) {
             routing.add(shardRouting(shardRouting));
         }
 
-        return IndexInfo.create(indexStats(stats.getPrimaries()), indexStats(stats.getTotal()),
+        return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
                 routing.build(), indices.isReopened(index));
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get information of all indices managed by Graylog and their shards.")
+    @RequiresPermissions(RestPermissions.INDICES_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    public AllIndicesInfo all() {
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats();
+
+        final Map<String, IndexInfo> indexInfos = new HashMap<>();
+        for(IndexStatistics indexStatistics : indicesStats) {
+            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
+            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
+                routing.add(shardRouting(shardRouting));
+            }
+
+            final IndexInfo indexInfo = IndexInfo.create(
+                    indexStats(indexStatistics.primaries()),
+                    indexStats(indexStatistics.total()),
+                    routing.build(),
+                    indices.isReopened(indexStatistics.indexName()));
+
+            indexInfos.put(indexStatistics.indexName(), indexInfo);
+        }
+
+        return AllIndicesInfo.create(indexInfos);
     }
 
     @GET
