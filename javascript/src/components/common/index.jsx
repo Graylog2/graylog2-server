@@ -6,6 +6,7 @@ import EntityListItem from './EntityListItem';
 import IfPermitted from './IfPermitted';
 import MultiSelect from './MultiSelect';
 import PageHeader from './PageHeader';
+import PaginatedList from './PaginatedList';
 import Select from './Select';
 import Spinner from './Spinner';
 import TableList from './TableList';
@@ -22,6 +23,7 @@ export {
   IfPermitted,
   MultiSelect,
   PageHeader,
+  PaginatedList,
   Spinner,
   TableList,
   TypeAheadDataFilter,
