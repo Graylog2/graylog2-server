@@ -127,6 +127,7 @@ const jsRoutes = {
       newExtractor: (nodeId, inputId, extractorType, fieldName, index, messageId) => {
         return {url: `/system/inputs/${nodeId}/${inputId}/extractors/new?extractor_type=${extractorType}&field=${fieldName}&example_index=${index}&example_id=${messageId}`};
       },
+      update: (inputId, extractorId) => { return {url: `/system/inputs/${inputId}/extractors/${extractorId}`}; },
     },
     MessagesController: {
       single: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
