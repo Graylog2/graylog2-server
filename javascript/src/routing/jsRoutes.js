@@ -34,6 +34,14 @@ const jsRoutes = {
         widgetValue: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'}; },
         updatePositions: (dashboardId) => { return {url: '/dashboards/' + dashboardId + '/positions'}; },
       },
+      IndexerClusterApiController: {
+        health: () => { return {url: '/system/indexer/cluster/health'}; },
+        name: () => { return {url: '/system/indexer/cluster/name'}; },
+      },
+      IndexerFailuresApiController: {
+        count: () => { return {url: '/system/indexer/failures/count'}; },
+        list: () => { return {url: '/system/indexer/failures?limit=' + limit + '&offset=' + offset}; },
+      },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },
         get: (id) => { return {url: `/system/inputs/${id}`}; },
