@@ -48,11 +48,13 @@ const SystemMessagesComponent = React.createClass({
           <SystemMessagesList messages={this.state.messages}/>
 
 
-          <Pagination bsSize="small" items={numberPages}
-                      activePage={this.state.currentPage}
-                      onSelect={this._onSelected}
-                      prev next first last
-                      maxButtons={Math.min(paginatorSize, numberPages)}/>
+          <nav style={{textAlign: 'center'}}>
+            <Pagination bsSize="small" items={numberPages}
+                        activePage={this.state.currentPage}
+                        onSelect={this._onSelected}
+                        prev next first last
+                        maxButtons={Math.min(paginatorSize, numberPages)}/>
+          </nav>
         </Col>
       </Row>
     );

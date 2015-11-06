@@ -11,6 +11,9 @@ const Routes = {
       EXPORT: '/system/contentpacks/export',
     },
     GROKPATTERNS: '/system/grokpatterns',
+    INDICES: {
+      FAILURES: '/system/indices/failures',
+    },
     INPUTS: '/system/inputs',
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',

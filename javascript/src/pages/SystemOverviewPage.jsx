@@ -4,7 +4,7 @@ import { IfPermitted } from 'components/common';
 import { NotificationsList } from 'components/notifications';
 import { TimesList } from 'components/times';
 import { SystemMessagesComponent } from 'components/systemmessages';
-import { IndexerClusterHealth } from 'components/indexers';
+import { IndexerClusterHealth, IndexerFailuresComponent } from 'components/indexers';
 
 const SystemOverviewPage = React.createClass({
   render() {
@@ -16,6 +16,10 @@ const SystemOverviewPage = React.createClass({
 
         <IfPermitted permissions="indexercluster:read">
           <IndexerClusterHealth />
+        </IfPermitted>
+
+        <IfPermitted permissions="indices:failures">
+          <IndexerFailuresComponent />
         </IfPermitted>
 
         <TimesList />

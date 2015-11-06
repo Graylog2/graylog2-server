@@ -39,8 +39,8 @@ const jsRoutes = {
         name: () => { return {url: '/system/indexer/cluster/name'}; },
       },
       IndexerFailuresApiController: {
-        count: () => { return {url: '/system/indexer/failures/count'}; },
-        list: () => { return {url: '/system/indexer/failures?limit=' + limit + '&offset=' + offset}; },
+        count: (since) => { return {url: '/system/indexer/failures/count?since=' + since}; },
+        list: (limit, offset) => { return {url: '/system/indexer/failures?limit=' + limit + '&offset=' + offset}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },

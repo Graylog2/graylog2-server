@@ -10,8 +10,8 @@ const IndexerClusterStore = Reflux.createStore({
     this.health().then((health) => {
       this.trigger({health: health});
     });
-    this.name().then((name) => {
-      this.trigger({name: name});
+    this.name().then((response) => {
+      this.trigger({name: response.name});
     });
   },
   health() {

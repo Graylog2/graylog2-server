@@ -14,5 +14,5 @@ class AlarmCallbackHistoryStore {
         return fetch('GET', url).catch(failCallback);
     }
 }
-var alarmCallbackHistoryStore = new AlarmCallbackHistoryStore();
-export = alarmCallbackHistoryStore;
+const alarmCallbackHistoryStore = new AlarmCallbackHistoryStore();
+export default alarmCallbackHistoryStore;
