@@ -5,16 +5,19 @@ const PaginatedList = React.createClass({
   propTypes: {
     children: React.PropTypes.node.isRequired,
     onChange: React.PropTypes.func.isRequired,
+    pageSize: React.PropTypes.number,
     pageSizes: React.PropTypes.arrayOf(React.PropTypes.number),
     totalItems: React.PropTypes.number.isRequired,
   },
   getDefaultProps() {
+    const defaultPageSizes = [10, 50, 100];
     return {
-      pageSizes: [10, 50, 100],
+      pageSizes: defaultPageSizes,
+      pageSize: defaultPageSizes[0],
     };
   },
   getInitialState() {
-    return {pageSize: this.props.pageSizes[0], currentPage: 1};
+    return {currentPage: 1, pageSize: this.props.pageSize};
   },
   _onChangePageSize(event) {
     event.preventDefault();
