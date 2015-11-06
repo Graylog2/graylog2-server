@@ -2,7 +2,6 @@ import React from 'react';
 
 import { IfPermitted } from 'components/common';
 import NotificationsList from 'components/notifications/NotificationsList';
-import { SystemJobList } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 
 const SystemOverviewPage = React.createClass({
