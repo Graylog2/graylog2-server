@@ -101,6 +101,7 @@ const jsRoutes = {
         create: (streamId) => { return {url: '/streams/' + streamId + '/rules'}; },
       },
       SystemApiController: {
+        info: () => { return {url: '/system'}; },
         fields: () => { return {url: '/system/fields'}; },
       },
       SystemMessagesApiController: {
