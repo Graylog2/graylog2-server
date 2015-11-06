@@ -38,7 +38,7 @@ const EditExtractor = React.createClass({
       );
       controls.push(
         <div key="grokControls">
-          <Input type="text" name="grok_pattern" label="Grok pattern" labelClassName="col-md-2"
+          <Input type="text" id="grok_pattern" label="Grok pattern" labelClassName="col-md-2"
                  wrapperClassName="col-md-10"
                  defaultValue={config.grok_pattern}
                  help={helpMessage}/>
@@ -53,13 +53,13 @@ const EditExtractor = React.createClass({
           <Input type="checkbox" label="Flatten structures" wrapperClassName="col-md-offset-2 col-md-10"
                  defaultChecked={config.flatten}
                  help="Whether to flatten JSON objects into a single message field or to expand into multiple fields."/>
-          <Input type="text" label="List item separator" name="list_separator" labelClassName="col-md-2"
+          <Input type="text" label="List item separator" id="list_separator" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.list_separator} required
                  help="What string to use to concatenate items of a JSON list."/>
-          <Input type="text" label="Key separator" name="key_separator" labelClassName="col-md-2"
+          <Input type="text" label="Key separator" id="key_separator" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.key_separator} required
                  help={<span>What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).</span>}/>
-          <Input type="text" label="Key/value separator" name="kv_separator" labelClassName="col-md-2"
+          <Input type="text" label="Key/value separator" id="kv_separator" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.kv_separator} required
                  help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."/>
         </div>
@@ -76,7 +76,7 @@ const EditExtractor = React.createClass({
       );
       controls.push(
         <div key="regexControls">
-          <Input type="text" label="Regular expression" name="regex_value" labelClassName="col-md-2"
+          <Input type="text" label="Regular expression" id="regex_value" labelClassName="col-md-2"
                  placeholder="^.*string(.+)$"
                  wrapperClassName="col-md-10" defaultValue={config.regex_value} required
                  help={helpMessage}/>
@@ -94,11 +94,11 @@ const EditExtractor = React.createClass({
       );
       controls.push(
         <div key="regexReplaceControls">
-          <Input type="text" label="Regular expression" name="regex" labelClassName="col-md-2"
+          <Input type="text" label="Regular expression" id="regex" labelClassName="col-md-2"
                  placeholder="^.*string(.+)$"
                  wrapperClassName="col-md-10" defaultValue={config.regex} required
                  help={helpMessage}/>
-          <Input type="text" label="Replacement" name="replacement" labelClassName="col-md-2"
+          <Input type="text" label="Replacement" id="replacement" labelClassName="col-md-2"
                  placeholder="$1"
                  wrapperClassName="col-md-10" defaultValue={config.replacement} required
                  help={<span>The replacement used for the matching text. Please refer to the <a target="_blank" href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">Matcher</a> API documentation for the possible options.</span>}/>
@@ -113,10 +113,10 @@ const EditExtractor = React.createClass({
     case 'substring':
       controls.push(
         <div key="substringControls">
-          <Input type="text" label="Begin index" name="begin_index" labelClassName="col-md-2"
+          <Input type="text" label="Begin index" id="begin_index" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.begin_index} required
                  help="Character position from where to start extracting. (Inclusive)"/>
-          <Input type="text" label="End index" name="end_index" labelClassName="col-md-2"
+          <Input type="text" label="End index" id="end_index" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.end_index} required
                  help={<span>Where to end extracting. (Exclusive) <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.</span>}/>
         </div>
@@ -127,10 +127,10 @@ const EditExtractor = React.createClass({
     case 'split_and_index':
       controls.push(
         <div key="splitAndIndexControls">
-          <Input type="text" label="Split by" name="split_by" labelClassName="col-md-2"
+          <Input type="text" label="Split by" id="split_by" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.split_by} required
                  help={<span>What character to split on. <strong>Example:</strong> A whitespace character will split <em>foo bar baz</em> to <em>[foo,bar,baz]</em>.</span>}/>
-          <Input type="text" label="Target index" name="index" labelClassName="col-md-2"
+          <Input type="text" label="Target index" id="index" labelClassName="col-md-2"
                  wrapperClassName="col-md-10" defaultValue={config.index} required
                  help={<span>What part of the split string to you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em> from <em>foo bar baz</em> when split by whitespace.</span>}/>
         </div>
@@ -146,9 +146,9 @@ const EditExtractor = React.createClass({
   },
   render() {
     // TODO:
-    // - Add controls for each extractor type
     // - Make string/regex conditions work again
     // - Add converters
+    // - Load recent message from input
     return (
       <div>
         <Row className="content extractor-list">
@@ -196,7 +196,7 @@ const EditExtractor = React.createClass({
                     </div>
                   </Input>
 
-                  <Input type="text" name="target_field" label="Store as field"
+                  <Input type="text" id="target_field" label="Store as field"
                          defaultValue={this.props.extractor.target_field}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"
@@ -208,17 +208,19 @@ const EditExtractor = React.createClass({
                          help={<span>Do you want to copy or cut from source? You cannot use the cutting feature on standard fields like <em>message</em> and <em>source</em>.</span>}>
                     <label className="radio-inline">
                       <input type="radio" name="cursor_strategy" value="copy"
+                             onChange={this._onFieldChange('cursor_strategy')}
                              defaultChecked={this.props.extractor.cursor_strategy === 'copy'}/>
                       Copy
                     </label>
                     <label className="radio-inline">
                       <input type="radio" name="cursor_strategy" value="cut"
+                             onChange={this._onFieldChange('cursor_strategy')}
                              defaultChecked={this.props.extractor.cursor_strategy === 'cut'}/>
                       Cut
                     </label>
                   </Input>
 
-                  <Input type="text" name="title" label="Extractor title" defaultValue={this.props.extractor.title}
+                  <Input type="text" id="title" label="Extractor title" defaultValue={this.props.extractor.title}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"
                          required
