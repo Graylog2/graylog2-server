@@ -3,20 +3,11 @@
 var React = require('react');
 var FieldHelpers = require('./FieldHelpers');
 
+var NumberUtils = require('util/NumberUtils');
+
 var NumberField = React.createClass({
     MAX_SAFE_INTEGER: (Number.MAX_SAFE_INTEGER !== undefined ? Number.MAX_SAFE_INTEGER : Math.pow(2,53)-1),
     MIN_SAFE_INTEGER: (Number.MIN_SAFE_INTEGER !== undefined ? Number.MIN_SAFE_INTEGER : -1*(Math.pow(2,53)-1)),
-    getInitialState() {
-        return {
-            typeName: this.props.typeName,
-            field: this.props.field,
-            title: this.props.title,
-            value: this.props.value
-        };
-    },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
     _getDefaultValidationSpecs() {
         return {min: this.MIN_SAFE_INTEGER, max: this.MAX_SAFE_INTEGER};
     },
@@ -39,16 +30,15 @@ var NumberField = React.createClass({
         }
     },
     handleChange(evt) {
-        const numericValue = Number(evt.target.value);
-        this.props.onChange(this.state.title, numericValue);
-        this.setState({value: numericValue});
+        const numericValue = NumberUtils.isNumber(evt.target.value) ? Number(evt.target.value) : undefined;
+        this.props.onChange(this.props.title, numericValue);
     },
     render() {
-        var typeName = this.state.typeName;
-        var field = this.state.field;
+        var typeName = this.props.typeName;
+        var field = this.props.field;
         var isRequired = !field.is_optional;
         var validationSpecs = this.validationSpec(field);
-        var defaultValue = field.default_value;
+        var fieldValue = this.props.value !== undefined ? this.props.value : field.default_value;
 
         return (
             <div className="form-group">
@@ -56,8 +46,9 @@ var NumberField = React.createClass({
                     {field.human_name}
                     {FieldHelpers.optionalMarker(field)}
                 </label>
-                <input id={field.title} type="number" required={isRequired} onChange={this.handleChange} value={this.state.value}
-                       defaultValue={defaultValue} className="input-xlarge validatable form-control"
+
+                <input id={field.title} type="number" required={isRequired} onChange={this.handleChange}
+                       defaultValue={fieldValue} className="input-xlarge validatable form-control"
                        {...validationSpecs} autoFocus={this.props.autoFocus} />
 
                 <p className="help-block">{field.description}</p>
