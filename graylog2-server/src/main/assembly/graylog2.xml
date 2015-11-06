@@ -49,7 +49,7 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.build.directory}/graylog2-server-${project.version}.jar</source>
+            <source>${project.build.directory}/graylog2-server-${project.version}-shaded.jar</source>
             <destName>graylog.jar</destName>
             <outputDirectory>/</outputDirectory>
         </file>

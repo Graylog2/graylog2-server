@@ -376,6 +376,7 @@
                             <mainClass>${mainClass}</mainClass>
                         </transformer>
                     </transformers>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
                         <filter>
