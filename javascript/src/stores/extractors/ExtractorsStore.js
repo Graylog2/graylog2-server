@@ -6,11 +6,18 @@ import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 const ExtractorsStore = Reflux.createStore({
   listenables: [ExtractorsActions],
   sourceUrl: '/system/inputs/',
+  extractors: undefined,
+  extractor: undefined,
+
+  init() {
+    this.trigger({extractors: this.extractors, extractor: this.extractor});
+  },
 
   list(inputId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')))
       .then(response => {
-        this.trigger({extractors: response.extractors});
+        this.extractors = response.extractors;
+        this.trigger({extractors: this.extractors});
       });
 
     ExtractorsActions.list.promise(promise);
@@ -19,7 +26,8 @@ const ExtractorsStore = Reflux.createStore({
   get(inputId, extractorId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)))
       .then(response => {
-        this.trigger({extractor: response});
+        this.extractor = response;
+        this.trigger({extractor: this.extractor});
       });
 
     ExtractorsActions.get.promise(promise);
