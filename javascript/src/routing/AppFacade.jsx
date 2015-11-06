@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import AppRouter from 'routing/AppRouter';
-import LoginPage from 'components/sessions/LoginPage';
+import LoginPage from 'pages/LoginPage';
 import SessionStore from 'stores/sessions/SessionStore';
 
 const AppFacade = React.createClass({
