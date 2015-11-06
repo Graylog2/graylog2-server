@@ -8,6 +8,7 @@ import ExtractorUtils from 'util/ExtractorUtils';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 
 import ToolsStore from 'stores/tools/ToolsStore';
+import FormUtils from 'util/FormsUtils';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -33,7 +34,7 @@ const EditExtractor = React.createClass({
     return (event) => {
       const nextState = {};
       const updatedExtractor = this.state.updatedExtractor;
-      updatedExtractor[key] = event.target.value;
+      updatedExtractor[key] = FormUtils.getValueFromEventTarget(event.target);
       nextState.updatedExtractor = updatedExtractor;
 
       // Reset result of testing condition after a change in the input
