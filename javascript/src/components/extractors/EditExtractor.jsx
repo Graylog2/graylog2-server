@@ -5,6 +5,7 @@ import {LinkContainer} from 'react-router-bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 import ExtractorUtils from 'util/ExtractorUtils';
+import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -12,6 +13,19 @@ import Routes from 'routing/Routes';
 const EditExtractor = React.createClass({
   propTypes: {
     extractor: PropTypes.object,
+    inputId: PropTypes.string.isRequired,
+  },
+  getInitialState() {
+    return {
+      updatedExtractor: this.props.extractor,
+    };
+  },
+  _onFieldChange(key) {
+    return (event) => {
+      const updatedExtractor = this.state.updatedExtractor;
+      updatedExtractor[key] = event.target.value;
+      this.setState({updatedExtractor: updatedExtractor});
+    };
   },
   _getExtractorControls(extractorType, config) {
     const controls = [];
@@ -102,7 +116,8 @@ const EditExtractor = React.createClass({
                  placeholder="$1"
                  wrapperClassName="col-md-10" defaultValue={config.replacement} required
                  help={<span>The replacement used for the matching text. Please refer to the <a target="_blank" href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">Matcher</a> API documentation for the possible options.</span>}/>
-          <Input type="checkbox" label="Replace all occurrences of the pattern" wrapperClassName="col-md-offset-2 col-md-10"
+          <Input type="checkbox" label="Replace all occurrences of the pattern"
+                 wrapperClassName="col-md-offset-2 col-md-10"
                  defaultChecked={config.replace_all}
                  help="Whether to replace all occurrences of the given pattern or only the first occurrence."/>
         </div>
@@ -139,10 +154,14 @@ const EditExtractor = React.createClass({
       // TODO: try
       break;
     default:
-      console.warn(`Unsupported extractor type ${this.props.extractor.type}`);
+      console.warn(`Unsupported extractor type ${extractorType}`);
     }
 
     return controls;
+  },
+  _updateExtractor(event) {
+    event.preventDefault();
+    ExtractorsActions.update.triggerPromise(this.props.inputId, this.state.updatedExtractor);
   },
   render() {
     // TODO:
@@ -156,50 +175,56 @@ const EditExtractor = React.createClass({
             <h2>Example message</h2>
             <Row style={{marginTop: 5}}>
               <Col md={12}>
-                <ExtractorExampleMessage field={this.props.extractor.target_field} example={'Alles wird wunderbar'}/>
+                <ExtractorExampleMessage field={this.state.updatedExtractor.target_field}
+                                         example={'Alles wird wunderbar'}/>
               </Col>
             </Row>
             <h2>Extractor configuration</h2>
             <Row>
               <Col md={8}>
-                <form className="extractor-form form-horizontal" method="POST">
+                <form className="extractor-form form-horizontal" method="POST" onSubmit={this._updateExtractor}>
                   <FormControls.Static label="Extractor type"
-                                       value={ExtractorUtils.getReadableExtractorTypeName(this.props.extractor.type)}
+                                       value={ExtractorUtils.getReadableExtractorTypeName(this.state.updatedExtractor.type)}
                                        labelClassName="col-md-2" wrapperClassName="col-md-10"/>
-                  <FormControls.Static label="Source field" value={this.props.extractor.source_field}
+                  <FormControls.Static label="Source field" value={this.state.updatedExtractor.source_field}
                                        labelClassName="col-md-2" wrapperClassName="col-md-10"/>
 
-                  {this._getExtractorControls(this.props.extractor.type, this.props.extractor.extractor_config)}
+                  {this._getExtractorControls(this.state.updatedExtractor.type, this.state.updatedExtractor.extractor_config)}
 
                   <Input label="Condition" labelClassName="col-md-2" wrapperClassName="col-md-10"
                          help="Extracting only from messages that match a certain condition helps you avoiding wrong or unnecessary extractions and can also save CPU resources.">
                     <div className="radio">
                       <label>
                         <input type="radio" name="condition_type" value="none"
-                               defaultChecked={this.props.extractor.condition_type === 'none'}/>
+                               onChange={this._onFieldChange('condition_type')}
+                               defaultChecked={this.state.updatedExtractor.condition_type === 'none'}/>
                         Always try to extract
                       </label>
                     </div>
                     <div className="radio">
                       <label>
                         <input type="radio" name="condition_type" value="string"
-                               defaultChecked={this.props.extractor.condition_type === 'string'}/>
+                               onChange={this._onFieldChange('condition_type')}
+                               defaultChecked={this.state.updatedExtractor.condition_type === 'string'}/>
                         Only attempt extraction if field contains string
                       </label>
                     </div>
                     <div className="radio">
                       <label>
                         <input type="radio" name="condition_type" value="regex"
-                               defaultChecked={this.props.extractor.condition_type === 'regex'}/>
+                               onChange={this._onFieldChange('condition_type')}
+                               defaultChecked={this.state.updatedExtractor.condition_type === 'regex'}/>
                         Only attempt extraction if field matches regular expression
                       </label>
                     </div>
                   </Input>
+                  {conditionInput}
 
                   <Input type="text" id="target_field" label="Store as field"
-                         defaultValue={this.props.extractor.target_field}
+                         defaultValue={this.state.updatedExtractor.target_field}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"
+                         onChange={this._onFieldChange('target_field')}
                          required
                          help={<span>Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em> for example if you are extracting a HTTP response code.</span>}/>
 
@@ -209,20 +234,22 @@ const EditExtractor = React.createClass({
                     <label className="radio-inline">
                       <input type="radio" name="cursor_strategy" value="copy"
                              onChange={this._onFieldChange('cursor_strategy')}
-                             defaultChecked={this.props.extractor.cursor_strategy === 'copy'}/>
+                             defaultChecked={this.state.updatedExtractor.cursor_strategy === 'copy'}/>
                       Copy
                     </label>
                     <label className="radio-inline">
                       <input type="radio" name="cursor_strategy" value="cut"
                              onChange={this._onFieldChange('cursor_strategy')}
-                             defaultChecked={this.props.extractor.cursor_strategy === 'cut'}/>
+                             defaultChecked={this.state.updatedExtractor.cursor_strategy === 'cut'}/>
                       Cut
                     </label>
                   </Input>
 
-                  <Input type="text" id="title" label="Extractor title" defaultValue={this.props.extractor.title}
+                  <Input type="text" id="title" label="Extractor title"
+                         defaultValue={this.state.updatedExtractor.title}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"
+                         onChange={this._onFieldChange('title')}
                          required
                          help="A descriptive name for this extractor."/>
 

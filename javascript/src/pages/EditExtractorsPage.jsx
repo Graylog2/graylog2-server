@@ -48,7 +48,7 @@ const EditExtractorsPage = React.createClass({
             {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
           </span>
         </PageHeader>
-        <EditExtractor extractor={this.state.extractor} />
+        <EditExtractor extractor={this.state.extractor} inputId={this.state.input.input_id} />
       </div>
     );
   },
