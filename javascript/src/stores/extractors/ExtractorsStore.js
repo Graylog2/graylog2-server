@@ -12,6 +12,8 @@ function getExtractorDTO(extractor) {
     converters[converter.type] = converter.config;
   });
 
+  const conditionValue = extractor.condition_type !== 'none' ? extractor.condition_value : '';
+
   return {
     title: extractor.title,
     cut_or_copy: extractor.cursor_strategy,
@@ -21,7 +23,7 @@ function getExtractorDTO(extractor) {
     extractor_config: extractor.extractor_config,
     converters: converters,
     condition_type: extractor.condition_type,
-    condition_value: extractor.condition_value,
+    condition_value: conditionValue,
     order: extractor.order,
   };
 }
