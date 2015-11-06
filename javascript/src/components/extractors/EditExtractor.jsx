@@ -7,6 +7,8 @@ import ExtractorExampleMessage from './ExtractorExampleMessage';
 import ExtractorUtils from 'util/ExtractorUtils';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 
+import ToolsStore from 'stores/tools/ToolsStore';
+
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
@@ -14,18 +16,87 @@ const EditExtractor = React.createClass({
   propTypes: {
     extractor: PropTypes.object,
     inputId: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
+  },
+  getDefaultProps() {
+    return {
+      exampleMessage: 'This is an example message, please change me!',
+    };
   },
   getInitialState() {
     return {
       updatedExtractor: this.props.extractor,
+      conditionTestResult: undefined,
     };
   },
   _onFieldChange(key) {
     return (event) => {
+      const nextState = {};
       const updatedExtractor = this.state.updatedExtractor;
       updatedExtractor[key] = event.target.value;
-      this.setState({updatedExtractor: updatedExtractor});
+      nextState.updatedExtractor = updatedExtractor;
+
+      // Reset result of testing condition after a change in the input
+      if (key === 'condition_value') {
+        nextState.conditionTestResult = undefined;
+      }
+
+      this.setState(nextState);
     };
+  },
+  _testCondition() {
+    const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.props.exampleMessage);
+    promise.then(result => this.setState({conditionTestResult: result.matched}));
+  },
+  _getExtractorConditionControls() {
+    let conditionInput;
+
+    if (this.state.updatedExtractor.condition_type !== 'none') {
+      let conditionInputLabel;
+      let conditionInputHelp;
+
+      if (this.state.updatedExtractor.condition_type === 'string') {
+        conditionInputLabel = 'Field contains string';
+        conditionInputHelp = 'Type a string that the field should contain in order to attempt the extraction.';
+      } else {
+        conditionInputLabel = 'Field matches regular expression';
+        conditionInputHelp = 'Type a regular expression that the field should contain in order to attempt the extraction.';
+      }
+
+      let inputStyle;
+      if (this.state.conditionTestResult === true) {
+        inputStyle = 'success';
+        conditionInputHelp = 'Matches! Extractor would run against this example.';
+      } else if (this.state.conditionTestResult === false) {
+        inputStyle = 'error';
+        conditionInputHelp = 'Does not match! Extractor would not run.';
+      }
+
+      conditionInput = (
+        <div>
+          <Input id="condition_value" label={conditionInputLabel}
+                 bsStyle={inputStyle}
+                 labelClassName="col-md-2"
+                 wrapperClassName="col-md-10"
+                 help={conditionInputHelp}>
+            <Row className="row-sm">
+              <Col md={11}>
+                <input type="text" id="condition_value" className="form-control"
+                       defaultValue={this.state.updatedExtractor.condition_value}
+                       onChange={this._onFieldChange('condition_value')} required/>
+              </Col>
+              <Col md={1} className="text-right">
+                <Button bsStyle="info" onClick={this._testCondition} disabled={this.state.updatedExtractor.condition_value === ''}>
+                  Try
+                </Button>
+              </Col>
+            </Row>
+          </Input>
+        </div>
+      );
+    }
+
+    return conditionInput;
   },
   _getExtractorControls(extractorType, config) {
     const controls = [];
@@ -165,9 +236,9 @@ const EditExtractor = React.createClass({
   },
   render() {
     // TODO:
-    // - Make string/regex conditions work again
     // - Add converters
     // - Load recent message from input
+
     return (
       <div>
         <Row className="content extractor-list">
@@ -176,7 +247,7 @@ const EditExtractor = React.createClass({
             <Row style={{marginTop: 5}}>
               <Col md={12}>
                 <ExtractorExampleMessage field={this.state.updatedExtractor.target_field}
-                                         example={'Alles wird wunderbar'}/>
+                                         example={this.props.exampleMessage}/>
               </Col>
             </Row>
             <h2>Extractor configuration</h2>
@@ -218,7 +289,7 @@ const EditExtractor = React.createClass({
                       </label>
                     </div>
                   </Input>
-                  {conditionInput}
+                  {this._getExtractorConditionControls()}
 
                   <Input type="text" id="target_field" label="Store as field"
                          defaultValue={this.state.updatedExtractor.target_field}
