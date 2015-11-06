@@ -95,6 +95,9 @@ const jsRoutes = {
       SystemApiController: {
         fields: () => { return {url: '/system/fields'}; },
       },
+      SystemMessagesApiController: {
+        all: (page) => { return {url: '/system/messages?page=' + page}; },
+      },
       ToolsApiController: {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
       },
