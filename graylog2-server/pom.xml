@@ -377,6 +377,13 @@
                                 <include>**</include>
                             </includes>
                         </filter>
+                        <!-- http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ -->
+                        <filter>
+                            <artifact>commons-collections:commons-collections</artifact>
+                            <excludes>
+                                <exclude>org/apache/commons/collections/functors/InvokerTransformer.class</exclude>
+                            </excludes>
+                        </filter>
                     </filters>
                 </configuration>
                 <executions>
