@@ -35,8 +35,8 @@ const ToolsStore = {
         const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
 
         promise.catch((errorThrown) => {
-            UserNotification.error("Testing grok pattern failed with status: " + errorThrown,
-                "Could not test grok pattern");
+            UserNotification.error('Details: ' + errorThrown,
+                'We were not able to run the grok extraction. Please check your parameters.');
         });
 
         return promise;
