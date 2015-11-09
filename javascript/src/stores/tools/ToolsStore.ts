@@ -29,6 +29,17 @@ const ToolsStore = {
         });
 
         return promise;
+    },
+    testGrok(pattern: string, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.grokTest().url;
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
+
+        promise.catch((errorThrown) => {
+            UserNotification.error("Testing grok pattern failed with status: " + errorThrown,
+                "Could not test grok pattern");
+        });
+
+        return promise;
     }
 };
 

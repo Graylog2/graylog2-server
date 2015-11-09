@@ -110,6 +110,7 @@ const jsRoutes = {
       ToolsApiController: {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
         regexTest: () => { return {url: '/tools/regex_tester'};},
+        grokTest: () => { return {url: '/tools/grok_tester'};},
       },
       UsersApiController: {
         changePassword: (username) => { return {url: '/users/' + username + '/password'}; },
