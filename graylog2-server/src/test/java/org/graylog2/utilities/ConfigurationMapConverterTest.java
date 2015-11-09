@@ -24,6 +24,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.database.ValidationException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,7 +87,7 @@ public class ConfigurationMapConverterTest {
 
     @Test
     public void convertValuesThrowsIllegalArgumentExceptionOnEmptyFieldDescription() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(ValidationException.class);
         thrown.expectMessage("Unknown configuration field description for field \"string\"");
 
         final ConfigurationRequest cr = new ConfigurationRequest();
@@ -99,7 +100,7 @@ public class ConfigurationMapConverterTest {
 
     @Test
     public void convertValuesThrowsIllegalArgumentExceptionOnUnknwonType() throws Exception {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(ValidationException.class);
         thrown.expectMessage("Unknown configuration field type \"dummy\"");
 
         final ConfigurationRequest cr = new ConfigurationRequest();

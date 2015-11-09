@@ -35,7 +35,7 @@ public class ConfigurationMapConverter {
             final String field = entry.getKey();
             final Map<String, Object> fieldDescription = configurationFields.get(field);
             if (fieldDescription == null || fieldDescription.isEmpty()) {
-                throw new IllegalArgumentException("Unknown configuration field description for field \"" + field + "\"");
+                throw new ValidationException(field, "Unknown configuration field description for field \"" + field + "\"");
             }
 
             final String type = (String) fieldDescription.get("type");
@@ -58,7 +58,7 @@ public class ConfigurationMapConverter {
                     value = "true".equalsIgnoreCase(String.valueOf(entry.getValue()));
                     break;
                 default:
-                    throw new IllegalArgumentException("Unknown configuration field type \"" + type + "\"");
+                    throw new ValidationException(field, "Unknown configuration field type \"" + type + "\"");
             }
 
             configuration.put(field, value);
