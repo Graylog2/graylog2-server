@@ -27,7 +27,7 @@ class DocsHelper {
     STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
     STREAMS: 'streams.html',
     STREAM_PROCESSING_RUNTIME_LIMITS: 'streams.html#stream-processing-runtime-limits',
-    USERS_ROLES: 'users_roles.html',
+    USERS_ROLES: 'users_and_roles.html',
     WELCOME: '', // Welcome page to the documentation
   };
   DOCS_URL: string = 'http://docs.graylog.org/en/';
