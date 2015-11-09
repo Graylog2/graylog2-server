@@ -1,12 +1,11 @@
 import React, {PropTypes} from 'react';
-import {Input, Button, Panel} from 'react-bootstrap';
-import {LinkContainer} from 'react-router-bootstrap';
+import {Col, Input, Panel} from 'react-bootstrap';
+
+import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
+import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
 
 import DocumentationLink from 'components/support/DocumentationLink';
-import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
-
 import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
@@ -26,23 +25,10 @@ const EditExtractorConfiguration = React.createClass({
       control = <CopyInputExtractorConfiguration/>;
       break;
     case 'grok':
-      helpMessage = (
-        <span>
-          Matches the field against the current Grok pattern list, use <b>{'%{PATTERN-NAME}'}</b> to refer to a{' '}
-          <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}><a>stored pattern</a></LinkContainer>.
-        </span>
+      control = (
+        <GrokExtractorConfiguration configuration={this.props.configuration}
+                                    onChange={this._onConfigurationChange}/>
       );
-      controls.push(
-        <div key="grokControls">
-          <Input type="text" id="grok_pattern" label="Grok pattern" labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.grok_pattern}
-                 onChange={this.props.onChange('grok_pattern')}
-                 help={helpMessage}/>
-        </div>
-      );
-
-      // TODO: try
       break;
     case 'json':
       controls.push(
