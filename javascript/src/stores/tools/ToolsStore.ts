@@ -24,8 +24,8 @@ const ToolsStore = {
         const promise = fetch('POST', URLUtils.qualifyUrl(url), {regex: regex, string: string});
 
         promise.catch((errorThrown) => {
-            UserNotification.error("Testing regular expression failed with status: " + errorThrown,
-                "Could not test regular expression");
+            UserNotification.error('Details: ' + errorThrown,
+                'Could not try regular expression. Make sure that it is valid.');
         });
 
         return promise;
