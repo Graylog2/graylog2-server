@@ -30,7 +30,7 @@ const RegexExtractorConfiguration = React.createClass({
   _onTryClick() {
     this.setState({trying: true});
 
-    const promise = ToolsStore.testRegex(this.refs.regexValue.value, this.props.exampleMessage);
+    const promise = ToolsStore.testRegex(this.props.configuration.regex_value, this.props.exampleMessage);
     promise.then(result => {
       if (!result.matched) {
         UserNotification.warning('Regular expression did not match.');
@@ -48,7 +48,7 @@ const RegexExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying || (this.refs.regexValue && this.refs.regexValue.value === '');
+    return this.state.trying || this.props.configuration.regex_value === '';
   },
   render() {
     const helpMessage = (
@@ -66,7 +66,7 @@ const RegexExtractorConfiguration = React.createClass({
                help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text" ref="regexValue" id="regex_value" className="form-control"
+              <input type="text" id="regex_value" className="form-control"
                      defaultValue={this.props.configuration.regex_value}
                      placeholder="^.*string(.+)$"
                      onChange={this._onChange('regex_value')}

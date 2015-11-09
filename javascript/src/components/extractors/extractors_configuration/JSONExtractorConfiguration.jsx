@@ -1,7 +1,6 @@
 import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
 
-import UserNotification from 'util/UserNotification';
 import ToolsStore from 'stores/tools/ToolsStore';
 
 const JSONExtractorConfiguration = React.createClass({
@@ -47,7 +46,7 @@ const JSONExtractorConfiguration = React.createClass({
   },
   _isTryButtonDisabled() {
     const configuration = this.props.configuration;
-    return this.state.trying || (configuration && (configuration.list_separator === '' || configuration.key_separator === '' || configuration.kv_separator === ''));
+    return this.state.trying || configuration.list_separator === '' || configuration.key_separator === '' || configuration.kv_separator === '';
   },
   render() {
     return (

@@ -29,7 +29,7 @@ const GrokExtractorConfiguration = React.createClass({
   _onTryClick() {
     this.setState({trying: true});
 
-    const promise = ToolsStore.testGrok(this.refs.grokPattern.value, this.props.exampleMessage);
+    const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.exampleMessage);
     promise.then(result => {
       if (!result.matched) {
         UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
@@ -48,7 +48,7 @@ const GrokExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying || (this.refs.grokPattern && this.refs.grokPattern.value === '');
+    return this.state.trying || this.props.configuration.grok_pattern === '';
   },
   render() {
     const helpMessage = (
@@ -67,7 +67,7 @@ const GrokExtractorConfiguration = React.createClass({
                help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text" ref="grokPattern" id="grok_pattern" className="form-control"
+              <input type="text" id="grok_pattern" className="form-control"
                      defaultValue={this.props.configuration.grok_pattern}
                      onChange={this._onChange('grok_pattern')}
                      required/>
