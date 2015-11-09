@@ -3,6 +3,7 @@ import {Input, Button, Panel} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
+import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -16,20 +17,13 @@ const EditExtractorConfiguration = React.createClass({
     onChange: PropTypes.func.isRequired,
   },
   render() {
+    let control;
     const controls = [];
     let helpMessage;
 
     switch (this.props.extractorType) {
     case 'copy_input':
-      controls.push(
-        <div key="copyInputInfo" className="form-group">
-          <div className="col-md-offset-2 col-md-10">
-            <Panel bsStyle="info" style={{marginBottom: 0}}>
-              The entire input will be copied verbatim.
-            </Panel>
-          </div>
-        </div>
-      );
+      control = <CopyInputExtractorConfiguration/>;
       break;
     case 'grok':
       helpMessage = (
@@ -223,7 +217,7 @@ const EditExtractorConfiguration = React.createClass({
       console.warn(`Unsupported extractor type ${this.props.extractorType}`);
     }
 
-    return <div>{controls}</div>;
+    return <div>{control || controls}</div>;
   },
 });
 
