@@ -40,7 +40,26 @@ const ToolsStore = {
         });
 
         return promise;
-    }
+    },
+    testJSON(flatten: boolean, listSeparator: string, keySeparator: string, kvSeparator: string, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.jsonTest().url;
+        const payload = {
+            flatten: flatten,
+            list_separator: listSeparator,
+            key_separator: keySeparator,
+            kv_separator: kvSeparator,
+            string: string,
+        };
+
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'We were not able to run the JSON extraction. Please check your parameters.');
+        });
+
+        return promise;
+    },
 };
 
 export = ToolsStore;
