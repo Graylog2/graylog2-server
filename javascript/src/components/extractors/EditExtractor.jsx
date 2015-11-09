@@ -134,9 +134,11 @@ const EditExtractor = React.createClass({
                   <FormControls.Static label="Source field" value={this.state.updatedExtractor.source_field}
                                        labelClassName="col-md-2" wrapperClassName="col-md-10"/>
 
-                  <EditExtractorConfiguration extractorType={this.state.updatedExtractor.type}
+                  <EditExtractorConfiguration ref="extractorConfiguration"
+                                              extractorType={this.state.updatedExtractor.type}
                                               configuration={this.state.updatedExtractor.extractor_config}
-                                              onChange={this._onConfigurationChange}/>
+                                              onChange={this._onConfigurationChange}
+                                              exampleMessage={this.props.exampleMessage}/>
 
                   <Input label="Condition" labelClassName="col-md-2" wrapperClassName="col-md-10"
                          help="Extracting only from messages that match a certain condition helps you avoiding wrong or unnecessary extractions and can also save CPU resources.">

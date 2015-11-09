@@ -1,20 +1,57 @@
 import React, {PropTypes} from 'react';
 import {Row, Col, Input, Button} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
+
 import Routes from 'routing/Routes';
+import UserNotification from 'util/UserNotification';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 const GrokExtractorConfiguration = React.createClass({
   propTypes: {
     configuration: PropTypes.object.isRequired,
+    exampleMessage: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
+    onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {
       trying: false,
     };
   },
+  _onChange(key) {
+    const onConfigurationChange = this.props.onChange(key);
+
+    return (event) => {
+      this.props.onExtractorPreviewLoad(undefined);
+      onConfigurationChange(event);
+    };
+  },
   _onTryClick() {
     this.setState({trying: true});
+
+    const promise = ToolsStore.testGrok(this.refs.grokPattern.value, this.props.exampleMessage);
+    promise.then(result => {
+      if (!result.matched) {
+        UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
+        return;
+      }
+
+      const matches = [];
+      result.matches.map(match => {
+        matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
+        matches.push(<dd key={`${match.name}-value`}>{match.match}</dd>);
+      });
+
+      const preview = (
+        <dl>
+          {matches}
+        </dl>
+      );
+
+      this.props.onExtractorPreviewLoad(preview);
+    });
+
+    promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
     return this.state.trying || (this.refs.grokPattern && this.refs.grokPattern.value === '');
@@ -38,7 +75,7 @@ const GrokExtractorConfiguration = React.createClass({
             <Col md={11}>
               <input type="text" ref="grokPattern" id="grok_pattern" className="form-control"
                      defaultValue={this.props.configuration.grok_pattern}
-                     onChange={this.props.onChange('grok_pattern')}
+                     onChange={this._onChange('grok_pattern')}
                      required/>
             </Col>
             <Col md={1} className="text-right">

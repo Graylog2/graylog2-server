@@ -14,6 +14,15 @@ const EditExtractorConfiguration = React.createClass({
     extractorType: PropTypes.oneOf(ExtractorUtils.EXTRACTOR_TYPES).isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    exampleMessage: PropTypes.string.isRequired,
+  },
+  getInitialState() {
+    return {
+      extractorPreview: undefined,
+    };
+  },
+  _onExtractorPreviewLoad(extractorPreviewNode) {
+    this.setState({extractorPreview: extractorPreviewNode});
   },
   render() {
     let control;
@@ -27,7 +36,9 @@ const EditExtractorConfiguration = React.createClass({
     case 'grok':
       control = (
         <GrokExtractorConfiguration configuration={this.props.configuration}
-                                    onChange={this._onConfigurationChange}/>
+                                    exampleMessage={this.props.exampleMessage}
+                                    onChange={this.props.onChange}
+                                    onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
     case 'json':
@@ -203,7 +214,26 @@ const EditExtractorConfiguration = React.createClass({
       console.warn(`Unsupported extractor type ${this.props.extractorType}`);
     }
 
-    return <div>{control || controls}</div>;
+    let extractorPreview;
+
+    if (this.state.extractorPreview) {
+      extractorPreview = (
+        <div className="form-group">
+          <Col md={10} mdOffset={2}>
+            <Panel header="Extractor preview" bsStyle="info">
+              {this.state.extractorPreview}
+            </Panel>
+          </Col>
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        {control || controls}
+        {extractorPreview}
+      </div>
+    );
   },
 });
 
