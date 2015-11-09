@@ -3,6 +3,7 @@ import {Col, Input, Panel} from 'react-bootstrap';
 
 import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
 import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
+import JSONExtractorConfiguration from './extractors_configuration/JSONExtractorConfiguration';
 import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
 
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -43,49 +44,12 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'json':
-      controls.push(
-        <div key="jsonControls">
-          <Input type="checkbox"
-                 id="flatten"
-                 label="Flatten structures"
-                 wrapperClassName="col-md-offset-2 col-md-10"
-                 defaultChecked={this.props.configuration.flatten}
-                 onChange={this.props.onChange('flatten')}
-                 help="Whether to flatten JSON objects into a single message field or to expand into multiple fields."/>
-
-          <Input type="text"
-                 id="list_separator"
-                 label="List item separator"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.list_separator}
-                 required
-                 onChange={this.props.onChange('list_separator')}
-                 help="What string to use to concatenate items of a JSON list."/>
-
-          <Input type="text"
-                 id="key_separator"
-                 label="Key separator"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.key_separator}
-                 required
-                 onChange={this.props.onChange('key_separator')}
-                 help={<span>What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).</span>}/>
-
-          <Input type="text"
-                 id="kv_separator"
-                 label="Key/value separator"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.kv_separator}
-                 required
-                 onChange={this.props.onChange('kv_separator')}
-                 help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."/>
-        </div>
+      control = (
+        <JSONExtractorConfiguration configuration={this.props.configuration}
+                                    exampleMessage={this.props.exampleMessage}
+                                    onChange={this.props.onChange}
+                                    onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
-
-      // TODO: try
       break;
     case 'regex':
       control = (
