@@ -5,9 +5,7 @@ import CopyInputExtractorConfiguration from './extractors_configuration/CopyInpu
 import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
 import JSONExtractorConfiguration from './extractors_configuration/JSONExtractorConfiguration';
 import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
-
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
+import RegexReplaceExtractorConfiguration from './extractors_configuration/RegexReplaceExtractorConfiguration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
@@ -29,7 +27,6 @@ const EditExtractorConfiguration = React.createClass({
   render() {
     let control;
     const controls = [];
-    let helpMessage;
 
     switch (this.props.extractorType) {
     case 'copy_input':
@@ -60,49 +57,12 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'regex_replace':
-      helpMessage = (
-        <span>
-          The regular expression used for extraction.{' '}
-          Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
-        </span>
+      control = (
+        <RegexReplaceExtractorConfiguration configuration={this.props.configuration}
+                                            exampleMessage={this.props.exampleMessage}
+                                            onChange={this.props.onChange}
+                                            onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
-      controls.push(
-        <div key="regexReplaceControls">
-          <Input type="text"
-                 id="regex"
-                 label="Regular expression"
-                 labelClassName="col-md-2"
-                 placeholder="^.*string(.+)$"
-                 onChange={this.props.onChange('regex')}
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.regex}
-                 required
-                 help={helpMessage}/>
-
-          <Input type="text"
-                 id="replacement"
-                 label="Replacement"
-                 labelClassName="col-md-2"
-                 placeholder="$1"
-                 onChange={this.props.onChange('replacement')}
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.replacement}
-                 required
-                 help={<span>The replacement used for the matching text. Please refer to the{' '}
-                 <a target="_blank" href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">Matcher</a>{' '}
-                  API documentation for the possible options.</span>}/>
-
-          <Input type="checkbox"
-                 id="replace_all"
-                 label="Replace all occurrences of the pattern"
-                 wrapperClassName="col-md-offset-2 col-md-10"
-                 defaultChecked={this.props.configuration.replace_all}
-                 onChange={this.props.onChange('replace_all')}
-                 help="Whether to replace all occurrences of the given pattern or only the first occurrence."/>
-        </div>
-      );
-
-      // TODO: try
       break;
     case 'substring':
       controls.push(
