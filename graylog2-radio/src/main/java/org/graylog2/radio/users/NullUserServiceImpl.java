@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class NullUserServiceImpl implements UserService {
     @Override
@@ -109,6 +110,16 @@ public class NullUserServiceImpl implements UserService {
 
     @Override
     public Collection<User> loadAllForRole(Role role) {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public List<String> getPermissionsForUser(User user) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Set<String> getRoleNames(User user) {
         return Collections.emptySet();
     }
 }

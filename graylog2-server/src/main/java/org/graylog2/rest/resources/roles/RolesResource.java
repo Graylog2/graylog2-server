@@ -17,9 +17,6 @@
 package org.graylog2.rest.resources.roles;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -33,11 +30,9 @@ import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.rest.models.roles.responses.RolesResponse;
 import org.graylog2.rest.models.users.responses.UserSummary;
-import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
 import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
@@ -62,7 +57,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -77,12 +71,10 @@ public class RolesResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(RolesResource.class);
 
     private final RoleService roleService;
-    private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
-    public RolesResource(RoleService roleService, InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
+    public RolesResource(RoleService roleService) {
         this.roleService = roleService;
-        this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
     }
 
     @GET
@@ -178,24 +170,19 @@ public class RolesResource extends RestResource {
     @ApiOperation(value = "Retrieve the role's members")
     public RoleMembershipResponse getMembers(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
         final Role role = roleService.load(name);
-        final Map<String, Role> idMap = roleService.loadAllIdMap();
-
         final Collection<User> users = userService.loadAllForRole(role);
 
         Set<UserSummary> userSummaries = Sets.newHashSetWithExpectedSize(users.size());
         for (User user : users) {
-            final Set<String> roleIds = user.getRoleIds();
-            final Set<String> roleNames = Sets.newHashSet(
-                    Iterables.filter(
-                    Collections2.transform(roleIds,
-                                           Roles.roleIdToNameFunction(idMap)), Predicates.notNull()));
+            final Set<String> roleNames = userService.getRoleNames(user);
+
             userSummaries.add(UserSummary.create(
                     user.getId(),
                     user.getName(),
                     user.getEmail(),
                     user.getFullName(),
                     isPermitted(RestPermissions.USERS_PERMISSIONSEDIT,
-                                user.getName()) ? user.getPermissions() : Collections.<String>emptyList(),
+                                user.getName()) ? userService.getPermissionsForUser(user) : Collections.<String>emptyList(),
                     user.getPreferences(),
                     firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
                     user.getSessionTimeoutMs(),
