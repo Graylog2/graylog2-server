@@ -3,6 +3,7 @@ import {Col, Input, Panel} from 'react-bootstrap';
 
 import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
 import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
+import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -87,28 +88,12 @@ const EditExtractorConfiguration = React.createClass({
       // TODO: try
       break;
     case 'regex':
-      helpMessage = (
-        <span>
-          The regular expression used for extraction. First matcher group is used.{' '}
-          Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
-        </span>
+      control = (
+        <RegexExtractorConfiguration configuration={this.props.configuration}
+                                     exampleMessage={this.props.exampleMessage}
+                                     onChange={this.props.onChange}
+                                     onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
-      controls.push(
-        <div key="regexControls">
-          <Input type="text"
-                 id="regex_value"
-                 label="Regular expression"
-                 labelClassName="col-md-2"
-                 placeholder="^.*string(.+)$"
-                 onChange={this.props.onChange('regex_value')}
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.regex_value}
-                 required
-                 help={helpMessage}/>
-        </div>
-      );
-
-      // TODO: try
       break;
     case 'regex_replace':
       helpMessage = (
