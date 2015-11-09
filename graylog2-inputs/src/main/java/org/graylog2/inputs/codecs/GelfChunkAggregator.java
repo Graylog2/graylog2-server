@@ -150,8 +150,11 @@ public class GelfChunkAggregator implements CodecAggregator {
             final byte[] allChunks[] = new byte[sequenceCount][];
             for (int i = 0; i < entry.payloadArray.length(); i++) {
                 final GELFMessageChunk messageChunk = entry.payloadArray.get(i);
-                allChunks[i] = messageChunk.getData();
-
+                if (messageChunk == null) {
+                    log.debug("Couldn't read chunk {} of message {}, skipping this chunk.", i, messageId);
+                } else {
+                    allChunks[i] = messageChunk.getData();
+                }
             }
             completeMessages.inc();
             return ChannelBuffers.wrappedBuffer(allChunks);
