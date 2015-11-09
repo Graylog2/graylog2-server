@@ -17,7 +17,6 @@
 package org.graylog2.bindings.providers;
 
 import org.graylog2.bundles.BundleImporter;
-import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.grok.GrokPatternService;
@@ -44,7 +43,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
     private final DashboardService dashboardService;
-    private final DashboardRegistry dashboardRegistry;
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
     private final Searches searches;
@@ -60,7 +58,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final StreamRuleService streamRuleService,
                                   final OutputService outputService,
                                   final DashboardService dashboardService,
-                                  final DashboardRegistry dashboardRegistry,
                                   final DashboardWidgetCreator dashboardWidgetCreator,
                                   final ServerStatus serverStatus,
                                   final Searches searches,
@@ -74,7 +71,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
-        this.dashboardRegistry = dashboardRegistry;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
         this.searches = searches;
@@ -87,7 +83,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     public BundleImporter get() {
         return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, outputService, dashboardService,
-                dashboardRegistry, dashboardWidgetCreator, serverStatus, searches,
+                dashboardWidgetCreator, serverStatus, searches,
                 messageInputFactory, inputLauncher, grokPatternService);
     }
 }
