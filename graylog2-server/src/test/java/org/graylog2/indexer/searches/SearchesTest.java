@@ -164,6 +164,79 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTermsWithNonExistingIndex() throws Exception {
+        final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
+                .orderedBy(new IndexRangeComparator())
+                .add(new IndexRange() {
+                    @Override
+                    public String indexName() {
+                        return INDEX_NAME;
+                    }
+
+                    @Override
+                    public DateTime calculatedAt() {
+                        return DateTime.now();
+                    }
+
+                    @Override
+                    public DateTime end() {
+                        return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+                    }
+
+                    @Override
+                    public int calculationDuration() {
+                        return 0;
+                    }
+
+                    @Override
+                    public DateTime begin() {
+                        return new DateTime(0L, DateTimeZone.UTC);
+                    }
+                })
+                .add(new IndexRange() {
+                    @Override
+                    public String indexName() {
+                        return "does-not-exist";
+                    }
+
+                    @Override
+                    public DateTime calculatedAt() {
+                        return DateTime.now();
+                    }
+
+                    @Override
+                    public DateTime end() {
+                        return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+                    }
+
+                    @Override
+                    public int calculationDuration() {
+                        return 0;
+                    }
+
+                    @Override
+                    public DateTime begin() {
+                        return new DateTime(0L, DateTimeZone.UTC);
+                    }
+                }).build();
+        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
+
+        TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
+                new DateTime(2015, 1, 1, 0, 0),
+                new DateTime(2015, 1, 2, 0, 0)));
+
+        assertThat(result.getTotal()).isEqualTo(10L);
+        assertThat(result.getMissing()).isEqualTo(2L);
+        assertThat(result.getTerms())
+                .hasSize(4)
+                .containsEntry("1", 2L)
+                .containsEntry("2", 2L)
+                .containsEntry("3", 3L)
+                .containsEntry("4", 1L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void termsRecordsMetrics() throws Exception {
         TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
                 new DateTime(2015, 1, 1, 0, 0),
@@ -269,6 +342,80 @@ public class SearchesTest {
                 .containsEntry(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L);
     }
 
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
+    public void testHistogramWithNonExistingIndex() throws Exception {
+        final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
+                .orderedBy(new IndexRangeComparator())
+                .add(new IndexRange() {
+                    @Override
+                    public String indexName() {
+                        return INDEX_NAME;
+                    }
+
+                    @Override
+                    public DateTime calculatedAt() {
+                        return DateTime.now();
+                    }
+
+                    @Override
+                    public DateTime end() {
+                        return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+                    }
+
+                    @Override
+                    public int calculationDuration() {
+                        return 0;
+                    }
+
+                    @Override
+                    public DateTime begin() {
+                        return new DateTime(0L, DateTimeZone.UTC);
+                    }
+                })
+                .add(new IndexRange() {
+                    @Override
+                    public String indexName() {
+                        return "does-not-exist";
+                    }
+
+                    @Override
+                    public DateTime calculatedAt() {
+                        return DateTime.now();
+                    }
+
+                    @Override
+                    public DateTime end() {
+                        return new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+                    }
+
+                    @Override
+                    public int calculationDuration() {
+                        return 0;
+                    }
+
+                    @Override
+                    public DateTime begin() {
+                        return new DateTime(0L, DateTimeZone.UTC);
+                    }
+                }).build();
+        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
+
+        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
+
+        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.MINUTE);
+        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
+        assertThat(h.getResults())
+                .hasSize(5)
+                .containsEntry(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 2, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 3, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 4, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L)
+                .containsEntry(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC).getMillis() / 1000L, 2L);
+    }
+    
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
