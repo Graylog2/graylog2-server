@@ -25,4 +25,14 @@ public class GrokPatternSummary {
     public String pattern;
 
     public String contentPack;
+
+    @Override
+    public String toString() {
+        return "GrokPatternSummary{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", pattern='" + pattern + '\'' +
+                ", contentPack='" + contentPack + '\'' +
+                '}';
+    }
 }
