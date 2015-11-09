@@ -30,6 +30,23 @@ const ToolsStore = {
 
         return promise;
     },
+    testRegexReplace(regex: string, replacement: string, replaceAll: boolean, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.regexReplaceTest().url;
+        const payload = {
+            regex: regex,
+            replacement: replacement,
+            replace_all: replaceAll,
+            string: string
+        };
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'Could not try regular expression. Make sure that it is valid.');
+        });
+
+        return promise;
+    },
     testGrok(pattern: string, string: string): Promise<Object> {
         const url = jsRoutes.controllers.api.ToolsApiController.grokTest().url;
         const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
