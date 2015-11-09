@@ -42,13 +42,7 @@ const GrokExtractorConfiguration = React.createClass({
         matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
       });
 
-      const preview = (
-        <dl>
-          {matches}
-        </dl>
-      );
-
-      this.props.onExtractorPreviewLoad(preview);
+      this.props.onExtractorPreviewLoad(<dl>{matches}</dl>);
     });
 
     promise.finally(() => this.setState({trying: false}));

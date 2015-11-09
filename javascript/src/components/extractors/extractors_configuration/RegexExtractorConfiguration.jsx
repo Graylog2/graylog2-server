@@ -42,11 +42,7 @@ const RegexExtractorConfiguration = React.createClass({
         return;
       }
 
-      const preview = (
-        <samp>{result.match.match}</samp>
-      );
-
-      this.props.onExtractorPreviewLoad(preview);
+      this.props.onExtractorPreviewLoad(<samp>{result.match.match}</samp>);
     });
 
     promise.finally(() => this.setState({trying: false}));
@@ -63,7 +59,7 @@ const RegexExtractorConfiguration = React.createClass({
     );
 
     return (
-      <div key="regexControls">
+      <div>
         <Input label="Regular expression"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
