@@ -27,6 +27,17 @@ const EditExtractor = React.createClass({
       conditionTestResult: undefined,
     };
   },
+  // Ensures the target field only contains alphanumeric characters and underscores
+  _onTargetFieldChange(event) {
+    const value = event.target.value;
+    const newValue = value.replace(/[^\w\d_]/g, '');
+
+    if (value !== newValue) {
+      this.refs.targetField.getInputDOMNode().value = newValue;
+    }
+
+    this._onFieldChange('target_field')(event);
+  },
   _onFieldChange(key) {
     return (event) => {
       const nextState = {};
@@ -113,6 +124,13 @@ const EditExtractor = React.createClass({
     // - Add converters
     // - Load recent message from input
 
+    const targetFieldHelpMessage = (
+      <span>
+        Choose a field name to store the extracted value. It can only contain <b>alphanumeric characters and{' '}
+        underscores</b>. Example: <em>http_response_code</em>.
+      </span>
+    );
+
     return (
       <div>
         <Row className="content extractor-list">
@@ -169,13 +187,13 @@ const EditExtractor = React.createClass({
                   </Input>
                   {this._getExtractorConditionControls()}
 
-                  <Input type="text" id="target_field" label="Store as field"
+                  <Input type="text" ref="targetField" id="target_field" label="Store as field"
                          defaultValue={this.state.updatedExtractor.target_field}
                          labelClassName="col-md-2"
                          wrapperClassName="col-md-10"
-                         onChange={this._onFieldChange('target_field')}
+                         onChange={this._onTargetFieldChange}
                          required
-                         help={<span>Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em> for example if you are extracting a HTTP response code.</span>}/>
+                         help={targetFieldHelpMessage}/>
 
 
                   <Input label="Extraction strategy" labelClassName="col-md-2" wrapperClassName="col-md-10"
