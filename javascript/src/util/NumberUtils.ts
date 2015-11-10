@@ -30,7 +30,7 @@ var NumberUtils = {
     formatNumber(number) {
         try {
             return numeral(NumberUtils.normalizeNumber(number)).format('0,0.[00]');
-        } catch(e) {
+        } catch (e) {
             return number;
         }
     },
@@ -40,6 +40,9 @@ var NumberUtils = {
         } catch (e) {
             return percentage;
         }
+    },
+    isNumber(possibleNumber) {
+        return possibleNumber !== "" && !isNaN(possibleNumber);
     },
 };
 
