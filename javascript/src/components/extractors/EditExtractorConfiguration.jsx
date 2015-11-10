@@ -6,6 +6,7 @@ import GrokExtractorConfiguration from './extractors_configuration/GrokExtractor
 import JSONExtractorConfiguration from './extractors_configuration/JSONExtractorConfiguration';
 import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
 import RegexReplaceExtractorConfiguration from './extractors_configuration/RegexReplaceExtractorConfiguration';
+import SubstringExtractorConfiguration from './extractors_configuration/SubstringExtractorConfiguration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
@@ -65,32 +66,12 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'substring':
-      controls.push(
-        <div key="substringControls">
-          <Input type="number"
-                 id="begin_index"
-                 label="Begin index"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.begin_index}
-                 onChange={this.props.onChange('begin_index')}
-                 min="0"
-                 required
-                 help="Character position from where to start extracting. (Inclusive)"/>
-
-          <Input type="number"
-                 id="end_index"
-                 label="End index"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.end_index}
-                 onChange={this.props.onChange('end_index')}
-                 required
-                 help={<span>Where to end extracting. (Exclusive) <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.</span>}/>
-        </div>
+      control = (
+        <SubstringExtractorConfiguration configuration={this.props.configuration}
+                                         exampleMessage={this.props.exampleMessage}
+                                         onChange={this.props.onChange}
+                                         onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
-
-      // TODO: try
       break;
     case 'split_and_index':
       controls.push(
