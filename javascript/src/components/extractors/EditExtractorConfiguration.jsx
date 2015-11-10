@@ -1,11 +1,12 @@
 import React, {PropTypes} from 'react';
-import {Col, Input, Panel} from 'react-bootstrap';
+import {Col, Panel} from 'react-bootstrap';
 
 import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
 import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
 import JSONExtractorConfiguration from './extractors_configuration/JSONExtractorConfiguration';
 import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
 import RegexReplaceExtractorConfiguration from './extractors_configuration/RegexReplaceExtractorConfiguration';
+import SplitAndIndexExtractorConfiguration from './extractors_configuration/SplitAndIndexExtractorConfiguration';
 import SubstringExtractorConfiguration from './extractors_configuration/SubstringExtractorConfiguration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -26,15 +27,14 @@ const EditExtractorConfiguration = React.createClass({
     this.setState({extractorPreview: extractorPreviewNode});
   },
   render() {
-    let control;
-    const controls = [];
+    let extractorConfiguration;
 
     switch (this.props.extractorType) {
     case 'copy_input':
-      control = <CopyInputExtractorConfiguration/>;
+      extractorConfiguration = <CopyInputExtractorConfiguration/>;
       break;
     case 'grok':
-      control = (
+      extractorConfiguration = (
         <GrokExtractorConfiguration configuration={this.props.configuration}
                                     exampleMessage={this.props.exampleMessage}
                                     onChange={this.props.onChange}
@@ -42,7 +42,7 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'json':
-      control = (
+      extractorConfiguration = (
         <JSONExtractorConfiguration configuration={this.props.configuration}
                                     exampleMessage={this.props.exampleMessage}
                                     onChange={this.props.onChange}
@@ -50,7 +50,7 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'regex':
-      control = (
+      extractorConfiguration = (
         <RegexExtractorConfiguration configuration={this.props.configuration}
                                      exampleMessage={this.props.exampleMessage}
                                      onChange={this.props.onChange}
@@ -58,7 +58,7 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'regex_replace':
-      control = (
+      extractorConfiguration = (
         <RegexReplaceExtractorConfiguration configuration={this.props.configuration}
                                             exampleMessage={this.props.exampleMessage}
                                             onChange={this.props.onChange}
@@ -66,7 +66,7 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'substring':
-      control = (
+      extractorConfiguration = (
         <SubstringExtractorConfiguration configuration={this.props.configuration}
                                          exampleMessage={this.props.exampleMessage}
                                          onChange={this.props.onChange}
@@ -74,31 +74,12 @@ const EditExtractorConfiguration = React.createClass({
       );
       break;
     case 'split_and_index':
-      controls.push(
-        <div key="splitAndIndexControls">
-          <Input type="text"
-                 id="split_by"
-                 label="Split by"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.split_by}
-                 onChange={this.props.onChange('split_by')}
-                 required
-                 help={<span>What character to split on. <strong>Example:</strong> A whitespace character will split <em>foo bar baz</em> to <em>[foo,bar,baz]</em>.</span>}/>
-
-          <Input type="number"
-                 id="index"
-                 label="Target index"
-                 labelClassName="col-md-2"
-                 wrapperClassName="col-md-10"
-                 defaultValue={this.props.configuration.index}
-                 onChange={this.props.onChange('index')}
-                 required
-                 help={<span>What part of the split string to you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em> from <em>foo bar baz</em> when split by whitespace.</span>}/>
-        </div>
+      extractorConfiguration = (
+        <SplitAndIndexExtractorConfiguration configuration={this.props.configuration}
+                                             exampleMessage={this.props.exampleMessage}
+                                             onChange={this.props.onChange}
+                                             onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
-
-      // TODO: try
       break;
     default:
       console.warn(`Unsupported extractor type ${this.props.extractorType}`);
@@ -120,7 +101,7 @@ const EditExtractorConfiguration = React.createClass({
 
     return (
       <div>
-        {control || controls}
+        {extractorConfiguration}
         {extractorPreview}
       </div>
     );
