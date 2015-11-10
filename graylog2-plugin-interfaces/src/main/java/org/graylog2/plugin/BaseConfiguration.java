@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -130,6 +131,9 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
     private Duration httpReadTimeout = Duration.seconds(10L);
+
+    @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
+    private String installationSource = "unknown";
 
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
@@ -304,5 +308,9 @@ public abstract class BaseConfiguration {
 
     public Duration getHttpReadTimeout() {
         return httpReadTimeout;
+    }
+
+    public String getInstallationSource() {
+        return installationSource;
     }
 }
