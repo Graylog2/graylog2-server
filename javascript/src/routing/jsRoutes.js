@@ -113,6 +113,7 @@ const jsRoutes = {
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
         regexTest: () => { return {url: '/tools/regex_tester'};},
         regexReplaceTest: () => { return {url: '/tools/regex_replace_tester'};},
+        splitAndIndexTest: () => { return {url: '/tools/split_and_index_tester'};},
         substringTest: () => { return {url: '/tools/substring_tester'};},
       },
       UsersApiController: {

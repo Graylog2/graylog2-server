@@ -19,34 +19,6 @@ const ToolsStore = {
 
         return promise;
     },
-    testRegex(regex: string, string: string): Promise<Object> {
-        const url = jsRoutes.controllers.api.ToolsApiController.regexTest().url;
-        const promise = fetch('POST', URLUtils.qualifyUrl(url), {regex: regex, string: string});
-
-        promise.catch((errorThrown) => {
-            UserNotification.error('Details: ' + errorThrown,
-                'Could not try regular expression. Make sure that it is valid.');
-        });
-
-        return promise;
-    },
-    testRegexReplace(regex: string, replacement: string, replaceAll: boolean, string: string): Promise<Object> {
-        const url = jsRoutes.controllers.api.ToolsApiController.regexReplaceTest().url;
-        const payload = {
-            regex: regex,
-            replacement: replacement,
-            replace_all: replaceAll,
-            string: string
-        };
-        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
-
-        promise.catch((errorThrown) => {
-            UserNotification.error('Details: ' + errorThrown,
-                'Could not try regular expression. Make sure that it is valid.');
-        });
-
-        return promise;
-    },
     testGrok(pattern: string, string: string): Promise<Object> {
         const url = jsRoutes.controllers.api.ToolsApiController.grokTest().url;
         const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
@@ -77,6 +49,51 @@ const ToolsStore = {
 
         return promise;
     },
+    testRegex(regex: string, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.regexTest().url;
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), {regex: regex, string: string});
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'Could not try regular expression. Make sure that it is valid.');
+        });
+
+        return promise;
+    },
+    testRegexReplace(regex: string, replacement: string, replaceAll: boolean, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.regexReplaceTest().url;
+        const payload = {
+            regex: regex,
+            replacement: replacement,
+            replace_all: replaceAll,
+            string: string
+        };
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'Could not try regular expression. Make sure that it is valid.');
+        });
+
+        return promise;
+    },
+    testSplitAndIndex(splitBy: string, index: number, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.splitAndIndexTest().url;
+        const payload = {
+            split_by: splitBy,
+            index: index,
+            string: string,
+        };
+
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'We were not able to run the split and index extraction. Please check your parameters.');
+        });
+
+        return promise;
+    },
     testSubstring(beginIndex: number, endIndex: number, string: string): Promise<Object> {
         const url = jsRoutes.controllers.api.ToolsApiController.substringTest().url;
         const payload = {
@@ -93,7 +110,7 @@ const ToolsStore = {
         });
 
         return promise;
-    }
+    },
 };
 
 export = ToolsStore;
