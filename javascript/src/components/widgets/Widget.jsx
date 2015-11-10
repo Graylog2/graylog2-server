@@ -24,7 +24,8 @@ import WidgetsActions from 'actions/widgets/WidgetsActions';
 
 const Widget = React.createClass({
   propTypes: {
-    widgetId: React.PropTypes.string.isRequired,
+    widget: React.PropTypes.object.isRequired,
+    dashboardGrid: React.PropTypes.object,
     dashboardId: React.PropTypes.string.isRequired,
     shouldUpdate: React.PropTypes.bool.isRequired,
     locked: React.PropTypes.bool.isRequired,
@@ -42,17 +43,11 @@ const Widget = React.createClass({
       QUICKVALUES: 'QUICKVALUES',
       FIELD_CHART: 'FIELD_CHART',
       STACKED_CHART: 'STACKED_CHART',
-    }
+    },
   },
 
   getInitialState() {
     return {
-      deleted: false,
-      type: '',
-      title: '',
-      cacheTime: 10,
-      creatorUserId: '',
-      config: {},
       result: undefined,
       calculatedAt: undefined,
       error: false,
@@ -62,18 +57,7 @@ const Widget = React.createClass({
     };
   },
   _isBoundToStream() {
-    return ('stream_id' in this.state.config) && (this.state.config.stream_id !== null);
-  },
-  _getWidgetData() {
-    return {
-      widgetId: this.props.widgetId,
-      dashboardId: this.props.dashboardId,
-      title: this.state.title,
-      type: this.state.type,
-      cacheTime: this.state.cacheTime,
-      creatorUserId: this.state.creatorUserId,
-      config: this.state.config
-    };
+    return ('stream_id' in this.props.widget.config) && (this.props.widget.config.stream_id !== null);
   },
   _getWidgetNode() {
     return ReactDOM.findDOMNode(this.refs.widget);
@@ -82,39 +66,18 @@ const Widget = React.createClass({
     this._calculateWidgetSize();
   },
   componentDidMount() {
-    this._loadData();
     this._loadValue();
-    this.loadDataInterval = setInterval(this._loadData, this.WIDGET_DATA_REFRESH);
-    this.loadValueInterval = setInterval(this._loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
+    this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
+
+    if (this.props.dashboardGrid) {
+      this.props.dashboardGrid.add_widget()
+    }
 
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentWillUnmount() {
-    clearInterval(this.loadDataInterval);
     clearInterval(this.loadValueInterval);
     $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
-  },
-  _loadData() {
-    if (!this.props.shouldUpdate) {
-      return;
-    }
-
-    WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId).then((widget) => {
-      this.setState({
-        type: widget.type,
-        title: widget.title,
-        cacheTime: widget.cacheTime,
-        creatorUserId: widget.creatorUserId,
-        config: widget.config
-      });
-    }, (jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status === 404) {
-        UserNotification.warning("It looks like widget \"" + this.state.title + "\" does not exist anymore. " +
-          "Please refresh the page to remove it from the dashboard.",
-          "Could not load widget information");
-        this.setState({deleted: true});
-      }
-    });
   },
   _loadValue() {
     if (!this.props.shouldUpdate) {
@@ -123,20 +86,20 @@ const Widget = React.createClass({
 
     const width = this.refs.widget.clientWidth;
 
-    WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width).then((value) => {
+    WidgetsStore.loadValue(this.props.dashboardId, this.props.widget.id, width).then((value) => {
       this.setState({
         result: value.result,
         calculatedAt: value.calculated_at,
         error: false,
-        errorMessage: undefined
+        errorMessage: undefined,
       });
-    }, (jqXHR, textStatus, errorThrown) => {
-      const error = jqXHR.responseText === "" || jqXHR.responseText === "\"\"" ? errorThrown : jqXHR.responseText;
-      const newResult = this.state.result === undefined ? "N/A" : this.state.result;
+    }, (response) => {
+      const error = response.message;
+      const newResult = this.state.result === undefined ? 'N/A' : this.state.result;
       this.setState({
         result: newResult,
         error: true,
-        errorMessage: "Error loading widget value: " + error
+        errorMessage: 'Error loading widget value: ' + error,
       });
     });
   },
@@ -151,7 +114,7 @@ const Widget = React.createClass({
     }
   },
   _getVisualization() {
-    if (this.state.type === "") {
+    if (this.props.widget.type === '') {
       return;
     }
 
@@ -161,77 +124,78 @@ const Widget = React.createClass({
       </div>;
     }
 
-    if (this.state.result === "N/A") {
+    if (this.state.result === 'N/A') {
       return <div className="not-available">{this.state.result}</div>;
     }
 
     var visualization;
 
-    switch (this.state.type) {
+    switch (this.props.widget.type.toUpperCase()) {
       case this.constructor.Type.SEARCH_RESULT_COUNT:
       case this.constructor.Type.STREAM_SEARCH_RESULT_COUNT:
       case this.constructor.Type.STATS_COUNT:
-        visualization = <NumericVisualization data={this.state.result} config={this.state.config}/>;
+        visualization = <NumericVisualization data={this.state.result} config={this.props.widget.config}/>;
         break;
       case this.constructor.Type.SEARCH_RESULT_CHART:
-        visualization = <HistogramVisualization id={this.props.widgetId}
+        visualization = <HistogramVisualization id={this.props.widget.id}
                                                 data={this.state.result}
-                                                interval={this.state.config.interval}
+                                                interval={this.props.widget.config.interval}
                                                 height={this.state.height}
                                                 width={this.state.width}/>;
         break;
       case this.constructor.Type.QUICKVALUES:
-        visualization = <QuickValuesVisualization id={this.props.widgetId}
-                                                  config={this.state.config}
+        visualization = <QuickValuesVisualization id={this.props.widget.id}
+                                                  config={this.props.widget.config}
                                                   data={this.state.result}
                                                   height={this.state.height}
                                                   width={this.state.width}/>;
         break;
       case this.constructor.Type.FIELD_CHART:
-        visualization = <GraphVisualization id={this.props.widgetId}
+        visualization = <GraphVisualization id={this.props.widget.id}
                                             data={this.state.result}
-                                            config={this.state.config}
+                                            config={this.props.widget.config}
                                             height={this.state.height}
                                             width={this.state.width}/>;
         break;
       case this.constructor.Type.STACKED_CHART:
-        visualization = <StackedGraphVisualization id={this.props.widgetId}
+        visualization = <StackedGraphVisualization id={this.props.widget.id}
                                                    data={this.state.result}
-                                                   config={this.state.config}
+                                                   config={this.props.widget.config}
                                                    height={this.state.height}
                                                    width={this.state.width}/>;
         break;
       default:
-        throw("Error: Widget type '" + this.state.type + "' not supported");
+        throw("Error: Widget type '" + this.props.widget.type + "' not supported");
     }
 
     return visualization;
   },
   _getUrlPath() {
     if (this._isBoundToStream()) {
-      return "/streams/" + this.state.config.stream_id + "/messages";
+      return '/streams/' + this.props.widget.config.stream_id + '/messages';
     } else {
-      return "/search";
+      return '/search';
     }
   },
   _getUrlQueryString() {
-    const rangeType = this.state.config['range_type'];
+    const config = this.props.widget.config;
+    const rangeType = config.timerange.type;
 
     const query = {
-      q: this.state.config.query,
+      q: config.query,
       rangetype: rangeType,
-      interval: this.state.config.interval
+      interval: config.interval,
     };
     switch(rangeType) {
       case 'relative':
-        query[rangeType] = this.state.config.range;
+        query[rangeType] = config.timerange.range;
         break;
       case 'absolute':
-        query["from"] = this.state.config.from;
-        query["to"] = this.state.config.to;
+        query['from'] = config.timerange.from;
+        query['to'] = config.timerange.to;
         break;
       case 'keyword':
-        query[rangeType] = this.state.config[rangeType];
+        query[rangeType] = config.timerange.keyword;
         break;
     }
 
@@ -242,16 +206,17 @@ const Widget = React.createClass({
     const path = this._getUrlPath();
     const queryString = this._getUrlQueryString();
 
-    return URLUtils.appPrefixed(path + "?" + queryString);
+    return URLUtils.appPrefixed(path + '?' + queryString);
   },
   metricsUrl() {
     // TODO: replace with react router link
-    const url = "/system/metrics/master";
+    const url = '/system/metrics/master';
     const query = {
-      prefilter: "org.graylog2.dashboards.widgets.*." + this.props.widgetId
+      // TODO: replace hardcoded metric name
+      prefilter: 'org.graylog2.dashboards.widgets.*.' + this.props.widget.id
     };
 
-    return URLUtils.appPrefixed(url + "?" + Qs.stringify(query));
+    return URLUtils.appPrefixed(url + '?' + Qs.stringify(query));
   },
   _replaySearch(e) {
     URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
@@ -275,19 +240,20 @@ const Widget = React.createClass({
     this.props.dashboardGrid.enable();
   },
   updateWidget(newWidgetData) {
-    newWidgetData.id = this.props.widgetId;
+    newWidgetData.id = this.props.widget.id;
 
-    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData);
-    this.setState({
-      title: newWidgetData.title,
-      cacheTime: newWidgetData.cacheTime,
-      config: newWidgetData.config
+    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData).then(() => {
+      this.setState({
+        title: newWidgetData.title,
+        cacheTime: newWidgetData.cacheTime,
+        config: newWidgetData.config,
+      });
     });
   },
   deleteWidget() {
-    if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
+    if (window.confirm('Do you really want to delete "' + this.props.widget.description + '"?')) {
       this.setState({deleted: true});
-      WidgetsActions.removeWidget(this.props.dashboardId, this.props.widgetId);
+      WidgetsActions.removeWidget(this.props.dashboardId, this.props.widget.id);
     }
   },
   render() {
@@ -296,7 +262,7 @@ const Widget = React.createClass({
     }
     const showConfigModal = (
       <WidgetConfigModal ref="configModal"
-                         widget={this._getWidgetData()}
+                         widget={this.props.widget}
                          boundToStream={this._isBoundToStream()}
                          metricsAction={this._goToWidgetMetrics}/>
     );
@@ -304,15 +270,15 @@ const Widget = React.createClass({
     const editConfigModal = (
       <WidgetEditConfigModal ref="editModal"
                              widgetTypes={this.constructor.Type}
-                             widget={this._getWidgetData()}
+                             widget={this.props.widget}
                              onUpdate={this.updateWidget}
                              onModalHidden={this._enableGridster}/>
     );
 
     return (
-      <div ref="widget" className="widget" data-widget-id={this.props.widgetId}>
+      <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
         <WidgetHeader ref="widgetHeader"
-                      title={this.state.title}
+                      title={this.props.widget.description}
                       calculatedAt={this.state.calculatedAt}
                       error={this.state.error}
                       errorMessage={this.state.errorMessage}/>
@@ -328,7 +294,7 @@ const Widget = React.createClass({
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );
-  }
+  },
 });
 
 export default Widget;
