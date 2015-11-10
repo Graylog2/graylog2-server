@@ -17,7 +17,7 @@ var webpackConfig = {
         ],
         loaders: [
             { test: /\.json$/, loader: 'json-loader' },
-            { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ },
+            { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader?stage=0'], exclude: /node_modules|\.node_cache/ },
             { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
             { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file-loader' },
             { test: /\.png$/, loader: 'url-loader' },
