@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 
@@ -11,15 +10,11 @@ import WidgetsStore from 'stores/widgets/WidgetsStore';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
-import Spinner from 'components/common/Spinner';
-import PageHeader from 'components/common/PageHeader';
+import { GridsterContainer, GridsterWidget, PageHeader, Spinner } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
 import Widget from 'components/widgets/Widget';
-
-require('!script!../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../public/javascripts/jquery.gridster.min.js');
 
 const ShowDashboardPage = React.createClass({
   componentDidMount() {
@@ -27,74 +22,13 @@ const ShowDashboardPage = React.createClass({
     this.listenTo(WidgetsStore, this.removeWidget);
     setInterval(this.loadData, 2000);
   },
-  componentWillUpdate(prevProps, prevState) {
-    if (this.state.dashboards && this.didInitialize) {
-      const oldWidgetList = prevState.dashboard.widgets.map((x) => x.id);
-      const newWidgetList = this.state.dashboard.widgets.map((x) => x.id);
-      const removedWidgets = oldWidgetList.filter((x) => newWidgetList.indexOf(x) < 0);
-      const newWidgets = newWidgetList.filter((x) => oldWidgetList.indexOf(x) < 0);
-      if (removedWidgets.length > 0 || newWidgets.length > 0) {
-        console.log('New Widgets: ', newWidgets);
-        console.log('Removed Widgets: ', removedWidgets);
-      }
-    }
-  },
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.didInitialize && this.refs.gridster && this.state.dashboard) {
-      this.didInitialize = true;
-      const rootNode = ReactDOM.findDOMNode(this.refs.gridster);
-      const dashboardGrid = this._initGridster(rootNode);
-
-      this._arrangeWidgets(dashboardGrid, this.state.dashboard.widgets, this.state.dashboard.positions);
-
-      this.lockDashboard(dashboardGrid);
-
-      this.setState({dashboardGrid: dashboardGrid});
-    }
-  },
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
-  didInitialize: false,
 
   getInitialState() {
     return {
       locked: true,
-      dashboardGrid: undefined,
       forceUpdateInBackground: false,
     };
-  },
-  _initGridster(rootNode) {
-    return $(rootNode).gridster({
-      widget_margins: [10, 10],
-      widget_base_dimensions: [410, 200],
-      resize: {
-        enabled: true,
-        stop: this._onPositionsChanged,
-      },
-      draggable: {
-        stop: this._onPositionsChanged,
-      },
-      serialize_params: function(widgetListItem, pos) {
-        const widget = $('.widget', widgetListItem);
-
-        return {
-          id: widget.attr('data-widget-id'),
-          col: pos.col,
-          row: pos.row,
-          size_x: pos.size_x,
-          size_y: pos.size_y,
-        };
-      },
-    }).data('gridster');
-  },
-
-  _arrangeWidgets(grid, widgets, positions) {
-    //grid.remove_all_widgets();
-    widgets.forEach((widget) => {
-      const position = positions[widget.id] || {row: 0, col: 0, width: 1, height: 1};
-
-      const $elem = $(ReactDOM.findDOMNode(this.refs['widget-' + widget.id]));
-      grid.add_widget($elem, position.width, position.height, position.col, position.row);
-    });
   },
   loadData() {
     DashboardStore.get(this.props.params.dashboardId)
@@ -114,8 +48,6 @@ const ShowDashboardPage = React.createClass({
   removeWidget(props) {
     if (props.delete) {
       this.loadData();
-      const widgetElem = ReactDOM.findDOMNode(this.refs['widget-' + props.delete]);
-      this.state.dashboardGrid.remove_widget($(widgetElem));
     }
   },
   emptyDashboard() {
@@ -141,41 +73,29 @@ const ShowDashboardPage = React.createClass({
 
       return d1.col < d2.col;
     }).map((widget) => {
-      const position = this.state.dashboard.positions[widget.id] || {row: 0, col: 0, width: 1, height: 1};
       return (
-        <li ref={'widget-' + widget.id} key={'li-' + widget.id} data-row={position.row} data-col={position.col} data-sizex={position.width} data-sizey={position.height}>
-          <Widget key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id} locked={this.state.locked} dashboardGrid={this.state.dashboardGrid} shouldUpdate={this.shouldUpdate()}/>
-        </li>
+        <Widget id={widget.id} key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id}
+                locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
       );
     });
     return (
       <Row>
         <div className="dashboard">
-          <div ref="gridster" className="gridster" data-dashboard-id={dashboard.id}>
-            <ul>
-              {widgets}
-            </ul>
-          </div>
+          <GridsterContainer ref="gridsterContainer" positions={this.state.dashboard.positions}>
+            {widgets}
+          </GridsterContainer>
         </div>
       </Row>
     );
-  },
-  lockDashboard(dashboardGrid) {
-    dashboardGrid.disable();
-    dashboardGrid.disable_resize();
-  },
-  unlockDashboard(dashboardGrid) {
-    dashboardGrid.enable();
-    dashboardGrid.enable_resize();
   },
   _onUnlock() {
     const locked = !this.state.locked;
     this.setState({locked: locked});
 
     if (locked) {
-      this.lockDashboard(this.state.dashboardGrid);
+      this.refs.gridsterContainer.lockGrid();
     } else {
-      this.unlockDashboard(this.state.dashboardGrid);
+      this.refs.gridsterContainer.unlockGrid();
     }
   },
   _onPositionsChanged() {
@@ -252,6 +172,7 @@ const ShowDashboardPage = React.createClass({
           {supportText}
           {actions}
         </PageHeader>
+
         {this.formatDashboard(dashboard)}
       </span>
     );

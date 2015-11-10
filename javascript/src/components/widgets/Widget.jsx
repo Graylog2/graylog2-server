@@ -8,16 +8,14 @@ import URLUtils from 'util/URLUtils';
 
 import UserNotification from 'util/UserNotification';
 
-import WidgetHeader from 'components/widgets/WidgetHeader';
-import WidgetFooter from 'components/widgets/WidgetFooter';
-import WidgetConfigModal from 'components/widgets/WidgetConfigModal';
-import WidgetEditConfigModal from 'components/widgets/WidgetEditConfigModal';
+import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader } from 'components/widgets';
 
-import NumericVisualization from 'components/visualizations/NumericVisualization';
-import HistogramVisualization from 'components/visualizations/HistogramVisualization';
-import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
-import GraphVisualization from 'components/visualizations/GraphVisualization';
-import StackedGraphVisualization from 'components/visualizations/StackedGraphVisualization';
+import {
+  NumericVisualization,
+  HistogramVisualization,
+  QuickValuesVisualization,
+  GraphVisualization,
+  StackedGraphVisualization } from 'components/visualizations';
 
 import WidgetsStore from 'stores/widgets/WidgetsStore';
 import WidgetsActions from 'actions/widgets/WidgetsActions';
@@ -29,6 +27,33 @@ const Widget = React.createClass({
     dashboardId: React.PropTypes.string.isRequired,
     shouldUpdate: React.PropTypes.bool.isRequired,
     locked: React.PropTypes.bool.isRequired,
+  },
+  getInitialState() {
+    return {
+      result: undefined,
+      calculatedAt: undefined,
+      error: false,
+      errorMessage: undefined,
+      height: undefined,
+      width: undefined,
+    };
+  },
+  componentDidMount() {
+    this._loadValue();
+    this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
+
+    if (this.props.dashboardGrid) {
+      this.props.dashboardGrid.add_widget()
+    }
+
+    $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
+  },
+  componentDidUpdate() {
+    this._calculateWidgetSize();
+  },
+  componentWillUnmount() {
+    clearInterval(this.loadValueInterval);
+    $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
   WIDGET_DATA_REFRESH: 30 * 1000,
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
@@ -46,38 +71,11 @@ const Widget = React.createClass({
     },
   },
 
-  getInitialState() {
-    return {
-      result: undefined,
-      calculatedAt: undefined,
-      error: false,
-      errorMessage: undefined,
-      height: undefined,
-      width: undefined,
-    };
-  },
   _isBoundToStream() {
     return ('stream_id' in this.props.widget.config) && (this.props.widget.config.stream_id !== null);
   },
   _getWidgetNode() {
     return ReactDOM.findDOMNode(this.refs.widget);
-  },
-  componentDidUpdate() {
-    this._calculateWidgetSize();
-  },
-  componentDidMount() {
-    this._loadValue();
-    this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
-
-    if (this.props.dashboardGrid) {
-      this.props.dashboardGrid.add_widget()
-    }
-
-    $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
-  },
-  componentWillUnmount() {
-    clearInterval(this.loadValueInterval);
-    $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
   _loadValue() {
     if (!this.props.shouldUpdate) {
@@ -119,9 +117,11 @@ const Widget = React.createClass({
     }
 
     if (this.state.result === undefined) {
-      return <div className="loading">
-        <i className="fa fa-spin fa-3x fa-refresh spinner"></i>
-      </div>;
+      return (
+        <div className="loading">
+          <i className="fa fa-spin fa-3x fa-refresh spinner"/>
+        </div>
+      );
     }
 
     if (this.state.result === 'N/A') {
@@ -165,7 +165,7 @@ const Widget = React.createClass({
                                                    width={this.state.width}/>;
         break;
       default:
-        throw("Error: Widget type '" + this.props.widget.type + "' not supported");
+        throw('Error: Widget type "' + this.props.widget.type + '" not supported');
     }
 
     return visualization;
