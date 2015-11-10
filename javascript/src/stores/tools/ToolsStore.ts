@@ -77,6 +77,23 @@ const ToolsStore = {
 
         return promise;
     },
+    testSubstring(beginIndex: number, endIndex: number, string: string): Promise<Object> {
+        const url = jsRoutes.controllers.api.ToolsApiController.substringTest().url;
+        const payload = {
+            start: beginIndex,
+            end: endIndex,
+            string: string,
+        };
+
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), payload);
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+                'We were not able to run the substring extraction. Please check index boundaries.');
+        });
+
+        return promise;
+    }
 };
 
 export = ToolsStore;

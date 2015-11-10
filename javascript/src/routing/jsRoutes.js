@@ -108,11 +108,12 @@ const jsRoutes = {
         all: (page) => { return {url: '/system/messages?page=' + page}; },
       },
       ToolsApiController: {
+        grokTest: () => { return {url: '/tools/grok_tester'};},
+        jsonTest: () => { return {url: '/tools/json_tester'};},
         naturalDateTest: (text) => { return {url: `/tools/natural_date_tester?string=${text}`}; },
         regexTest: () => { return {url: '/tools/regex_tester'};},
         regexReplaceTest: () => { return {url: '/tools/regex_replace_tester'};},
-        grokTest: () => { return {url: '/tools/grok_tester'};},
-        jsonTest: () => { return {url: '/tools/json_tester'};},
+        substringTest: () => { return {url: '/tools/substring_tester'};},
       },
       UsersApiController: {
         changePassword: (username) => { return {url: '/users/' + username + '/password'}; },
