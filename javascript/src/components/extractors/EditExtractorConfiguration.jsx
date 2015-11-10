@@ -30,10 +30,10 @@ const EditExtractorConfiguration = React.createClass({
     let extractorConfiguration;
 
     switch (this.props.extractorType) {
-    case 'copy_input':
+    case ExtractorUtils.ExtractorTypes.COPY_INPUT:
       extractorConfiguration = <CopyInputExtractorConfiguration/>;
       break;
-    case 'grok':
+    case ExtractorUtils.ExtractorTypes.GROK:
       extractorConfiguration = (
         <GrokExtractorConfiguration configuration={this.props.configuration}
                                     exampleMessage={this.props.exampleMessage}
@@ -41,7 +41,7 @@ const EditExtractorConfiguration = React.createClass({
                                     onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
-    case 'json':
+    case ExtractorUtils.ExtractorTypes.JSON:
       extractorConfiguration = (
         <JSONExtractorConfiguration configuration={this.props.configuration}
                                     exampleMessage={this.props.exampleMessage}
@@ -49,7 +49,7 @@ const EditExtractorConfiguration = React.createClass({
                                     onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
-    case 'regex':
+    case ExtractorUtils.ExtractorTypes.REGEX:
       extractorConfiguration = (
         <RegexExtractorConfiguration configuration={this.props.configuration}
                                      exampleMessage={this.props.exampleMessage}
@@ -57,7 +57,7 @@ const EditExtractorConfiguration = React.createClass({
                                      onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
-    case 'regex_replace':
+    case ExtractorUtils.ExtractorTypes.REGEX_REPLACE:
       extractorConfiguration = (
         <RegexReplaceExtractorConfiguration configuration={this.props.configuration}
                                             exampleMessage={this.props.exampleMessage}
@@ -65,7 +65,7 @@ const EditExtractorConfiguration = React.createClass({
                                             onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
-    case 'substring':
+    case ExtractorUtils.ExtractorTypes.SUBSTRING:
       extractorConfiguration = (
         <SubstringExtractorConfiguration configuration={this.props.configuration}
                                          exampleMessage={this.props.exampleMessage}
@@ -73,7 +73,7 @@ const EditExtractorConfiguration = React.createClass({
                                          onExtractorPreviewLoad={this._onExtractorPreviewLoad}/>
       );
       break;
-    case 'split_and_index':
+    case ExtractorUtils.ExtractorTypes.SPLIT_AND_INDEX:
       extractorConfiguration = (
         <SplitAndIndexExtractorConfiguration configuration={this.props.configuration}
                                              exampleMessage={this.props.exampleMessage}

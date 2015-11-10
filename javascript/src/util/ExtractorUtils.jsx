@@ -1,16 +1,17 @@
 import jsRoutes from 'routing/jsRoutes';
 
-const ExtractorTypes = {
-  COPY_INPUT: 'Copy Input',
-  GROK: 'Grok pattern',
-  JSON: 'JSON',
-  REGEX: 'Regular expression',
-  REGEX_REPLACE: 'Replace with regular expression',
-  SPLIT_AND_INDEX: 'Split & Index',
-  SUBSTRING: 'Substring',
-};
+const ExtractorTypes = Object.freeze({
+  COPY_INPUT: 'copy_input',
+  GROK: 'grok',
+  JSON: 'json',
+  REGEX: 'regex',
+  REGEX_REPLACE: 'regex_replace',
+  SPLIT_AND_INDEX: 'split_and_index',
+  SUBSTRING: 'substring',
+});
 
 const ExtractorUtils = {
+  ExtractorTypes: ExtractorTypes,
   EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map(type => type.toLocaleLowerCase()),
 
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
@@ -23,7 +24,24 @@ const ExtractorUtils = {
   },
 
   getReadableExtractorTypeName(extractorType) {
-    return extractorType ? ExtractorTypes[extractorType.toLocaleUpperCase()] : extractorType;
+    switch (extractorType) {
+    case ExtractorTypes.COPY_INPUT:
+      return 'Copy input';
+    case ExtractorTypes.GROK:
+      return 'Grok pattern';
+    case ExtractorTypes.JSON:
+      return 'JSON';
+    case ExtractorTypes.REGEX:
+      return 'Regular expression';
+    case ExtractorTypes.REGEX_REPLACE:
+      return 'Replace with regular expression';
+    case ExtractorTypes.SPLIT_AND_INDEX:
+      return 'Split & Index';
+    case ExtractorTypes.SUBSTRING:
+      return 'Substring';
+    default:
+      return extractorType;
+    }
   },
 };
 
