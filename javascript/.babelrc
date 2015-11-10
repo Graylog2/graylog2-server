@@ -1,0 +1,10 @@
+{
+  "stage": 0,
+    "env": {
+      "development": {
+        "plugins": [
+          "import-asserts"
+        ]
+      }
+    }
+}
