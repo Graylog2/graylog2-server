@@ -30,6 +30,7 @@ import EditUsersPage from 'pages/EditUsersPage';
 import GrokPatternsPage from 'pages/GrokPatternsPage';
 import SystemOverviewPage from 'pages/SystemOverviewPage';
 import IndexerFailuresPage from 'pages/IndexerFailuresPage';
+import IndicesPage from 'pages/IndicesPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -57,6 +58,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>
+            <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage}/>
             <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>

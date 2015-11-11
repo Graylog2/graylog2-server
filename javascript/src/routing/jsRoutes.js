@@ -34,6 +34,11 @@ const jsRoutes = {
         widgetValue: (dashboardId, widgetId) => { return {url: '/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'}; },
         updatePositions: (dashboardId) => { return {url: '/dashboards/' + dashboardId + '/positions'}; },
       },
+      DeflectorApiController: {
+        config: () => { return {url: '/system/deflector/config'}; },
+        cycle: () => { return {url: '/system/deflector/cycle'}; },
+        list: () => { return {url: '/system/deflector'}; },
+      },
       IndexerClusterApiController: {
         health: () => { return {url: '/system/indexer/cluster/health'}; },
         name: () => { return {url: '/system/indexer/cluster/name'}; },
@@ -41,6 +46,15 @@ const jsRoutes = {
       IndexerFailuresApiController: {
         count: (since) => { return {url: '/system/indexer/failures/count?since=' + since}; },
         list: (limit, offset) => { return {url: '/system/indexer/failures?limit=' + limit + '&offset=' + offset}; },
+      },
+      IndexRangesApiController: {
+        list: () => { return {url: '/system/indices/ranges'}; },
+        rebuild: () => { return {url: '/system/indices/ranges/rebuild'}; },
+      },
+      IndicesApiController: {
+        close: (indexId) => { return {url: '/system/indexer/' + indexId + '/close'}; },
+        delete: (indexId) => { return {url: '/system/indexer/indices/' + indexId}; },
+        list: () => { return {url: '/system/indexer/indices'}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },

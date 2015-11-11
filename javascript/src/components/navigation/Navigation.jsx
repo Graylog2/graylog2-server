@@ -114,6 +114,11 @@ const Navigation = React.createClass({
                   <MenuItem>Collectors</MenuItem>
                 </LinkContainer>
               }
+              {this.isPermitted(this.props.permissions, ['INDICES_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                  <MenuItem>Indices</MenuItem>
+                </LinkContainer>
+              }
               {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
                   <MenuItem>Outputs</MenuItem>

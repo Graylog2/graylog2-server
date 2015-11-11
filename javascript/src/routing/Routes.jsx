@@ -12,6 +12,7 @@ const Routes = {
     },
     GROKPATTERNS: '/system/grokpatterns',
     INDICES: {
+      LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
     },
     INPUTS: '/system/inputs',
