@@ -52,8 +52,8 @@ const jsRoutes = {
         rebuild: () => { return {url: '/system/indices/ranges/rebuild'}; },
       },
       IndicesApiController: {
-        close: (indexId) => { return {url: '/system/indexer/' + indexId + '/close'}; },
-        delete: (indexId) => { return {url: '/system/indexer/indices/' + indexId}; },
+        close: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/close'}; },
+        delete: (indexName) => { return {url: '/system/indexer/indices/' + indexName}; },
         list: () => { return {url: '/system/indexer/indices'}; },
       },
       InputsApiController: {

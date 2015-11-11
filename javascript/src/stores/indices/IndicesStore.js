@@ -28,14 +28,14 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.list.promise(promise);
   },
-  close(indexId) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.close(indexId).url);
+  close(indexName) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.close(indexName).url);
     const promise = fetch('POST', url);
 
     IndicesActions.close.promise(promise);
   },
-  delete() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.delete(indexId).url);
+  delete(indexName) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.delete(indexName).url);
     const promise = fetch('DELETE', url);
 
     IndicesActions.delete.promise(promise);

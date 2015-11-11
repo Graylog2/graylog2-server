@@ -12,15 +12,13 @@ const IndexSummary = React.createClass({
     children: React.PropTypes.node.isRequired,
     index: React.PropTypes.object.isRequired,
     indexRange: React.PropTypes.object.isRequired,
+    isDeflector: React.PropTypes.bool.isRequired,
   },
   getInitialState() {
-    return { showDetails: this._isDeflector(this.props.index) };
-  },
-  _isDeflector(index) {
-    return index.name === this.props.deflector.info.current_target;
+    return { showDetails: this.props.isDeflector };
   },
   _deflectorBadge(index) {
-    if (this._isDeflector(index)) {
+    if (this.props.isDeflector) {
       return <i className="fa fa-bolt" title="Write-active index"/>;
     }
   },
@@ -29,8 +27,8 @@ const IndexSummary = React.createClass({
       return <i className="fa fa-retweet" title="Reopened index"/>;
     }
   },
-  _formatIndexRange(index) {
-    if (this._isDeflector(index)) {
+  _formatIndexRange() {
+    if (this.props.isDeflector) {
       return 'up to ' + moment().fromNow();
     }
 

@@ -1,13 +1,43 @@
 import React from 'react';
 import moment from 'moment';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
-import { ShardMeter } from 'components/indices';
+import IndicesActions from 'actions/indices/IndicesActions';
+
+import { ShardMeter, ShardRoutingOverview } from 'components/indices';
 
 const IndexDetails = React.createClass({
   propTypes: {
     index: React.PropTypes.object.isRequired,
     indexRange: React.PropTypes.object.isRequired,
+    isDeflector: React.PropTypes.bool.isRequired,
+  },
+  _formatActionButtons() {
+    if (this.props.isDeflector) {
+      return (
+        <span>
+          <Button bsStyle="warning" bsSize="xs" disabled>Deflector index cannot be closed</Button>{' '}
+          <Button bsStyle="danger" bsSize="xs" disabled>Deflector index cannot be deleted</Button>
+        </span>
+      );
+    }
+
+    return (
+      <span>
+        <Button bsStyle="warning" bsSize="xs" onClick={this._onCloseIndex}>Close index</Button>{' '}
+        <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
+      </span>
+    );
+  },
+  _onCloseIndex() {
+    if (window.confirm('Really close index ' + this.props.index.name + '?')) {
+      IndicesActions.close(this.props.index.name);
+    }
+  },
+  _onDeleteIndex() {
+    if (window.confirm('Really delete index ' + this.props.index.name + '?')) {
+      IndicesActions.delete(this.props.index.name);
+    }
   },
   render() {
     const { index, indexRange } = this.props;
@@ -27,6 +57,12 @@ const IndexDetails = React.createClass({
             <ShardMeter title="Total shard operations" shardMeter={index.all_shards} />
           </Col>
         </Row>
+
+        <ShardRoutingOverview routing={index.routing} />
+
+        <hr style={{marginBottom: '5', marginTop: '10'}}/>
+
+        {this._formatActionButtons()}
       </div>
     );
   },

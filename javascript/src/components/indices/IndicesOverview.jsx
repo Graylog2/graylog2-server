@@ -9,15 +9,18 @@ const IndicesOverview = React.createClass({
     indexRanges: React.PropTypes.array.isRequired,
     indices: React.PropTypes.object.isRequired,
   },
+  _isDeflector(index) {
+    return index.name === this.props.deflector.info.current_target;
+  },
   _formatIndex(indexName, index) {
     const indexRange = this.props.indexRanges.filter((indexRange) => indexRange.index_name === indexName)[0];
     index.name = indexName;
     return (
       <Row key={'index-summary-' + index.name} className="content index-description">
         <Col md={12}>
-          <IndexSummary index={index} indexRange={indexRange} deflector={this.props.deflector}>
+          <IndexSummary index={index} indexRange={indexRange} isDeflector={this._isDeflector(index)}>
             <span>
-              <IndexDetails index={index} indexRange={indexRange} />
+              <IndexDetails index={index} indexRange={indexRange} isDeflector={this._isDeflector(index)}/>
             </span>
           </IndexSummary>
         </Col>
