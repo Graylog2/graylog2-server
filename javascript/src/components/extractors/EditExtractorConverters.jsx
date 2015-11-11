@@ -4,6 +4,7 @@ import {Select} from 'components/common';
 
 import {
   DateConverterConfiguration,
+  FlexdateConverterConfiguration,
   NumericConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
@@ -85,6 +86,13 @@ const EditExtractorConverters = React.createClass({
                                       type={converterType}
                                       configuration={converterConfig}
                                       onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.FLEXDATE:
+        return (
+          <FlexdateConverterConfiguration key={converterType}
+                                          type={converterType}
+                                          configuration={converterConfig}
+                                          onChange={this._onConverterChange}/>
         );
       default:
         console.warn(`Converter type ${converterType} is not supported.`);
