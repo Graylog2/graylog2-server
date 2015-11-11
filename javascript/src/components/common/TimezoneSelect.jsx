@@ -3,7 +3,6 @@ import moment from 'moment';
 import jQuery from 'jquery';
 
 import Select from 'components/common/Select';
-import Spinner from 'components/common/Spinner';
 
 const TimezoneSelect = React.createClass({
   getValue() {

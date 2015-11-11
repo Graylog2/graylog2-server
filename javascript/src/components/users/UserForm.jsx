@@ -15,7 +15,7 @@ import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
-import TimezoneSelect from 'components/users/TimezoneSelect';
+import {TimezoneSelect} from 'components/common';
 
 const UserForm = React.createClass({
   propTypes: {

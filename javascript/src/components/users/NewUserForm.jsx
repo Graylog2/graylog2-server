@@ -4,7 +4,7 @@ import { Row, Col, Input, Button, FormControls } from 'react-bootstrap';
 
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
-import TimezoneSelect from 'components/users/TimezoneSelect';
+import {TimezoneSelect} from 'components/common';
 
 const NewUserForm = React.createClass({
   propTypes: {
