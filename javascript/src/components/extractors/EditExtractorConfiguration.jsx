@@ -1,13 +1,15 @@
 import React, {PropTypes} from 'react';
 import {Col, Panel} from 'react-bootstrap';
 
-import CopyInputExtractorConfiguration from './extractors_configuration/CopyInputExtractorConfiguration';
-import GrokExtractorConfiguration from './extractors_configuration/GrokExtractorConfiguration';
-import JSONExtractorConfiguration from './extractors_configuration/JSONExtractorConfiguration';
-import RegexExtractorConfiguration from './extractors_configuration/RegexExtractorConfiguration';
-import RegexReplaceExtractorConfiguration from './extractors_configuration/RegexReplaceExtractorConfiguration';
-import SplitAndIndexExtractorConfiguration from './extractors_configuration/SplitAndIndexExtractorConfiguration';
-import SubstringExtractorConfiguration from './extractors_configuration/SubstringExtractorConfiguration';
+import {
+  CopyInputExtractorConfiguration,
+  GrokExtractorConfiguration,
+  JSONExtractorConfiguration,
+  RegexExtractorConfiguration,
+  RegexReplaceExtractorConfiguration,
+  SplitAndIndexExtractorConfiguration,
+  SubstringExtractorConfiguration,
+} from 'components/extractors/extractors_configuration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
