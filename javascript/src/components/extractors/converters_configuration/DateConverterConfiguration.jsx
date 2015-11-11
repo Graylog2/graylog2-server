@@ -53,6 +53,7 @@ const DateConverterConfiguration = React.createClass({
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
+               ref="converterEnabled"
                id={`enable-${this.props.type}-converter`}
                label="Convert to date type"
                wrapperClassName="col-md-offset-2 col-md-10"
@@ -69,7 +70,7 @@ const DateConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-10"
                      placeholder="yyyy-MM-dd HH:mm:ss.SSS"
                      onChange={this._onChange('date_format')}
-                     required
+                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}
                      help={dateFormatHelpMessage}/>
 
               <Input label="Time Zone"
