@@ -5,6 +5,7 @@ import {Select} from 'components/common';
 import {
   DateConverterConfiguration,
   FlexdateConverterConfiguration,
+  HashConverterConfiguration,
   NumericConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
@@ -83,6 +84,13 @@ const EditExtractorConverters = React.createClass({
       case ExtractorUtils.ConverterTypes.DATE:
         return (
           <DateConverterConfiguration key={converterType}
+                                      type={converterType}
+                                      configuration={converterConfig}
+                                      onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.HASH:
+        return (
+          <HashConverterConfiguration key={converterType}
                                       type={converterType}
                                       configuration={converterConfig}
                                       onChange={this._onConverterChange}/>
