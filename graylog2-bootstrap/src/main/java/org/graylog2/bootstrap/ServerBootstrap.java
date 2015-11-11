@@ -37,6 +37,7 @@ import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.shared.system.stats.SystemStatsModule;
+import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +75,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void startCommand() {
-        LOG.info("Graylog {} {} starting up (JRE: {}, installed from: {})", commandName, version,
-                Tools.getSystemInformation(), configuration.getInstallationSource());
+        final OS os = OS.getOs();
+
+        LOG.info("Graylog {} {} starting up", commandName, version);
+        LOG.info("JRE: {}", Tools.getSystemInformation());
+        LOG.info("Deployment: {}", configuration.getInstallationSource());
+        LOG.info("OS: {}", os.getPlatformName());
+        LOG.info("Arch: {}", os.getArch());
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
