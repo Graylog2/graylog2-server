@@ -7,6 +7,7 @@ import {
   FlexdateConverterConfiguration,
   HashConverterConfiguration,
   NumericConverterConfiguration,
+  SplitAndCountConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -94,6 +95,13 @@ const EditExtractorConverters = React.createClass({
                                       type={converterType}
                                       configuration={converterConfig}
                                       onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.SPLIT_AND_COUNT:
+        return (
+          <SplitAndCountConverterConfiguration key={converterType}
+                                               type={converterType}
+                                               configuration={converterConfig}
+                                               onChange={this._onConverterChange}/>
         );
       case ExtractorUtils.ConverterTypes.FLEXDATE:
         return (
