@@ -11,6 +11,20 @@ const ExtractorTypes = Object.freeze({
 });
 
 const ExtractorUtils = {
+  ConverterTypes: Object.freeze({
+    NUMERIC: 'numeric',
+    DATE: 'date',
+    HASH: 'hash',
+    SPLIT_AND_COUNT: 'split_and_count',
+    IP_ANONYMIZER: 'ip_anonymizer',
+    SYSLOG_PRI_LEVEL: 'syslog_pri_level',
+    SYSLOG_PRI_FACILITY: 'syslog_pri_facility',
+    TOKENIZER: 'tokenizer',
+    CSV: 'csv',
+    LOWERCASE: 'lowercase',
+    UPPERCASE: 'uppercase',
+    FLEXDATE: 'flexdate',
+  }),
   ExtractorTypes: ExtractorTypes,
   EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map(type => type.toLocaleLowerCase()),
 
@@ -41,6 +55,37 @@ const ExtractorUtils = {
       return 'Substring';
     default:
       return extractorType;
+    }
+  },
+
+  getReadableConverterTypeName(converterType) {
+    switch (converterType) {
+    case this.ConverterTypes.NUMERIC:
+      return 'Numeric';
+    case this.ConverterTypes.DATE:
+      return 'Date';
+    case this.ConverterTypes.FLEXDATE:
+      return 'Flexible Date';
+    case this.ConverterTypes.HASH:
+      return 'Hash';
+    case this.ConverterTypes.LOWERCASE:
+      return 'Lowercase';
+    case this.ConverterTypes.UPPERCASE:
+      return 'Uppercase';
+    case this.ConverterTypes.TOKENIZER:
+      return 'Key = Value Pairs To Fields';
+    case this.ConverterTypes.CSV:
+      return 'CSV To Fields';
+    case this.ConverterTypes.SPLIT_AND_COUNT:
+      return 'Split & Count';
+    case this.ConverterTypes.IP_ANONYMIZER:
+      return 'Anonymize IPv4 Addresses';
+    case this.ConverterTypes.SYSLOG_PRI_LEVEL:
+      return 'Syslog Level From PRI';
+    case this.ConverterTypes.SYSLOG_PRI_FACILITY:
+      return 'Syslog Facility From PRI';
+    default:
+      return converterType;
     }
   },
 };
