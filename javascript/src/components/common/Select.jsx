@@ -8,6 +8,11 @@ const Select = React.createClass({
       value: this.props.value,
     };
   },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.value !== nextProps.value) {
+      this.setState({value: nextProps.value});
+    }
+  },
   componentDidMount() {
     this.reactSelectStyles.use();
   },
