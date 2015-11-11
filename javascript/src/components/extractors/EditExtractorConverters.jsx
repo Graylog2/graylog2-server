@@ -9,6 +9,7 @@ import {
   IpAnonymizerConverterConfiguration,
   NumericConverterConfiguration,
   SplitAndCountConverterConfiguration,
+  SyslogPriFacilityConverterConfiguration,
   SyslogPriLevelConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
@@ -118,6 +119,13 @@ const EditExtractorConverters = React.createClass({
                                                 type={converterType}
                                                 configuration={converterConfig}
                                                 onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.SYSLOG_PRI_FACILITY:
+        return (
+          <SyslogPriFacilityConverterConfiguration key={converterType}
+                                                   type={converterType}
+                                                   configuration={converterConfig}
+                                                   onChange={this._onConverterChange}/>
         );
       case ExtractorUtils.ConverterTypes.FLEXDATE:
         return (
