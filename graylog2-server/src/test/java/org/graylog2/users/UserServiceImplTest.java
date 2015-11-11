@@ -16,6 +16,9 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -27,8 +30,11 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.users.Role;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -39,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -57,13 +64,15 @@ public class UserServiceImplTest {
     private UserServiceImpl userService;
     @Mock
     private RoleService roleService;
+    @Mock
+    private InMemoryRolePermissionResolver permissionsResolver;
 
     @Before
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
         final UserImpl.Factory userFactory = new UserImplFactory(configuration);
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissionsResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -154,5 +163,48 @@ public class UserServiceImplTest {
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
             return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, adminRoleObjectId);
         }
+    }
+
+    private Role createRole(String name) {
+        final RoleImpl role = new RoleImpl();
+
+        role._id = new ObjectId(DateTime.now(DateTimeZone.UTC).toDate()).toString();
+        role.setName(name);
+
+        return role;
+    }
+
+    @Test
+    public void testGetRoleNames() throws Exception {
+        final UserImplFactory factory = new UserImplFactory(new Configuration());
+        final UserImpl user = factory.create(new HashMap<>());
+        final Role role = createRole("Foo");
+
+        final ImmutableMap<String, Role> map = ImmutableMap.<String, Role>builder()
+                .put(role.getId(), role)
+                .build();
+
+        when(roleService.loadAllIdMap()).thenReturn(map);
+        assertThat(userService.getRoleNames(user)).isEmpty();
+
+        user.setRoleIds(Sets.newHashSet(role.getId()));
+        assertThat(userService.getRoleNames(user)).containsOnly("Foo");
+
+        when(roleService.loadAllIdMap()).thenReturn(new HashMap<>());
+        assertThat(userService.getRoleNames(user)).isEmpty();
+    }
+
+    @Test
+    public void testGetPermissionsForUser() throws Exception {
+        final UserImplFactory factory = new UserImplFactory(new Configuration());
+        final UserImpl user = factory.create(new HashMap<>());
+        final Role role = createRole("Foo");
+
+        user.setRoleIds(Sets.newHashSet(role.getId()));
+        user.setPermissions(Lists.newArrayList("hello:world"));
+
+        when(permissionsResolver.resolveStringPermission(role.getId())).thenReturn(Sets.newHashSet("foo:bar"));
+
+        assertThat(userService.getPermissionsForUser(user)).containsOnly("foo:bar", "hello:world");
     }
 }
