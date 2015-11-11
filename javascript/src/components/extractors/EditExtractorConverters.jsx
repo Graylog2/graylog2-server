@@ -42,7 +42,8 @@ const EditExtractorConverters = React.createClass({
   },
   _getConvertersConfiguration() {
     const controls = this.state.displayedConverters.map(converterType => {
-      const converterConfig = this.props.converters.filter(converter => converter.type === converterType)[0] || {};
+      const converter = this.props.converters.filter(converter => converter.type === converterType)[0];
+      const converterConfig = converter ? converter.config : {};
 
       switch (converterType) {
       case ExtractorUtils.ConverterTypes.NUMERIC:
