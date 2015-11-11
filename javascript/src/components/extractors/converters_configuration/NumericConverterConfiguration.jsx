@@ -15,7 +15,7 @@ const NumericConverterConfiguration = React.createClass({
   _getConverterObject() {
     return {type: this.props.type, config: this.props.configuration};
   },
-  _onChange(event) {
+  _toggleConverter(event) {
     let converter;
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
@@ -31,7 +31,7 @@ const NumericConverterConfiguration = React.createClass({
                label="Convert to numeric value"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked
-               onChange={this._onChange}/>
+               onChange={this._toggleConverter}/>
       </div>
     );
   },
