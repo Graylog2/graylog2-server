@@ -84,7 +84,7 @@ public class IndexRangesCleanupPeriodical extends Periodical {
         }
 
         if (!removedIndices.isEmpty()) {
-            LOG.info("Removing index range information for non-existing indices: {}", removedIndices);
+            LOG.info("Removing index range information for unavailable indices: {}", removedIndices);
             eventBus.post(IndicesDeletedEvent.create(removedIndices));
         }
     }
