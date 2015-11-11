@@ -13,6 +13,7 @@ import {
   SyslogPriFacilityConverterConfiguration,
   SyslogPriLevelConverterConfiguration,
   TokenizerConverterConfiguration,
+  UppercaseConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -139,6 +140,13 @@ const EditExtractorConverters = React.createClass({
       case ExtractorUtils.ConverterTypes.LOWERCASE:
         return (
           <LowercaseConverterConfiguration key={converterType}
+                                           type={converterType}
+                                           configuration={converterConfig}
+                                           onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.UPPERCASE:
+        return (
+          <UppercaseConverterConfiguration key={converterType}
                                            type={converterType}
                                            configuration={converterConfig}
                                            onChange={this._onConverterChange}/>

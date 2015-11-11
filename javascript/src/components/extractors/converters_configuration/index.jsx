@@ -8,3 +8,4 @@ export SplitAndCountConverterConfiguration from './SplitAndCountConverterConfigu
 export SyslogPriFacilityConverterConfiguration from './SyslogPriFacilityConverterConfiguration';
 export SyslogPriLevelConverterConfiguration from './SyslogPriLevelConverterConfiguration';
 export TokenizerConverterConfiguration from './TokenizerConverterConfiguration';
+export UppercaseConverterConfiguration from './UppercaseConverterConfiguration';
