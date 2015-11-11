@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import {Row, Col, Input, Button, FormControls} from 'react-bootstrap';
 
 import ExtractorExampleMessage from './ExtractorExampleMessage';
-import EditExtractorConfiguration from './EditExtractorConfiguration.jsx';
+import EditExtractorConfiguration from './EditExtractorConfiguration';
+import EditExtractorConverters from './EditExtractorConverters';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -59,6 +60,22 @@ const EditExtractor = React.createClass({
       updatedExtractor.extractor_config[key] = FormUtils.getValueFromInput(event.target);
       this.setState({updatedExtractor: updatedExtractor});
     };
+  },
+  _onConverterChange(converterType, newConverter) {
+    const updatedExtractor = this.state.updatedExtractor;
+    const previousConverter = updatedExtractor.converters.filter(converter => converter.type === converterType)[0];
+
+    if (previousConverter) {
+      // Remove converter from the list
+      const position = updatedExtractor.converters.indexOf(previousConverter);
+      updatedExtractor.converters.splice(position, 1);
+    }
+
+    if (newConverter) {
+      updatedExtractor.converters.push(newConverter);
+    }
+
+    this.setState({updatedExtractor: updatedExtractor});
   },
   _testCondition() {
     const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.props.exampleMessage);
@@ -219,6 +236,10 @@ const EditExtractor = React.createClass({
                          onChange={this._onFieldChange('title')}
                          required
                          help="A descriptive name for this extractor."/>
+
+                  <EditExtractorConverters extractorType={this.state.updatedExtractor.type}
+                                           converters={this.state.updatedExtractor.converters}
+                                           onChange={this._onConverterChange}/>
 
                   <Input wrapperClassName="col-md-offset-2 col-md-10">
                     <Button type="submit" bsStyle="success">Update extractor</Button>

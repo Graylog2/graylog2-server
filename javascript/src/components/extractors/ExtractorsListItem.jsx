@@ -211,6 +211,7 @@ const ExtractorsListItem = React.createClass({
     // TODO:
     // - Delete extractors
     // - Edit extractors
+    // - Order extractors
 
     return (
       <EntityListItem key={`entry-list-${this.props.extractor.id}`}
