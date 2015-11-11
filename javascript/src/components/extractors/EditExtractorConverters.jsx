@@ -6,6 +6,7 @@ import {
   DateConverterConfiguration,
   FlexdateConverterConfiguration,
   HashConverterConfiguration,
+  IpAnonymizerConverterConfiguration,
   NumericConverterConfiguration,
   SplitAndCountConverterConfiguration,
 } from 'components/extractors/converters_configuration';
@@ -102,6 +103,13 @@ const EditExtractorConverters = React.createClass({
                                                type={converterType}
                                                configuration={converterConfig}
                                                onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.IP_ANONYMIZER:
+        return (
+          <IpAnonymizerConverterConfiguration key={converterType}
+                                              type={converterType}
+                                              configuration={converterConfig}
+                                              onChange={this._onConverterChange}/>
         );
       case ExtractorUtils.ConverterTypes.FLEXDATE:
         return (
