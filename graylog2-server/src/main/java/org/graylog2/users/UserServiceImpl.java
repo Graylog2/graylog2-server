@@ -171,6 +171,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         user.setFullName(fullName);
         user.setExternal(true);
 
+        if (user.getTimeZone() == null) {
+            user.setTimeZone(configuration.getRootTimeZone());
+        }
+
         final String email = userEntry.getEmail();
         if (isNullOrEmpty(email)) {
             LOG.debug("No email address found for user {} in LDAP. Using {}@localhost", username, username);
