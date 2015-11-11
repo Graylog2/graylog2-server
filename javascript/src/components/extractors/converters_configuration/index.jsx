@@ -1,3 +1,4 @@
+export CSVConverterConfiguration from './CSVConverterConfiguration';
 export DateConverterConfiguration from './DateConverterConfiguration';
 export FlexdateConverterConfiguration from './FlexdateConverterConfiguration';
 export HashConverterConfiguration from './HashConverterConfiguration';

@@ -3,6 +3,7 @@ import {Row, Col, Input, Button, Panel} from 'react-bootstrap';
 import {Select} from 'components/common';
 
 import {
+  CSVConverterConfiguration,
   DateConverterConfiguration,
   FlexdateConverterConfiguration,
   HashConverterConfiguration,
@@ -136,6 +137,13 @@ const EditExtractorConverters = React.createClass({
                                            type={converterType}
                                            configuration={converterConfig}
                                            onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.CSV:
+        return (
+          <CSVConverterConfiguration key={converterType}
+                                     type={converterType}
+                                     configuration={converterConfig}
+                                     onChange={this._onConverterChange}/>
         );
       case ExtractorUtils.ConverterTypes.LOWERCASE:
         return (
