@@ -237,9 +237,11 @@ const EditExtractor = React.createClass({
                          required
                          help="A descriptive name for this extractor."/>
 
-                  <EditExtractorConverters extractorType={this.state.updatedExtractor.type}
-                                           converters={this.state.updatedExtractor.converters}
-                                           onChange={this._onConverterChange}/>
+                  <div style={{marginBottom: 10}}>
+                    <EditExtractorConverters extractorType={this.state.updatedExtractor.type}
+                                             converters={this.state.updatedExtractor.converters}
+                                             onChange={this._onConverterChange}/>
+                  </div>
 
                   <Input wrapperClassName="col-md-offset-2 col-md-10">
                     <Button type="submit" bsStyle="success">Update extractor</Button>
