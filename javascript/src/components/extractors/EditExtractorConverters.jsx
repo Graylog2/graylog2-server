@@ -11,6 +11,7 @@ import {
   SplitAndCountConverterConfiguration,
   SyslogPriFacilityConverterConfiguration,
   SyslogPriLevelConverterConfiguration,
+  TokenizerConverterConfiguration,
 } from 'components/extractors/converters_configuration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -126,6 +127,13 @@ const EditExtractorConverters = React.createClass({
                                                    type={converterType}
                                                    configuration={converterConfig}
                                                    onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.TOKENIZER:
+        return (
+          <TokenizerConverterConfiguration key={converterType}
+                                           type={converterType}
+                                           configuration={converterConfig}
+                                           onChange={this._onConverterChange}/>
         );
       case ExtractorUtils.ConverterTypes.FLEXDATE:
         return (
