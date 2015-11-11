@@ -22,6 +22,7 @@ class DocsHelper {
     INDEXER_FAILURES: 'indexer_failures.html',
     INDEX_MODEL: 'index_model.html',
     LOAD_BALANCERS: 'load_balancers.html',
+    PAGE_STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
     RADIO_ARCHITECTURE: 'architecture.html#highly-available-setup-with-graylog-radio',
     SEARCH_QUERY_LANGUAGE: 'queries.html',
     STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',

@@ -2,7 +2,10 @@ import React, {PropTypes} from 'react';
 import {Row, Col, Input, Button, Panel} from 'react-bootstrap';
 import {Select} from 'components/common';
 
-import {NumericConverterConfiguration} from 'components/extractors/converters_configuration';
+import {
+  DateConverterConfiguration,
+  NumericConverterConfiguration,
+} from 'components/extractors/converters_configuration';
 
 import ExtractorUtils from 'util/ExtractorUtils';
 
@@ -15,6 +18,7 @@ const EditExtractorConverters = React.createClass({
   getInitialState() {
     return {
       displayedConverters: this.props.converters.map(converter => converter.type),
+      disabledConverters: {}, // Keep disabled converters configuration, so the user doesn't need to type it again
       selectedConverter: undefined,
     };
   },
@@ -25,6 +29,21 @@ const EditExtractorConverters = React.createClass({
     const newDisplayedConverters = this.state.displayedConverters;
     newDisplayedConverters.push(this.state.selectedConverter);
     this.setState({selectedConverter: undefined, converters: newDisplayedConverters});
+  },
+  _onConverterChange(converterType, converter) {
+    if (converter) {
+      const newDisabledConverters = this.state.disabledConverters;
+      if (newDisabledConverters.hasOwnProperty(converterType)) {
+        delete newDisabledConverters[converterType];
+        this.setState({disabledConverters: newDisabledConverters});
+      }
+    } else {
+      const newDisabledConverters = this.state.disabledConverters;
+      newDisabledConverters[converterType] = this._getConverterByType(converterType);
+      this.setState({disabledConverters: newDisabledConverters});
+    }
+
+    this.props.onChange(converterType, converter);
   },
   _getConverterOptions() {
     const converterOptions = [];
@@ -40,10 +59,17 @@ const EditExtractorConverters = React.createClass({
 
     return converterOptions;
   },
+  _getConverterByType(converterType) {
+    const currentConverter = this.props.converters.filter(converter => converter.type === converterType)[0];
+    return (currentConverter ? currentConverter.config : {});
+  },
   _getConvertersConfiguration() {
     const controls = this.state.displayedConverters.map(converterType => {
-      const converter = this.props.converters.filter(converter => converter.type === converterType)[0];
-      const converterConfig = converter ? converter.config : {};
+      // Get converter configuration from disabledConverters if it was disabled
+      let converterConfig = this._getConverterByType(converterType);
+      if (Object.keys(converterConfig).length === 0 && this.state.disabledConverters.hasOwnProperty(converterType)) {
+        converterConfig = this.state.disabledConverters[converterType];
+      }
 
       switch (converterType) {
       case ExtractorUtils.ConverterTypes.NUMERIC:
@@ -51,7 +77,14 @@ const EditExtractorConverters = React.createClass({
           <NumericConverterConfiguration key={converterType}
                                          type={converterType}
                                          configuration={converterConfig}
-                                         onChange={this.props.onChange}/>
+                                         onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.DATE:
+        return (
+          <DateConverterConfiguration key={converterType}
+                                      type={converterType}
+                                      configuration={converterConfig}
+                                      onChange={this._onConverterChange}/>
         );
       default:
         console.warn(`Converter type ${converterType} is not supported.`);
