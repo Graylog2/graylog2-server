@@ -27,6 +27,9 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.esplugin.IndicesClosedEvent;
+import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
+import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -40,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -62,7 +66,6 @@ public class MongoIndexRangeServiceTest {
 
     @Mock
     private Indices indices;
-    @Mock
     private EventBus localEventBus;
     @Mock
     private EventBus clusterEventBus;
@@ -70,6 +73,7 @@ public class MongoIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        localEventBus = new EventBus("local-event-bus");
         indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, localEventBus, clusterEventBus);
     }
 
@@ -228,5 +232,41 @@ public class MongoIndexRangeServiceTest {
         assertThat(after.calculationDuration()).isEqualTo(2);
 
         verify(clusterEventBus, times(2)).post(IndexRangeUpdatedEvent.create(indexName));
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testHandleIndexDeletion() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+
+        localEventBus.post(IndicesDeletedEvent.create(Collections.singleton("graylog_1")));
+
+        assertThat(indexRangeService.findAll()).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testHandleIndexClosing() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+
+        localEventBus.post(IndicesClosedEvent.create(Collections.singleton("graylog_1")));
+
+        assertThat(indexRangeService.findAll()).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testHandleIndexReopening() throws Exception {
+        final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
+        when(indices.timestampStatsOfIndex("graylog_3")).thenReturn(TimestampStats.create(begin, end));
+
+        localEventBus.post(IndicesReopenedEvent.create(Collections.singleton("graylog_3")));
+
+        final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
+        assertThat(indexRanges).hasSize(1);
+        assertThat(indexRanges.first().indexName()).isEqualTo("graylog_3");
+        assertThat(indexRanges.first().begin()).isEqualTo(begin);
+        assertThat(indexRanges.first().end()).isEqualTo(end);
     }
 }

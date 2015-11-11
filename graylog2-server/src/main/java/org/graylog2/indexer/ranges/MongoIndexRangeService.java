@@ -30,7 +30,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
+import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
+import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.joda.time.DateTime;
@@ -134,7 +136,27 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been deleted. Removing index range.");
             collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        }
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexClosing(IndicesClosedEvent event) {
+        for (String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been closed. Removing index range.");
+            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        }
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexReopening(IndicesReopenedEvent event) {
+        for (String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
+            final IndexRange indexRange = calculateRange(index);
+            save(indexRange);
         }
     }
 }
