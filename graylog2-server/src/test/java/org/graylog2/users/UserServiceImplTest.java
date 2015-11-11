@@ -34,7 +34,6 @@ import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.shared.users.Role;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -168,7 +167,7 @@ public class UserServiceImplTest {
     private Role createRole(String name) {
         final RoleImpl role = new RoleImpl();
 
-        role._id = new ObjectId(DateTime.now(DateTimeZone.UTC).toDate()).toString();
+        role._id = new ObjectId().toString();
         role.setName(name);
 
         return role;
