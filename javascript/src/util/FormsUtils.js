@@ -1,14 +1,14 @@
 import NumberUtils from 'util/NumberUtils';
 
 const FormUtils = {
-  getValueFromEventTarget(target) {
-    switch (target.type) {
+  getValueFromInput(input) {
+    switch (input.type) {
     case 'checkbox':
-      return target.checked;
+      return input.checked;
     case 'number':
-      return (target.value === '' || !NumberUtils.isNumber(target.value) ? undefined : Number(target.value));
+      return (input.value === '' || !NumberUtils.isNumber(input.value) ? undefined : Number(input.value));
     default:
-      return target.value;
+      return input.value;
     }
   },
 };

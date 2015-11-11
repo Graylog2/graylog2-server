@@ -42,7 +42,7 @@ const EditExtractor = React.createClass({
     return (event) => {
       const nextState = {};
       const updatedExtractor = this.state.updatedExtractor;
-      updatedExtractor[key] = FormUtils.getValueFromEventTarget(event.target);
+      updatedExtractor[key] = FormUtils.getValueFromInput(event.target);
       nextState.updatedExtractor = updatedExtractor;
 
       // Reset result of testing condition after a change in the input
@@ -56,7 +56,7 @@ const EditExtractor = React.createClass({
   _onConfigurationChange(key) {
     return (event) => {
       const updatedExtractor = this.state.updatedExtractor;
-      updatedExtractor.extractor_config[key] = FormUtils.getValueFromEventTarget(event.target);
+      updatedExtractor.extractor_config[key] = FormUtils.getValueFromInput(event.target);
       this.setState({updatedExtractor: updatedExtractor});
     };
   },
