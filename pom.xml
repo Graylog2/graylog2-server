@@ -649,6 +649,11 @@
                 <version>0.7</version>
             </dependency>
             <dependency>
+                <groupId>org.graylog.repackaged</groupId>
+                <artifactId>os-platform-finder</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.hdrhistogram</groupId>
                 <artifactId>HdrHistogram</artifactId>
                 <version>2.1.7</version>
