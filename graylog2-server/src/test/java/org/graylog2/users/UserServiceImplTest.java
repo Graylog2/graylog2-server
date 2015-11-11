@@ -32,7 +32,6 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.Role;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -138,8 +137,8 @@ public class UserServiceImplTest {
     private Role createRole(String name) {
         final RoleImpl role = new RoleImpl();
 
-        role._id = new ObjectId(DateTime.now().withZone(DateTimeZone.UTC).toDate()).toString();
-        role.name = "Foo";
+        role._id = new ObjectId().toString();
+        role.setName(name);
 
         return role;
     }
