@@ -237,7 +237,7 @@ const EditExtractor = React.createClass({
                          required
                          help="A descriptive name for this extractor."/>
 
-                  <div style={{marginBottom: 10}}>
+                  <div style={{marginBottom: 20}}>
                     <EditExtractorConverters extractorType={this.state.updatedExtractor.type}
                                              converters={this.state.updatedExtractor.converters}
                                              onChange={this._onConverterChange}/>
