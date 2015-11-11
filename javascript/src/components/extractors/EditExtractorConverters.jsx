@@ -7,6 +7,7 @@ import {
   FlexdateConverterConfiguration,
   HashConverterConfiguration,
   IpAnonymizerConverterConfiguration,
+  LowercaseConverterConfiguration,
   NumericConverterConfiguration,
   SplitAndCountConverterConfiguration,
   SyslogPriFacilityConverterConfiguration,
@@ -131,6 +132,13 @@ const EditExtractorConverters = React.createClass({
       case ExtractorUtils.ConverterTypes.TOKENIZER:
         return (
           <TokenizerConverterConfiguration key={converterType}
+                                           type={converterType}
+                                           configuration={converterConfig}
+                                           onChange={this._onConverterChange}/>
+        );
+      case ExtractorUtils.ConverterTypes.LOWERCASE:
+        return (
+          <LowercaseConverterConfiguration key={converterType}
                                            type={converterType}
                                            configuration={converterConfig}
                                            onChange={this._onConverterChange}/>
