@@ -1,4 +1,4 @@
-var webpackSharedConfig = require("./webpack.shared.config");
+var webpackSharedConfig = require("./webpack.config");
 
 webpackSharedConfig.externals = [];
 

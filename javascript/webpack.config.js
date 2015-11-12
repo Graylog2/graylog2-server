@@ -11,7 +11,7 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
-var webpackConfig = {
+const webpackConfig = {
   entry: {
     app: APP_PATH,
     config: APP_PATH + '/config.js',
@@ -81,4 +81,8 @@ if (TARGET === 'build') {
       new webpack.optimize.OccurenceOrderPlugin()
     ],
   });
+}
+
+if (TARGET === undefined) {
+  module.exports = webpackConfig;
 }
