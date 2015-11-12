@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+import ExtractorUtils from 'util/ExtractorUtils';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -46,6 +47,20 @@ const ExtractorsStore = Reflux.createStore({
       });
 
     ExtractorsActions.list.promise(promise);
+  },
+
+  // Creates an basic extractor object that we can use to create new extractors.
+  new(type, field) {
+    if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
+      throw new Error('Invalid extractor type provided: ' + type);
+    }
+
+    return {
+      type: type,
+      source_field: field,
+      converters: [],
+      extractor_config: {},
+    };
   },
 
   get(inputId, extractorId) {
