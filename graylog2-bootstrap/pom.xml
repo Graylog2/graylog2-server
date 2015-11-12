@@ -64,6 +64,10 @@
             <groupId>log4j</groupId>
             <artifactId>apache-log4j-extras</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.repackaged</groupId>
+            <artifactId>os-platform-finder</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
