@@ -30,6 +30,10 @@ public abstract class InternalLogMessage {
     public abstract String level();
 
     @JsonProperty
+    @Nullable
+    public abstract String marker();
+
+    @JsonProperty
     @NotNull
     public abstract DateTime timestamp();
 
@@ -47,18 +51,19 @@ public abstract class InternalLogMessage {
 
     @JsonProperty
     @NotNull
-    public abstract Map<String, String> mdc();
+    public abstract Map<String, String> context();
 
     @JsonCreator
     public static InternalLogMessage create(@JsonProperty("message") @NotEmpty String message,
                                             @JsonProperty("class_name") @NotEmpty String className,
                                             @JsonProperty("level") @NotEmpty String level,
+                                            @JsonProperty("marker") @NotEmpty String marker,
                                             @JsonProperty("timestamp") @NotNull DateTime timestamp,
                                             @JsonProperty("throwable") @NotNull List<String> throwable,
                                             @JsonProperty("thread_name") @NotEmpty String threadName,
                                             @JsonProperty("ndc") @Nullable String ndc,
-                                            @JsonProperty("mdc") @NotNull Map<String, String> mdc) {
-        return new AutoValue_InternalLogMessage(message, className, level, timestamp, throwable, threadName, ndc, mdc);
+                                            @JsonProperty("context") @NotNull Map<String, String> context) {
+        return new AutoValue_InternalLogMessage(message, className, level, marker, timestamp, throwable, threadName, ndc, context);
     }
 
 }

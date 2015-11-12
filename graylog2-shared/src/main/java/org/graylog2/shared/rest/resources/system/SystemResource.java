@@ -23,11 +23,11 @@ import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.models.system.responses.SystemJVMResponse;
-import org.graylog2.shared.ServerVersion;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -76,7 +76,8 @@ public class SystemResource extends RestResource {
                 Tools.getLocalCanonicalHostname(),
                 serverStatus.getLifecycle().getDescription().toLowerCase(),
                 serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(),
-                serverStatus.getTimezone().getID());
+                serverStatus.getTimezone().getID(),
+                System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"));
     }
 
     @GET

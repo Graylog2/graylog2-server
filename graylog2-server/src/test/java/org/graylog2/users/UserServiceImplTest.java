@@ -16,6 +16,10 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -26,6 +30,8 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.InMemoryRolePermissionResolver;
+import org.graylog2.shared.users.Role;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,6 +42,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,12 +60,14 @@ public class UserServiceImplTest {
     private UserServiceImpl userService;
     @Mock
     private RoleService roleService;
+    @Mock
+    private InMemoryRolePermissionResolver permissionsResolver;
 
     @Before
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, permissionsResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -123,5 +132,46 @@ public class UserServiceImplTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCount() throws Exception {
         assertThat(userService.count()).isEqualTo(4L);
+    }
+
+    private Role createRole(String name) {
+        final RoleImpl role = new RoleImpl();
+
+        role._id = new ObjectId().toString();
+        role.setName(name);
+
+        return role;
+    }
+
+    @Test
+    public void testGetRoleNames() throws Exception {
+        final UserImpl user = new UserImpl(Maps.<String, Object>newHashMap());
+        final Role role = createRole("Foo");
+
+        final ImmutableMap<String, Role> map = ImmutableMap.<String, Role>builder()
+                .put(role.getId(), role)
+                .build();
+
+        when(roleService.loadAllIdMap()).thenReturn(map);
+        assertThat(userService.getRoleNames(user)).isEmpty();
+
+        user.setRoleIds(Sets.newHashSet(role.getId()));
+        assertThat(userService.getRoleNames(user)).containsOnly("Foo");
+
+        when(roleService.loadAllIdMap()).thenReturn(new HashMap<String, Role>());
+        assertThat(userService.getRoleNames(user)).isEmpty();
+    }
+
+    @Test
+    public void testGetPermissionsForUser() throws Exception {
+        final UserImpl user = new UserImpl(Maps.<String, Object>newHashMap());
+        final Role role = createRole("Foo");
+
+        user.setRoleIds(Sets.newHashSet(role.getId()));
+        user.setPermissions(Lists.newArrayList("hello:world"));
+
+        when(permissionsResolver.resolveStringPermission(role.getId())).thenReturn(Sets.newHashSet("foo:bar"));
+
+        assertThat(userService.getPermissionsForUser(user)).containsOnly("foo:bar", "hello:world");
     }
 }

@@ -19,6 +19,9 @@ package org.graylog2.restclient.models.api.responses.cluster;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ClusterEntitySummaryResponse {
+    @JsonProperty("cluster_id")
+    public String clusterId;
+
     @JsonProperty("node_id")
     public String nodeId;
 

@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static org.graylog2.inputs.codecs.GelfChunkAggregator.*;
@@ -193,6 +194,27 @@ public class GelfChunkAggregatorTest {
         assertEquals(1, counterValueNamed(metricRegistry, WAITING_MESSAGES));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+    }
+
+    @Test
+    public void testChunkEntryCompareTo() throws Exception {
+        // Test if the ChunkEntry#compareTo() method can handle ChunkEntry objects which have the same timestamp.
+        // See: https://github.com/Graylog2/graylog2-server/issues/1462
+
+        final ConcurrentSkipListSet<GelfChunkAggregator.ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet<>();
+        final long currentTime = System.currentTimeMillis();
+
+        for (int i = 0; i < 10; i++) {
+            sortedEvictionSet.add(new GelfChunkAggregator.ChunkEntry(1, currentTime, "a" + i));
+        }
+
+        final int size = sortedEvictionSet.size();
+
+        for (int i = 0; i < size; i++) {
+            sortedEvictionSet.remove(sortedEvictionSet.first());
+        }
+
+        assertTrue("eviction set should be empty", sortedEvictionSet.isEmpty());
     }
 
     private ChannelBuffer[] createChunkedMessage(int messageSize, int maxChunkSize) {

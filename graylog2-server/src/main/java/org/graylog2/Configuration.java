@@ -17,7 +17,9 @@
 package org.graylog2;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -25,6 +27,10 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.graylog2.plugin.Tools.getUriWithDefaultPath;
 import static org.graylog2.plugin.Tools.getUriWithPort;
@@ -133,6 +139,15 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
+
+    @Parameter(value = "content_packs_loader_enabled")
+    private boolean contentPacksLoaderEnabled = true;
+
+    @Parameter(value = "content_packs_dir", validators = DirectoryPathReadableValidator.class)
+    private Path contentPacksDir = Paths.get("data", "contentpacks");
+
+    @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
+    private Set<String> contentPacksAutoLoad = Collections.emptySet();
 
     public boolean isMaster() {
         return isMaster;
@@ -269,5 +284,17 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getDashboardWidgetDefaultCacheTime() {
         return dashboardWidgetDefaultCacheTime;
+    }
+
+    public boolean isContentPacksLoaderEnabled() {
+        return contentPacksLoaderEnabled;
+    }
+
+    public Path getContentPacksDir() {
+        return contentPacksDir;
+    }
+
+    public Set<String> getContentPacksAutoLoad() {
+        return contentPacksAutoLoad;
     }
 }

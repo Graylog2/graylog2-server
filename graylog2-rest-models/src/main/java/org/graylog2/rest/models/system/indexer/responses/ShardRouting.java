@@ -17,6 +17,7 @@
 package org.graylog2.rest.models.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -25,39 +26,40 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 @AutoValue
 public abstract class ShardRouting {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract int id();
 
-    @JsonProperty
+    @JsonProperty("state")
     public abstract String state();
 
-    @JsonProperty
+    @JsonProperty("active")
     public abstract boolean active();
 
-    @JsonProperty
+    @JsonProperty("primary")
     public abstract boolean primary();
 
-    @JsonProperty
+    @JsonProperty("node_id")
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("node_name")
     public abstract String nodeName();
 
-    @JsonProperty
+    @JsonProperty("node_hostname")
     public abstract String nodeHostname();
 
-    @JsonProperty
+    @JsonProperty("relocating_to")
     @Nullable
     public abstract String relocatingTo();
 
-    public static ShardRouting create(int id,
-                                      String state,
-                                      boolean active,
-                                      boolean primary,
-                                      String nodeId,
-                                      String nodeName,
-                                      String nodeHostname,
-                                      @Nullable String relocatingTo) {
+    @JsonCreator
+    public static ShardRouting create(@JsonProperty("id") int id,
+                                      @JsonProperty("state") String state,
+                                      @JsonProperty("active") boolean active,
+                                      @JsonProperty("primary") boolean primary,
+                                      @JsonProperty("node_id") String nodeId,
+                                      @JsonProperty("node_name") String nodeName,
+                                      @JsonProperty("node_hostname") String nodeHostname,
+                                      @JsonProperty("relocating_to") @Nullable String relocatingTo) {
         return new AutoValue_ShardRouting(id, state, active, primary, nodeId, nodeName, nodeHostname, relocatingTo);
     }
 }

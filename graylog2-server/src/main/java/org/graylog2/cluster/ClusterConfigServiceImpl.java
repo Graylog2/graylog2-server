@@ -94,7 +94,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
 
         if (config == null) {
-            LOG.warn("Couldn't find cluster config of type {}", type.getCanonicalName());
+            LOG.debug("Couldn't find cluster config of type {}", type.getCanonicalName());
             return null;
         }
 

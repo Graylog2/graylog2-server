@@ -41,7 +41,8 @@ public class SystemTest extends BaseRestTest {
                             "server_id",
                             "started_at",
                             "timezone",
-                            "version"
+                            "version",
+                            "operating_system"
                     ));
     }
 

@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IndexRangeTest {
+public class EsIndexRangeTest {
     @Test
     public void testCreate() throws Exception {
         String indexName = "test";
@@ -34,7 +34,7 @@ public class IndexRangeTest {
         DateTime end = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
         DateTime calculatedAt = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
         int calculationDuration = 42;
-        IndexRange indexRange = IndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
+        EsIndexRange indexRange = EsIndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
 
         assertThat(indexRange.indexName()).isEqualTo(indexName);
         assertThat(indexRange.begin()).isEqualTo(begin);
@@ -50,16 +50,16 @@ public class IndexRangeTest {
         DateTime end = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
         DateTime calculatedAt = new DateTime(2015, 2, 1, 0, 0, DateTimeZone.UTC);
         int calculationDuration = 42;
-        IndexRange indexRange = IndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
+        EsIndexRange indexRange = EsIndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
 
         ObjectMapper objectMapper = new ServerObjectMapperProvider().get();
         String json = objectMapper.writeValueAsString(indexRange);
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
 
-        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
-        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
-        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_END)).isEqualTo(end.toString());
-        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
-        assertThat(JsonPath.read(document, "$." + IndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
+        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_INDEX_NAME)).isEqualTo(indexName);
+        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_BEGIN)).asString().isEqualTo(begin.toString());
+        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_END)).isEqualTo(end.toString());
+        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_CALCULATED_AT)).isEqualTo(calculatedAt.toString());
+        assertThat(JsonPath.read(document, "$." + EsIndexRange.FIELD_TOOK_MS)).isEqualTo(calculationDuration);
     }
 }

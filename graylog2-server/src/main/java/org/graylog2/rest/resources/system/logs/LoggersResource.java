@@ -151,6 +151,8 @@ public class LoggersResource extends RestResource {
         // Setting the level falls back to DEBUG if provided level is invalid.
         Level newLevel = Level.toLevel(level.toUpperCase());
         logger.setLevel(newLevel);
+
+        LOG.debug("Successfully set log level for subsystem \"{}\" to \"{}\"", subsystem.getTitle(), newLevel);
     }
 
     @PUT
@@ -168,6 +170,8 @@ public class LoggersResource extends RestResource {
         // Setting the level falls back to DEBUG if provided level is invalid.
         Level newLevel = Level.toLevel(level.toUpperCase());
         logger.setLevel(newLevel);
+
+        LOG.debug("Successfully set log level for logger \"{}\" to \"{}\"", loggerName, newLevel);
     }
 
     @GET
@@ -207,6 +211,7 @@ public class LoggersResource extends RestResource {
                     event.getRenderedMessage(),
                     event.getLoggerName(),
                     event.getLevel().toString(),
+                    null,
                     new DateTime(event.getTimeStamp(), DateTimeZone.UTC),
                     throwable,
                     event.getThreadName(),

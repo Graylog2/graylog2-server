@@ -87,6 +87,7 @@ public abstract class MessageInput implements Stoppable {
      */
     private final Configuration codecConfig;
     private final Counter globalIncomingMessages;
+    private final Counter globalIncomingBytes;
 
     protected String title;
     protected String creatorUserId;
@@ -122,6 +123,7 @@ public abstract class MessageInput implements Stoppable {
         rawSize = localRegistry.meter("rawSize");
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
+        globalIncomingBytes = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT_BYTES);
     }
 
     public static long getDefaultRecvBufferSize() {
@@ -337,7 +339,9 @@ public abstract class MessageInput implements Stoppable {
 
         incomingMessages.mark();
         globalIncomingMessages.inc();
-        rawSize.mark(rawMessage.getPayload().length);
+        final int payloadLength = rawMessage.getPayload().length;
+        rawSize.mark(payloadLength);
+        globalIncomingBytes.inc(payloadLength);
     }
 
     public String getType() {

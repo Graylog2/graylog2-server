@@ -17,9 +17,8 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
+import com.eaio.uuid.UUID;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -29,6 +28,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
@@ -55,10 +56,13 @@ public class ClusterResource extends RestResource {
 
     private final NodeService nodeService;
     private final NodeId nodeId;
+    private final ClusterId clusterId;
 
     @Inject
     public ClusterResource(NodeService nodeService,
+                           ClusterConfigService clusterConfigService,
                            NodeId nodeId) {
+        clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.nodeService = nodeService;
         this.nodeId = nodeId;
     }
@@ -107,7 +111,9 @@ public class ClusterResource extends RestResource {
     }
 
     private NodeSummary nodeSummary(Node node) {
-        return NodeSummary.create(node.getNodeId(),
+        return NodeSummary.create(
+                clusterId.clusterId(),
+                node.getNodeId(),
                 node.getType().toString().toLowerCase(),
                 node.isMaster(),
                 node.getTransportAddress(),

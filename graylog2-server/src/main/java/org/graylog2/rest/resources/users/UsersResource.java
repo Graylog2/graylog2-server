@@ -16,8 +16,6 @@
  */
 package org.graylog2.rest.resources.users;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -31,6 +29,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
@@ -43,7 +42,6 @@ import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -54,6 +52,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -80,6 +79,7 @@ import java.util.Set;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
 @Path("/users")
@@ -91,19 +91,16 @@ public class UsersResource extends RestResource {
 
     private final UserService userService;
     private final AccessTokenService accessTokenService;
-    private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
     private final RoleService roleService;
     private final Configuration configuration;
 
     @Inject
     public UsersResource(UserService userService,
                          AccessTokenService accessTokenService,
-                         InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                          RoleService roleService,
                          Configuration configuration) {
         this.userService = userService;
         this.accessTokenService = accessTokenService;
-        this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         this.roleService = roleService;
         this.configuration = configuration;
     }
@@ -164,16 +161,7 @@ public class UsersResource extends RestResource {
         user.setFullName(cr.fullName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
-        final List<String> roles = cr.roles();
-        if (roles != null) {
-            try {
-                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
-                user.setRoleIds(Sets.newHashSet(roleIds));
-            } catch (org.graylog2.database.NotFoundException e) {
-                throw new InternalServerErrorException(e);
-            }
-        }
+        setUserRoles(cr.roles(), user);
 
         if (cr.timezone() != null) {
             user.setTimeZone(cr.timezone());
@@ -197,6 +185,18 @@ public class UsersResource extends RestResource {
                 .build(user.getName());
 
         return Response.created(userUri).build();
+    }
+
+    private void setUserRoles(@Nullable List<String> roles, User user) {
+        if (roles != null) {
+            try {
+                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
+                user.setRoleIds(Sets.newHashSet(roleIds));
+            } catch (org.graylog2.database.NotFoundException e) {
+                throw new InternalServerErrorException(e);
+            }
+        }
     }
 
     @PUT
@@ -230,6 +230,10 @@ public class UsersResource extends RestResource {
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
             user.setPermissions(cr.permissions());
+        }
+
+        if (isPermitted(USERS_ROLESEDIT, user.getName())) {
+            setUserRoles(cr.roles(), user);
         }
 
         final String timezone = cr.timezone();
@@ -454,39 +458,24 @@ public class UsersResource extends RestResource {
     }
 
     private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
-
-        final List<String> permissions;
-
         final Set<String> roleIds = user.getRoleIds();
         Set<String> roleNames = Collections.emptySet();
-        if (!roleIds.isEmpty()) {
-            try {
-                final Map<String, Role> idMap = roleService.loadAllIdMap();
-                roleNames = Sets.newHashSet(Iterables.filter(Collections2.transform(roleIds, Roles.roleIdToNameFunction(idMap)),
-                                            Predicates.notNull()));
-            } catch (org.graylog2.database.NotFoundException e) {
-                LOG.error("Unable to load roles", e);
-                throw new InternalServerErrorException("Unable to load roles", e);
-            }
-        }
-        if (includePermissions) {
-            Set<String> permSet = Sets.newHashSet(user.getPermissions());
 
-            for (String roleId : roleIds) {
-                final Set<String> rolePerms = inMemoryRolePermissionResolver.resolveStringPermission(roleId);
-                permSet.addAll(rolePerms);
+        if (!roleIds.isEmpty()) {
+            roleNames = userService.getRoleNames(user);
+
+            if (roleNames.isEmpty()) {
+                LOG.error("Unable to load role names for role IDs {} for user {}", roleIds, user);
+                throw new InternalServerErrorException("Unable to load role names");
             }
-            permissions = Lists.newArrayList(permSet);
         }
-        else {
-            permissions = Collections.emptyList();
-        }
+
         return UserSummary.create(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getFullName(),
-                permissions,
+                includePermissions ? userService.getPermissionsForUser(user) : Collections.<String>emptyList(),
                 user.getPreferences(),
                 firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
                 user.getSessionTimeoutMs(),

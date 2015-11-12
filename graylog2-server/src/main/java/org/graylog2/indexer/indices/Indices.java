@@ -16,7 +16,9 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
@@ -49,6 +51,7 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -56,16 +59,26 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.collect.UnmodifiableIterator;
 import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.Index;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.max.Max;
+import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -129,11 +142,11 @@ public class Indices implements IndexManagement {
                 BulkResponse response = c.bulk(request.request()).actionGet();
 
                 LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                         source,
-                         target,
-                         response.getItems().length,
-                         response.getTookInMillis(),
-                         response.hasFailures());
+                        source,
+                        target,
+                        response.getItems().length,
+                        response.getTookInMillis(),
+                        response.hasFailures());
 
                 if (response.hasFailures()) {
                     throw new RuntimeException("Failed to move a message. Check your indexer log.");
@@ -152,9 +165,7 @@ public class Indices implements IndexManagement {
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        Map<String, IndexStats> indices = getAll();
-        IndexStats index = indices.get(indexName);
-
+        final IndexStats index = indexStats(indexName);
         if (index == null) {
             throw new IndexNotFoundException();
         }
@@ -163,9 +174,18 @@ public class Indices implements IndexManagement {
     }
 
     public Map<String, IndexStats> getAll() {
-        ActionFuture<IndicesStatsResponse> isr = c.admin().indices().stats(new IndicesStatsRequest().all());
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).request();
+        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
-        return isr.actionGet().getIndices();
+        return response.getIndices();
+    }
+
+    @Nullable
+    public IndexStats indexStats(final String indexName) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexName).request();
+        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
+
+        return response.getIndex(indexName);
     }
 
     public String allIndicesAlias() {
@@ -209,11 +229,8 @@ public class Indices implements IndexManagement {
         final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
         final PutMappingResponse messageMappingResponse =
                 indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
-        final Map<String, Object> metaMapping = indexMapping.metaMapping();
-        final PutMappingResponse metaMappingResponse =
-                indexMapping.createMapping(indexName, IndexMapping.TYPE_INDEX_RANGE, metaMapping).actionGet();
 
-        return messageMappingResponse.isAcknowledged() && metaMappingResponse.isAcknowledged();
+        return messageMappingResponse.isAcknowledged();
     }
 
     public Set<String> getAllMessageFields() {
@@ -368,25 +385,56 @@ public class Indices implements IndexManagement {
         return reopenedIndices;
     }
 
+    @Nullable
     public IndexStatistics getIndexStats(String index) {
-        final IndexStatistics stats = new IndexStatistics();
+        if (!index.startsWith(configuration.getIndexPrefix())) {
+            return null;
+        }
+
+        final IndexStats indexStats;
         try {
-            IndicesStatsResponse indicesStatsResponse = c.admin().indices().stats(new IndicesStatsRequest().all()).actionGet();
-            IndexStats indexStats = indicesStatsResponse.getIndex(index);
-
-            if (indexStats == null) {
-                return null;
-            }
-            stats.setPrimaries(indexStats.getPrimaries());
-            stats.setTotal(indexStats.getTotal());
-
-            for (ShardStats shardStats : indexStats.getShards()) {
-                stats.addShardRouting(shardStats.getShardRouting());
-            }
+            indexStats = indexStats(index);
         } catch (ElasticsearchException e) {
             return null;
         }
-        return stats;
+
+        if (indexStats == null) {
+            return null;
+        }
+
+        final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
+        for (ShardStats shardStats : indexStats.getShards()) {
+            shardRouting.add(shardStats.getShardRouting());
+        }
+
+        return IndexStatistics.create(indexStats.getIndex(), indexStats.getPrimaries(), indexStats.getTotal(), shardRouting.build());
+    }
+
+    public Set<IndexStatistics> getIndicesStats() {
+        final Map<String, IndexStats> responseIndices;
+        try {
+            responseIndices = getAll();
+        } catch (ElasticsearchException e) {
+            return Collections.emptySet();
+        }
+
+        final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
+        for (IndexStats indexStats : responseIndices.values()) {
+            final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
+            for (ShardStats shardStats : indexStats.getShards()) {
+                shardRouting.add(shardStats.getShardRouting());
+            }
+
+            final IndexStatistics stats = IndexStatistics.create(
+                    indexStats.getIndex(),
+                    indexStats.getPrimaries(),
+                    indexStats.getTotal(),
+                    shardRouting.build());
+
+            result.add(stats);
+        }
+
+        return result.build();
     }
 
     public boolean cycleAlias(String aliasName, String targetIndex) {
@@ -446,5 +494,46 @@ public class Indices implements IndexManagement {
             LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
             return null;
         }
+    }
+
+    /**
+     * Calculate min and max message timestamps in the given index.
+     *
+     * @param index Name of the index to query.
+     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
+     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
+     */
+    public TimestampStats timestampStatsOfIndex(String index) {
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
+                .filter(FilterBuilders.existsFilter("timestamp"))
+                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
+                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
+        final SearchRequestBuilder srb = c.prepareSearch()
+                .setIndices(index)
+                .setSearchType(SearchType.COUNT)
+                .addAggregation(builder);
+
+        final SearchResponse response;
+        try {
+            response = c.search(srb.request()).actionGet();
+        } catch (IndexMissingException e) {
+            throw e;
+        } catch (ElasticsearchException e) {
+            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
+            throw new IndexMissingException(new Index(index));
+        }
+
+        final Filter f = response.getAggregations().get("agg");
+        if (f.getDocCount() == 0L) {
+            LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
+            return TimestampStats.EMPTY;
+        }
+
+        final Min minAgg = f.getAggregations().get("ts_min");
+        final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
+        final Max maxAgg = f.getAggregations().get("ts_max");
+        final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
+
+        return TimestampStats.create(min, max);
     }
 }

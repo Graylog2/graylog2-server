@@ -22,6 +22,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 
 import java.util.List;
+import java.util.Map;
 
 @ImplementedBy(AlarmCallbackConfigurationServiceMJImpl.class)
 public interface AlarmCallbackConfigurationService {
@@ -30,6 +31,7 @@ public interface AlarmCallbackConfigurationService {
     AlarmCallbackConfiguration load(String alarmCallbackId);
     AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId);
     long count();
+    Map<String, Long> countPerType();
     String save(AlarmCallbackConfiguration model) throws ValidationException;
     int destroy(AlarmCallbackConfiguration model);
 }

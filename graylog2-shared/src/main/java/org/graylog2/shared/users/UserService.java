@@ -23,6 +23,7 @@ import org.graylog2.shared.security.ldap.LdapSettings;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface UserService extends PersistedService {
     User load(String username);
@@ -42,4 +43,8 @@ public interface UserService extends PersistedService {
     long count();
 
     Collection<User> loadAllForRole(Role role);
+
+    Set<String> getRoleNames(User user);
+
+    List<String> getPermissionsForUser(User user);
 }

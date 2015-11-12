@@ -73,6 +73,12 @@ public abstract class ClusterStats {
     @JsonProperty
     public abstract long contentPackCount();
 
+    @JsonProperty
+    public abstract LdapStats ldapStats();
+
+    @JsonProperty
+    public abstract AlarmStats alarmStats();
+
     public static ClusterStats create(ElasticsearchStats elasticsearchStats,
                                       MongoStats mongoStats,
                                       long streamCount,
@@ -87,7 +93,9 @@ public abstract class ClusterStats {
                                       Map<String, Long> inputCountByType,
                                       long extractorCount,
                                       Map<Extractor.Type, Long> extractorCountByType,
-                                      long contentPackCount) {
+                                      long contentPackCount,
+                                      LdapStats ldapStats,
+                                      AlarmStats alarmStats) {
         return new AutoValue_ClusterStats(
                 elasticsearchStats,
                 mongoStats,
@@ -103,6 +111,8 @@ public abstract class ClusterStats {
                 inputCountByType,
                 extractorCount,
                 extractorCountByType,
-                contentPackCount);
+                contentPackCount,
+                ldapStats,
+                alarmStats);
     }
 }

@@ -127,6 +127,10 @@ public class RestPermissions {
     public static final String ROLES_READ = "roles:read";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_DELETE = "roles:delete";
+    public static final String CLUSTER_CONFIG_ENTRY_CREATE = "clusterconfigentry:create";
+    public static final String CLUSTER_CONFIG_ENTRY_READ = "clusterconfigentry:read";
+    public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
+    public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
 
     // Standard set of permissions of readers.
     public static final Set<String> READER_BASE_PERMISSIONS = ImmutableSet.<String>builder().add(

@@ -31,6 +31,7 @@ public final class GlobalMetricNames {
     public static final String RATE_SUFFIX = "1-sec-rate";
 
     public static final String INPUT_THROUGHPUT = "org.graylog2.throughput.input";
+    public static final String INPUT_THROUGHPUT_BYTES = "org.graylog2.throughput.input.size";
 
     public static final String OUTPUT_THROUGHPUT = "org.graylog2.throughput.output";
     public static final String OUTPUT_THROUGHPUT_RATE = name(OUTPUT_THROUGHPUT, RATE_SUFFIX);

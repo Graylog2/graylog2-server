@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest;
 
+import org.apache.shiro.subject.Subject;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.slf4j.Logger;
@@ -39,19 +40,29 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
 
             final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
 
-            final String remoteUser = ((ShiroSecurityContext)requestContext.getSecurityContext()).getUsername();
+            final ShiroSecurityContext securityContext = (ShiroSecurityContext) requestContext.getSecurityContext();
+            String remoteUser = null;
+            if (securityContext.getUserPrincipal() != null) {
+                final Subject subject = securityContext.getSubject();
+                if (subject.getPrincipal() == null) {
+                    remoteUser = "-";
+                } else {
+                    remoteUser = securityContext.getUserPrincipal().getName();
+                }
+            }
             final Date requestDate = requestContext.getDate();
-            LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}", new Object[]{
-                    remoteAddr.getAddress().getHostAddress(),
-                    (remoteUser == null ? "-" : remoteUser),
-                    (requestDate == null ? "-" : requestDate),
-                    requestContext.getMethod(),
-                    requestContext.getUriInfo().getPath(),
-                    (rawQuery == null ? "" : "?" + rawQuery),
-                    requestContext.getHeaderString(HttpHeaders.USER_AGENT),
-                    responseContext.getStatus(),
-                    responseContext.getLength()
-            });
+            final boolean sessionExtended = requestContext.getHeaders().getFirst("X-Graylog2-No-Session-Extension") == null;
+            LOG.debug("{} {} [{}] \"{} {}{}\" {} (Session extended: {}) {} {}",
+                      remoteAddr.getAddress().getHostAddress(),
+                      (remoteUser == null ? "-" : remoteUser),
+                      (requestDate == null ? "-" : requestDate),
+                      requestContext.getMethod(),
+                      requestContext.getUriInfo().getPath(),
+                      (rawQuery == null ? "" : "?" + rawQuery),
+                      requestContext.getHeaderString(HttpHeaders.USER_AGENT),
+                      (sessionExtended ? "true" : "false"),
+                      responseContext.getStatus(),
+                      responseContext.getLength());
         } catch (Exception ignored) {
             LOG.error(":(", ignored);
         }

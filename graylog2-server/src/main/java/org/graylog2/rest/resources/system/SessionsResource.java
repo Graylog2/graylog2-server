@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Metered;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -27,11 +28,11 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -70,6 +71,7 @@ public class SessionsResource extends RestResource {
     }
 
     @POST
+    @Metered
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
                               @ApiParam(name = "Login request", value = "Username and credentials", required = true)
@@ -120,6 +122,7 @@ public class SessionsResource extends RestResource {
     }
 
     @DELETE
+    @Metered
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication

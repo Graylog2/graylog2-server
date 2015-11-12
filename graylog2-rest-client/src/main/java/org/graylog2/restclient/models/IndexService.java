@@ -16,7 +16,10 @@
  */
 package org.graylog2.restclient.models;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
+import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.restclient.lib.APIException;
@@ -29,6 +32,7 @@ import org.graylog2.restroutes.generated.routes;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.restclient.lib.Configuration.apiTimeout;
@@ -55,6 +59,16 @@ public class IndexService {
         }
 
         return indices;
+    }
+
+    public IndexInfo indexInfo(String index) throws APIException, IOException {
+        return api.path(routes.IndicesResource().single(index), IndexInfo.class).execute();
+    }
+
+    public Map<String, IndexInfo> allIndicesInfo() throws APIException, IOException {
+        final AllIndicesInfo allIndicesInfo = api.path(routes.IndicesResource().all(), AllIndicesInfo.class).execute();
+
+        return ImmutableMap.copyOf(allIndicesInfo.indices());
     }
 
     public DeflectorInformationResponse getDeflectorInfo() throws APIException, IOException {

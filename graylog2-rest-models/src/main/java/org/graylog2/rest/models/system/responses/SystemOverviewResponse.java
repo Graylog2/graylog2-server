@@ -60,6 +60,8 @@ public abstract class SystemOverviewResponse {
     public abstract String lbStatus();
     @JsonProperty
     public abstract String timezone();
+    @JsonProperty("operating_system")
+    public abstract String operatingSystem();
 
     @JsonCreator
     public static SystemOverviewResponse create(@JsonProperty("facility") String facility,
@@ -71,7 +73,8 @@ public abstract class SystemOverviewResponse {
                                                 @JsonProperty("hostname") String hostname,
                                                 @JsonProperty("lifecycle") String lifecycle,
                                                 @JsonProperty("lb_status") String lbStatis,
-                                                @JsonProperty("timezone") String timezone) {
-        return new AutoValue_SystemOverviewResponse(facility, codename, serverId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone);
+                                                @JsonProperty("timezone") String timezone,
+                                                @JsonProperty("operating_system") String operatingSystem) {
+        return new AutoValue_SystemOverviewResponse(facility, codename, serverId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone, operatingSystem);
     }
 }

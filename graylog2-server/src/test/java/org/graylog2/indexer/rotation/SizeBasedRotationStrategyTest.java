@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
+import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.index.store.StoreStats;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -27,6 +28,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,10 +47,9 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotate() throws IndexNotFoundException {
-        final IndexStatistics stats = new IndexStatistics();
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
-        stats.setPrimaries(commonStats);
+        final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(configuration.getMaxSizePerIndex()).thenReturn(100L);
@@ -63,10 +65,9 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testDontRotate() throws IndexNotFoundException {
-        final IndexStatistics stats = new IndexStatistics();
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
-        stats.setPrimaries(commonStats);
+        final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(configuration.getMaxSizePerIndex()).thenReturn(100000L);

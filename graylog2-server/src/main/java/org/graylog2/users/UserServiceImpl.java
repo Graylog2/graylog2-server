@@ -16,6 +16,10 @@
  */
 package org.graylog2.users;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -30,10 +34,12 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
+import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +59,17 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     private final Configuration configuration;
     private final RoleService roleService;
+    private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
     public UserServiceImpl(final MongoConnection mongoConnection,
                            final Configuration configuration,
-                           final RoleService roleService) {
+                           final RoleService roleService,
+                           final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
+        this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
     }
@@ -157,6 +166,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         user.setFullName(fullName);
         user.setExternal(true);
 
+        if (user.getTimeZone() == null) {
+            user.setTimeZone(configuration.getRootTimeZone());
+        }
+
         final String email = userEntry.getEmail();
         if (isNullOrEmpty(email)) {
             LOG.debug("No email address found for user {} in LDAP. Using {}@localhost", username, username);
@@ -248,5 +261,40 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             users.add(new UserImpl((ObjectId) dbObject.get("_id"), dbObject.toMap()));
         }
         return users;
+    }
+
+    @Override
+    public Set<String> getRoleNames(User user) {
+        final Set<String> roleIds = user.getRoleIds();
+
+        if (roleIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        Map<String, Role> idMap;
+        try {
+            idMap = roleService.loadAllIdMap();
+        } catch (NotFoundException e) {
+            LOG.error("Unable to load role ID map. Using empty map.", e);
+            idMap = Collections.emptyMap();
+        }
+
+        return ImmutableSet.copyOf(
+                Iterables.filter(
+                        Collections2.transform(roleIds, Roles.roleIdToNameFunction(idMap)),
+                        Predicates.notNull()
+                )
+        );
+    }
+
+    @Override
+    public List<String> getPermissionsForUser(User user) {
+        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder().addAll(user.getPermissions());
+
+        for (String roleId : user.getRoleIds()) {
+            permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
+        }
+
+        return permSet.build().asList();
     }
 }
