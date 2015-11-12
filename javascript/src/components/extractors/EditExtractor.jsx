@@ -155,7 +155,7 @@ const EditExtractor = React.createClass({
             <h2>Example message</h2>
             <Row style={{marginTop: 5}}>
               <Col md={12}>
-                <ExtractorExampleMessage field={this.state.updatedExtractor.target_field}
+                <ExtractorExampleMessage field={this.state.updatedExtractor.source_field}
                                          example={this.props.exampleMessage}/>
               </Col>
             </Row>
