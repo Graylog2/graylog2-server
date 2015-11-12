@@ -9,13 +9,19 @@ import IndexerClusterActions from 'actions/indexers/IndexerClusterActions';
 
 const IndexerClusterStore = Reflux.createStore({
   listenables: [IndexerClusterActions],
+  state: {},
   init() {
-    this.health().then((health) => {
-      this.trigger({health: health});
-    });
-    this.name().then((response) => {
-      this.trigger({name: response.name});
-    });
+    Promise.all([
+      this.health().then((health) => {
+        this.state.health = health;
+      }),
+      this.name().then((response) => {
+        this.state.name = response.name;
+      })
+    ]).then(() => this.trigger(this.state));
+  },
+  getInitialState() {
+    return this.state;
   },
   health() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.health().url);
