@@ -137,9 +137,15 @@ const EditExtractor = React.createClass({
     ExtractorsActions.update.triggerPromise(this.props.inputId, this.state.updatedExtractor);
   },
   render() {
-    // TODO:
-    // - Add converters
-    // - Load recent message from input
+    const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you ' +
+      'avoiding wrong or unnecessary extractions and can also save CPU resources.'
+
+    const cursorStrategyHelpMessage = (
+      <span>
+        Do you want to copy or cut from source? You cannot use the cutting feature on standard fields like{' '}
+        <em>message</em> and <em>source</em>.
+      </span>
+    );
 
     const targetFieldHelpMessage = (
       <span>
@@ -176,7 +182,7 @@ const EditExtractor = React.createClass({
                                               exampleMessage={this.props.exampleMessage}/>
 
                   <Input label="Condition" labelClassName="col-md-2" wrapperClassName="col-md-10"
-                         help="Extracting only from messages that match a certain condition helps you avoiding wrong or unnecessary extractions and can also save CPU resources.">
+                         help={conditionTypeHelpMessage}>
                     <div className="radio">
                       <label>
                         <input type="radio" name="condition_type" value="none"
@@ -214,7 +220,7 @@ const EditExtractor = React.createClass({
 
 
                   <Input label="Extraction strategy" labelClassName="col-md-2" wrapperClassName="col-md-10"
-                         help={<span>Do you want to copy or cut from source? You cannot use the cutting feature on standard fields like <em>message</em> and <em>source</em>.</span>}>
+                         help={cursorStrategyHelpMessage}>
                     <label className="radio-inline">
                       <input type="radio" name="cursor_strategy" value="copy"
                              onChange={this._onFieldChange('cursor_strategy')}

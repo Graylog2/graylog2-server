@@ -31,6 +31,10 @@ const EditExtractorsPage = React.createClass({
     return !(this.state.input && this.state.extractor);
   },
   render() {
+    // TODO:
+    // - Load recent message from input
+    // - Redirect when extractor or input were deleted
+
     if (this._isLoading()) {
       return <Spinner/>;
     }
