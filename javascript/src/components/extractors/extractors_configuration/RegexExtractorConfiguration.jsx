@@ -42,7 +42,8 @@ const RegexExtractorConfiguration = React.createClass({
         return;
       }
 
-      this.props.onExtractorPreviewLoad(<samp>{result.match.match}</samp>);
+      const preview = (result.match.match ? <samp>{result.match.match}</samp> : '');
+      this.props.onExtractorPreviewLoad(preview);
     });
 
     promise.finally(() => this.setState({trying: false}));

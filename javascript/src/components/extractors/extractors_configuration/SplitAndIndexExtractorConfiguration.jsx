@@ -36,7 +36,8 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
         return;
       }
 
-      this.props.onExtractorPreviewLoad(<samp>{result.cut}</samp>);
+      const preview = (result.cut ? <samp>{result.cut}</samp> : '');
+      this.props.onExtractorPreviewLoad(preview);
     });
 
     promise.finally(() => this.setState({trying: false}));

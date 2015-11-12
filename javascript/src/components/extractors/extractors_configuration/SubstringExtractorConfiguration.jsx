@@ -48,8 +48,8 @@ const SubstringExtractorConfiguration = React.createClass({
 
     this._verifySubstringInputs();
 
-    if (this.props.configuration.begin_index === this.props.configuration.end_index) {
-      this.props.onExtractorPreviewLoad(<em>Nothing will be extracted</em>);
+    if (this.state.configuration.begin_index === this.state.configuration.end_index) {
+      this.props.onExtractorPreviewLoad('');
       this.setState({trying: false});
     } else {
       const promise = ToolsStore.testSubstring(this.props.configuration.begin_index, this.props.configuration.end_index,

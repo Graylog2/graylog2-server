@@ -89,12 +89,12 @@ const EditExtractorConfiguration = React.createClass({
 
     let extractorPreview;
 
-    if (this.state.extractorPreview) {
+    if (this.state.extractorPreview !== undefined) {
       extractorPreview = (
         <div className="form-group">
           <Col md={10} mdOffset={2}>
             <Panel header="Extractor preview" bsStyle="info">
-              {this.state.extractorPreview}
+              {this.state.extractorPreview === '' ? <em>Nothing will be extracted</em> : this.state.extractorPreview}
             </Panel>
           </Col>
         </div>
