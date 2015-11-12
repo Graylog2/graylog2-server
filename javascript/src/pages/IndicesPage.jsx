@@ -7,7 +7,7 @@ import { DeflectorActions, IndexRangesActions, IndicesActions } from 'actions/in
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, Spinner } from 'components/common';
 import { DocumentationLink } from 'components/support';
-import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
+import { DeflectorConfigSummary, IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
 
 const IndicesPage = React.createClass({
   componentDidMount() {
@@ -41,6 +41,7 @@ const IndicesPage = React.createClass({
           </span>
 
           <span>
+            <DeflectorConfigSummary config={this.state.deflector.config} />
           </span>
 
           <IndicesMaintenanceDropdown />

@@ -1,4 +1,5 @@
 export ClosedIndexDetails from './ClosedIndexDetails';
+export DeflectorConfigSummary from './DeflectorConfigSummary';
 export IndexDetails from './IndexDetails';
 export IndexRangeSummary from './IndexRangeSummary';
 export IndexSummary from './IndexSummary';
