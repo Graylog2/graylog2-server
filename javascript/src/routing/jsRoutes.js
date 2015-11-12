@@ -149,6 +149,7 @@ const jsRoutes = {
       show: (id) => { return {url: '/dashboards/' + id }; },
     },
     ExtractorsController: {
+      create: (inputId) => { return {url: `/system/inputs/${inputId}/extractors`}; },
       newExtractor: (nodeId, inputId, extractorType, fieldName, index, messageId) => {
         return {url: `/system/inputs/${nodeId}/${inputId}/extractors/new?extractor_type=${extractorType}&field=${fieldName}&example_index=${index}&example_id=${messageId}`};
       },

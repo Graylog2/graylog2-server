@@ -12,17 +12,17 @@ function getExtractorDTO(extractor) {
     converters[converter.type] = converter.config;
   });
 
-  const conditionValue = extractor.condition_type !== 'none' ? extractor.condition_value : '';
+  const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
     title: extractor.title,
-    cut_or_copy: extractor.cursor_strategy,
+    cut_or_copy: extractor.cursor_strategy || 'copy',
     source_field: extractor.source_field,
     target_field: extractor.target_field,
     extractor_type: extractor.type,
     extractor_config: extractor.extractor_config,
     converters: converters,
-    condition_type: extractor.condition_type,
+    condition_type: extractor.condition_type || 'none',
     condition_value: conditionValue,
     order: extractor.order,
   };
@@ -58,7 +58,40 @@ const ExtractorsStore = Reflux.createStore({
     ExtractorsActions.get.promise(promise);
   },
 
-  update(inputId, extractor) {
+  save(inputId, extractor) {
+    let promise;
+
+    if (extractor.id) {
+      promise = this.update(inputId, extractor, true);
+    } else {
+      promise = this.create(inputId, extractor, true);
+    }
+
+    ExtractorsActions.save.promise(promise);
+  },
+
+  create(inputId, extractor, calledFromMethod) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.create(inputId).url);
+
+    const promise = fetch('POST', url, getExtractorDTO(extractor))
+      .then(() => {
+        UserNotification.success('Extractor created successfully');
+        if (this.extractor) {
+          ExtractorsActions.get.triggerPromise(inputId, extractor.id);
+        }
+      })
+      .catch(error => {
+        UserNotification.error('Creating extractor failed: ' + error,
+          'Could not create extractor');
+      });
+
+    if (!calledFromMethod) {
+      ExtractorsActions.create.promise(promise);
+    }
+    return promise;
+  },
+
+  update(inputId, extractor, calledFromMethod) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.update(inputId, extractor.id).url);
 
     const promise = fetch('PUT', url, getExtractorDTO(extractor))
@@ -73,7 +106,10 @@ const ExtractorsStore = Reflux.createStore({
           'Could not update extractor');
       });
 
-    ExtractorsActions.update.promise(promise);
+    if (!calledFromMethod) {
+      ExtractorsActions.update.promise(promise);
+    }
+    return promise;
   },
 });
 
