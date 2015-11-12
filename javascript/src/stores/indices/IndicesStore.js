@@ -47,16 +47,25 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.close.promise(promise);
   },
+  closeCompleted() {
+    IndicesActions.list();
+  },
   delete(indexName) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.delete(indexName).url);
     const promise = fetch('DELETE', url);
 
     IndicesActions.delete.promise(promise);
   },
-  closeCompleted() {
+  deleteCompleted() {
     IndicesActions.list();
   },
-  deleteCompleted() {
+  reopen(indexName) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.reopen(indexName).url);
+    const promise = fetch('POST', url);
+
+    IndicesActions.reopen.promise(promise);
+  },
+  reopenCompleted() {
     IndicesActions.list();
   },
 });

@@ -21,6 +21,9 @@ const jsRoutes = {
         export: () => { return {url: '/system/bundles/export'}; },
         list: () => { return {url: '/system/bundles'}; },
       },
+      CountsApiController: {
+        total: () => { return {url: '/count/total'}; },
+      },
       DashboardsApiController: {
         create: () => { return {url: '/dashboards' }; },
         index: () => { return {url: '/dashboards' }; },
@@ -56,6 +59,7 @@ const jsRoutes = {
         delete: (indexName) => { return {url: '/system/indexer/indices/' + indexName}; },
         list: () => { return {url: '/system/indexer/indices'}; },
         listClosed: () => { return {url: '/system/indexer/indices/closed'}; },
+        reopen: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/reopen'}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },

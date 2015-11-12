@@ -36,7 +36,7 @@ const IndicesOverview = React.createClass({
         <Col md={12}>
           <IndexSummary index={index} indexRange={indexRange} isDeflector={this._isDeflector(index)}>
             <span>
-              <ClosedIndexDetails indexRange={indexRange} />
+              <ClosedIndexDetails indexName={indexName} indexRange={indexRange} />
             </span>
           </IndexSummary>
         </Col>

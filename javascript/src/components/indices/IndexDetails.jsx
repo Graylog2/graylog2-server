@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { Button, Col, Row } from 'react-bootstrap';
 
-import IndicesActions from 'actions/indices/IndicesActions';
+import { IndicesActions } from 'actions/indices';
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 

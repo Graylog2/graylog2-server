@@ -5,7 +5,10 @@ import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
+import IndexerClusterActions from 'actions/indexers/IndexerClusterActions';
+
 const IndexerClusterStore = Reflux.createStore({
+  listenables: [IndexerClusterActions],
   init() {
     this.health().then((health) => {
       this.trigger({health: health});
@@ -16,11 +19,19 @@ const IndexerClusterStore = Reflux.createStore({
   },
   health() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.health().url);
-    return fetch('GET', url);
+    const promise = fetch('GET', url);
+
+    IndexerClusterActions.health.promise(promise);
+
+    return promise;
   },
   name() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.name().url);
-    return fetch('GET', url);
+    const promise = fetch('GET', url);
+
+    IndexerClusterActions.name.promise(promise);
+
+    return promise;
   },
 });
 
