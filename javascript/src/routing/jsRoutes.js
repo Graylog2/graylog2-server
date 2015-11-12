@@ -55,6 +55,7 @@ const jsRoutes = {
         close: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/close'}; },
         delete: (indexName) => { return {url: '/system/indexer/indices/' + indexName}; },
         list: () => { return {url: '/system/indexer/indices'}; },
+        listClosed: () => { return {url: '/system/indexer/indices/closed'}; },
       },
       InputsApiController: {
         list: () => { return {url: '/system/inputs'}; },

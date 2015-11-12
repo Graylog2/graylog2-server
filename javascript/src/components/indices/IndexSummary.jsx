@@ -4,10 +4,9 @@ import numeral from 'numeral';
 import moment from 'moment';
 import { Collapse } from 'react-bootstrap';
 
-import DeflectorStore from 'stores/indices/DeflectorStore';
+import { IndexSizeSummary } from 'components/indices';
 
 const IndexSummary = React.createClass({
-  mixins: [Reflux.connect(DeflectorStore)],
   propTypes: {
     children: React.PropTypes.node.isRequired,
     index: React.PropTypes.object.isRequired,
@@ -17,7 +16,7 @@ const IndexSummary = React.createClass({
   getInitialState() {
     return { showDetails: this.props.isDeflector };
   },
-  _deflectorBadge(index) {
+  _deflectorBadge() {
     if (this.props.isDeflector) {
       return <i className="fa fa-bolt" title="Write-active index"/>;
     }
@@ -52,7 +51,7 @@ const IndexSummary = React.createClass({
     return (
       <span>
         <h2>
-          {this._deflectorBadge(index)}{' '}
+          {this._deflectorBadge()}{' '}
 
           {index.name}{' '}
 
@@ -61,7 +60,7 @@ const IndexSummary = React.createClass({
           <small>
             Contains messages {this._formatIndexRange(index)}{' '}
 
-            ({numeral(index.all_shards.store_size_bytes).format('0.0b')} / {numeral(index.all_shards.documents.count).format('0,0')} messages){' '}
+            <IndexSizeSummary index={index} />
 
             <a onClick={this._toggleShowDetails}>{this._formatShowDetailsLink()}</a>
           </small>

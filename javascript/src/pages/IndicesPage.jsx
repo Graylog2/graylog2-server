@@ -1,14 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
 
-import DeflectorStore from 'stores/indices/DeflectorStore';
-import IndexRangesStore from 'stores/indices/IndexRangesStore';
-import IndicesStore from 'stores/indices/IndicesStore';
-
-import DeflectorActions from 'actions/indices/DeflectorActions';
-import IndexRangesActions from 'actions/indices/IndexRangesActions';
-import IndicesActions from 'actions/indices/IndicesActions';
+import { DeflectorStore, IndexRangesStore, IndicesStore } from 'stores/indices';
+import { DeflectorActions, IndexRangesActions, IndicesActions } from 'actions/indices';
 
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, Spinner } from 'components/common';
@@ -16,8 +10,6 @@ import { DocumentationLink } from 'components/support';
 import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
 
 const IndicesPage = React.createClass({
-  mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore), Reflux.connect(IndexRangesStore)],
-  REFRESH_INTERVAL: 2000,
   componentDidMount() {
     const timerId = setInterval(() => {
       DeflectorActions.config();
@@ -32,6 +24,8 @@ const IndicesPage = React.createClass({
   componentWillUnmount() {
     clearInterval(this.state.timerId);
   },
+  mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore), Reflux.connect(IndexRangesStore)],
+  REFRESH_INTERVAL: 2000,
   render() {
     if (!this.state.indices || !this.state.indexRanges || !this.state.deflector) {
       return <Spinner />;
@@ -52,7 +46,8 @@ const IndicesPage = React.createClass({
           <IndicesMaintenanceDropdown />
         </PageHeader>
 
-        <IndicesOverview indices={this.state.indices} deflector={this.state.deflector} indexRanges={this.state.indexRanges} />
+        <IndicesOverview indices={this.state.indices} closedIndices={this.state.closedIndices}
+                         deflector={this.state.deflector} indexRanges={this.state.indexRanges} />
       </span>
     );
   },

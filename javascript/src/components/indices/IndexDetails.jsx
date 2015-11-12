@@ -4,7 +4,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 import IndicesActions from 'actions/indices/IndicesActions';
 
-import { ShardMeter, ShardRoutingOverview } from 'components/indices';
+import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
 const IndexDetails = React.createClass({
   propTypes: {
@@ -43,7 +43,7 @@ const IndexDetails = React.createClass({
     const { index, indexRange } = this.props;
     return (
       <div className="index-info">
-        Range re-calculated {moment(indexRange.calculated_at).fromNow()} in {indexRange.took_ms}ms.{' '}
+        <IndexRangeSummary indexRange={indexRange} />{' '}
 
         {index.all_shards.segments} segments,{' '}
         {index.all_shards.open_search_contexts} open search contexts,{' '}
