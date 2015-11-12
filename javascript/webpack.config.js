@@ -1,6 +1,6 @@
 // webpack.config.js
 const webpack = require('webpack');
-var path = require('path');
+const path = require('path');
 const Clean = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
@@ -33,7 +33,7 @@ const webpackConfig = {
       { test: /\.png$/, loader: 'url-loader' },
       { test: /\.less$/, loader: 'style!css!less' },
       { test: /\.css$/, loader: 'style!css' },
-    ]
+    ],
   },
   resolve: {
     // you can now require('file') instead of require('file.coffee')
@@ -50,7 +50,7 @@ const webpackConfig = {
   ],
 };
 
-if(TARGET === 'start') {
+if (TARGET === 'start') {
   console.log('Running in development mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
@@ -61,7 +61,7 @@ if(TARGET === 'start') {
       progress: true,
     },
     plugins: [
-      new webpack.HotModuleReplacementPlugin()
+      new webpack.HotModuleReplacementPlugin(),
     ],
   });
 }
@@ -78,7 +78,7 @@ if (TARGET === 'build') {
         },
       }),
       new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurenceOrderPlugin()
+      new webpack.optimize.OccurenceOrderPlugin(),
     ],
   });
 }
