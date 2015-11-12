@@ -41,8 +41,8 @@ const Routes = {
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
-  new_extractor: (nodeId, inputId, extractorType, field, exampleIndex, exampleId) => {
-    return `/system/inputs/${nodeId}/${inputId}/extractors/new?extractor_type=${extractorType}&field=${field}&example_index=${exampleIndex}&example_id=${exampleId}`;
+  new_extractor: (nodeId, inputId) => {
+    return `/system/inputs/${nodeId}/${inputId}/extractors/new`;
   },
   edit_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
