@@ -33,18 +33,12 @@ public abstract class ConfigurationVariable {
     public abstract Object value();
 
     @JsonCreator
-    public static ConfigurationVariable create(@JsonProperty("name") String name, @JsonProperty("value") String x) {
-        return new AutoValue_ConfigurationVariable(name, x);
-    }
-
-    @JsonCreator
-    public static ConfigurationVariable create(@JsonProperty("name") String name, @JsonProperty("value") Number x) {
-        return new AutoValue_ConfigurationVariable(name, x);
-    }
-
-    @JsonCreator
-    public static ConfigurationVariable create(@JsonProperty("name") String name, @JsonProperty("value") Boolean x) {
-        return new AutoValue_ConfigurationVariable(name, x);
+    public static ConfigurationVariable create(@JsonProperty("name") String name, @JsonProperty("value") Object value) {
+        if (value instanceof String || value instanceof Number || value instanceof Boolean) {
+            return new AutoValue_ConfigurationVariable(name, value);
+        } else {
+            throw new RuntimeException("Exposed configuration variable must be of type String, Number or Boolean.");
+        }
     }
 
 }

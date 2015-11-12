@@ -20,11 +20,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigurationVariableTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test(expected = RuntimeException.class)
+    public void doesNotAcceptInvalidTypes() {
+        ConfigurationVariable.create("foo", new HashMap<String, String>());
+    }
+
+    @Test
+    public void doesAcceptStrings() {
+        ConfigurationVariable.create("foo", "bar");
+    }
+
+    @Test
+    public void doesAcceptNumbers() {
+        ConfigurationVariable.create("foo", 9001);
+        ConfigurationVariable.create("foo", 9001L);
+        ConfigurationVariable.create("foo", 9001.0);
+    }
+
+    @Test
+    public void doesAcceptBooleans() {
+        ConfigurationVariable.create("foo", true);
+        ConfigurationVariable.create("foo", false);
+    }
 
     @Test
     public void testDeserializeString() throws IOException {
