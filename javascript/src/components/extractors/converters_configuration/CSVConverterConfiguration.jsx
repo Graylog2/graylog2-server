@@ -69,7 +69,7 @@ const CSVConverterConfiguration = React.createClass({
                      defaultValue={this.props.configuration.separator || ','}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxlength="2"
+                     maxLength="2"
                      onChange={this._onChange('separator')}
                      help={separatorHelpMessage}/>
 
@@ -79,7 +79,7 @@ const CSVConverterConfiguration = React.createClass({
                      defaultValue={this.props.configuration.quote_char || '"'}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxlength="1"
+                     maxLength="1"
                      onChange={this._onChange('quote_char')}/>
 
               <Input type="text"
@@ -88,7 +88,7 @@ const CSVConverterConfiguration = React.createClass({
                      defaultValue={this.props.configuration.escape_char || '\\'}
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
-                     maxlength="1"
+                     maxLength="1"
                      onChange={this._onChange('escape_char')}
                      help="Character used to escape the separator and quote characters."/>
 
