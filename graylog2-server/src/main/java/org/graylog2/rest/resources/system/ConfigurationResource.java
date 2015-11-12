@@ -18,6 +18,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableList;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -30,8 +31,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 @RequiresAuthentication
 @Api(value = "System/Configuration", description = "Read-only access to configuration variables")
@@ -53,43 +52,36 @@ public class ConfigurationResource extends RestResource  {
      */
     @GET
     @Timed
-    @ApiOperation(value = "Get all reported configuration variables and their values")
-    public ConfigurationList getAll() {
-        List<ConfigurationVariable> config = new ArrayList<>();
-
-        config.add(ConfigurationVariable.create("inputbuffer_processors", configuration.getInputbufferProcessors()));
-        config.add(ConfigurationVariable.create("processbuffer_processors", configuration.getProcessBufferProcessors()));
-        config.add(ConfigurationVariable.create("outputbuffer_processors", configuration.getOutputBufferProcessors()));
-        config.add(ConfigurationVariable.create("processor_wait_strategy", configuration.getProcessorWaitStrategy().getClass().getName()));
-        config.add(ConfigurationVariable.create("inputbuffer_wait_strategy", configuration.getInputBufferWaitStrategy().getClass().getName()));
-        config.add(ConfigurationVariable.create("inputbuffer_ring_size", configuration.getInputBufferRingSize()));
-        config.add(ConfigurationVariable.create("ring_size", configuration.getRingSize()));
-
-        config.add(ConfigurationVariable.create("plugin_dir", configuration.getPluginDir()));
-        config.add(ConfigurationVariable.create("node_id_file", configuration.getNodeIdFile()));
-
-        config.add(ConfigurationVariable.create("allow_highlighting", configuration.isAllowHighlighting()));
-        config.add(ConfigurationVariable.create("allow_leading_wildcard_searches", configuration.isAllowLeadingWildcardSearches()));
-
-        config.add(ConfigurationVariable.create("rotation_strategy", esConfiguration.getRotationStrategy()));
-        config.add(ConfigurationVariable.create("retention_strategy", esConfiguration.getRetentionStrategy()));
-        config.add(ConfigurationVariable.create("elasticsearch_max_docs_per_index", esConfiguration.getMaxDocsPerIndex()));
-        config.add(ConfigurationVariable.create("elasticsearch_max_size_per_index", esConfiguration.getMaxSizePerIndex()));
-        config.add(ConfigurationVariable.create("elasticsearch_max_time_per_index", esConfiguration.getMaxTimePerIndex().toString()));
-        config.add(ConfigurationVariable.create("elasticsearch_max_number_of_indices", esConfiguration.getMaxNumberOfIndices()));
-        config.add(ConfigurationVariable.create("elasticsearch_shards", esConfiguration.getShards()));
-        config.add(ConfigurationVariable.create("elasticsearch_replicas", esConfiguration.getReplicas()));
-
-        config.add(ConfigurationVariable.create("stream_processing_timeout", configuration.getStreamProcessingTimeout()));
-        config.add(ConfigurationVariable.create("stream_processing_max_faults", configuration.getStreamProcessingMaxFaults()));
-
-        config.add(ConfigurationVariable.create("output_module_timeout", configuration.getOutputModuleTimeout()));
-        config.add(ConfigurationVariable.create("stale_master_timeout", configuration.getStaleMasterTimeout()));
-
-        config.add(ConfigurationVariable.create("disable_index_optimization", esConfiguration.isDisableIndexOptimization()));
-        config.add(ConfigurationVariable.create("index_optimization_max_num_segments", esConfiguration.getIndexOptimizationMaxNumSegments()));
-
-        config.add(ConfigurationVariable.create("gc_warning_threshold", configuration.getGcWarningThreshold().toString()));
+    @ApiOperation(value = "Get relevant configuration variables and their values")
+    public ConfigurationList getRelevant() {
+        ImmutableList<ConfigurationVariable> config = ImmutableList.<ConfigurationVariable>builder()
+            .add(ConfigurationVariable.create("inputbuffer_processors", configuration.getInputbufferProcessors()))
+            .add(ConfigurationVariable.create("processbuffer_processors", configuration.getProcessBufferProcessors()))
+            .add(ConfigurationVariable.create("outputbuffer_processors", configuration.getOutputBufferProcessors()))
+            .add(ConfigurationVariable.create("processor_wait_strategy", configuration.getProcessorWaitStrategy().getClass().getName()))
+            .add(ConfigurationVariable.create("inputbuffer_wait_strategy", configuration.getInputBufferWaitStrategy().getClass().getName()))
+            .add(ConfigurationVariable.create("inputbuffer_ring_size", configuration.getInputBufferRingSize()))
+            .add(ConfigurationVariable.create("ring_size", configuration.getRingSize()))
+            .add(ConfigurationVariable.create("plugin_dir", configuration.getPluginDir()))
+            .add(ConfigurationVariable.create("node_id_file", configuration.getNodeIdFile()))
+            .add(ConfigurationVariable.create("allow_highlighting", configuration.isAllowHighlighting()))
+            .add(ConfigurationVariable.create("allow_leading_wildcard_searches", configuration.isAllowLeadingWildcardSearches()))
+            .add(ConfigurationVariable.create("rotation_strategy", esConfiguration.getRotationStrategy()))
+            .add(ConfigurationVariable.create("retention_strategy", esConfiguration.getRetentionStrategy()))
+            .add(ConfigurationVariable.create("elasticsearch_max_docs_per_index", esConfiguration.getMaxDocsPerIndex()))
+            .add(ConfigurationVariable.create("elasticsearch_max_size_per_index", esConfiguration.getMaxSizePerIndex()))
+            .add(ConfigurationVariable.create("elasticsearch_max_time_per_index", esConfiguration.getMaxTimePerIndex().toString()))
+            .add(ConfigurationVariable.create("elasticsearch_max_number_of_indices", esConfiguration.getMaxNumberOfIndices()))
+            .add(ConfigurationVariable.create("elasticsearch_shards", esConfiguration.getShards()))
+            .add(ConfigurationVariable.create("elasticsearch_replicas", esConfiguration.getReplicas()))
+            .add(ConfigurationVariable.create("stream_processing_timeout", configuration.getStreamProcessingTimeout()))
+            .add(ConfigurationVariable.create("stream_processing_max_faults", configuration.getStreamProcessingMaxFaults()))
+            .add(ConfigurationVariable.create("output_module_timeout", configuration.getOutputModuleTimeout()))
+            .add(ConfigurationVariable.create("stale_master_timeout", configuration.getStaleMasterTimeout()))
+            .add(ConfigurationVariable.create("disable_index_optimization", esConfiguration.isDisableIndexOptimization()))
+            .add(ConfigurationVariable.create("index_optimization_max_num_segments", esConfiguration.getIndexOptimizationMaxNumSegments()))
+            .add(ConfigurationVariable.create("gc_warning_threshold", configuration.getGcWarningThreshold().toString()))
+            .build();
 
         return ConfigurationList.create(config);
     }
