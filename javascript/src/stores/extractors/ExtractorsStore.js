@@ -90,7 +90,7 @@ const ExtractorsStore = Reflux.createStore({
 
     const promise = fetch('POST', url, getExtractorDTO(extractor))
       .then(() => {
-        UserNotification.success('Extractor created successfully');
+        UserNotification.success(`Extractor ${extractor.title} created successfully`);
         if (this.extractor) {
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }
@@ -111,7 +111,7 @@ const ExtractorsStore = Reflux.createStore({
 
     const promise = fetch('PUT', url, getExtractorDTO(extractor))
       .then(() => {
-        UserNotification.success('Extractor updated successfully');
+        UserNotification.success(`Extractor "${extractor.title}" updated successfully`);
         if (this.extractor) {
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }

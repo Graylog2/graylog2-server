@@ -17,6 +17,7 @@ const EditExtractor = React.createClass({
     extractor: PropTypes.object.isRequired,
     inputId: PropTypes.string.isRequired,
     exampleMessage: PropTypes.string,
+    onSave: PropTypes.func.isRequired,
   },
   getDefaultProps() {
     return {
@@ -133,11 +134,12 @@ const EditExtractor = React.createClass({
   },
   _saveExtractor(event) {
     event.preventDefault();
-    ExtractorsActions.save.triggerPromise(this.props.inputId, this.state.updatedExtractor);
+    ExtractorsActions.save.triggerPromise(this.props.inputId, this.state.updatedExtractor)
+      .then(() => this.props.onSave());
   },
   render() {
     const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you ' +
-      'avoiding wrong or unnecessary extractions and can also save CPU resources.'
+      'avoiding wrong or unnecessary extractions and can also save CPU resources.';
 
     const cursorStrategyHelpMessage = (
       <span>

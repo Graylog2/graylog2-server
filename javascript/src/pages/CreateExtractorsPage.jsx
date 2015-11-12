@@ -6,6 +6,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 
 import DocsHelper from 'util/DocsHelper';
+import Routes from 'routing/Routes';
 
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 import InputsStore from 'stores/inputs/InputsStore';
@@ -15,6 +16,7 @@ const CreateExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
   getInitialState() {
     const { query } = this.props.location;
@@ -37,6 +39,16 @@ const CreateExtractorsPage = React.createClass({
   _isLoading() {
     return !(this.state.input && this.state.exampleMessage);
   },
+  _extractorSaved() {
+    let url;
+    if (this.state.input.global) {
+      url = Routes.global_input_extractors(this.props.params.inputId);
+    } else {
+      url = Routes.local_input_extractors(this.props.params.nodeId, this.props.params.inputId);
+    }
+
+    this.props.history.pushState(null, url);
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -55,8 +67,11 @@ const CreateExtractorsPage = React.createClass({
             {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
           </span>
         </PageHeader>
-        <EditExtractor action="create" extractor={this.state.extractor} inputId={this.state.input.input_id}
-                       exampleMessage={this.state.exampleMessage[this.state.field]}/>
+        <EditExtractor action="create"
+                       extractor={this.state.extractor}
+                       inputId={this.state.input.input_id}
+                       exampleMessage={this.state.exampleMessage[this.state.field]}
+                       onSave={this._extractorSaved}/>
       </div>
     );
   },
