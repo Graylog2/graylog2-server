@@ -6,7 +6,7 @@
 * Install [node.js](http://nodejs.org/) and npm.
 * `cd javascript/`
 * `npm install`
-* `npm start
+* `npm start`
 
 * open http://localhost:8080
 
