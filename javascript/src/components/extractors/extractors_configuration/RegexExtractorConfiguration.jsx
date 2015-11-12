@@ -6,6 +6,7 @@ import DocsHelper from 'util/DocsHelper';
 
 import UserNotification from 'util/UserNotification';
 import ToolsStore from 'stores/tools/ToolsStore';
+import FormUtils from 'util/FormsUtils';
 
 const RegexExtractorConfiguration = React.createClass({
   propTypes: {
@@ -20,11 +21,11 @@ const RegexExtractorConfiguration = React.createClass({
     };
   },
   _onChange(key) {
-    const onConfigurationChange = this.props.onChange(key);
-
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
-      onConfigurationChange(event);
+      const newConfig = this.props.configuration;
+      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      this.props.onChange(newConfig);
     };
   },
   _onTryClick() {
@@ -49,7 +50,7 @@ const RegexExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying || this.props.configuration.regex_value === '';
+    return this.state.trying || !this.props.configuration.regex_value;
   },
   render() {
     const helpMessage = (

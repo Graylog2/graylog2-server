@@ -88,6 +88,24 @@ const ExtractorUtils = {
       return converterType;
     }
   },
+
+  getEffectiveConfiguration(defaultConfiguration, currentConfiguration) {
+    const effectiveConfiguration = {};
+
+    for (const key in defaultConfiguration) {
+      if (defaultConfiguration.hasOwnProperty(key)) {
+        effectiveConfiguration[key] = defaultConfiguration[key];
+      }
+    }
+
+    for (const key in currentConfiguration) {
+      if (currentConfiguration.hasOwnProperty(key)) {
+        effectiveConfiguration[key] = currentConfiguration[key];
+      }
+    }
+
+    return effectiveConfiguration;
+  },
 };
 
 export default ExtractorUtils;

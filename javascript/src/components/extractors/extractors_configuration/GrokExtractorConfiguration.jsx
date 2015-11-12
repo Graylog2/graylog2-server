@@ -5,6 +5,7 @@ import {LinkContainer} from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import ToolsStore from 'stores/tools/ToolsStore';
+import FormUtils from 'util/FormsUtils';
 
 const GrokExtractorConfiguration = React.createClass({
   propTypes: {
@@ -19,11 +20,11 @@ const GrokExtractorConfiguration = React.createClass({
     };
   },
   _onChange(key) {
-    const onConfigurationChange = this.props.onChange(key);
-
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
-      onConfigurationChange(event);
+      const newConfig = this.props.configuration;
+      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      this.props.onChange(newConfig);
     };
   },
   _onTryClick() {
@@ -49,7 +50,7 @@ const GrokExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying || this.props.configuration.grok_pattern === '';
+    return this.state.trying || !this.props.configuration.grok_pattern;
   },
   render() {
     const helpMessage = (

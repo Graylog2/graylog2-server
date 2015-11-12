@@ -56,12 +56,10 @@ const EditExtractor = React.createClass({
       this.setState(nextState);
     };
   },
-  _onConfigurationChange(key) {
-    return (event) => {
-      const updatedExtractor = this.state.updatedExtractor;
-      updatedExtractor.extractor_config[key] = FormUtils.getValueFromInput(event.target);
-      this.setState({updatedExtractor: updatedExtractor});
-    };
+  _onConfigurationChange(newConfiguration) {
+    const updatedExtractor = this.state.updatedExtractor;
+    updatedExtractor.extractor_config = newConfiguration;
+    this.setState({updatedExtractor: updatedExtractor});
   },
   _onConverterChange(converterType, newConverter) {
     const updatedExtractor = this.state.updatedExtractor;

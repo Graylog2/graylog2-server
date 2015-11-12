@@ -2,6 +2,8 @@ import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
 
 import ToolsStore from 'stores/tools/ToolsStore';
+import ExtractorUtils from 'util/ExtractorUtils';
+import FormUtils from 'util/FormsUtils';
 
 const JSONExtractorConfiguration = React.createClass({
   propTypes: {
@@ -13,27 +15,38 @@ const JSONExtractorConfiguration = React.createClass({
   getInitialState() {
     return {
       trying: false,
+      configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+  componentDidMount() {
+    this.props.onChange(this.state.configuration);
+  },
+  componentWillReceiveProps(nextProps) {
+    this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
+  },
+  DEFAULT_CONFIGURATION: {list_separator: ', ', key_separator: '.', kv_separator: '='},
+  _getEffectiveConfiguration(configuration) {
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+  },
   _onChange(key) {
-    const onConfigurationChange = this.props.onChange(key);
-
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
-      onConfigurationChange(event);
+      const newConfig = this.state.configuration;
+      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      this.props.onChange(newConfig);
     };
   },
   _onTryClick() {
     this.setState({trying: true});
 
-    const configuration = this.props.configuration;
+    const configuration = this.state.configuration;
     const promise = ToolsStore.testJSON(configuration.flatten, configuration.list_separator,
       configuration.key_separator, configuration.kv_separator, this.props.exampleMessage);
 
     promise.then(result => {
       const matches = [];
       for (const match in result.matches) {
-        if ({}.hasOwnProperty.call(result.matches, match)) {
+        if (result.matches.hasOwnProperty(match)) {
           matches.push(<dt key={`${match}-name`}>{match}</dt>);
           matches.push(<dd key={`${match}-value`}><samp>{result.matches[match]}</samp></dd>);
         }
@@ -46,8 +59,7 @@ const JSONExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    const configuration = this.props.configuration;
-    return this.state.trying || configuration.list_separator === '' || configuration.key_separator === '' || configuration.kv_separator === '';
+    return this.state.trying;
   },
   render() {
     return (
@@ -56,7 +68,7 @@ const JSONExtractorConfiguration = React.createClass({
                id="flatten"
                label="Flatten structures"
                wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked={this.props.configuration.flatten}
+               defaultChecked={this.state.configuration.flatten}
                onChange={this._onChange('flatten')}
                help="Whether to flatten JSON objects into a single message field or to expand into multiple fields."/>
 
@@ -65,7 +77,7 @@ const JSONExtractorConfiguration = React.createClass({
                label="List item separator"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.list_separator}
+               defaultValue={this.state.configuration.list_separator}
                required
                onChange={this._onChange('list_separator')}
                help="What string to use to concatenate items of a JSON list."/>
@@ -75,7 +87,7 @@ const JSONExtractorConfiguration = React.createClass({
                label="Key separator"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.key_separator}
+               defaultValue={this.state.configuration.key_separator}
                required
                onChange={this._onChange('key_separator')}
                help={<span>What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em> flattened).</span>}/>
@@ -85,7 +97,7 @@ const JSONExtractorConfiguration = React.createClass({
                label="Key/value separator"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.kv_separator}
+               defaultValue={this.state.configuration.kv_separator}
                required
                onChange={this._onChange('kv_separator')}
                help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."/>

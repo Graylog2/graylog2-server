@@ -3,6 +3,8 @@ import {Input, Button} from 'react-bootstrap';
 
 import ToolsStore from 'stores/tools/ToolsStore';
 import UserNotification from 'util/UserNotification';
+import ExtractorUtils from 'util/ExtractorUtils';
+import FormUtils from 'util/FormsUtils';
 
 const SplitAndIndexExtractorConfiguration = React.createClass({
   propTypes: {
@@ -14,20 +16,31 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
   getInitialState() {
     return {
       trying: false,
+      configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+  componentDidMount() {
+    this.props.onChange(this.state.configuration);
+  },
+  componentWillReceiveProps(nextProps) {
+    this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
+  },
+  DEFAULT_CONFIGURATION: {index: 1},
+  _getEffectiveConfiguration(configuration) {
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+  },
   _onChange(key) {
-    const onConfigurationChange = this.props.onChange(key);
-
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
-      onConfigurationChange(event);
+      const newConfig = this.state.configuration;
+      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      this.props.onChange(newConfig);
     };
   },
   _onTryClick() {
     this.setState({trying: true});
 
-    const promise = ToolsStore.testSplitAndIndex(this.props.configuration.split_by, this.props.configuration.index,
+    const promise = ToolsStore.testSplitAndIndex(this.state.configuration.split_by, this.state.configuration.index,
       this.props.exampleMessage);
 
     promise.then(result => {
@@ -43,8 +56,8 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    const configuration = this.props.configuration;
-    return this.state.trying || configuration.split_by === '' || configuration.index === undefined;
+    const configuration = this.state.configuration;
+    return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1;
   },
   render() {
     const splitByHelpMessage = (
@@ -68,7 +81,7 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
                label="Split by"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.split_by}
+               defaultValue={this.state.configuration.split_by}
                onChange={this._onChange('split_by')}
                required
                help={splitByHelpMessage}/>
@@ -78,9 +91,9 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
                label="Target index"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.index}
+               defaultValue={this.state.configuration.index}
                onChange={this._onChange('index')}
-               min="0"
+               min="1"
                required
                help={indexHelpMessage}/>
 

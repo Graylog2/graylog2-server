@@ -3,6 +3,8 @@ import {Input, Button} from 'react-bootstrap';
 
 import ToolsStore from 'stores/tools/ToolsStore';
 import UserNotification from 'util/UserNotification';
+import ExtractorUtils from 'util/ExtractorUtils';
+import FormUtils from 'util/FormsUtils';
 
 const SubstringExtractorConfiguration = React.createClass({
   propTypes: {
@@ -14,32 +16,43 @@ const SubstringExtractorConfiguration = React.createClass({
   getInitialState() {
     return {
       trying: false,
+      configuration: this._getEffectiveConfiguration(this.props.configuration),
     };
   },
+  componentDidMount() {
+    this.props.onChange(this.state.configuration);
+  },
+  componentWillReceiveProps(nextProps) {
+    this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
+  },
+  DEFAULT_CONFIGURATION: {begin_index: 0, end_index: 1},
+  _getEffectiveConfiguration(configuration) {
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+  },
   _onChange(key) {
-    const onConfigurationChange = this.props.onChange(key);
-
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
-      onConfigurationChange(event);
+      const newConfig = this.state.configuration;
+      newConfig[key] = FormUtils.getValueFromInput(event.target);
+      this.props.onChange(newConfig);
     };
   },
   _verifySubstringInputs() {
     const beginIndex = this.refs.beginIndex.getInputDOMNode();
     const endIndex = this.refs.endIndex.getInputDOMNode();
 
-    if (this.props.configuration.begin_index === undefined || this.props.configuration.begin_index < 0) {
+    if (this.state.configuration.begin_index === undefined || this.state.configuration.begin_index < 0) {
       beginIndex.value = 0;
       this._onChange('begin_index')({target: beginIndex});
     }
 
-    if (this.props.configuration.end_index === undefined || this.props.configuration.end_index < 0) {
+    if (this.state.configuration.end_index === undefined || this.state.configuration.end_index < 0) {
       endIndex.value = 0;
       this._onChange('end_index')({target: endIndex});
     }
 
-    if (this.props.configuration.begin_index > this.props.configuration.end_index) {
-      beginIndex.value = this.props.configuration.end_index;
+    if (this.state.configuration.begin_index > this.state.configuration.end_index) {
+      beginIndex.value = this.state.configuration.end_index;
       this._onChange('begin_index')({target: beginIndex});
     }
   },
@@ -52,7 +65,7 @@ const SubstringExtractorConfiguration = React.createClass({
       this.props.onExtractorPreviewLoad('');
       this.setState({trying: false});
     } else {
-      const promise = ToolsStore.testSubstring(this.props.configuration.begin_index, this.props.configuration.end_index,
+      const promise = ToolsStore.testSubstring(this.state.configuration.begin_index, this.state.configuration.end_index,
         this.props.exampleMessage);
 
       promise.then(result => {
@@ -67,7 +80,8 @@ const SubstringExtractorConfiguration = React.createClass({
     }
   },
   _isTryButtonDisabled() {
-    return this.state.trying || this.props.configuration.begin_index === undefined || this.props.configuration.end_index === undefined;
+    const configuration = this.state.configuration;
+    return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0;
   },
   render() {
     const endIndexHelpMessage = (
@@ -84,7 +98,7 @@ const SubstringExtractorConfiguration = React.createClass({
                label="Begin index"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.begin_index}
+               defaultValue={this.state.configuration.begin_index}
                onChange={this._onChange('begin_index')}
                min="0"
                required
@@ -96,7 +110,7 @@ const SubstringExtractorConfiguration = React.createClass({
                label="End index"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.end_index}
+               defaultValue={this.state.configuration.end_index}
                onChange={this._onChange('end_index')}
                min="0"
                required
