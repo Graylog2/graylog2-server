@@ -6,16 +6,11 @@
 * Install [node.js](http://nodejs.org/) and npm.
 * `cd javascript/`
 * `npm install`
-* `npm run watch`
-
-**_or_**
-* `npm run hot` for hot reloading.
+* `npm start
 
 * open http://localhost:8080
 
-The `npm run watch` command will run the `webpack --watch` task, which is continuously bundling JS whenever a source
-file changes.
-The `npm run hot` command will run the `webpack-dev-server` instead, which allows in-browser hot reloading.
+The `npm start` command will run the `webpack-dev-server`, which allows in-browser hot reloading.
 In order to make switching between different branches faster, we use a script to store all `node_modules` folders
 into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
 
