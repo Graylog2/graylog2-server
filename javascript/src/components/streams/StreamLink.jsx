@@ -1,15 +1,14 @@
-/* global jsRoutes */
+import React from 'react';
+import { Link } from 'react-router';
 
-'use strict';
+import Routes from 'routing/Routes';
 
-var React = require('react');
-
-var StreamLink = React.createClass({
-    render() {
-        var stream = this.props.stream;
-        var url = jsRoutes.controllers.StreamSearchController.index(stream.id, "*", "relative", 300).url;
-        return <a href={url}>{stream.title}</a>;
-    }
+const StreamLink = React.createClass({
+  render() {
+    const stream = this.props.stream;
+    const route = Routes.stream_search(stream.id, '*', 'relative', 300);
+    return <Link to={route}>{stream.title}</Link>;
+  },
 });
 
-module.exports = StreamLink;
+export default StreamLink;
