@@ -3,6 +3,7 @@
   "env": {
     "start": {
       "plugins": [
+        "react-auto-display-name",
         "react-transform"
       ],
       "extra": {
