@@ -126,6 +126,24 @@ const ExtractorsStore = Reflux.createStore({
     }
     return promise;
   },
+
+  delete(inputId, extractor) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.delete(inputId, extractor.id).url);
+
+    const promise = fetch('DELETE', url)
+      .then(() => {
+        UserNotification.success(`Extractor "${extractor.title}" deleted successfully`);
+        if (this.extractors) {
+          ExtractorsActions.list.triggerPromise(inputId);
+        }
+      })
+      .catch(error => {
+        UserNotification.error('Deleting extractor failed: ' + error,
+          `Could not delete extractor ${extractor.title}`);
+      });
+
+    ExtractorsActions.delete.promise(promise);
+  },
 });
 
 export default ExtractorsStore;

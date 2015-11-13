@@ -5,6 +5,7 @@ import numeral from 'numeral';
 
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
+import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import Routes from 'routing/Routes';
 
 const ExtractorsListItem = React.createClass({
@@ -23,7 +24,7 @@ const ExtractorsListItem = React.createClass({
   },
   _deleteExtractor() {
     if (window.confirm(`Really remove extractor "${this.props.extractor.title}?"`)) {
-      alert('Delete extractor');
+      ExtractorsActions.delete.triggerPromise(this.props.inputId, this.props.extractor);
     }
   },
   _formatExtractorSubtitle() {
