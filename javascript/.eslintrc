@@ -2,6 +2,7 @@
   "extends": "airbnb",
   "rules": {
     "no-else-return": 1,
+    "new-cap": 0,
   },
   "settings": {
     "import/resolve": {
