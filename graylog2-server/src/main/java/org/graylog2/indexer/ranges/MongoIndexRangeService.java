@@ -16,13 +16,17 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import org.bson.types.ObjectId;
@@ -47,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.SortedSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class MongoIndexRangeService implements IndexRangeService {
@@ -154,15 +160,33 @@ public class MongoIndexRangeService implements IndexRangeService {
     @Subscribe
     @AllowConcurrentEvents
     public void handleIndexReopening(IndicesReopenedEvent event) {
-        for (String index : event.indices()) {
+        for (final String index : event.indices()) {
             LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
 
             indices.waitForRecovery(index);
-            // F*ck my life. Seems like Elasticsearch is lying when it says that the cluster health state
-            // for this index is YELLOW (or GREEN) or is at least off by a few milliseconds. :-(
-            Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
 
-            final IndexRange indexRange = calculateRange(index);
+            final Retryer<IndexRange> retryer = RetryerBuilder.<IndexRange>newBuilder()
+                    .retryIfException()
+                    .withWaitStrategy(WaitStrategies.exponentialWait())
+                    .withStopStrategy(StopStrategies.stopAfterDelay(5, TimeUnit.MINUTES))
+                    .build();
+
+            final IndexRange indexRange;
+            try {
+                indexRange = retryer.call(new Callable<IndexRange>() {
+                    @Override
+                    public IndexRange call() throws Exception {
+                        return calculateRange(index);
+                    }
+                });
+            } catch (ExecutionException e) {
+                LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
+                throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
+            } catch (RetryException e) {
+                LOG.error("Couldn't calculate index range for index \"" + index + "\"", e);
+                throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
+            }
+
             save(indexRange);
         }
     }
