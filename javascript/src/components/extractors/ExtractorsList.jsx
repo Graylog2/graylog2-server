@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import {Row, Col} from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
@@ -30,6 +31,10 @@ const ExtractorsList = React.createClass({
       return <Spinner/>;
     }
 
+    const formattedExtractors = this.state.extractors
+      .sort((extractor1, extractor2) => naturalSort(extractor1.order, extractor2.order))
+      .map(this._formatExtractor);
+
     return (
       <div>
         <AddExtractorWizard inputId={this.props.input.input_id}/>
@@ -37,7 +42,7 @@ const ExtractorsList = React.createClass({
           <Col md={12}>
             <h2>Configured extractors</h2>
             <EntityList bsNoItemsStyle="info" noItemsText="This input has no configured extractors."
-                        items={this.state.extractors.map(this._formatExtractor)} />
+                        items={formattedExtractors}/>
           </Col>
         </Row>
       </div>
