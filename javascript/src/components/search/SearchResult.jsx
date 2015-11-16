@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 
 import SearchSidebar from './SearchSidebar';
 import ResultTable from './ResultTable';
-import LegacyHistogram from './LegacyHistogram';
+import { LegacyHistogram } from 'components/search';
 import FieldGraphs from './FieldGraphs';
 import FieldQuickValues from './FieldQuickValues';
 import FieldStatistics from './FieldStatistics';
@@ -102,7 +102,7 @@ const SearchResult = React.createClass({
     this.setState({selectedFields: selectedFields});
   },
   _fields() {
-    return this.props.result[this.state.showAllFields ? 'all_fields' : 'page_fields'];
+    return this.props.result[this.state.showAllFields ? 'all_fields' : 'fields'];
   },
 
   sortFields(fieldSet) {

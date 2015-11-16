@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 import jQuery from 'jquery';
 import moment from 'moment';
+import md5 from 'md5';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
@@ -48,6 +49,14 @@ const UniversalSearchStore = Reflux.createStore({
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
+      result.fields = response.fields.map((field) => {
+        return {
+          hash: md5(field),
+          name: field,
+          standard_selected: (field === 'message' || field === 'source'),
+        };
+      });
+
       result.messages = result.messages.map((messageSummary) => {
         const message = messageSummary.message;
         const newMessage = {

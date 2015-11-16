@@ -16,7 +16,7 @@ import SearchStore from 'stores/search/SearchStore';
 import NodesActions from 'actions/nodes/NodesActions';
 
 import { Spinner } from 'components/common';
-import { LegacyHistogram, ResultTable, SearchSidebar } from 'components/search';
+import { SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
   getInitialState() {
@@ -115,39 +115,18 @@ const SearchPage = React.createClass({
   },
 
   render() {
-    if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields) {
+    if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram) {
       return <Spinner />;
     }
     const searchResult = this.state.searchResult;
     searchResult.all_fields = this.state.fields;
     const selectedFields = this.sortFields(Immutable.List(this.state.selectedFields));
-    const histogram = (this.state.histogram ? <LegacyHistogram formattedHistogram={this._formatHistogram(this.state.histogram.results)}
-                                                               histogram={this.state.histogram}
-                                                               permissions={this.state.currentUser.permissions}
-                                                               isStreamSearch={false}/> : null);
     return (
-      <div id="main-content-search" className="row">
-        <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
-          <div ref="oma" id="sidebar-affix">
-            <SearchSidebar builtQuery={searchResult.built_query} fields={searchResult.all_fields} selectedFields={selectedFields}
-                           result={searchResult} permissions={this.state.currentUser.permissions} onFieldToggled={this._onToggled}/>
-
-          </div>
-        </div>
-        <div className="col-md-9 col-sm-12" id="main-content-sidebar">
-          {histogram}
-          <ResultTable messages={this.state.searchResult.messages}
-                       page={1}
-                       selectedFields={selectedFields}
-                       sortField={'source'}
-                       sortOrder={'asc'}
-                       resultCount={this.state.searchResult.total_results}
-                       inputs={this.state.inputs}
-                       streams={this.state.streams}
-                       nodes={Immutable.Map(this.state.nodes)}
-                       highlight={false} />
-        </div>
-      </div>
+      <SearchResult query={SearchStore.query} builtQuery={searchResult.built_query}
+                    result={searchResult} histogram={this.state.histogram}
+                    formattedHistogram={this._formatHistogram(this.state.histogram.results)}
+                    streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
+                    searchInStream={null} permissions={this.state.currentUser.permissions} />
     );
   },
 });
