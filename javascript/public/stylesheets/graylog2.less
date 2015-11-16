@@ -2603,3 +2603,35 @@ ul.pill-list > li {
   margin-top: 2px;
   margin-bottom: 2px;
 }
+
+.sortable-list {
+  cursor: move;
+
+  .dragging {
+    opacity: 0.5;
+  }
+  .over {
+    border: 1px dashed #8c8e86;
+  }
+
+  .sortable-list-item:first-child .list-group-item {
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+  }
+
+  .sortable-list-item:last-child .list-group-item {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    margin-bottom: 0;
+  }
+
+  .list-group-item:first-child {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+  }
+
+  .list-group-item:last-child {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}

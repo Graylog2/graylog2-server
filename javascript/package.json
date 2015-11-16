@@ -37,6 +37,8 @@
     "react-addons-pure-render-mixin": "0.14.x",
     "react-addons-test-utils": "0.14.x",
     "react-bootstrap": "0.27.x",
+    "react-dnd": "^2.0.2",
+    "react-dnd-html5-backend": "^2.0.0",
     "react-dom": "0.14.x",
     "react-router": "^1.0.0-rc1",
     "react-router-bootstrap": "^0.19.0",

@@ -1,12 +1,13 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Button} from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
 import ExtractorsListItem from './ExtractorsListItem';
+import ExtractorsSortModal from './ExtractorSortModal';
 
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
@@ -21,14 +22,29 @@ const ExtractorsList = React.createClass({
     ExtractorsActions.list.triggerPromise(this.props.input.input_id);
   },
   _formatExtractor(extractor) {
-    return <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.input_id} nodeId={this.props.node.node_id}/>;
+    return (
+      <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.input_id}
+                          nodeId={this.props.node.node_id}/>
+    );
   },
   _isLoading() {
     return !this.state.extractors;
   },
+  _openSortModal() {
+    this.refs.sortModal.open();
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
+    }
+
+    let sortExtractorsButton;
+    if (this.state.extractors.length > 1) {
+      sortExtractorsButton = (
+        <Button bsSize="xsmall" bsStyle="primary" className="pull-right" onClick={this._openSortModal}>
+          Sort extractors
+        </Button>
+      );
     }
 
     const formattedExtractors = this.state.extractors
@@ -40,11 +56,19 @@ const ExtractorsList = React.createClass({
         <AddExtractorWizard inputId={this.props.input.input_id}/>
         <Row className="content extractor-list">
           <Col md={12}>
-            <h2>Configured extractors</h2>
+            <Row className="row-sm">
+              <Col md={8}>
+                <h2>Configured extractors</h2>
+              </Col>
+              <Col md={4}>
+                {sortExtractorsButton}
+              </Col>
+            </Row>
             <EntityList bsNoItemsStyle="info" noItemsText="This input has no configured extractors."
                         items={formattedExtractors}/>
           </Col>
         </Row>
+        <ExtractorsSortModal ref="sortModal" input={this.props.input} extractors={this.state.extractors}/>
       </div>
     );
   },
