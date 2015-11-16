@@ -16,7 +16,7 @@ import ToolsStore from 'stores/tools/ToolsStore';
 
 import UIUtils from 'util/UIUtils';
 
-import { momentHelper } from 'legacy/moment-helper.js';
+import momentHelper from 'legacy/moment-helper.js';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap-datepicker.js');

@@ -78,7 +78,7 @@ const SearchSidebar = React.createClass({
     predefinedFieldSelection: React.PropTypes.func,
     result: React.PropTypes.object,
     searchInStream: React.PropTypes.object,
-    selectedFields: React.PropTypes.array,
+    selectedFields: React.PropTypes.object,
     shouldHighlight: React.PropTypes.bool,
     showAllFields: React.PropTypes.bool,
     showHighlightToggle: React.PropTypes.bool,
@@ -221,8 +221,8 @@ const SearchSidebar = React.createClass({
           </h2>
 
           <p style={{marginTop: 3}}>
-            Found <strong>{numeral(this.props.result.total_result_count).format('0,0')} messages</strong>&nbsp;
-            in {numeral(this.props.result.took_ms).format('0,0')} ms, searched in&nbsp;
+            Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>&nbsp;
+            in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
             <a href="#" onClick={this._showIndicesModal}>
               {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
             </a>.

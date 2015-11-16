@@ -2,7 +2,7 @@ import React from 'react';
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { Router, Route } from 'react-router';
+import { IndexRoute, Router, Route } from 'react-router';
 import {createHistory} from 'history';
 
 import Routes from 'routing/Routes';
@@ -39,6 +39,7 @@ const AppRouter = React.createClass({
       <Router history={createHistory()}>
         <Route path="/" component={App}>
           <Route component={AppWithSearchBar}>
+            <IndexRoute component={SearchPage}/>
             <Route path={Routes.SEARCH} component={SearchPage}/>
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>

@@ -66,6 +66,9 @@ const jsRoutes = {
         get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
+      MessageFieldsApiController: {
+        list: () => { return {url: '/system/fields'}; },
+      },
       NotificationsApiController: {
         delete: (type) => { return {url: '/system/notifications/' + type}; },
         list: () => { return {url: '/system/notifications'}; },
@@ -134,6 +137,9 @@ const jsRoutes = {
         regexReplaceTest: () => { return {url: '/tools/regex_replace_tester'};},
         splitAndIndexTest: () => { return {url: '/tools/split_and_index_tester'};},
         substringTest: () => { return {url: '/tools/substring_tester'};},
+      },
+      UniversalSearchApiController: {
+        search: (type, query) => { return {url: '/search/universal/' + type + '?query=' + query}; },
       },
       UsersApiController: {
         changePassword: (username) => { return {url: '/users/' + username + '/password'}; },

@@ -12,6 +12,8 @@ const MessageFieldSearchActions = React.createClass({
   getInitialState() {
     this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(this.props.message.source_node_id,
       this.props.message.source_input_id, this.props.fieldName, this.props.message.index, this.props.message.id);
+
+    return null;
   },
   _formatExtractorMenuItem(extractorType) {
     return (

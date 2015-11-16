@@ -1,12 +1,11 @@
-'use strict';
-
-var $ = require('jquery');
-
 var React = require('react');
 var ReactDOM = require('react-dom');
 var PageItem = require('react-bootstrap').PageItem;
 
 var SearchStore = require('../../stores/search/SearchStore');
+
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/bootstrap.min.js');
 
 var Page = React.createClass({
     render() {

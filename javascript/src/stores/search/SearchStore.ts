@@ -7,6 +7,7 @@
 import $ = require('jquery');
 import Immutable = require('immutable');
 import jsRoutes = require('routing/jsRoutes');
+const Routes = require('routing/Routes');
 var Qs = require('qs');
 var URLUtils = require('../../util/URLUtils');
 
@@ -306,9 +307,9 @@ class SearchStore {
     searchBaseLocation(action) {
         var location;
         if (this.searchInStream) {
-            location = jsRoutes.controllers.StreamSearchController[action](this.searchInStream.id).url;
+            location = Routes.stream_search(this.searchInStream.id);
         } else {
-            location = jsRoutes.controllers.SearchController[action]().url;
+            location = Routes.SEARCH;
         }
         return location;
     }

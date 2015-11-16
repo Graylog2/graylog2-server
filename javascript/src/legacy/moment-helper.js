@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 
-export default {
+const momentHelper = {
     DATE_FORMAT_NO_MS: "YYYY-MM-DD HH:mm:ss",
     DATE_FORMAT: "YYYY-MM-DD HH:mm:ss.SSS",
     DATE_FORMAT_TZ_NO_MS: "YYYY-MM-DD HH:mm:ss Z",
@@ -67,5 +67,7 @@ export default {
             return "isoWeek"; // Weeks should start on Monday :)
         }
         return resolution;
-    }
+    },
 };
+
+export default momentHelper;
