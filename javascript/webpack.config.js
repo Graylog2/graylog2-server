@@ -83,6 +83,6 @@ if (TARGET === 'build') {
   });
 }
 
-if (TARGET === undefined) {
+if (TARGET !== 'build' && TARGET !== 'start') {
   module.exports = webpackConfig;
 }
