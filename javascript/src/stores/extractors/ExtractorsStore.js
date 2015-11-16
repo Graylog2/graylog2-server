@@ -144,6 +144,26 @@ const ExtractorsStore = Reflux.createStore({
 
     ExtractorsActions.delete.promise(promise);
   },
+
+  order(inputId, orderedExtractors) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.order(inputId).url);
+    const orderedExtractorsMap = {};
+    orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
+
+    const promise = fetch('POST', url, {order: orderedExtractorsMap});
+    promise.then(() => {
+      UserNotification.success('Extractor positions updated successfully');
+      if (this.extractors) {
+        ExtractorsActions.list.triggerPromise(inputId);
+      }
+    });
+    promise.catch(error => {
+      UserNotification.error('Changing extractor positions failed: ' + error,
+        'Could not update extractor positions');
+    });
+
+    ExtractorsActions.order.promise(promise);
+  },
 });
 
 export default ExtractorsStore;
