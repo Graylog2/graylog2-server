@@ -140,6 +140,8 @@ const jsRoutes = {
       },
       UniversalSearchApiController: {
         search: (type, query) => { return {url: '/search/universal/' + type + '?query=' + query}; },
+        histogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/histogram?query=' + query + '&interval=' + interval}; },
+        fieldHistogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/fieldHistogram?query=' + query + '&interval=' + interval}; },
       },
       UsersApiController: {
         changePassword: (username) => { return {url: '/users/' + username + '/password'}; },

@@ -10,6 +10,8 @@ var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 
 var SearchStore = require('../../stores/search/SearchStore');
 
+import resultHistogram from 'legacy/result-histogram';
+
 // Hue-manatee. We tried to be sorry, but aren't.
 var LegacyHistogram = React.createClass({
     RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],

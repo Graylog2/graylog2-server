@@ -25,8 +25,8 @@ const SearchResult = React.createClass({
   propTypes: {
     query: PropTypes.string,
     builtQuery: PropTypes.string,
-    result: PropTypes.object,
-    histogram: PropTypes.object,
+    result: PropTypes.object.isRequired,
+    histogram: PropTypes.object.isRequired,
     formattedHistogram: PropTypes.array,
     searchInStream: PropTypes.object,
     streams: PropTypes.instanceOf(Immutable.Map),
@@ -52,8 +52,6 @@ const SearchResult = React.createClass({
     return {
       query: '*',
       builtQuery: '',
-      result: {},
-      histogram: {},
       formattedHistogram: [],
       searchInStream: null,
       streams: Immutable.Map({}),

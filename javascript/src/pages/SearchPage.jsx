@@ -2,7 +2,9 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
+import moment from 'moment';
 
+import CurrentUserStore from 'stores/users/CurrentUserStore';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
 import NodesStore from 'stores/nodes/NodesStore';
@@ -14,7 +16,7 @@ import SearchStore from 'stores/search/SearchStore';
 import NodesActions from 'actions/nodes/NodesActions';
 
 import { Spinner } from 'components/common';
-import { ResultTable, SearchSidebar } from 'components/search';
+import { LegacyHistogram, ResultTable, SearchSidebar } from 'components/search';
 
 const SearchPage = React.createClass({
   getInitialState() {
@@ -22,11 +24,17 @@ const SearchPage = React.createClass({
       selectedFields: ['message', 'source'],
     };
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore)],
+  mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore), Reflux.connect(CurrentUserStore)],
   componentDidMount() {
     const query = SearchStore.query.length > 0 ? SearchStore.query : '*';
     UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS()).then((response) => {
       this.setState({searchResult: response});
+
+      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
+
+      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval).then((histogram) => {
+        this.setState({histogram: histogram});
+      });
     });
     InputsStore.list((inputs) => {
       const inputsMap = {};
@@ -41,6 +49,45 @@ const SearchPage = React.createClass({
     });
 
     NodesActions.list();
+  },
+  _determineHistogramResolution(response) {
+    let queryRangeInMinutes;
+    if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
+      const oldestIndex = Object.keys(response.used_indices)
+        .map((key) => response.used_indices[key])
+        .sort((i1, i2) => moment(i1.end).isAfter(i2.end))[0];
+      queryRangeInMinutes = moment(response.to).diff(oldestIndex.begin, 'minutes');
+    } else {
+      queryRangeInMinutes = moment(response.to).diff(response.from, 'minutes');
+    }
+
+    const duration = moment.duration(queryRangeInMinutes, 'minutes');
+
+    if (duration.hours() < 12) {
+      return 'minute';
+    }
+
+    if (duration.days() < 2) {
+      return 'hour';
+    }
+
+    if (duration.days() < 30) {
+      return 'day';
+    }
+
+    if (duration.days() < 6*30) {
+      return 'week';
+    }
+
+    if (duration.days() < 2*365) {
+      return 'month';
+    }
+
+    if (duration.days() < 10*365) {
+      return 'quarter';
+    }
+
+    return 'year';
   },
   sortFields(fieldSet) {
     let newFieldSet = fieldSet;
@@ -61,6 +108,11 @@ const SearchPage = React.createClass({
       this.setState({selectedFields: this.state.selectedFields.concat(fieldName)});
     }
   },
+  _formatHistogram(results) {
+    return Object.keys(results).map((key) => {
+      return {x: Number(key), y: results[key]};
+    });
+  },
 
   render() {
     if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields) {
@@ -69,16 +121,21 @@ const SearchPage = React.createClass({
     const searchResult = this.state.searchResult;
     searchResult.all_fields = this.state.fields;
     const selectedFields = this.sortFields(Immutable.List(this.state.selectedFields));
+    const histogram = (this.state.histogram ? <LegacyHistogram formattedHistogram={this._formatHistogram(this.state.histogram.results)}
+                                                               histogram={this.state.histogram}
+                                                               permissions={this.state.currentUser.permissions}
+                                                               isStreamSearch={false}/> : null);
     return (
       <div id="main-content-search" className="row">
         <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
           <div ref="oma" id="sidebar-affix">
             <SearchSidebar builtQuery={searchResult.built_query} fields={searchResult.all_fields} selectedFields={selectedFields}
-                           result={searchResult} permissions={['*']} onFieldToggled={this._onToggled}/>
+                           result={searchResult} permissions={this.state.currentUser.permissions} onFieldToggled={this._onToggled}/>
 
           </div>
         </div>
         <div className="col-md-9 col-sm-12" id="main-content-sidebar">
+          {histogram}
           <ResultTable messages={this.state.searchResult.messages}
                        page={1}
                        selectedFields={selectedFields}

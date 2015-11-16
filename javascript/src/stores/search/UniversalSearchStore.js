@@ -43,7 +43,7 @@ const UniversalSearchStore = Reflux.createStore({
     return result;
   },
   search(type, query, timerange) {
-    const parameters = Object.keys(timerange).map((key) => key + '=' + timerange[key]);
+    const parameters = Object.keys(timerange).map((key) => key === 'relative' ? 'range=' + timerange[key] : key + '=' + timerange[key]);
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query).url + '&' + parameters);
 
     return fetch('GET', url).then((response) => {
@@ -66,6 +66,16 @@ const UniversalSearchStore = Reflux.createStore({
       });
 
       return result;
+    });
+  },
+  histogram(type, query, timerange, interval) {
+    const parameters = Object.keys(timerange).map((key) => key === 'relative' ? 'range=' + timerange[key] : key + '=' + timerange[key]);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval).url
+        + '&' + parameters);
+
+    return fetch('GET', url).then((response) => {
+      response.histogram_boundaries = response.queried_timerange;
+      return response;
     });
   },
 });
