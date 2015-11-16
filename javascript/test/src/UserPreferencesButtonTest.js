@@ -1,10 +1,9 @@
 import PreferencesStore from 'stores/users/PreferencesStore';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 import UserPreferencesModal from 'components/users/UserPreferencesModal';
-import React from 'react/addons';
+import React from 'react';
+import ReactTestUtils from 'react-addons-test-utils';
 import $ from 'jquery';
-
-const ReactTestUtils = React.addons.TestUtils;
 
 describe('UserPreferencesButton', function () {
     it('should load user data when user clicks edit button', function () {
@@ -22,7 +21,7 @@ describe('UserPreferencesButton', function () {
         );
         var input = ReactTestUtils.findRenderedDOMComponentWithTag(instance, 'button');
 
-        ReactTestUtils.Simulate.click(input.getDOMNode());
+        ReactTestUtils.Simulate.click(input);
         expect(PreferencesStore.loadUserPreferences).toHaveBeenCalledWith(userName, jasmine.any(Function));
     });
 });
