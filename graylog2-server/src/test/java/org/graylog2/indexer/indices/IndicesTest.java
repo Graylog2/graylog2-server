@@ -78,7 +78,7 @@ public class IndicesTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG, new IndexMapping(client));
+        indices = new Indices(client, CONFIG, new IndexMapping());
     }
 
     @Test
