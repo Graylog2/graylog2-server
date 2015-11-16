@@ -18,20 +18,12 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.client.Client;
-import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Tools;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Representing the message type mapping in ElasticSearch. This is giving ES more
@@ -40,24 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
-
-    private final Client client;
-
-    @Inject
-    public IndexMapping(Client client) {
-        this.client = checkNotNull(client);
-    }
-
-    public ActionFuture<PutMappingResponse> createMapping(final String index, final String type, final Map<String, Object> mapping) {
-        return client.admin().indices().putMapping(mappingRequest(index, type, mapping));
-    }
-
-    private PutMappingRequest mappingRequest(final String index, final String type, final Map<String, Object> mapping) {
-        return client.admin().indices().preparePutMapping(index)
-                .setType(type)
-                .setSource(ImmutableMap.of(type, mapping))
-                .request();
-    }
 
     public Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(

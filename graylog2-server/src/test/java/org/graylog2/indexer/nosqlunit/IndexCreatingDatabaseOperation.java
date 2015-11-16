@@ -51,7 +51,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping(client));
+            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping());
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }

@@ -37,7 +37,6 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRespon
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
@@ -220,17 +219,14 @@ public class Indices implements IndexManagement {
                 "number_of_shards", configuration.getShards(),
                 "number_of_replicas", configuration.getReplicas(),
                 "index.analysis.analyzer.analyzer_keyword", keywordLowercase);
-
-        final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName).setSettings(settings).request();
-        if (!c.admin().indices().create(cir).actionGet().isAcknowledged()) {
-            return false;
-        }
-
         final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
-        final PutMappingResponse messageMappingResponse =
-                indexMapping.createMapping(indexName, IndexMapping.TYPE_MESSAGE, messageMapping).actionGet();
 
-        return messageMappingResponse.isAcknowledged();
+        final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
+                .setSettings(settings)
+                .addMapping(IndexMapping.TYPE_MESSAGE, messageMapping)
+                .request();
+
+        return c.admin().indices().create(cir).actionGet().isAcknowledged();
     }
 
     public Set<String> getAllMessageFields() {
