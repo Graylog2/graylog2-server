@@ -1,5 +1,8 @@
+import Rickshaw from 'rickshaw';
+
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
-Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
+
+const Graylog2Selector = Rickshaw.Class.create({
 
     initialize: function (args) {
         var graph = args.graph;
@@ -147,3 +150,5 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
 
 });
 
+Rickshaw.Graph.Graylog2Selector = Graylog2Selector;
+export default Graylog2Selector;

@@ -1,4 +1,11 @@
-resultHistogram = {
+import Rickshaw from 'rickshaw';
+import rickshawHelper from 'legacy/rickshaw-helper';
+import momentHelper from 'legacy/moment-helper';
+import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
+import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
+import numeral from 'numeral';
+
+const resultHistogram = {
     _histogram: [],
     _histogramContainer: $("#result-graph"),
     _yAxis: $("#y_axis"),
@@ -94,7 +101,7 @@ resultHistogram = {
             element: this._graphTimeline[0]
         });
 
-        fillAlertAnnotator(resultGraph, annotator);
+        /*fillAlertAnnotator(resultGraph, annotator);*/
 
         resultGraph.render();
 
@@ -111,9 +118,4 @@ resultHistogram = {
     }
 };
 
-$(document).ready(function() {
-    if (typeof resultHistogramData != "undefined") {
-        resultHistogram.setData(resultHistogramData);
-        resultHistogram.drawResultGraph();
-    }
-});
+export default resultHistogram;

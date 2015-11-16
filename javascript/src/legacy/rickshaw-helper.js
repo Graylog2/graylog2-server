@@ -1,6 +1,10 @@
+import Rickshaw from 'rickshaw';
+import moment from 'moment';
+import momentHelper from 'legacy/moment-helper';
+
 // We need to override Rickshaw _frequentInterval detection for bar charts due to this issue:
 // https://github.com/shutterstock/rickshaw/issues/461
-SmartResolutionBarRenderer = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Bar, {
+const SmartResolutionBarRenderer = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Bar, {
     defaults: function($super) {
 
         var defaults = Rickshaw.extend( $super(), {
@@ -25,7 +29,7 @@ SmartResolutionBarRenderer = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Bar, 
     }
 });
 
-rickshawHelper = {
+const rickshawHelper = {
     getRenderer: function (renderer) {
         if (renderer == "bar") {
             return SmartResolutionBarRenderer;
@@ -108,3 +112,5 @@ rickshawHelper = {
         }
     }
 };
+
+export default rickshawHelper;

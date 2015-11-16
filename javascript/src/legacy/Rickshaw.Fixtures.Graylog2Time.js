@@ -1,6 +1,9 @@
+import Rickshaw from 'rickshaw';
+import graphHelper from 'legacy/graphHelper';
+
 Rickshaw.namespace('Rickshaw.Fixtures.Graylog2Time');
 
-Rickshaw.Fixtures.Graylog2Time = function() {
+const Graylog2Time = function() {
 
 	var self = this;
 
@@ -121,3 +124,7 @@ Rickshaw.Fixtures.Graylog2Time = function() {
 		return Math.ceil(time / unit.seconds) * unit.seconds;
 	};
 };
+
+Rickshaw.Fixtures.Graylog2Time = Graylog2Time;
+
+export default Graylog2Time;
