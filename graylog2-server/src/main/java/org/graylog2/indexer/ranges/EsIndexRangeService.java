@@ -17,7 +17,6 @@
 package org.graylog2.indexer.ranges;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -25,7 +24,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.primitives.Ints;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetRequestBuilder;
@@ -36,12 +34,9 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
-import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +46,6 @@ import javax.inject.Singleton;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 
@@ -63,18 +57,15 @@ public class EsIndexRangeService implements IndexRangeService {
     private final LoadingCache<String, IndexRange> cache;
     private final Client client;
     private final Deflector deflector;
-    private final Indices indices;
 
     @Inject
     public EsIndexRangeService(Client client,
                                Deflector deflector,
-                               Indices indices,
                                EventBus eventBus,
                                @ClusterEventBus EventBus clusterEventBus,
                                MetricRegistry metricRegistry) {
         this.client = requireNonNull(client);
         this.deflector = requireNonNull(deflector);
-        this.indices = requireNonNull(indices);
 
         final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
             @Override
@@ -190,13 +181,7 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange calculateRange(String index) {
-        final Stopwatch sw = Stopwatch.createStarted();
-        final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final TimestampStats stats = indices.timestampStatsOfIndex(index);
-        final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
-
-        LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
-        return EsIndexRange.create(index, stats.min(), stats.max(), now, duration);
+        throw new UnsupportedOperationException();
     }
 
     @Override
