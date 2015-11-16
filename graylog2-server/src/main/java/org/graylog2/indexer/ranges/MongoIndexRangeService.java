@@ -22,6 +22,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import org.bson.types.ObjectId;
@@ -155,6 +156,12 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void handleIndexReopening(IndicesReopenedEvent event) {
         for (String index : event.indices()) {
             LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
+
+            indices.waitForRecovery(index);
+            // F*ck my life. Seems like Elasticsearch is lying when it says that the cluster health state
+            // for this index is YELLOW (or GREEN) or is at least off by a few milliseconds. :-(
+            Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
+
             final IndexRange indexRange = calculateRange(index);
             save(indexRange);
         }
