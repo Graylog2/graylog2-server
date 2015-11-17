@@ -3,6 +3,8 @@ import InputDropdown from 'components/inputs/InputDropdown';
 import InputsStore from 'stores/inputs/InputsStore';
 import UserNotification from 'util/UserNotification';
 
+import UniversalSearchStore from 'stores/search/UniversalSearchStore';
+
 const RecentMessageLoader = React.createClass({
   propTypes: {
     inputs: PropTypes.object,
@@ -15,10 +17,15 @@ const RecentMessageLoader = React.createClass({
       UserNotification.error('Invalid input selected: ' + inputId,
         'Could not load message from invalid Input ' + inputId);
     }
-    InputsStore.globalRecentMessage(input, (message) => {
-      message.source_input_id = input.input_id;
-      this.props.onMessageLoaded(message);
-    });
+    UniversalSearchStore.search('relative', 'gl2_source_input:' + inputId + ' OR gl2_source_radio_input:' + inputId, { range: 0 })
+      .then((response) => {
+        if (response.total_results > 0) {
+          this.props.onMessageLoaded(response.messages[0]);
+        } else {
+          UserNotification.error('Input did not return a recent message.');
+          this.props.onMessageLoaded(undefined);
+        }
+      });
   },
   render() {
     let helpMessage;

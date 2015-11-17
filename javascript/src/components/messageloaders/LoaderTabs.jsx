@@ -3,6 +3,7 @@ import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import InputsStore from 'stores/inputs/InputsStore';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 import RecentMessageLoader from './RecentMessageLoader';
 import MessageShow from 'components/search/MessageShow';
@@ -29,11 +30,6 @@ const LoaderTabs = React.createClass({
     }
   },
   onMessageLoaded(message) {
-    if (!message.formatted_fields) {
-      message.formatted_fields = {};
-    }
-    message.formatted_fields.timestamp = message.timestamp;
-    message.fields._id = message.id;
     this.setState({message: message});
     if (this.props.onMessageLoaded) {
       this.props.onMessageLoaded(message);
@@ -47,6 +43,11 @@ const LoaderTabs = React.createClass({
       });
       this.setState({inputs: Immutable.Map(inputs)});
     });
+    StreamsStore.listStreams().then((response) => {
+      const streams = {};
+      response.forEach((stream) => { streams[stream.id] = stream });
+      this.setState({streams: Immutable.Map(streams)});
+    });
   },
   render() {
     let displayMessage;
@@ -54,6 +55,7 @@ const LoaderTabs = React.createClass({
       displayMessage = (
         <Col md={12}>
           <MessageShow message={this.state.message} inputs={this.state.inputs}
+                       streams={this.state.streams}
                        disableTestAgainstStream
                        disableFieldActions={!this.props.customFieldActions}
                        customFieldActions={this.props.customFieldActions}/>

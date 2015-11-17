@@ -34,9 +34,13 @@ const StreamRulesEditor = React.createClass({
   },
   onMessageLoaded(message) {
     this.setState({message: message});
-    StreamsStore.testMatch(this.props.params.streamId, {message: message.fields}, (resultData) => {
-      this.setState({matchData: resultData});
-    });
+    if (message !== undefined) {
+      StreamsStore.testMatch(this.props.params.streamId, {message: message.fields}, (resultData) => {
+        this.setState({matchData: resultData});
+      });
+    } else {
+      this.setState({matchData: undefined});
+    }
   },
   render() {
     const styles = (this.state.matchData ? this._getListClassName(this.state.matchData) : 'info');

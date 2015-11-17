@@ -21,12 +21,11 @@ var MessagesStore = {
         var url = jsRoutes.controllers.MessagesController.single(index.trim(), messageId.trim()).url;
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
             .then(response => {
-                // TODO: We need to fix this
-                const tempMessage = response.message;
-                tempMessage.id = tempMessage._id;
-                tempMessage.index = response.index;
-                tempMessage.fields = [];
-                return tempMessage;
+              return {
+                id: messageId,
+                fields: response.message,
+                index: response.index,
+              };
             })
             .catch(errorThrown => {
                 UserNotification.error("Loading message information failed with status: " + errorThrown,

@@ -111,6 +111,7 @@ const jsRoutes = {
         delete: (streamId) => { return {url: '/streams/' + streamId}; },
         pause: (streamId) => { return {url: '/streams/' + streamId + '/pause'}; },
         resume: (streamId) => { return {url: '/streams/' + streamId + '/resume'}; },
+        testMatch: (streamId) => { return {url: '/streams/' + streamId + '/testMatch'}; },
       },
       StreamOutputsApiController: {
         add: (streamId) => { return {url: '/streams/' + streamId + '/outputs'}; },
