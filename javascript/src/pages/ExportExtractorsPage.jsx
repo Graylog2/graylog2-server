@@ -6,7 +6,7 @@ import ExportExtractors from 'components/extractors/ExportExtractors';
 
 import InputsStore from 'stores/inputs/InputsStore';
 
-const ExtractorsPage = React.createClass({
+const ExportExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
@@ -40,4 +40,4 @@ const ExtractorsPage = React.createClass({
   },
 });
 
-export default ExtractorsPage;
+export default ExportExtractorsPage;
