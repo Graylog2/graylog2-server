@@ -63,10 +63,10 @@ class DashboardStore {
 
   updateWritableDashboards() {
     const permissions = CurrentUserStore.get().permissions;
-    const dashboards = new Map();
+    const dashboards = {};
     this.updateDashboards();
     this.getWritableDashboardList(permissions).forEach((dashboard) => {
-      dashboards.set(dashboard.id, dashboard);
+      dashboards[dashboard.id] = dashboard;
     });
     this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards);
   }
