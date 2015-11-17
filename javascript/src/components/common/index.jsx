@@ -1,4 +1,5 @@
 export ChosenSelectInput from './ChosenSelectInput';
+export ClipboardButton from './ClipboardButton';
 export DataFilter from './DataFilter';
 export DataTable from './DataTable';
 export EntityList from './EntityList';
@@ -10,6 +11,8 @@ export MultiSelect from './MultiSelect';
 export PageHeader from './PageHeader';
 export PaginatedList from './PaginatedList';
 export Select from './Select';
+export SortableList from './SortableList';
+export SortableListItem from './SortableListItem';
 export Spinner from './Spinner';
 export TableList from './TableList';
 export TimezoneSelect from './TimezoneSelect';
