@@ -3,6 +3,7 @@ import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import ExtractorUtils from 'util/ExtractorUtils';
+import Promise from 'bluebird';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -40,11 +41,11 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   list(inputId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')))
-      .then(response => {
-        this.extractors = response.extractors;
-        this.trigger({extractors: this.extractors});
-      });
+    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
+    promise.then(response => {
+      this.extractors = response.extractors;
+      this.trigger({extractors: this.extractors});
+    });
 
     ExtractorsActions.list.promise(promise);
   },
@@ -64,11 +65,11 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   get(inputId, extractorId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)))
-      .then(response => {
-        this.extractor = response;
-        this.trigger({extractor: this.extractor});
-      });
+    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
+    promise.then(response => {
+      this.extractor = response;
+      this.trigger({extractor: this.extractor});
+    });
 
     ExtractorsActions.get.promise(promise);
   },
@@ -85,10 +86,14 @@ const ExtractorsStore = Reflux.createStore({
     ExtractorsActions.save.promise(promise);
   },
 
-  create(inputId, extractor, calledFromMethod) {
+  _silentExtractorCreate(inputId, extractor) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.create(inputId).url);
+    return fetch('POST', url, getExtractorDTO(extractor));
+  },
 
-    const promise = fetch('POST', url, getExtractorDTO(extractor))
+  create(inputId, extractor, calledFromMethod) {
+    const promise = this._silentExtractorCreate(inputId, extractor);
+    promise
       .then(() => {
         UserNotification.success(`Extractor ${extractor.title} created successfully`);
         if (this.extractor) {
@@ -109,7 +114,8 @@ const ExtractorsStore = Reflux.createStore({
   update(inputId, extractor, calledFromMethod) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.update(inputId, extractor.id).url);
 
-    const promise = fetch('PUT', url, getExtractorDTO(extractor))
+    const promise = fetch('PUT', url, getExtractorDTO(extractor));
+    promise
       .then(() => {
         UserNotification.success(`Extractor "${extractor.title}" updated successfully`);
         if (this.extractor) {
@@ -130,7 +136,8 @@ const ExtractorsStore = Reflux.createStore({
   delete(inputId, extractor) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.delete(inputId, extractor.id).url);
 
-    const promise = fetch('DELETE', url)
+    const promise = fetch('DELETE', url);
+    promise
       .then(() => {
         UserNotification.success(`Extractor "${extractor.title}" deleted successfully`);
         if (this.extractors) {
@@ -163,6 +170,30 @@ const ExtractorsStore = Reflux.createStore({
     });
 
     ExtractorsActions.order.promise(promise);
+  },
+
+  import(inputId, extractors) {
+    let successfulImports = 0;
+    let failedImports = 0;
+    const promises = [];
+
+    extractors.forEach((extractor) => {
+      const promise = this._silentExtractorCreate(inputId, extractor);
+      promise
+        .then(() => successfulImports++)
+        .catch(() => failedImports++);
+      promises.push(promise);
+    });
+
+    Promise.settle(promises).then(() => {
+      if (failedImports === 0) {
+        UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
+          'Import operation successful');
+      } else {
+        UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
+          'Import operation completed');
+      }
+    });
   },
 });
 
