@@ -4,7 +4,7 @@ import React from 'react';
 import { Input } from 'react-bootstrap';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
-import DashboardStore from '../../stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 
 const EditDashboardModal = React.createClass({
   propTypes: {
@@ -49,7 +49,7 @@ const EditDashboardModal = React.createClass({
     let promise;
 
     if (this._isCreateModal()) {
-      promise = DashboardStore.createDashboard(this.state.title, this.state.description);
+      promise = DashboardsStore.createDashboard(this.state.title, this.state.description);
       promise.done((id) => {
         this.close();
 
@@ -60,7 +60,7 @@ const EditDashboardModal = React.createClass({
         this.setState(this.getInitialState());
       });
     } else {
-      promise = DashboardStore.saveDashboard(this.state);
+      promise = DashboardsStore.saveDashboard(this.state);
       promise.done(() => {
         this.close();
 

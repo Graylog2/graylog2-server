@@ -2,7 +2,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -21,13 +21,13 @@ const DashboardListPage = React.createClass({
   getInitialState() {
     return {
       dashboardsLoaded: false,
-      dashboards: DashboardStore.dashboards,
+      dashboards: DashboardsStore.dashboards,
       filteredDashboards: Immutable.List(),
     };
   },
   componentDidMount() {
-    DashboardStore.addOnDashboardsChangedCallback(this._onDashboardsChange);
-    DashboardStore.updateDashboards();
+    DashboardsStore.addOnDashboardsChangedCallback(this._onDashboardsChange);
+    DashboardsStore.updateDashboards();
   },
   _onDashboardsChange(dashboards) {
     if (!this.isMounted()) {

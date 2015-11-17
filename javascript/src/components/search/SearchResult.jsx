@@ -14,7 +14,7 @@ import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Widget from 'components/widgets/Widget';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import SearchStore from 'stores/search/SearchStore';
 import DocsHelper from 'util/DocsHelper';
 
@@ -65,7 +65,7 @@ const SearchResult = React.createClass({
   componentDidMount() {
     this._updateWidth();
     this._initializeAffix();
-    DashboardStore.updateWritableDashboards();
+    DashboardsStore.updateWritableDashboards();
     $(window).on('resize', this._resizeCallback);
   },
 

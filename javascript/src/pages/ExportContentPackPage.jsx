@@ -3,7 +3,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 
 import UserNotification from 'util/UserNotification';
 
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
 import InputsStore from 'stores/inputs/InputsStore';
 import OutputsStore from 'stores/outputs/OutputsStore';
@@ -18,7 +18,7 @@ const ExportContentPackPage = React.createClass({
     return {};
   },
   componentDidMount() {
-    DashboardStore.listDashboards().then((dashboards) => {
+    DashboardsStore.listDashboards().then((dashboards) => {
       this.setState({dashboards: dashboards});
     });
     GrokPatternsStore.loadPatterns((grokPatterns) => {

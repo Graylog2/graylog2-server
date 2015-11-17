@@ -7,7 +7,7 @@ import { MenuItem } from 'react-bootstrap';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from '../../util/PermissionsMixin';
 
-import DashboardStore from '../../stores/dashboard/DashboardStore';
+import DashboardsStore from '../../stores/dashboards/DashboardsStore';
 
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
@@ -62,7 +62,7 @@ const Dashboard = React.createClass({
   },
   _onDashboardDelete() {
     if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
-      DashboardStore.remove(this.props.dashboard);
+      DashboardsStore.remove(this.props.dashboard);
     }
   },
 });

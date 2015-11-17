@@ -6,7 +6,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 
 import StreamsStore from 'stores/streams/StreamsStore';
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import RolesStore from 'stores/users/RolesStore';
 import UsersStore from 'stores/users/UsersStore';
@@ -35,7 +35,7 @@ const UserForm = React.createClass({
         streams: streams.sort((s1, s2) => s1.title.localeCompare(s2.title)),
       });
     });
-    DashboardStore.listDashboards().then((dashboards) => {
+    DashboardsStore.listDashboards().then((dashboards) => {
       this.setState({dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title))});
     });
     RolesStore.loadRoles().then((response) => {

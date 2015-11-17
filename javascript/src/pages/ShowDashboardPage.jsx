@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import FocusStore from 'stores/tools/FocusStore';
 import WidgetsStore from 'stores/widgets/WidgetsStore';
 
@@ -31,7 +31,7 @@ const ShowDashboardPage = React.createClass({
     };
   },
   loadData() {
-    DashboardStore.get(this.props.params.dashboardId)
+    DashboardsStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
         if (this.isMounted()) {
           this.setState({dashboard: dashboard});
@@ -104,7 +104,7 @@ const ShowDashboardPage = React.createClass({
     });
     const dashboard = this.state.dashboard;
 
-    DashboardStore.updatePositions(dashboard, positions);
+    DashboardsStore.updatePositions(dashboard, positions);
   },
   _toggleFullscreen() {
     const element = document.documentElement;

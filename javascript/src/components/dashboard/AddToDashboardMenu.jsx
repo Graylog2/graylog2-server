@@ -6,19 +6,19 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import WidgetCreationModal from 'components/widgets/WidgetCreationModal';
 import EditDashboardModal from 'components/dashboard/EditDashboardModal';
 
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import WidgetStore from 'stores/widgets/WidgetsStore';
 
 const AddToDashboardMenu = React.createClass({
   mixins: [PermissionsMixin],
   getInitialState() {
     return {
-      dashboards: DashboardStore.writableDashboards,
+      dashboards: DashboardsStore.writableDashboards,
       selectedDashboard: '',
     };
   },
   componentDidMount() {
-    DashboardStore.addOnWritableDashboardsChangedCallback(dashboards => {
+    DashboardsStore.addOnWritableDashboardsChangedCallback(dashboards => {
       if (this.isMounted()) {
         this.setState({dashboards: dashboards});
       }

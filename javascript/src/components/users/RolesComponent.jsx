@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
 import StreamsStore from 'stores/streams/StreamsStore';
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import RolesStore from 'stores/users/RolesStore';
 
 import UserNotification from 'util/UserNotification';
@@ -23,7 +23,7 @@ const RolesComponent = React.createClass({
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({streams: Immutable.List(streams)}));
-    DashboardStore.listDashboards().then(dashboards => this.setState({dashboards: dashboards}));
+    DashboardsStore.listDashboards().then(dashboards => this.setState({dashboards: dashboards}));
   },
 
   loadRoles() {

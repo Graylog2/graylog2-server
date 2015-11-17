@@ -16,7 +16,7 @@ interface Dashboard {
   content_pack: string;
 }
 
-class DashboardStore {
+class DashboardsStore {
   private _writableDashboards: Immutable.Map<string, Dashboard>;
   private _dashboards: Immutable.List<Dashboard>;
   private _onWritableDashboardsChanged: {(dashboards: Immutable.Map<string, Dashboard>): void; }[] = [];
@@ -185,5 +185,5 @@ class DashboardStore {
   }
 }
 
-const dashboardStore = new DashboardStore();
-export = dashboardStore;
+const dashboardsStore = new DashboardsStore();
+export = dashboardsStore;

@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import moment from 'moment';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardStore from 'stores/dashboard/DashboardStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
 import NodesStore from 'stores/nodes/NodesStore';
@@ -50,7 +50,7 @@ const SearchPage = React.createClass({
     });
 
     NodesActions.list();
-    DashboardStore.updateWritableDashboards();
+    DashboardsStore.updateWritableDashboards();
   },
   _determineHistogramResolution(response) {
     let queryRangeInMinutes;
