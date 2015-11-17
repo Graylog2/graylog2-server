@@ -6,6 +6,8 @@ import UserNotification = require("util/UserNotification");
 import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require("../../util/URLUtils");
 const fetch = require('logic/rest/FetchProvider').default;
+const PermissionsMixin = require('util/PermissionsMixin');
+const CurrentUserStore = require('stores/users/CurrentUserStore');
 
 interface Dashboard {
   id: string;
@@ -60,8 +62,13 @@ class DashboardStore {
   }
 
   updateWritableDashboards() {
-    const promise = this.getWritableDashboardList();
-    promise.done((dashboards) => this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards));
+    const permissions = CurrentUserStore.get().permissions;
+    const dashboards = new Map();
+    this.updateDashboards();
+    this.getWritableDashboardList(permissions).forEach((dashboard) => {
+      dashboards.set(dashboard.id, dashboard);
+    });
+    this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards);
   }
 
   updateDashboards() {
@@ -89,16 +96,8 @@ class DashboardStore {
     return promise;
   }
 
-  getWritableDashboardList(): JQueryPromise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.listWritable().url);
-    const promise = fetch('GET', url);
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Loading your dashboard list failed with status: " + errorThrown,
-          "Could not load your dashboard list");
-      }
-    });
-    return promise;
+  getWritableDashboardList(permissions: Array<string>): Array<Dashboard> {
+    return this.dashboards.toArray().filter((dashboard) => PermissionsMixin.isPermitted(permissions, 'dashboards:edit:' + dashboard.id));
   }
 
   get(id : string): JQueryPromise<Dashboard> {

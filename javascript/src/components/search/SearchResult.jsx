@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
@@ -18,6 +17,9 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DashboardStore from 'stores/dashboard/DashboardStore';
 import SearchStore from 'stores/search/SearchStore';
 import DocsHelper from 'util/DocsHelper';
+
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/bootstrap.min.js');
 
 let resizeMutex;
 
@@ -154,7 +156,7 @@ const SearchResult = React.createClass({
     const anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
     // short circuit if the result turned up empty
-    if (this.props.result.total_result_count === 0) {
+    if (this.props.result.total_results === 0) {
       let streamDescription = null;
       if (this.props.searchInStream) {
         streamDescription = 'in stream ' + this.props.searchInStream.title;
@@ -253,7 +255,7 @@ const SearchResult = React.createClass({
                        selectedFields={this.state.selectedFields}
                        sortField={this.state.sortField}
                        sortOrder={this.state.sortOrder}
-                       resultCount={this.props.result.total_result_count}
+                       resultCount={this.props.result.total_results}
                        inputs={this.props.inputs}
                        streams={this.props.streams}
                        nodes={this.props.nodes}

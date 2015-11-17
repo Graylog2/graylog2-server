@@ -30,6 +30,9 @@ const DashboardListPage = React.createClass({
     DashboardStore.updateDashboards();
   },
   _onDashboardsChange(dashboards) {
+    if (!this.isMounted()) {
+      return;
+    }
     if (dashboards) {
       this.setState({dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true});
     } else {

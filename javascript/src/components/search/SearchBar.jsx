@@ -44,7 +44,11 @@ const SearchBar = React.createClass({
       ReactDOM.findDOMNode(this.refs.searchForm).submit();
     };
     SearchStore.onAddQueryTerm = this._animateQueryChange;
-    SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => this.setState({savedSearches: newSavedSearches}));
+    SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => {
+      if (this.isMounted()) {
+        this.setState({savedSearches: newSavedSearches});
+      }
+    });
     this._initializeSearchQueryInput();
     this._initalizeDatepicker();
   },
