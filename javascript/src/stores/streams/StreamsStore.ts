@@ -127,22 +127,22 @@ class StreamsStore {
   }
   testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamsApiController.testMatch(streamId).url);
-    fetch('POST', url, message).then(callback, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Testing stream rules of stream failed with status: " + errorThrown,
+    fetch('POST', url, message).then(callback, (error) => {
+      UserNotification.error("Testing stream rules of stream failed with status: " + error.message,
         "Could not test stream rules of stream");
     });
   }
   addReceiver(streamId: string, type: string, entity: string, callback: () => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.addReceiver(streamId, type, entity).url);
-    fetch('POST', url).then(callback, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Adding stream alert received failed with error: " + errorThrown,
+    fetch('POST', url).then(callback, (error) => {
+      UserNotification.error("Adding stream alert received failed with error: " + error.message,
           "Could not add stream alert receiver");
     }).then(this._emitChange.bind(this));
   }
   deleteReceiver(streamId: string, type: string, entity: string, callback: () => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.deleteReceiver(streamId, type, entity).url);
-    fetch('DELETE', url).then(callback, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Deleting stream alert received failed with error: " + errorThrown,
+    fetch('DELETE', url).then(callback, (error) => {
+      UserNotification.error("Deleting stream alert received failed with error: " + error.message,
           "Could not delete stream alert receiver");
     }).then(this._emitChange.bind(this));
   }
