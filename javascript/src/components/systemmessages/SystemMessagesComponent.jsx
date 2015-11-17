@@ -12,7 +12,10 @@ const SystemMessagesComponent = React.createClass({
   },
   componentDidMount() {
     this.loadMessages(this.state.currentPage);
-    setInterval(() => { this.loadMessages(this.state.currentPage); }, 1000);
+    this.interval = setInterval(() => { this.loadMessages(this.state.currentPage); }, 1000);
+  },
+  componentWillUnmount() {
+    clearInterval(this.interval);
   },
   PER_PAGE: 30,
   loadMessages(page) {
