@@ -19,12 +19,11 @@ const BooleanField = React.createClass({
       <div className="form-group">
         <div className="checkbox">
           <label>
-            <input id={typeName + '-' + field.title}
+            <input id={typeName + '-' + title}
                    type="checkbox"
                    checked={value}
-                   name={'configuration[' + field.title + ']'}
-                   onChange={this.handleChange}
-                   autoFocus={this.props.autoFocus} />
+                   name={`configuration[${title}]`}
+                   onChange={this.handleChange}/>
 
             {field.human_name}
 
