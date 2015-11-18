@@ -66,16 +66,12 @@ public abstract class SearchResource extends RestResource {
 
     protected final Searches searches;
     private final Counter emptySearchResults;
-    private final Counter interactiveSearches;
 
     @Inject
     public SearchResource(Searches searches, MetricRegistry metricRegistry) {
         this.searches = searches;
         emptySearchResults = metricRegistry.counter(MetricRegistry.name(SearchResource.class,
                                                                         "empty-search-results"));
-        interactiveSearches = metricRegistry.counter(MetricRegistry.name(SearchResource.class,
-                                                                        "interactive-searches"));
-
     }
 
     protected void validateInterval(String interval) {
@@ -161,7 +157,6 @@ public abstract class SearchResource extends RestResource {
         if (sr.getTotalResults() == 0) {
             emptySearchResults.inc();
         }
-        interactiveSearches.inc();
         return SearchResponse.create(sr.getOriginalQuery(),
                 sr.getBuiltQuery(),
                 indexRangeListToValueList(sr.getUsedIndices()),
