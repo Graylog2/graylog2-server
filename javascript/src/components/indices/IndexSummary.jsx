@@ -28,14 +28,26 @@ const IndexSummary = React.createClass({
   },
   _formatIndexRange() {
     if (this.props.isDeflector) {
-      return 'up to ' + moment().fromNow();
+      return 'Contains messages up to ' + moment().fromNow();
+    }
+
+    if (this.props.index.all_shards) {
+      const count = this.props.index.all_shards.documents.count;
+      const deleted = this.props.index.all_shards.documents.deleted;
+      if (count === 0 || count - deleted === 0) {
+        return 'Index does not contain any messages.';
+      }
+    }
+
+    if (!this.props.indexRange) {
+      return 'Time range of index is unknown, because index range is not available. Please recalculate index ranges manually.';
     }
 
     if (this.props.indexRange.begin === 0) {
-      return 'up to ' + moment(this.props.indexRange.end).fromNow();
+      return 'Contains messages up to ' + moment(this.props.indexRange.end).fromNow();
     }
 
-    return 'from ' + moment(this.props.indexRange.begin).fromNow() + ' up to ' + moment(this.props.indexRange.end).fromNow();
+    return 'Contains messages from ' + moment(this.props.indexRange.begin).fromNow() + ' up to ' + moment(this.props.indexRange.end).fromNow();
   },
   _formatShowDetailsLink() {
     if (this.state.showDetails) {
@@ -58,7 +70,7 @@ const IndexSummary = React.createClass({
           {this._reopenedBadged(index)}{' '}
 
           <small>
-            Contains messages {this._formatIndexRange(index)}{' '}
+            {this._formatIndexRange(index)}{' '}
 
             <IndexSizeSummary index={index} />
 

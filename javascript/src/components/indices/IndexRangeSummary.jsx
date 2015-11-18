@@ -7,6 +7,9 @@ const IndexRangeSummary = React.createClass({
   },
   render() {
     const { indexRange } = this.props;
+    if (!indexRange) {
+      return <span><i>No index range available.</i></span>;
+    }
     return (
       <span>Range re-calculated{' '}
         <span title={indexRange.calculated_at}>{moment(indexRange.calculated_at).fromNow()}</span>{' '}
