@@ -109,6 +109,11 @@ const Navigation = React.createClass({
                   <MenuItem>Inputs</MenuItem>
                 </LinkContainer>
               }
+              {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
+                  <MenuItem>Outputs</MenuItem>
+                </LinkContainer>
+              }
               {this.isPermitted(this.props.permissions, ['COLLECTORS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
                   <MenuItem>Collectors</MenuItem>
@@ -119,9 +124,9 @@ const Navigation = React.createClass({
                   <MenuItem>Indices</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
-                <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
-                  <MenuItem>Outputs</MenuItem>
+              {this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
+                <LinkContainer to={Routes.SYSTEM.LOGGING}>
+                  <MenuItem>Logging</MenuItem>
                 </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['USERS_READ']) &&

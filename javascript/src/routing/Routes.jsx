@@ -16,6 +16,7 @@ const Routes = {
       FAILURES: '/system/indices/failures',
     },
     INPUTS: '/system/inputs',
+    LOGGING: '/system/logging',
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',

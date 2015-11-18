@@ -34,6 +34,7 @@ import GrokPatternsPage from 'pages/GrokPatternsPage';
 import SystemOverviewPage from 'pages/SystemOverviewPage';
 import IndexerFailuresPage from 'pages/IndexerFailuresPage';
 import IndicesPage from 'pages/IndicesPage';
+import LoggersPage from 'pages/LoggersPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -66,6 +67,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>
             <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage}/>
             <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage}/>
+            <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
             <Route path={Routes.SYSTEM.USERS.CREATE} component={CreateUsersPage}/>
