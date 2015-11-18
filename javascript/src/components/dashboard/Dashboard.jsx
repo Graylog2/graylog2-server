@@ -1,8 +1,7 @@
 /* global jsRoutes */
 
 import React from 'react';
-import { DropdownButton } from 'react-bootstrap';
-import { MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from '../../util/PermissionsMixin';
@@ -19,7 +18,7 @@ const Dashboard = React.createClass({
     permissions: React.PropTypes.arrayOf(React.PropTypes.string),
   },
   mixins: [PermissionsMixin],
-  render() {
+  _getDashboardActions() {
     let dashboardActions;
 
     if (this.isPermitted(this.props.permissions, [`dashboards:edit:${this.props.dashboard.id}`])) {
@@ -37,8 +36,20 @@ const Dashboard = React.createClass({
           </DropdownButton>
         </div>
       );
+    } else {
+      dashboardActions = (
+        <div className="stream-actions">
+          <DropdownButton title="More actions" pullRight>
+            <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
+              as startpage</MenuItem>
+          </DropdownButton>
+        </div>
+      );
     }
 
+    return dashboardActions;
+  },
+  render() {
     const createdFromContentPack = (this.props.dashboard.content_pack ?
       <i className="fa fa-cube" title="Created from content pack"/> : null);
 
@@ -51,7 +62,7 @@ const Dashboard = React.createClass({
         </h2>
 
         <div className="stream-data">
-          {dashboardActions}
+          {this._getDashboardActions()}
           <div className="stream-description">
             {createdFromContentPack}
             <span ref="dashboardDescription">{this.props.dashboard.description}</span>
