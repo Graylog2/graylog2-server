@@ -24,20 +24,29 @@ const Stream = React.createClass({
   render() {
     const stream = this.props.stream;
     const permissions = this.props.permissions;
-    const editRulesLink = (this.isPermitted(permissions, ['streams:edit:' + stream.id]) ?
-      (<LinkContainer to={Routes.stream_edit(stream.id)}>
-        <Button bsStyle='info'>Edit rules</Button>
-      </LinkContainer>) : null);
 
-    let manageOutputsLink = null;
-    let manageAlertsLink = null;
-    if (this.isPermitted(permissions, ['streams:edit:' + stream.id, 'stream_outputs:read'])) {
-      manageOutputsLink = (<LinkContainer to={Routes.stream_outputs(stream.id)}>
-        <Button bsStyle="info">Manage Outputs</Button>
-      </LinkContainer>);
-      manageAlertsLink = (<LinkContainer to={Routes.stream_alerts(stream.id)}>
-        <Button bsStyle="info">Manage Alerts</Button>
-      </LinkContainer>);
+    let editRulesLink;
+    let manageOutputsLink;
+    let manageAlertsLink;
+    if (this.isPermitted(permissions, ['streams:edit:' + stream.id])) {
+      editRulesLink = (
+        <LinkContainer to={Routes.stream_edit(stream.id)}>
+          <Button bsStyle="info">Edit rules</Button>
+        </LinkContainer>
+      );
+      manageAlertsLink = (
+        <LinkContainer to={Routes.stream_alerts(stream.id)}>
+          <Button bsStyle="info">Manage Alerts</Button>
+        </LinkContainer>
+      );
+
+      if (this.isPermitted(permissions, ['stream_outputs:read'])) {
+        manageOutputsLink = (
+          <LinkContainer to={Routes.stream_outputs(stream.id)}>
+            <Button bsStyle="info">Manage Outputs</Button>
+          </LinkContainer>
+        );
+      }
     }
 
     let toggleStreamLink;
