@@ -17,9 +17,8 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
-import org.graylog2.restclient.lib.Tools;
 import org.apache.commons.lang3.StringEscapeUtils;
-import play.twirl.api.Html;
+import org.graylog2.restclient.lib.Tools;
 
 import java.util.List;
 
@@ -58,14 +57,14 @@ public class FieldMapper {
         return value;
     }
 
-    private static Html convertNewlinesToBr(Object fullMessage) {
+    private static String convertNewlinesToBr(Object fullMessage) {
         if (fullMessage == null) {
             return null;
         }
 
         String s = StringEscapeUtils.escapeHtml4(fullMessage.toString());
         s = s.replaceAll("\\n", "<br>");
-        return Html.apply(s);
+        return s;
     }
 
     private static String mapSyslogLevel(Object level) {
