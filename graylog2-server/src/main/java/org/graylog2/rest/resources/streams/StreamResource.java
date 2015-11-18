@@ -32,22 +32,22 @@ import org.bson.types.ObjectId;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
+import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
-import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
@@ -55,6 +55,9 @@ import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -285,7 +288,12 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
         final Stream stream = streamService.load(streamId);
-        final Message message = new Message(serialisedMessage.get("message"));
+        // This is such a hack...
+        final Map<String, Object> m = new HashMap<>(serialisedMessage.get("message"));
+        final String timeStamp = firstNonNull((String) m.get(Message.FIELD_TIMESTAMP),
+                DateTime.now(DateTimeZone.UTC).toString(ISODateTimeFormat.dateTime()));
+        m.put(Message.FIELD_TIMESTAMP, Tools.dateTimeFromString(timeStamp));
+        final Message message = new Message(m);
 
         final StreamRouterEngine streamRouterEngine = streamRouterEngineFactory.create(Lists.newArrayList(stream), Executors.newSingleThreadExecutor());
         final List<StreamRouterEngine.StreamTestMatch> streamTestMatches = streamRouterEngine.testMatch(message);
