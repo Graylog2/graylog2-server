@@ -66,6 +66,7 @@ public final class Tools {
     public static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
+    public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
 
     private Tools() {
     }
@@ -298,6 +299,13 @@ public final class Tools {
      */
     public static DateTime dateTimeFromDouble(double x) {
         return new DateTime(Math.round(x * 1000), DateTimeZone.UTC);
+    }
+
+    /**
+     * Parse the string representation of an ISO 8601 date/timestamp with milliseconds and timezone.
+     */
+    public static DateTime dateTimeFromString(String s) {
+        return ISO_DATE_FORMAT_FORMATTER.parseDateTime(s);
     }
 
     /**
