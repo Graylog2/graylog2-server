@@ -10,27 +10,11 @@ const BooleanField = React.createClass({
     typeName: React.PropTypes.string.isRequired,
     value: React.PropTypes.any,
   },
-  getInitialState() {
-    return {
-      typeName: this.props.typeName,
-      field: this.props.field,
-      title: this.props.title,
-      value: (this.props.value === undefined ? this.props.field.default_value : this.props.value),
-    };
-  },
-  componentWillReceiveProps(props) {
-    this.setState(props);
-  },
-  handleChange() {
-    const newValue = !this.state.value;
-    this.setState({value: newValue});
-    this.props.onChange(this.state.title, newValue);
-  },
   render() {
-    const field = this.state.field;
-    const typeName = this.state.typeName;
-    const value = this.state.value;
-    // TODO: replace with bootstrap input component
+    const field = this.props.field;
+    const typeName = this.props.typeName;
+    const title = this.props.title;
+    const value = this._getEffectiveValue();
     return (
       <div className="form-group">
         <div className="checkbox">
@@ -50,6 +34,14 @@ const BooleanField = React.createClass({
         <p className="help-block">{field.description}</p>
       </div>
     );
+  },
+  _getEffectiveValue() {
+    return (this.props.value === undefined ? this.props.field.default_value : this.props.value);
+  },
+  handleChange() {
+    const newValue = !this._getEffectiveValue();
+    this.setState({value: newValue});
+    this.props.onChange(this.props.title, newValue);
   },
 });
 
