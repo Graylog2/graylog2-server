@@ -1,9 +1,8 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, {Builder} from 'logic/rest/FetchProvider';
 
 import NotificationsActions from 'actions/notifications/NotificationsActions';
 
@@ -25,7 +24,11 @@ const NotificationsStore = Reflux.createStore({
   },
   list() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.NotificationsApiController.list().url);
-    const promise = fetch('GET', url);
+    return new Builder('GET', url)
+      .authenticated()
+      .setHeader('X-Graylog2-No-Session-Extension', 'true')
+      .json()
+      .build();
 
     NotificationsActions.list.promise(promise);
   },
