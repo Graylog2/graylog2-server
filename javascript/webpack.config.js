@@ -27,7 +27,6 @@ const webpackConfig = {
       // { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
     ],
     loaders: [
-      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ },
       { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
@@ -49,6 +48,14 @@ const webpackConfig = {
   plugins: [
     new Clean([BUILD_PATH]),
     new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png'}),
+  ],
+};
+
+const commonConfigs = {
+  loaders: [
+    { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
+  ],
+  plugins: [
     new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'vendor', /* filename= */'vendor.bundle.js'),
     new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'config', /* filename= */'config.js', ['config']),
   ],
@@ -56,7 +63,7 @@ const webpackConfig = {
 
 if (TARGET === 'start') {
   console.log('Running in development mode');
-  module.exports = merge(webpackConfig, {
+  module.exports = merge(webpackConfig, merge(commonConfigs, {
     devtool: 'eval',
     devServer: {
       historyApiFallback: true,
@@ -67,12 +74,12 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
     ],
-  });
+  }));
 }
 
 if (TARGET === 'build') {
   console.log('Running in production mode');
-  module.exports = merge(webpackConfig, {
+  module.exports = merge(webpackConfig, merge(commonConfigs, {
     plugins: [
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
@@ -84,9 +91,10 @@ if (TARGET === 'build') {
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
     ],
-  });
+  }));
 }
 
-if (TARGET !== 'build' && TARGET !== 'start') {
+if (Object.keys(module.exports).length === 0) {
+  console.log("Running in default mode");
   module.exports = webpackConfig;
 }
