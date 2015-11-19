@@ -22,6 +22,12 @@ export class Builder {
     return this;
   }
 
+  setHeader(header, value) {
+    this.request = this.request.set(header, value);
+
+    return this;
+  }
+
   json(body) {
     this.request = this.request
       .send(body)
