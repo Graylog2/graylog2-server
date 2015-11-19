@@ -3,6 +3,7 @@ const Reflux = require('reflux');
 import UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require('util/URLUtils');
+const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const WidgetsActions = require('actions/widgets/WidgetsActions');
 
@@ -74,7 +75,12 @@ const WidgetsStore = Reflux.createStore({
 
     loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
-        var promise = fetch('GET', url);
+        const promise = new Builder('GET', url)
+            .authenticated()
+            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .json()
+            .build();
+
         promise.catch((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
                 UserNotification.error("Loading widget information failed with status: " + errorThrown,
@@ -99,7 +105,12 @@ const WidgetsStore = Reflux.createStore({
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
-        return fetch('GET', url);
+
+        return new Builder('GET', url)
+            .authenticated()
+            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .json()
+            .build();
     },
 
     removeWidget(dashboardId: string, widgetId: string): void {

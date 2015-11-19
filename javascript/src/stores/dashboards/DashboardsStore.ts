@@ -5,6 +5,7 @@ import Immutable = require('immutable');
 import UserNotification = require("util/UserNotification");
 import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require("../../util/URLUtils");
+const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const PermissionsMixin = require('util/PermissionsMixin');
 const CurrentUserStore = require('stores/users/CurrentUserStore');
@@ -100,9 +101,13 @@ class DashboardsStore {
     return this.dashboards.toArray().filter((dashboard) => PermissionsMixin.isPermitted(permissions, 'dashboards:edit:' + dashboard.id));
   }
 
-  get(id : string): JQueryPromise<Dashboard> {
+  get(id: string): JQueryPromise<Dashboard> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
-    const promise = fetch('GET', url);
+    const promise = new Builder('GET', url)
+        .authenticated()
+        .setHeader('X-Graylog2-No-Session-Extension', 'true')
+        .json()
+        .build();
 
     promise.catch((error) => {
       if (error.additional.status !== 404) {
