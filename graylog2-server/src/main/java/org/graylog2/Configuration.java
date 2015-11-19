@@ -149,6 +149,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoLoad = Collections.emptySet();
 
+    @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
+    private Duration indexRangesCleanupInterval = Duration.hours(1L);
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -296,5 +299,9 @@ public class Configuration extends BaseConfiguration {
 
     public Set<String> getContentPacksAutoLoad() {
         return contentPacksAutoLoad;
+    }
+
+    public Duration getIndexRangesCleanupInterval() {
+        return indexRangesCleanupInterval;
     }
 }
