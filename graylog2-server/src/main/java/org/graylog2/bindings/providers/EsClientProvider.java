@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
@@ -29,16 +30,23 @@ import javax.inject.Singleton;
 @Singleton
 public class EsClientProvider implements Provider<Client> {
     private final Node node;
+    private final MetricRegistry metricRegistry;
     private final Duration requestTimeout;
 
     @Inject
-    public EsClientProvider(Node node, @Named("elasticsearch_request_timeout") Duration requestTimeout) {
+    public EsClientProvider(Node node,
+                            MetricRegistry metricRegistry,
+                            @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.node = node;
+        this.metricRegistry = metricRegistry;
         this.requestTimeout = requestTimeout;
     }
 
     @Override
     public Client get() {
-        return new GlobalTimeoutClient(node.client(), requestTimeout.getQuantity(), requestTimeout.getUnit());
+        return new GlobalTimeoutClient(node.client(),
+                                       requestTimeout.getQuantity(),
+                                       requestTimeout.getUnit(),
+                                       metricRegistry);
     }
 }
