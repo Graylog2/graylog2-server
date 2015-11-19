@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Navbar, CollapsibleNav, Nav, NavBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, CollapsibleNav, Nav, NavbarBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -75,9 +75,11 @@ const Navigation = React.createClass({
       </LinkContainer>);
     // TODO: fix permission names
     return (
-      <Navbar inverse fluid fixedTop toggleNavKey={0}>
-        <NavBrand>{brand}</NavBrand>
-        <CollapsibleNav eventKey={0}>
+      <Navbar inverse fluid fixedTop>
+        <Navbar.Header>
+          <Navbar.Brand>{brand}</Navbar.Brand>
+        </Navbar.Header>
+        <Navbar.Collapse eventKey={0}>
           <Nav navbar>
             {this.isPermitted(this.props.permissions, ['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
               <LinkContainer to={Routes.SEARCH}>
@@ -160,7 +162,7 @@ const Navigation = React.createClass({
             </LinkContainer>
           </Nav>
 
-          <Nav navbar right>
+          <Nav navbar pullRight>
             <LinkContainer to={Routes.SYSTEM.NODES}>
               <NavItem>
                 <GlobalThroughput />
@@ -168,7 +170,7 @@ const Navigation = React.createClass({
             </LinkContainer>
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
           </Nav>
-        </CollapsibleNav>
+        </Navbar.Collapse>
       </Navbar>
     );
   },
