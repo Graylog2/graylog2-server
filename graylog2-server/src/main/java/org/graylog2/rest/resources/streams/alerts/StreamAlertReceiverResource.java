@@ -142,8 +142,7 @@ public class StreamAlertReceiverResource extends RestResource {
         streamService.removeAlertReceiver(stream, type, entity);
     }
 
-    // TODO Replace @GET with @POST (because the method isn't idempotent)
-    @GET
+    @POST
     @Timed
     @Path("sendDummyAlert")
     @ApiOperation(value = "Send a test mail for a given stream")
@@ -151,7 +150,7 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
+    public Response sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id the dummy alert should be sent for.", required = true)
                                @PathParam("streamId") String streamid)
             throws TransportConfigurationException, EmailException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
