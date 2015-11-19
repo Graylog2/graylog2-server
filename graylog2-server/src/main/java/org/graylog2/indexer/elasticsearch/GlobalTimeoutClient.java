@@ -16,12 +16,16 @@
  */
 package org.graylog2.indexer.elasticsearch;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.Action;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ActionResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.ClusterAdminClient;
@@ -33,19 +37,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GlobalTimeoutClient extends FilterClient {
     private final long timeout;
     private final TimeUnit unit;
+    private final Counter searchRequests;
 
-    public GlobalTimeoutClient(Client in, long timeout, TimeUnit unit) {
+    public GlobalTimeoutClient(Client in, long timeout, TimeUnit unit, MetricRegistry metricRegistry) {
         super(in);
 
         checkArgument(timeout > 0);
         this.timeout = timeout;
         this.unit = checkNotNull(unit);
+        this.searchRequests = metricRegistry.counter(name(GlobalTimeoutClient.class, "search-requests"));
     }
 
     @Override
@@ -66,6 +73,12 @@ public class GlobalTimeoutClient extends FilterClient {
     @Override
     public AdminClient admin() {
         return new GlobalTimeoutAdminClient(super.admin(), timeout, unit);
+    }
+
+    @Override
+    public ActionFuture<SearchResponse> search(SearchRequest request) {
+        searchRequests.inc();
+        return super.search(request);
     }
 
     public static class GlobalTimeoutAdminClient implements AdminClient {
