@@ -105,7 +105,7 @@ class DashboardsStore {
     const promise = fetch('GET', url);
 
     promise.catch((error) => {
-      if (error.status !== 404) {
+      if (error.additional.status !== 404) {
         UserNotification.error("Loading your dashboard failed with status: " + error.message,
           "Could not load your dashboard");
       }
