@@ -17,11 +17,6 @@ import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTr
 import Widget from 'components/widgets/Widget';
 
 const ShowDashboardPage = React.createClass({
-  componentDidMount() {
-    this.loadData();
-    this.listenTo(WidgetsStore, this.removeWidget);
-    setInterval(this.loadData, 2000);
-  },
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
@@ -29,6 +24,16 @@ const ShowDashboardPage = React.createClass({
       locked: true,
       forceUpdateInBackground: false,
     };
+  },
+  componentDidMount() {
+    this.loadData();
+    this.listenTo(WidgetsStore, this.removeWidget);
+    this.loadInterval = setInterval(this.loadData, 2000);
+  },
+  componentWillUnmount() {
+    if (this.loadInterval) {
+      clearInterval(this.loadInterval);
+    }
   },
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
