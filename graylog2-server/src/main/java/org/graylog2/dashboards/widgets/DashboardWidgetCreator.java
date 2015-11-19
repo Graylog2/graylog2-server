@@ -68,21 +68,31 @@ public class DashboardWidgetCreator {
         String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
 
         // Build timerange.
-        final String rangeType = (String) awr.config().get("range_type");
+        final Map<String, Object> timerangeConfig;
+        final String rangeType;
+
+        if (awr.config().get("timerange") != null) {
+            timerangeConfig = (Map<String, Object>)awr.config().get("timerange");
+            rangeType = (String) timerangeConfig.get("type");
+        } else {
+            timerangeConfig = awr.config();
+            rangeType = (String)timerangeConfig.get("range_type");
+        }
+
         if (rangeType == null) {
-            throw new InvalidRangeParametersException("range_type not set");
+            throw new InvalidRangeParametersException("timerange type not set");
         }
 
         final TimeRange timeRange;
         switch (rangeType) {
             case "relative":
-                timeRange = new RelativeRange(Integer.parseInt(String.valueOf(awr.config().get("range"))));
+                timeRange = new RelativeRange(Integer.parseInt(String.valueOf(timerangeConfig.get("range"))));
                 break;
             case "keyword":
-                timeRange = new KeywordRange((String) awr.config().get("keyword"));
+                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
                 break;
             case "absolute":
-                timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
+                timeRange = new AbsoluteRange((String) timerangeConfig.get("from"), (String) timerangeConfig.get("to"));
                 break;
             default:
                 throw new InvalidRangeParametersException("range_type not recognized");

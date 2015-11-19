@@ -37,6 +37,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.dashboards.responses.WidgetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
@@ -257,6 +258,29 @@ public class DashboardsResource extends RestResource {
                 .build(dashboardId, widget.getId());
 
         return Response.created(widgetUri).entity(result).build();
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get a widget")
+    @Path("/{dashboardId}/widgets/{widgetId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found."),
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public WidgetSummary getWidget(
+            @ApiParam(name = "dashboardId", required = true)
+            @PathParam("dashboardId") String dashboardId,
+            @ApiParam(name = "widgetId", required = true)
+            @PathParam("widgetId") String widgetId) throws NotFoundException {
+        checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
+
+        final Dashboard dashboard = dashboardService.load(dashboardId);
+        final DashboardWidget widget = dashboard.getWidget(widgetId);
+
+        return WidgetSummary.create(widget.getId(), widget.getDescription(), widget.getType().name(), widget.getCacheTime(),
+                widget.getCreatorUserId(), widget.getConfig());
     }
 
     @DELETE
