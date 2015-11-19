@@ -134,6 +134,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
 
+    @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
+    private Duration indexRangesCleanupInterval = Duration.hours(1L);
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -269,5 +272,9 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getDashboardWidgetDefaultCacheTime() {
         return dashboardWidgetDefaultCacheTime;
+    }
+
+    public Duration getIndexRangesCleanupInterval() {
+        return indexRangesCleanupInterval;
     }
 }
