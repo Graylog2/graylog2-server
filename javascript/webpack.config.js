@@ -52,18 +52,20 @@ const webpackConfig = {
 };
 
 const commonConfigs = {
-  loaders: [
-    { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
-  ],
+  module: {
+    loaders: [
+      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
+    ],
+  },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'vendor', /* filename= */'vendor.bundle.js'),
-    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'config', /* filename= */'config.js', ['config']),
+    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.bundle.js'),
+    new webpack.optimize.CommonsChunkPlugin('config', 'config.js', ['config']),
   ],
 };
 
 if (TARGET === 'start') {
   console.log('Running in development mode');
-  module.exports = merge(webpackConfig, merge(commonConfigs, {
+  module.exports = merge(webpackConfig, {
     devtool: 'eval',
     devServer: {
       historyApiFallback: true,
@@ -74,12 +76,12 @@ if (TARGET === 'start') {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
     ],
-  }));
+  });
 }
 
 if (TARGET === 'build') {
   console.log('Running in production mode');
-  module.exports = merge(webpackConfig, merge(commonConfigs, {
+  module.exports = merge(webpackConfig, {
     plugins: [
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
@@ -91,7 +93,11 @@ if (TARGET === 'build') {
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
     ],
-  }));
+  });
+}
+
+if (TARGET === 'start' || TARGET === 'build') {
+  module.exports = merge(commonConfigs, module.exports);
 }
 
 if (Object.keys(module.exports).length === 0) {
