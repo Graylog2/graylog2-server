@@ -3,20 +3,13 @@ import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
 
-import 'javascripts/shims/styles/shim.css';
-import 'stylesheets/bootstrap.min.css';
-import 'stylesheets/font-awesome.min.css';
-import 'stylesheets/newfonts.less';
-import 'stylesheets/bootstrap-submenus.less';
 import 'stylesheets/rickshaw.min.css';
-import 'stylesheets/toastr.min.css';
 import 'stylesheets/datepicker.less';
 import 'stylesheets/chosen.bootstrap.min.css';
 import 'stylesheets/chosen-bootstrap.less';
 import 'stylesheets/jquery.gridster.min.css';
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
-import 'stylesheets/graylog2.less';
 import 'c3/c3.css';
 import 'dc/dc.css';
 

@@ -14,10 +14,11 @@ process.env.BABEL_ENV = TARGET;
 const webpackConfig = {
   entry: {
     app: APP_PATH,
-    config: APP_PATH + '/config.js',
+    config: 'config.js',
   },
   output: {
     path: BUILD_PATH,
+    vendor: ['react', 'react-router', 'react-bootstrap'],
     filename: '[name].[hash].js',
     publicPath: '/',
   },
@@ -26,6 +27,7 @@ const webpackConfig = {
       // { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
     ],
     loaders: [
+      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ },
       { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
@@ -47,6 +49,8 @@ const webpackConfig = {
   plugins: [
     new Clean([BUILD_PATH]),
     new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png'}),
+    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'vendor', /* filename= */'vendor.bundle.js'),
+    new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'config', /* filename= */'config.js', ['config']),
   ],
 };
 
