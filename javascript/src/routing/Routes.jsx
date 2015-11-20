@@ -4,6 +4,7 @@ const Routes = {
   STREAMS: '/streams',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
+  GETTING_STARTED: '/gettingstarted',
   SYSTEM: {
     COLLECTORS: '/system/collectors',
     CONTENTPACKS: {

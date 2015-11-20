@@ -35,6 +35,7 @@ import SystemOverviewPage from 'pages/SystemOverviewPage';
 import IndexerFailuresPage from 'pages/IndexerFailuresPage';
 import IndicesPage from 'pages/IndicesPage';
 import LoggersPage from 'pages/LoggersPage';
+import GettingStartedPage from 'pages/GettingStartedPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -48,6 +49,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SOURCES} component={SourcesPage}/>
           </Route>
           <Route component={AppWithoutSearchBar}>
+            <Route path={Routes.GETTING_STARTED} component={GettingStartedPage}/>
             <Route path={Routes.STREAMS} component={StreamsPage}/>
             <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
