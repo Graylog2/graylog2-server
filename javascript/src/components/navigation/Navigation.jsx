@@ -72,7 +72,7 @@ const Navigation = React.createClass({
     const logoUrl = require('images/toplogo.png');
     const brand = (
       <LinkContainer to={Routes.HOME}>
-        <img src={logoUrl}/>
+        <a><img src={logoUrl}/></a>
       </LinkContainer>);
     // TODO: fix permission names
     return (
