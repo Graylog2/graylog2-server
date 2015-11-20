@@ -17,7 +17,6 @@
 package org.graylog2.dashboards;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
@@ -68,51 +68,49 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         return new DashboardImpl(dashboardData);
     }
 
+    private Dashboard create(ObjectId id, Map<String, Object> fields) {
+        final Dashboard dashboard = new DashboardImpl(id, fields);
+        // Add all widgets of this dashboard.
+        if (fields.containsKey(DashboardImpl.EMBEDDED_WIDGETS)) {
+            if (fields.get(DashboardImpl.EMBEDDED_WIDGETS) instanceof List) {
+                for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
+                    try {
+                        final DashboardWidget widget = dashboardWidgetCreator.fromPersisted(searches, widgetFields);
+                        dashboard.addPersistedWidget(widget);
+                    } catch (DashboardWidget.NoSuchWidgetTypeException e) {
+                        LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);
+                    } catch (InvalidRangeParametersException e) {
+                        LOG.error("Invalid range parameters of widget in dashboard: [" + dashboard.getId() + "]", e);
+                    } catch (InvalidWidgetConfigurationException e) {
+                        LOG.error("Invalid configuration of widget in dashboard: [" + dashboard.getId() + "]", e);
+                    }
+                }
+            }
+        }
+
+        return dashboard;
+    }
+
     @Override
     public Dashboard load(String id) throws NotFoundException {
-        BasicDBObject o = (BasicDBObject) get(DashboardImpl.class, id);
+        final BasicDBObject o = (BasicDBObject) get(DashboardImpl.class, id);
 
         if (o == null) {
             throw new NotFoundException();
         }
 
-        return new DashboardImpl((ObjectId) o.get("_id"), o.toMap());
+        final Dashboard dashboard = this.create((ObjectId) o.get("_id"), o.toMap());
+
+        return dashboard;
     }
 
     @Override
     public List<Dashboard> all() {
-        List<Dashboard> dashboards = Lists.newArrayList();
+        final List<DBObject> results = query(DashboardImpl.class, new BasicDBObject());
 
-        List<DBObject> results = query(DashboardImpl.class, new BasicDBObject());
-        for (DBObject o : results) {
-            Map<String, Object> fields = o.toMap();
-            Dashboard dashboard = new DashboardImpl((ObjectId) o.get("_id"), fields);
-
-            // Add all widgets of this dashboard.
-            if (fields.containsKey(DashboardImpl.EMBEDDED_WIDGETS)) {
-                for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
-                    DashboardWidget widget = null;
-                    try {
-                        widget = dashboardWidgetCreator.fromPersisted(searches, widgetFields);
-                    } catch (DashboardWidget.NoSuchWidgetTypeException e) {
-                        LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);
-                        continue;
-                    } catch (InvalidRangeParametersException e) {
-                        LOG.error("Invalid range parameters of widget in dashboard: [" + dashboard.getId() + "]", e);
-                        continue;
-                    } catch (InvalidWidgetConfigurationException e) {
-                        LOG.error("Invalid configuration of widget in dashboard: [" + dashboard.getId() + "]", e);
-                        continue;
-                    }
-                    dashboard.addPersistedWidget(widget);
-                }
-            }
-
-
-            dashboards.add(dashboard);
-        }
-
-        return dashboards;
+        return (List<Dashboard>)results.stream()
+                .map(o -> (Dashboard)new DashboardImpl((ObjectId) o.get("_id"), o.toMap()))
+                .collect(Collectors.toList());
     }
 
     @Override
