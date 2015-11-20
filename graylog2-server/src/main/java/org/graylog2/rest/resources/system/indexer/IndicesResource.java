@@ -32,7 +32,6 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
@@ -40,9 +39,6 @@ import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,15 +66,11 @@ public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
     @Inject
-    private CreateNewSingleIndexRangeJob.Factory rebuildIndexRangesJobFactory;
-    @Inject
     private Indices indices;
     @Inject
     private Cluster cluster;
     @Inject
     private Deflector deflector;
-    @Inject
-    private SystemJobManager systemJobManager;
 
     @GET
     @Timed
@@ -195,16 +187,6 @@ public class IndicesResource extends RestResource {
         }
 
         indices.reopenIndex(index);
-
-        // Trigger index ranges rebuild job.
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector, index);
-        try {
-            systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg);
-        }
     }
 
     @POST
