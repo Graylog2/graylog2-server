@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Navbar, CollapsibleNav, Nav, NavbarBrand, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -13,16 +13,14 @@ import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 
 const Navigation = React.createClass({
-  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
-
   propTypes: {
     requestPath: React.PropTypes.string.isRequired,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-
     loginName: React.PropTypes.string.isRequired,
     fullName: React.PropTypes.string.isRequired,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
+
+  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
 
   _isActive(prefix) {
     return this.props.requestPath.indexOf(prefix) === 0;
