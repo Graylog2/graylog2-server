@@ -29,10 +29,13 @@ import org.graylog2.shared.rest.resources.RestResource;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 @RequiresAuthentication
-@Api(value = "System/Configuration", description = "Read-only access to configuration variables")
+@Api(value = "System/Configuration", description = "Read-only access to configuration settings")
 @Path("/system/configuration")
+@Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource extends RestResource {
 
     private final Configuration configuration;
@@ -44,13 +47,9 @@ public class ConfigurationResource extends RestResource {
         this.esConfiguration = esConfiguration;
     }
 
-    /*
-     * This call is returning a list of configuration values that are safe to return, i.e. do not include any sensitive
-     * information.
-     */
     @GET
     @Timed
-    @ApiOperation(value = "Get relevant configuration variables and their values")
+    @ApiOperation(value = "Get relevant configuration settings and their values")
     public ExposedConfiguration getRelevant() {
         return ExposedConfiguration.create(configuration, esConfiguration);
     }
