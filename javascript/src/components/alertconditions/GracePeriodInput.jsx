@@ -3,6 +3,7 @@ import React from 'react';
 const GracePeriodInput = React.createClass({
   propTypes: {
     parameters: React.PropTypes.object,
+    alertCondition: React.PropTypes.object.isRequired,
   },
   getDefaultProps() {
     return {
@@ -14,8 +15,8 @@ const GracePeriodInput = React.createClass({
   },
   getValue() {
     return {
-      grace: parseInt(this.refs.grace.value),
-      backlog: parseInt(this.refs.backlog.value),
+      grace: Number(this.refs.grace.value),
+      backlog: Number(this.refs.backlog.value),
     };
   },
   render() {
@@ -36,7 +37,7 @@ const GracePeriodInput = React.createClass({
         <span className="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
       </span>
     );
-  }
+  },
 });
 
 export default GracePeriodInput;
