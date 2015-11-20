@@ -27,25 +27,32 @@ const NotificationsList = React.createClass({
 
     const count = this.state.total;
 
+    let title;
+    let content;
+
     if (count === 0) {
-      return (
+      title = 'No notifications';
+      content = (
         <Alert bsStyle="success" className="notifications-none">
           <i className="fa fa-check-circle"/>{' '}
           &nbsp;No notifications
         </Alert>
       );
+    } else {
+      title = `There ${this._formatNotificationCount(count)}$`;
+      content = this.state.notifications.map((notification) => <Notification key={notification.id} notification={notification} />);
     }
 
     return (
       <Row className="content">
         <Col md={12}>
-          <h2>There {this._formatNotificationCount(count)}</h2>
+          <h2>{title}</h2>
           <p className="description">
             Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification
             types will also provide a link to the Graylog documentation if you need more information or assistance.
           </p>
 
-          {this.state.notifications.map((notification) => <Notification key={notification.id} notification={notification} />)}
+          {content}
         </Col>
       </Row>
     );
