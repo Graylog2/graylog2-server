@@ -24,7 +24,7 @@ const NotificationsStore = Reflux.createStore({
   },
   list() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.NotificationsApiController.list().url);
-    return new Builder('GET', url)
+    const promise = new Builder('GET', url)
       .authenticated()
       .setHeader('X-Graylog2-No-Session-Extension', 'true')
       .json()
