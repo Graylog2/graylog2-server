@@ -14,22 +14,22 @@ const MessageCountConditionSummary = React.createClass({
 
     return 'last ' + time + ' minutes';
   },
-  _formatMessageThreshold(threshold, threshold_type) {
+  _formatMessageThreshold(threshold, thresholdType) {
     if (threshold === 1) {
-      return 'is ' + threshold_type + ' than one message';
+      return 'is ' + thresholdType + ' than one message';
     }
 
-    return 'are ' + threshold_type + ' than ' + threshold + ' messages';
+    return 'are ' + thresholdType + ' than ' + threshold + ' messages';
   },
   render() {
     const alertCondition = this.props.alertCondition;
     const threshold = alertCondition.parameters.threshold;
-    const threshold_type = alertCondition.parameters.threshold_type;
+    const thresholdType = alertCondition.parameters.threshold_type;
     const time = alertCondition.parameters.time;
 
     return (
       <span>
-        Alert is triggered when there {this._formatMessageThreshold(threshold, threshold_type)} in the {this._formatTime(time)}.
+        Alert is triggered when there {this._formatMessageThreshold(threshold, thresholdType)} in the {this._formatTime(time)}.
         {' '}
         <GracePeriodSummary alertCondition={alertCondition} />
         {' '}

@@ -10,8 +10,8 @@ const FieldContentConditionForm = React.createClass({
   getDefaultProps() {
     return {
       alertCondition: {
-        field: "",
-        value: "",
+        field: '',
+        value: '',
       },
     };
   },

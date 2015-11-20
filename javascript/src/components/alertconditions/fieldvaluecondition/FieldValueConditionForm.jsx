@@ -10,7 +10,7 @@ const FieldValueConditionForm = React.createClass({
   getDefaultProps() {
     return {
       alertCondition: {
-        field: "",
+        field: '',
         time: 0,
         threshold: 0,
         threshold_type: 'LOWER',
@@ -26,7 +26,7 @@ const FieldValueConditionForm = React.createClass({
   getValue() {
     return jQuery.extend({
       field: this.refs.field.value,
-      time: parseInt(this.refs.time.value),
+      time: Number(this.refs.time.value),
       threshold: parseFloat(this.refs.threshold.value),
       threshold_type: this.refs.threshold_type.value,
       type: this.refs.check_type.value,
@@ -84,7 +84,7 @@ const FieldValueConditionForm = React.createClass({
         <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
       </span>
     );
-  }
+  },
 });
 
 export default FieldValueConditionForm;

@@ -1,9 +1,6 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input } from 'react-bootstrap';
 
-import DocumentationLink from 'components/support/DocumentationLink';
-
-import DocsHelper from 'util/DocsHelper';
 import FormUtils from 'util/FormsUtils';
 
 const CSVConverterConfiguration = React.createClass({
