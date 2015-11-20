@@ -24,7 +24,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.ExposedConfiguration;
-import org.graylog2.rest.models.system.configuration.ConfigurationList;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -34,7 +33,7 @@ import javax.ws.rs.Path;
 @RequiresAuthentication
 @Api(value = "System/Configuration", description = "Read-only access to configuration variables")
 @Path("/system/configuration")
-public class ConfigurationResource extends RestResource  {
+public class ConfigurationResource extends RestResource {
 
     private final Configuration configuration;
     private final ElasticsearchConfiguration esConfiguration;
@@ -52,10 +51,7 @@ public class ConfigurationResource extends RestResource  {
     @GET
     @Timed
     @ApiOperation(value = "Get relevant configuration variables and their values")
-    public ConfigurationList getRelevant() {
-        return ConfigurationList.create(
-                new ExposedConfiguration(configuration, esConfiguration).asList()
-        );
+    public ExposedConfiguration getRelevant() {
+        return ExposedConfiguration.create(configuration, esConfiguration);
     }
-
 }
