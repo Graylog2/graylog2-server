@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 
 const ConfigurationWell = React.createClass({
   propTypes: {
@@ -19,7 +18,8 @@ const ConfigurationWell = React.createClass({
     if (!config) {
       return ('');
     }
-    const formattedItems = $.map(config, (value, key) => {
+    const formattedItems = Object.keys(config).sort().map((key) => {
+      const value = config[key];
       const requestedConfiguration = typeDefinition.requested_configuration[key];
       if (requestedConfiguration && requestedConfiguration.attributes.indexOf('is_password') > -1) {
         return this._formatPasswordField(value, key);
