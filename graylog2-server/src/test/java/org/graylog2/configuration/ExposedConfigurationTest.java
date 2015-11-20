@@ -68,32 +68,32 @@ public class ExposedConfigurationTest {
         final ExposedConfiguration c = ExposedConfiguration.create(configuration, elasticsearchConfiguration);
 
         final String json = objectMapper.writeValueAsString(c);
-        assertThat(JsonPath.read(json, "$.inputbuffer_processors")).isEqualTo(c.inputBufferProcessors());
-        assertThat(JsonPath.read(json, "$.processbuffer_processors")).isEqualTo(c.processBufferProcessors());
-        assertThat(JsonPath.read(json, "$.outputbuffer_processors")).isEqualTo(c.outputBufferProcessors());
-        assertThat(JsonPath.read(json, "$.processor_wait_strategy")).isEqualTo(c.processorWaitStrategy());
-        assertThat(JsonPath.read(json, "$.inputbuffer_wait_strategy")).isEqualTo(c.inputBufferWaitStrategy());
-        assertThat(JsonPath.read(json, "$.inputbuffer_ring_size")).isEqualTo(c.inputBufferRingSize());
-        assertThat(JsonPath.read(json, "$.ring_size")).isEqualTo(c.ringSize());
-        assertThat(JsonPath.read(json, "$.plugin_dir")).isEqualTo(c.pluginDir());
-        assertThat(JsonPath.read(json, "$.node_id_file")).isEqualTo(c.nodeIdFile());
-        assertThat(JsonPath.read(json, "$.allow_highlighting")).isEqualTo(c.allowHighlighting());
-        assertThat(JsonPath.read(json, "$.allow_leading_wildcard_searches")).isEqualTo(c.allowLeadingWildcardSearches());
-        assertThat(JsonPath.read(json, "$.rotation_strategy")).isEqualTo(c.rotationStrategy());
-        assertThat(JsonPath.read(json, "$.retention_strategy")).isEqualTo(c.retentionStrategy());
-        assertThat(JsonPath.read(json, "$.elasticsearch_max_docs_per_index")).isEqualTo(c.maxDocsPerIndex());
-        assertThat(JsonPath.read(json, "$.elasticsearch_max_size_per_index")).isEqualTo((int) c.maxSizePerIndex());
-        assertThat(JsonPath.read(json, "$.elasticsearch_max_time_per_index")).isEqualTo(c.maxTimePerIndex().toString());
-        assertThat(JsonPath.read(json, "$.elasticsearch_max_number_of_indices")).isEqualTo(c.maxNumberOfIndices());
-        assertThat(JsonPath.read(json, "$.elasticsearch_shards")).isEqualTo(c.shards());
-        assertThat(JsonPath.read(json, "$.elasticsearch_replicas")).isEqualTo(c.replicas());
-        assertThat(JsonPath.read(json, "$.stream_processing_timeout")).isEqualTo((int) c.streamProcessingTimeout());
-        assertThat(JsonPath.read(json, "$.stream_processing_max_faults")).isEqualTo(c.streamProcessingMaxFaults());
-        assertThat(JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
-        assertThat(JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleMasterTimeout());
-        assertThat(JsonPath.read(json, "$.disable_index_optimization")).isEqualTo(c.disableIndexOptimization());
-        assertThat(JsonPath.read(json, "$.index_optimization_max_num_segments")).isEqualTo(c.indexOptimizationMaxSegments());
-        assertThat(JsonPath.read(json, "$.gc_warning_threshold")).isEqualTo(c.gcWarningThreshold());
+        assertThat((int) JsonPath.read(json, "$.inputbuffer_processors")).isEqualTo(c.inputBufferProcessors());
+        assertThat((int) JsonPath.read(json, "$.processbuffer_processors")).isEqualTo(c.processBufferProcessors());
+        assertThat((int) JsonPath.read(json, "$.outputbuffer_processors")).isEqualTo(c.outputBufferProcessors());
+        assertThat((String) JsonPath.read(json, "$.processor_wait_strategy")).isEqualTo(c.processorWaitStrategy());
+        assertThat((String) JsonPath.read(json, "$.inputbuffer_wait_strategy")).isEqualTo(c.inputBufferWaitStrategy());
+        assertThat((int) JsonPath.read(json, "$.inputbuffer_ring_size")).isEqualTo(c.inputBufferRingSize());
+        assertThat((int) JsonPath.read(json, "$.ring_size")).isEqualTo(c.ringSize());
+        assertThat((String) JsonPath.read(json, "$.plugin_dir")).isEqualTo(c.pluginDir());
+        assertThat((String) JsonPath.read(json, "$.node_id_file")).isEqualTo(c.nodeIdFile());
+        assertThat((boolean) JsonPath.read(json, "$.allow_highlighting")).isEqualTo(c.allowHighlighting());
+        assertThat((boolean) JsonPath.read(json, "$.allow_leading_wildcard_searches")).isEqualTo(c.allowLeadingWildcardSearches());
+        assertThat((String) JsonPath.read(json, "$.rotation_strategy")).isEqualTo(c.rotationStrategy());
+        assertThat((String) JsonPath.read(json, "$.retention_strategy")).isEqualTo(c.retentionStrategy());
+        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_docs_per_index")).isEqualTo(c.maxDocsPerIndex());
+        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_size_per_index")).isEqualTo((int) c.maxSizePerIndex());
+        assertThat((String) JsonPath.read(json, "$.elasticsearch_max_time_per_index")).isEqualTo(c.maxTimePerIndex().toString());
+        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_number_of_indices")).isEqualTo(c.maxNumberOfIndices());
+        assertThat((int) JsonPath.read(json, "$.elasticsearch_shards")).isEqualTo(c.shards());
+        assertThat((int) JsonPath.read(json, "$.elasticsearch_replicas")).isEqualTo(c.replicas());
+        assertThat((int) JsonPath.read(json, "$.stream_processing_timeout")).isEqualTo((int) c.streamProcessingTimeout());
+        assertThat((int) JsonPath.read(json, "$.stream_processing_max_faults")).isEqualTo(c.streamProcessingMaxFaults());
+        assertThat((int) JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
+        assertThat((int) JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleMasterTimeout());
+        assertThat((boolean) JsonPath.read(json, "$.disable_index_optimization")).isEqualTo(c.disableIndexOptimization());
+        assertThat((int) JsonPath.read(json, "$.index_optimization_max_num_segments")).isEqualTo(c.indexOptimizationMaxSegments());
+        assertThat((String) JsonPath.read(json, "$.gc_warning_threshold")).isEqualTo(c.gcWarningThreshold());
     }
 
     @Test
