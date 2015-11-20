@@ -31,8 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -76,7 +75,7 @@ public class IndexRangesCleanupPeriodical extends Periodical {
         final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllDeflectorIndexNames());
         final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
 
-        final List<String> removedIndices = new ArrayList<>();
+        final Set<String> removedIndices = new HashSet<>();
         for (IndexRange indexRange : indexRanges) {
             if (!indexNames.contains(indexRange.indexName())) {
                 removedIndices.add(indexRange.indexName());
