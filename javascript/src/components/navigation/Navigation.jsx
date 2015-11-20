@@ -10,6 +10,7 @@ import NotificationsStore from 'stores/notifications/NotificationsStore';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
+import HelpMenu from 'components/navigation/HelpMenu';
 
 const Navigation = React.createClass({
   mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
@@ -168,6 +169,7 @@ const Navigation = React.createClass({
                 <GlobalThroughput />
               </NavItem>
             </LinkContainer>
+            <HelpMenu active={this._isActive('/gettingstarted')}/>
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
           </Nav>
         </Navbar.Collapse>
