@@ -55,6 +55,7 @@ public class ServerStatus {
 
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final String clusterId;
     private final DateTime startedAt;
     private final Set<Capability> capabilitySet;
     private MessageDetailRecordingStrategy messageDetailRecordingStrategy = MessageDetailRecordingStrategy.NEVER;
@@ -69,6 +70,7 @@ public class ServerStatus {
     public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus) {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
+        this.clusterId = "";
         this.startedAt = Tools.iso8601();
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
         this.messageDetailRecordingStrategy = configuration.isMessageRecordingsEnabled()
@@ -78,6 +80,10 @@ public class ServerStatus {
 
     public NodeId getNodeId() {
         return nodeId;
+    }
+
+    public String getClusterId() {
+        return clusterId;
     }
 
     public Lifecycle getLifecycle() {

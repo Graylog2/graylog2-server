@@ -47,6 +47,8 @@ public abstract class SystemOverviewResponse {
     @JsonProperty
     public abstract String serverId();
     @JsonProperty
+    public abstract String clusterId();
+    @JsonProperty
     public abstract String version();
     @JsonProperty
     public abstract String startedAt();
@@ -60,18 +62,22 @@ public abstract class SystemOverviewResponse {
     public abstract String lbStatus();
     @JsonProperty
     public abstract String timezone();
+    @JsonProperty("operating_system")
+    public abstract String operatingSystem();
 
     @JsonCreator
     public static SystemOverviewResponse create(@JsonProperty("facility") String facility,
                                                 @JsonProperty("codename") String codename,
                                                 @JsonProperty("server_id") String serverId,
+                                                @JsonProperty("cluster_id") String clusterId,
                                                 @JsonProperty("version") String version,
                                                 @JsonProperty("started_at") String startedAt,
                                                 @JsonProperty("is_processing") boolean isProcessing,
                                                 @JsonProperty("hostname") String hostname,
                                                 @JsonProperty("lifecycle") String lifecycle,
                                                 @JsonProperty("lb_status") String lbStatis,
-                                                @JsonProperty("timezone") String timezone) {
-        return new AutoValue_SystemOverviewResponse(facility, codename, serverId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone);
+                                                @JsonProperty("timezone") String timezone,
+                                                @JsonProperty("operating_system") String operatingSystem) {
+        return new AutoValue_SystemOverviewResponse(facility, codename, serverId, clusterId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone, operatingSystem);
     }
 }

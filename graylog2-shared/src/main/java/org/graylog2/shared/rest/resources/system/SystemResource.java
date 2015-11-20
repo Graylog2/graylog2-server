@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
+import com.eaio.uuid.UUID;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
@@ -25,6 +26,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
@@ -49,10 +52,12 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 @Path("/system")
 public class SystemResource extends RestResource {
     private final ServerStatus serverStatus;
+    private final ClusterId clusterId;
 
     @Inject
-    public SystemResource(ServerStatus serverStatus) {
+    public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService) {
         this.serverStatus = serverStatus;
+        this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
     }
 
     @GET
@@ -62,16 +67,19 @@ public class SystemResource extends RestResource {
     public SystemOverviewResponse system() {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
+
         return SystemOverviewResponse.create("graylog2-server",
                 ServerVersion.CODENAME,
                 serverStatus.getNodeId().toString(),
+                clusterId.clusterId(),
                 ServerVersion.VERSION.toString(),
                 Tools.getISO8601String(serverStatus.getStartedAt()),
                 serverStatus.isProcessing(),
                 Tools.getLocalCanonicalHostname(),
                 serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH),
                 serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH),
-                serverStatus.getTimezone().getID());
+                serverStatus.getTimezone().getID(),
+                System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"));
     }
 
     @GET
