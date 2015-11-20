@@ -16,6 +16,11 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -30,7 +35,9 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
+import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
+import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.joda.time.DateTime;
@@ -44,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.SortedSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class MongoIndexRangeService implements IndexRangeService {
@@ -134,7 +143,51 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been deleted. Removing index range.");
             collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        }
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexClosing(IndicesClosedEvent event) {
+        for (String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been closed. Removing index range.");
+            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        }
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void handleIndexReopening(IndicesReopenedEvent event) {
+        for (final String index : event.indices()) {
+            LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
+
+            indices.waitForRecovery(index);
+
+            final Retryer<IndexRange> retryer = RetryerBuilder.<IndexRange>newBuilder()
+                    .retryIfException()
+                    .withWaitStrategy(WaitStrategies.exponentialWait())
+                    .withStopStrategy(StopStrategies.stopAfterDelay(5, TimeUnit.MINUTES))
+                    .build();
+
+            final IndexRange indexRange;
+            try {
+                indexRange = retryer.call(new Callable<IndexRange>() {
+                    @Override
+                    public IndexRange call() throws Exception {
+                        return calculateRange(index);
+                    }
+                });
+            } catch (ExecutionException e) {
+                LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
+                throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
+            } catch (RetryException e) {
+                LOG.error("Couldn't calculate index range for index \"" + index + "\"", e);
+                throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
+            }
+
+            save(indexRange);
         }
     }
 }

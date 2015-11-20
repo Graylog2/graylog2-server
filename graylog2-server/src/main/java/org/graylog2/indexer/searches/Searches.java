@@ -24,6 +24,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;
@@ -457,11 +458,11 @@ public class Searches {
         QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
-        SearchRequestBuilder srb = c.prepareSearch();
         final Set<String> affectedIndices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
-        srb.setIndices(affectedIndices.toArray(new String[affectedIndices.size()]));
-        srb.setQuery(qs);
-        srb.addAggregation(builder);
+        final SearchRequestBuilder srb = c.prepareSearch(affectedIndices.toArray(new String[affectedIndices.size()]))
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
+                .setQuery(qs)
+                .addAggregation(builder);
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
@@ -584,8 +585,8 @@ public class Searches {
             query = "*";
         }
 
-        SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(indices.toArray(new String[indices.size()]));
+        final SearchRequestBuilder srb = c.prepareSearch(indices.toArray(new String[indices.size()]))
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen());
 
         final QueryBuilder queryBuilder;
 

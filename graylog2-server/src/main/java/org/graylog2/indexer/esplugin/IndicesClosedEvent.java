@@ -22,10 +22,10 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 @AutoValue
-public abstract class IndicesDeletedEvent {
+public abstract class IndicesClosedEvent {
     public abstract Set<String> indices();
 
-    public static IndicesDeletedEvent create(Set<String> indices) {
-        return new AutoValue_IndicesDeletedEvent(ImmutableSet.copyOf(indices));
+    public static IndicesClosedEvent create(Set<String> indices) {
+        return new AutoValue_IndicesClosedEvent(ImmutableSet.copyOf(indices));
     }
 }
