@@ -1,62 +1,69 @@
-'use strict';
+import React from 'react';
+import FieldHelpers from 'components/configurationforms/FieldHelpers';
 
-var React = require('react');
-var FieldHelpers = require('./FieldHelpers');
+const TextField = React.createClass({
+  propTypes: {
+    autoFocus: React.PropTypes.bool,
+    field: React.PropTypes.object.isRequired,
+    onChange: React.PropTypes.func.isRequired,
+    title: React.PropTypes.string.isRequired,
+    typeName: React.PropTypes.string.isRequired,
+    value: React.PropTypes.any,
+  },
+  getInitialState() {
+    return {
+      typeName: this.props.typeName,
+      field: this.props.field,
+      title: this.props.title,
+      value: this.props.value,
+    };
+  },
+  componentWillReceiveProps(props) {
+    this.setState(props);
+  },
+  handleChange(evt) {
+    this.props.onChange(this.state.title, evt.target.value);
+    this.setState({value: evt.target.value});
+  },
+  _fieldValue(field) {
+    return field.default_value;
+  },
+  render() {
+    const field = this.state.field;
+    const title = this.state.title;
+    const typeName = this.state.typeName;
 
-var TextField = React.createClass({
-    _fieldValue(field) {
-        return field.default_value;
-    },
-    getInitialState() {
-        return {
-            typeName: this.props.typeName,
-            field: this.props.field,
-            title: this.props.title,
-            value: this.props.value
-        };
-    },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
-    handleChange(evt) {
-        this.props.onChange(this.state.title, evt.target.value);
-        this.setState({value: evt.target.value});
-    },
-    render() {
-        var field = this.state.field;
-        var title = this.state.title;
-        var typeName = this.state.typeName;
+    let inputField;
+    const value = this._fieldValue(field);
+    const isRequired = !field.is_optional;
+    const fieldType = (!FieldHelpers.hasAttribute(field.attributes, 'textarea') && FieldHelpers.hasAttribute(field.attributes, 'is_password') ? 'password' : 'text');
 
-        var inputField;
-        var value = this._fieldValue(field);
-        var isRequired = !field.is_optional;
-        var fieldType = (!FieldHelpers.hasAttribute(field.attributes, "textarea") && FieldHelpers.hasAttribute(field.attributes, "is_password") ? "password" : "text");
-
-        if (FieldHelpers.hasAttribute(field.attributes, "textarea")) {
-            inputField = (
-                    <textarea id={title} className="form-control" rows={10}
-                              name={"configuration["+title+"]"} required={isRequired} defaultValue={value} value={this.state.value}
-                              onChange={this.handleChange} autoFocus={this.props.autoFocus}>
+    if (FieldHelpers.hasAttribute(field.attributes, 'textarea')) {
+      inputField = (
+        <textarea id={title} className="form-control" rows={10}
+                  name={'configuration[' + title + ']'} required={isRequired} defaultValue={value} value={this.state.value}
+                  onChange={this.handleChange} autoFocus={this.props.autoFocus}>
                     </textarea>
-            );
-        } else {
-            inputField = (
-                <input id={title} type={fieldType} className="form-control" name={"configuration["+title+"]"} value={this.state.value}
-                       onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)} autoFocus={this.props.autoFocus} />
-            );
-        }
-
-        return (
-            <div className="form-group">
-                <label htmlFor={typeName + "-" + title + ")"}>
-                    {field.human_name}
-                    {FieldHelpers.optionalMarker(field)}
-                </label>
-                {inputField}
-                <p className="help-block">{field.description}</p>
-            </div>
-        );
+      );
+    } else {
+      inputField = (
+        <input id={title} type={fieldType} className="form-control" name={'configuration[' + title + ']'} value={this.state.value}
+               onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)} autoFocus={this.props.autoFocus} />
+      );
     }
+
+    // TODO: replace with bootstrap input component
+    return (
+      <div className="form-group">
+        <label htmlFor={typeName + '-' + title + ')'}>
+          {field.human_name}
+          {FieldHelpers.optionalMarker(field)}
+        </label>
+        {inputField}
+        <p className="help-block">{field.description}</p>
+      </div>
+    );
+  },
 });
 
-module.exports = TextField;
+export default TextField;
