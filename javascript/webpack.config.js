@@ -96,11 +96,22 @@ if (TARGET === 'build') {
   });
 }
 
+if (TARGET === 'test') {
+  console.log('Running test/ci mode');
+  module.exports = merge(webpackConfig, {
+    module: {
+      preLoaders: [
+        { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
+      ],
+    },
+  });
+}
+
 if (TARGET === 'start' || TARGET === 'build') {
   module.exports = merge(commonConfigs, module.exports);
 }
 
 if (Object.keys(module.exports).length === 0) {
-  console.log("Running in default mode");
+  console.log('Running in default mode');
   module.exports = webpackConfig;
 }
