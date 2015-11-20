@@ -1,8 +1,8 @@
-export AlarmCallback from './AlarmCallback';
-export AlarmCallbackComponent from './AlarmCallbackComponent';
-export AlarmCallbackHistory from './AlarmCallbackHistory';
-export AlarmCallbackHistoryOverview from './AlarmCallbackHistoryOverview';
-export AlarmCallbackList from './AlarmCallbackList';
-export CreateAlarmCallbackButton from './CreateAlarmCallbackButton';
-export DeleteAlarmCallbackButton from './DeleteAlarmCallbackButton';
-export EditAlarmCallbackButton from './EditAlarmCallbackButton';
+export { default as AlarmCallback } from './AlarmCallback';
+export { default as AlarmCallbackComponent } from './AlarmCallbackComponent';
+export { default as AlarmCallbackHistory } from './AlarmCallbackHistory';
+export { default as AlarmCallbackHistoryOverview } from './AlarmCallbackHistoryOverview';
+export { default as AlarmCallbackList } from './AlarmCallbackList';
+export { default as CreateAlarmCallbackButton } from './CreateAlarmCallbackButton';
+export { default as DeleteAlarmCallbackButton } from './DeleteAlarmCallbackButton';
+export { default as EditAlarmCallbackButton } from './EditAlarmCallbackButton';

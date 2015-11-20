@@ -6,13 +6,14 @@ import CurrentUserStore from 'stores/users/CurrentUserStore';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 const IfPermitted = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   propTypes: {
+    children: React.PropTypes.node.isRequired,
     permissions: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.arrayOf(React.PropTypes.string),
     ]).isRequired,
   },
+  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   render() {
     const permissions = this.state.currentUser.permissions;
     if (this.isPermitted(permissions, this.props.permissions)) {

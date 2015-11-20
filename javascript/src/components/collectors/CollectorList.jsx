@@ -4,11 +4,9 @@ import { Row, Col, Alert } from 'react-bootstrap';
 import CollectorsStore from 'stores/collectors/CollectorsStore';
 
 import CollectorRow from './CollectorRow';
-import Spinner from 'components/common/Spinner';
+import { Spinner } from 'components/common';
 
 const CollectorList = React.createClass({
-  COLLECTOR_DATA_REFRESH: 5 * 1000,
-
   getInitialState() {
     return {
       filter: '',
@@ -19,6 +17,8 @@ const CollectorList = React.createClass({
   componentDidMount() {
     this.loadData();
   },
+  COLLECTOR_DATA_REFRESH: 5 * 1000,
+
   loadData() {
     CollectorsStore.load((resp) => {
       if (this.isMounted()) {
@@ -67,6 +67,24 @@ const CollectorList = React.createClass({
       </div>
     );
   },
+  toggleShowInactive() {
+    this.setState({showInactive: !this.state.showInactive});
+  },
+  sortById() {
+    this.setState({sort: (collector) => {return collector.id;}});
+  },
+  sortByNodeId() {
+    this.setState({sort: (collector) => {return collector.node_id;}});
+  },
+  sortByOperatingSystem() {
+    this.setState({sort: (collector) => {return collector.node_details.operating_system;}});
+  },
+  sortByLastSeen() {
+    this.setState({sort: (collector) => {return collector.last_seen;}});
+  },
+  sortByCollectorVersion() {
+    this.setState({sort: (collector) => {return collector.collector_version;}});
+  },
   _formatEmptyListAlert() {
     const showInactiveHint = (this.state.showInactive ? null : ' and/or click on \"Include inactive collectors\"');
     return <Alert>There are no collectors to show. Try adjusting your search filter{showInactiveHint}.</Alert>;
@@ -105,24 +123,6 @@ const CollectorList = React.createClass({
 
     return <Spinner />;
   },
-  toggleShowInactive() {
-    this.setState({showInactive: !this.state.showInactive});
-  },
-  sortById() {
-    this.setState({sort: (collector) => {return collector.id;}});
-  },
-  sortByNodeId() {
-    this.setState({sort: (collector) => {return collector.node_id;}});
-  },
-  sortByOperatingSystem() {
-    this.setState({sort: (collector) => {return collector.node_details.operating_system;}});
-  },
-  sortByLastSeen() {
-    this.setState({sort: (collector) => {return collector.last_seen;}});
-  },
-  sortByCollectorVersion() {
-    this.setState({sort: (collector) => {return collector.collector_version;}});
-  },
 });
 
-module.exports = CollectorList;
+export default CollectorList;
