@@ -25,28 +25,22 @@ class StreamRulesStore {
     private callbacks: Array<Callback> = [];
 
     types(callback: ((streamRuleTypes: Array<StreamRuleType>) => void)) {
-        /*var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Fetching Stream Rule Types failed with status: " + errorThrown,
-                "Could not retrieve Stream Rule Types");
-        };
-
-        $.getJSON(jsRoutes.controllers.api.StreamRulesApiController.types().url, callback).fail(failCallback);*/
         var url = "/streams/null/rules/types";
         var promise = fetch('GET', URLUtils.qualifyUrl(url));
 
         return promise;
     }
     list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Fetching Stream Rules failed with status: " + errorThrown,
+        var failCallback = (error) => {
+            UserNotification.error("Fetching Stream Rules failed with status: " + error,
                 "Could not retrieve Stream Rules");
         };
 
         fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url)).then(callback, failCallback);
     }
     update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating Stream Rule failed with status: " + errorThrown,
+        var failCallback = (error) => {
+            UserNotification.error("Updating Stream Rule failed with status: " + error,
                 "Could not update Stream Rule");
         };
 
@@ -56,8 +50,8 @@ class StreamRulesStore {
         fetch('PUT', url, request).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     remove(streamId: string, streamRuleId: string, callback: (() => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Deleting Stream Rule failed with status: " + errorThrown,
+        var failCallback = (error) => {
+            UserNotification.error("Deleting Stream Rule failed with status: " + error,
                 "Could not delete Stream Rule");
         };
 
@@ -65,8 +59,8 @@ class StreamRulesStore {
         fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     create(streamId: string, data: StreamRule, callback: (() => void)) {
-        var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Creating Stream Rule failed with status: " + errorThrown,
+        var failCallback = (error) => {
+            UserNotification.error("Creating Stream Rule failed with status: " + error,
                 "Could not create Stream Rule");
         };
 

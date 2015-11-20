@@ -11,29 +11,29 @@ const AlertConditionsStore = Reflux.createStore({
   listenables: AlertConditionsActions,
 
   delete(streamId, alertConditionId) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Removing Alert Condition failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Removing Alert Condition failed with status: ' + error,
         'Could not remove Alert Conditions');
     };
 
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.delete(streamId, alertConditionId).url);
     const promise = fetch('DELETE', url).then(() => {
       AlertConditionsActions.list(streamId);
-    });
+    }, failCallback);
     AlertConditionsActions.delete.promise(promise);
   },
   list(streamId) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Fetching Alert Conditions failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Fetching Alert Conditions failed with status: ' + error,
         'Could not retrieve Alert Conditions');
     };
 
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => {
-      const conditions = response.conditions.map((condition => {
+      const conditions = response.conditions.map((condition) => {
         condition.stream_id = streamId;
         return condition;
-      }));
+      });
       this.trigger({alertConditions: conditions});
       return conditions;
     }, failCallback);
@@ -42,8 +42,8 @@ const AlertConditionsStore = Reflux.createStore({
     return promise;
   },
   save(streamId, alertCondition) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Saving Alert Condition failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Saving Alert Condition failed with status: ' + error,
         'Could not save Alert Condition');
     };
 
@@ -55,8 +55,8 @@ const AlertConditionsStore = Reflux.createStore({
     AlertConditionsActions.save.promise(promise);
   },
   update(streamId, alertConditionId, request) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error('Saving Alert Condition failed with status: ' + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error('Saving Alert Condition failed with status: ' + error,
         'Could not save Alert Condition');
     };
 

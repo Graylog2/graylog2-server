@@ -34,11 +34,11 @@ var MessagesStore = {
         return promise;
     },
 
-    fieldTerms(index: string, messageId: string, field: string): JQueryPromise<Array<string>> {
+    fieldTerms(index: string, messageId: string, field: string): Promise<Array<string>> {
         var url = jsRoutes.controllers.MessagesController.analyze(index, messageId, field).url;
-        var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading field terms failed with status: " + errorThrown,
+        var promise = fetch('GET', url);
+        promise.fail((error) => {
+            UserNotification.error("Loading field terms failed with status: " + error,
                 "Could not load field terms.");
         });
         return promise;

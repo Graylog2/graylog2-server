@@ -29,16 +29,16 @@ const OutputsStore = {
       return resp.types[typeName];
     }, this._failCallback).then(callback);
   },
-  remove(outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+  remove(outputId: string, callback: (error) => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.delete(outputId).url);
-    fetch('DELETE', url).then(callback, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Terminating output failed with status: " + errorThrown,
+    fetch('DELETE', url).then(callback, (error) => {
+      UserNotification.error("Terminating output failed with status: " + error,
         "Could not terminate output");
     });
   },
   save(output: any, callback: (output: Output) => void) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Saving Output \"" + output.title + "\" failed with status: " + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error("Saving Output \"" + output.title + "\" failed with status: " + error,
         "Could not save Output");
     };
 
@@ -47,8 +47,8 @@ const OutputsStore = {
     fetch('POST', url, output).then(callback, failCallback);
   },
   update(output: Output, deltas: any, callback: (output: Output) => void) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Updating Output \"" + output.title + "\" failed with status: " + errorThrown,
+    const failCallback = (error) => {
+      UserNotification.error("Updating Output \"" + output.title + "\" failed with status: " + error,
         "Could not update Output");
     };
 
@@ -56,8 +56,8 @@ const OutputsStore = {
 
     fetch('PUT', url, deltas).then(callback, failCallback);
   },
-  _failCallback(jqXHR: any, textStatus: string, errorThrown: string) {
-    UserNotification.error("Loading outputs failed with status: " + errorThrown,
+  _failCallback(error: string) {
+    UserNotification.error("Loading outputs failed with status: " + error,
       "Could not load outputs");
   }
 };

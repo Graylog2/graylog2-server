@@ -44,7 +44,7 @@ class StreamsStore {
     });
   }
   get(streamId: string, callback: ((stream: Stream) => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Loading Stream failed with status: " + errorThrown,
         "Could not retrieve Stream");
     };
@@ -53,7 +53,7 @@ class StreamsStore {
     fetch('GET', URLUtils.qualifyUrl(url)).then(callback, failCallback);
   }
   remove(streamId: string, callback: (() => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Removing Stream failed with status: " + errorThrown,
         "Could not remove Stream");
     };
@@ -62,7 +62,7 @@ class StreamsStore {
     fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
   }
   pause(streamId: string, callback: (() => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Pausing Stream failed with status: " + errorThrown,
         "Could not pause Stream");
     };
@@ -71,7 +71,7 @@ class StreamsStore {
     fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
   }
   resume(streamId: string, callback: (() => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Resuming Stream failed with status: " + errorThrown,
         "Could not resume Stream");
     };
@@ -81,7 +81,7 @@ class StreamsStore {
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   save(stream: any, callback: ((streamId: string) => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Saving Stream failed with status: " + errorThrown,
         "Could not save Stream");
     };
@@ -91,7 +91,7 @@ class StreamsStore {
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   update(streamId: string, data: any, callback: (() => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Updating Stream failed with status: " + errorThrown,
         "Could not update Stream");
     };
@@ -101,7 +101,7 @@ class StreamsStore {
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   cloneStream(streamId: string, data: any, callback: (() => void)) {
-    const failCallback = (jqXHR, textStatus, errorThrown) => {
+    const failCallback = (errorThrown) => {
       UserNotification.error("Cloning Stream failed with status: " + errorThrown,
         "Could not clone Stream");
     };
@@ -110,17 +110,17 @@ class StreamsStore {
     fetch('POST', url, data)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
-  removeOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+  removeOutput(streamId: string, outputId: string, callback: (errorThrown) => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url);
 
-    fetch('DELETE', url).then(callback, (jqXHR, textStatus, errorThrown) => {
+    fetch('DELETE', url).then(callback, (errorThrown) => {
       UserNotification.error("Removing output from stream failed with status: " + errorThrown,
         "Could not remove output from stream");
     }).then(this._emitChange.bind(this));
   }
-  addOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+  addOutput(streamId: string, outputId: string, callback: (errorThrown) => void) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamOutputsApiController.add(streamId, outputId).url);
-    fetch('POST', url, {outputs: [outputId]}).then(callback, (jqXHR, textStatus, errorThrown) => {
+    fetch('POST', url, {outputs: [outputId]}).then(callback, (errorThrown) => {
       UserNotification.error("Adding output to stream failed with status: " + errorThrown,
         "Could not add output to stream");
     }).then(this._emitChange.bind(this));

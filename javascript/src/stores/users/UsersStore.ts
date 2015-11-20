@@ -1,4 +1,4 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import UserNotification = require('util/UserNotification');
 import URLUtils = require('util/URLUtils');
@@ -37,44 +37,44 @@ const UsersStore = {
     return URLUtils.qualifyUrl("/system/users/edit/" + username);
   },
 
-  create(request: any): JQueryPromise<string[]> {
+  create(request: any): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.create().url);
     const promise = fetch('POST', url, request);
     return promise;
   },
 
-  loadUsers(): JQueryPromise<User[]> {
+  loadUsers(): Promise<User[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.list().url);
     const promise = fetch('GET', url);
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Loading user list failed with status: " + errorThrown,
+    promise.catch((error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Loading user list failed with status: " + error,
           "Could not load user list");
       }
     });
     return promise;
   },
 
-  load(username: string): JQueryPromise<User> {
+  load(username: string): Promise<User> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.load(username).url);
     const promise = fetch('GET', url);
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Loading user failed with status: " + errorThrown,
+    promise.catch((error) => {
+      UserNotification.error("Loading user failed with status: " + error,
         "Could not load user " + username);
     });
 
     return promise;
   },
 
-  deleteUser(username: string): JQueryPromise<string[]> {
+  deleteUser(username: string): Promise<string[]> {
     const  url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.delete(username).url);
     const  promise = fetch('DELETE', url);
 
     promise.then(() => {
       UserNotification.success("User \"" + username + "\" was deleted successfully");
-    }, (jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Delete user failed with status: " + errorThrown,
+    }, (error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Delete user failed with status: " + error,
           "Could not delete user");
       }
     });

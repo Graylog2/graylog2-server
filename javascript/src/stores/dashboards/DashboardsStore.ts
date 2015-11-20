@@ -1,5 +1,6 @@
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 /// <reference path='../../routing/jsRoutes.d.ts' />
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import Immutable = require('immutable');
 import UserNotification = require("util/UserNotification");
@@ -81,16 +82,16 @@ class DashboardsStore {
       });
   }
 
-  listDashboards(): JQueryPromise<Immutable.List<Dashboard>> {
+  listDashboards(): Promise<Immutable.List<Dashboard>> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.index().url);
     const promise = fetch('GET', url)
       .then((response) => {
         const dashboardList = Immutable.List<Dashboard>(response.dashboards);
 
         return dashboardList;
-      }, (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.status !== 404) {
-          UserNotification.error("Loading dashboard list failed with status: " + errorThrown,
+      }, (error) => {
+        if (error.additional.status !== 404) {
+          UserNotification.error("Loading dashboard list failed with status: " + error,
             "Could not load dashboards");
         }
       });
@@ -101,7 +102,7 @@ class DashboardsStore {
     return this.dashboards.toArray().filter((dashboard) => PermissionsMixin.isPermitted(permissions, 'dashboards:edit:' + dashboard.id));
   }
 
-  get(id: string): JQueryPromise<Dashboard> {
+  get(id: string): Promise<Dashboard> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
     const promise = new Builder('GET', url)
         .authenticated()
@@ -119,7 +120,7 @@ class DashboardsStore {
     return promise;
   }
 
-  createDashboard(title: string, description: string): JQueryPromise<string[]> {
+  createDashboard(title: string, description: string): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.create().url);
     const promise = fetch('POST', url, {title: title, description: description})
 
@@ -131,15 +132,15 @@ class DashboardsStore {
       } else if (this._onWritableDashboardsChanged.length > 0) {
         this.updateWritableDashboards();
       }
-    }, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + errorThrown,
+    }, (error) => {
+      UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + error,
         "Could not create dashboard");
     });
 
     return promise;
   }
 
-  saveDashboard(dashboard: Dashboard): JQueryPromise<string[]> {
+  saveDashboard(dashboard: Dashboard): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.update(dashboard.id).url);
     const promise = fetch('PUT', url, {title: dashboard.title, description: dashboard.description});
 
@@ -151,15 +152,15 @@ class DashboardsStore {
       } else if (this._onWritableDashboardsChanged.length > 0) {
         this.updateWritableDashboards();
       }
-    }, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
+    }, (error) => {
+      UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + error,
         "Could not save dashboard");
     });
 
     return promise;
   }
 
-  remove(dashboard: Dashboard): JQueryPromise<string[]> {
+  remove(dashboard: Dashboard): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.delete(dashboard.id).url);
     const promise = fetch('DELETE', url)
 
@@ -171,8 +172,8 @@ class DashboardsStore {
       } else if (this._onWritableDashboardsChanged.length > 0) {
         this.updateWritableDashboards();
       }
-    }, (jqXHR, textStatus, errorThrown) => {
-      UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + errorThrown,
+    }, (error) => {
+      UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + error,
         "Could not delete dashboard");
     });
 

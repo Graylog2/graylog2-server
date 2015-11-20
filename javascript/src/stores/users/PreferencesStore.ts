@@ -45,7 +45,7 @@ var PreferencesStore = {
     fetch('PUT', url, {preferences: preferencesAsMap}).then(() => {
       UserNotification.success("User preferences successfully saved");
       callback(preferences);
-    }, (jqXHR, textStatus, errorThrown) => {
+    }, (errorThrown) => {
       UserNotification.error("Saving of preferences for \"" + this._userName + "\" failed with status: " + errorThrown,
         "Could not save user preferences");
     });
@@ -58,7 +58,7 @@ var PreferencesStore = {
       var sortedArray = this.convertPreferenceMapToArray(data.preferences);
       callback(sortedArray);
     };
-    var failCallback = (jqXHR, textStatus, errorThrown) => {
+    var failCallback = (errorThrown) => {
       UserNotification.error(
         "Loading of user preferences for \"" + userName + "\" failed with status: " + errorThrown + ". Try reloading the page",
         "Could not retrieve user preferences from server");

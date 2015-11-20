@@ -1,3 +1,5 @@
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
+
 const Reflux = require('reflux');
 
 import UserNotification = require('util/UserNotification');
@@ -57,15 +59,15 @@ const WidgetsStore = Reflux.createStore({
         };
     },
 
-    addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): JQueryPromise<string[]> {
+    addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): Promise<string[]> {
         var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url);
         var promise = fetch('POST', url, widgetData);
 
         promise.then(() => UserNotification.success("Widget created successfully"),
-        (jqXHR, textStatus, errorThrown) => {
-            if (jqXHR.status !== 404) {
-                UserNotification.error("Creating widget failed with status: " + errorThrown,
+        (error) => {
+            if (error.additional.status !== 404) {
+                UserNotification.error("Creating widget failed with status: " + error,
                     "Could not create widget");
             }
         });
@@ -73,7 +75,7 @@ const WidgetsStore = Reflux.createStore({
         return promise;
     },
 
-    loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
+    loadWidget(dashboardId: string, widgetId: string): Promise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
         const promise = new Builder('GET', url)
             .authenticated()
@@ -81,16 +83,16 @@ const WidgetsStore = Reflux.createStore({
             .json()
             .build();
 
-        promise.catch((jqXHR, textStatus, errorThrown) => {
-            if (jqXHR.status !== 404) {
-                UserNotification.error("Loading widget information failed with status: " + errorThrown,
+        promise.catch((error) => {
+            if (error.additional.status !== 404) {
+                UserNotification.error("Loading widget information failed with status: " + error,
                     "Could not load widget information");
             }
         });
         return promise.then((widget) => this._deserializeWidget(widget));
     },
 
-    updateWidget(dashboardId: string, widget: Widget) {
+    updateWidget(dashboardId: string, widget: Widget): Promise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
         var promise = fetch('PUT', url, this._serializeWidgetForUpdate(widget));
 
@@ -103,7 +105,7 @@ const WidgetsStore = Reflux.createStore({
         return promise;
     },
 
-    loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
+    loadValue(dashboardId: string, widgetId: string, resolution: number): Promise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
 
         return new Builder('GET', url)
@@ -113,7 +115,7 @@ const WidgetsStore = Reflux.createStore({
             .build();
     },
 
-    removeWidget(dashboardId: string, widgetId: string): void {
+    removeWidget(dashboardId: string, widgetId: string): Promise<string[]> {
         const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.removeWidget(dashboardId, widgetId).url);
 
         const promise = fetch('DELETE', url).then(() => {

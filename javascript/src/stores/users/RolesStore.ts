@@ -18,9 +18,9 @@ export interface RoleMembership {
 export const RolesStore = {
   loadRoles(): JQueryPromise<string[]> {
     const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.listRoles().url));
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Loading role list failed with status: " + errorThrown,
+    promise.catch((error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Loading role list failed with status: " + error,
           "Could not load role list");
       }
     });
@@ -32,8 +32,8 @@ export const RolesStore = {
 
     promise.then((newRole) => {
       UserNotification.success("Role \"" + newRole.name + "\" was created successfully");
-    }, (jqXHR) => {
-      UserNotification.error("Creating role \"" + role.name + "\" failed with status: " + jqXHR.responseText,
+    }, (error) => {
+      UserNotification.error("Creating role \"" + role.name + "\" failed with status: " + error,
         "Could not create role");
     });
 
@@ -45,9 +45,9 @@ export const RolesStore = {
 
     promise.then((newRole) => {
       UserNotification.success("Role \"" + newRole.name + "\" was updated successfully");
-    }, (jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Updating role failed with status: " + errorThrown,
+    }, (error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Updating role failed with status: " + error,
           "Could not update role");
       }
     });
@@ -61,9 +61,9 @@ export const RolesStore = {
 
     promise.then(() => {
       UserNotification.success("Role \"" + rolename + "\" was deleted successfully");
-    }, (jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Deleting role failed with status: " + errorThrown,
+    }, (error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Deleting role failed with status: " + error,
           "Could not delete role");
       }
     });
@@ -72,9 +72,9 @@ export const RolesStore = {
   getMembers(rolename: string): JQueryPromise<RoleMembership[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.loadMembers(rolename).url);
     const promise = fetch('GET', url);
-    promise.catch((jqXHR, textStatus, errorThrown) => {
-      if (jqXHR.status !== 404) {
-        UserNotification.error("Could not load role's members with status: " + errorThrown,
+    promise.catch((error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Could not load role's members with status: " + error,
           "Could not load role members");
       }
     });
