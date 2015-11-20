@@ -1,5 +1,12 @@
 {
-  "extends": "airbnb",
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "import/warnings"
+  ],
+  "plugins": [
+    "import",
+  ],
   "rules": {
     "no-else-return": 1,
     "new-cap": 0,
