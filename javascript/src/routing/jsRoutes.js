@@ -144,6 +144,10 @@ const jsRoutes = {
         histogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/histogram?query=' + query + '&interval=' + interval}; },
         fieldHistogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/fieldHistogram?query=' + query + '&interval=' + interval}; },
       },
+      UsageStatsApiController: {
+        pluginEnabled: () => { return {url: '/plugins/org.graylog.plugins.usagestatistics/config'}; },
+        setOptOutState: () => { return {url: '/plugins/org.graylog.plugins.usagestatistics/opt-out'}; },
+      },
       UsersApiController: {
         changePassword: (username) => { return {url: '/users/' + username + '/password'}; },
         create: () => { return {url: '/users'}; },
