@@ -16,17 +16,23 @@
  */
 package org.graylog2.indexer.esplugin;
 
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.ClusterChangedEvent;
 import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.ClusterStateListener;
+import org.elasticsearch.cluster.metadata.MetaData;
 import org.elasticsearch.common.component.AbstractLifecycleComponent;
 import org.elasticsearch.common.settings.Settings;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.elasticsearch.common.base.Preconditions.checkNotNull;
 
@@ -57,11 +63,47 @@ public class IndexChangeMonitor extends AbstractLifecycleComponent<IndexChangeMo
         }
 
         if (eventBus != null) {
-            final List<String> indicesDeleted = event.indicesDeleted();
+            final Set<String> indicesDeleted = new HashSet<>(event.indicesDeleted());
             if (!indicesDeleted.isEmpty()) {
                 eventBus.post(IndicesDeletedEvent.create(indicesDeleted));
             }
+
+            final Set<String> indicesClosed = calculateClosedIndices(event.state(), event.previousState());
+            if (!indicesClosed.isEmpty()) {
+                eventBus.post(IndicesClosedEvent.create(indicesClosed));
+            }
+
+            final Set<String> indicesReopened = calculateReopenedIndices(event.state(), event.previousState());
+            if (!indicesReopened.isEmpty()) {
+                eventBus.post(IndicesReopenedEvent.create(indicesReopened));
+            }
         }
+    }
+
+    private Set<String> calculateClosedIndices(ClusterState currentState, @Nullable ClusterState previousState) {
+        if (previousState == null || previousState.metaData() == currentState.metaData()) {
+            return Collections.emptySet();
+        }
+
+        final Set<String> currentClosedIndices = getClosedIndices(currentState.getMetaData());
+        final Set<String> previousClosedIndices = getClosedIndices(previousState.getMetaData());
+
+        return Sets.difference(currentClosedIndices, previousClosedIndices);
+    }
+
+    private Set<String> calculateReopenedIndices(ClusterState currentState, @Nullable ClusterState previousState) {
+        if (previousState == null || previousState.metaData() == currentState.metaData()) {
+            return Collections.emptySet();
+        }
+
+        final Set<String> currentClosedIndices = getClosedIndices(currentState.getMetaData());
+        final Set<String> previousClosedIndices = getClosedIndices(previousState.getMetaData());
+
+        return Sets.difference(previousClosedIndices, currentClosedIndices);
+    }
+
+    private HashSet<String> getClosedIndices(MetaData currentMetaData) {
+        return new HashSet<>(Arrays.asList(currentMetaData.concreteAllClosedIndices()));
     }
 
     @Override

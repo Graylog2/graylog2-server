@@ -23,10 +23,8 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch.EmbeddedElasticsearch;
-import org.assertj.jodatime.api.Assertions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.Deflector;
@@ -87,7 +85,7 @@ public class EsIndexRangeServiceTest {
     public void setUp() throws Exception {
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(client));
         final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION, new NullActivityWriter(), null, null, indices);
-        indexRangeService = new EsIndexRangeService(client, deflector, indices, localEventBus, clusterEventBus, new MetricRegistry());
+        indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, clusterEventBus, new MetricRegistry());
     }
 
     @Test
@@ -144,34 +142,8 @@ public class EsIndexRangeServiceTest {
         assertThat(indexRangeService.findAll()).hasSize(2);
     }
 
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @Test(expected = UnsupportedOperationException.class)
     public void calculateRangeReturnsIndexRange() throws Exception {
-        final String index = "graylog";
-        final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
-        final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
-        final IndexRange indexRange = indexRangeService.calculateRange(index);
-
-        assertThat(indexRange.indexName()).isEqualTo(index);
-        assertThat(indexRange.begin()).isEqualTo(min);
-        assertThat(indexRange.end()).isEqualTo(max);
-        Assertions.assertThat(indexRange.calculatedAt()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
-    }
-
-    @Test
-    @UsingDataSet(locations = "EsIndexRangeServiceTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testCalculateRangeWithEmptyIndex() throws Exception {
-        final String index = "graylog";
-        final IndexRange range = indexRangeService.calculateRange(index);
-
-        assertThat(range).isNotNull();
-        assertThat(range.indexName()).isEqualTo(index);
-        assertThat(range.begin()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
-        assertThat(range.end()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
-    }
-
-    @Test(expected = IndexMissingException.class)
-    public void testCalculateRangeWithNonExistingIndex() throws Exception {
-        indexRangeService.calculateRange("does-not-exist");
+        indexRangeService.calculateRange("graylog");
     }
 }
