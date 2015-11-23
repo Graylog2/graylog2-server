@@ -41,14 +41,14 @@ const FieldStatistics = React.createClass({
     if (this.isMounted) {
       this.setState({statsLoadPending: this.state.statsLoadPending.set(field, true)});
       const promise = FieldStatisticsStore.getFieldStatistics(field);
-      promise.done((statistics) => {
+      promise.then((statistics) => {
         this.setState({
           fieldStatistics: this.state.fieldStatistics.set(field, statistics),
           statsLoadPending: this.state.statsLoadPending.set(field, false),
         });
-      }).fail((jqXHR) => {
+      }).catch((error) => {
         // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
-        if (jqXHR.status === 400) {
+        if (error.additional.status === 400) {
           this.setState({
             fieldStatistics: this.state.fieldStatistics.delete(field),
             statsLoadPending: this.state.statsLoadPending.delete(field),
