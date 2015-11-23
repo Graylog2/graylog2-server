@@ -97,11 +97,19 @@
 
             for (var field in msg) {
                 var newElems = placeHolders.clone();
-                var i = 0;
                 newElems.each( function(c, elem) {
-                    var newElem = elem.outerHTML.replace(/\{\{field\}\}/g, field)
-                        .replace(/\{\{value\}\}/g, htmlEscape(msg[field]))
-                        .replace(/\{\{raw-value\}\}/g, htmlEscape(msg[field]).replace(/"/g, "&quot;"));
+                    var newElem;
+
+                    // Full message was already escaped in the web interface, no need to do that again on the preview
+                    if (elem.localName === "dd" && field === "full_message") {
+                        newElem = elem.outerHTML.replace(/\{\{field\}\}/g, field)
+                          .replace(/\{\{value\}\}/g, msg[field])
+                          .replace(/\{\{raw-value\}\}/g, msg[field].replace(/"/g, "&quot;"));
+                    } else {
+                        newElem = elem.outerHTML.replace(/\{\{field\}\}/g, field)
+                          .replace(/\{\{value\}\}/g, htmlEscape(msg[field]))
+                          .replace(/\{\{raw-value\}\}/g, htmlEscape(msg[field]).replace(/"/g, "&quot;"));
+                    }
                     var newElem = $( newElem ).removeAttr("data-occurrence");
                     newElem.appendTo(list);
                 });
