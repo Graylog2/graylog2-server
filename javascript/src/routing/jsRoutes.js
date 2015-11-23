@@ -140,8 +140,8 @@ const jsRoutes = {
         substringTest: () => { return {url: '/tools/substring_tester'};},
       },
       UniversalSearchApiController: {
-        search: (type, query) => { return {url: '/search/universal/' + type + '?query=' + query}; },
-        histogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/histogram?query=' + query + '&interval=' + interval}; },
+        search: (type, query, timerange) => { return {url: `/search/universal/${type}?query=${query}&${timerange}`}; },
+        histogram: (type, query, interval, timerange) => { return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}`}; },
         fieldHistogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/fieldHistogram?query=' + query + '&interval=' + interval}; },
       },
       UsageStatsApiController: {

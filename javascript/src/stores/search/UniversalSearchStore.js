@@ -3,7 +3,7 @@ import jQuery from 'jquery';
 import moment from 'moment';
 import md5 from 'md5';
 
-import UserNotification from 'util/UserNotification';
+import Qs from 'qs';
 import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -44,8 +44,8 @@ const UniversalSearchStore = Reflux.createStore({
     return result;
   },
   search(type, query, timerange) {
-    const parameters = Object.keys(timerange).map((key) => key === 'relative' ? 'range=' + timerange[key] : key + '=' + timerange[key]);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query).url + '&' + parameters.join('&'));
+    const timerangeParams = Qs.stringify(timerange);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
@@ -78,9 +78,8 @@ const UniversalSearchStore = Reflux.createStore({
     });
   },
   histogram(type, query, timerange, interval) {
-    const parameters = Object.keys(timerange).map((key) => key === 'relative' ? 'range=' + timerange[key] : key + '=' + timerange[key]);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval).url
-        + '&' + parameters.join('&'));
+    const timerangeParams = Qs.stringify(timerange);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams).url);
 
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;
