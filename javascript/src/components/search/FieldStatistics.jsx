@@ -18,7 +18,7 @@ const FieldStatistics = React.createClass({
       fieldStatistics: Immutable.Map(),
       sortBy: 'field',
       sortDescending: false,
-      autoReload: true,
+      autoReload: false,
     };
   },
   componentDidMount() {
