@@ -10,7 +10,7 @@ var c3 = require('c3');
 var d3 = require('d3');
 
 var D3Utils = require('../../util/D3Utils');
-var NumberUtils = require('../../util/NumberUtils');
+import NumberUtils from 'util/NumberUtils';
 
 var StackedGraphVisualization = React.createClass({
     getInitialState() {

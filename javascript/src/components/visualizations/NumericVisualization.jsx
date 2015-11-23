@@ -3,7 +3,7 @@
 var React = require('react');
 var numeral = require('numeral');
 
-var NumberUtils = require("../../util/NumberUtils");
+import NumberUtils from 'util/NumberUtils';
 
 var TrendIndicatorType = {
     HIGHER: "higher",

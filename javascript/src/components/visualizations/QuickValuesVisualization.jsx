@@ -12,7 +12,7 @@ var d3 = require('d3');
 
 var D3Utils = require('../../util/D3Utils');
 var StringUtils = require('../../util/StringUtils');
-var NumberUtils = require('../../util/NumberUtils');
+import NumberUtils from 'util/NumberUtils';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap.min.js');

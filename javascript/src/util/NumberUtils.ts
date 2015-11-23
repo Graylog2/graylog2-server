@@ -1,10 +1,8 @@
 /// <reference path="../../declarations/node/node.d.ts" />
 
-'use strict';
+const numeral = require('numeral');
 
-var numeral = require('numeral');
-
-var NumberUtils = {
+const NumberUtils = {
     normalizeNumber(number) {
         switch (number) {
             case "NaN":
@@ -29,14 +27,14 @@ var NumberUtils = {
     },
     formatNumber(number) {
         try {
-            return numeral(NumberUtils.normalizeNumber(number)).format('0,0.[00]');
+            return numeral(this.normalizeNumber(number)).format('0,0.[00]');
         } catch (e) {
             return number;
         }
     },
     formatPercentage(percentage) {
         try {
-            return numeral(NumberUtils.normalizeNumber(percentage)).format("0.00%");
+            return numeral(this.normalizeNumber(percentage)).format("0.00%");
         } catch (e) {
             return percentage;
         }
@@ -46,4 +44,4 @@ var NumberUtils = {
     },
 };
 
-export = NumberUtils;
+export default NumberUtils;
