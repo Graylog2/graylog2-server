@@ -16,7 +16,7 @@ const FieldQuickValues = React.createClass({
   getInitialState() {
     return {
       field: undefined,
-      autoReload: true,
+      autoReload: false,
       data: [],
     };
   },
