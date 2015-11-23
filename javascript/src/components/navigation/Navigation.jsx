@@ -154,11 +154,11 @@ const Navigation = React.createClass({
           </Nav>
 
           <Nav navbar>
-            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-              <NavItem className="notification-badge-link">
+            <NavItem className="notification-badge-link">
+              <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge">{this.state.total}</span>
-              </NavItem>
-            </LinkContainer>
+              </LinkContainer>
+            </NavItem>
           </Nav>
 
           <Nav navbar pullRight>
