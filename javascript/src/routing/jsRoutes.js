@@ -144,6 +144,7 @@ const jsRoutes = {
         histogram: (type, query, interval, timerange) => { return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}`}; },
         fieldHistogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/fieldHistogram?query=' + query + '&interval=' + interval}; },
         fieldStats: (type, query, field, timerange) => { return {url: `/search/universal/${type}/stats?query=${query}&field=${field}&${timerange}`}; },
+        fieldTerms: (type, query, field, timerange) => { return {url: `/search/universal/${type}/terms?query=${query}&field=${field}&${timerange}`}; },
       },
       UsageStatsApiController: {
         pluginEnabled: () => { return {url: '/plugins/org.graylog.plugins.usagestatistics/config'}; },

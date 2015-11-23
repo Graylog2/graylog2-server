@@ -1,37 +1,49 @@
-/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-'use strict';
+const fetch = require('logic/rest/FetchProvider').default;
+import SearchStore = require('stores/search/SearchStore');
+import UserNotification = require('util/UserNotification');
+import jsRoutes = require('routing/jsRoutes');
+import URLUtils = require('util/URLUtils');
+const Qs = require('qs');
 
-declare var $: any;
-declare var jsRoutes: any;
-
-import SearchStore = require('../search/SearchStore');
-import UserNotification = require('../../util/UserNotification');
-
-var FieldQuickValuesStore = {
-    getQuickValues(field: string): JQueryPromise<string[]> {
+const FieldQuickValuesStore = {
+    getQuickValues(field: string): Promise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
         var streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
 
-        var url = jsRoutes.controllers.api.SearchApiController.fieldTerms(
-            originalSearchURLParams.get('q'),
+        var rangeType = originalSearchURLParams.get('rangetype');
+        var timerange = {};
+        switch(rangeType) {
+            case 'relative':
+                timerange['relative'] = originalSearchURLParams.get('relative');
+                break;
+            case 'absolute':
+                timerange['from'] = originalSearchURLParams.get('from');
+                timerange['to'] = originalSearchURLParams.get('to');
+                break;
+            case 'keyword':
+                timerange['keyword'] = originalSearchURLParams.get('keyword');
+                break;
+        }
+
+        var url = jsRoutes.controllers.api.UniversalSearchApiController.fieldTerms(
+            rangeType,
+            originalSearchURLParams.get('q') || '*',
             field,
-            originalSearchURLParams.get('rangetype'),
-            originalSearchURLParams.get('relative'),
-            originalSearchURLParams.get('from'),
-            originalSearchURLParams.get('to'),
-            originalSearchURLParams.get('keyword'),
-            streamId
+            Qs.stringify(timerange)
         ).url;
 
-        var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading quick values failed with status: " + errorThrown,
-                "Could not load quick values");
+        url = URLUtils.qualifyUrl(url);
+
+        var promise = fetch('GET', url);
+        promise.catch(error => {
+            UserNotification.error('Loading quick values failed with status: ' + error,
+                'Could not load quick values');
         });
 
         return promise;
-    }
+    },
 };
 
-export = FieldQuickValuesStore;
+export default FieldQuickValuesStore;
