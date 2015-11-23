@@ -10,6 +10,7 @@
   "rules": {
     "no-else-return": 1,
     "new-cap": 0,
+    "import/no-unresolved": 1,
   },
   "settings": {
     "import/resolve": {
