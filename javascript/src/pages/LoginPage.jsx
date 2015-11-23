@@ -1,22 +1,23 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Input, Button, ButtonInput, Alert } from 'react-bootstrap';
+import { Row, Input, ButtonInput, Alert } from 'react-bootstrap';
 import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 
+import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+import authStyle from '!style/useable!css!less!stylesheets/auth.less';
+
 const LoginPage = React.createClass({
   mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
-  disconnectedStyle: require('!style/useable!css!less!stylesheets/disconnected.less'),
-  authStyle: require('!style/useable!css!less!stylesheets/auth.less'),
-
   componentDidMount() {
-    this.disconnectedStyle.use();
-    this.authStyle.use();
+    disconnectedStyle.use();
+    authStyle.use();
   },
   componentWillUnmount() {
-    this.disconnectedStyle.unuse();
-    this.authStyle.unuse();
+    disconnectedStyle.unuse();
+    authStyle.unuse();
   },
+
   onSignInClicked(event) {
     event.preventDefault();
     this.resetLastError();
@@ -30,6 +31,21 @@ const LoginPage = React.createClass({
         this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.message});
       }
     });
+  },
+  formatLastError(error) {
+    if (error) {
+      return (
+        <div className="form-group">
+          <Alert bsStyle="danger">
+            <a className="close" onClick={this.resetLastError}>×</a>{error}
+          </Alert>
+        </div>
+      );
+    }
+    return null;
+  },
+  resetLastError() {
+    this.setState({lastError: undefined});
   },
   render() {
     const alert = this.formatLastError(this.state.lastError);
@@ -60,21 +76,6 @@ const LoginPage = React.createClass({
         </div>
       </div>
     );
-  },
-  formatLastError(error) {
-    if (error) {
-      return (
-        <div className="form-group">
-          <Alert bsStyle="danger">
-            <a className="close" onClick={this.resetLastError}>×</a>{error}
-          </Alert>
-        </div>
-      );
-    }
-    return null;
-  },
-  resetLastError() {
-    this.setState({lastError: undefined});
   },
 });
 
