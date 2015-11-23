@@ -8,9 +8,9 @@ import jsRoutes = require('routing/jsRoutes');
 import URLUtils = require('util/URLUtils');
 import UserNotification = require('util/UserNotification');
 import SearchStore = require('stores/search/SearchStore');
-var Qs = require('qs');
+const Qs = require('qs');
 
-var FieldStatisticsStore = {
+const FieldStatisticsStore = {
     FUNCTIONS: Immutable.OrderedMap({
         count: 'Total',
         mean: 'Mean',
@@ -21,7 +21,7 @@ var FieldStatisticsStore = {
         sum: 'Sum',
         cardinality: 'Cardinality',
     }),
-    getFieldStatistics(field: string): JQueryPromise<string[]> {
+    getFieldStatistics(field: string): Promise<string[]> {
         var originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
         var streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
 
@@ -59,4 +59,4 @@ var FieldStatisticsStore = {
     }
 };
 
-export = FieldStatisticsStore;
+export default FieldStatisticsStore;

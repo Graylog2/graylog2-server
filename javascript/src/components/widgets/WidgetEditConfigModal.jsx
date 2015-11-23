@@ -5,7 +5,7 @@
 var React = require('react');
 var Input = require('react-bootstrap').Input;
 
-var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
+import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 var FieldGraphsStore = require('../../stores/field-analyzers/FieldGraphsStore');
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 import S from 'string';

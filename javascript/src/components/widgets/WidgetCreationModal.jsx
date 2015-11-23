@@ -9,7 +9,7 @@ var Immutable = require('immutable');
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Widget = require('./Widget');
 
-var FieldStatisticsStore = require('../../stores/field-analyzers/FieldStatisticsStore');
+import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 
 var StringUtils = require('../../util/StringUtils');
 
