@@ -7,6 +7,7 @@ import Widget from 'components/widgets/Widget';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 import NumberUtils from 'util/NumberUtils';
+import UserNotification from 'util/UserNotification';
 
 const FieldStatistics = React.createClass({
   propTypes: {
@@ -48,11 +49,14 @@ const FieldStatistics = React.createClass({
         });
       }).catch((error) => {
         // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
-        if (error.additional.status === 400) {
+        if (error.additional && error.additional.status === 400) {
           this.setState({
             fieldStatistics: this.state.fieldStatistics.delete(field),
             statsLoadPending: this.state.statsLoadPending.delete(field),
           });
+        } else {
+          UserNotification.error('Loading field statistics failed with status: ' + error,
+            'Could not load field statistics');
         }
       });
     }
