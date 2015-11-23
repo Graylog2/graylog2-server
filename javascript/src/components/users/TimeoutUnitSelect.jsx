@@ -9,9 +9,9 @@ const TimeoutUnitSelect = React.createClass({
     return (
       <select className="form-control" ref="session_timeout_unit" {...this.props}>
         <option value={1000}>Seconds</option>
-        <option value={60*1000}>Minutes</option>
-        <option value={60*60*1000}>Hours</option>
-        <option value={24*60*60*1000}>Days</option>
+        <option value={60 * 1000}>Minutes</option>
+        <option value={60 * 60 * 1000}>Hours</option>
+        <option value={24 * 60 * 60 * 1000}>Days</option>
       </select>
     );
   },
