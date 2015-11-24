@@ -146,12 +146,12 @@ var WidgetCreationModal = React.createClass({
                         </Input>
                     );
                     controls.push(
-                        <Input key="statsFunction"
+                        <Input key="stats_function"
                                type="select"
-                               ref="statsFunction"
+                               ref="stats_function"
                                label="Statistical function"
                                help="Select the statistical function to use in the widget."
-                               onChange={() => this._onConfigurationInputChange('statsFunction')}>
+                               onChange={() => this._onConfigurationInputChange('stats_function')}>
                             {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
                                 return (
                                     <option key={statFunction} value={statFunction}>

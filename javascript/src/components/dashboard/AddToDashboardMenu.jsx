@@ -1,6 +1,7 @@
 import React from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
+import $ from 'jquery';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import WidgetCreationModal from 'components/widgets/WidgetCreationModal';
