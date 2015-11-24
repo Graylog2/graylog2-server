@@ -11,8 +11,9 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import SearchStore from 'stores/search/SearchStore';
-import SavedSearchesStore from 'stores/search/SavedSearchesStore';
 import ToolsStore from 'stores/tools/ToolsStore';
+
+import SavedSearchesActions from 'actions/search/SavedSearchesActions';
 
 import UIUtils from 'util/UIUtils';
 
@@ -24,7 +25,9 @@ require('!script!../../../public/javascripts/bootstrap-datepicker.js');
 const SearchBar = React.createClass({
   propTypes: {
     userPreferences: PropTypes.object,
+    savedSearches: PropTypes.arrayOf(PropTypes.object).isRequired,
   },
+
   getInitialState() {
     this.initialSearchParams = SearchStore.getParams();
     this.datepickerInitialized = false;
@@ -33,7 +36,6 @@ const SearchBar = React.createClass({
       rangeParams: this.initialSearchParams.rangeParams,
       query: this.initialSearchParams.query,
       savedSearch: SearchStore.savedSearch,
-      savedSearches: Immutable.List(),
       keywordPreview: Immutable.Map(),
     };
   },
@@ -44,11 +46,6 @@ const SearchBar = React.createClass({
       ReactDOM.findDOMNode(this.refs.searchForm).submit();
     };
     SearchStore.onAddQueryTerm = this._animateQueryChange;
-    SavedSearchesStore.addOnSavedSearchesChangedListener((newSavedSearches) => {
-      if (this.isMounted()) {
-        this.setState({savedSearches: newSavedSearches});
-      }
-    });
     this._initializeSearchQueryInput();
     this._initalizeDatepicker();
   },
@@ -187,7 +184,7 @@ const SearchBar = React.createClass({
   _savedSearchSelected() {
     const selectedSavedSearch = this.refs.savedSearchesSelector.getValue();
     const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : undefined;
-    SavedSearchesStore.execute(selectedSavedSearch, streamId, $(window).width());
+    SavedSearchesActions.execute.triggerPromise(selectedSavedSearch, streamId, $(window).width());
   },
 
   _getRangeTypeSelector() {
@@ -291,7 +288,7 @@ const SearchBar = React.createClass({
   },
 
   _getSavedSearchesSelector() {
-    const sortedSavedSearches = this.state.savedSearches.sort((searchA, searchB) => {
+    const sortedSavedSearches = this.props.savedSearches.sort((searchA, searchB) => {
       return searchA.title.toLowerCase().localeCompare(searchB.title.toLowerCase());
     });
 

@@ -91,7 +91,6 @@ const jsRoutes = {
       SavedSearchesApiController: {
         create: () => { return {url: '/search/saved'}; },
         delete: (savedSearchId) => { return {url: `/search/saved/${savedSearchId}`}; },
-        list: () => { return {url: '/search/saved'}; },
         update: (savedSearchId) => { return {url: `/search/saved/${savedSearchId}`}; },
       },
       StreamAlertsApiController: {
