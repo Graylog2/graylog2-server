@@ -44,7 +44,6 @@
     "react-router": "^1.0.0-rc1",
     "react-router-bootstrap": "^0.19.0",
     "react-select": "^0.8.2",
-    "react-zeroclipboard": "^2.0.1",
     "reflux": "^0.2.12",
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.0.x",

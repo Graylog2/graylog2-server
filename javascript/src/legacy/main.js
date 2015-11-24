@@ -1,26 +1,5 @@
 $(document).ready(function() {
 
-    ZeroClipboard.config( { swfPath: appPrefixed("/assets/images/ZeroClipboard.swf"), forceHandCursor: true } );
-    clipBoardClient = new ZeroClipboard($(".copy-clipboard"));
-
-    clipBoardClient.on( 'mouseover', function(client, args) {
-        $(this)
-            .attr('data-original-title', $(this).attr('data-initial-title'))
-            .tooltip({delay: { show: 0, hide: 0 }})
-            .tooltip('fixTitle')
-            .tooltip('show');
-    });
-    clipBoardClient.on( 'mouseout', function(client, args) {
-        $(this).tooltip('hide');
-    });
-    clipBoardClient.on( 'complete', function(client, args) {
-        $(this).tooltip('destroy');
-        $(this).attr('data-original-title', "Copied.")
-            .tooltip({delay: { show: 0, hide: 250 }})
-            .tooltip('fixTitle')
-            .tooltip('show');
-    });
-
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
     $(window).resize(function() {
@@ -604,8 +583,6 @@ function substringMatcher(possibleMatches, displayKey, limit) {
         });
     };
 })(jQuery);
-
-clipBoardClient = {};
 
 // This is holding all field graphs.
 fieldGraphs = {};

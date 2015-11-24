@@ -4,10 +4,7 @@ var React = require('react');
 var PureRenderMixin = require('react-addons-pure-render-mixin');
 
 var Modal = require('react-bootstrap').Modal;
-var Button = require('react-bootstrap').Button;
-var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
-var Tooltip = require('react-bootstrap').Tooltip;
-var ReactZeroClipboard = require('react-zeroclipboard');
+import {ClipboardButton} from 'components/common';
 
 var BootstrapModalWrapper = require('../bootstrap/BootstrapModalWrapper');
 
@@ -37,16 +34,7 @@ var ShowQueryModal = React.createClass({
                   <pre>{queryText}</pre>
               </Modal.Body>
               <Modal.Footer>
-                  <OverlayTrigger
-                    placement="top"
-                    ref="copyBtnTooltip"
-                    overlay={<Tooltip id="elasticsearch-query-copied-tooltip">Query copied to clipboard.</Tooltip>}>
-                      <ReactZeroClipboard
-                        text={queryText}
-                        onAfterCopy={() => { this.refs['copyBtnTooltip'].toggle(); window.setTimeout(() => this.refs['copyBtnTooltip'] && this.refs['copyBtnTooltip'].toggle(), 1000); } }>
-                          <Button>Copy query</Button>
-                      </ReactZeroClipboard>
-                  </OverlayTrigger>
+                <ClipboardButton title="Copy query" text={queryText}/>
               </Modal.Footer>
           </BootstrapModalWrapper>
         );

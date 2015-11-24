@@ -1,11 +1,10 @@
 import React, {PropTypes} from 'react';
-import {ButtonGroup, Button, Row, Col, OverlayTrigger, Tooltip, DropdownButton, MenuItem} from 'react-bootstrap';
-import ReactZeroClipboard from 'react-zeroclipboard';
+import {ButtonGroup, Button, Row, Col, DropdownButton, MenuItem} from 'react-bootstrap';
 import Immutable from 'immutable';
 import StreamsStore from 'stores/streams/StreamsStore';
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from './MessageFields';
-import Spinner from 'components/common/Spinner';
+import {Spinner, ClipboardButton} from 'components/common';
 
 import jsRoutes from 'routing/jsRoutes';
 import momentHelper from 'legacy/moment-helper.js';
@@ -166,17 +165,7 @@ const MessageDetail = React.createClass({
           <ButtonGroup className="pull-right" bsSize="small">
             <Button href={messageUrl}>Permalink</Button>
 
-            <OverlayTrigger
-              placement="top"
-              ref="copyBtnTooltip"
-              overlay={<Tooltip id="message-id-copied-tooltip">Message ID copied to clipboard.</Tooltip>}>
-              <ReactZeroClipboard
-                text={this.props.message.id}
-                onAfterCopy={() => { this.refs.copyBtnTooltip.toggle(); window.setTimeout(() => this.refs.copyBtnTooltip.toggle(), 1000); } }>
-                <Button>Copy ID</Button>
-              </ReactZeroClipboard>
-            </OverlayTrigger>
-
+            <ClipboardButton title="Copy ID" text={this.props.message.id}/>
             {testAgainstStream}
           </ButtonGroup>
           <h3><i className="fa fa-envelope"></i> <a href={messageUrl}
