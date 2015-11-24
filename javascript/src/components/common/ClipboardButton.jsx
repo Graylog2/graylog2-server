@@ -26,7 +26,7 @@ const ClipboardButton = React.createClass({
     };
   },
   componentDidMount() {
-    this.clipboard = new Clipboard(ReactDOM.findDOMNode(this.refs.copyButton));
+    this.clipboard = new Clipboard('[data-clipboard-button]');
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
   },
@@ -38,8 +38,8 @@ const ClipboardButton = React.createClass({
   _onSuccess(event) {
     this.setState({tooltipMessage: 'Copied!'});
 
-    if (this.onSuccess) {
-      this.onSuccess(event);
+    if (this.props.onSuccess) {
+      this.props.onSuccess(event);
     }
 
     event.clearSelection();
@@ -69,7 +69,7 @@ const ClipboardButton = React.createClass({
 
     return (
       <OverlayTrigger placement="top" trigger="click" overlay={tooltip} rootClose>
-        <Button ref="copyButton" data-clipboard-action={this.props.action} {...filteredProps}>
+        <Button data-clipboard-button data-clipboard-action={this.props.action} {...filteredProps}>
           {this.props.title}
         </Button>
       </OverlayTrigger>
