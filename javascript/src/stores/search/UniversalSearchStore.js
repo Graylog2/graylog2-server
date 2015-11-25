@@ -43,9 +43,9 @@ const UniversalSearchStore = Reflux.createStore({
 
     return result;
   },
-  search(type, query, timerange) {
+  search(type, query, timerange, limit) {
     const timerangeParams = Qs.stringify(timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams, limit).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
