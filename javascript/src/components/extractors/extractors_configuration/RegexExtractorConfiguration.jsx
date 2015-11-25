@@ -11,7 +11,7 @@ import FormUtils from 'util/FormsUtils';
 const RegexExtractorConfiguration = React.createClass({
   propTypes: {
     configuration: PropTypes.object.isRequired,
-    exampleMessage: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
@@ -50,7 +50,7 @@ const RegexExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying || !this.props.configuration.regex_value;
+    return this.state.trying || !this.props.configuration.regex_value || !this.props.exampleMessage;
   },
   render() {
     const helpMessage = (

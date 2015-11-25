@@ -8,7 +8,7 @@ import FormUtils from 'util/FormsUtils';
 const JSONExtractorConfiguration = React.createClass({
   propTypes: {
     configuration: PropTypes.object.isRequired,
-    exampleMessage: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
@@ -59,7 +59,7 @@ const JSONExtractorConfiguration = React.createClass({
     promise.finally(() => this.setState({trying: false}));
   },
   _isTryButtonDisabled() {
-    return this.state.trying;
+    return this.state.trying || !this.props.exampleMessage;
   },
   render() {
     return (

@@ -10,16 +10,22 @@ const ExtractorExampleMessage = React.createClass({
     return {
       example: '',
       field: '',
+      newMessageLoaded: false,
     };
   },
   componentWillMount() {
     this.setState({example: this.props.example});
   },
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.newMessageLoaded && this.state.example !== nextProps.example) {
+      this.setState({example: nextProps.example});
+    }
+  },
   onExampleLoaded(message) {
     const newExample = message.fields[this.props.field];
 
     if (newExample) {
-      this.setState({example: newExample});
+      this.setState({example: newExample, newMessageLoaded: true});
     }
   },
   render() {

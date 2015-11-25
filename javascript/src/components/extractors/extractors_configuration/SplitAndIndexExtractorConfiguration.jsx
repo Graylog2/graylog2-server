@@ -9,7 +9,7 @@ import FormUtils from 'util/FormsUtils';
 const SplitAndIndexExtractorConfiguration = React.createClass({
   propTypes: {
     configuration: PropTypes.object.isRequired,
-    exampleMessage: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
@@ -57,7 +57,7 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
   },
   _isTryButtonDisabled() {
     const configuration = this.state.configuration;
-    return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1;
+    return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1 || !this.props.exampleMessage;
   },
   render() {
     const splitByHelpMessage = (

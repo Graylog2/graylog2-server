@@ -9,7 +9,7 @@ import FormUtils from 'util/FormsUtils';
 const SubstringExtractorConfiguration = React.createClass({
   propTypes: {
     configuration: PropTypes.object.isRequired,
-    exampleMessage: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
     onChange: PropTypes.func.isRequired,
     onExtractorPreviewLoad: PropTypes.func.isRequired,
   },
@@ -81,7 +81,7 @@ const SubstringExtractorConfiguration = React.createClass({
   },
   _isTryButtonDisabled() {
     const configuration = this.state.configuration;
-    return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0;
+    return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0 || !this.props.exampleMessage;
   },
   render() {
     const endIndexHelpMessage = (

@@ -76,6 +76,9 @@ const EditExtractor = React.createClass({
     const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.props.exampleMessage);
     promise.then(result => this.setState({conditionTestResult: result.matched}));
   },
+  _tryButtonDisabled() {
+    return this.state.updatedExtractor.condition_value === '' || !this.props.exampleMessage;
+  },
   _getExtractorConditionControls() {
     if (!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none') {
       return <div></div>;
@@ -116,7 +119,7 @@ const EditExtractor = React.createClass({
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._testCondition}
-                      disabled={this.state.updatedExtractor.condition_value === ''}>
+                      disabled={this._tryButtonDisabled()}>
                 Try
               </Button>
             </Col>

@@ -18,7 +18,7 @@ const EditExtractorConfiguration = React.createClass({
     extractorType: PropTypes.oneOf(ExtractorUtils.EXTRACTOR_TYPES).isRequired,
     configuration: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    exampleMessage: PropTypes.string.isRequired,
+    exampleMessage: PropTypes.string,
   },
   getInitialState() {
     return {
