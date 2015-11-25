@@ -24,7 +24,7 @@ const momentHelper = {
         if (appConfig.gl2UserTimeZone !== null) {
             date.tz(appConfig.gl2UserTimeZone);
         } else if (appConfig.gl2UserTimeZoneOffset != null) {
-            date.zone(appConfig.gl2UserTimeZoneOffset);
+            date.utcOffset(appConfig.gl2UserTimeZoneOffset);
         }
 
         return date;

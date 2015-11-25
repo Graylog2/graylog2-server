@@ -38,7 +38,7 @@ export default {
         momentDate = momentHelper.toUserTimeZone(date);
       } else {
         momentDate = moment(date);
-        momentDate.zone(tzOffset);
+        momentDate.utcOffset(tzOffset);
       }
 
       this.dateTimeFormats.some(function (format) {
@@ -67,8 +67,8 @@ export default {
       } else {
         runningMoment = moment(initDateTime);
         endMoment = moment(endDateTime);
-        runningMoment.zone(tzOffset);
-        endMoment.zone(tzOffset);
+        runningMoment.utcOffset(tzOffset);
+        endMoment.utcOffset(tzOffset);
       }
 
       if (!runningMoment.isValid() || !endMoment.isValid()) {
