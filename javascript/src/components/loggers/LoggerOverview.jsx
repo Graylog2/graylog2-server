@@ -1,7 +1,11 @@
 import React from 'react';
+import Reflux from 'reflux';
+
 import { Button, Col, Row } from 'react-bootstrap';
+import SampleStore from 'stores/SampleStore';
 
 const LoggerOverview = React.createClass({
+  mixins: [Reflux.connect(SampleStore({foo: 23}))],
   render() {
     return (
       <Row className="row-sm log-writing-node content">
@@ -14,6 +18,8 @@ const LoggerOverview = React.createClass({
               </Button>
             </div>
           </div>
+
+          <span>{this.state.foo}</span>
         </Col>
       </Row>
     );

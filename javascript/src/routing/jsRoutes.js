@@ -69,6 +69,10 @@ const jsRoutes = {
       MessageFieldsApiController: {
         list: () => { return {url: '/system/fields'}; },
       },
+      MetricsApiController: {
+        multiple: () => { return {url: '/system/metrics/multiple'}; },
+        byNamespace: (namespace) => { return {url: '/system/metrics/namespace/' + namespace}; },
+      },
       NotificationsApiController: {
         delete: (type) => { return {url: '/system/notifications/' + type}; },
         list: () => { return {url: '/system/notifications'}; },

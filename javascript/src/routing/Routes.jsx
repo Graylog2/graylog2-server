@@ -18,6 +18,7 @@ const Routes = {
     },
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
+    METRICS: (nodeId) => '/system/metrics/node/' + nodeId,
     NODES: '/system/nodes',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
