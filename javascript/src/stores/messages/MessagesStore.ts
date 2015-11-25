@@ -1,9 +1,12 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
+const moment = require('moment');
+
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 import UserNotification = require("util/UserNotification");
 import URLUtils = require("util/URLUtils");
+const MessageFieldsFilter = require('logic/message/MessageFieldsFilter');
 
 interface Field {
     name: string;
@@ -21,11 +24,21 @@ var MessagesStore = {
         var url = jsRoutes.controllers.MessagesController.single(index.trim(), messageId.trim()).url;
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
             .then(response => {
-              return {
-                id: messageId,
-                fields: response.message,
-                index: response.index,
-              };
+                const message = response.message;
+                const filteredFields = MessageFieldsFilter.filterFields(message);
+                const newMessage = {
+                    id: message._id,
+                    timestamp: moment(message.timestamp).unix(),
+                    filtered_fields: filteredFields,
+                    formatted_fields: filteredFields,
+                    fields: message,
+                    index: response.index,
+                    source_node_id: message.gl2_source_node,
+                    source_input_id: message.gl2_source_input,
+                    stream_ids: message.streams,
+                };
+
+                return newMessage;
             })
             .catch(errorThrown => {
                 UserNotification.error("Loading message information failed with status: " + errorThrown,
