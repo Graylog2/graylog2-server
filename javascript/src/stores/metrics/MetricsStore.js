@@ -11,12 +11,13 @@ const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions],
   namespace: 'org.graylog2',
   registrations: {},
+  metrics: {},
 
   init() {
     MetricsActions.names();
   },
   getInitialState() {
-    return { names: this.names };
+    return { names: this.names, metrics: this.metrics };
   },
   list() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MetricsApiController.multiple().url);
@@ -24,6 +25,7 @@ const MetricsStore = Reflux.createStore({
     const promise = fetch('POST', url, body).then((response) => {
       const metrics = {};
       response.metrics.forEach((metric) => metrics[metric.full_name] = metric);
+      this.metrics = metrics;
       this.trigger({ metrics: metrics });
       return metrics;
     });

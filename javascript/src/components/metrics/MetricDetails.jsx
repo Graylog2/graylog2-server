@@ -37,7 +37,7 @@ const MetricDetails = React.createClass({
   },
   render() {
     const metricName = this.props.metric.full_name;
-    const metric = this.state.metrics ? this.state.metrics[metricName] : this.props.metric;
+    const metric = this.state.metrics && this.state.metrics[metricName] ? this.state.metrics[metricName] : this.props.metric;
     const type = String(metric.type).capitalize().toString();
     const details = this._formatDetailsForType(type, metric);
     return (

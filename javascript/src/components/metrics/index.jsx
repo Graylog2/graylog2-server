@@ -5,5 +5,6 @@ export { default as MeterDetails } from './MeterDetails';
 export { default as Metric } from './Metric';
 export { default as MetricDetails } from './MetricDetails';
 export { default as MetricsComponent } from './MetricsComponent';
+export { default as MetricsFilterInput } from './MetricsFilterInput';
 export { default as MetricsList } from './MetricsList';
 export { default as TimerDetails } from './TimerDetails';

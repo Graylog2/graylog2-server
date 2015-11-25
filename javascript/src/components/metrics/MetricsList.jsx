@@ -1,28 +1,24 @@
 import React from 'react';
-import Reflux from 'reflux';
-
-import MetricsStore from 'stores/metrics/MetricsStore';
 
 import { Spinner } from 'components/common';
 import { Metric } from 'components/metrics';
 
 const MetricsList = React.createClass({
-  mixins: [Reflux.connect(MetricsStore)],
+  propTypes: {
+    names: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    namespace: React.PropTypes.string.isRequired,
+  },
   _formatMetric(metric) {
     return (
-      <li key={'li-' + metric.full_name} data-metricname="@name">
-        <Metric key={metric.full_name} metric={metric} namespace={MetricsStore.namespace} />
+      <li key={'li-' + metric.full_name}>
+        <Metric key={metric.full_name} metric={metric} namespace={this.props.namespace} />
       </li>
     );
   },
   render() {
-    if (!this.state.names) {
-      return <Spinner />;
-    }
-
     return (
       <ul className="metric-list">
-        {this.state.names.sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
+        {this.props.names.sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
           .map((metric) => this._formatMetric(metric))}
       </ul>
     );

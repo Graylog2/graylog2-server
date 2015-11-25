@@ -5,6 +5,7 @@ const MetricsActions = Reflux.createActions({
   'names': { asyncResult: true },
   'add': { asyncResult: true },
   'remove': { asyncResult: true },
+  'filter': { asyncResult: true },
 });
 
 export default MetricsActions;
