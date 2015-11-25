@@ -1,5 +1,6 @@
 import React from 'react';
-import { Panel, Button, Row, Col } from 'react-bootstrap';
+import ReactDOM from 'react-dom';
+import { Button, Row, Col } from 'react-bootstrap';
 import { UsageStatsOptOutStore } from '../../stores/usagestats/UsageStatsOptOutStore';
 
 const UsageStatsOptOut = React.createClass({
@@ -7,17 +8,23 @@ const UsageStatsOptOut = React.createClass({
     return {
       optOutStateLoaded: false,
       optOutState: null,
-      pluginEnabled: false
+      pluginEnabled: false,
+      buttonWidth: 80,
     };
   },
   componentDidMount() {
     UsageStatsOptOutStore.pluginEnabled().done((isEnabled) => {
-      this.setState({pluginEnabled: isEnabled});
+      this.setState({pluginEnabled: isEnabled}, this._updateOkButtonWidth);
     });
 
     UsageStatsOptOutStore.getOptOutState().done((optOutState) => {
-      this.setState({optOutStateLoaded: true, optOutState: optOutState});
+      this.setState({optOutStateLoaded: true, optOutState: optOutState}, this._updateOkButtonWidth);
     });
+  },
+  _updateOkButtonWidth() {
+    if (this.refs.dontSendButton) {
+      this.setState({buttonWidth: ReactDOM.findDOMNode(this.refs.dontSendButton).clientWidth});
+    }
   },
   _handleClickEnable() {
     UsageStatsOptOutStore.setOptIn(true);
@@ -49,10 +56,15 @@ const UsageStatsOptOut = React.createClass({
                 </Col>
                 <Col md={2}>
                   <div className="text-right">
-                    <Button bsSize="small" bsStyle="success"
-                            onClick={this._handleClickEnable}>Ok</Button>
+                    <Button ref="dontSendButton" bsSize="small" onClick={this._handleClickDisable}>
+                      Don't send
+                    </Button>
                     &nbsp;
-                    <Button bsSize="small" onClick={this._handleClickDisable}>Don't send</Button>
+                    <Button bsSize="small" bsStyle="success"
+                            onClick={this._handleClickEnable}
+                            style={{width: this.state.buttonWidth}}>
+                      Ok
+                    </Button>
                   </div>
                 </Col>
               </Row>
