@@ -4,7 +4,7 @@ import MessageLoader from './MessageLoader';
 const ExtractorExampleMessage = React.createClass({
   propTypes: {
     field: PropTypes.string.isRequired,
-    example: PropTypes.string.isRequired,
+    example: PropTypes.string,
   },
   getInitialState() {
     return {

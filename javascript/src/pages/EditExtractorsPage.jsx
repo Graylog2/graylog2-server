@@ -12,6 +12,7 @@ import Routes from 'routing/Routes';
 import InputsStore from 'stores/inputs/InputsStore';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
+import UniversalSearchstore from 'stores/search/UniversalSearchStore';
 
 const EditExtractorsPage = React.createClass({
   propTypes: {
@@ -23,14 +24,23 @@ const EditExtractorsPage = React.createClass({
     return {
       extractor: undefined,
       input: undefined,
+      exampleMessage: undefined,
     };
   },
   componentDidMount() {
     InputsStore.get(this.props.params.inputId).then(input => this.setState({input: input}));
     ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
+    UniversalSearchstore.search('relative', 'gl2_source_input:' + this.props.params.inputId + ' OR gl2_source_radio_input:' + this.props.params.inputId, { range: 0 }, 1)
+      .then((response) => {
+        if (response.total_results > 0) {
+          this.setState({exampleMessage: response.messages[0]});
+        } else {
+          this.setState({exampleMessage: {}});
+        }
+      });
   },
   _isLoading() {
-    return !(this.state.input && this.state.extractor);
+    return !(this.state.input && this.state.extractor && this.state.exampleMessage);
   },
   _extractorSaved() {
     let url;
@@ -44,7 +54,6 @@ const EditExtractorsPage = React.createClass({
   },
   render() {
     // TODO:
-    // - Load recent message from input
     // - Redirect when extractor or input were deleted
 
     if (this._isLoading()) {
@@ -65,7 +74,10 @@ const EditExtractorsPage = React.createClass({
             {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
           </span>
         </PageHeader>
-        <EditExtractor action="edit" extractor={this.state.extractor} inputId={this.state.input.input_id}
+        <EditExtractor action="edit"
+                       extractor={this.state.extractor}
+                       inputId={this.state.input.input_id}
+                       exampleMessage={this.state.exampleMessage.fields[this.state.extractor.source_field]}
                        onSave={this._extractorSaved}/>
       </div>
     );
