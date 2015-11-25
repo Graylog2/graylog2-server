@@ -19,11 +19,6 @@ const EditExtractor = React.createClass({
     exampleMessage: PropTypes.string,
     onSave: PropTypes.func.isRequired,
   },
-  getDefaultProps() {
-    return {
-      exampleMessage: 'This is an example message, please change me!',
-    };
-  },
   getInitialState() {
     return {
       updatedExtractor: this.props.extractor,
