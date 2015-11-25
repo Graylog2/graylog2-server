@@ -59,11 +59,12 @@ const UniversalSearchStore = Reflux.createStore({
 
       result.messages = result.messages.map((messageSummary) => {
         const message = messageSummary.message;
+        const filteredFields = this._filterFields(message);
         const newMessage = {
           id: message._id,
           timestamp: moment(message.timestamp).unix(),
-          filtered_fields: this._filterFields(message),
-          formatted_fields: this._filterFields(message),
+          filtered_fields: filteredFields,
+          formatted_fields: filteredFields,
           fields: message,
           index: messageSummary.index,
           source_node_id: message.gl2_source_node,
