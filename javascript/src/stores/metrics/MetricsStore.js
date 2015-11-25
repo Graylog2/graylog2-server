@@ -42,11 +42,9 @@ const MetricsStore = Reflux.createStore({
     MetricsActions.names.promise(promise);
   },
   add(metricName) {
-    console.log('Registering ', metricName);
     this.registrations[metricName] = this.registrations[metricName] ? this.registrations[metricName] + 1 : 1;
   },
   remove(metricName) {
-    console.log('Unregistering ', metricName);
     this.registrations[metricName] = this.registrations[metricName] > 0 ? this.registrations[metricName] - 1 : 0;
   },
 });
