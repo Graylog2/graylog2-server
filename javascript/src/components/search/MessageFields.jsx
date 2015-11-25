@@ -12,7 +12,7 @@ const MessageFields = React.createClass({
   SPECIAL_FIELDS: ['full_message', 'level'],
   render() {
     const fields = [];
-    const formattedFields = Immutable.Map(this.props.message.fields).sortBy((value, key) => key, (fieldA, fieldB) => fieldA.localeCompare(fieldB));
+    const formattedFields = Immutable.Map(this.props.message.formatted_fields).sortBy((value, key) => key, (fieldA, fieldB) => fieldA.localeCompare(fieldB));
     formattedFields.forEach((value, key) => {
       let innerValue = value;
       if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
