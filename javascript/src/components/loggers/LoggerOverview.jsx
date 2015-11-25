@@ -2,7 +2,6 @@ import React from 'react';
 import Reflux from 'reflux';
 
 import { Button, Col, Row } from 'react-bootstrap';
-import SampleStore from 'stores/SampleStore';
 
 const LoggerOverview = React.createClass({
   mixins: [Reflux.connect(SampleStore({foo: 23}))],
