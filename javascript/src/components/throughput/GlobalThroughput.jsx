@@ -13,7 +13,6 @@ const GlobalThroughput = React.createClass({
   componentDidMount() {
     setInterval(MetricsActions.list, 2000);
   },
-  metrics: ['org.graylog2.throughput.input.1-sec-rate', 'org.graylog2.throughput.output.1-sec-rate'],
   render() {
     if (!this.state.throughput) {
       return <Spinner />;
@@ -27,4 +26,4 @@ const GlobalThroughput = React.createClass({
   },
 });
 
-module.exports = GlobalThroughput;
+export default GlobalThroughput;
