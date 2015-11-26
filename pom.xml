@@ -690,6 +690,16 @@
                 <artifactId>javax.el-api</artifactId>
                 <version>3.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit</groupId>
+                <artifactId>retrofit</artifactId>
+                <version>2.0.0-beta2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit</groupId>
+                <artifactId>converter-jackson</artifactId>
+                <version>2.0.0-beta2</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
