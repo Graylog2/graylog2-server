@@ -19,7 +19,10 @@ const Routes = {
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
     METRICS: (nodeId) => '/system/metrics/node/' + nodeId,
-    NODES: '/system/nodes',
+    NODES: {
+      LIST: '/system/nodes',
+      SHOW: (nodeId) => '/system/nodes/' + nodeId,
+    },
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     ROLES: '/system/roles',

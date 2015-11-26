@@ -102,7 +102,7 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
-              <LinkContainer to={Routes.SYSTEM.NODES}>
+              <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
               {this.isPermitted(this.props.permissions, ['INPUTS_READ']) &&
@@ -162,7 +162,7 @@ const Navigation = React.createClass({
           </Nav>
 
           <Nav navbar pullRight>
-            <LinkContainer to={Routes.SYSTEM.NODES}>
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
               <NavItem>
                 <GlobalThroughput />
               </NavItem>
