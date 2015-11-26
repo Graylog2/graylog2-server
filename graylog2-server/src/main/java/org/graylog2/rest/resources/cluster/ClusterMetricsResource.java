@@ -6,7 +6,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
@@ -16,6 +15,7 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.rest.models.system.metrics.responses.MetricNamesResponse;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.security.RestPermissions;
 import retrofit.Response;
@@ -38,7 +38,7 @@ import java.util.List;
 @RequiresAuthentication
 @Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog2 metrics")
 @Path("/cluster/{nodeId}/metrics")
-public class ClusterMetricsResource {
+public class ClusterMetricsResource extends RestResource {
     private final RemoteMetricsResource remoteMetricsResource;
 
     @Inject
@@ -52,7 +52,7 @@ public class ClusterMetricsResource {
         if (authenticationTokens != null && authenticationTokens.size() >= 1) {
             this.remoteMetricsResource = remoteInterfaceProvider.get(targetNode, authenticationTokens.get(0), RemoteMetricsResource.class);
         } else {
-            throw new UnauthorizedException();
+            this.remoteMetricsResource = remoteInterfaceProvider.get(targetNode, RemoteMetricsResource.class);
         }
     }
 
