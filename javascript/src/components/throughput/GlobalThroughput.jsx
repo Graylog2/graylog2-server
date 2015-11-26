@@ -10,9 +10,6 @@ import { Spinner } from 'components/common';
 
 const GlobalThroughput = React.createClass({
   mixins: [Reflux.connect(GlobalThroughputStore)],
-  componentDidMount() {
-    setInterval(MetricsActions.list, 2000);
-  },
   render() {
     if (!this.state.throughput) {
       return <Spinner />;

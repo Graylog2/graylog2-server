@@ -15,7 +15,9 @@ const GlobalThroughputStore = Reflux.createStore({
   init() {
     this.listenTo(NodesStore, this.updateNodes);
     this.listenTo(MetricsStore, this.updateMetrics);
+    setInterval(MetricsActions.list, this.INTERVAL);
   },
+  INTERVAL: 2000,
   updateNodes(update) {
     const nodeIds = Object.keys(update.nodes);
     nodeIds.forEach((nodeId) => {

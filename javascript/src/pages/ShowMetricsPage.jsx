@@ -11,10 +11,6 @@ import { MetricsComponent } from 'components/metrics';
 
 const ShowMetricsPage = React.createClass({
   mixins: [Reflux.connect(MetricsStore), Reflux.connect(NodesStore)],
-
-  componentDidMount() {
-    setInterval(MetricsActions.list, 2000);
-  },
   render() {
     if (!this.state.nodes || !this.state.metricsNames) {
       return <Spinner />;
