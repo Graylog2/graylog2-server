@@ -16,30 +16,63 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.gettingstarted.GettingStartedState;
+import org.graylog2.plugin.Version;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.DisplayGettingStarted;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 
 @RequiresAuthentication
-@Api(value = "System/Getting Started Guide", description = "Getting Started guide")
+@Api(value = "System/GettingStartedGuides", description = "Getting Started guide")
 @Path("/system/gettingstarted")
 public class GettingStartedResource extends RestResource {
 
+    private final ClusterConfigService clusterConfigService;
+
+    @Inject
+    public GettingStartedResource(ClusterConfigService clusterConfigService) {
+        this.clusterConfigService = clusterConfigService;
+    }
+
     @GET
+    @ApiOperation("Check whether to display the Getting started guide for this version")
     public DisplayGettingStarted displayGettingStarted() {
-        return DisplayGettingStarted.create(true);
+        final GettingStartedState gettingStartedState = clusterConfigService.get(GettingStartedState.class);
+        if (gettingStartedState == null) {
+            return  DisplayGettingStarted.create(true);
+        }
+        final Boolean isDismissed = gettingStartedState.dismissedInVersions().get(currentMinorVersionString());
+        if (isDismissed == null) {
+            return DisplayGettingStarted.create(true);
+        }
+        return DisplayGettingStarted.create(!isDismissed);
     }
 
     @POST
     @Path("dismiss")
-    public Response dismissGettingStarted() {
-        return Response.noContent().build();
+    @ApiOperation("Dismiss auto-showing getting started guide for this version")
+    public void dismissGettingStarted() {
+        final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,
+                                                                                GettingStartedState.create(Maps.<String, Boolean>newHashMap()));
+        gettingStartedState.dismissedInVersions().put(currentMinorVersionString(), true);
+        clusterConfigService.write(gettingStartedState);
+
+    }
+
+    private static String currentMinorVersionString() {
+        // cannot use a "." here because MongoDB doesn't allow them in keys
+        return String.format("%d:%d",
+                             Version.CURRENT_CLASSPATH.major,
+                             Version.CURRENT_CLASSPATH.minor);
     }
 
 }
