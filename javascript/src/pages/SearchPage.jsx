@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
 import NodesStore from 'stores/nodes/NodesStore';
@@ -25,7 +26,7 @@ const SearchPage = React.createClass({
       selectedFields: ['message', 'source'],
     };
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore), Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore), Reflux.connect(CurrentUserStore), Reflux.listenTo(InputsStore, '_formatInputs')],
   componentDidMount() {
     const query = SearchStore.query.length > 0 ? SearchStore.query : '*';
     UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS()).then((response) => {
@@ -37,11 +38,7 @@ const SearchPage = React.createClass({
         this.setState({histogram: histogram});
       });
     });
-    InputsStore.list((inputs) => {
-      const inputsMap = {};
-      inputs.forEach((input) => inputsMap[input.input_id] = input);
-      this.setState({inputs: Immutable.Map(inputsMap)});
-    });
+    InputsActions.list.triggerPromise();
 
     StreamsStore.listStreams().then((streams) => {
       const streamsMap = {};
@@ -51,6 +48,10 @@ const SearchPage = React.createClass({
 
     NodesActions.list();
     DashboardsStore.updateWritableDashboards();
+  },
+  _formatInputs(state) {
+    const inputs = InputsStore.inputsAsMap(state.inputs);
+    this.setState({inputs: Immutable.Map(inputs)});
   },
   _determineHistogramResolution(response) {
     let queryRangeInMinutes;

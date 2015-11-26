@@ -1,10 +1,12 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 
 import UserNotification from 'util/UserNotification';
 
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import OutputsStore from 'stores/outputs/OutputsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -14,6 +16,7 @@ import ConfigurationBundlesActions from 'actions/configuration-bundles/Configura
 import PageHeader from 'components/common/PageHeader';
 
 const ExportContentPackPage = React.createClass({
+  mixins: [Reflux.connect(InputsStore)],
   getInitialState() {
     return {};
   },
@@ -24,9 +27,7 @@ const ExportContentPackPage = React.createClass({
     GrokPatternsStore.loadPatterns((grokPatterns) => {
       this.setState({grok_patterns: grokPatterns});
     });
-    InputsStore.list((inputs) => {
-      this.setState({inputs: inputs});
-    });
+    InputsActions.list.triggerPromise();
     OutputsStore.load((resp) => {
       this.setState({outputs: resp.outputs});
     });

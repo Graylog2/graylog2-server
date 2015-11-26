@@ -1,22 +1,25 @@
 import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
 
 import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 import ImportExtractors from 'components/extractors/ImportExtractors';
 
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 
 const ImportExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(InputsStore)],
   getInitialState() {
     return {
       input: undefined,
     };
   },
   componentDidMount() {
-    InputsStore.get(this.props.params.inputId).then(input => this.setState({input: input}));
+    InputsActions.get.triggerPromise(this.props.params.inputId).then(input => this.setState({input: input}));
   },
   _isLoading() {
     return !this.state.input;

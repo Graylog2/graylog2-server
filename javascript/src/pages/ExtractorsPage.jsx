@@ -12,6 +12,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import NodesActions from 'actions/nodes/NodesActions';
 
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import NodesStore from 'stores/nodes/NodesStore';
 
@@ -19,7 +20,7 @@ const ExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.listenTo(NodesStore, 'onNodesChange')],
+  mixins: [Reflux.connect(InputsStore), Reflux.listenTo(NodesStore, 'onNodesChange')],
   getInitialState() {
     return {
       input: undefined,
@@ -27,7 +28,7 @@ const ExtractorsPage = React.createClass({
     };
   },
   componentDidMount() {
-    InputsStore.get(this.props.params.inputId).then(input => this.setState({input: input}));
+    InputsActions.get.triggerPromise(this.props.params.inputId);
     NodesActions.list.triggerPromise();
   },
   onNodesChange(nodes) {

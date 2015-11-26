@@ -7,6 +7,7 @@ import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import NodesActions from 'actions/nodes/NodesActions';
 import NodesStore from 'stores/nodes/NodesStore';
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessagesStore from 'stores/messages/MessagesStore';
 
@@ -14,7 +15,7 @@ const ShowMessagePage = React.createClass({
   propTypes: {
     params: PropTypes.object,
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.ListenerMethods],
+  mixins: [Reflux.connect(NodesStore), Reflux.listenTo(InputsStore, '_formatInput')],
   getInitialState() {
     return {
       streams: undefined,
@@ -23,10 +24,17 @@ const ShowMessagePage = React.createClass({
     };
   },
   componentDidMount() {
-    MessagesStore.loadMessage(this.props.params.index, this.props.params.messageId).then(message => this.setState({message: message}));
+    MessagesStore.loadMessage(this.props.params.index, this.props.params.messageId).then(message => {
+      this.setState({message: message});
+      InputsActions.get.triggerPromise(message.source_input_id);
+    });
     StreamsStore.listStreams().then(streams => this.setState({streams: Immutable.Map(streams)}));
-    InputsStore.list(inputs => this.setState({inputs: Immutable.Map(inputs)}));
     NodesActions.list.triggerPromise();
+  },
+  _formatInput(state) {
+    const input = {};
+    input[state.input.input_id] = state.input;
+    this.setState({inputs: Immutable.Map(input)});
   },
   _isLoaded() {
     return this.state.message && this.state.streams && this.state.nodes && this.state.inputs;

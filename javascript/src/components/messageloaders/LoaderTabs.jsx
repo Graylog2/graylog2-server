@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
 import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
@@ -17,6 +19,7 @@ const LoaderTabs = React.createClass({
     selectedInputId: PropTypes.string,
     customFieldActions: PropTypes.node,
   },
+  mixins: [Reflux.listenTo(InputsStore, '_formatInputs')],
   getInitialState() {
     return {
       message: undefined,
@@ -29,6 +32,10 @@ const LoaderTabs = React.createClass({
       this.refs.messageLoader.submit(this.props.messageId, this.props.index);
     }
   },
+  _formatInputs(state) {
+    const inputs = InputsStore.inputsAsMap(state.inputs);
+    this.setState({inputs: Immutable.Map(inputs)});
+  },
   onMessageLoaded(message) {
     this.setState({message: message});
     if (this.props.onMessageLoaded) {
@@ -36,13 +43,7 @@ const LoaderTabs = React.createClass({
     }
   },
   loadData() {
-    InputsStore.list((inputsList) => {
-      const inputs = {};
-      inputsList.forEach(input => {
-        inputs[input.input_id] = input;
-      });
-      this.setState({inputs: Immutable.Map(inputs)});
-    });
+    InputsActions.list.triggerPromise();
     StreamsStore.listStreams().then((response) => {
       const streams = {};
       response.forEach((stream) => { streams[stream.id] = stream });

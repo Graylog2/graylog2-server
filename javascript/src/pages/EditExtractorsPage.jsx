@@ -9,6 +9,7 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
@@ -19,7 +20,7 @@ const EditExtractorsPage = React.createClass({
     params: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
+  mixins: [Reflux.connect(ExtractorsStore), Reflux.connect(InputsStore)],
   getInitialState() {
     return {
       extractor: undefined,
@@ -28,7 +29,7 @@ const EditExtractorsPage = React.createClass({
     };
   },
   componentDidMount() {
-    InputsStore.get(this.props.params.inputId).then(input => this.setState({input: input}));
+    InputsActions.get.triggerPromise(this.props.params.inputId);
     ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
     UniversalSearchstore.search('relative', 'gl2_source_input:' + this.props.params.inputId + ' OR gl2_source_radio_input:' + this.props.params.inputId, { range: 0 }, 1)
       .then((response) => {

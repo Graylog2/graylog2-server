@@ -5,6 +5,8 @@ import {Row, Col} from 'react-bootstrap';
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
 import Spinner from 'components/common/Spinner';
+
+import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import SingleNodeActions from 'actions/nodes/SingleNodeActions';
 import SingleNodeStore from 'stores/nodes/SingleNodeStore';
@@ -13,7 +15,7 @@ const InputsList = React.createClass({
   propTypes: {
     permissions: PropTypes.array.isRequired,
   },
-  mixins: [Reflux.connect(SingleNodeStore), Reflux.ListenerMethods],
+  mixins: [Reflux.connect(SingleNodeStore), Reflux.listenTo(InputsStore, '_splitInputs')],
   getInitialState() {
     return {
       globalInputs: undefined,
@@ -21,12 +23,14 @@ const InputsList = React.createClass({
     };
   },
   componentDidMount() {
-    InputsStore.list(inputs => {
-      const globalInputs = inputs.filter((input) => input.message_input.global === true);
-      const localInputs = inputs.filter((input) => input.message_input.global === false);
-      this.setState({globalInputs: globalInputs, localInputs: localInputs});
-    }, false);
+    InputsActions.list.triggerPromise(true);
     SingleNodeActions.get.triggerPromise();
+  },
+  _splitInputs(state) {
+    const inputs = state.inputs;
+    const globalInputs = inputs.filter((input) => input.message_input.global === true);
+    const localInputs = inputs.filter((input) => input.message_input.global === false);
+    this.setState({globalInputs: globalInputs, localInputs: localInputs});
   },
   _isLoading() {
     return !(this.state.localInputs && this.state.globalInputs && this.state.node);

@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
 
 import Spinner from 'components/common/Spinner';
 import PageHeader from 'components/common/PageHeader';
@@ -10,6 +11,7 @@ import Routes from 'routing/Routes';
 
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 import InputsStore from 'stores/inputs/InputsStore';
+import InputsActions from 'actions/inputs/InputsActions';
 import MessagesStore from 'stores/messages/MessagesStore';
 
 const CreateExtractorsPage = React.createClass({
@@ -18,6 +20,7 @@ const CreateExtractorsPage = React.createClass({
     location: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(InputsStore)],
   getInitialState() {
     const { query } = this.props.location;
 
@@ -32,7 +35,7 @@ const CreateExtractorsPage = React.createClass({
     };
   },
   componentDidMount() {
-    InputsStore.get(this.props.params.inputId).then(input => this.setState({input: input}));
+    InputsActions.get.triggerPromise(this.props.params.inputId);
     MessagesStore.loadMessage(this.state.exampleIndex, this.state.exampleId)
       .then(message => this.setState({exampleMessage: message}));
   },
