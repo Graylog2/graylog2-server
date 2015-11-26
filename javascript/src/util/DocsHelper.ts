@@ -42,6 +42,10 @@ class DocsHelper {
   toLink(path: string, title: string): string {
     return '<a href=\'' + this.toString(path) + '\' target=\'_blank\'>' + title + '</a>';
   }
+
+  versionedDocsHomePage(): string {
+    return this.toString('');
+  }
 }
 
 var docsHelper = new DocsHelper();
