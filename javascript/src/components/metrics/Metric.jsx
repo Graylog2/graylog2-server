@@ -6,6 +6,7 @@ const Metric = React.createClass({
   propTypes: {
     metric: React.PropTypes.object.isRequired,
     namespace: React.PropTypes.string,
+    nodeId: React.PropTypes.string.isRequired,
   },
   getInitialState() {
     return {
@@ -36,7 +37,7 @@ const Metric = React.createClass({
   },
   render() {
     const metric = this.props.metric;
-    const details = this.state.expanded ? <MetricDetails metric={this.props.metric} /> : null;
+    const details = this.state.expanded ? <MetricDetails nodeId={this.props.nodeId} metric={this.props.metric} /> : null;
     return (
       <span>
         <div className="name">

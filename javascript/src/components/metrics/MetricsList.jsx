@@ -7,11 +7,12 @@ const MetricsList = React.createClass({
   propTypes: {
     names: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     namespace: React.PropTypes.string.isRequired,
+    nodeId: React.PropTypes.string.isRequired,
   },
   _formatMetric(metric) {
     return (
       <li key={'li-' + metric.full_name}>
-        <Metric key={metric.full_name} metric={metric} namespace={this.props.namespace} />
+        <Metric key={metric.full_name} metric={metric} namespace={this.props.namespace} nodeId={this.props.nodeId}/>
       </li>
     );
   },

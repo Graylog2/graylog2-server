@@ -14,10 +14,10 @@ const MetricDetails = React.createClass({
   },
   mixins: [Reflux.connect(MetricsStore)],
   componentDidMount() {
-    MetricsActions.add(this.props.metric.full_name);
+    MetricsActions.add(this.props.nodeId, this.props.metric.full_name);
   },
   componentWillUnmount() {
-    MetricsActions.remove(this.props.metric.full_name);
+    MetricsActions.remove(this.props.nodeId, this.props.metric.full_name);
   },
   _formatDetailsForType(type, metric) {
     switch(type) {
@@ -37,7 +37,9 @@ const MetricDetails = React.createClass({
   },
   render() {
     const metricName = this.props.metric.full_name;
-    const metric = this.state.metrics && this.state.metrics[metricName] ? this.state.metrics[metricName] : this.props.metric;
+    const nodeId = this.props.nodeId;
+    const metric = this.state.metrics && this.state.metrics[nodeId] && this.state.metrics[nodeId][metricName] ?
+      this.state.metrics[nodeId][metricName] : this.props.metric;
     const type = String(metric.type).capitalize().toString();
     const details = this._formatDetailsForType(type, metric);
     return (

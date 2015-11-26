@@ -9,7 +9,9 @@ const NodesStore = Reflux.createStore({
   nodes: undefined,
 
   init() {
-    this._propagateState();
+    if (this.nodes === undefined) {
+      NodesActions.list();
+    }
   },
 
   getInitialState() {

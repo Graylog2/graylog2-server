@@ -5,49 +5,81 @@ import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
+import NodesStore from 'stores/nodes/NodesStore';
+
 import MetricsActions from 'actions/metrics/MetricsActions';
 
 const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions],
   namespace: 'org.graylog2',
   registrations: {},
-  metrics: {},
 
   init() {
-    MetricsActions.names();
+    this.listenTo(NodesStore, this.updateNodes);
   },
   getInitialState() {
-    return { names: this.names, metrics: this.metrics };
+    return { metricsNames: this.metricsNames, metrics: this.metrics };
+  },
+  updateNodes(update) {
+    this.nodes = update.nodes;
+    MetricsActions.names();
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MetricsApiController.multiple().url);
-    const body = { metrics: Object.keys(this.registrations).filter((metricName) => this.registrations[metricName] > 0) };
-    const promise = fetch('POST', url, body).then((response) => {
-      const metrics = {};
-      response.metrics.forEach((metric) => metrics[metric.full_name] = metric);
-      this.metrics = metrics;
-      this.trigger({ metrics: metrics });
-      return metrics;
-    });
+    const promise = Promise.all(Object.keys(this.registrations)
+      .filter((nodeId) => Object.keys(this.registrations[nodeId]).length > 0)
+      .map((nodeId) => {
+        const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterMetricsApiController.multiple(nodeId).url);
+        const body = {metrics: Object.keys(this.registrations[nodeId]).filter((metricName) => this.registrations[nodeId][metricName] > 0)};
+        return fetch('POST', url, body).then((response) => {
+          const metrics = {};
+          response.metrics.forEach((metric) => metrics[metric.full_name] = metric);
+          return {nodeId: nodeId, metrics: metrics};
+        });
+      })).then((responses) => {
+        const metrics = {};
+        responses.forEach((response) => {
+          metrics[response.nodeId] = response.metrics;
+        });
+
+        this.trigger({metrics: metrics});
+        this.metrics = metrics;
+        return metrics;
+      });
 
     MetricsActions.list.promise(promise);
   },
   names() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MetricsApiController.byNamespace(this.namespace).url);
-    const promise = fetch('GET', url).then((response) => {
-      this.trigger({ names: response.metrics });
-      this.names = response.metrics;
-
-      return response.metrics;
+    const promise = Promise.all(Object.keys(this.nodes).map((nodeId) => {
+      const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
+      return fetch('GET', url).then((response) => {
+        return {nodeId: nodeId, names: response.metrics};
+      });
+    })).then((responses) => {
+      const metricsNames = {};
+      responses.forEach((response) => {
+        metricsNames[response.nodeId] = response.names;
+      });
+      this.trigger({metricsNames: metricsNames});
+      this.metricsNames = metricsNames;
+      return metricsNames;
     });
 
     MetricsActions.names.promise(promise);
   },
-  add(metricName) {
-    this.registrations[metricName] = this.registrations[metricName] ? this.registrations[metricName] + 1 : 1;
+  add(nodeId, metricName) {
+    if (!this.registrations[nodeId]) {
+      this.registrations[nodeId] = {};
+    }
+    this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] ? this.registrations[nodeId][metricName] + 1 : 1;
   },
-  remove(metricName) {
-    this.registrations[metricName] = this.registrations[metricName] > 0 ? this.registrations[metricName] - 1 : 0;
+  remove(nodeId, metricName) {
+    if (!this.registrations[nodeId]) {
+      return;
+    }
+    this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] > 0 ? this.registrations[nodeId][metricName] - 1 : 0;
+    if (this.registrations[nodeId][metricName] === 0) {
+      delete this.registrations[nodeId][metricName];
+    }
   },
 });
 

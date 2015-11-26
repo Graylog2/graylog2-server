@@ -73,6 +73,10 @@ const jsRoutes = {
         multiple: () => { return {url: '/system/metrics/multiple'}; },
         byNamespace: (namespace) => { return {url: '/system/metrics/namespace/' + namespace}; },
       },
+      ClusterMetricsApiController: {
+        multiple: (nodeId) => { return {url: '/cluster/' + nodeId + '/metrics/multiple'}; },
+        byNamespace: (nodeId, namespace) => { return {url: '/cluster/' + nodeId + '/metrics/namespace/' + namespace}; },
+      },
       NotificationsApiController: {
         delete: (type) => { return {url: '/system/notifications/' + type}; },
         list: () => { return {url: '/system/notifications'}; },

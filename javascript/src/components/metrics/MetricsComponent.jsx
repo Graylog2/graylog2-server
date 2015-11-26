@@ -4,28 +4,27 @@ import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Col, Row } from 'react-bootstrap';
 import String from 'string';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
-
 import { Spinner } from 'components/common';
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
 
 const MetricsComponent = React.createClass({
-  mixins: [LinkedStateMixin, Reflux.connect(MetricsStore)],
+  propTypes: {
+    names: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    namespace: React.PropTypes.string.isRequired,
+    nodeId: React.PropTypes.string.isRequired,
+  },
+  mixins: [LinkedStateMixin],
   getInitialState() {
     return { filter: '' };
   },
   render() {
-    if (!this.state.names) {
-      return <Spinner />;
-    }
-
-    const filteredNames = this.state.names
+    const filteredNames = this.props.names
       .filter((metric) => String(metric.full_name).contains(this.state.filter));
     return (
       <Row className="content">
         <Col md={12}>
           <MetricsFilterInput valueLink={this.linkState('filter')} />
-          <MetricsList names={filteredNames} namespace={MetricsStore.namespace}/>
+          <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId}/>
         </Col>
       </Row>
     );
