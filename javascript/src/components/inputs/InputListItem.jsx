@@ -15,14 +15,14 @@ const InputListItem = React.createClass({
   mixins: [PermissionsMixin],
   _labelClassForState(state) {
     switch (state) {
-    case 'RUNNING':
-      return 'success';
-    case 'FAILED':
-      return 'danger';
-    case 'STARTING':
-      return 'info';
-    default:
-      return 'warning';
+      case 'RUNNING':
+        return 'success';
+      case 'FAILED':
+        return 'danger';
+      case 'STARTING':
+        return 'info';
+      default:
+        return 'warning';
     }
   },
 
@@ -99,7 +99,6 @@ const InputListItem = React.createClass({
       <DropdownButton key={`more-actions-${this.props.input.id}`}
                       title="More actions"
                       id={`more-actions-dropdown-${this.props.input.id}`}
-                      className="more-actions"
                       pullRight>
         {this._getMoreActionsItems()}
       </DropdownButton>

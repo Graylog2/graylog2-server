@@ -1,6 +1,5 @@
 import React, {PropTypes} from 'react';
 import InputDropdown from 'components/inputs/InputDropdown';
-import InputsStore from 'stores/inputs/InputsStore';
 import UserNotification from 'util/UserNotification';
 
 import UniversalSearchStore from 'stores/search/UniversalSearchStore';
@@ -40,7 +39,7 @@ const RecentMessageLoader = React.createClass({
         <InputDropdown inputs={this.props.inputs} preselectedInputId={this.props.selectedInputId} onLoadMessage={this.onClick} title="Load Message"/>
       </div>
     );
-  }
+  },
 });
 
 export default RecentMessageLoader;
