@@ -1,7 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
-import { Button, LinkContainer, ProgressBar } from 'react-bootstrap';
+import { Button, ProgressBar } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
 
