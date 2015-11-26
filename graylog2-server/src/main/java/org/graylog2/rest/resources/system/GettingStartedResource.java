@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -50,10 +50,7 @@ public class GettingStartedResource extends RestResource {
         if (gettingStartedState == null) {
             return  DisplayGettingStarted.create(true);
         }
-        final Boolean isDismissed = gettingStartedState.dismissedInVersions().get(currentMinorVersionString());
-        if (isDismissed == null) {
-            return DisplayGettingStarted.create(true);
-        }
+        final boolean isDismissed = gettingStartedState.dismissedInVersions().contains(currentMinorVersionString());
         return DisplayGettingStarted.create(!isDismissed);
     }
 
@@ -62,15 +59,14 @@ public class GettingStartedResource extends RestResource {
     @ApiOperation("Dismiss auto-showing getting started guide for this version")
     public void dismissGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,
-                                                                                GettingStartedState.create(Maps.<String, Boolean>newHashMap()));
-        gettingStartedState.dismissedInVersions().put(currentMinorVersionString(), true);
+                                                                                GettingStartedState.create(Sets.<String>newHashSet()));
+        gettingStartedState.dismissedInVersions().add(currentMinorVersionString());
         clusterConfigService.write(gettingStartedState);
 
     }
 
     private static String currentMinorVersionString() {
-        // cannot use a "." here because MongoDB doesn't allow them in keys
-        return String.format("%d:%d",
+        return String.format("%d.%d",
                              Version.CURRENT_CLASSPATH.major,
                              Version.CURRENT_CLASSPATH.minor);
     }

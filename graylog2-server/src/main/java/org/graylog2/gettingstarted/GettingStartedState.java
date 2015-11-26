@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import java.util.Map;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -36,10 +37,10 @@ public abstract class GettingStartedState {
      * @return dismissal state of getting started pages across all stored versions
      */
     @JsonProperty
-    public abstract Map<String, Boolean> dismissedInVersions();
+    public abstract Set<String> dismissedInVersions();
 
     @JsonCreator
-    public static GettingStartedState create(@JsonProperty("dismissed_in_versions") Map<String, Boolean> dismissedInVersions) {
+    public static GettingStartedState create(@JsonProperty("dismissed_in_versions") Set<String> dismissedInVersions) {
         return new AutoValue_GettingStartedState(dismissedInVersions);
     }
 
