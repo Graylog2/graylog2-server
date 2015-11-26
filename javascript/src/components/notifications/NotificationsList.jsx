@@ -39,7 +39,7 @@ const NotificationsList = React.createClass({
         </Alert>
       );
     } else {
-      title = `There ${this._formatNotificationCount(count)}$`;
+      title = `There ${this._formatNotificationCount(count)}`;
       content = this.state.notifications.map((notification) => <Notification key={notification.id} notification={notification} />);
     }
 
