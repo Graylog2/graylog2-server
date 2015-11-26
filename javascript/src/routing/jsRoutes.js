@@ -134,6 +134,9 @@ const jsRoutes = {
         info: () => { return {url: '/system'}; },
         fields: () => { return {url: '/system/fields'}; },
       },
+      SystemJobsApiController: {
+        list: () => { return {url: '/cluster/jobs'}; },
+      },
       SystemMessagesApiController: {
         all: (page) => { return {url: '/system/messages?page=' + page}; },
       },

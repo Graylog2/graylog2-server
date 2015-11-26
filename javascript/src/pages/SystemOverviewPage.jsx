@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { IfPermitted } from 'components/common';
-import { NotificationsList } from 'components/notifications';
-import { TimesList } from 'components/times';
-import { SystemMessagesComponent } from 'components/systemmessages';
 import { IndexerClusterHealth, IndexerFailuresComponent } from 'components/indexers';
+import { NotificationsList } from 'components/notifications';
+import { SystemJobsComponent } from 'components/systemjobs';
+import { SystemMessagesComponent } from 'components/systemmessages';
+import { TimesList } from 'components/times';
 import UsageStatsOptIn from 'components/usagestats/UsageStatsOptIn';
 
 const SystemOverviewPage = React.createClass({
@@ -13,6 +14,10 @@ const SystemOverviewPage = React.createClass({
       <span>
         <IfPermitted permissions="notifications:read">
           <NotificationsList />
+        </IfPermitted>
+
+        <IfPermitted permissions="systemjobs:read">
+          <SystemJobsComponent />
         </IfPermitted>
 
         <IfPermitted permissions="indexercluster:read">

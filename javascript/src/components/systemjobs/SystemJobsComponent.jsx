@@ -1,0 +1,43 @@
+import React from 'react';
+import Reflux from 'reflux';
+import { Col, Row } from 'react-bootstrap';
+
+import SystemJobsStore from 'stores/systemjobs/SystemJobsStore';
+
+import SystemJobsActions from 'actions/systemjobs/SystemJobsActions';
+
+import { Spinner } from 'components/common';
+import { SystemJobsList } from 'components/systemjobs';
+
+const SystemJobsComponent = React.createClass({
+  mixins: [Reflux.connect(SystemJobsStore)],
+  componentDidMount() {
+    SystemJobsActions.list();
+
+    this.interval = setInterval(2000, SystemJobsActions.list);
+  },
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  },
+  render() {
+    if (!this.state.jobs) {
+      return <Spinner />;
+    }
+    const jobs = Object.keys(this.state.jobs).map((nodeId) => this.state.jobs[nodeId].jobs).reduce((a, b) => a.concat(b));
+    return (
+      <Row className="content">
+        <Col md={12}>
+          <h2>System jobs</h2>
+          <p className="description">
+            A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
+            provide progress information or can be stopped.
+          </p>
+
+          <SystemJobsList jobs={jobs} />
+        </Col>
+      </Row>
+    );
+  },
+});
+
+export default SystemJobsComponent;
