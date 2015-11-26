@@ -36,13 +36,24 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static org.graylog2.inputs.codecs.GelfChunkAggregator.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.CHUNK_COUNTER;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.COMPLETE_MESSAGES;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.ChunkEntry;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.DUPLICATE_CHUNKS;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.EXPIRED_CHUNKS;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.EXPIRED_MESSAGES;
+import static org.graylog2.inputs.codecs.GelfChunkAggregator.WAITING_MESSAGES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GelfChunkAggregatorTest {
     private static final byte[] CHUNK_MAGIC_BYTES = new byte[]{0x1e, 0x0f};
+
     private ScheduledThreadPoolExecutor poolExecutor;
     private GelfChunkAggregator aggregator;
     private MetricRegistry metricRegistry;
@@ -73,6 +84,7 @@ public class GelfChunkAggregatorTest {
         assertEquals(0, counterValueNamed(metricRegistry, WAITING_MESSAGES));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+        assertEquals(0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
     }
 
     @Test
@@ -92,6 +104,7 @@ public class GelfChunkAggregatorTest {
                 assertEquals(0, counterValueNamed(metricRegistry, WAITING_MESSAGES));
                 assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
                 assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+                assertEquals(0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
 
             } else {
                 assertNull("chunks not complete", result.getMessage());
@@ -101,7 +114,7 @@ public class GelfChunkAggregatorTest {
                 assertEquals("one message waiting", 1, counterValueNamed(metricRegistry, WAITING_MESSAGES));
                 assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
                 assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
-
+                assertEquals(0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
             }
         }
     }
@@ -147,6 +160,7 @@ public class GelfChunkAggregatorTest {
         assertEquals("last chunk creates another waiting message", 1, counterValueNamed(metricRegistry, WAITING_MESSAGES));
         assertEquals("4 chunks expired", 4, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
         assertEquals("one message expired", 1, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+        assertEquals("no duplicate chunks", 0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
 
         // reset clock for other tests
         DateTimeUtils.setCurrentMillisSystem();
@@ -169,6 +183,7 @@ public class GelfChunkAggregatorTest {
         assertEquals(0, counterValueNamed(metricRegistry, WAITING_MESSAGES));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+        assertEquals(0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
     }
 
     @Test
@@ -194,6 +209,31 @@ public class GelfChunkAggregatorTest {
         assertEquals(1, counterValueNamed(metricRegistry, WAITING_MESSAGES));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
         assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+        assertEquals(0, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
+    }
+
+    @Test
+    public void duplicateChunk() {
+        final byte[] messageId1 = generateMessageId(1);
+        final byte[] messageId2 = generateMessageId(2);
+        final ChannelBuffer chunk1 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
+        final ChannelBuffer chunk2 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
+        final ChannelBuffer chunk3 = createChunk(messageId2, (byte) 0, (byte) 2, new byte[16]);
+        final ChannelBuffer chunk4 = createChunk(messageId1, (byte) 1, (byte) 2, new byte[16]);
+        final ChannelBuffer chunk5 = createChunk(messageId2, (byte) 1, (byte) 2, new byte[16]);
+
+        assertNull("message should not be complete", aggregator.addChunk(chunk1).getMessage());
+        assertNull("message should not be complete", aggregator.addChunk(chunk2).getMessage());
+        assertNull("message should not be complete", aggregator.addChunk(chunk3).getMessage());
+        assertNotNull("message 1 should be complete", aggregator.addChunk(chunk4).getMessage());
+        assertNotNull("message 2 should be complete", aggregator.addChunk(chunk5).getMessage());
+
+        assertEquals(2, counterValueNamed(metricRegistry, COMPLETE_MESSAGES));
+        assertEquals(5, counterValueNamed(metricRegistry, CHUNK_COUNTER));
+        assertEquals(0, counterValueNamed(metricRegistry, WAITING_MESSAGES));
+        assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_CHUNKS));
+        assertEquals(0, counterValueNamed(metricRegistry, EXPIRED_MESSAGES));
+        assertEquals(1, counterValueNamed(metricRegistry, DUPLICATE_CHUNKS));
     }
 
     @Test
@@ -217,6 +257,26 @@ public class GelfChunkAggregatorTest {
         assertTrue("eviction set should be empty", sortedEvictionSet.isEmpty());
     }
 
+    @Test
+    public void testChunkEntryEquals() throws Exception {
+        final GelfChunkAggregator.ChunkEntry entry = new ChunkEntry(1, 0L, "id");
+
+        assertThat(entry).isEqualTo(new ChunkEntry(1, 0L, "id"));
+        assertThat(entry).isEqualTo(new ChunkEntry(2, 0L, "id"));
+        assertThat(entry).isNotEqualTo(new ChunkEntry(1, 1L, "id"));
+        assertThat(entry).isNotEqualTo(new ChunkEntry(1, 0L, "foo"));
+    }
+
+    @Test
+    public void testChunkEntryHashCode() throws Exception {
+        final GelfChunkAggregator.ChunkEntry entry = new ChunkEntry(1, 0L, "id");
+
+        assertThat(entry.hashCode()).isEqualTo(new ChunkEntry(1, 0L, "id").hashCode());
+        assertThat(entry.hashCode()).isEqualTo(new ChunkEntry(2, 0L, "id").hashCode());
+        assertThat(entry.hashCode()).isNotEqualTo(new ChunkEntry(1, 1L, "id").hashCode());
+        assertThat(entry.hashCode()).isNotEqualTo(new ChunkEntry(1, 0L, "foo").hashCode());
+    }
+
     private ChannelBuffer[] createChunkedMessage(int messageSize, int maxChunkSize) {
         return createChunkedMessage(messageSize, maxChunkSize, generateMessageId());
     }
@@ -230,31 +290,32 @@ public class GelfChunkAggregatorTest {
         if ((messageSize % maxChunkSize) != 0) {
             sequenceCount++;
         }
+
         final ChannelBuffer[] buffers = new ChannelBuffer[sequenceCount];
-
-        final byte[] sequenceCountArr = new byte[]{(byte) sequenceCount};
-
         for (int sequenceNumber = 0; sequenceNumber < sequenceCount; sequenceNumber++) {
-            final byte[] sequenceNumberArry = new byte[]{(byte) sequenceNumber};
-
             // fake payload, we don't care about actually parsing it in this test
             int payloadSize = maxChunkSize;
             // correctly size the last chunk
             if (sequenceNumber + 1 == sequenceCount) {
                 payloadSize = (messageSize % maxChunkSize);
             }
-            final ChannelBuffer payload = ChannelBuffers.buffer(payloadSize);
-            payload.writeZero(payloadSize);
 
-            buffers[sequenceNumber] = ChannelBuffers.copiedBuffer(
-                    CHUNK_MAGIC_BYTES,
-                    messageId,
-                    sequenceNumberArry,
-                    sequenceCountArr,
-                    payload.array()
-            );
+            buffers[sequenceNumber] = createChunk(messageId, (byte) sequenceNumber, (byte) sequenceCount, new byte[payloadSize]);
         }
+
         return buffers;
+    }
+
+    private ChannelBuffer createChunk(byte[] messageId, byte sequenceNumber, byte sequenceCount, byte[] payload) {
+        final ChannelBuffer channelBuffer = ChannelBuffers.dynamicBuffer(payload.length + 12);
+
+        channelBuffer.writeBytes(CHUNK_MAGIC_BYTES);
+        channelBuffer.writeBytes(messageId);
+        channelBuffer.writeByte(sequenceNumber);
+        channelBuffer.writeByte(sequenceCount);
+        channelBuffer.writeBytes(payload);
+
+        return channelBuffer;
     }
 
     private byte[] generateMessageId(int id) {

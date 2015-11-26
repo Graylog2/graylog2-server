@@ -19,6 +19,7 @@ package org.graylog2.inputs.codecs;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
@@ -30,9 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,6 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static java.util.Objects.requireNonNull;
 
 public class GelfChunkAggregator implements CodecAggregator {
     private static final Logger log = LoggerFactory.getLogger(GelfChunkAggregator.class);
@@ -55,6 +59,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     public static final String COMPLETE_MESSAGES = name(GelfChunkAggregator.class, "complete-messages");
     public static final String EXPIRED_MESSAGES = name(GelfChunkAggregator.class, "expired-messages");
     public static final String EXPIRED_CHUNKS = name(GelfChunkAggregator.class, "expired-chunks");
+    public static final String DUPLICATE_CHUNKS = name(GelfChunkAggregator.class, "duplicate-chunks");
 
     private final ConcurrentMap<String, ChunkEntry> chunks = Maps.newConcurrentMap();
     private final ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet<>();
@@ -62,6 +67,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     private final Counter waitingMessages;
     private final Counter expiredMessages;
     private final Counter expiredChunks;
+    private final Counter duplicateChunks;
     private final Counter completeMessages;
 
     @Inject
@@ -73,6 +79,7 @@ public class GelfChunkAggregator implements CodecAggregator {
         completeMessages = metricRegistry.counter(COMPLETE_MESSAGES);
         expiredMessages = metricRegistry.counter(EXPIRED_MESSAGES);
         expiredChunks = metricRegistry.counter(EXPIRED_CHUNKS);
+        duplicateChunks = metricRegistry.counter(DUPLICATE_CHUNKS);
     }
 
     @Nonnull
@@ -115,9 +122,10 @@ public class GelfChunkAggregator implements CodecAggregator {
      * If the message isn't complete, it adds the chunk to the internal buffer and waits for more incoming messages.
      * Outdated chunks are being purged regularly.
      *
-     * @param gelfMessage   the gelf message chunk
+     * @param gelfMessage the gelf message chunk
      * @return null or a {@link org.graylog2.plugin.journal.RawMessage raw message} object
      */
+    @Nullable
     private ChannelBuffer checkForCompletion(GELFMessage gelfMessage) {
         if (!chunks.isEmpty() && log.isDebugEnabled()) {
             log.debug("Dumping GELF chunk map [chunks for {} messages]:\n{}", chunks.size(), humanReadableChunkMap());
@@ -128,6 +136,7 @@ public class GelfChunkAggregator implements CodecAggregator {
         final String messageId = chunk.getId();
 
         ChunkEntry entry = new ChunkEntry(sequenceCount, chunk.getArrival(), messageId);
+
         final ChunkEntry existing = chunks.putIfAbsent(messageId, entry);
         if (existing == null) {
             // add this chunk entry to the eviction set
@@ -138,8 +147,14 @@ public class GelfChunkAggregator implements CodecAggregator {
             entry = existing;
         }
 
+        final int sequenceNumber = chunk.getSequenceNumber();
+        if (!entry.payloadArray.compareAndSet(sequenceNumber, null, chunk)) {
+            log.error("Received duplicate chunk {} for message {} from {}", sequenceNumber, messageId, gelfMessage.getSourceAddress());
+            duplicateChunks.inc();
+            return null;
+        }
+
         final int chunkWatermark = entry.chunkSlotsWritten.incrementAndGet();
-        entry.payloadArray.set(chunk.getSequenceNumber(), chunk);
 
         if (chunkWatermark == sequenceCount) {
             // message is complete by chunk count, assemble and return it.
@@ -166,6 +181,7 @@ public class GelfChunkAggregator implements CodecAggregator {
             log.debug("Not all chunks of <{}> arrived within {}ms. Dropping chunks.", messageId, VALIDITY_PERIOD);
             expireEntry(messageId);
         }
+
         return null;
     }
 
@@ -203,15 +219,15 @@ public class GelfChunkAggregator implements CodecAggregator {
 
     @VisibleForTesting
     static class ChunkEntry implements Comparable<ChunkEntry> {
-        private final AtomicInteger chunkSlotsWritten = new AtomicInteger(0);
-        private final long firstTimestamp;
-        private final AtomicReferenceArray<GELFMessageChunk> payloadArray;
-        private final String id;
+        protected final AtomicInteger chunkSlotsWritten = new AtomicInteger(0);
+        protected final long firstTimestamp;
+        protected final AtomicReferenceArray<GELFMessageChunk> payloadArray;
+        protected final String id;
 
         public ChunkEntry(int chunkCount, long firstTimestamp, String id) {
             this.payloadArray = new AtomicReferenceArray<>(chunkCount);
             this.firstTimestamp = firstTimestamp;
-            this.id = id;
+            this.id = requireNonNull(id);
         }
 
         @Override
@@ -221,20 +237,16 @@ public class GelfChunkAggregator implements CodecAggregator {
 
             final ChunkEntry that = (ChunkEntry) o;
 
+            if (!id.equals(that.id)) return false;
             if (firstTimestamp != that.firstTimestamp) return false;
-            if (!chunkSlotsWritten.equals(that.chunkSlotsWritten)) return false;
-            //noinspection RedundantIfStatement
-            if (!payloadArray.equals(that.payloadArray)) return false;
 
+            //noinspection RedundantIfStatement
             return true;
         }
 
         @Override
         public int hashCode() {
-            int result = chunkSlotsWritten.hashCode();
-            result = 31 * result + (int) (firstTimestamp ^ (firstTimestamp >>> 32));
-            result = 31 * result + payloadArray.hashCode();
-            return result;
+            return Objects.hash(id, firstTimestamp);
         }
 
         @Override
@@ -249,6 +261,15 @@ public class GelfChunkAggregator implements CodecAggregator {
                 return id.compareTo(o.id);
             }
             return firstTimestamp < o.firstTimestamp ? -1 : 1;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("id", id)
+                    .add("firstTimestamp", firstTimestamp)
+                    .add("chunkSlotsWritten", chunkSlotsWritten)
+                    .toString();
         }
     }
 
