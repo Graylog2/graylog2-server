@@ -1,82 +1,56 @@
-/* global jsRoutes */
+import React from 'react';
+import Reflux from 'reflux';
+import numeral from 'numeral';
+import { Button, LinkContainer, ProgressBar } from 'react-bootstrap';
 
-'use strict';
+import MetricsStore from 'stores/metrics/MetricsStore';
 
-var React = require('react');
-var ProgressBar = require('react-bootstrap').ProgressBar;
-var Button = require('react-bootstrap').Button;
-//noinspection JSUnusedGlobalSymbols
-var MetricsStore = require('../../stores/metrics/MetricsStore');
-var numeral = require('numeral');
+import MetricsActions from 'actions/metrics/MetricsActions';
 
-var metricsStore = MetricsStore.instance;
+import Routes from 'routing/Routes';
+import { Spinner } from 'components/common';
 
-var BufferUsage = React.createClass({
-    getInitialState() {
-        return ({
-            usagePercentage: 0,
-            usage: 0,
-            size: 0,
-            hasError: false,
-            initialized: true
-        });
-    },
-    componentWillMount() {
-        var metricNames = [
-            this._metricPrefix() + 'usage',
-            this._metricPrefix() + 'size'
-        ];
-        metricsStore.listen({
-            nodeId: this.props.nodeId,
-            metricNames: metricNames,
-            callback: (update, hasError) => {
-                if (hasError) {
-                    this.setState({hasError: hasError});
-                    return;
-                }
-                // update is [{nodeId, values: [{name, value: {metric}}]} ...]
-                // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
-
-                var usage = 0;
-                var size = 0;
-                // we will only get one result, because we ask for only one node
-                update[0].values.forEach((namedMetric) => {
-                    if (namedMetric.name === this._metricPrefix() + 'usage') {
-                        usage = namedMetric.metric.value;
-                    }
-                    if (namedMetric.name === this._metricPrefix() + 'size') {
-                        size = namedMetric.metric.value;
-                    }
-                });
-                var usagePercentage = size === 0 ? 0 : (usage / size) * 100;
-                this.setState({
-                    initialized: true,
-                    usagePercentage: usagePercentage,
-                    usage: usage,
-                    size: size,
-                    hasError: hasError
-                });
-            }
-        });
-    },
-    render() {
-        var percentLabel = numeral(this.state.usagePercentage / 100).format('0.0 %');
-        return (
-            <div>
-                <Button href={jsRoutes.controllers.MetricsController.ofNode(this.props.nodeId, this._metricPrefix()).url} bsSize="xsmall" className="pull-right">Metrics</Button>
-                <h3>{this.props.title}</h3>
-                <div className="node-buffer-usage">
-                    <ProgressBar now={this.state.usagePercentage}
-                                 bsStyle='warning'
-                                 label={percentLabel} />
-                </div>
-                <span><strong>{this.state.usage} messages</strong> in {this.props.title.toLowerCase()}, {percentLabel} utilized.</span>
-            </div>);
-    },
-    _metricPrefix() {
-        return 'org.graylog2.buffers.' + this.props.bufferType + '.';
+const BufferUsage = React.createClass({
+  propTypes: {
+    bufferType: React.PropTypes.string.isRequired,
+    nodeId: React.PropTypes.string.isRequired,
+    title: React.PropTypes.node.isRequired,
+  },
+  mixins: [Reflux.connect(MetricsStore)],
+  componentWillMount() {
+    const metricNames = [
+      this._metricPrefix() + 'usage',
+      this._metricPrefix() + 'size',
+    ];
+    metricNames.forEach((metricName) => MetricsActions.add(this.props.nodeId, metricName));
+  },
+  _metricPrefix() {
+    return 'org.graylog2.buffers.' + this.props.bufferType + '.';
+  },
+  render() {
+    if (!this.state.metrics) {
+      return <Spinner />;
     }
-
+    const nodeId = this.props.nodeId;
+    const usageMetric = this.state.metrics[nodeId][this._metricPrefix() + 'usage'];
+    const usagePercentage = usageMetric ? usageMetric.metric.value : NaN;
+    const percentLabel = numeral(usagePercentage / 100).format('0.0 %');
+    const sizeMetric = this.state.metrics[nodeId][this._metricPrefix() + 'size'];
+    const size = sizeMetric ? sizeMetric.metric.value : NaN;
+    return (
+      <div>
+        <LinkContainer to={Routes.SYSTEM.METRIC(nodeId)}>
+          <Button bsSize="xsmall" className="pull-right">Metrics</Button>
+        </LinkContainer>
+        <h3>{this.props.title}</h3>
+        <div className="node-buffer-usage">
+          <ProgressBar now={usagePercentage}
+                       bsStyle="warning"
+                       label={percentLabel} />
+        </div>
+        <span><strong>{size} messages</strong> in {this.props.title.toLowerCase()}, {percentLabel} utilized.</span>
+      </div>);
+  },
 });
 
-module.exports = BufferUsage;
+export default BufferUsage;
