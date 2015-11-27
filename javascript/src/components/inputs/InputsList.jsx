@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import {Row, Col} from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
@@ -29,8 +30,12 @@ const InputsList = React.createClass({
   },
   _splitInputs(state) {
     const inputs = state.inputs;
-    const globalInputs = inputs.filter((input) => input.message_input.global === true);
-    const localInputs = inputs.filter((input) => input.message_input.global === false);
+    const globalInputs = inputs
+      .filter(input => input.message_input.global === true)
+      .sort((inputA, inputB) => naturalSort(inputA.message_input.title, inputB.message_input.title));
+    const localInputs = inputs
+      .filter((input) => input.message_input.global === false)
+      .sort((inputA, inputB) => naturalSort(inputA.message_input.title, inputB.message_input.title));
     this.setState({globalInputs: globalInputs, localInputs: localInputs});
   },
   _isLoading() {
