@@ -1,0 +1,141 @@
+#!/bin/bash -e
+readonly PROGNAME=$(basename $0)
+readonly PROGDIR=$(readlink -m $(dirname $0))
+readonly ARGS="$@"
+readonly DEFAULT_CONFIG_FILE="${PROGDIR}/config/do.conf"
+readonly CONFIG_FILE=${CONFIG_FILE:-$DEFAULT_CONFIG_FILE}
+
+source "${CONFIG_FILE}"
+
+start_services() {
+	exec docker-compose -p "${PROJECT_NAME}" start $@
+}
+
+stop_services() {
+	exec docker-compose -p "${PROJECT_NAME}" stop $@
+}
+
+restart_services() {
+	exec docker-compose -p "${PROJECT_NAME}" restart $@
+}
+
+kill_services() {
+	exec docker-compose -p "${PROJECT_NAME}" kill $@
+}
+
+pause_services() {
+	exec docker-compose -p "${PROJECT_NAME}" pause $@
+}
+
+unpause_services() {
+	exec docker-compose -p "${PROJECT_NAME}" unpause $@
+}
+
+create_containers() {
+	exec docker-compose -p "${PROJECT_NAME}" up -d $@
+}
+
+remove_containers() {
+	exec docker-compose -p "${PROJECT_NAME}" rm $@
+}
+
+list_containers() {
+	exec docker-compose -p "${PROJECT_NAME}" ps $@
+}
+
+show_logs() {
+	exec docker-compose -p "${PROJECT_NAME}" logs $@
+}
+
+create_volumes() {
+	docker volume create --name="${ELASTICSEARCH_DATA_VOLUME}"
+	docker volume create --name="${MONGODB_DATA_VOLUME}"
+}
+
+remove_volumes() {
+	exec docker volume rm "${ELASTICSEARCH_DATA_VOLUME}" "${MONGODB_DATA_VOLUME}"
+}
+
+usage() {
+	cat <<- EOF
+	usage: $PROGNAME command
+	
+	This program starts Docker containers with all dependencies required for running Graylog.
+	It reads its configuration from $CONFIG_FILE and certain environment variables.
+
+	Also see docker-compose(1) for details.
+
+	COMMANDS:
+	  up                    Create and start Docker containers
+	  rm                    Remove the created Docker containers
+	  ps                    List Docker containers
+
+	  mkvol                 Create Docker volumes ($ELASTICSEARCH_DATA_VOLUME, $MONGODB_DATA_VOLUME)
+	  rmvol                 Remove Docker volumes ($ELASTICSEARCH_DATA_VOLUME, $MONGODB_DATA_VOLUME)
+
+	  start                 Start service(s)
+	  stop                  Stop service(s)
+	  restart               Restart service(s)
+	  kill                  Force stop service
+
+	  pause                 Pause service(s)
+	  unpause               Unpause service(s)
+
+	  logs                  Show logs of the running Docker containers
+
+	EOF
+}
+
+main() {
+	if [[ "$#" -eq 0 ]]; then
+		usage
+		exit 0
+	fi
+
+	local command=$1; shift
+
+	case "${command}" in
+	up)
+		create_containers $@
+		;;
+	rm)
+		remove_containers $@
+		;;
+	ps)
+		list_containers $@
+		;;
+	mkvol)
+		create_volumes
+		;;
+	rmvol)
+		remove_volumes
+		;;
+	start)
+		start_services $@
+		;;
+	stop)
+		stop_services $@
+		;;
+	restart)
+		restart_services $@
+		;;
+	kill)
+		kill_services $@
+		;;
+	pause)
+		pause_services $@
+		;;
+	unpause)
+		unpause_services $@
+		;;
+	logs)
+		show_logs $@
+		;;
+	*)
+		usage
+		exit 0
+		;;
+	esac
+}
+
+main $ARGS

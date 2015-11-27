@@ -1,0 +1,17 @@
+elasticsearch:
+  image: "${ELASTICSEARCH_IMAGE}:${ELASTICSEARCH_VERSION}"
+  command: "elasticsearch -Des.cluster.name=${ELASTICSEARCH_CLUSTER_NAME}"
+  ports:
+   - "9200:9200"
+   - "9300:9300"
+  volumes:
+   - "${ELASTICSEARCH_CONFIG_VOLUME}:/usr/share/elasticsearch/config:ro"
+   - "${ELASTICSEARCH_DATA_VOLUME}:/usr/share/elasticsearch/data"
+mongodb:
+  image: "${MONGODB_IMAGE}:${MONGODB_VERSION}"
+  command: "mongod --smallfiles"
+  ports:
+   - "27017:27017"
+  volumes:
+   - "${MONGODB_CONFIG_VOLUME}:/etc/mongod.conf:ro"
+   - "${MONGODB_DATA_VOLUME}:/data/db"
