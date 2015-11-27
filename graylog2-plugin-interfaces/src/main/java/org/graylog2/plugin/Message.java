@@ -256,12 +256,6 @@ public class Message {
             return;
         }
 
-        if (FIELD_TIMESTAMP.equals(key) && !(value instanceof DateTime) && !(value instanceof Date)) {
-            LOG.warn("Field [{}] must be of value Date or DateTime. Make sure to apply a date converter when using extractors. Not overwriting field.",
-                    FIELD_TIMESTAMP);
-            return;
-        }
-
         if(value instanceof String) {
             final String str = ((String) value).trim();
 
