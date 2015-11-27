@@ -42,12 +42,27 @@ const InputsStore = Reflux.createStore({
 
         return this.input;
       })
-      .catch(errorThrown => {
-        UserNotification.error(`Fetching input ${inputId} failed with status: ${errorThrown}`,
+      .catch(error => {
+        UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
           'Could not retrieve input');
       });
 
     InputsActions.get.promise(promise);
+  },
+
+  create(input) {
+    const promise = fetch('POST', URLUtils.qualifyUrl(this.sourceUrl), input);
+    promise
+      .then(() => {
+        UserNotification.success(`Input '${input.title}' launched successfully`);
+        InputsActions.list.triggerPromise(true);
+      })
+      .catch(error => {
+        UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
+          'Could not launch input');
+      });
+
+    InputsActions.create.promise(promise);
   },
 });
 
