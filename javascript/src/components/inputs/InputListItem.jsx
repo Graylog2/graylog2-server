@@ -6,6 +6,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import jsRoutes from 'routing/jsRoutes';
 import Routes from 'routing/Routes';
 
+import InputsActions from 'actions/inputs/InputsActions';
+
 const InputListItem = React.createClass({
   propTypes: {
     input: PropTypes.object.isRequired,
@@ -26,6 +28,12 @@ const InputListItem = React.createClass({
     }
   },
 
+  _deleteInput() {
+    if (window.confirm(`Do you really want to delete input '${this.props.input.message_input.title}'?`)) {
+      InputsActions.delete.triggerPromise(this.props.input);
+    }
+  },
+
   _getMoreActionsItems() {
     const items = [];
 
@@ -40,7 +48,7 @@ const InputListItem = React.createClass({
     }
     if (this.isPermitted(this.props.permissions, [`inputs:terminate`])) {
       items.push(<MenuItem key={`divider-${this.props.input.id}`} divider/>);
-      items.push(<MenuItem key={`delete-input-${this.props.input.id}`}>Delete input</MenuItem>);
+      items.push(<MenuItem key={`delete-input-${this.props.input.id}`} onClick={this._deleteInput}>Delete input</MenuItem>);
     }
 
     return items;
