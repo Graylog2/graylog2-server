@@ -4,7 +4,8 @@ import {Row, Col} from 'react-bootstrap';
 
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
-import Spinner from 'components/common/Spinner';
+import {IfPermitted, Spinner} from 'components/common';
+import CreateInputControl from './CreateInputControl';
 
 import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
@@ -28,6 +29,7 @@ const InputsList = React.createClass({
   },
   _splitInputs(state) {
     const inputs = state.inputs;
+    console.log('inputs', state.inputs);
     const globalInputs = inputs.filter((input) => input.message_input.global === true);
     const localInputs = inputs.filter((input) => input.message_input.global === false);
     this.setState({globalInputs: globalInputs, localInputs: localInputs});
@@ -45,7 +47,10 @@ const InputsList = React.createClass({
 
     return (
       <div>
-        <Row className="content">Cannot create inputs at the moment</Row>
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl/>
+        </IfPermitted>
+
         <Row className="content input-list">
           <Col md={12}>
             <h2>
