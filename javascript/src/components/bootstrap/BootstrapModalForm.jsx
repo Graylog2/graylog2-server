@@ -14,7 +14,7 @@ import { validate } from 'legacy/validations.js';
 class BootstrapModalForm extends Component {
   static propTypes = {
     /* Modal title */
-    title: PropTypes.string,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /* Form contents, included in the modal body */
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
