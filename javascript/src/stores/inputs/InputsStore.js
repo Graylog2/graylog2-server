@@ -64,6 +64,24 @@ const InputsStore = Reflux.createStore({
 
     InputsActions.create.promise(promise);
   },
+
+  delete(input) {
+    const inputId = input.id ? input.id : input.input_id;
+    const inputTitle = input.title ? input.title : input.message_input.title;
+
+    const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
+    promise
+      .then(() => {
+        UserNotification.success(`Input '${inputTitle}' deleted successfully`);
+        InputsActions.list.triggerPromise(true);
+      })
+      .catch(error => {
+        UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
+          'Could not delete input');
+      });
+
+    InputsActions.delete.promise(promise);
+  },
 });
 
 InputsStore.inputsAsMap = (inputsList) => {
