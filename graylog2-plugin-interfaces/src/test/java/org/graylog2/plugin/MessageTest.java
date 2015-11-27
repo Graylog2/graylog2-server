@@ -22,7 +22,6 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -35,13 +34,11 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -248,39 +245,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testDoesNotOverwriteTimestampWithBadValue() throws Exception {
-        final DateTime dateTime = new DateTime(2015, 9, 8, 0, 0, DateTimeZone.UTC);
-        final Date date = new DateTime(2014, 3, 10, 0, 0, DateTimeZone.UTC).toDate();
-
-        message.addField(Message.FIELD_TIMESTAMP, dateTime);
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, "foo");
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, 123);
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, 123L);
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, true);
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, new Object());
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addFields(ImmutableMap.<String, Object>of(Message.FIELD_TIMESTAMP, "foo"));
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addStringFields(ImmutableMap.<String, String>of(Message.FIELD_TIMESTAMP, "foo"));
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(dateTime);
-
-        message.addField(Message.FIELD_TIMESTAMP, date);
-        assertThat(message.getField(Message.FIELD_TIMESTAMP)).isEqualTo(date);
-    }
-
-    @Test
     public void testGetMessage() throws Exception {
         assertEquals("foo", message.getMessage());
     }
@@ -318,6 +282,15 @@ public class MessageTest {
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
         assertEquals(Collections.EMPTY_LIST, object.get("streams"));
+    }
+
+    @Test
+    public void testToElasticSearchObjectWithoutDateTimeTimestamp() throws Exception {
+        message.addField("timestamp", "time!");
+
+        final Map<String, Object> object = message.toElasticSearchObject();
+
+        assertEquals("time!", object.get("timestamp"));
     }
 
     @Test
