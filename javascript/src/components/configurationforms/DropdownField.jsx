@@ -10,7 +10,7 @@ const DropdownField = React.createClass({
     onChange: React.PropTypes.func.isRequired,
     title: React.PropTypes.string.isRequired,
     typeName: React.PropTypes.string.isRequired,
-    value: React.PropTypes.any.isRequired,
+    value: React.PropTypes.any,
   },
   getInitialState() {
     return {
