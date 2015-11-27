@@ -29,7 +29,6 @@ const InputsList = React.createClass({
   },
   _splitInputs(state) {
     const inputs = state.inputs;
-    console.log('inputs', state.inputs);
     const globalInputs = inputs.filter((input) => input.message_input.global === true);
     const localInputs = inputs.filter((input) => input.message_input.global === false);
     this.setState({globalInputs: globalInputs, localInputs: localInputs});
