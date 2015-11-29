@@ -30,6 +30,7 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -134,5 +135,13 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addPasswordAlgorithm(String passwordAlgorithmName, Class<? extends PasswordAlgorithm> passwordAlgorithmClass) {
         passwordAlgorithmBinder().addBinding(passwordAlgorithmName).to(passwordAlgorithmClass);
+    }
+
+    protected Multibinder<MessageProcessor> processorBinder() {
+        return Multibinder.newSetBinder(binder(), MessageProcessor.class);
+    }
+
+    protected void addMessageProcessor(Class<? extends MessageProcessor> processorClass) {
+        processorBinder().addBinding().to(processorClass);
     }
 }

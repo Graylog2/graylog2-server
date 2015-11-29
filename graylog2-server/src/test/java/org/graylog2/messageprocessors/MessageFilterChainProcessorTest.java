@@ -14,45 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.buffers.processors;
+package org.graylog2.messageprocessors;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import org.graylog2.Configuration;
-import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.journal.Journal;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ServerProcessBufferProcessorTest {
+public class MessageFilterChainProcessorTest {
     @Mock
     private ServerStatus serverStatus;
 
     @Before
     public void setUp() throws Exception {
-        when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
+        Mockito.when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
     }
 
     @Test
@@ -64,43 +55,30 @@ public class ServerProcessBufferProcessorTest {
                 third,
                 first,
                 second);
-        final ServerProcessBufferProcessor processor = new ServerProcessBufferProcessor(mock(
-                MetricRegistry.class), filters, mock(Configuration.class), serverStatus, mock(OutputBuffer.class), mock(
-                Journal.class));
+        final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(Mockito.mock(MetricRegistry.class),
+                                                                                      filters,
+                                                                                      Mockito.mock(Journal.class),
+                                                                                      serverStatus);
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
-        assertEquals(filterRegistry.get(0), first);
-        assertEquals(filterRegistry.get(1), second);
-        assertEquals(filterRegistry.get(2), third);
+        Assert.assertEquals(filterRegistry.get(0), first);
+        Assert.assertEquals(filterRegistry.get(1), second);
+        Assert.assertEquals(filterRegistry.get(2), third);
     }
 
     @Test
     public void testHandleMessageEmptyFilterSet() throws Exception {
-        MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        AtomicInteger processBufferWatermark = new AtomicInteger();
-        OutputBuffer outputBuffer = mock(OutputBuffer.class);
-        final Configuration configuration = mock(Configuration.class);
-
-        final ServerProcessBufferProcessor emptyFilters =
-                new ServerProcessBufferProcessor(metricRegistry,
-                        Sets.<MessageFilter>newHashSet(),
-                        configuration,
-                        mock(ServerStatus.class),
-                        outputBuffer,
-                        mock(Journal.class));
         try {
-            emptyFilters.handleMessage(new Message("test", "source", Tools.iso8601()));
-            fail("A processor with empty filter set should throw an exception");
-        } catch (RuntimeException ignored) {
-        }
+            new MessageFilterChainProcessor(new MetricRegistry(),
+                                            Sets.newHashSet(),
+                                            Mockito.mock(Journal.class),
+                                            serverStatus);
+            Assert.fail("A processor without message filters should fail on creation");
+        } catch (RuntimeException ignored) {}
     }
 
     @Test
     public void testHandleMessage() {
-        MetricRegistry metricRegistry = new MetricRegistry();
-        AtomicInteger processBufferWatermark = new AtomicInteger();
-        OutputBuffer outputBuffer = mock(OutputBuffer.class);
-        final Configuration configuration = mock(Configuration.class);
 
         MessageFilter filterOnlyFirst = new MessageFilter() {
             private boolean filterOut = true;
@@ -126,27 +104,21 @@ public class ServerProcessBufferProcessorTest {
             }
         };
 
-        final Journal journal = mock(Journal.class);
-        final ServerProcessBufferProcessor filterTest =
-                new ServerProcessBufferProcessor(metricRegistry,
-                        Sets.newHashSet(filterOnlyFirst),
-                        configuration,
-                        serverStatus,
-                        outputBuffer,
-                        journal);
-
+        final MessageFilterChainProcessor filterTest = new MessageFilterChainProcessor(new MetricRegistry(),
+                                                                                       Sets.newHashSet(filterOnlyFirst),
+                                                                                       Mockito.mock(Journal.class),
+                                                                                       serverStatus);
         Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
         filteredoutMessage.setJournalOffset(1);
         Message unfilteredMessage = new Message("filtered out", "source", Tools.iso8601());
 
-        filterTest.handleMessage(filteredoutMessage);
-        filterTest.handleMessage(unfilteredMessage);
+        final Messages messages1 = filterTest.process(filteredoutMessage);
+        final Messages messages2 = filterTest.process(unfilteredMessage);
 
-        verify(outputBuffer, times(0)).insertBlocking(same(filteredoutMessage));
-        verify(outputBuffer, times(1)).insertBlocking(same(unfilteredMessage));
-        verify(journal, times(1)).markJournalOffsetCommitted(1);
-        assertTrue(filteredoutMessage.getFilterOut());
-        assertFalse(unfilteredMessage.getFilterOut());
+        Assert.assertTrue(filteredoutMessage.getFilterOut());
+        Assert.assertFalse(unfilteredMessage.getFilterOut());
+        Assert.assertEquals(0, Iterables.size(messages1));
+        Assert.assertEquals(1, Iterables.size(messages2));
     }
 
     private class DummyFilter implements MessageFilter {

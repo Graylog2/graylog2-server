@@ -161,7 +161,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     final List<ResultMessage> searchResult = fieldStatsResult.getSearchHits();
                     summaries = Lists.newArrayListWithCapacity(searchResult.size());
                     for (ResultMessage resultMessage : searchResult) {
-                        final Message msg = new Message(resultMessage.getMessage());
+                        final Message msg = resultMessage.getMessage();
                         this.searchHits.add(msg);
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }

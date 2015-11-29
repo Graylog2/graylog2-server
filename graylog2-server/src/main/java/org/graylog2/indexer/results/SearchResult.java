@@ -25,7 +25,6 @@ import org.graylog2.plugin.Message;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,10 +64,10 @@ public class SearchResult extends IndexQueryResult {
 
         Iterator<ResultMessage> i = hits.iterator();
         while(i.hasNext()) {
-            final Map<String, Object> message = i.next().getMessage();
-            allFields.addAll(message.keySet());
+            final Message message = i.next().getMessage();
+            allFields.addAll(message.getFieldNames());
 
-            for (String field : message.keySet()) {
+            for (String field : message.getFieldNames()) {
                 if (!Message.RESERVED_FIELDS.contains(field)) {
                     filteredFields.add(field);
                 }

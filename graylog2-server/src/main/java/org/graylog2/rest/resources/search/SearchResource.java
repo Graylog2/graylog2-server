@@ -180,7 +180,8 @@ public abstract class SearchResource extends RestResource {
         final List<ResultMessageSummary> result = Lists.newArrayListWithCapacity(resultMessages.size());
 
         for (ResultMessage resultMessage : resultMessages) {
-            result.add(ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage(), resultMessage.getIndex()));
+            // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
+            result.add(ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()));
         }
 
         return result;

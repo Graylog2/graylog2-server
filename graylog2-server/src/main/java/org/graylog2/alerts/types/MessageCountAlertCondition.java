@@ -103,7 +103,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 if (getBacklog() > 0) {
                     final SearchResult backlogResult = searches.search("*", filter, new RelativeRange(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
-                        final Message msg = new Message(resultMessage.getMessage());
+                        final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }
                 }
