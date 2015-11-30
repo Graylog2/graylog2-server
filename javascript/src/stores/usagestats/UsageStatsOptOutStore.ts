@@ -19,13 +19,9 @@ export var UsageStatsOptOutStore = {
             .then(response => {
                 return response.enabled;
             })
-            .catch(error => {
-                if (error.additional.status === 404) {
-                    console.log('Usage stats configuration does not exist. Plugin not loaded?');
-                } else {
-                    console.log('Unable to load usage stats configuration', error);
-                }
-
+            .catch(() => {
+                // When the plugin is not loaded the CORS options request will fail and we can't tell at this point
+                // what was the cause for the problem. Therefore, we return false and don't notify the user.
                 return false;
             });
 
@@ -35,13 +31,9 @@ export var UsageStatsOptOutStore = {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.setOptOutState().url);
         var promise = fetch('GET', url);
 
-        promise = promise.catch((error) => {
-            if (error.additional.status === 404) {
-                console.log('Opt-out state does not exist. Plugin not loaded?');
-            } else {
-                UserNotification.error("Loading usage stats opt-out state failed: " + error);
-            }
-
+        promise = promise.catch(() => {
+            // When the plugin is not loaded the CORS options request will fail and we can't tell at this point
+            // what was the cause for the problem. Therefore, we return false and don't notify the user.
             return null;
         });
 
