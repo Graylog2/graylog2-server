@@ -1,7 +1,3 @@
-export FieldGraphs from './FieldGraphs';
-export FieldQuickValues from './FieldQuickValues';
-export FieldStatistics from './FieldStatistics';
-export LegacyFieldGraph from './LegacyFieldGraph';
 export LegacyHistogram from './LegacyHistogram';
 export MessageDetail from './MessageDetail';
 export MessageFieldDescription from './MessageFieldDescription';

@@ -5,9 +5,9 @@ import Immutable from 'immutable';
 import SearchSidebar from './SearchSidebar';
 import ResultTable from './ResultTable';
 import { LegacyHistogram } from 'components/search';
-import FieldGraphs from './FieldGraphs';
-import FieldQuickValues from './FieldQuickValues';
-import FieldStatistics from './FieldStatistics';
+import FieldGraphs from 'components/field-analyzers/FieldGraphs';
+import FieldQuickValues from 'components/field-analyzers/FieldQuickValues';
+import FieldStatistics from 'components/field-analyzers/FieldStatistics';
 import ShowQueryModal from './ShowQueryModal';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';

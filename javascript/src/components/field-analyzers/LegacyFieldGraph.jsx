@@ -20,7 +20,7 @@ const LegacyFieldGraph = React.createClass({
     stacked: PropTypes.bool.isRequired,
     hidden: PropTypes.bool.isRequired,
     graphOptions: PropTypes.object.isRequired,
-    dashboards: PropTypes.any.isRequired,
+    dashboards: PropTypes.any,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
     onDelete: PropTypes.func.isRequired,
   },
