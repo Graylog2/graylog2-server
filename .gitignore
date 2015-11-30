@@ -36,3 +36,5 @@ dependency-reduced-pom.xml
 
 **/pom.xml.versionsBackup
 
+/graylog2-server/src/main/resources/web-interface/assets/**/*
+

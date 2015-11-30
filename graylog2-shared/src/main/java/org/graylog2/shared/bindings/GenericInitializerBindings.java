@@ -28,6 +28,5 @@ public class GenericInitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(RestApiService.class);
-        serviceBinder.addBinding().to(WebInterfaceService.class);
     }
 }

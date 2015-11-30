@@ -1,10 +1,12 @@
-package org.graylog2.shared.initializers;
+package org.graylog2.initializers;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.shared.initializers.AbstractJerseyService;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
@@ -40,16 +42,16 @@ public class WebInterfaceService extends AbstractJerseyService {
 
     @Override
     protected void startUp() throws Exception {
-        final String[] additionalResources = new String[0];
-        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class,
-                buildResourceConfig(
-                        configuration.isWebEnableGzip(),
-                        configuration.isWebEnableCors(),
-                        Collections.emptySet(),
-                        configuration.getWebListenUri(),
-                        additionalResources
-                )
+        final String[] resources = new String[] {"org.graylog2.web.resources"};
+        final ResourceConfig rc = buildResourceConfig(
+                configuration.isWebEnableGzip(),
+                configuration.isWebEnableCors(),
+                Collections.emptySet(),
+                configuration.getWebListenUri(),
+                resources
         );
+
+        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
 
         final int maxInitialLineLength = configuration.getWebMaxInitialLineLength();
         final int maxHeaderSize = configuration.getWebMaxHeaderSize();
