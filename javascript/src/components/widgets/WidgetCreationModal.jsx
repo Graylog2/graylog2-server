@@ -7,7 +7,7 @@ var Input = require('react-bootstrap').Input;
 var Immutable = require('immutable');
 
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
-var Widget = require('./Widget');
+import Widget from './Widget';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 
