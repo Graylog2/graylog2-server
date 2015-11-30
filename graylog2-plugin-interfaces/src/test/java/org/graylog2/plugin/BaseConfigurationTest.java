@@ -41,20 +41,19 @@ import static org.junit.Assert.assertEquals;
 
 public class BaseConfigurationTest {
     private class Configuration extends BaseConfiguration {
-        @Parameter(value = "rest_listen_uri", required = true)
-        private URI restListenUri = URI.create("http://127.0.0.1:12900/");
-
-        @Parameter(value = "node_id_file", required = false)
-        private String nodeIdFile = "/etc/graylog/server/node-id";
-
         @Override
         public String getNodeIdFile() {
-            return nodeIdFile;
+            return "/etc/graylog/server/node-id";
         }
 
         @Override
         public URI getRestListenUri() {
-            return Tools.getUriWithPort(restListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_PORT);
+            return Tools.getUriWithPort(URI.create("http://127.0.0.1:12900/"), BaseConfiguration.GRAYLOG2_DEFAULT_PORT);
+        }
+
+        @Override
+        public URI getWebListenUri() {
+            return Tools.getUriWithPort(URI.create("http://127.0.0.1:9000/"), BaseConfiguration.GRAYLOG2_DEFAULT_WEB_PORT);
         }
     }
 

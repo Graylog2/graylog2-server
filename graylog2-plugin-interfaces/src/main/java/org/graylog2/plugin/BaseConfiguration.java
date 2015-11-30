@@ -44,6 +44,7 @@ import java.net.URI;
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
     protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
+    protected static final int GRAYLOG2_DEFAULT_WEB_PORT = 9000;
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -135,8 +136,49 @@ public abstract class BaseConfiguration {
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
+    @Parameter(value = "web_enable_cors")
+    private boolean webEnableCors = false;
+
+    @Parameter(value = "web_enable_gzip")
+    private boolean webEnableGzip = false;
+
+    @Parameter(value = "web_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
+    private int webMaxInitialLineLength = 4096;
+
+    @Parameter(value = "web_max_header_size", required = true, validator = PositiveIntegerValidator.class)
+    private int webMaxHeaderSize = 8192;
+
+    @Parameter(value = "web_max_chunk_size", required = true, validator = PositiveIntegerValidator.class)
+    private int webMaxChunkSize = 8192;
+
+    @Parameter(value = "web_enable_tls")
+    private boolean webEnableTls = false;
+
+    @Parameter(value = "web_thread_pool_size")
+    private int webThreadPoolSize = 16;
+
+    @Parameter(value = "web_tls_cert_file")
+    private File webTlsCertFile;
+
+    @Parameter(value = "web_tls_key_file")
+    private File webTlsKeyFile;
+
+    @Parameter(value = "web_tls_key_password")
+    private String webTlsKeyPassword;
+
+    @Parameter(value = "web_worker_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int webWorkerThreadsMaxPoolSize = 16;
+
     public String getRestUriScheme() {
-        return isRestEnableTls() ? "https" : "http";
+        return getUriScheme(isRestEnableTls());
+    }
+
+    public String getWebUriScheme() {
+        return getUriScheme(isWebEnableTls());
+    }
+
+    public String getUriScheme(boolean enableTls) {
+        return enableTls ? "https" : "http";
     }
 
     public URI getRestTransportUri() {
@@ -266,6 +308,8 @@ public abstract class BaseConfiguration {
 
     public abstract URI getRestListenUri();
 
+    public abstract URI getWebListenUri();
+
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
     }
@@ -312,5 +356,49 @@ public abstract class BaseConfiguration {
 
     public String getInstallationSource() {
         return installationSource;
+    }
+
+    public boolean isWebEnableCors() {
+        return webEnableCors;
+    }
+
+    public boolean isWebEnableGzip() {
+        return webEnableGzip;
+    }
+
+    public int getWebMaxInitialLineLength() {
+        return webMaxInitialLineLength;
+    }
+
+    public int getWebMaxHeaderSize() {
+        return webMaxHeaderSize;
+    }
+
+    public int getWebMaxChunkSize() {
+        return webMaxChunkSize;
+    }
+
+    public boolean isWebEnableTls() {
+        return webEnableTls;
+    }
+
+    public int getWebThreadPoolSize() {
+        return webThreadPoolSize;
+    }
+
+    public File getWebTlsCertFile() {
+        return webTlsCertFile;
+    }
+
+    public File getWebTlsKeyFile() {
+        return webTlsKeyFile;
+    }
+
+    public String getWebTlsKeyPassword() {
+        return webTlsKeyPassword;
+    }
+
+    public int getWebWorkerThreadsMaxPoolSize() {
+        return webWorkerThreadsMaxPoolSize;
     }
 }
