@@ -55,6 +55,18 @@ const GraphFactory = {
 };
 
 const GraphVisualization = React.createClass({
+  statics: {
+    getReadableFieldChartStatisticalFunction(statisticalFunction) {
+      switch (statisticalFunction) {
+        case "count":
+          return "total";
+        case "total":
+          return "sum";
+        default:
+          return statisticalFunction;
+      }
+    },
+  },
   getInitialState() {
     this.triggerRender = true;
     this.graphData = crossfilter();
@@ -130,16 +142,6 @@ const GraphVisualization = React.createClass({
       });
     this.graph.render();
   },
-  getReadableFieldChartStatisticalFunction(statisticalFunction) {
-    switch (statisticalFunction) {
-      case "count":
-        return "total";
-      case "total":
-        return "sum";
-      default:
-        return statisticalFunction;
-    }
-  },
   _formatTooltipTitle(d) {
     var formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.HUMAN_TZ);
 
@@ -150,7 +152,7 @@ const GraphVisualization = React.createClass({
       formattedValue = d3.format(".2r")(d.y);
     }
 
-    var valueText = this.getReadableFieldChartStatisticalFunction(this.props.config.valuetype) + " " + this.props.config.field + ": " + formattedValue + "<br>";
+    var valueText = GraphVisualization.getReadableFieldChartStatisticalFunction(this.props.config.valuetype) + " " + this.props.config.field + ": " + formattedValue + "<br>";
     var keyText = "<span class=\"date\">" + formattedKey + "</span>";
 
     return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
