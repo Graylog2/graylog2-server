@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import jQuery from 'jquery'; // We need to use this jQuery to send custom events
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
@@ -12,6 +12,11 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import jsRoutes from 'routing/jsRoutes';
 import UserNotification from 'util/UserNotification';
+import StringUtils from 'util/StringUtils';
+
+// We need to require the other jQuery to make jQuery UI work :/
+require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../../public/javascripts/jquery-ui.min.js');
 
 function generateShortId() {
     return Math.random().toString(36).substr(2, 9);
@@ -29,12 +34,12 @@ export function generateId() {
 export const FieldChart = {
     fieldGraphs: {},
     GRAPH_HEIGHT: 120,
-    //palette: new Rickshaw.Color.Palette({scheme: 'colorwheel'}),
+    PALETTE: new Rickshaw.Color.Palette({scheme: 'colorwheel'}),
 
     _getDefaultOptions(opts) {
         var searchParams = {};
-        $(document).trigger("get-original-search.graylog.search", {
-            callback: function (params) {
+        jQuery(document).trigger("get-original-search.graylog.search", {
+            callback(params) {
                 searchParams = params.toJS();
             }
         });
@@ -200,49 +205,51 @@ export const FieldChart = {
         this.fieldGraphs[opts.chartid] = graph;
 
         // Make it draggable.
-        //$graphContainer.draggable({
-        //    handle: ".reposition-handle",
-        //    cursor: "move",
-        //    scope: "#field-graphs",
-        //    revert: "invalid", // return to position when not dropped on a droppable.
-        //    opacity: 0.5,
-        //    containment: $("#field-graphs"),
-        //    axis: "y",
-        //    snap: $(".field-graph-container"),
-        //    snapMode: "inner"
-        //});
+        $graphContainer.draggable({
+            handle: ".reposition-handle",
+            cursor: "move",
+            scope: "#field-graphs",
+            revert: "invalid", // return to position when not dropped on a droppable.
+            opacity: 0.5,
+            containment: $("#field-graphs"),
+            axis: "y",
+            snap: $(".field-graph-container"),
+            snapMode: "inner"
+        });
+
+        const that = this;
 
         // ...and droppable.
-        //$graphContainer.droppable({
-        //    scope: "#field-graphs",
-        //    tolerance: "intersect",
-        //    activate: function (event, ui) {
-        //        // Show merge hints on all charts except the dragged one when dragging starts.
-        //        $("#field-graphs .merge-hint").not($(".merge-hint", ui.draggable)).show();
-        //    },
-        //    deactivate: function () {
-        //        // Hide all merge hints when dragging stops.
-        //        $("#field-graphs .merge-hint").hide();
-        //    },
-        //    over: function () {
-        //        $(this).css("background-color", "#C7E2ED");
-        //        $(".merge-hint span", $(this)).switchClass("alpha80", "merge-drop-ready");
-        //    },
-        //    out: function () {
-        //        $(this).css("background-color", "#fff");
-        //        $(".merge-hint span", $(this)).switchClass("merge-drop-ready", "alpha80");
-        //    },
-        //    drop: function (event, ui) {
-        //        // Merge charts.
-        //        var target = $(this).attr("data-chart-id");
-        //        var dragged = ui.draggable.attr("data-chart-id");
-        //
-        //        ui.draggable.hide();
-        //        $(this).css("background-color", "#fff");
-        //
-        //        mergeCharts(target, dragged);
-        //    }
-        //});
+        $graphContainer.droppable({
+            scope: "#field-graphs",
+            tolerance: "intersect",
+            activate(event, ui) {
+                // Show merge hints on all charts except the dragged one when dragging starts.
+                $("#field-graphs .merge-hint").not($(".merge-hint", ui.draggable)).show();
+            },
+            deactivate() {
+                // Hide all merge hints when dragging stops.
+                $("#field-graphs .merge-hint").hide();
+            },
+            over() {
+                $(this).css("background-color", "#C7E2ED");
+                $(".merge-hint span", $(this)).switchClass("alpha80", "merge-drop-ready");
+            },
+            out() {
+                $(this).css("background-color", "#fff");
+                $(".merge-hint span", $(this)).switchClass("merge-drop-ready", "alpha80");
+            },
+            drop(event, ui) {
+                // Merge charts.
+                var target = $(this).attr("data-chart-id");
+                var dragged = ui.draggable.attr("data-chart-id");
+
+                ui.draggable.hide();
+                $(this).css("background-color", "#fff");
+
+                that._mergeCharts(target, dragged);
+            },
+        });
     },
 
     _onFieldHistogramFail($graphElement, opts, error) {
@@ -265,11 +272,11 @@ export const FieldChart = {
     },
 
     _changeGraphConfig(graphContainer, key, value) {
-        var opts = this._chartOptionsFromContainer(graphContainer);
-        opts[key] = value;
+        const options = this._chartOptionsFromContainer(graphContainer);
+        options[key] = value;
 
-        graphContainer.attr("data-lines", JSON.stringify(opts));
-        sendUpdatedGraphEvent(this._chartOptionsFromContainer(graphContainer));
+        graphContainer.attr("data-lines", JSON.stringify(options));
+        sendUpdatedGraphEvent(options);
     },
 
     _insertSpinner($graphContainer) {
@@ -331,8 +338,6 @@ export const FieldChart = {
 
               if (renderingOptions && renderingOptions.newGraph) {
                   sendCreatedGraphEvent(opts);
-              } else {
-                  sendUpdatedGraphEvent(opts);
               }
           })
           .catch(error => this._onFieldHistogramFail($graphElement, opts, error))
@@ -387,34 +392,77 @@ export const FieldChart = {
         this._changeGraphConfig(graphContainer, "valuetype", statisticalFunction);
         this.renderFieldChart(graphOptions, graphContainer);
     },
+
+    _mergeCharts(targetId, draggedId) {
+        var targetChart = this.fieldGraphs[targetId];
+        var draggedChart = this.fieldGraphs[draggedId];
+
+        var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
+        var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
+
+        var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
+
+        for (var i = 0; i < draggedChart.series.length; i++) {
+            var lineColor = this.PALETTE.color();
+            var series = draggedChart.series[i];
+            var query = series.gl2_query;
+
+            if (query == undefined || query == "") {
+                query = "*";
+            }
+
+            // Add query to query list of chart.
+            var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
+              + "<span class=\"type-description\">[" + StringUtils.escapeHTML(series.valuetype) + "] " + series.field + ", </span> "
+              + "Query: <span class='field-graph-query'>" + StringUtils.escapeHTML(query) + "</span>";
+
+            $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
+
+            var addSeries = {
+                name: "value" + i,
+                color: lineColor,
+                gl2_query: query,
+                valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(series.valuetype),
+                field: series.field
+            };
+
+            addSeries["data"] = series.data;
+
+            targetChart.series.push(addSeries);
+        }
+
+        targetChart.renderer.unstack = true;
+
+        sendMergedGraphsEvent(targetId, draggedId);
+
+        // Reflect all the chart changes we made.
+        targetChart.update();
+        targetChart.render();
+    },
+
+    stackGraphs(targetGraphId, sourceGraphId) {
+        this._mergeCharts(targetGraphId, sourceGraphId);
+        const sourceGraphElement = $('.field-graph-container[data-chart-id="' + sourceGraphId + '"]');
+        sourceGraphElement.hide();
+    },
 };
 
 
-//$(document).on('merge.graylog.fieldgraph', function (event, data) {
-//    "use strict";
-//    mergeCharts(data.targetGraphId, data.sourceGraphId);
-//    var sourceGraphElement = $('.field-graph-container[data-chart-id="' + data.sourceGraphId + '"]');
-//    sourceGraphElement.hide();
-//});
-//
 function sendCreatedGraphEvent(opts) {
-    "use strict";
-    $(document).trigger('created.graylog.fieldgraph', {graphOptions: opts});
+    jQuery(document).trigger('created.graylog.fieldgraph', {graphOptions: opts});
 }
 
 function sendUpdatedGraphEvent(opts) {
-    "use strict";
-    $(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
+    jQuery(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
 }
 
 function sendFailureEvent(graphId, errorMessage) {
-    $(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
+    jQuery(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
 }
 
-//function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
-//    $(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
-//}
-//
+function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
+    jQuery(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
+}
 
 // Changing type of value graphs.
 $(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
@@ -451,50 +499,3 @@ $(document).on("click", ".field-graph-container ul.valuetype-selector li a", fun
     var valuetype = $(this).attr("data-type");
     FieldChart.changeStatisticalFunction(graphContainer, valuetype);
 });
-
-//function mergeCharts(targetId, draggedId) {
-//    var targetChart = fieldGraphs[targetId];
-//    var draggedChart = fieldGraphs[draggedId];
-//
-//    var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
-//    var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
-//
-//    var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
-//
-//    for (var i = 0; i < draggedChart.series.length; i++) {
-//        var lineColor = palette.color();
-//        var series = draggedChart.series[i];
-//        var query = series.gl2_query;
-//
-//        if (query == undefined || query == "") {
-//            query = "*";
-//        }
-//
-//        // Add query to query list of chart.
-//        var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
-//          + "<span class=\"type-description\">[" + htmlEscape(series.valuetype) + "] " + series.field + ", </span> "
-//          + "Query: <span class='field-graph-query'>" + htmlEscape(query) + "</span>";
-//
-//        $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
-//
-//        var addSeries = {
-//            name: "value" + i,
-//            color: lineColor,
-//            gl2_query: query,
-//            valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(series.valuetype),
-//            field: series.field
-//        };
-//
-//        addSeries["data"] = series.data;
-//
-//        targetChart.series.push(addSeries);
-//    }
-//
-//    targetChart.renderer.unstack = true;
-//
-//    sendMergedGraphsEvent(targetId, draggedId);
-//
-//    // Reflect all the chart changes we made.
-//    targetChart.update();
-//    targetChart.render();
-//}

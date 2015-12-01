@@ -185,10 +185,7 @@ class FieldGraphsStore {
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {
-        $(document).trigger('merge.graylog.fieldgraph', {
-            targetGraphId: targetGraphId,
-            sourceGraphId: sourceGraphId
-        });
+        FieldChart.stackGraphs(targetGraphId, sourceGraphId);
     }
 
     getFieldGraphAsCreateWidgetRequestParams(graphId: string, widgetType: string): CreateFieldChartWidgetRequestParams {
