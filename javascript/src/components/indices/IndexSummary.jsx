@@ -2,7 +2,6 @@ import React from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 import moment from 'moment';
-import { Collapse } from 'react-bootstrap';
 
 import { IndexSizeSummary } from 'components/indices';
 
@@ -79,9 +78,7 @@ const IndexSummary = React.createClass({
         </h2>
 
         <div className="index-info-holder">
-          <Collapse in={this.state.showDetails} timeout={0}>
-            {this.props.children}
-          </Collapse>
+          {this.state.showDetails && this.props.children}
         </div>
       </span>
     );
