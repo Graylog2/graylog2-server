@@ -54,21 +54,26 @@ import java.util.List;
 @RequiresAuthentication
 @Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog2 metrics")
 @Path("/cluster/{nodeId}/metrics")
+@Produces(MediaType.APPLICATION_JSON)
 public class ClusterMetricsResource extends RestResource {
-    private final RemoteMetricsResource remoteMetricsResource;
+    private final NodeService nodeService;
+    private final RemoteInterfaceProvider remoteInterfaceProvider;
 
     @Inject
-    public ClusterMetricsResource(@PathParam("nodeId") String nodeId,
-                                  NodeService nodeService,
-                                  RemoteInterfaceProvider remoteInterfaceProvider,
-                                  @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
+    public ClusterMetricsResource(NodeService nodeService,
+                                  RemoteInterfaceProvider remoteInterfaceProvider) {
+        this.nodeService = nodeService;
+        this.remoteInterfaceProvider = remoteInterfaceProvider;
+    }
+
+    private RemoteMetricsResource getResourceForNode(String nodeId, HttpHeaders httpHeaders) throws NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
         if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.remoteMetricsResource = remoteInterfaceProvider.get(targetNode, authenticationTokens.get(0), RemoteMetricsResource.class);
+            return remoteInterfaceProvider.get(targetNode, authenticationTokens.get(0), RemoteMetricsResource.class);
         } else {
-            this.remoteMetricsResource = remoteInterfaceProvider.get(targetNode, RemoteMetricsResource.class);
+            return remoteInterfaceProvider.get(targetNode, RemoteMetricsResource.class);
         }
     }
 
@@ -77,9 +82,10 @@ public class ClusterMetricsResource extends RestResource {
     @Path("/names")
     @ApiOperation(value = "Get all metrics keys/names from node")
     @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
-    @Produces(MediaType.APPLICATION_JSON)
-    public MetricNamesResponse metricNames() throws IOException {
-        final Response<MetricNamesResponse> result =  remoteMetricsResource.metricNames().execute();
+    public MetricNamesResponse metricNames(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+                                           @PathParam("nodeId") String nodeId,
+                                           @Context HttpHeaders httpHeaders) throws IOException, NodeNotFoundException {
+        final Response<MetricNamesResponse> result = getResourceForNode(nodeId, httpHeaders).metricNames().execute();
         if (result.isSuccess()) {
             return result.body();
         } else {
@@ -94,9 +100,12 @@ public class ClusterMetricsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
-    public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
-                                                  @Valid @NotNull MetricsReadRequest request) throws IOException {
-        final Response<MetricsSummaryResponse> result = remoteMetricsResource.multipleMetrics(request).execute();
+    public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+                                                  @PathParam("nodeId") String nodeId,
+                                                  @ApiParam(name = "Requested metrics", required = true)
+                                                  @Valid @NotNull MetricsReadRequest request,
+                                                  @Context HttpHeaders httpHeaders) throws IOException, NodeNotFoundException {
+        final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId, httpHeaders).multipleMetrics(request).execute();
         if (result.isSuccess()) {
             return result.body();
         } else {
@@ -111,10 +120,12 @@ public class ClusterMetricsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such metric namespace")
     })
-    @Produces(MediaType.APPLICATION_JSON)
-    public MetricsSummaryResponse byNamespace(@ApiParam(name = "namespace", required = true)
-                                              @PathParam("namespace") String namespace) throws IOException {
-        final Response<MetricsSummaryResponse> result = remoteMetricsResource.byNamespace(namespace).execute();
+    public MetricsSummaryResponse byNamespace(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
+                                              @PathParam("nodeId") String nodeId,
+                                              @ApiParam(name = "namespace", required = true)
+                                              @PathParam("namespace") String namespace,
+                                              @Context HttpHeaders httpHeaders) throws IOException, NodeNotFoundException {
+        final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId, httpHeaders).byNamespace(namespace).execute();
         if (result.isSuccess()) {
             return result.body();
         } else {
