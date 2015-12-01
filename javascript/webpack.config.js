@@ -48,6 +48,7 @@ const webpackConfig = {
   plugins: [
     new Clean([BUILD_PATH]),
     new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png'}),
+    new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template'}),
   ],
 };
 
