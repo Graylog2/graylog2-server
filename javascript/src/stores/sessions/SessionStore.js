@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import SessionActions from 'actions/sessions/SessionActions';
+import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
 import { Builder } from 'logic/rest/FetchProvider';
 
@@ -10,12 +11,8 @@ const SessionStore = Reflux.createStore({
   username: undefined,
 
   init() {
-    if (localStorage.getItem('sessionId') !== undefined) {
-      this.sessionId = localStorage.getItem('sessionId');
-    }
-    if (localStorage.getItem('username') !== undefined) {
-      this.username = localStorage.getItem('username');
-    }
+    this.sessionId = Store.get('sessionId');
+    this.username = Store.get('username');
     this._propagateState();
   },
   getInitialState() {
@@ -46,8 +43,8 @@ const SessionStore = Reflux.createStore({
   },
 
   _removeSession() {
-    delete localStorage.sessionId;
-    delete localStorage.username;
+    Store.delete('sessionId');
+    Store.delete('username');
     this.sessionId = undefined;
     this.username = undefined;
     this._propagateState();
@@ -58,8 +55,8 @@ const SessionStore = Reflux.createStore({
   },
 
   loginCompleted(sessionInfo) {
-    localStorage.setItem('sessionId', sessionInfo.sessionId);
-    localStorage.setItem('username', sessionInfo.username);
+    Store.set('sessionId', sessionInfo.sessionId);
+    Store.set('username', sessionInfo.username);
     this.sessionId = sessionInfo.sessionId;
     this.username = sessionInfo.username;
     this._propagateState();
