@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <link rel="shortcut icon" href="/favicon.png">
+    ${foreach cssFiles cssFile}
+    <link href="${cssfile}" rel="stylesheet">
+    ${end}
+  </head>
+  <body>
+    ${foreach jsFiles jsFile}
+    <script src="${jsFile}"></script>
+    ${end}
+  </body>
+</html>
