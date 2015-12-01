@@ -6,6 +6,7 @@ var Immutable = require('immutable');
 
 var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 import Widget from './Widget';
+import GraphVisualization from 'components/visualizations/GraphVisualization';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 
