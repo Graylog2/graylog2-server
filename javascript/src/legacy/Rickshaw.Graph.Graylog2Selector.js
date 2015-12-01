@@ -1,4 +1,5 @@
 import Rickshaw from 'rickshaw';
+import NumberUtils from 'util/NumberUtils';
 
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 
@@ -93,7 +94,7 @@ const Graylog2Selector = Rickshaw.Class.create({
             var from = $('#universalsearch .absolute .absolute-from-human');
             var to = $('#universalsearch .absolute .absolute-to-human');
 
-            if (!isNumber(position.xMin) || !isNumber(position.xMax)) {
+            if (!NumberUtils.isNumber(position.xMin) || !NumberUtils.isNumber(position.xMax)) {
                 clearSelection();
                 return;
             }
