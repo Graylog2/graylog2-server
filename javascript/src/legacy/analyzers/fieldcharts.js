@@ -31,11 +31,11 @@ export const FieldChart = {
     GRAPH_HEIGHT: 120,
     //palette: new Rickshaw.Color.Palette({scheme: 'colorwheel'}),
 
-    getDefaultOptions(opts) {
+    _getDefaultOptions(opts) {
         var searchParams = {};
         $(document).trigger("get-original-search.graylog.search", {
             callback: function (params) {
-                searchParams = params.toJS()
+                searchParams = params.toJS();
             }
         });
 
@@ -105,7 +105,7 @@ export const FieldChart = {
         return opts;
     },
 
-    getTimeRangeParams(opts) {
+    _getTimeRangeParams(opts) {
         var timerange = {};
         switch (opts.rangetype) {
             case "relative":
@@ -123,7 +123,7 @@ export const FieldChart = {
         return timerange;
     },
 
-    _onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, renderingOptions, data) {
+    _onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, data) {
         if (opts.query.trim().length > 0) {
             $(".field-graph-query", $graphContainer).text(opts.query);
         } else {
@@ -199,12 +199,6 @@ export const FieldChart = {
 
         this.fieldGraphs[opts.chartid] = graph;
 
-        if (renderingOptions.newGraph) {
-            sendCreatedGraphEvent(opts);
-        } else {
-            sendUpdatedGraphEvent(opts);
-        }
-
         // Make it draggable.
         //$graphContainer.draggable({
         //    handle: ".reposition-handle",
@@ -262,20 +256,36 @@ export const FieldChart = {
         }
     },
 
-    insertSpinner($graphContainer) {
+    _chartOptionsFromContainer(cc) {
+        try {
+            return JSON.parse(cc.attr("data-lines"));
+        } catch (e) {
+            return this._getDefaultOptions();
+        }
+    },
+
+    _changeGraphConfig(graphContainer, key, value) {
+        var opts = this._chartOptionsFromContainer(graphContainer);
+        opts[key] = value;
+
+        graphContainer.attr("data-lines", JSON.stringify(opts));
+        sendUpdatedGraphEvent(this._chartOptionsFromContainer(graphContainer));
+    },
+
+    _insertSpinner($graphContainer) {
         var spinnerElement = $(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
         $graphContainer.append(spinnerElement);
     },
 
-    deleteSpinner($graphContainer) {
+    _deleteSpinner($graphContainer) {
         $(".spinner", $graphContainer).remove();
     },
 
-    _renderFieldChart(opts, graphContainer, renderingOptions) {
+    renderFieldChart(opts, graphContainer, renderingOptions) {
         var field = opts.field;
         var $graphContainer = $(graphContainer);
 
-        this.insertSpinner($graphContainer);
+        this._insertSpinner($graphContainer);
 
         // Delete a possibly already existing graph to manage updates.
         var $graphElement = $('.field-graph', $graphContainer);
@@ -284,8 +294,8 @@ export const FieldChart = {
         $graphYAxis.html("");
         $graphYAxis.hide();
 
-        opts = this.getDefaultOptions(opts);
-        const timeRangeParams = this.getTimeRangeParams(opts);
+        opts = this._getDefaultOptions(opts);
+        const timeRangeParams = this._getTimeRangeParams(opts);
 
         const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
           opts.rangetype,
@@ -316,16 +326,66 @@ export const FieldChart = {
           });
 
         promise
-          .then(data => this._onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, renderingOptions, data))
+          .then(data => {
+              this._onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, data);
+
+              if (renderingOptions && renderingOptions.newGraph) {
+                  sendCreatedGraphEvent(opts);
+              } else {
+                  sendUpdatedGraphEvent(opts);
+              }
+          })
           .catch(error => this._onFieldHistogramFail($graphElement, opts, error))
           .finally(() => {
               $graphYAxis.show();
-              this.deleteSpinner($graphContainer);
+              this._deleteSpinner($graphContainer);
           });
     },
 
-    createFieldChart(options, graphContainer) {
-        this._renderFieldChart(options, graphContainer, {newGraph: true, stacked: false});
+    renderNewFieldChart(options, graphContainer) {
+        this.renderFieldChart(options, graphContainer, {newGraph: true});
+    },
+
+    changeInterpolation(graphContainer, interpolation) {
+        const graphOptions = this._chartOptionsFromContainer(graphContainer);
+        this._changeGraphConfig(graphContainer, "interpolation", interpolation);
+
+        const graph = this.fieldGraphs[graphOptions.chartid];
+        graph.interpolation = interpolation;
+        graph.render();
+    },
+
+    changeRenderer(graphContainer, renderer) {
+        const graphOptions = this._chartOptionsFromContainer(graphContainer);
+        this._changeGraphConfig(graphContainer, "renderer", renderer);
+
+        const graph = this.fieldGraphs[graphOptions.chartid];
+        graph.setRenderer(renderer);
+
+        if (renderer == "scatterplot") {
+            graph.renderer.dotSize = 2;
+        }
+
+        if (renderer == "area") {
+            graph.renderer.stroke = true;
+        }
+
+        graph.renderer.unstack = true;
+        graph.render();
+    },
+
+    changeResolution(graphContainer, resolution) {
+        const graphOptions = this._chartOptionsFromContainer(graphContainer);
+        graphOptions.interval = resolution;
+        this._changeGraphConfig(graphContainer, "interval", resolution);
+        this.renderFieldChart(graphOptions, graphContainer);
+    },
+
+    changeStatisticalFunction(graphContainer, statisticalFunction) {
+        var graphOptions = this._chartOptionsFromContainer(graphContainer);
+        graphOptions.valuetype = statisticalFunction;
+        this._changeGraphConfig(graphContainer, "valuetype", statisticalFunction);
+        this.renderFieldChart(graphOptions, graphContainer);
     },
 };
 
@@ -355,99 +415,43 @@ function sendFailureEvent(graphId, errorMessage) {
 //    $(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
 //}
 //
-//// Changing type of value graphs.
-//$(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
-//    e.preventDefault();
-//
-//    var type = $(this).attr("data-type");
-//
-//    var graphContainer = $(this).closest(".field-graph-container");
-//    var field = graphContainer.attr("data-field");
-//    var graphOpts = chartOptionsFromContainer(graphContainer);
-//    changeGraphConfig(graphContainer, "renderer", type);
-//
-//    var graph = fieldGraphs[graphOpts.chartid];
-//    graph.setRenderer(type);
-//
-//    if (type == "scatterplot") {
-//        graph.renderer.dotSize = 2;
-//    }
-//
-//    if (type == "area") {
-//        graph.renderer.stroke = true;
-//    }
-//
-//    graph.renderer.unstack = true;
-//
-//    graph.render();
-//
-//    sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
-//});
-//
-//// Changing interpolation of value graphs.
-//$(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
-//    e.preventDefault();
-//
-//    var interpolation = $(this).attr('data-type');
-//
-//    var graphContainer = $(this).closest(".field-graph-container");
-//    var field = graphContainer.attr("data-field");
-//    var graphOpts = chartOptionsFromContainer(graphContainer);
-//    changeGraphConfig(graphContainer, "interpolation", interpolation);
-//
-//    var graph = fieldGraphs[graphOpts.chartid];
-//    graph.interpolation = interpolation;
-//    graph.render();
-//
-//    sendUpdatedGraphEvent(chartOptionsFromContainer(graphContainer));
-//});
-//
-//// Changing interval of value graphs.
-//$(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
-//    e.preventDefault();
-//    var graphContainer = $(this).closest(".field-graph-container");
-//    var field = graphContainer.attr("data-field");
-//
-//    var interval = $(this).attr("data-type");
-//    var opts = chartOptionsFromContainer(graphContainer);
-//    opts.interval = interval;
-//    opts.field = field;
-//
-//    renderFieldChart(opts, graphContainer, {newGraph: false});
-//    changeGraphConfig(graphContainer, "interval", interval);
-//});
-//
-//// Changing value type of value graphs.
-//$(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
-//    e.preventDefault();
-//    var graphContainer = $(this).closest(".field-graph-container");
-//    var field = graphContainer.attr("data-field");
-//
-//    var valuetype = $(this).attr("data-type");
-//    var opts = chartOptionsFromContainer(graphContainer);
-//    opts.valuetype = valuetype;
-//    opts.field = field;
-//
-//    renderFieldChart(opts, graphContainer, {newGraph: false});
-//    changeGraphConfig(graphContainer, "valuetype", valuetype);
-//});
-//
-//
-//function chartOptionsFromContainer(cc) {
-//    try {
-//        return JSON.parse(cc.attr("data-lines"));
-//    } catch (e) {
-//        return getDefaultOptions();
-//    }
-//}
-//
-//function changeGraphConfig(graphContainer, key, value) {
-//    var opts = chartOptionsFromContainer(graphContainer);
-//    opts[key] = value;
-//
-//    graphContainer.attr("data-lines", JSON.stringify(opts));
-//}
-//
+
+// Changing type of value graphs.
+$(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
+    e.preventDefault();
+
+    var graphContainer = $(this).closest(".field-graph-container");
+    var type = $(this).attr("data-type");
+    FieldChart.changeRenderer(graphContainer, type);
+});
+
+// Changing interpolation of value graphs.
+$(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
+    e.preventDefault();
+
+    var graphContainer = $(this).closest(".field-graph-container");
+    var interpolation = $(this).attr('data-type');
+    FieldChart.changeInterpolation(graphContainer, interpolation);
+});
+
+// Changing interval of value graphs.
+$(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
+    e.preventDefault();
+
+    var graphContainer = $(this).closest(".field-graph-container");
+    var interval = $(this).attr("data-type");
+    FieldChart.changeResolution(graphContainer, interval);
+});
+
+// Changing value type of value graphs.
+$(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
+    e.preventDefault();
+
+    var graphContainer = $(this).closest(".field-graph-container");
+    var valuetype = $(this).attr("data-type");
+    FieldChart.changeStatisticalFunction(graphContainer, valuetype);
+});
+
 //function mergeCharts(targetId, draggedId) {
 //    var targetChart = fieldGraphs[targetId];
 //    var draggedChart = fieldGraphs[draggedId];

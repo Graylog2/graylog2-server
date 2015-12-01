@@ -181,7 +181,7 @@ class FieldGraphsStore {
     }
 
     renderFieldGraph(graphOptions: Object, graphContainer: Element) {
-        FieldChart.createFieldChart(graphOptions, graphContainer);
+        FieldChart.renderNewFieldChart(graphOptions, graphContainer);
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {
