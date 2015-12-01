@@ -159,7 +159,7 @@ const jsRoutes = {
           return {url: url};
         },
         histogram: (type, query, interval, timerange) => { return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}`}; },
-        fieldHistogram: (type, query, interval) => { return {url: '/search/universal/' + type + '/fieldHistogram?query=' + query + '&interval=' + interval}; },
+        fieldHistogram: (type, query, field, resolution, timerange) => { return {url: `/search/universal/${type}/fieldhistogram?query=${query}&interval=${resolution}&field=${field}&${timerange}`}; },
         fieldStats: (type, query, field, timerange) => { return {url: `/search/universal/${type}/stats?query=${query}&field=${field}&${timerange}`}; },
         fieldTerms: (type, query, field, timerange) => { return {url: `/search/universal/${type}/terms?query=${query}&field=${field}&${timerange}`}; },
       },

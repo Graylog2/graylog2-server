@@ -1,15 +1,14 @@
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 
-'use strict';
-
-declare var $: any;
-declare var generateId: ()=>string;
-
+const $ = require('jquery');
 import Immutable = require('immutable');
 
-import UserNotification = require("../../util/UserNotification");
 const Store = require('logic/local-storage/Store');
+const fieldCharts = require('legacy/analyzers/fieldcharts');
+const generateId = fieldCharts.generateId;
+const FieldChart = fieldCharts.FieldChart;
 
+import UserNotification = require('util/UserNotification');
 
 interface CreateFieldChartWidgetRequestParams {
     widgetType: string;
@@ -182,10 +181,7 @@ class FieldGraphsStore {
     }
 
     renderFieldGraph(graphOptions: Object, graphContainer: Element) {
-        $(document).trigger("create.graylog.fieldgraph", {
-            options: graphOptions,
-            container: graphContainer
-        });
+        FieldChart.createFieldChart(graphOptions, graphContainer);
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {
