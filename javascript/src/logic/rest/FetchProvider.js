@@ -12,7 +12,7 @@ export class FetchError extends Error {
 
 export class Builder {
   constructor(method, url) {
-    this.request = request(method, url);
+    this.request = request(method, url.replace(/([^:])\/\//, '$1/'));
   }
 
   authenticated() {
