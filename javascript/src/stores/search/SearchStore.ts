@@ -265,16 +265,16 @@ class SearchStore {
 
     // Get initial search params, with names used in AJAX requests
     getOriginalSearchParams(): Immutable.Map<string,any> {
-        var orignalParams = Immutable.Map<string, any>();
-        orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
-        orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
-        orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
-        orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
+        var originalParams = Immutable.Map<string, any>();
+        originalParams = originalParams.set('range_type', this.originalSearch.get('rangeType'));
+        originalParams = originalParams.merge(this.originalSearch.get('rangeParams'));
+        originalParams = originalParams.set('query', this.originalSearch.get('query'));
+        originalParams = originalParams.set('interval', this.originalSearch.get('resolution'));
         if (this.searchInStream) {
-            orignalParams = orignalParams.set('streamId', this.searchInStream.id);
+            originalParams = originalParams.set('streamId', this.searchInStream.id);
         }
 
-        return orignalParams;
+        return originalParams;
     }
 
     // Get initial search params with the current selected fields
