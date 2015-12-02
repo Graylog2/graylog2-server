@@ -78,7 +78,7 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public DeflectorSummary deflector() {
-        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex());
+        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex(), this.config());
     }
 
     @GET

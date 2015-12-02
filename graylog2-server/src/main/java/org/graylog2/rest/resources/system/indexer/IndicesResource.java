@@ -33,6 +33,7 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
+import org.graylog2.rest.models.system.indexer.responses.BulkIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
@@ -172,6 +173,16 @@ public class IndicesResource extends RestResource {
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
+
+    @GET
+    @Timed
+    @Path("/all")
+    @ApiOperation(value = "Get a list of all indices, open, closed and reopened.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public BulkIndices bulk() {
+        return BulkIndices.create(this.closed(), this.reopened(), this.all());
+    }
+
 
     @POST
     @Timed

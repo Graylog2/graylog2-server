@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 
 @AutoValue
 @JsonAutoDetect
@@ -30,9 +31,13 @@ public abstract class DeflectorSummary {
     @JsonProperty("current_target")
     public abstract String currentTarget();
 
+    @JsonProperty("config")
+    public abstract DeflectorConfigResponse config();
+
     @JsonCreator
     public static DeflectorSummary create(@JsonProperty("is_up") boolean isUp,
-                                          @JsonProperty("current_target") String currentTarget) {
-        return new AutoValue_DeflectorSummary(isUp, currentTarget);
+                                          @JsonProperty("current_target") String currentTarget,
+                                          @JsonProperty("config") DeflectorConfigResponse config) {
+        return new AutoValue_DeflectorSummary(isUp, currentTarget, config);
     }
 }
