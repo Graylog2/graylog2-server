@@ -1,27 +1,20 @@
-logs
-project/project
-project/target
-target
 tmp
 .history
 dist
 /.idea
 /*.iml
-/out
 /.idea_modules
 /.classpath
 /.project
-/RUNNING_PID
 /.settings
 .ecltarget
 
-conf/graylog2-web-interface.conf
-conf/graylog-web-interface.conf
-
 .target
 .DS_Store
-javascript/node_modules
-javascript/dist
-app/views/build/scripts.scala.html
-public/javascripts/build
+
+.node_cache
+/node_modules
+sandbox.js
+npm-debug.log
+/build
 

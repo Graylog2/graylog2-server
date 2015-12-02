@@ -4,7 +4,6 @@
 ## Development Setup
 
 * Install [node.js](http://nodejs.org/) and npm.
-* `cd javascript/`
 * `npm install`
 * `npm start`
 
