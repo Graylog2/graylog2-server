@@ -1,12 +1,16 @@
 import React, {PropTypes} from 'react';
 import {ButtonGroup, Button, Row, Col, DropdownButton, MenuItem} from 'react-bootstrap';
 import Immutable from 'immutable';
+import { LinkContainer } from 'react-router-bootstrap';
+
 import StreamsStore from 'stores/streams/StreamsStore';
+
 import StreamLink from 'components/streams/StreamLink';
-import MessageFields from './MessageFields';
+import MessageFields from 'components/search/MessageFields';
 import {Spinner, ClipboardButton} from 'components/common';
 
 import jsRoutes from 'routing/jsRoutes';
+import Routes from 'routing/Routes';
 import momentHelper from 'legacy/moment-helper.js';
 
 const MessageDetail = React.createClass({
@@ -59,7 +63,7 @@ const MessageDetail = React.createClass({
       const nodeURL = node.radio ? jsRoutes.controllers.RadiosController.show(nodeId).url : jsRoutes.controllers.NodesController.node(nodeId).url;
       nodeInformation = (
         <a href={nodeURL}>
-          <i className="fa fa-code-fork"></i>
+          <i className="fa fa-code-fork"/>
           &nbsp;
           <span style={{wordBreak: 'break-word'}}>{node.short_node_id}</span>&nbsp;/&nbsp;<span
           style={{wordBreak: 'break-word'}}>{node.hostname}</span>
@@ -153,7 +157,7 @@ const MessageDetail = React.createClass({
       <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
                       id="select-stream-dropdown">
         { streamList }
-        { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"></i>
+        { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"/>
           Loading streams</MenuItem> }
         { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
       </DropdownButton>);
@@ -168,8 +172,11 @@ const MessageDetail = React.createClass({
             <ClipboardButton title="Copy ID" text={this.props.message.id}/>
             {testAgainstStream}
           </ButtonGroup>
-          <h3><i className="fa fa-envelope"></i> <a href={messageUrl}
-                                                    style={{color: '#000'}}>{this.props.message.id}</a></h3>
+          <h3><i className="fa fa-envelope"/>
+            <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
+              <a href="#" style={{color: '#000'}}>{this.props.message.id}</a>
+            </LinkContainer>
+          </h3>
         </Col>
       </Row>
       <Row>
