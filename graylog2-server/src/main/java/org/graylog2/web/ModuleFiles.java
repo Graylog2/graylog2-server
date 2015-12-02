@@ -10,7 +10,7 @@ import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class PackageFiles {
+public abstract class ModuleFiles {
     @JsonProperty("chunks")
     public abstract Map<String, ChunkDescription> chunks();
 
@@ -21,9 +21,9 @@ public abstract class PackageFiles {
     public abstract List<String> cssFiles();
 
     @JsonCreator
-    public static PackageFiles create(@JsonProperty("chunks") Map<String, ChunkDescription> chunks,
-                                      @JsonProperty("js") List<String> jsFiles,
-                                      @JsonProperty("css") List<String> cssFiles) {
+    public static ModuleFiles create(@JsonProperty("chunks") Map<String, ChunkDescription> chunks,
+                                     @JsonProperty("js") List<String> jsFiles,
+                                     @JsonProperty("css") List<String> cssFiles) {
         return new AutoValue_PackageFiles(chunks, jsFiles, cssFiles);
     }
 }

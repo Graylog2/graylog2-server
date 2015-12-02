@@ -21,16 +21,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.Map;
-
 @AutoValue
 @JsonAutoDetect
-public abstract class PackageManifest {
+public abstract class ModuleManifest {
     @JsonProperty("files")
-    public abstract PackageFiles files();
+    public abstract ModuleFiles files();
 
     @JsonCreator
-    public static PackageManifest create(@JsonProperty("files") PackageFiles files) {
-        return new AutoValue_PackageManifest(files);
+    public static ModuleManifest create(@JsonProperty("files") ModuleFiles files) {
+        return new AutoValue_ModuleManifest(files);
     }
 }

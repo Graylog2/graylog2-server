@@ -17,9 +17,8 @@
 package org.graylog2.web.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.graylog2.web.IndexHtmlGenerator;
-import org.graylog2.web.PackageManifest;
+import org.graylog2.web.ModuleManifest;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -31,7 +30,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
-import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -43,7 +41,7 @@ public class WebInterfaceAssetsResource {
     @Inject
     public WebInterfaceAssetsResource(ObjectMapper objectMapper) throws IOException {
         final InputStream packageManifest = ClassLoader.getSystemResourceAsStream(pathPrefix + "/module.json");
-        final PackageManifest manifest = objectMapper.readValue(packageManifest, PackageManifest.class);
+        final ModuleManifest manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
         this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", manifest.files().cssFiles(), manifest.files().jsFiles());
     }
 
