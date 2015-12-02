@@ -272,6 +272,7 @@ public class RestApiService extends AbstractIdleService {
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, listenUri)
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
+                .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .registerClasses(
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
