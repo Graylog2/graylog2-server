@@ -17,22 +17,46 @@
 package org.graylog2.shared.rest;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class CORSFilter implements ContainerResponseFilter {
+public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilter {
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        // we have already added the necessary headers for OPTIONS requests below
+        if (requestContext.getRequest().getMethod().equalsIgnoreCase("options")) {
+            return;
+        }
+
         String origin = requestContext.getHeaders().getFirst("Origin");
         if (origin != null && !origin.isEmpty()) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
             responseContext.getHeaders().add("Access-Control-Allow-Credentials", true);
             responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Graylog2-No-Session-Extension");
             responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        }
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        // answer OPTIONS requests early so we don't have jersey produce WADL responses for them (we only use them for CORS preflight)
+        if (requestContext.getRequest().getMethod().equalsIgnoreCase("options")) {
+            final Response.ResponseBuilder options = Response.noContent();
+            String origin = requestContext.getHeaders().getFirst("Origin");
+            if (origin != null && !origin.isEmpty()) {
+                options.header("Access-Control-Allow-Origin", origin);
+                options.header("Access-Control-Allow-Credentials", true);
+                options.header("Access-Control-Allow-Headers",
+                               "Authorization, Content-Type, X-Graylog2-No-Session-Extension");
+                options.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                // In order to avoid redoing the preflight thingy for every request, see http://stackoverflow.com/a/12021982/1088469
+                options.header("Access-Control-Max-Age", "600"); // 10 minutes seems to be the maximum allowable value
+                requestContext.abortWith(options.build());
+            }
         }
     }
 }
