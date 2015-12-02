@@ -3,12 +3,12 @@ import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import $ from 'jquery';
 
-import PermissionsMixin from 'util/PermissionsMixin';
-import WidgetCreationModal from 'components/widgets/WidgetCreationModal';
-import EditDashboardModal from 'components/dashboard/EditDashboardModal';
-
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import WidgetStore from 'stores/widgets/WidgetsStore';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+import { WidgetCreationModal } from 'components/widgets';
+import { EditDashboardModal } from 'components/dashboard';
 
 const AddToDashboardMenu = React.createClass({
   mixins: [PermissionsMixin],
@@ -34,18 +34,18 @@ const AddToDashboardMenu = React.createClass({
     this.refs.widgetModal.open();
   },
   _saveWidget(title, configuration) {
-    var widgetConfig = Immutable.Map(this.props.configuration);
-    var searchParams = Immutable.Map(this.searchParams);
+    let widgetConfig = Immutable.Map(this.props.configuration);
+    const searchParams = Immutable.Map(this.searchParams);
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
-    var promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
+    const promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
     promise.done(() => this.refs.widgetModal.saved());
   },
   _createNewDashboard() {
-    this.refs['createDashboardModal'].open();
+    this.refs.createDashboardModal.open();
   },
   _renderDashboardMenu() {
-    var dashboards = Immutable.List();
+    let dashboards = Immutable.List();
 
     this.state.dashboards
       .sortBy(dashboard => dashboard.title)
@@ -58,7 +58,7 @@ const AddToDashboardMenu = React.createClass({
       });
 
     return (
-      <DropdownButton bsStyle={this.props.bsStyle || "info"}
+      <DropdownButton bsStyle={this.props.bsStyle || 'info'}
                       bsSize="small"
                       title={this.props.title}
                       pullRight={this.props.pullRight}
@@ -69,8 +69,8 @@ const AddToDashboardMenu = React.createClass({
     );
   },
   _renderNoDashboardsMenu() {
-    var canCreateDashboard = this.isPermitted(this.props.permissions, ["dashboards:create"]);
-    var option;
+    const canCreateDashboard = this.isPermitted(this.props.permissions, ['dashboards:create']);
+    let option;
     if (canCreateDashboard) {
       option = <MenuItem key="createDashboard">No dashboards, create one?</MenuItem>;
     } else {
@@ -79,7 +79,7 @@ const AddToDashboardMenu = React.createClass({
 
     return (
       <div style={{display: 'inline'}}>
-        <DropdownButton bsStyle={this.props.bsStyle || "info"}
+        <DropdownButton bsStyle={this.props.bsStyle || 'info'}
                         bsSize="small"
                         title={this.props.title}
                         pullRight={this.props.pullRight}
@@ -102,7 +102,7 @@ const AddToDashboardMenu = React.createClass({
         </ButtonGroup>
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}
-                             supportsTrending={true}
+                             supportsTrending
                              configuration={this.props.configuration}
                              onConfigurationSaved={this._saveWidget}
                              fields={this.props.fields}

@@ -1,14 +1,12 @@
-/* global jsRoutes */
-
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
-import PermissionsMixin from '../../util/PermissionsMixin';
+import PermissionsMixin from 'util/PermissionsMixin';
 
-import DashboardsStore from '../../stores/dashboards/DashboardsStore';
+import DashboardsStore from 'stores/dashboards/DashboardsStore';
 
-import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import jsRoutes from 'routing/jsRoutes';
 
