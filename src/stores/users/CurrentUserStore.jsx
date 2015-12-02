@@ -27,7 +27,7 @@ const CurrentUserStore = Reflux.createStore({
     if (sessionInfo.sessionId && sessionInfo.username) {
       const username = sessionInfo.username;
 
-      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
+      fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
         .then((resp) => {
           this.currentUser = resp;
           this.trigger({currentUser: this.currentUser});
