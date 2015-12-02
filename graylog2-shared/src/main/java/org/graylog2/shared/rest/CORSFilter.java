@@ -38,6 +38,8 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
             responseContext.getHeaders().add("Access-Control-Allow-Credentials", true);
             responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Graylog2-No-Session-Extension");
             responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            // In order to avoid redoing the preflight thingy for every request, see http://stackoverflow.com/a/12021982/1088469
+            responseContext.getHeaders().add("Access-Control-Max-Age", "600"); // 10 minutes seems to be the maximum allowable value
         }
     }
 
