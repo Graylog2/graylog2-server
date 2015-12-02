@@ -44,8 +44,7 @@ public class WebInterfaceAssetsResource {
     public WebInterfaceAssetsResource(ObjectMapper objectMapper) throws IOException {
         final InputStream packageManifest = ClassLoader.getSystemResourceAsStream(pathPrefix + "/module.json");
         final PackageManifest manifest = objectMapper.readValue(packageManifest, PackageManifest.class);
-        final List<String> jsFiles = (List<String>)manifest.files().get("js");
-        this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", Collections.emptySet(), jsFiles);
+        this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", manifest.files().cssFiles(), manifest.files().jsFiles());
     }
 
     @GET

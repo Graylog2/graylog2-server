@@ -27,10 +27,10 @@ import java.util.Map;
 @JsonAutoDetect
 public abstract class PackageManifest {
     @JsonProperty("files")
-    public abstract Map<String, Object> files();
+    public abstract PackageFiles files();
 
     @JsonCreator
-    public static PackageManifest create(@JsonProperty("files") Map<String, Object> files) {
+    public static PackageManifest create(@JsonProperty("files") PackageFiles files) {
         return new AutoValue_PackageManifest(files);
     }
 }
