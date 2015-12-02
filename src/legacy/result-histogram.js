@@ -24,6 +24,7 @@ const resultHistogram = {
     },
 
     resetContainerElements: function(elem) {
+        this._resultHistogramGraph = undefined;
         this._histogramContainer = $("#result-graph", elem);
         this._yAxis = $("#y_axis", elem);
         this._graphTimeline = $("#result-graph-timeline", elem);
