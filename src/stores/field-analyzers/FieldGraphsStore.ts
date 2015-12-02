@@ -62,12 +62,7 @@ class FieldGraphsStore {
     onFieldGraphsMerged: (targetGraphId: Object)=>void;
 
     constructor() {
-        this.renderedGraphs = Immutable.Set<string>();
-        this._fieldGraphs = Immutable.Map<string, Object>(Store.get("pinned-field-charts"));
-        this._stackedGraphs = Immutable.fromJS(Store.get("stacked-graphs") || {}, (key, value) => {
-            var isIndexed = Immutable.Iterable.isIndexed(value);
-            return isIndexed ? value.toSet() : value.toMap();
-        });
+        this.resetStore();
 
         $(document).on('created.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
@@ -90,6 +85,16 @@ class FieldGraphsStore {
         $(document).on('merged.graylog.fieldgraph', (event, data) => {
             this.updateStackedGraphs(data.targetGraphId, data.draggedGraphId);
         });
+    }
+
+    resetStore() {
+        this.renderedGraphs = Immutable.Set<string>();
+        this._fieldGraphs = Immutable.Map<string, Object>(Store.get("pinned-field-charts"));
+        this._stackedGraphs = Immutable.fromJS(Store.get("stacked-graphs") || {}, (key, value) => {
+            var isIndexed = Immutable.Iterable.isIndexed(value);
+            return isIndexed ? value.toSet() : value.toMap();
+        });
+        FieldChart.reload();
     }
 
     get fieldGraphs(): Immutable.Map<string, Object> {

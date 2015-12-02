@@ -34,7 +34,11 @@ export function generateId() {
 export const FieldChart = {
     fieldGraphs: {},
     GRAPH_HEIGHT: 120,
-    PALETTE: new Rickshaw.Color.Palette({scheme: 'colorwheel'}),
+    palette: new Rickshaw.Color.Palette({scheme: 'colorwheel'}),
+
+    reload() {
+        this.palette = new Rickshaw.Color.Palette({scheme: 'colorwheel'});
+    },
 
     _getDefaultOptions(opts) {
         var searchParams = {};
@@ -398,12 +402,9 @@ export const FieldChart = {
         var draggedChart = this.fieldGraphs[draggedId];
 
         var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
-        var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
-
-        var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         for (var i = 0; i < draggedChart.series.length; i++) {
-            var lineColor = this.PALETTE.color();
+            var lineColor = this.palette.color();
             var series = draggedChart.series[i];
             var query = series.gl2_query;
 
