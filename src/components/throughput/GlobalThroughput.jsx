@@ -4,8 +4,6 @@ import numeral from 'numeral';
 
 import GlobalThroughputStore from 'stores/metrics/GlobalThroughputStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
-
 import { Spinner } from 'components/common';
 
 const GlobalThroughput = React.createClass({
