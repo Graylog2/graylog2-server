@@ -40,6 +40,6 @@ public abstract class ModuleFiles {
     public static ModuleFiles create(@JsonProperty("chunks") Map<String, ChunkDescription> chunks,
                                      @JsonProperty("js") List<String> jsFiles,
                                      @JsonProperty("css") List<String> cssFiles) {
-        return new AutoValue_PackageFiles(chunks, jsFiles, cssFiles);
+        return new AutoValue_ModuleFiles(chunks, jsFiles, cssFiles);
     }
 }
