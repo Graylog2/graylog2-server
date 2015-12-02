@@ -16,20 +16,37 @@
  */
 package org.graylog2.web.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.emory.mathcs.backport.java.util.Collections;
+import org.graylog2.web.IndexHtmlGenerator;
+import org.graylog2.web.PackageManifest;
+
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
+import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Path("{filename: .*}")
 public class WebInterfaceAssetsResource {
     private static String pathPrefix = "web-interface/assets";
+    private final IndexHtmlGenerator indexHtmlGenerator;
+
+    @Inject
+    public WebInterfaceAssetsResource(ObjectMapper objectMapper) throws IOException {
+        final InputStream packageManifest = ClassLoader.getSystemResourceAsStream(pathPrefix + "/module.json");
+        final PackageManifest manifest = objectMapper.readValue(packageManifest, PackageManifest.class);
+        final List<String> jsFiles = (List<String>)manifest.files().get("js");
+        this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", Collections.emptySet(), jsFiles);
+    }
 
     @GET
     public Response get(@PathParam("filename") String filename) {
@@ -54,7 +71,7 @@ public class WebInterfaceAssetsResource {
 
     private Response getDefaultResponse() {
         return Response
-                .ok(getStreamForFile("index.html"))
+                .ok(this.indexHtmlGenerator.get())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
                 .build();
     }
