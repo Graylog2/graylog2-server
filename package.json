@@ -38,6 +38,7 @@
     "react-addons-pure-render-mixin": "0.14.x",
     "react-addons-test-utils": "0.14.x",
     "react-bootstrap": "0.28.x",
+    "react-day-picker": "^1.1.5",
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.0",
     "react-dom": "0.14.x",
