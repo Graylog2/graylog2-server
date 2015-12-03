@@ -1,4 +1,5 @@
 import Rickshaw from 'rickshaw';
+import moment from 'moment';
 import graphHelper from 'legacy/graphHelper';
 
 Rickshaw.namespace('Rickshaw.Fixtures.Graylog2Time');
