@@ -35,8 +35,8 @@ public abstract class BulkIndices {
 
     @JsonCreator
     public static BulkIndices create(@JsonProperty("closed") ClosedIndices closed,
-                                         @JsonProperty("reopened") ClosedIndices reopened,
-                                         @JsonProperty("all") AllIndicesInfo all) {
+                                     @JsonProperty("reopened") ClosedIndices reopened,
+                                     @JsonProperty("all") AllIndicesInfo all) {
         return new AutoValue_BulkIndices(closed, reopened, all);
     }
 }
