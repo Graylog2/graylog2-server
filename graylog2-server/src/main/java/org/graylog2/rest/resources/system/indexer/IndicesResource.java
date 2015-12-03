@@ -177,7 +177,7 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/all")
-    @ApiOperation(value = "Get a list of all indices, open, closed and reopened.")
+    @ApiOperation(value = "List all open, closed and reopened indices.")
     @Produces(MediaType.APPLICATION_JSON)
     public BulkIndices bulk() {
         return BulkIndices.create(this.closed(), this.reopened(), this.all());
