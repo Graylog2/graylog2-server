@@ -13,7 +13,7 @@ const UniversalSearchStore = Reflux.createStore({
   listenables: [],
 
   search(type, query, timerange, limit) {
-    const timerangeParams = Qs.stringify(timerange);
+    const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams, limit).url);
 
     return fetch('GET', url).then((response) => {
@@ -48,7 +48,7 @@ const UniversalSearchStore = Reflux.createStore({
     });
   },
   histogram(type, query, timerange, interval) {
-    const timerangeParams = Qs.stringify(timerange);
+    const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams).url);
 
     return fetch('GET', url).then((response) => {
@@ -57,5 +57,14 @@ const UniversalSearchStore = Reflux.createStore({
     });
   },
 });
+
+UniversalSearchStore.serializeTimeRange = (type, timerange) => {
+  // The server API uses the `range` parameter instead of `relative` for indicating a relative time range.
+  if (type === 'relative') {
+    return Qs.stringify({range: timerange.relative});
+  }
+
+  return Qs.stringify(timerange);
+};
 
 export default UniversalSearchStore;

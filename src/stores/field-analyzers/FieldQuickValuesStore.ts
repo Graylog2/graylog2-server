@@ -16,7 +16,7 @@ const FieldQuickValuesStore = {
         var timerange = {};
         switch(rangeType) {
             case 'relative':
-                timerange['relative'] = originalSearchURLParams.get('relative');
+                timerange['range'] = originalSearchURLParams.get('relative');
                 break;
             case 'absolute':
                 timerange['from'] = originalSearchURLParams.get('from');
