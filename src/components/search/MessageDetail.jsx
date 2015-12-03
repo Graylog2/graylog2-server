@@ -172,7 +172,9 @@ const MessageDetail = React.createClass({
             <ClipboardButton title="Copy ID" text={this.props.message.id}/>
             {testAgainstStream}
           </ButtonGroup>
-          <h3><i className="fa fa-envelope"/>
+          <h3>
+            <i className="fa fa-envelope"/>
+            &nbsp;
             <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
               <a href="#" style={{color: '#000'}}>{this.props.message.id}</a>
             </LinkContainer>
