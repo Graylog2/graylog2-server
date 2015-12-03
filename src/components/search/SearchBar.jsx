@@ -1,11 +1,11 @@
-/* global $ */
-
+import $ from 'jquery';
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
+import moment from 'moment';
 
-import ChosenSelectInput from 'components/common/ChosenSelectInput';
+import {ChosenSelectInput, DatePicker} from 'components/common';
 import QueryInput from './QueryInput';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -19,9 +19,6 @@ import UIUtils from 'util/UIUtils';
 
 import momentHelper from 'legacy/moment-helper.js';
 
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap-datepicker.js');
-
 const SearchBar = React.createClass({
   propTypes: {
     userPreferences: PropTypes.object,
@@ -30,7 +27,6 @@ const SearchBar = React.createClass({
 
   getInitialState() {
     this.initialSearchParams = SearchStore.getParams();
-    this.datepickerInitialized = false;
     return {
       rangeType: this.initialSearchParams.rangeType,
       rangeParams: this.initialSearchParams.rangeParams,
@@ -47,10 +43,6 @@ const SearchBar = React.createClass({
     };
     SearchStore.onAddQueryTerm = this._animateQueryChange;
     this._initializeSearchQueryInput();
-    this._initalizeDatepicker();
-  },
-  componentDidUpdate() {
-    this._initalizeDatepicker();
   },
   componentWillUnmount() {
     this._removeSearchQueryInput();
@@ -71,34 +63,6 @@ const SearchBar = React.createClass({
       const queryDOMElement = ReactDOM.findDOMNode(this.refs.query);
       $(queryDOMElement).off('typeahead:change');
     }
-  },
-  // We need to initialize datepicker every time the absolute timerange is selected, but only once :/
-  _initalizeDatepicker() {
-    if (this.state.rangeType !== 'absolute') {
-      this.datepickerInitialized = false;
-      return;
-    }
-
-    if (this.datepickerInitialized) {
-      return;
-    }
-
-    ['from', 'to'].forEach((field) => {
-      const input = this.refs[field + 'Formatted'].getInputDOMNode();
-      const that = this; // Thank you for this (or that) jquery
-
-      $(input).datepicker({
-        format: 'yyyy-mm-dd',
-        weekStart: 1,
-      }).on('changeDate', (event) => {
-        const dateString = event.target.value + ' 00:00:00';
-        const date = momentHelper.parseUserLocalFromString(dateString);
-        event.target.value = date.format(momentHelper.DATE_FORMAT_TZ);
-        that._rangeParamsChanged(field)();
-      });
-    });
-
-    this.datepickerInitialized = true;
   },
   _animateQueryChange() {
     UIUtils.scrollToHint(ReactDOM.findDOMNode(this.refs.universalSearch));
@@ -187,6 +151,16 @@ const SearchBar = React.createClass({
     SavedSearchesActions.execute.triggerPromise(selectedSavedSearch, streamId, $(window).width());
   },
 
+  _onDateSelected(field) {
+    return (event, date) => {
+      const dateString = moment(date).format();
+      const parsedDate = momentHelper.parseUserLocalFromString(dateString);
+      const inputField = this.refs[`${field}Formatted`].getInputDOMNode();
+      inputField.value = parsedDate.format(momentHelper.DATE_FORMAT_TZ);
+      this._rangeParamsChanged(field)();
+    };
+  },
+
   _getRangeTypeSelector() {
     let selector;
 
@@ -225,30 +199,43 @@ const SearchBar = React.createClass({
           <div className="row no-bm" style={{marginLeft: 50}}>
             <div className="col-md-5" style={{padding: 0}}>
               <Input type="hidden" name="from" ref="from"/>
-              <Input type="text"
-                     ref="fromFormatted"
-                     value={this._formattedDateStringInUserTZ('from')}
-                     onChange={this._rangeParamsChanged('from')}
-                     placeholder={momentHelper.DATE_FORMAT}
-                     buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
-                     bsStyle={this._isValidDateField('from') ? null : 'error'}
-                     bsSize="small"
-                     required/>
+              <DatePicker id="searchFromDatePicker"
+                          title="Search start date"
+                          date={this.state.rangeParams.get('from')}
+                          dateFormatString={momentHelper.DATE_FORMAT_TZ}
+                          onChange={this._onDateSelected('from')} >
+                <Input type="text"
+                       ref="fromFormatted"
+                       value={this._formattedDateStringInUserTZ('from')}
+                       onChange={this._rangeParamsChanged('from')}
+                       placeholder={momentHelper.DATE_FORMAT}
+                       buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
+                       bsStyle={this._isValidDateField('from') ? null : 'error'}
+                       bsSize="small"
+                       required/>
+              </DatePicker>
+
             </div>
             <div className="col-md-1">
               <p className="text-center" style={{margin: 0, lineHeight: '30px'}}>to</p>
             </div>
             <div className="col-md-5" style={{padding: 0}}>
               <Input type="hidden" name="to" ref="to"/>
-              <Input type="text"
-                     ref="toFormatted"
-                     value={this._formattedDateStringInUserTZ('to')}
-                     onChange={this._rangeParamsChanged('to')}
-                     placeholder={momentHelper.DATE_FORMAT}
-                     buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
-                     bsStyle={this._isValidDateField('to') ? null : 'error'}
-                     bsSize="small"
-                     required/>
+              <DatePicker id="searchToDatePicker"
+                          title="Search end date"
+                          date={this.state.rangeParams.get('to')}
+                          dateFormatString={momentHelper.DATE_FORMAT_TZ}
+                          onChange={this._onDateSelected('to')} >
+                <Input type="text"
+                       ref="toFormatted"
+                       value={this._formattedDateStringInUserTZ('to')}
+                       onChange={this._rangeParamsChanged('to')}
+                       placeholder={momentHelper.DATE_FORMAT}
+                       buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
+                       bsStyle={this._isValidDateField('to') ? null : 'error'}
+                       bsSize="small"
+                       required/>
+                </DatePicker>
             </div>
           </div>
         </div>

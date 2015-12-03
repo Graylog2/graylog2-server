@@ -4,7 +4,6 @@ import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
 
 import 'stylesheets/rickshaw.min.css';
-import 'stylesheets/datepicker.less';
 import 'stylesheets/chosen.bootstrap.min.css';
 import 'stylesheets/chosen-bootstrap.less';
 import 'stylesheets/jquery.gridster.min.css';
