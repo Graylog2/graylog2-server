@@ -1,20 +1,11 @@
 tmp
-.history
 dist
-/.idea
-/*.iml
-/.idea_modules
-/.classpath
-/.project
-/.settings
-.ecltarget
-
-.target
 .DS_Store
 
 .node_cache
-/node_modules
+node_modules
 sandbox.js
 npm-debug.log
-/build
+build
+node
 
