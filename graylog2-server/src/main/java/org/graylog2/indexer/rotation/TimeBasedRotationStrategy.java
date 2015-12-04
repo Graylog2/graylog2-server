@@ -17,10 +17,10 @@
 package org.graylog2.indexer.rotation;
 
 import com.google.common.base.MoreObjects;
-import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
@@ -44,23 +44,20 @@ import static org.joda.time.DateTimeFieldType.weekOfWeekyear;
 import static org.joda.time.DateTimeFieldType.year;
 
 @Singleton
-public class TimeBasedRotationStrategy implements RotationStrategy {
+public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
 
-    private final Period rotationPeriod;
     private final Indices indices;
+    private final ClusterConfigService clusterConfigService;
     private DateTime lastRotation;
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
-        this(configuration.getMaxTimePerIndex(), indices);
-    }
-
-    public TimeBasedRotationStrategy(Period rotationPeriod, Indices indices) {
-        this.rotationPeriod = rotationPeriod.normalizedStandard();
-        anchor = determineRotationPeriodAnchor(null, rotationPeriod);
-        lastRotation = null;
+    public TimeBasedRotationStrategy(Indices indices, Deflector deflector, ClusterConfigService clusterConfigService) {
+        super(deflector);
+        this.clusterConfigService = clusterConfigService;
+        this.anchor = null;
+        this.lastRotation = null;
         this.indices = indices;
     }
 
@@ -125,7 +122,15 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
 
     @Nonnull
     @Override
-    public Result shouldRotate(String index) {
+    protected Result shouldRotate(String index) {
+        final TimeBasedRotationStrategyConfig config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
+
+        if (config == null) {
+            log.warn("No rotation strategy configuration found, not running index rotation!");
+            return null;
+        }
+
+        final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
         final DateTime now = Tools.iso8601();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (lastRotation == null) {
@@ -153,7 +158,7 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
         return new SimpleResult(true, MessageFormat.format("Rotation period {0} elapsed, next rotation at {1}", rotationPeriod, anchor));
     }
 
-    private static class SimpleResult implements Result {
+    private static class SimpleResult implements AbstractRotationStrategy.Result {
         private final String message;
         private final boolean rotate;
 

@@ -16,44 +16,54 @@
  */
 package org.graylog2.indexer.rotation;
 
-import javax.inject.Inject;
-import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-public class MessageCountRotationStrategy implements RotationStrategy {
+public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
 
     private final Indices indices;
-    private int maxDocsPerIndex;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public MessageCountRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
+    public MessageCountRotationStrategy(Indices indices, Deflector deflector, ClusterConfigService clusterConfigService) {
+        super(deflector);
         this.indices = indices;
-        maxDocsPerIndex = configuration.getMaxDocsPerIndex();
+        this.clusterConfigService = clusterConfigService;
     }
 
+    @Nullable
     @Override
-    public RotationStrategy.Result shouldRotate(String index) {
+    protected AbstractRotationStrategy.Result shouldRotate(String index) {
+        final MessageCountRotationStrategyConfig config = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
+
+        if (config == null) {
+            log.warn("No rotation strategy configuration found, not running index rotation!");
+            return null;
+        }
+
         try {
             final long numberOfMessages = indices.numberOfMessages(index);
             return new Result(index,
                               numberOfMessages,
-                              maxDocsPerIndex,
-                              numberOfMessages > maxDocsPerIndex);
+                              config.maxDocsPerIndex(),
+                              numberOfMessages > config.maxDocsPerIndex());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;
         }
     }
 
-    private static class Result implements RotationStrategy.Result {
+    private static class Result implements AbstractRotationStrategy.Result {
 
         public static final MessageFormat ROTATE_FORMAT = new MessageFormat(
                 "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",

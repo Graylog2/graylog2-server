@@ -16,66 +16,67 @@
  */
 package org.graylog2.indexer.rotation;
 
-import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageCountRotationStrategyTest {
     @Mock
-    private ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
+    private ClusterConfigService clusterConfigService;
+
     @Mock
-    private Indices indices = mock(Indices.class);
+    private Deflector deflector;
+
+    @Mock
+    private Indices indices;
 
     @Test
     public void testRotate() throws IndexNotFoundException {
         when(indices.numberOfMessages("name")).thenReturn(10L);
-        when(configuration.getMaxDocsPerIndex()).thenReturn(5);
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                indices);
-        final RotationStrategy.Result rotate = strategy.shouldRotate("name");
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        assertNotNull(rotate);
-        assertEquals(true, rotate.shouldRotate());
+        strategy.rotate("name");
+        verify(deflector, times(1)).cycle();
+        reset(deflector);
     }
 
     @Test
     public void testDontRotate() throws IndexNotFoundException {
         when(indices.numberOfMessages("name")).thenReturn(1L);
-        when(configuration.getMaxDocsPerIndex()).thenReturn(5);
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                indices);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        final RotationStrategy.Result rotate = strategy.shouldRotate("name");
-
-        assertNotNull(rotate);
-        assertEquals(false, rotate.shouldRotate());
+        strategy.rotate("name");
+        verify(deflector, never()).cycle();
+        reset(deflector);
     }
 
 
     @Test
     public void testIndexUnavailable() throws IndexNotFoundException {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
-        when(configuration.getMaxDocsPerIndex()).thenReturn(5);
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                indices);
-        final RotationStrategy.Result rotate = strategy.shouldRotate("name");
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        assertNull(rotate);
+        strategy.rotate("name");
+        verify(deflector, never()).cycle();
+        reset(deflector);
     }
 }

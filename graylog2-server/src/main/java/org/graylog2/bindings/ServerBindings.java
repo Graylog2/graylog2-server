@@ -36,7 +36,6 @@ import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.bindings.providers.RotationStrategyProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
@@ -60,7 +59,6 @@ import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
@@ -116,7 +114,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
-        bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
         bind(EventBus.class).annotatedWith(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 

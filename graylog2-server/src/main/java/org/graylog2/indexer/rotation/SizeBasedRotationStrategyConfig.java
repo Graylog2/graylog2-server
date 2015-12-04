@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bindings;
 
-import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
-import org.graylog2.plugin.PluginModule;
+package org.graylog2.indexer.rotation;
 
-public class RotationStrategyBindings extends PluginModule {
-    @Override
-    protected void configure() {
-        addRotationStrategy(MessageCountRotationStrategy.class);
-        addRotationStrategy(SizeBasedRotationStrategy.class);
-        addRotationStrategy(TimeBasedRotationStrategy.class);
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+@JsonAutoDetect
+@AutoValue
+public abstract class SizeBasedRotationStrategyConfig {
+    @JsonProperty("max_size")
+    public abstract long maxSize();
+
+    @JsonCreator
+    public static SizeBasedRotationStrategyConfig create(@JsonProperty("max_size") long maxSize) {
+        return new AutoValue_SizeBasedRotationStrategyConfig(maxSize);
     }
-
 }
