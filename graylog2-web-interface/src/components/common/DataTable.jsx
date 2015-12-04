@@ -1,0 +1,128 @@
+import React from 'react';
+import { TypeAheadDataFilter } from 'components/common';
+
+const DataTableElement = React.createClass({
+  propTypes: {
+    element: React.PropTypes.any,
+    formatter: React.PropTypes.func.isRequired,
+  },
+  render() {
+    return this.props.formatter(this.props.element);
+  },
+});
+
+const DataTable = React.createClass({
+  propTypes: {
+    children: React.PropTypes.node,
+    className: React.PropTypes.string,
+    displayKey: React.PropTypes.string,
+    dataRowFormatter: React.PropTypes.func.isRequired,
+    filterBy: React.PropTypes.string,
+    filterLabel: React.PropTypes.string.isRequired,
+    filterKeys: React.PropTypes.array.isRequired,
+    filterSuggestions: React.PropTypes.string,
+    headerCellFormatter: React.PropTypes.func.isRequired,
+    headers: React.PropTypes.array.isRequired,
+    id: React.PropTypes.string,
+    rows: React.PropTypes.array.isRequired,
+    sortByKey: React.PropTypes.string,
+  },
+  getDefaultProps() {
+    return {
+      filterSuggestions: [],
+      displayKey: 'value',
+    };
+  },
+  getInitialState() {
+    return {
+      headers: this.props.headers,
+      rows: this.props.rows,
+      filteredRows: this.props.rows,
+    };
+  },
+  componentWillReceiveProps(newProps) {
+    this.setState({
+      headers: newProps.headers,
+      rows: newProps.rows,
+      filteredRows: newProps.rows,
+    });
+  },
+  getFormattedHeaders() {
+    let i = 0;
+    const formattedHeaders = this.state.headers.map((header) => {
+      i++;
+      return <DataTableElement key={'header-' + i} element={header} formatter={this.props.headerCellFormatter}/>;
+    });
+
+    return <tr>{formattedHeaders}</tr>;
+  },
+  getFormattedDataRows() {
+    let i = 0;
+    const sortedDataRows = this.state.filteredRows.sort((a, b) => {
+      return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+    });
+    const formattedDataRows = sortedDataRows.map((row) => {
+      i++;
+      return <DataTableElement key={'row-' + i} element={row} formatter={this.props.dataRowFormatter}/>;
+    });
+
+    return formattedDataRows;
+  },
+  filterDataRows(filteredRows) {
+    this.setState({filteredRows: filteredRows});
+  },
+  render() {
+    let filter;
+    if (this.props.filterKeys.length !== 0) {
+      filter = (
+        <div className="row">
+          <div className="col-md-8">
+            <TypeAheadDataFilter label={this.props.filterLabel}
+                                 data={this.state.rows}
+                                 displayKey={this.props.displayKey}
+                                 filterBy={this.props.filterBy}
+                                 filterSuggestions={this.props.filterSuggestions}
+                                 searchInKeys={this.props.filterKeys}
+                                 onDataFiltered={this.filterDataRows}/>
+          </div>
+          <div className="col-md-4">
+            {this.props.children}
+          </div>
+        </div>
+      );
+    }
+
+    let data;
+    if (this.state.rows.length === 0) {
+      data = <p>No data available.</p>;
+    } else if (this.state.filteredRows.length === 0) {
+      data = <p>Filter does not match any data.</p>;
+    } else {
+      data = (
+        <table className={'table ' + this.props.className}>
+          <thead>
+          {this.getFormattedHeaders()}
+          </thead>
+          <tbody>
+          {this.getFormattedDataRows()}
+          </tbody>
+        </table>
+      );
+    }
+
+    return (
+      <div>
+        {filter}
+        <div className="row">
+          <div className="col-md-12">
+            <div id={this.props.id} className="data-table table-responsive">
+              {data}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+});
+
+export default DataTable;

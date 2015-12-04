@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+NODE_CACHE="$(pwd)/.node_cache"
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+function clean_up() {
+  rm -rf node_modules
+}
+
+function prepare_cache() {
+  mkdir $NODE_CACHE
+}
+
+function install_modules() {
+  npm install
+  mv node_modules "$NODE_CACHE/$current_branch"
+  promote_module
+}
+
+function promote_module() {
+  ln -s "$NODE_CACHE/$current_branch" node_modules
+}
+
+if [[ ! -f 'package.json' ]]; then
+  echo "Error: this program should be run at the same level as your package.json file"
+  exit 1
+fi
+
+clean_up
+if [[ -d $NODE_CACHE ]]; then
+  if [[ -d "$NODE_CACHE/$current_branch" ]]; then
+    promote_module
+  else
+    install_modules
+  fi
+else
+  prepare_cache
+  install_modules
+fi
+exit 0
+

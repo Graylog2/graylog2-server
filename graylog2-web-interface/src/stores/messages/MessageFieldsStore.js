@@ -1,0 +1,37 @@
+import Reflux from 'reflux';
+import md5 from 'md5';
+
+import UserNotification from 'util/UserNotification';
+import URLUtils from 'util/URLUtils';
+import jsRoutes from 'routing/jsRoutes';
+import fetch from 'logic/rest/FetchProvider';
+
+const MessageFieldsStore = Reflux.createStore({
+  listenables: [],
+  fields: undefined,
+
+  init() {
+    this.list();
+  },
+  getInitialState() {
+    return {fields: this.fields};
+  },
+  list() {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MessageFieldsApiController.list().url);
+    const promise = fetch('GET', url).then((response) => {
+      const result = response.fields.map((field) => {
+        return {
+          hash: md5(field),
+          name: field,
+          standard_selected: (field === 'message' || field === 'source'),
+        };
+      });
+      this.fields = result;
+      this.trigger(this.getInitialState());
+      return result;
+    });
+    return promise;
+  },
+});
+
+export default MessageFieldsStore;
