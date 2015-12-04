@@ -365,6 +365,9 @@
                 <directory>${webInterface.path}/build</directory>
                 <targetPath>web-interface/assets</targetPath>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
         </resources>
         <plugins>
             <plugin>
