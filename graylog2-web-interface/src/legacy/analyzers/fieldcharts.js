@@ -257,12 +257,13 @@ export const FieldChart = {
     },
 
     _onFieldHistogramFail($graphElement, opts, error) {
-        if (error.status === 400) {
+        if (error.additional && error.additional.status === 400) {
             sendFailureEvent(opts.chartid, "Field graphs are only available for numeric fields.");
         } else {
             var alert = $('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
-            $graphElement.append(alert);
-            UserNotification.error("Loading field graph for '" + opts.field + "' failed with status: " + error.status);
+            $graphElement.html(alert);
+            const errorMessage = (error.additional ? ` with status ${error.additional.status}` : ` with error: ${error.message}`);
+            UserNotification.error(`Loading field graph for '${opts.field}' failed ${errorMessage}`);
             console.error(error);
         }
     },
