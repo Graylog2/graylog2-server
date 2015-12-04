@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, ButtonGroup, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
+import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
 import numeral from 'numeral';
 
 import Widget from 'components/widgets/Widget';
@@ -9,59 +9,7 @@ import SearchStore from 'stores/search/SearchStore';
 import { SavedSearchControls, ShowQueryModal } from 'components/search';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-
-const MessageField = React.createClass({
-  propTypes: {
-    field: React.PropTypes.object,
-    onFieldSelectedForGraph: React.PropTypes.func.isRequired,
-    onFieldSelectedForQuickValues: React.PropTypes.func.isRequired,
-    onFieldSelectedForStats: React.PropTypes.func.isRequired,
-    onToggled: React.PropTypes.func,
-    selected: React.PropTypes.bool,
-  },
-  getInitialState() {
-    return {
-      showActions: false,
-    };
-  },
-  _toggleShowActions() {
-    this.setState({showActions: !this.state.showActions});
-  },
-  render() {
-    let toggleClassName = 'fa fa-fw open-analyze-field ';
-    toggleClassName += this.state.showActions ? 'open-analyze-field-active fa-caret-down' : 'fa-caret-right';
-
-    return (
-      <li>
-        <div className="pull-left">
-          <i className={toggleClassName}
-             onClick={this._toggleShowActions}></i>
-        </div>
-        <div style={{marginLeft: 25}}>
-          <Input type="checkbox"
-                 label={this.props.field.name}
-                 checked={this.props.selected}
-                 onChange={() => this.props.onToggled(this.props.field.name)}/>
-
-          {this.state.showActions &&
-          <div className="analyze-field">
-            <ButtonGroup bsSize="xsmall">
-              <Button onClick={() => this.props.onFieldSelectedForStats(this.props.field.name)}>
-                Statistics
-              </Button>
-              <Button onClick={() => this.props.onFieldSelectedForQuickValues(this.props.field.name)}>
-                Quick values
-              </Button>
-              <Button onClick={() => this.props.onFieldSelectedForGraph(this.props.field.name)}>
-                Generate chart
-              </Button>
-            </ButtonGroup>
-          </div>}
-        </div>
-      </li>
-    );
-  },
-});
+import SidebarMessageField from './SidebarMessageField';
 
 let resizeMutex;
 
@@ -189,13 +137,13 @@ const SearchSidebar = React.createClass({
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((field) => {
         return (
-          <MessageField key={field.name}
-                        field={field}
-                        onToggled={this.props.onFieldToggled}
-                        onFieldSelectedForGraph={this.props.onFieldSelectedForGraph}
-                        onFieldSelectedForQuickValues={this.props.onFieldSelectedForQuickValues}
-                        onFieldSelectedForStats={this.props.onFieldSelectedForStats}
-                        selected={this.props.selectedFields.contains(field.name)}/>
+          <SidebarMessageField key={field.name}
+                               field={field}
+                               onToggled={this.props.onFieldToggled}
+                               onFieldSelectedForGraph={this.props.onFieldSelectedForGraph}
+                               onFieldSelectedForQuickValues={this.props.onFieldSelectedForQuickValues}
+                               onFieldSelectedForStats={this.props.onFieldSelectedForStats}
+                               selected={this.props.selectedFields.contains(field.name)}/>
         );
       });
     let searchTitle = null;
