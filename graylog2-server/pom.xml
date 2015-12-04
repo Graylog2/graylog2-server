@@ -43,6 +43,7 @@
 
     <properties>
         <mainClass>org.graylog2.bootstrap.Main</mainClass>
+        <webInterface.path>../graylog2-web-interface</webInterface.path>
     </properties>
 
     <dependencies>
@@ -359,7 +360,65 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${webInterface.path}/build</directory>
+                <targetPath>web-interface/assets</targetPath>
+            </resource>
+        </resources>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <id>exec-npm-install</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <workingDirectory>${webInterface.path}</workingDirectory>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>install</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>exec-npm-run-build</id>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <workingDirectory>${webInterface.path}</workingDirectory>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${webInterface.path}</directory>
+                            <includes>
+                                <include>build/**/*</include>
+                                <include>node_modules/**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
