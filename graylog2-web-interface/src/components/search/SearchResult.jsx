@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 
 import SearchSidebar from './SearchSidebar';
@@ -17,11 +16,6 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import SearchStore from 'stores/search/SearchStore';
 import DocsHelper from 'util/DocsHelper';
-
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap.min.js');
-
-let resizeMutex;
 
 const SearchResult = React.createClass({
   propTypes: {
@@ -44,7 +38,6 @@ const SearchResult = React.createClass({
       sortField: SearchStore.sortField,
       sortOrder: SearchStore.sortOrder,
       showAllFields: false,
-      currentSidebarWidth: null,
       shouldHighlight: true,
       currentPage: SearchStore.page,
     };
@@ -63,14 +56,7 @@ const SearchResult = React.createClass({
   },
 
   componentDidMount() {
-    this._updateWidth();
-    this._initializeAffix();
     DashboardsStore.updateWritableDashboards();
-    $(window).on('resize', this._resizeCallback);
-  },
-
-  componentWillUnmount() {
-    $(window).off('resize', this._resizeCallback);
   },
 
   onFieldToggled(fieldName) {
@@ -128,31 +114,12 @@ const SearchResult = React.createClass({
   addFieldStatistics(field) {
     this.refs.fieldStatisticsComponent.addFieldStatistics(field);
   },
-
-  _initializeAffix() {
-    $(ReactDOM.findDOMNode(this.refs.oma)).affix({
-      offset: {top: 111},
-    });
-  },
-  _resizeCallback() {
-    // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
-    clearTimeout(resizeMutex);
-    resizeMutex = setTimeout(() => this._updateWidth(), 100);
-  },
-  _updateWidth() {
-    const node = ReactDOM.findDOMNode(this.refs.opa);
-    this.setState({currentSidebarWidth: $(node).width()});
-  },
   _showQueryModal(event) {
     event.preventDefault();
     this.refs.showQueryModal.open();
   },
 
   render() {
-    let style = {};
-    if (this.state.currentSidebarWidth) {
-      style = {width: this.state.currentSidebarWidth};
-    }
     const anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
     // short circuit if the result turned up empty
@@ -210,26 +177,24 @@ const SearchResult = React.createClass({
     return (
       <div id="main-content-search" className="row">
         <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
-          <div ref="oma" id="sidebar-affix" style={style}>
-            <SearchSidebar result={this.props.result}
-                           builtQuery={this.props.builtQuery}
-                           selectedFields={this.state.selectedFields}
-                           fields={this._fields()}
-                           showAllFields={this.state.showAllFields}
-                           togglePageFields={this.togglePageFields}
-                           onFieldToggled={this.onFieldToggled}
-                           onFieldSelectedForGraph={this.addFieldGraph}
-                           onFieldSelectedForQuickValues={this.addFieldQuickValues}
-                           onFieldSelectedForStats={this.addFieldStatistics}
-                           predefinedFieldSelection={this.predefinedFieldSelection}
-                           showHighlightToggle={anyHighlightRanges}
-                           shouldHighlight={this.state.shouldHighlight}
-                           toggleShouldHighlight={() => this.setState({shouldHighlight: !this.state.shouldHighlight})}
-                           currentSavedSearch={SearchStore.savedSearch}
-                           searchInStream={this.props.searchInStream}
-                           permissions={this.props.permissions}
-            />
-          </div>
+          <SearchSidebar result={this.props.result}
+                         builtQuery={this.props.builtQuery}
+                         selectedFields={this.state.selectedFields}
+                         fields={this._fields()}
+                         showAllFields={this.state.showAllFields}
+                         togglePageFields={this.togglePageFields}
+                         onFieldToggled={this.onFieldToggled}
+                         onFieldSelectedForGraph={this.addFieldGraph}
+                         onFieldSelectedForQuickValues={this.addFieldQuickValues}
+                         onFieldSelectedForStats={this.addFieldStatistics}
+                         predefinedFieldSelection={this.predefinedFieldSelection}
+                         showHighlightToggle={anyHighlightRanges}
+                         shouldHighlight={this.state.shouldHighlight}
+                         toggleShouldHighlight={() => this.setState({shouldHighlight: !this.state.shouldHighlight})}
+                         currentSavedSearch={SearchStore.savedSearch}
+                         searchInStream={this.props.searchInStream}
+                         permissions={this.props.permissions}
+          />
         </div>
         <div className="col-md-9 col-sm-12" id="main-content-sidebar">
           <FieldStatistics ref="fieldStatisticsComponent"
