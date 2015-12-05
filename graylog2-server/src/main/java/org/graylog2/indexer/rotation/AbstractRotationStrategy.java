@@ -18,6 +18,7 @@
 package org.graylog2.indexer.rotation;
 
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,15 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     protected abstract Result shouldRotate(String indexName);
 
     @Override
-    public void rotate(String indexName) {
+    public void rotate() {
+        final String indexName;
+        try {
+            indexName = deflector.getNewestTargetName();
+        } catch (NoTargetIndexException e) {
+            LOG.error("Could not find current deflector target. Aborting.", e);
+            return;
+        }
+
         final Result rotate = shouldRotate(indexName);
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");

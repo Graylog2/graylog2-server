@@ -109,7 +109,7 @@ public class TimeBasedRotationStrategyTest {
     }
 
     @Test
-    public void shouldRotateHourly() {
+    public void shouldRotateHourly() throws Exception {
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
         final Period period = Period.hours(1);
 
@@ -117,32 +117,33 @@ public class TimeBasedRotationStrategyTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
 
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
         final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
         // Should not rotate the first index.
-        hourlyRotation.rotate("ignored");
+        hourlyRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
 
         clock.tick(seconds(2));
 
         // Crossed rotation period.
-        hourlyRotation.rotate("ignored");
+        hourlyRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
 
         clock.tick(seconds(2));
 
         // Did not cross rotation period.
-        hourlyRotation.rotate("ignored");
+        hourlyRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }
 
     @Test
-    public void shouldRotateNonIntegralPeriod() {
+    public void shouldRotateNonIntegralPeriod() throws Exception {
         // start 5 minutes before full hour
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 55, 0, 0, DateTimeZone.UTC);
         final Period period = Period.minutes(10);
@@ -150,13 +151,14 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
         final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
-        tenMinRotation.rotate("ignored");
+        tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
 
@@ -164,7 +166,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(seconds(1));
 
         // Did not cross rotation period.
-        tenMinRotation.rotate("ignored");
+        tenMinRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
 
@@ -172,7 +174,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(minutes(4).withSeconds(59));
 
         // Crossed rotation period.
-        tenMinRotation.rotate("ignored");
+        tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
 
@@ -181,14 +183,14 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(minutes(51));
 
         // Crossed multiple rotation periods.
-        tenMinRotation.rotate("ignored");
+        tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
 
         // move time to 2:52:00
         // this should not cycle again, because next valid rotation time is 3:00:00
         clock.tick(minutes(1));
-        tenMinRotation.rotate("ignored");
+        tenMinRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }

@@ -59,7 +59,7 @@ public class IndexRotationThreadTest {
             public RotationStrategy get() {
                 return new RotationStrategy() {
                     @Override
-                    public void rotate(String indexName) {
+                    public void rotate() {
 
                     }
                 };
@@ -90,7 +90,7 @@ public class IndexRotationThreadTest {
             public RotationStrategy get() {
                 return new RotationStrategy() {
                     @Override
-                    public void rotate(String indexName) {
+                    public void rotate() {
                         deflector.cycle();
                     }
                 };
@@ -114,7 +114,6 @@ public class IndexRotationThreadTest {
         rotationThread.checkForRotation();
 
         verify(deflector, times(1)).cycle();
-        verify(deflector, times(1)).getNewestTargetName();
     }
 
     @Test
@@ -124,7 +123,7 @@ public class IndexRotationThreadTest {
             public RotationStrategy get() {
                 return new RotationStrategy() {
                     @Override
-                    public void rotate(String indexName) {
+                    public void rotate() {
 
                     }
                 };
@@ -148,7 +147,6 @@ public class IndexRotationThreadTest {
         rotationThread.checkForRotation();
 
         verify(deflector, never()).cycle();
-        verify(deflector, times(1)).getNewestTargetName();
     }
 
     @Test

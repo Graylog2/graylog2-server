@@ -44,38 +44,41 @@ public class MessageCountRotationStrategyTest {
     private Indices indices;
 
     @Test
-    public void testRotate() throws IndexNotFoundException {
+    public void testRotate() throws Exception {
         when(indices.numberOfMessages("name")).thenReturn(10L);
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
     }
 
     @Test
-    public void testDontRotate() throws IndexNotFoundException {
+    public void testDontRotate() throws Exception {
         when(indices.numberOfMessages("name")).thenReturn(1L);
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }
 
 
     @Test
-    public void testIndexUnavailable() throws IndexNotFoundException {
+    public void testIndexUnavailable() throws Exception {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }

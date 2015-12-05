@@ -23,5 +23,5 @@
 package org.graylog2.plugin.indexer.rotation;
 
 public interface RotationStrategy {
-    void rotate(String indexName);
+    void rotate();
 }

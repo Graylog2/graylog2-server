@@ -106,15 +106,7 @@ public class IndexRotationThread extends Periodical {
             return;
         }
 
-        String currentTarget;
-        try {
-            currentTarget = deflector.getNewestTargetName();
-        } catch (NoTargetIndexException e) {
-            LOG.error("Could not find current deflector target. Aborting.", e);
-            return;
-        }
-
-        rotationStrategy.rotate(currentTarget);
+        rotationStrategy.rotate();
     }
 
     protected void checkAndRepair() {

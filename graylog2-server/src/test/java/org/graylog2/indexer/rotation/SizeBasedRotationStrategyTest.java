@@ -20,7 +20,6 @@ import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.index.store.StoreStats;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -49,47 +48,50 @@ public class SizeBasedRotationStrategyTest {
     private Indices indices;
 
     @Test
-    public void testRotate() throws IndexNotFoundException {
+    public void testRotate() throws Exception {
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
     }
 
 
     @Test
-    public void testDontRotate() throws IndexNotFoundException {
+    public void testDontRotate() throws Exception {
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }
 
 
     @Test
-    public void testRotateFailed() throws IndexNotFoundException {
+    public void testRotateFailed() throws Exception {
         when(indices.getIndexStats("name")).thenReturn(null);
+        when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
-        strategy.rotate("name");
+        strategy.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
     }
