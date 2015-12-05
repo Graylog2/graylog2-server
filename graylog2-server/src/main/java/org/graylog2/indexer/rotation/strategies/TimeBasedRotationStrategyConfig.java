@@ -15,7 +15,7 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.indexer.rotation;
+package org.graylog2.indexer.rotation.strategies;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;

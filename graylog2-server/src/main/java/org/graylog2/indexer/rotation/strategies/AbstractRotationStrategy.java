@@ -15,7 +15,7 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.indexer.rotation;
+package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractRotationStrategy implements RotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRotationStrategy.class);
 
-    interface Result {
+    public interface Result {
         String getDescription();
         boolean shouldRotate();
     }

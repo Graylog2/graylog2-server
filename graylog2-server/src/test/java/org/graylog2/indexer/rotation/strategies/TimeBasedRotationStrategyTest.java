@@ -14,7 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.rotation;
+
+package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;

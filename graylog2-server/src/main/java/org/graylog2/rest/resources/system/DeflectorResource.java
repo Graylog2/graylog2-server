@@ -27,9 +27,9 @@ import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyRespon
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 import org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse;

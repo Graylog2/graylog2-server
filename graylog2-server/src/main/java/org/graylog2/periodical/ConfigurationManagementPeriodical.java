@@ -19,12 +19,12 @@ package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.management.IndexManagementConfig;
-import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.MessageCountRotationStrategyConfig;
-import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.SizeBasedRotationStrategyConfig;
-import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
