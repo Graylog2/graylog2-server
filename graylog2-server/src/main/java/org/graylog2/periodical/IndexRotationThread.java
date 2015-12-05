@@ -92,7 +92,14 @@ public class IndexRotationThread extends Periodical {
             return;
         }
 
-        final RotationStrategy rotationStrategy = rotationStrategyMap.get(config.rotationStrategy()).get();
+        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategy());
+
+        if (rotationStrategyProvider == null) {
+            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategy());
+            return;
+        }
+
+        final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
 
         if (rotationStrategy == null) {
             LOG.warn("No rotation strategy found, not running index rotation!");
