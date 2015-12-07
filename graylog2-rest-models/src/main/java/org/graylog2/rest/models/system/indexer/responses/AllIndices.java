@@ -21,16 +21,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.Map;
-
-@JsonAutoDetect
 @AutoValue
-public abstract class AllIndicesInfo {
-    @JsonProperty
-    public abstract Map<String, IndexInfo> indices();
+@JsonAutoDetect
+public abstract class AllIndices {
+    @JsonProperty("closed")
+    public abstract ClosedIndices closed();
+
+    @JsonProperty("reopened")
+    public abstract ClosedIndices reopened();
+
+    @JsonProperty("all")
+    public abstract OpenIndicesInfo all();
 
     @JsonCreator
-    public static AllIndicesInfo create(@JsonProperty("indices") Map<String, IndexInfo> indices) {
-        return new AutoValue_AllIndicesInfo(indices);
+    public static AllIndices create(@JsonProperty("closed") ClosedIndices closed,
+                                    @JsonProperty("reopened") ClosedIndices reopened,
+                                    @JsonProperty("all") OpenIndicesInfo all) {
+        return new AutoValue_AllIndices(closed, reopened, all);
     }
 }

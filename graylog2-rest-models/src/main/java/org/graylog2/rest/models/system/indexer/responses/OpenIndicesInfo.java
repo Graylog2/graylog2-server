@@ -14,30 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.deflector.responses;
+package org.graylog2.rest.models.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 
-@AutoValue
+import java.util.Map;
+
 @JsonAutoDetect
-public abstract class DeflectorSummary {
-    @JsonProperty("is_up")
-    public abstract boolean isUp();
-
-    @JsonProperty("current_target")
-    public abstract String currentTarget();
-
-    @JsonProperty("config")
-    public abstract DeflectorConfigResponse config();
+@AutoValue
+public abstract class OpenIndicesInfo {
+    @JsonProperty
+    public abstract Map<String, IndexInfo> indices();
 
     @JsonCreator
-    public static DeflectorSummary create(@JsonProperty("is_up") boolean isUp,
-                                          @JsonProperty("current_target") String currentTarget,
-                                          @JsonProperty("config") DeflectorConfigResponse config) {
-        return new AutoValue_DeflectorSummary(isUp, currentTarget, config);
+    public static OpenIndicesInfo create(@JsonProperty("indices") Map<String, IndexInfo> indices) {
+        return new AutoValue_OpenIndicesInfo(indices);
     }
 }
