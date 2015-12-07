@@ -10,7 +10,7 @@ const FieldGraphs = React.createClass({
     from: PropTypes.any.isRequired,
     to: PropTypes.any.isRequired,
     resolution: PropTypes.any.isRequired,
-    searchInStream: PropTypes.bool,
+    searchInStream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   getInitialState() {
