@@ -32,8 +32,8 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.rest.models.system.indexer.responses.AllIndicesInfo;
-import org.graylog2.rest.models.system.indexer.responses.BulkIndices;
+import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
+import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
@@ -105,10 +105,10 @@ public class IndicesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get information of all indices managed by Graylog and their shards.")
+    @ApiOperation(value = "Get information of all open indices managed by Graylog and their shards.")
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public AllIndicesInfo all() {
+    public OpenIndicesInfo open() {
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats();
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
@@ -127,7 +127,7 @@ public class IndicesResource extends RestResource {
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
 
-        return AllIndicesInfo.create(indexInfos);
+        return OpenIndicesInfo.create(indexInfos);
     }
 
     @GET
@@ -179,8 +179,8 @@ public class IndicesResource extends RestResource {
     @Path("/all")
     @ApiOperation(value = "List all open, closed and reopened indices.")
     @Produces(MediaType.APPLICATION_JSON)
-    public BulkIndices bulk() {
-        return BulkIndices.create(this.closed(), this.reopened(), this.all());
+    public AllIndices all() {
+        return AllIndices.create(this.closed(), this.reopened(), this.open());
     }
 
 

@@ -25,12 +25,12 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class AllIndicesInfo {
+public abstract class OpenIndicesInfo {
     @JsonProperty
     public abstract Map<String, IndexInfo> indices();
 
     @JsonCreator
-    public static AllIndicesInfo create(@JsonProperty("indices") Map<String, IndexInfo> indices) {
-        return new AutoValue_AllIndicesInfo(indices);
+    public static OpenIndicesInfo create(@JsonProperty("indices") Map<String, IndexInfo> indices) {
+        return new AutoValue_OpenIndicesInfo(indices);
     }
 }

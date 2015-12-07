@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class BulkIndices {
+public abstract class AllIndices {
     @JsonProperty("closed")
     public abstract ClosedIndices closed();
 
@@ -31,12 +31,12 @@ public abstract class BulkIndices {
     public abstract ClosedIndices reopened();
 
     @JsonProperty("all")
-    public abstract AllIndicesInfo all();
+    public abstract OpenIndicesInfo all();
 
     @JsonCreator
-    public static BulkIndices create(@JsonProperty("closed") ClosedIndices closed,
-                                     @JsonProperty("reopened") ClosedIndices reopened,
-                                     @JsonProperty("all") AllIndicesInfo all) {
-        return new AutoValue_BulkIndices(closed, reopened, all);
+    public static AllIndices create(@JsonProperty("closed") ClosedIndices closed,
+                                    @JsonProperty("reopened") ClosedIndices reopened,
+                                    @JsonProperty("all") OpenIndicesInfo all) {
+        return new AutoValue_AllIndices(closed, reopened, all);
     }
 }
