@@ -20,7 +20,7 @@ const IndicesStore = Reflux.createStore({
     return { indices: this.indices, closedIndices: this.closedIndices };
   },
   list() {
-    const urlList = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.list().url);
+    const urlList = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.listOpen().url);
     const promiseList = fetch('GET', urlList).then((response) => {
       this.indices = response.indices;
       return { indices: response.indices };
