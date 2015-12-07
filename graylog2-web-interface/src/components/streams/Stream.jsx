@@ -68,7 +68,7 @@ const Stream = React.createClass({
     return (
       <li className="stream">
         <h2>
-          <LinkContainer to={Routes.stream_search(stream.id, "*", 'relative', 300)}>
+          <LinkContainer to={Routes.stream_search(stream.id)}>
             <a>{stream.title}</a>
           </LinkContainer>
 
