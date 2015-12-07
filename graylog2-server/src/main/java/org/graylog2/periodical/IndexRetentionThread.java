@@ -16,22 +16,20 @@
  */
 package org.graylog2.periodical;
 
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.retention.RetentionStrategyFactory;
+import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Map;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -43,6 +41,8 @@ public class IndexRetentionThread extends Periodical {
     private final Deflector deflector;
     private final Cluster cluster;
     private final ActivityWriter activityWriter;
+    private final ClusterConfigService clusterConfigService;
+    private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
     private final Indices indices;
 
     @Inject
@@ -50,12 +50,16 @@ public class IndexRetentionThread extends Periodical {
                                 Deflector deflector,
                                 Indices indices,
                                 Cluster cluster,
-                                ActivityWriter activityWriter) {
+                                ActivityWriter activityWriter,
+                                ClusterConfigService clusterConfigService,
+                                Map<String, Provider<RetentionStrategy>> retentionStrategyMap) {
         this.configuration = configuration;
         this.deflector = deflector;
         this.indices = indices;
         this.cluster = cluster;
         this.activityWriter = activityWriter;
+        this.clusterConfigService = clusterConfigService;
+        this.retentionStrategyMap = retentionStrategyMap;
     }
 
     @Override
@@ -65,67 +69,28 @@ public class IndexRetentionThread extends Periodical {
             return;
         }
 
-        final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
-        final int indexCount = deflectorIndices.size();
-        final int maxIndices = configuration.getMaxNumberOfIndices();
+        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
 
-        // Do we have more indices than the configured maximum?
-        if (indexCount <= maxIndices) {
-            LOG.debug("Number of indices ({}) lower than limit ({}). Not performing any retention actions.",
-                    indexCount, maxIndices);
+        if (config == null) {
+            LOG.warn("No index management configuration found, not running index retention!");
             return;
         }
 
-        // We have more indices than the configured maximum! Remove as many as needed.
-        final int removeCount = indexCount - maxIndices;
-        final String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). " +
-                "Running retention for " + removeCount + " indices.";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+        final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategy());
 
-        try {
-            runRetention(
-                    RetentionStrategyFactory.fromString(configuration.getRetentionStrategy(), indices),
-                    deflectorIndices,
-                    removeCount
-            );
-        } catch (RetentionStrategyFactory.NoSuchStrategyException e) {
-            LOG.error("Could not run index retention. No such strategy.", e);
-        } catch (NoTargetIndexException e) {
-            LOG.error("Could not run index retention. No target index.", e);
+        if (retentionStrategyProvider == null) {
+            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.retentionStrategy());
+            return;
         }
+
+        final RetentionStrategy retentionStrategy = retentionStrategyProvider.get();
+
+        retentionStrategy.retain();
     }
 
     @Override
     protected Logger getLogger() {
         return LOG;
-    }
-
-    public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> deflectorIndices, int removeCount) throws NoTargetIndexException {
-        for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
-            // Never run against the current deflector target.
-            if (indexName.equals(deflector.getCurrentActualTargetIndex())) {
-                LOG.info("Not running retention against current deflector target <{}>.", indexName);
-                continue;
-            }
-
-            /*
-             * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
-             * attribute and we can check for that here.
-             */
-            if (indices.isReopened(indexName)) {
-                LOG.info("Not running retention against reopened index <{}>.", indexName);
-                continue;
-            }
-
-            final String msg = "Running retention strategy [" + strategy.getClass().getCanonicalName() + "] " +
-                    "for index <" + indexName + ">";
-            LOG.info(msg);
-            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
-
-            // Sorry if this should ever go mad. Run retention strategy!
-            strategy.runStrategy(indexName);
-        }
     }
 
     @Override

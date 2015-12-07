@@ -22,55 +22,8 @@
  */
 package org.graylog2.plugin.indexer.retention;
 
-import com.google.common.base.Stopwatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface RetentionStrategy {
+    void retain();
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public abstract class RetentionStrategy {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategy.class);
-    private final IndexManagement indexManagement;
-
-    public enum Type {
-        DELETE,
-        CLOSE
-    }
-
-    protected RetentionStrategy(IndexManagement indexManagement) {
-        this.indexManagement = indexManagement;
-    }
-
-    protected abstract void onMessage(Map<String, String> message);
-    protected abstract boolean iterates();
-    protected abstract Type getType();
-
-    public void runStrategy(String indexName) {
-        Stopwatch sw = Stopwatch.createStarted();
-
-        if (iterates()) {
-            // TODO: Run per message.
-        }
-
-        // Delete or close index.
-        switch (getType()) {
-            case DELETE:
-                LOG.info("Strategy is deleting.");
-                indexManagement.delete(indexName);
-                break;
-            case CLOSE:
-                LOG.info("Strategy is closing.");
-                indexManagement.close(indexName);
-                break;
-        }
-
-        LOG.info("Finished index retention strategy [" + this.getClass().getCanonicalName() + "] for " +
-                "index <{}> in {}ms.", indexName, sw.stop().elapsed(TimeUnit.MILLISECONDS));
-    }
-
+    Class<?> configurationClass();
 }

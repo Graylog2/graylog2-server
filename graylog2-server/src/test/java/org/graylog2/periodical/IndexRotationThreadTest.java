@@ -70,7 +70,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -106,7 +106,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -143,7 +143,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -167,7 +167,7 @@ public class IndexRotationThreadTest {
         final Provider<RotationStrategy> provider = mock(Provider.class);
         when(cluster.isConnected()).thenReturn(false);
         when(cluster.isHealthy()).thenReturn(false);
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,

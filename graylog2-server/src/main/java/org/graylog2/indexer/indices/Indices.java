@@ -77,7 +77,6 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
-import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -95,7 +94,7 @@ import java.util.concurrent.TimeUnit;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 @Singleton
-public class Indices implements IndexManagement {
+public class Indices {
 
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
 

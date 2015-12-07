@@ -14,29 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.indexer.retention;
 
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.plugin.indexer.retention.IndexManagement;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.plugin.PluginModule;
 
-public class RetentionStrategyFactory {
-
-    public static RetentionStrategy fromString(String retentionStrategy, IndexManagement indexManagement) throws NoSuchStrategyException {
-        if (retentionStrategy.equals("delete")) {
-            return new DeletionRetentionStrategy(indexManagement);
-        } else if (retentionStrategy.equals("close")) {
-            return new ClosingRetentionStrategy(indexManagement);
-        }
-
-        throw new NoSuchStrategyException("No such retention strategy [" + retentionStrategy + "]");
+public class RetentionStrategyBindings extends PluginModule {
+    @Override
+    protected void configure() {
+        addRetentionStrategy(DeletionRetentionStrategy.class);
+        addRetentionStrategy(ClosingRetentionStrategy.class);
     }
-
-    public static class NoSuchStrategyException extends Exception {
-        public NoSuchStrategyException(String s) {
-            super(s);
-        }
-    }
-
 }
