@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
 import moment from 'moment';
 
@@ -21,6 +20,10 @@ import { Spinner } from 'components/common';
 import { SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
+  propTypes: {
+    location: PropTypes.object.isRequired,
+    searchInStream: PropTypes.object,
+  },
   getInitialState() {
     return {
       selectedFields: ['message', 'source'],
@@ -29,12 +32,13 @@ const SearchPage = React.createClass({
   mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore), Reflux.connect(CurrentUserStore), Reflux.listenTo(InputsStore, '_formatInputs')],
   componentDidMount() {
     const query = SearchStore.query.length > 0 ? SearchStore.query : '*';
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS()).then((response) => {
+    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
       this.setState({searchResult: response});
 
       const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval).then((histogram) => {
+      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
         this.setState({histogram: histogram});
       });
     });
@@ -129,7 +133,7 @@ const SearchPage = React.createClass({
                     result={searchResult} histogram={this.state.histogram}
                     formattedHistogram={this._formatHistogram(this.state.histogram.results)}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                    searchInStream={null} permissions={this.state.currentUser.permissions} />
+                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions} />
     );
   },
 });

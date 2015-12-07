@@ -150,18 +150,29 @@ const jsRoutes = {
         substringTest: () => { return {url: '/tools/substring_tester'};},
       },
       UniversalSearchApiController: {
-        search: (type, query, timerange, limit) => {
-          let url = `/search/universal/${type}?query=${query}&${timerange}`;
+        _streamFilter: (streamId) => {
+          return (streamId ? `&filter=streams:${streamId}` : '');
+        },
+        search(type, query, timerange, streamId, limit) {
+          let url = `/search/universal/${type}?query=${query}&${timerange}${this._streamFilter(streamId)}`;
           if (limit) {
             url += `&limit=${limit}`;
           }
 
           return {url: url};
         },
-        histogram: (type, query, interval, timerange) => { return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}`}; },
-        fieldHistogram: (type, query, field, resolution, timerange) => { return {url: `/search/universal/${type}/fieldhistogram?query=${query}&interval=${resolution}&field=${field}&${timerange}`}; },
-        fieldStats: (type, query, field, timerange) => { return {url: `/search/universal/${type}/stats?query=${query}&field=${field}&${timerange}`}; },
-        fieldTerms: (type, query, field, timerange) => { return {url: `/search/universal/${type}/terms?query=${query}&field=${field}&${timerange}`}; },
+        histogram(type, query, interval, timerange, streamId) {
+          return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}${this._streamFilter(streamId)}`};
+        },
+        fieldHistogram(type, query, field, resolution, timerange, streamId) {
+          return {url: `/search/universal/${type}/fieldhistogram?query=${query}&interval=${resolution}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+        },
+        fieldStats(type, query, field, timerange, streamId) {
+          return {url: `/search/universal/${type}/stats?query=${query}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+        },
+        fieldTerms(type, query, field, timerange, streamId) {
+          return {url: `/search/universal/${type}/terms?query=${query}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+        },
       },
       UsageStatsApiController: {
         pluginEnabled: () => { return {url: '/plugins/org.graylog.plugins.usagestatistics/config'}; },

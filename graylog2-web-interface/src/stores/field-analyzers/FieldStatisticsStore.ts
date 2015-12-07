@@ -44,7 +44,8 @@ const FieldStatisticsStore = {
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,
-            Qs.stringify(timerange)
+            Qs.stringify(timerange),
+            streamId
         ).url;
 
         url = URLUtils.qualifyUrl(url);

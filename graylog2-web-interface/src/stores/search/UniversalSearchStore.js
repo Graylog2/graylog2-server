@@ -12,9 +12,9 @@ import fetch from 'logic/rest/FetchProvider';
 const UniversalSearchStore = Reflux.createStore({
   listenables: [],
 
-  search(type, query, timerange, limit) {
+  search(type, query, timerange, streamId, limit) {
     const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams, limit).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams, streamId, limit).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
@@ -47,9 +47,9 @@ const UniversalSearchStore = Reflux.createStore({
       return result;
     });
   },
-  histogram(type, query, timerange, interval) {
+  histogram(type, query, timerange, interval, streamId) {
     const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;

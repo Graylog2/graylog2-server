@@ -126,7 +126,7 @@ const SearchResult = React.createClass({
     if (this.props.result.total_results === 0) {
       let streamDescription = null;
       if (this.props.searchInStream) {
-        streamDescription = 'in stream ' + this.props.searchInStream.title;
+        streamDescription = <span>in stream <em>{this.props.searchInStream.title}</em></span>;
       }
       return (
         <div>

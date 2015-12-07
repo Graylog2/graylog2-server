@@ -314,8 +314,8 @@ export const FieldChart = {
           opts.query || '*',
           opts.field,
           opts.interval,
-          Qs.stringify(timeRangeParams)
-          //opts.streamid,
+          Qs.stringify(timeRangeParams),
+          opts.streamid
         ).url;
 
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
