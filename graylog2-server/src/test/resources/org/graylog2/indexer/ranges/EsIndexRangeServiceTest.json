@@ -199,7 +199,6 @@
         },
         {
           "data": {
-            "_id": "graylog_1",
             "gl2_index_range_index_name": "graylog_1",
             "gl2_index_range_calculated_at": "2015-01-01T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-01T00:00:00.000Z",
@@ -220,7 +219,6 @@
         },
         {
           "data": {
-            "_id": "graylog_2",
             "gl2_index_range_index_name": "graylog_2",
             "gl2_index_range_calculated_at": "2015-01-02T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-03T00:00:00.000Z",
@@ -241,7 +239,6 @@
         },
         {
           "data": {
-            "_id": "ignored",
             "gl2_index_range_index_name": "ignored",
             "gl2_index_range_calculated_at": "2015-01-01T00:00:00.000Z",
             "gl2_index_range_begin": "2015-01-01T00:00:00.000Z",

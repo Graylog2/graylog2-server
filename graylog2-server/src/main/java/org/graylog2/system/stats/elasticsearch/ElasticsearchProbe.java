@@ -62,8 +62,7 @@ public class ElasticsearchProbe {
         final IndicesStats indicesStats = IndicesStats.create(
                 clusterStatsResponse.getIndicesStats().getIndexCount(),
                 clusterStatsResponse.getIndicesStats().getStore().sizeInBytes(),
-                clusterStatsResponse.getIndicesStats().getFieldData().getMemorySizeInBytes(),
-                clusterStatsResponse.getIndicesStats().getIdCache().getMemorySizeInBytes()
+                clusterStatsResponse.getIndicesStats().getFieldData().getMemorySizeInBytes()
         );
 
         final PendingClusterTasksResponse pendingClusterTasksResponse = adminClient.pendingClusterTasks(new PendingClusterTasksRequest()).actionGet();

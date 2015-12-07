@@ -20,10 +20,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.MutableDateTime;
 
@@ -40,10 +41,10 @@ public class FieldHistogramResult extends HistogramResult {
             .put("mean", 0)
             .build();
 
-    private final DateHistogram result;
+    private final Histogram result;
     private final Searches.DateHistogramInterval interval;
 
-    public FieldHistogramResult(DateHistogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+    public FieldHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
         this.result = result;
@@ -60,7 +61,7 @@ public class FieldHistogramResult extends HistogramResult {
         }
 
         final Map<Long, Map<String, Number>> results = Maps.newTreeMap();
-        for (DateHistogram.Bucket b : result.getBuckets()) {
+        for (Histogram.Bucket b : result.getBuckets()) {
             final ImmutableMap.Builder<String, Number> resultMap = ImmutableMap.builder();
             resultMap.put("total_count", b.getDocCount());
 
@@ -75,7 +76,8 @@ public class FieldHistogramResult extends HistogramResult {
             final Cardinality cardinality = b.getAggregations().get(Searches.AGG_CARDINALITY);
             resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getValue());
 
-            final long timestamp = b.getKeyAsDate().getMillis() / 1000L;
+            final DateTime keyAsDate = (DateTime) b.getKey();
+            final long timestamp = keyAsDate.getMillis() / 1000L;
             results.put(timestamp, resultMap.build());
         }
 
@@ -96,5 +98,4 @@ public class FieldHistogramResult extends HistogramResult {
         }
         return results;
     }
-
 }

@@ -16,27 +16,26 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.settings.SettingsException;
+import org.elasticsearch.node.GraylogNode;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.plugins.Plugin;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.esplugin.MonitorPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
+@Singleton
 public class EsNodeProvider implements Provider<Node> {
     private static final Logger LOG = LoggerFactory.getLogger(EsNodeProvider.class);
 
@@ -48,43 +47,45 @@ public class EsNodeProvider implements Provider<Node> {
     }
 
     @Override
-    @Singleton
     public Node get() {
-        final NodeBuilder builder = nodeBuilder().client(configuration.isClientNode());
-        Map<String, String> settings = readNodeSettings(configuration);
-
-        builder.settings().put(settings);
-        return builder.build();
+        return new GraylogNode(
+                readNodeSettings(configuration),
+                Collections.<Class<? extends Plugin>>singleton(MonitorPlugin.class));
     }
 
-    public static Map<String, String> readNodeSettings(ElasticsearchConfiguration conf) {
-        Map<String, String> settings = Maps.newHashMap();
+    public static Settings readNodeSettings(ElasticsearchConfiguration conf) {
+        final Settings.Builder settings = Settings.builder();
 
         // Standard Configuration.
         settings.put("cluster.name", conf.getClusterName());
 
         settings.put("node.name", conf.getNodeName());
-        settings.put("node.master", Boolean.toString(conf.isMasterNode()));
-        settings.put("node.data", Boolean.toString(conf.isDataNode()));
+        settings.put("node.master", conf.isMasterNode());
+        settings.put("node.data", conf.isDataNode());
+        settings.put("node.client", true);
 
+
+        settings.put("path.home", conf.getPathHome());
         if (!isNullOrEmpty(conf.getPathData())) {
             settings.put("path.data", conf.getPathData());
         }
 
-        settings.put("action.auto_create_index", Boolean.toString(false));
+        settings.put("action.auto_create_index", false);
 
-        settings.put("http.enabled", Boolean.toString(conf.isHttpEnabled()));
-        settings.put("transport.tcp.port", String.valueOf(conf.getTransportTcpPort()));
+        settings.put("http.enabled", conf.isHttpEnabled());
+        settings.put("transport.tcp.port", conf.getTransportTcpPort());
 
         settings.put("discovery.initial_state_timeout", conf.getInitialStateTimeout());
-        settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isMulticastDiscovery()));
+        settings.put("discovery.zen.ping.multicast.enabled", conf.isMulticastDiscovery());
 
-        if (conf.getUnicastHosts() != null && !conf.getUnicastHosts().isEmpty()) {
-            final ImmutableList.Builder<String> trimmedHosts = ImmutableList.builder();
-            for (String host : conf.getUnicastHosts()) {
-                trimmedHosts.add(host.trim());
+        final List<String> unicastHosts = conf.getUnicastHosts();
+        if (unicastHosts != null && !unicastHosts.isEmpty()) {
+            final String[] trimmedHosts = new String[unicastHosts.size()];
+            for (int i = 0; i < unicastHosts.size(); i++) {
+                final String host = unicastHosts.get(i);
+                trimmedHosts[i] = host.trim();
             }
-            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(trimmedHosts.build()));
+            settings.putArray("discovery.zen.ping.unicast.hosts", trimmedHosts);
         }
 
         if (!isNullOrEmpty(conf.getNetworkHost())) {
@@ -97,19 +98,16 @@ public class EsNodeProvider implements Provider<Node> {
             settings.put("network.publish_host", conf.getNetworkPublishHost());
         }
 
-        settings.put("plugins.mandatory", "graylog2-monitor");
-
         // Overwrite from a custom ElasticSearch config file.
-        final File esConfigFile = conf.getConfigFile();
+        final Path esConfigFile = conf.getConfigFile();
         if (esConfigFile != null) {
             try {
-                final byte[] esSettings = Files.readAllBytes(esConfigFile.toPath());
-                settings.putAll(new YamlSettingsLoader().load(esSettings));
-            } catch (IOException e) {
-                LOG.warn("Cannot read Elasticsearch configuration.");
+                settings.loadFromPath(esConfigFile);
+            } catch (SettingsException e) {
+                LOG.warn("Cannot read Elasticsearch configuration from " + esConfigFile, e);
             }
         }
 
-        return settings;
+        return settings.build();
     }
 }

@@ -18,8 +18,8 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -56,12 +56,12 @@ public class IndexHelper {
         return r;
     }
 
-    public static FilterBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
+    public static QueryBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
         if (range == null) {
             return null;
         }
 
-        return FilterBuilders.rangeFilter("timestamp")
+        return QueryBuilders.rangeQuery("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }

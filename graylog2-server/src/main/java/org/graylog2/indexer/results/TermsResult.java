@@ -45,7 +45,7 @@ public class TermsResult extends IndexQueryResult {
         Map<String, Long> terms = Maps.newHashMap();
 
         for(Terms.Bucket bucket : entries) {
-            terms.put(bucket.getKey(), bucket.getDocCount());
+            terms.put(bucket.getKeyAsString(), bucket.getDocCount());
         }
 
         return terms;

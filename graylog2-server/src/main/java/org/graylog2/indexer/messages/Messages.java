@@ -33,13 +33,10 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexMapping;
@@ -81,29 +78,28 @@ public class Messages {
         this.deflectorName = Deflector.buildName(configuration.getIndexPrefix());
     }
 
-    public ResultMessage get(String messageId, String index) throws IndexMissingException, DocumentNotFoundException {
-        GetRequestBuilder grb = new GetRequestBuilder(c, index);
-        grb.setId(messageId);
-
-        GetResponse r = c.get(grb.request()).actionGet();
+    public ResultMessage get(String messageId, String index) throws DocumentNotFoundException {
+        final GetRequest request = c.prepareGet(index, IndexMapping.TYPE_MESSAGE, messageId).request();
+        final GetResponse r = c.get(request).actionGet();
 
         if (!r.isExists()) {
-            throw new DocumentNotFoundException();
+            throw new DocumentNotFoundException(index, messageId);
         }
 
         return ResultMessage.parseFromSource(r);
     }
 
-    public List<String> analyze(String string, String index) throws IndexMissingException {
-        List<String> tokens = Lists.newArrayList();
-        AnalyzeRequestBuilder arb = new AnalyzeRequestBuilder(c.admin().indices(), index, string);
-        AnalyzeResponse r = c.admin().indices().analyze(arb.request()).actionGet();
+    public List<String> analyze(String string, String index) {
+        final AnalyzeRequestBuilder builder = c.admin().indices().prepareAnalyze(index, string);
+        final AnalyzeResponse response = c.admin().indices().analyze(builder.request()).actionGet();
 
-        for (AnalyzeToken token : r.getTokens()) {
-            tokens.add(token.getTerm());
+        final List<AnalyzeToken> tokens = response.getTokens();
+        final List<String> terms = Lists.newArrayListWithCapacity(tokens.size());
+        for (AnalyzeToken token : tokens) {
+            terms.add(token.getTerm());
         }
 
-        return tokens;
+        return terms;
     }
 
     public boolean bulkIndex(final List<Message> messages) {
@@ -155,15 +151,13 @@ public class Messages {
                 failedMessages, errorMessage);
     }
 
-    private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
-        return new IndexRequestBuilder(c)
-                .setId(id)
+    public IndexRequest buildIndexRequest(String index, Map<String, Object> source, String id) {
+        source.remove(Message.FIELD_ID);
+
+        return c.prepareIndex(index, IndexMapping.TYPE_MESSAGE, id)
                 .setSource(source)
-                .setIndex(index)
-                .setContentType(XContentType.JSON)
-                .setOpType(IndexRequest.OpType.INDEX)
-                .setType(IndexMapping.TYPE_MESSAGE)
-                .setConsistencyLevel(WriteConsistencyLevel.ONE);
+                .setConsistencyLevel(WriteConsistencyLevel.ONE)
+                .request();
     }
 
     private static class BulkRequestCallable implements Callable<BulkResponse> {

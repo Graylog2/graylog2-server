@@ -37,8 +37,7 @@ public class IndexMapping {
         return ImmutableMap.of(
                 "properties", partFieldProperties(analyzer),
                 "dynamic_templates", partDefaultAllInDynamicTemplate(),
-                // Compress source field
-                "_source", enabledAndCompressed(),
+                "_source", enabled(),
                 // Enable purging by TTL
                 "_ttl", enabled());
     }
@@ -47,20 +46,16 @@ public class IndexMapping {
      * Disable analyzing for every field by default.
      */
     private List<Map<String, Map<String, Object>>> partDefaultAllInDynamicTemplate() {
-        final Map<String, Serializable> mappingInternal = ImmutableMap.<String, Serializable>of(
-                "index", "not_analyzed",
-                "doc_values", true);
         final Map<String, Object> defaultInternal = ImmutableMap.of(
                 "match", "gl2_*",
-                "mapping", mappingInternal);
+                "mapping", notAnalyzedString());
         final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
 
-        final Map<String, String> mappingAll = ImmutableMap.of("index", "not_analyzed");
         final Map<String, Object> defaultAll = ImmutableMap.of(
                 // Match all
                 "match", "*",
                 // Analyze nothing by default
-                "mapping", mappingAll);
+                "mapping", ImmutableMap.of("index", "not_analyzed"));
         final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
 
         return ImmutableList.of(templateInternal, templateAll);
@@ -75,9 +70,16 @@ public class IndexMapping {
                 "full_message", analyzedString(analyzer),
                 // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
                 // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
-                "timestamp", typeTimeWithMillis(true),
+                "timestamp", typeTimeWithMillis(),
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
-                "source", analyzedString("analyzer_keyword"));
+                "source", analyzedString("analyzer_keyword"),
+                "streams", notAnalyzedString());
+    }
+
+    private Map<String, String> notAnalyzedString() {
+        return ImmutableMap.of(
+                "index", "not_analyzed",
+                "type", "string");
     }
 
     private Map<String, String> analyzedString(String analyzer) {
@@ -87,20 +89,13 @@ public class IndexMapping {
                 "analyzer", analyzer);
     }
 
-    private Map<String, Serializable> typeTimeWithMillis(boolean storeAsDocValues) {
+    private Map<String, Serializable> typeTimeWithMillis() {
         return ImmutableMap.<String, Serializable>of(
                 "type", "date",
-                "format", Tools.ES_DATE_FORMAT,
-                "doc_values", storeAsDocValues);
+                "format", Tools.ES_DATE_FORMAT);
     }
 
     private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
-    }
-
-    private Map<String, Boolean> enabledAndCompressed() {
-        return ImmutableMap.of(
-                "enabled", true,
-                "compress", true);
     }
 }

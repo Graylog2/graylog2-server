@@ -19,14 +19,14 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.FileReadableValidator;
+import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.joda.time.Period;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,6 +45,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "elasticsearch_path_data")
     private String pathData = "data/elasticsearch";
+
+    @Parameter(value = "elasticsearch_path_home")
+    private String pathHome = "data/elasticsearch";
 
     @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class)
     private int transportTcpPort = 9350;
@@ -76,8 +79,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
 
-    @Parameter(value = "elasticsearch_config_file", validator = FileReadableValidator.class)
-    private File configFile; // = "/etc/graylog/server/elasticsearch.yml";
+    @Parameter(value = "elasticsearch_config_file", validator = FilePathReadableValidator.class)
+    private Path configFile; // = "/etc/graylog/server/elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String indexPrefix = "graylog2";
@@ -181,7 +184,7 @@ public class ElasticsearchConfiguration {
         return disableVersionCheck;
     }
 
-    public File getConfigFile() {
+    public Path getConfigFile() {
         return configFile;
     }
 
@@ -243,6 +246,10 @@ public class ElasticsearchConfiguration {
 
     public String getPathData() {
         return pathData;
+    }
+
+    public String getPathHome() {
+        return pathHome;
     }
 
     public Duration getRequestTimeout() {

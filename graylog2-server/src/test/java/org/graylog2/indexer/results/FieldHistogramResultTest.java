@@ -18,7 +18,7 @@ package org.graylog2.indexer.results;
 
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog2.indexer.searches.Searches;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class FieldHistogramResultTest {
     @Test
     public void testGetInterval() throws Exception {
         final FieldHistogramResult fieldHistogramResult = new FieldHistogramResult(
-                mock(DateHistogram.class),
+                mock(Histogram.class),
                 "",
                 BytesArray.EMPTY,
                 Searches.DateHistogramInterval.MINUTE,
@@ -45,7 +45,7 @@ public class FieldHistogramResultTest {
     @Test
     @SuppressWarnings("unchecked")
     public void getResultsWorksWithZeroBuckets() throws Exception {
-        final DateHistogram dateHistogram = mock(DateHistogram.class);
+        final Histogram dateHistogram = mock(Histogram.class);
         when(dateHistogram.getBuckets()).thenReturn(Collections.EMPTY_LIST);
         final FieldHistogramResult fieldHistogramResult = new FieldHistogramResult(
                 dateHistogram,

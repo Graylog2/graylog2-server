@@ -19,16 +19,17 @@ package org.graylog2.indexer.results;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog2.indexer.searches.Searches;
+import org.joda.time.DateTime;
 
 import java.util.Map;
 
 public class DateHistogramResult extends HistogramResult {
-    private final DateHistogram result;
+    private final Histogram result;
     private final Searches.DateHistogramInterval interval;
 
-    public DateHistogramResult(DateHistogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+    public DateHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
         this.result = result;
@@ -44,8 +45,9 @@ public class DateHistogramResult extends HistogramResult {
     public Map<Long, Long> getResults() {
         Map<Long, Long> results = Maps.newTreeMap();
 
-        for (DateHistogram.Bucket bucket : result.getBuckets()) {
-            results.put(bucket.getKeyAsDate().getMillis() / 1000L, bucket.getDocCount());
+        for (Histogram.Bucket bucket : result.getBuckets()) {
+            final DateTime keyAsDate = (DateTime) bucket.getKey();
+            results.put(keyAsDate.getMillis() / 1000L, bucket.getDocCount());
         }
 
         return results;
