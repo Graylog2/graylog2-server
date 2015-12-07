@@ -8,6 +8,7 @@ import SearchBar from 'components/search/SearchBar';
 import SearchStore from 'stores/search/SearchStore';
 import SavedSearchesStore from 'stores/search/SavedSearchesStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StreamsStore from 'stores/streams/StreamsStore';
 
 import SavedSearchesActions from 'actions/search/SavedSearchesActions';
 
@@ -17,18 +18,23 @@ const AppWithSearchBar = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
+    params: PropTypes.object,
   },
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SavedSearchesStore)],
   getInitialState() {
     return {
       savedSearches: undefined,
+      stream: undefined,
     };
   },
   componentDidMount() {
     SavedSearchesActions.list.triggerPromise();
+    if (this.props.params.streamId) {
+      StreamsStore.get(this.props.params.streamId, (stream) => this.setState({stream: stream}));
+    }
   },
   _isLoading() {
-    return !this.state.savedSearches;
+    return !this.state.savedSearches || (this.props.params.streamId && !this.state.stream);
   },
   render() {
     if (this._isLoading()) {
@@ -39,11 +45,9 @@ const AppWithSearchBar = React.createClass({
     // TODO: Check if the search is in a stream
     // TODO: Take care of saved searches
     SearchStore.initializeFieldsFromHash();
-    //var searchInStream = searchBarElem.getAttribute('data-search-in-stream');
-    //if (searchInStream) {
-    //  searchInStream = JSON.parse(searchInStream);
-    //  SearchStore.searchInStream = searchInStream;
-    //}
+    if (this.state.stream) {
+      SearchStore.searchInStream = this.state.stream;
+    }
 
     return (
       <div className="container-fluid">
