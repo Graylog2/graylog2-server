@@ -69,9 +69,13 @@ public class WebInterfaceAssetsResource {
             }
         });
         final InputStream packageManifest = ClassLoader.getSystemResourceAsStream(pathPrefix + "/" + manifestFilename);
-        final ModuleManifest manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
-        jsFiles.addAll(manifest.files().jsFiles());
-        cssFiles.addAll(manifest.files().cssFiles());
+        if (packageManifest != null) {
+            final ModuleManifest manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
+            jsFiles.addAll(manifest.files().jsFiles());
+            cssFiles.addAll(manifest.files().cssFiles());
+        } else {
+            LOG.warn("Unable to find web interface assets. Maybe the web interface was not built into server?");
+        }
         this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", cssFiles, jsFiles);
     }
 
