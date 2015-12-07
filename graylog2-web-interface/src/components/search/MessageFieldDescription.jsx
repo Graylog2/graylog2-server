@@ -21,8 +21,8 @@ const MessageFieldDescription = React.createClass({
   },
   loadTerms(field) {
     return () => {
-      const promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.id, field);
-      promise.done((terms) => this._onTermsLoaded(terms));
+      const promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.fields[field]);
+      promise.then((terms) => this._onTermsLoaded(terms));
     };
   },
   _onTermsLoaded(terms) {
@@ -37,8 +37,9 @@ const MessageFieldDescription = React.createClass({
   },
   _getFormattedTerms() {
     const termsMarkup = [];
-    this.state.messageTerms.forEach((term) => termsMarkup.push(<span key={term}
-                                                                     className="message-terms">{term}</span>));
+    this.state.messageTerms.forEach((term, idx) => {
+      termsMarkup.push(<span key={idx} className="message-terms">{term}</span>);
+    });
 
     return termsMarkup;
   },
@@ -64,7 +65,7 @@ const MessageFieldDescription = React.createClass({
         <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
         {this._shouldShowTerms() &&
         <Alert bsStyle="info" onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>
-          Field terms: {this._getFormattedTerms()}
+          Field terms: &nbsp;{this._getFormattedTerms()}
         </Alert>
           }
       </dd>

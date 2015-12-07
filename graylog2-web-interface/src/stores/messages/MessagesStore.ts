@@ -47,13 +47,14 @@ var MessagesStore = {
         return promise;
     },
 
-    fieldTerms(index: string, messageId: string, field: string): Promise<Array<string>> {
-        var url = jsRoutes.controllers.MessagesController.analyze(index, messageId, field).url;
-        var promise = fetch('GET', url);
-        promise.fail((error) => {
-            UserNotification.error("Loading field terms failed with status: " + error,
-                "Could not load field terms.");
-        });
+    fieldTerms(index: string, string: string): Promise<Array<string>> {
+        const url = jsRoutes.controllers.MessagesController.analyze(index, string).url;
+        const promise = fetch('GET', URLUtils.qualifyUrl(url))
+            .then((response) => response.tokens)
+            .catch((error) => {
+                UserNotification.error("Loading field terms failed with status: " + error,
+                    "Could not load field terms.");
+            });
         return promise;
     }
 };
