@@ -18,11 +18,13 @@ package integration.system.grok;
 
 import com.jayway.restassured.response.ValidatableResponse;
 import integration.BaseRestTest;
+import integration.RequiresAuthentication;
 import org.junit.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+@RequiresAuthentication
 public class GrokTests extends BaseRestTest {
 
     private String id;
@@ -40,7 +42,8 @@ public class GrokTests extends BaseRestTest {
             .body(".", containsAllKeys(
                     "id",
                     "name",
-                    "pattern"
+                    "pattern",
+                    "content_pack"
             ));
     }
     
@@ -56,7 +59,8 @@ public class GrokTests extends BaseRestTest {
             .body(".", containsAllKeys(
                     "id",
                     "name",
-                    "pattern"
+                    "pattern",
+                    "content_pack"
             ));
     }
     
