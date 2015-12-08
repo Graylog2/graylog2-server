@@ -66,6 +66,18 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public List<Input> all() {
+        final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject());
+
+        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
+        for (final DBObject o : ownInputs) {
+            inputs.add(new InputImpl((ObjectId) o.get("_id"), o.toMap()));
+        }
+
+        return inputs.build();
+    }
+
+    @Override
     public List<Input> allOfThisNode(final String nodeId) {
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
@@ -171,6 +183,16 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         }
 
         return listBuilder.build();
+    }
+
+    @Override
+    public Input disable(Input input) {
+        return null;
+    }
+
+    @Override
+    public Input enable(Input input) {
+        return null;
     }
 
     @Override

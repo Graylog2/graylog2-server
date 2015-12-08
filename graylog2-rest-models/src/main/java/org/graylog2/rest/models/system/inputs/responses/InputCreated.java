@@ -21,9 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-/**
- * Created by dennis on 12/12/14.
- */
 @JsonAutoDetect
 @AutoValue
 public abstract class InputCreated {

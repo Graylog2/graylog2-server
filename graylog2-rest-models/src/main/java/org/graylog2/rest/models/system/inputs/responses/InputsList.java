@@ -23,19 +23,16 @@ import com.google.auto.value.AutoValue;
 
 import java.util.Set;
 
-/**
- * Created by dennis on 12/12/14.
- */
 @JsonAutoDetect
 @AutoValue
 public abstract class InputsList {
     @JsonProperty
-    public abstract Set<InputStateSummary> inputs();
+    public abstract Set<InputSummary> inputs();
     @JsonProperty
     public abstract int total();
 
     @JsonCreator
-    public static InputsList create(@JsonProperty("inputs") Set<InputStateSummary> inputs) {
+    public static InputsList create(@JsonProperty("inputs") Set<InputSummary> inputs) {
         return new AutoValue_InputsList(inputs, inputs.size());
     }
 }

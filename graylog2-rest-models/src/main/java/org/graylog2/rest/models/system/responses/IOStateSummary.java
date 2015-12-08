@@ -22,9 +22,6 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
-/**
- * Created by dennis on 12/12/14.
- */
 @JsonAutoDetect
 public abstract class IOStateSummary {
     @JsonProperty

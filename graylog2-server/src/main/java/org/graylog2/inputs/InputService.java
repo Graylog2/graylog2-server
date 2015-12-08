@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface InputService extends PersistedService {
+    List<Input> all();
+
     List<Input> allOfThisNode(String nodeId);
 
     Input create(String id, Map<String, Object> fields);
@@ -96,4 +98,7 @@ public interface InputService extends PersistedService {
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
 
     List<Map.Entry<String, String>> getStaticFields(Input input);
+
+    Input disable(Input input);
+    Input enable(Input input);
 }

@@ -26,7 +26,7 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class InputLaunchRequest {
+public abstract class InputCreateRequest {
     @JsonProperty
     public abstract String title();
 
@@ -44,11 +44,11 @@ public abstract class InputLaunchRequest {
     public abstract String node();
 
     @JsonCreator
-    public static InputLaunchRequest create(@JsonProperty("title") String title,
+    public static InputCreateRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("type") String type,
                                             @JsonProperty("global") boolean global,
                                             @JsonProperty("configuration") Map<String, Object> configuration,
                                             @JsonProperty("node") String node) {
-        return new AutoValue_InputLaunchRequest(title, type, global, configuration, node);
+        return new AutoValue_InputCreateRequest(title, type, global, configuration, node);
     }
 }
