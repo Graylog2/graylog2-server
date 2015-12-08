@@ -210,7 +210,7 @@ const SearchSidebar = React.createClass({
             </ul>
           </div>
           <div ref="footer">
-            <p style={{marginTop: 13, marginBottom: 0}}>
+            <div style={{marginTop: 13, marginBottom: 0}}>
               List <span className="message-result-fields-range"> fields of&nbsp;
               <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
                  onClick={this._showPageFields}>current page</a> or <a href="#"
@@ -224,7 +224,7 @@ const SearchSidebar = React.createClass({
                      onChange={this.props.toggleShouldHighlight} label="Highlight results"
                      groupClassName="result-highlight-control"/>
                 }
-            </p>
+            </div>
           </div>
         </div>
       </AutoAffix>
