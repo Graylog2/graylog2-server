@@ -349,11 +349,6 @@
 
             <!-- Cmdline and configuration -->
             <dependency>
-                <groupId>com.beust</groupId>
-                <artifactId>jcommander</artifactId>
-                <version>1.48</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.joschi</groupId>
                 <artifactId>jadconfig</artifactId>
                 <version>0.12.2</version>
