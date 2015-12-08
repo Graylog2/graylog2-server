@@ -1,0 +1,30 @@
+{
+  "username": "john",
+  "email": "john@example.com",
+  "full_name": "John Doe",
+  "password": "123456",
+  "permissions": [
+    "users:edit:john",
+    "users:passwordchange:john",
+    "indexercluster:read",
+    "messagecount:read",
+    "journal:read",
+    "inputs:read",
+    "metrics:read",
+    "savedsearches:edit",
+    "fieldnames:read",
+    "buffers:read",
+    "system:read",
+    "savedsearches:create",
+    "jvmstats:read",
+    "throughput:read",
+    "savedsearches:read",
+    "messages:read"
+  ],
+  "timezone": "Europe/Berlin",
+  "session_timeout_ms": -1,
+  "startpage": {},
+  "roles": [
+    "Test"
+  ]
+}
