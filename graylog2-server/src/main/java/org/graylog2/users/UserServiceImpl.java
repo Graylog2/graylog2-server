@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -296,5 +297,24 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         }
 
         return permSet.build().asList();
+    }
+
+    @Override
+    public void dissociateAllUsersFromRole(Role role) {
+        final Collection<User> usersInRole = loadAllForRole(role);
+        // remove role from any user still assigned
+        for (User user : usersInRole) {
+            if (user.isLocalAdmin()) {
+                continue;
+            }
+            final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
+            roles.remove(role.getId());
+            user.setRoleIds(roles);
+            try {
+                save(user);
+            } catch (ValidationException e) {
+                LOG.error("Unable to remove role {} from user {}", role.getName(), user);
+            }
+        }
     }
 }

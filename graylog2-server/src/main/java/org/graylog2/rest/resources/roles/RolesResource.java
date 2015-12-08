@@ -155,7 +155,7 @@ public class RolesResource extends RestResource {
 
     @DELETE
     @Path("{rolename}")
-    @ApiOperation(value = "Remove the named role and unassign any users from it")
+    @ApiOperation(value = "Remove the named role and dissociate any users from it")
     public void delete(@ApiParam(name = "rolename", required = true) @PathParam("rolename") String name) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_DELETE, name);
 
@@ -163,21 +163,7 @@ public class RolesResource extends RestResource {
         if (role.isReadOnly()) {
             throw new BadRequestException("Cannot delete read only system role " + name);
         }
-        final Collection<User> usersInRole = userService.loadAllForRole(role);
-        // remove role from any user still assigned
-        for (User user : usersInRole) {
-            if (user.isLocalAdmin()) {
-                continue;
-            }
-            final HashSet<String> roles = Sets.newHashSet(user.getRoleIds());
-            roles.remove(role.getId());
-            user.setRoleIds(roles);
-            try {
-                userService.save(user);
-            } catch (ValidationException e) {
-                log.error("Unable to remove role {} from user {}", name, user);
-            }
-        }
+        userService.dissociateAllUsersFromRole(role);
 
         if (roleService.delete(name) == 0) {
             throw new NotFoundException();

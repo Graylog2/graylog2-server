@@ -119,6 +119,10 @@ public class NullUserServiceImpl implements UserService {
     }
 
     @Override
+    public void dissociateAllUsersFromRole(Role role) {
+    }
+
+    @Override
     public Set<String> getRoleNames(User user) {
         return Collections.emptySet();
     }
