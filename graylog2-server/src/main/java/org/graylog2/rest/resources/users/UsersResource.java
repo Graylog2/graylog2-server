@@ -465,7 +465,6 @@ public class UsersResource extends RestResource {
 
             if (roleNames.isEmpty()) {
                 LOG.error("Unable to load role names for role IDs {} for user {}", roleIds, user);
-                throw new InternalServerErrorException("Unable to load role names");
             }
         }
 

@@ -24,6 +24,8 @@ import com.jayway.restassured.response.Response;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.core.IsCollectionContaining;
+import org.mockito.internal.matchers.Not;
 
 import java.io.IOException;
 import java.net.URL;
@@ -86,6 +88,23 @@ public class BaseRestTestHelper {
         return new KeysPresentMatcher(keys);
     }
 
+    public static ResponseAwareMatcher<Response> setContainsEntry(final String entry) {
+        return new ResponseAwareMatcher<Response>() {
+            @Override
+            public Matcher<?> matcher(Response response) throws Exception {
+                return IsCollectionContaining.hasItem(entry);
+            }
+        };
+    }
+
+    public static ResponseAwareMatcher<Response> setDoesNotContain(final String entry) {
+        return new ResponseAwareMatcher<Response>() {
+            @Override
+            public Matcher<?> matcher(Response response) throws Exception {
+                return new Not(IsCollectionContaining.hasItem(entry));
+            }
+        };
+    }
     /**
      * Use this method to load a json file from the classpath.
      * <p>
