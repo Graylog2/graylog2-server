@@ -44,6 +44,9 @@ public class BaseConfigurationTest {
         @Parameter(value = "rest_listen_uri", required = true)
         private URI restListenUri = URI.create("http://127.0.0.1:12900/");
 
+        @Parameter(value = "web_listen_uri", required = true)
+        private URI webListenUri = URI.create("http://127.0.0.1:9000/");
+
         @Parameter(value = "node_id_file", required = false)
         private String nodeIdFile = "/etc/graylog/server/node-id";
 
@@ -55,6 +58,11 @@ public class BaseConfigurationTest {
         @Override
         public URI getRestListenUri() {
             return Tools.getUriWithPort(restListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_PORT);
+        }
+
+        @Override
+        public URI getWebListenUri() {
+            return Tools.getUriWithPort(webListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_WEB_PORT);
         }
     }
 
@@ -130,5 +138,19 @@ public class BaseConfigurationTest {
 
         assertEquals("http", configWithoutTls.getRestUriScheme());
         assertEquals("https", configWithTls.getRestUriScheme());
+    }
+
+    @Test
+    public void testGetWebUriScheme() throws RepositoryException, ValidationException {
+        validProperties.put("web_enable_tls", "false");
+        final Configuration configWithoutTls = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configWithoutTls).process();
+
+        validProperties.put("web_enable_tls", "true");
+        final Configuration configWithTls = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configWithTls).process();
+
+        assertEquals("http", configWithoutTls.getWebUriScheme());
+        assertEquals("https", configWithTls.getWebUriScheme());
     }
 }

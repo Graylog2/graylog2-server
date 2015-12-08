@@ -89,6 +89,7 @@ import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
+import org.graylog2.web.IndexHtmlGenerator;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;

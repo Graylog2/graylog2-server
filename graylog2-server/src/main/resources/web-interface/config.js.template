@@ -1,0 +1,7 @@
+const appConfig = {
+  gl2ServerUrl: '${serverUri}',
+  gl2AppPathPrefix: '${appPathPrefix}',
+};
+
+window.appConfig = appConfig;
+
