@@ -45,38 +45,11 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Path("{filename: .*}")
 public class WebInterfaceAssetsResource {
-    private static final Logger LOG = LoggerFactory.getLogger(WebInterfaceAssetsResource.class);
-
-    private static String pathPrefix = "web-interface/assets";
-    private static String pluginPathPrefix = "/plugin/";
-    private static String manifestFilename = "module.json";
     private final IndexHtmlGenerator indexHtmlGenerator;
-    private final ObjectMapper objectMapper;
 
     @Inject
-    public WebInterfaceAssetsResource(ObjectMapper objectMapper,
-                                      Set<Plugin> plugins) throws IOException {
-        this.objectMapper = objectMapper;
-        final List<String> jsFiles = new ArrayList<>();
-        final List<String> cssFiles = new ArrayList<>();
-
-        plugins.stream().forEach(plugin -> {
-            final ModuleManifest pluginManifest = manifestForPlugin(plugin);
-            final String pathPrefix = pluginPathPrefix + plugin.metadata().getUniqueId() + "/";
-            if (pluginManifest != null) {
-                jsFiles.addAll(pluginManifest.files().jsFiles().stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList()));
-                cssFiles.addAll(pluginManifest.files().cssFiles().stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList()));
-            }
-        });
-        final InputStream packageManifest = ClassLoader.getSystemResourceAsStream(pathPrefix + "/" + manifestFilename);
-        if (packageManifest != null) {
-            final ModuleManifest manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
-            jsFiles.addAll(manifest.files().jsFiles());
-            cssFiles.addAll(manifest.files().cssFiles());
-        } else {
-            LOG.warn("Unable to find web interface assets. Maybe the web interface was not built into server?");
-        }
-        this.indexHtmlGenerator = new IndexHtmlGenerator("Graylog Web Interface", cssFiles, jsFiles);
+    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator) throws IOException {
+        this.indexHtmlGenerator = indexHtmlGenerator;
     }
 
     @GET
@@ -96,24 +69,8 @@ public class WebInterfaceAssetsResource {
                 .build();
     }
 
-    private ModuleManifest manifestForPlugin(Plugin plugin) {
-        final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/" + manifestFilename);
-        if (manifestStream != null) {
-            try {
-                final ModuleManifest manifest = objectMapper.readValue(manifestStream, ModuleManifest.class);
-                return manifest;
-            } catch (IOException e) {
-                LOG.warn("Unable to read manifest from plugin " + plugin + ": ", e);
-            }
-        }
-
-        LOG.debug("No valid manifest found for plugin " + plugin);
-
-        return null;
-    }
-
-    private static InputStream getStreamForFile(String filename) {
-        return ClassLoader.getSystemResourceAsStream(pathPrefix + "/" + filename);
+    private InputStream getStreamForFile(String filename) {
+        return this.getClass().getResourceAsStream("/" + PluginAssets.pathPrefix + "/" + filename);
     }
 
     private Response getDefaultResponse() {

@@ -17,25 +17,32 @@
 package org.graylog2.web;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.io.Resources;
 import org.apache.commons.io.IOUtils;
+import org.graylog2.web.resources.PluginAssets;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IndexHtmlGenerator {
+    private static final String title = "Graylog Web Interface";
     private final Engine engine = new Engine();
     private final String content;
 
     @Inject
-    public IndexHtmlGenerator(final String title, final Collection<String> cssFiles, final Collection<String> jsFiles) throws IOException {
-        final String template = IOUtils.toString(ClassLoader.getSystemResourceAsStream("web-interface/index.html.template"));
+    public IndexHtmlGenerator(PluginAssets pluginAssets) throws IOException {
+        final URL templateUrl = this.getClass().getResource("/web-interface/index.html.template");
+        final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
         final Map<String, Object> model = new HashMap<String, Object>() {{
             put("title", title);
-            put("cssFiles", cssFiles);
-            put("jsFiles", jsFiles);
+            put("cssFiles", pluginAssets.cssFiles());
+            put("jsFiles", pluginAssets.jsFiles());
         }};
 
         this.content = engine.transform(template, model);

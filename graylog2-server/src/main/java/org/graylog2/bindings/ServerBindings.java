@@ -89,6 +89,7 @@ import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
+import org.graylog2.web.IndexHtmlGenerator;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -165,6 +166,8 @@ public class ServerBindings extends Graylog2Module {
                 "org.graylog2.rest.resources",
                 "org.graylog2.shared.rest.resources"
         });
+
+        bind(IndexHtmlGenerator.class).in(Scopes.SINGLETON);
     }
 
     private void bindInterfaces() {
