@@ -46,6 +46,7 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
         final Map<String, Object> model = new HashMap<String, Object>() {{
+            put("rootTimeZone", configuration.getRootTimeZone());
             put("serverUri", configuration.getRestTransportUri());
             put("appPathPrefix", "");
         }};

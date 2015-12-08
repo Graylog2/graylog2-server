@@ -12,6 +12,10 @@ class AppConfig {
   gl2AppPathPrefix() : string {
     return this.appConfig['gl2AppPathPrefix'];
   }
+
+  rootTimeZone(): string {
+    return this.appConfig['rootTimeZone'];
+  }
 }
 
 export = AppConfig;
