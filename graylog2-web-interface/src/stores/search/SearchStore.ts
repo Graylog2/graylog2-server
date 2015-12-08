@@ -33,17 +33,7 @@ class SearchStore {
     searchInStream: any;
 
     constructor() {
-        var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
-        this.originalSearch = SearchStore._initializeOriginalSearch(parsedSearch);
-        this.query = this.originalSearch.get('query');
-        this.rangeType = this.originalSearch.get('rangeType');
-        this.rangeParams = this.originalSearch.get('rangeParams');
-        this.page = this.originalSearch.get('page');
-        this.resolution = this.originalSearch.get('resolution');
-        this.savedSearch = this.originalSearch.get('saved');
-        this.sortField = this.originalSearch.get('sortField');
-        this.sortOrder = this.originalSearch.get('sortOrder');
-        this.width = window.innerWidth;
+        this.load(true);
 
         window.addEventListener('resize', () => this.width = window.innerWidth);
         $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
@@ -51,6 +41,37 @@ class SearchStore {
         $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
         $(document).on('execute.graylog.search', this._submitSearch.bind(this));
         $(document).on('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
+    }
+
+    load(firstLoad) {
+        var parsedSearch = Immutable.Map<string, any>(URLUtils.getParsedSearch(window.location));
+        this.originalSearch = SearchStore._initializeOriginalSearch(parsedSearch);
+        if (firstLoad) {
+            this.query = this.originalSearch.get('query');
+            this.rangeType = this.originalSearch.get('rangeType');
+            this.rangeParams = this.originalSearch.get('rangeParams');
+            this.page = this.originalSearch.get('page');
+            this.resolution = this.originalSearch.get('resolution');
+        } else {
+            this._query = this.originalSearch.get('query');
+            this._rangeType = this.originalSearch.get('rangeType');
+            this._rangeParams = this.originalSearch.get('rangeParams');
+            this._page = this.originalSearch.get('page');
+            this._resolution = this.originalSearch.get('resolution');
+        }
+        this.savedSearch = this.originalSearch.get('saved');
+        this.sortField = this.originalSearch.get('sortField');
+        this.sortOrder = this.originalSearch.get('sortOrder');
+        this.width = window.innerWidth;
+    }
+
+    unload() {
+        window.removeEventListener('resize', () => this.width = window.innerWidth);
+        $(document).off('add-search-term.graylog.search', this._addSearchTerm.bind(this));
+        $(document).off('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
+        $(document).off('change-timerange.graylog.search', this._changeTimeRange.bind(this));
+        $(document).off('execute.graylog.search', this._submitSearch.bind(this));
+        $(document).off('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     initializeFieldsFromHash() {
@@ -293,7 +314,7 @@ class SearchStore {
         originalURLParams = originalURLParams.set('q', this.originalSearch.get('query'));
         originalURLParams = originalURLParams.set('interval', this.originalSearch.get('resolution'));
         originalURLParams = originalURLParams.set('page', this.originalSearch.get('page'));
-        originalURLParams = originalURLParams.set('fields', this.fields.join(','));
+        originalURLParams = originalURLParams.set('fields', this.fields ? this.fields.join(',') : '');
         originalURLParams = originalURLParams.set('sortField', this.originalSearch.get('sortField'));
         originalURLParams = originalURLParams.set('sortOrder', this.originalSearch.get('sortOrder'));
 

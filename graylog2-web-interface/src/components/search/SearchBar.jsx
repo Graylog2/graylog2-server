@@ -47,6 +47,9 @@ const SearchBar = React.createClass({
   componentWillUnmount() {
     this._removeSearchQueryInput();
   },
+  reload() {
+    this.setState(this.getInitialState());
+  },
   _initializeSearchQueryInput() {
     if (this.props.userPreferences.enableSmartSearch) {
       const queryInput = new QueryInput(this.refs.query.getInputDOMNode());
