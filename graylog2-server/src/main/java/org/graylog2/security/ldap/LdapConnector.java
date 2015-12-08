@@ -132,7 +132,7 @@ public class LdapConnector {
             entryCursor = connection.search(searchBase,
                                             filter,
                                             SearchScope.SUBTREE,
-                                            groupIdAttribute, displayNameAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf");
+                                            groupIdAttribute, displayNameAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf", "isMemberOf");
             final Iterator<Entry> it = entryCursor.iterator();
             if (it.hasNext()) {
                 final Entry e = it.next();
@@ -151,7 +151,8 @@ public class LdapConnector {
                     if (attribute.isHumanReadable()) {
                         ldapEntry.put(attribute.getId(), Joiner.on(", ").join(attribute.iterator()));
                     }
-                    if ("memberOf".equalsIgnoreCase(attribute.getId())) {
+                    // ActiveDirectory (memberOf) and Sun Directory Server (isMemberOf)
+                    if ("memberOf".equalsIgnoreCase(attribute.getId()) || "isMemberOf".equalsIgnoreCase(attribute.getId())) {
                         for (Value<?> group : attribute) {
                             groupDns.add(group.getString());
                         }
