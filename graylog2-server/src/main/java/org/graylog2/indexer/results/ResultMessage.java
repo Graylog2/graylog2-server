@@ -45,9 +45,9 @@ public class ResultMessage {
     public Multimap<String, Range<Integer>> highlightRanges;
 
     protected ResultMessage() { /* use factory method */}
-	
-	public static ResultMessage parseFromSource(SearchHit hit) {
-		ResultMessage m = new ResultMessage();
+
+    public static ResultMessage parseFromSource(SearchHit hit) {
+        ResultMessage m = new ResultMessage();
         // There is no _source field if addFields is used for the request. Just use the returned fields in that case.
         if (hit.getSource() != null) {
             m.setMessage(hit.getSource());
@@ -60,25 +60,25 @@ public class ResultMessage {
             m.setMessage(map);
 
         }
-		m.setIndex(hit.getIndex());
+        m.setIndex(hit.getIndex());
         m.setHighlightRanges(hit.getHighlightFields());
-		return m;
-	}
-	
-	public static ResultMessage parseFromSource(GetResponse r) {
-		ResultMessage m = new ResultMessage();
-		m.setMessage(r.getSource());
-		m.setIndex(r.getIndex());
         return m;
-	}
-	
-	public void setMessage(Map<String, Object> message) {
+    }
+
+    public static ResultMessage parseFromSource(GetResponse r) {
+        ResultMessage m = new ResultMessage();
+        m.setMessage(r.getSource());
+        m.setIndex(r.getIndex());
+        return m;
+    }
+
+    public void setMessage(Map<String, Object> message) {
         this.message = message;
         if (this.message.containsKey("timestamp")) {
             final Object tsField = this.message.get("timestamp");
             try {
                 this.message.put("timestamp",
-                                 ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
+                        ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
             } catch (IllegalArgumentException e) {
                 // could not parse date string, this is likely a bug, but we will leave the original value alone
                 LOG.warn("Could not parse timestamp of message {}", message.get("id"), e);
@@ -110,10 +110,10 @@ public class ResultMessage {
             LOG.debug("Highlight positions for message {}: {}", message.get("_id"), highlightRanges);
         }
     }
-	
-	public void setIndex(String index) {
-		this.index = index;
-	}
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
 
     public Map<String, Object> getMessage() {
         return message;
