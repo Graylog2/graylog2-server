@@ -28,7 +28,11 @@ const ShowMessagePage = React.createClass({
       this.setState({message: message});
       InputsActions.get.triggerPromise(message.source_input_id);
     });
-    StreamsStore.listStreams().then(streams => this.setState({streams: Immutable.Map(streams)}));
+    StreamsStore.listStreams().then(streams => {
+      const streamsMap = {};
+      streams.forEach((stream) => streamsMap[stream.id] = stream);
+      this.setState({streams: Immutable.Map(streamsMap)});
+    });
     NodesActions.list.triggerPromise();
   },
   _formatInput(state) {
