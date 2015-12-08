@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -30,14 +31,18 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
@@ -55,14 +60,20 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     private final ExtractorFactory extractorFactory;
     private final MessageInputFactory messageInputFactory;
+    private final EventBus clusterEventBus;
+    private final EventBus serverEventBus;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
-                            MessageInputFactory messageInputFactory) {
+                            MessageInputFactory messageInputFactory,
+                            @ClusterEventBus EventBus clusterEventBus,
+                            EventBus serverEventBus) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.messageInputFactory = messageInputFactory;
+        this.clusterEventBus = clusterEventBus;
+        this.serverEventBus = serverEventBus;
     }
 
     @Override
@@ -90,6 +101,36 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         }
 
         return inputs.build();
+    }
+
+    @Override
+    public <T extends Persisted> String save(T model) throws ValidationException {
+        final String resultId = super.save(model);
+        if (resultId != null && !resultId.isEmpty()) {
+            this.clusterEventBus.post(InputCreated.create(resultId));
+            this.serverEventBus.post(InputCreated.create(resultId));
+        }
+        return resultId;
+    }
+
+    @Override
+    public <T extends Persisted> String saveWithoutValidation(T model) {
+        final String resultId = super.saveWithoutValidation(model);
+        if (resultId != null && !resultId.isEmpty()) {
+            this.clusterEventBus.post(InputCreated.create(resultId));
+            this.serverEventBus.post(InputCreated.create(resultId));
+        }
+        return resultId;
+    }
+
+    @Override
+    public <T extends Persisted> int destroy(T model) {
+        final int result = super.destroy(model);
+        if (result > 0) {
+            this.clusterEventBus.post(InputDeleted.create(model.getId()));
+            this.serverEventBus.post(InputDeleted.create(model.getId()));
+        }
+        return result;
     }
 
     @Override

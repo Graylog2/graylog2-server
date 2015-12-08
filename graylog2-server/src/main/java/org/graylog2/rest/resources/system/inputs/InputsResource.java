@@ -120,17 +120,21 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
-    @RestrictToMaster
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
-        final Input input;
         try {
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
             messageInput.checkConfiguration();
-            input = this.inputService.create(messageInput.asMap());
+            final Input input = this.inputService.create(messageInput.asMap());
+            final String newId = inputService.save(input);
+            final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
+                    .path("{inputId}")
+                    .build(newId);
+
+            return Response.created(inputUri).entity(InputCreated.create(newId)).build();
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new NotFoundException("There is no such input type registered.", e);
@@ -139,11 +143,6 @@ public class InputsResource extends RestResource {
             throw new BadRequestException("Missing or invalid input configuration.", e);
         }
 
-        final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
-                .path("{inputId}")
-                .build(input.getId());
-
-        return Response.created(inputUri).entity(InputCreated.create(input.getId())).build();
     }
 
     @DELETE

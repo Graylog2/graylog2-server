@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 @Api(value = "System/InputStates", description = "Message input states of this node")
 @Path("/system/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 public class InputStatesResource extends RestResource {
     private final InputRegistry inputRegistry;
 
