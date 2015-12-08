@@ -6,11 +6,8 @@
         </Console>
     </Appenders>
     <Loggers>
-        <!-- Suppress crazy byte array dump of Drools -->
-        <Logger name="org.drools.compiler.kie.builder.impl.KieRepositoryImpl" level="warn"/>
-        <!-- Silence chatty natty -->
-        <Logger name="com.joestelmach.natty.Parser" level="warn"/>
-        <Root level="info">
+        <Logger name="org.graylog2" level="info"/>
+        <Root level="warn">
             <AppenderRef ref="STDOUT"/>
         </Root>
     </Loggers>
