@@ -169,7 +169,7 @@ class NotificationsFactory {
             <span>
               There is a node without any running inputs. This means that you are not receiving any messages from this
               node at this point in time. This is most probably an indication of an error or misconfiguration.
-              You can click <Link to={Routes.SYSTEM.INPUT}>here</Link> to solve this.
+              You can click <Link to={Routes.SYSTEM.INPUTS}>here</Link> to solve this.
             </span>
           ),
         };
