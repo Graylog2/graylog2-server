@@ -162,7 +162,7 @@ public abstract class AbstractJerseyService extends AbstractIdleService {
         }
 
         if (enableCors) {
-            LOG.info("Enabling CORS for REST API");
+            LOG.info("Enabling CORS for HTTP endpoint");
             rc.register(CORSFilter.class);
         }
 
