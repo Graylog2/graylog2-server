@@ -51,8 +51,8 @@ public class PluginAssets {
             final ModuleManifest pluginManifest = manifestForPlugin(plugin);
             final String pathPrefix = pluginPathPrefix + plugin.metadata().getUniqueId() + "/";
             if (pluginManifest != null) {
-                jsFiles.addAll(pluginManifest.files().jsFiles().stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList()));
-                cssFiles.addAll(pluginManifest.files().cssFiles().stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList()));
+                jsFiles.addAll(prefixFileNames(pluginManifest.files().jsFiles(), pathPrefix));
+                cssFiles.addAll(prefixFileNames(pluginManifest.files().cssFiles(), pathPrefix));
             }
         });
         final InputStream packageManifest = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + manifestFilename);
@@ -71,6 +71,10 @@ public class PluginAssets {
 
     public List<String> cssFiles() {
         return cssFiles;
+    }
+
+    private List<String> prefixFileNames(List<String> filenames, String pathPrefix) {
+        return filenames.stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList());
     }
 
     private ModuleManifest manifestForPlugin(Plugin plugin) {
