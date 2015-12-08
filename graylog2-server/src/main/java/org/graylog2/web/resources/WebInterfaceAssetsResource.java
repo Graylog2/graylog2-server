@@ -16,12 +16,8 @@
  */
 package org.graylog2.web.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog2.plugin.Plugin;
 import org.graylog2.web.IndexHtmlGenerator;
-import org.graylog2.web.ModuleManifest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.web.PluginAssets;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -30,16 +26,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 

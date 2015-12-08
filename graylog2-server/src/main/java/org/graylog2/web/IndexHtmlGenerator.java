@@ -18,15 +18,11 @@ package org.graylog2.web;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.io.Resources;
-import org.apache.commons.io.IOUtils;
-import org.graylog2.web.resources.PluginAssets;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
