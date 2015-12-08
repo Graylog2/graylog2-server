@@ -166,8 +166,6 @@ public class ServerBindings extends Graylog2Module {
                 "org.graylog2.rest.resources",
                 "org.graylog2.shared.rest.resources"
         });
-
-        bind(IndexHtmlGenerator.class).in(Scopes.SINGLETON);
     }
 
     private void bindInterfaces() {

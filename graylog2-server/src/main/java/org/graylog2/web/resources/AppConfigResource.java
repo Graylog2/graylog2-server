@@ -37,9 +37,14 @@ public class AppConfigResource {
     private final String content;
 
     @Inject
-    public AppConfigResource(Configuration configuration) throws IOException {
+    public AppConfigResource(Configuration configuration) {
         final URL templateUrl = this.getClass().getResource("/web-interface/config.js.template");
-        final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
+        final String template;
+        try {
+            template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
+        }
         final Map<String, Object> model = new HashMap<String, Object>() {{
             put("serverUri", configuration.getRestTransportUri());
             put("appPathPrefix", "");

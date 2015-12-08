@@ -26,7 +26,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 
@@ -37,7 +36,7 @@ public class WebInterfaceAssetsResource {
     private final IndexHtmlGenerator indexHtmlGenerator;
 
     @Inject
-    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator) throws IOException {
+    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator) {
         this.indexHtmlGenerator = indexHtmlGenerator;
     }
 

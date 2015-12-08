@@ -42,7 +42,7 @@ public class PluginAssets {
 
     @Inject
     public PluginAssets(Set<Plugin> plugins,
-                        ObjectMapper objectMapper) throws IOException {
+                        ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         this.jsFiles = new ArrayList<>();
         this.cssFiles = new ArrayList<>();
@@ -57,11 +57,16 @@ public class PluginAssets {
         });
         final InputStream packageManifest = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + manifestFilename);
         if (packageManifest != null) {
-            final ModuleManifest manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
+            final ModuleManifest manifest;
+            try {
+                manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to read web interface manifest: ", e);
+            }
             jsFiles.addAll(manifest.files().jsFiles());
             cssFiles.addAll(manifest.files().cssFiles());
         } else {
-            LOG.warn("Unable to find web interface assets. Maybe the web interface was not built into server?");
+            throw new IllegalStateException("Unable to find web interface assets. Maybe the web interface was not built into server?");
         }
     }
 
@@ -84,11 +89,11 @@ public class PluginAssets {
                 final ModuleManifest manifest = objectMapper.readValue(manifestStream, ModuleManifest.class);
                 return manifest;
             } catch (IOException e) {
-                LOG.warn("Unable to read manifest from plugin " + plugin + ": ", e);
+                LOG.warn("Unable to read web manifest from plugin " + plugin + ": ", e);
             }
         }
 
-        LOG.debug("No valid manifest found for plugin " + plugin);
+        LOG.debug("No valid web manifest found for plugin " + plugin);
 
         return null;
     }
