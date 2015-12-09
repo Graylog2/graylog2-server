@@ -32,6 +32,7 @@ const Routes = {
       edit: (username) => '/system/users/edit/' + username,
       LIST: '/system/users',
     },
+    LDAP: "/system/ldap",
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => '/streams/' + streamId + '/edit',

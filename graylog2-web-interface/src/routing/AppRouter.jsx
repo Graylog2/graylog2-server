@@ -44,6 +44,7 @@ import ShowMetricsPage from 'pages/ShowMetricsPage';
 import ShowNodePage from 'pages/ShowNodePage';
 import NodesPage from 'pages/NodesPage';
 import ThreadDumpPage from 'pages/ThreadDumpPage';
+import LdapPage from 'pages/LdapPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -93,6 +94,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
             <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
+            <Route path={Routes.SYSTEM.LDAP} component={LdapPage}/>
             {pluginRoutes}
           </Route>
         </Route>
