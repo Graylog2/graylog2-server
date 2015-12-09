@@ -58,7 +58,7 @@ public class InputEventListener {
     }
 
     @Subscribe public void inputCreated(InputCreated inputCreatedEvent) {
-        LOG.info("Input created: " + inputCreatedEvent.id());
+        LOG.debug("Input created/changed: " + inputCreatedEvent.id());
         final Input input;
         try {
             input = inputService.find(inputCreatedEvent.id());
@@ -88,7 +88,7 @@ public class InputEventListener {
     }
 
     @Subscribe public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.info("Input deleted: " + inputDeletedEvent.id());
+        LOG.debug("Input deleted: " + inputDeletedEvent.id());
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
         if (inputState != null) {
             inputRegistry.remove(inputState);
