@@ -60,14 +60,16 @@ public class Version implements Comparable<Version> {
         Version tmpVersion;
         try {
             final URL resource = Resources.getResource("version.properties");
-            final String versionProperties = Resources.toString(resource, UTF_8);
-            final Properties version = new Properties();
-            version.load(new StringReader(versionProperties));
+            final String versionPropertiesString = Resources.toString(resource, UTF_8);
+            final Properties versionProperties = new Properties();
+            versionProperties.load(new StringReader(versionPropertiesString));
 
-            final int major = Integer.parseInt(version.getProperty("version.major", "0"));
-            final int minor = Integer.parseInt(version.getProperty("version.minor", "0"));
-            final int incremental = Integer.parseInt(version.getProperty("version.incremental", "0"));
-            final String qualifier = version.getProperty("version.qualifier", "unknown");
+            com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionProperties.getProperty("project.version", "0.0.0"));
+
+            final int major = version.getMajorVersion();
+            final int minor = version.getMinorVersion();
+            final int incremental = version.getPatchVersion();
+            final String qualifier = version.getPreReleaseVersion();
 
             String commitSha = null;
             try {
@@ -83,7 +85,7 @@ public class Version implements Comparable<Version> {
             tmpVersion = new Version(major, minor, incremental, qualifier, commitSha);
         } catch (Exception e) {
             tmpVersion = new Version(0, 0, 0, "unknown");
-            LOG.error("Unable to read version.properties file, this build has no version number. If you get this message during development, you need to run 'Generate Sources' in IDEA or run 'mvn process-resources'.", e);
+            LOG.error("Unable to read version.properties file, this build has no version number.", e);
         }
         CURRENT_CLASSPATH = tmpVersion;
     }
