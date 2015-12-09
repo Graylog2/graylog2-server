@@ -169,19 +169,20 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
     })
     public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException {
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
 
-        final Map<String, Object> mergedInput = input.asMap();
+        final Map<String, Object> mergedInput = inputService.getMessageInput(input).asMap();
         final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
         messageInput.checkConfiguration();
 
         mergedInput.putAll(messageInput.asMap());
 
-        inputService.create(input.getId(), mergedInput);
+        final Input newInput = inputService.create(input.getId(), mergedInput);
+        inputService.save(newInput);
 
         final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")
@@ -198,7 +199,7 @@ public class InputsResource extends RestResource {
                 input.getContentPack(),
                 input.getId(),
                 input.getCreatedAt(),
-                input.getClass().getCanonicalName(),
+                input.getType(),
                 input.getCreatorUserId(),
                 input.getConfiguration(),
                 input.getStaticFields()
