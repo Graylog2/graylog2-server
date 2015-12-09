@@ -123,19 +123,19 @@ class DashboardsStore {
   createDashboard(title: string, description: string): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.create().url);
     const promise = fetch('POST', url, {title: title, description: description})
+      .then((response) => {
+        UserNotification.success("Dashboard successfully created");
 
-    promise.then(() => {
-      UserNotification.success("Dashboard successfully created");
-
-      if (this._onDashboardsChanged.length > 0) {
-        this.updateDashboards();
-      } else if (this._onWritableDashboardsChanged.length > 0) {
-        this.updateWritableDashboards();
-      }
-    }, (error) => {
-      UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + error,
-        "Could not create dashboard");
-    });
+        if (this._onDashboardsChanged.length > 0) {
+          this.updateDashboards();
+        } else if (this._onWritableDashboardsChanged.length > 0) {
+          this.updateWritableDashboards();
+        }
+        return response.dashboard_id;
+      }, (error) => {
+        UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + error,
+          "Could not create dashboard");
+      });
 
     return promise;
   }

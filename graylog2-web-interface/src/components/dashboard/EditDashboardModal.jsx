@@ -50,7 +50,7 @@ const EditDashboardModal = React.createClass({
 
     if (this._isCreateModal()) {
       promise = DashboardsStore.createDashboard(this.state.title, this.state.description);
-      promise.done((id) => {
+      promise.then((id) => {
         this.close();
 
         if (typeof this.props.onSaved === 'function') {
@@ -61,7 +61,7 @@ const EditDashboardModal = React.createClass({
       });
     } else {
       promise = DashboardsStore.saveDashboard(this.state);
-      promise.done(() => {
+      promise.then(() => {
         this.close();
 
         const idSelector = '[data-dashboard-id="' + this.state.id + '"]';
