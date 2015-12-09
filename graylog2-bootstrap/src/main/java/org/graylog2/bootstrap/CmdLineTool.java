@@ -79,6 +79,11 @@ import java.util.Set;
 import static com.google.common.base.Strings.nullToEmpty;
 
 public abstract class CmdLineTool implements CliCommand {
+    static {
+        // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
 
     protected static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
