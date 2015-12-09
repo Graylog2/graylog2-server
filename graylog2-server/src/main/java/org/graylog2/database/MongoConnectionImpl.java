@@ -16,7 +16,6 @@
  */
 package org.graylog2.database;
 
-import com.mongodb.CommandFailureException;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;

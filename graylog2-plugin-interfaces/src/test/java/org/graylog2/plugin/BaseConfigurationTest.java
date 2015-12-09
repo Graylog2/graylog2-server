@@ -77,12 +77,6 @@ public class BaseConfigurationTest {
         // Required properties
         validProperties.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
         validProperties.put("elasticsearch_config_file", tempFile.getAbsolutePath());
-        validProperties.put("mongodb_useauth", "true");
-        validProperties.put("mongodb_user", "user");
-        validProperties.put("mongodb_password", "pass");
-        validProperties.put("mongodb_database", "test");
-        validProperties.put("mongodb_host", "localhost");
-        validProperties.put("mongodb_port", "27017");
         validProperties.put("use_gelf", "true");
         validProperties.put("gelf_listen_port", "12201");
         validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"); // sha2 of admin
