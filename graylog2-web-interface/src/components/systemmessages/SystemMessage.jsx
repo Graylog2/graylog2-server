@@ -1,6 +1,8 @@
 import React from 'react';
 import moment from 'moment';
 
+import { LinkToNode } from 'components/common';
+
 const SystemMessage = React.createClass({
   propTypes: {
     message: React.PropTypes.object.isRequired,
@@ -11,11 +13,8 @@ const SystemMessage = React.createClass({
       <tr>
         <td>{moment(message.timestamp).format()}</td>
         <td>
-          <i className="fa fa-code-fork"></i>
-          // TODO: fix link to node
-          <a href="@routes.NodesController.node(message.getNodeId)">
-            {message.node_id}
-          </a>
+          <i className="fa fa-code-fork"></i>{' '}
+          <LinkToNode nodeId={message.node_id} />
         </td>
         <td>{message.content}</td>
       </tr>
