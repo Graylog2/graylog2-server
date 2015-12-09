@@ -27,7 +27,7 @@ const ExportContentPackPage = React.createClass({
     GrokPatternsStore.loadPatterns((grokPatterns) => {
       this.setState({grok_patterns: grokPatterns});
     });
-    InputsActions.list.triggerPromise();
+    InputsActions.list();
     OutputsStore.load((resp) => {
       this.setState({outputs: resp.outputs});
     });

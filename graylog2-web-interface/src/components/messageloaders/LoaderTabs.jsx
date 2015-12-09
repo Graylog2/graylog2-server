@@ -43,7 +43,7 @@ const LoaderTabs = React.createClass({
     }
   },
   loadData() {
-    InputsActions.list.triggerPromise();
+    InputsActions.list();
     StreamsStore.listStreams().then((response) => {
       const streams = {};
       response.forEach((stream) => { streams[stream.id] = stream });

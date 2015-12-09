@@ -16,10 +16,10 @@ const InputsStore = Reflux.createStore({
     this.trigger({inputs: this.inputs, input: this.input});
   },
 
-  list(completeInput) {
+  list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl))
       .then(response => {
-        this.inputs = (completeInput ? response.inputs : response.inputs.map((input) => input.message_input));
+        this.inputs = response.inputs;
         this.trigger({inputs: this.inputs});
 
         return this.inputs;
@@ -55,7 +55,7 @@ const InputsStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Input '${input.title}' launched successfully`);
-        InputsActions.list.triggerPromise(true);
+        InputsActions.list();
       })
       .catch(error => {
         UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
@@ -73,7 +73,7 @@ const InputsStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Input '${inputTitle}' deleted successfully`);
-        InputsActions.list.triggerPromise(true);
+        InputsActions.list();
       })
       .catch(error => {
         UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,

@@ -25,8 +25,8 @@ const InputsList = React.createClass({
     };
   },
   componentDidMount() {
-    InputsActions.list.triggerPromise(true);
-    SingleNodeActions.get.triggerPromise();
+    InputsActions.list();
+    SingleNodeActions.get();
   },
   _splitInputs(state) {
     const inputs = state.inputs;
