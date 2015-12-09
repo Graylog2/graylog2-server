@@ -77,7 +77,11 @@ public class Version implements Comparable<Version> {
                 final URL gitResource = Resources.getResource("git.properties");
                 final String gitProperties = Resources.toString(gitResource, UTF_8);
                 git.load(new StringReader(gitProperties));
-                commitSha = git.getProperty("git.commit.id.abbrev");
+                commitSha = git.getProperty("git.commit.id");
+                // abbreviate if present and looks like a long sha
+                if (commitSha != null && commitSha.length() > 7) {
+                    commitSha = commitSha.substring(0, 7);
+                }
             } catch (Exception e) {
                 LOG.debug("Git commit details are not available, skipping.", e);
             }
