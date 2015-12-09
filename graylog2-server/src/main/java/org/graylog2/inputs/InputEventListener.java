@@ -63,7 +63,7 @@ public class InputEventListener {
         try {
             input = inputService.find(inputCreatedEvent.id());
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            LOG.warn("Received InputCreated event but could not find Input: ", e);
             return;
         }
 
@@ -79,7 +79,7 @@ public class InputEventListener {
         try {
             messageInput = inputService.getMessageInput(input);
         } catch (NoSuchInputTypeException e) {
-            e.printStackTrace();
+            LOG.warn("Newly created input is of invalid type: " + input.getType(), e);
             return;
         }
         final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
