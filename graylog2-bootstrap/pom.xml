@@ -105,7 +105,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <maven.buildNumber.useLastCommittedRevision>true</maven.buildNumber.useLastCommittedRevision>
+                    <useLastCommittedRevision>true</useLastCommittedRevision>
                 </configuration>
             </plugin>
             <plugin>
