@@ -1229,14 +1229,14 @@
                             <dependency>
                                 <groupId>org.codehaus.plexus</groupId>
                                 <artifactId>plexus-compiler-javac-errorprone</artifactId>
-                                <version>2.5</version>
+                                <version>2.6</version>
                             </dependency>
                             <!-- override plexus-compiler-javac-errorprone's dependency on
                                  Error Prone with the latest version -->
                             <dependency>
                                 <groupId>com.google.errorprone</groupId>
                                 <artifactId>error_prone_core</artifactId>
-                                <version>2.0.4</version>
+                                <version>2.0.6</version>
                             </dependency>
                         </dependencies>
                     </plugin>
