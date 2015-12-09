@@ -367,22 +367,6 @@
         </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${webInterface.path}</directory>
-                            <includes>
-                                <include>build/**/*</include>
-                                <include>node_modules/**/*</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -463,10 +447,28 @@
         <profile>
             <id>web-interface-build</id>
             <activation>
-                <property><name>!skip.web.build</name></property>
+                <property>
+                    <name>!skip.web.build</name>
+                </property>
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${webInterface.path}</directory>
+                                    <includes>
+                                        <include>build/**/*</include>
+                                        <include>node_modules/**/*</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
