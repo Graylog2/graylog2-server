@@ -17,16 +17,20 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.bundles.Input;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
@@ -34,9 +38,10 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -50,10 +55,16 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class InputStatesResource extends RestResource {
     private final InputRegistry inputRegistry;
+    private final EventBus serverEventBus;
+    private final InputService inputService;
 
     @Inject
-    public InputStatesResource(InputRegistry inputRegistry) {
+    public InputStatesResource(InputRegistry inputRegistry,
+                               EventBus serverEventBus,
+                               InputService inputService) {
         this.inputRegistry = inputRegistry;
+        this.serverEventBus = serverEventBus;
+        this.inputService = inputService;
     }
 
     @GET
@@ -80,6 +91,36 @@ public class InputStatesResource extends RestResource {
             throw new NotFoundException("No input state for input id <" + inputId + "> on this node.");
         }
         return getInputStateSummary(inputState);
+    }
+
+    @PUT
+    @Path("/{inputId}")
+    @Timed
+    @ApiOperation(value = "(Re-)Start specified input on this node")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+    })
+    public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        final Input input = inputService.find(inputId);
+        final InputCreated result = InputCreated.create(inputId);
+        this.serverEventBus.post(result);
+
+        return result;
+    }
+
+    @DELETE
+    @Path("/{inputId}")
+    @Timed
+    @ApiOperation(value = "Stop specified input on this node")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+    })
+    public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        final Input input = inputService.find(inputId);
+        final InputDeleted result = InputDeleted.create(inputId);
+        this.serverEventBus.post(result);
+
+        return result;
     }
 
     private InputStateSummary getInputStateSummary(IOState<MessageInput> inputState) {
