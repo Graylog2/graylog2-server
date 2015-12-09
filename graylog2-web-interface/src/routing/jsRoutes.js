@@ -234,6 +234,11 @@ const jsRoutes = {
       },
       showMessage: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
     },
+    LdapController: {
+      info: () => { return {url: '/system/ldap/settings'}; },
+      groups: () => { return {url: '/system/ldap/groups'}; },
+      test: () => { return {url: '/system/ldap/test'}; },
+    },
   },
 };
 

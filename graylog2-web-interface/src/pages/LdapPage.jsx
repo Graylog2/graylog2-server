@@ -1,17 +1,16 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col, Button } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
-import Routes from 'routing/Routes';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import LdapStore from 'stores/users/LdapStore';
 
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
+import LdapComponent from 'components/users/LdapComponent';
 
 const LdapPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore), PermissionsMixin],
@@ -28,7 +27,7 @@ const LdapPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            ldap form
+            <LdapComponent />
           </Col>
         </Row>
       </span>
