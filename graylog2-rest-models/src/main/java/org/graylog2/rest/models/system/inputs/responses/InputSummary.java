@@ -17,6 +17,7 @@
 package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
@@ -54,17 +55,18 @@ public abstract class InputSummary {
     @JsonProperty
     public abstract Map<String, String> staticFields();
 
-    public static InputSummary create(String title,
-                                      String persistId,
-                                      Boolean global,
-                                      String name,
-                                      @Nullable String contentPack,
-                                      String inputId,
-                                      DateTime createdAt,
-                                      String type,
-                                      String creatorUserId,
-                                      Map<String, Object> attributes,
-                                      Map<String, String> staticFields) {
+    @JsonCreator
+    public static InputSummary create(@JsonProperty("title") String title,
+                                      @JsonProperty("persist_id") String persistId,
+                                      @JsonProperty("global") Boolean global,
+                                      @JsonProperty("name") String name,
+                                      @JsonProperty("content_pack") @Nullable String contentPack,
+                                      @JsonProperty("input_id") String inputId,
+                                      @JsonProperty("created_at") DateTime createdAt,
+                                      @JsonProperty("type") String type,
+                                      @JsonProperty("creator_user_id") String creatorUserId,
+                                      @JsonProperty("attributes") Map<String, Object> attributes,
+                                      @JsonProperty("static_fields") Map<String, String> staticFields) {
         return new AutoValue_InputSummary(title, persistId, global, name, contentPack, inputId, createdAt, type, creatorUserId, attributes, staticFields);
     }
 }
