@@ -24,6 +24,7 @@ package org.graylog2.plugin.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.FluentIterable;
@@ -437,7 +438,7 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         @Override
         public String toString() {
-            return com.google.common.base.Objects.toStringHelper(this)
+            return MoreObjects.toStringHelper(this)
                     .add("value", value)
                     .add("target", target)
                     .add("beginIndex", beginIndex)
