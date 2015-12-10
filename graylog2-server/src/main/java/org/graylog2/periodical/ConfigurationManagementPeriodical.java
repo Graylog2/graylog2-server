@@ -52,26 +52,27 @@ public class ConfigurationManagementPeriodical extends Periodical {
         final SizeBasedRotationStrategyConfig sizeBasedRotationStrategyConfig = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
         final TimeBasedRotationStrategyConfig timeBasedRotationStrategyConfig = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
 
-        if (messageCountRotationStrategyConfig == null) {
-            final MessageCountRotationStrategyConfig config = MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex());
-            clusterConfigService.write(config);
-            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_docs_per_index", config);
-        }
-        if (sizeBasedRotationStrategyConfig == null) {
-            final SizeBasedRotationStrategyConfig config = SizeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxSizePerIndex());
-            clusterConfigService.write(config);
-            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_size_per_index", config);
-        }
-        if (timeBasedRotationStrategyConfig == null) {
-            final TimeBasedRotationStrategyConfig config = TimeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxTimePerIndex());
-            clusterConfigService.write(config);
-            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", config);
-        }
+        // TODO: Disabled the conditions until we have a REST API and UI for the rotation/retention settings.
+        //if (messageCountRotationStrategyConfig == null) {
+            final MessageCountRotationStrategyConfig countConfig = MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex());
+            clusterConfigService.write(countConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_docs_per_index", countConfig);
+        //}
+        //if (sizeBasedRotationStrategyConfig == null) {
+            final SizeBasedRotationStrategyConfig sizeConfig = SizeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxSizePerIndex());
+            clusterConfigService.write(sizeConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_size_per_index", sizeConfig);
+        //}
+        //if (timeBasedRotationStrategyConfig == null) {
+            final TimeBasedRotationStrategyConfig timeConfig = TimeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxTimePerIndex());
+            clusterConfigService.write(timeConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
+        //}
 
         // Selected rotation strategy.
         final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
 
-        if (indexManagementConfig == null) {
+        //if (indexManagementConfig == null) {
             final Class<? extends RotationStrategy> rotationStrategyClass;
 
             switch (elasticsearchConfiguration.getRotationStrategy()) {
@@ -89,7 +90,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
             final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName());
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" setting: {}", "rotation_strategy", config);
-        }
+        //}
     }
 
     @Override
