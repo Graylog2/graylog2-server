@@ -1,6 +1,13 @@
 import Rickshaw from 'rickshaw';
 import moment from 'moment';
-import momentHelper from 'legacy/moment-helper';
+
+
+function getFormattedResolution(resolution) {
+    if (resolution == "week") {
+        return "isoWeek"; // Weeks should start on Monday :)
+    }
+    return resolution;
+}
 
 // We need to override Rickshaw _frequentInterval detection for bar charts due to this issue:
 // https://github.com/shutterstock/rickshaw/issues/461
@@ -73,7 +80,7 @@ const rickshawHelper = {
         }
         var toMoment = moment.utc(to);
 
-        var formattedResolution = momentHelper.getFormattedResolution(resolution);
+        var formattedResolution = getFormattedResolution(resolution);
         var fromFormatted = fromMoment.startOf(formattedResolution).unix();
         var toFormatted = toMoment.startOf(formattedResolution).unix();
 

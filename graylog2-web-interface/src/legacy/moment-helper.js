@@ -61,13 +61,6 @@ const momentHelper = {
     parseUserLocalFromString: function(dateString) {
         return moment.tz(this._cleanDateString(dateString), this._getAcceptedFormats(), true, appConfig.gl2UserTimeZone);
     },
-
-    getFormattedResolution: function(resolution) {
-        if (resolution == "week") {
-            return "isoWeek"; // Weeks should start on Monday :)
-        }
-        return resolution;
-    },
 };
 
 export default momentHelper;
