@@ -7,9 +7,9 @@ import d3 from 'd3';
 
 import D3Utils from 'util/D3Utils';
 import NumberUtils from 'util/NumberUtils';
+import DateTime from 'logic/datetimes/DateTime';
 
 import graphHelper from 'legacy/graphHelper';
-import momentHelper from 'legacy/moment-helper';
 
 const StackedGraphVisualization = React.createClass({
   propTypes: {
@@ -108,7 +108,7 @@ const StackedGraphVisualization = React.createClass({
     }
   },
   _formatTooltipTitle(x) {
-    return momentHelper.toUserTimeZone(x).format(momentHelper.HUMAN_TZ);
+    return new DateTime(x).format(DateTime.Formats.COMPLETE);
   },
   _formatTooltipValue(value) {
     let formattedValue;

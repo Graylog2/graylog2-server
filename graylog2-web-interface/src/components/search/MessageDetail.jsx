@@ -7,11 +7,10 @@ import StreamsStore from 'stores/streams/StreamsStore';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
-import {Spinner, ClipboardButton} from 'components/common';
+import {Spinner, ClipboardButton, Timestamp} from 'components/common';
 
 import jsRoutes from 'routing/jsRoutes';
 import Routes from 'routing/Routes';
-import momentHelper from 'legacy/moment-helper.js';
 
 const MessageDetail = React.createClass({
   propTypes: {
@@ -82,9 +81,6 @@ const MessageDetail = React.createClass({
       return this.state.allStreams;
     }
   },
-  _getFormattedTime() {
-    return momentHelper.toUserTimeZone(this.props.message.fields.timestamp).format('YYYY-MM-DD HH:mm:ss.SSS');
-  },
   render() {
     // Short circuit when all messages are being expanded at the same time
     if (this.props.expandAllRenderAsync) {
@@ -132,9 +128,7 @@ const MessageDetail = React.createClass({
       const rawTimestamp = this.props.message.fields.timestamp;
 
       timestamp.push(<dt key={'dt-' + rawTimestamp}>Timestamp</dt>);
-      timestamp.push(<dd key={'dd-' + rawTimestamp}>
-        <time key={'time-' + rawTimestamp} dateTime={rawTimestamp}>{this._getFormattedTime()}</time>
-      </dd>);
+      timestamp.push(<dd key={'dd-' + rawTimestamp}><Timestamp dateTime={rawTimestamp}/></dd>);
     }
 
     let receivedBy;

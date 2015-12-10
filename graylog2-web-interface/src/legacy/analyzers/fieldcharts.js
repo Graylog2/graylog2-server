@@ -5,7 +5,7 @@ import Rickshaw from 'rickshaw';
 import Qs from 'qs';
 import naturalSort from 'javascript-natural-sort';
 
-import momentHelper from 'legacy/moment-helper';
+import DateTime from 'logic/datetimes/DateTime';
 import rickshawHelper from 'legacy/rickshaw-helper';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 import URLUtils from 'util/URLUtils';
@@ -184,8 +184,7 @@ export const FieldChart = {
         new Rickshaw.Graph.HoverDetail({
             graph: graph,
             formatter: function (series, x, y) {
-                var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000));
-                var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
+                var date = `<span class="date">${new DateTime(x * 1000).toString(DateTime.Formats.COMPLETE)}</span>`;
                 var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
                 var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
                 return content;

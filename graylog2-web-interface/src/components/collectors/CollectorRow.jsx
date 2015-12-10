@@ -1,7 +1,6 @@
 import React from 'react';
-import moment from 'moment';
-import momentHelper from 'legacy/moment-helper';
 import jsRoutes from 'routing/jsRoutes';
+import {Timestamp} from 'components/common';
 
 const CollectorRow = React.createClass({
   propTypes: {
@@ -35,7 +34,6 @@ const CollectorRow = React.createClass({
     const style = {};
     const annotation = collector.active ? '' : '(inactive)';
     const osGlyph = this._getOsGlyph(collector.node_details.operating_system);
-    const formattedTime = (this.state.showRelativeTime ? moment(collector.last_seen).fromNow() : momentHelper.toUserTimeZone(moment(collector.last_seen)).format());
     return (
       <tr className={collectorClass} style={style}>
         <td className="limited">
@@ -46,7 +44,7 @@ const CollectorRow = React.createClass({
           {collector.node_details.operating_system}
         </td>
         <td className="limited">
-          <time dateTime={collector.last_seen} title={momentHelper.toUserTimeZone(moment(collector.last_seen)).format()}>{formattedTime}</time>
+          <Timestamp dateTime={collector.last_seen} relative={this.state.showRelativeTime}/>
         </td>
         <td className="limited">
           {collector.id}

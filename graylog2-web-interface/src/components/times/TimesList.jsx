@@ -2,12 +2,12 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
-import momentHelper from 'legacy/moment-helper';
+import DateTime from 'logic/datetimes/DateTime';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import SystemStore from 'stores/system/SystemStore';
 
-import { Spinner } from 'components/common';
+import { Spinner, Timestamp } from 'components/common';
 
 const TimesList = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
@@ -25,7 +25,7 @@ const TimesList = React.createClass({
       return <Spinner />;
     }
     const time = this.state.time;
-    const timeFormat = momentHelper.DATE_FORMAT_TZ;
+    const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
     const serverTimezone = this.state.system.timezone;
     return (
@@ -40,11 +40,11 @@ const TimesList = React.createClass({
 
           <dl className="system-time">
             <dt>User <em>{currentUser.username}</em></dt>
-            <dd><time>{time.clone().utc().tz(currentUser.timezone).format(timeFormat)}</time></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat}/></dd>
             <dt>Your web browser:</dt>
-            <dd><time>{time.clone().format(timeFormat)}</time></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} tz={'browser'}/></dd>
             <dt>Graylog server:</dt>
-            <dd><time>{time.clone().utc().tz(serverTimezone).format(timeFormat)}</time></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone}/></dd>
           </dl>
         </Col>
       </Row>

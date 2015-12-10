@@ -1,7 +1,5 @@
 import React from 'react';
-import Reflux from 'reflux';
-import numeral from 'numeral';
-import moment from 'moment';
+import DateTime from 'logic/datetimes/DateTime';
 
 import { IndexSizeSummary } from 'components/indices';
 
@@ -27,7 +25,7 @@ const IndexSummary = React.createClass({
   },
   _formatIndexRange() {
     if (this.props.isDeflector) {
-      return 'Contains messages up to ' + moment().fromNow();
+      return 'Contains messages up to ' + new DateTime().toRelativeString();
     }
 
     if (this.props.index.all_shards) {
@@ -43,10 +41,10 @@ const IndexSummary = React.createClass({
     }
 
     if (this.props.indexRange.begin === 0) {
-      return 'Contains messages up to ' + moment(this.props.indexRange.end).fromNow();
+      return 'Contains messages up to ' + new DateTime(this.props.indexRange.end).toRelativeString();
     }
 
-    return 'Contains messages from ' + moment(this.props.indexRange.begin).fromNow() + ' up to ' + moment(this.props.indexRange.end).fromNow();
+    return 'Contains messages from ' + new DateTime(this.props.indexRange.begin).toRelativeString() + ' up to ' + new DateTime(this.props.indexRange.end).toRelativeString();
   },
   _formatShowDetailsLink() {
     if (this.state.showDetails) {

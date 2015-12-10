@@ -1,5 +1,5 @@
 import React from 'react';
-import moment from 'moment';
+import {Timestamp} from 'components/common';
 
 const IndexerFailure = React.createClass({
   propTypes: {
@@ -9,7 +9,7 @@ const IndexerFailure = React.createClass({
     const failure = this.props.failure;
     return (
       <tr>
-        <td title={failure.timestamp}>{moment(failure.timestamp).fromNow()}</td>
+        <td title={failure.timestamp}><Timestamp dateTime={failure.timestamp} relative/></td>
         <td>{failure.index}</td>
         <td>{failure.letter_id}</td>
         <td>{failure.message}</td>

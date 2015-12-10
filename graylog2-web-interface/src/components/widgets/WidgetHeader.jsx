@@ -1,7 +1,7 @@
 "use strict";
 
 var React = require('react');
-var moment = require('moment');
+import {Timestamp} from 'components/common';
 
 var WidgetHeader = React.createClass({
     render() {
@@ -17,7 +17,7 @@ var WidgetHeader = React.createClass({
             <div>
                 <div className="widget-update-info">
                     {loadErrorElement}
-                    <span title={this.props.calculatedAt}>{moment(this.props.calculatedAt).fromNow()}</span>
+                    <span title={this.props.calculatedAt}><Timestamp dateTime={this.props.calculatedAt} relative/></span>
                 </div>
                 <div className="widget-title">
                     {this.props.title}

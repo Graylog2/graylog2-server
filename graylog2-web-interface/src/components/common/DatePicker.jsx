@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {OverlayTrigger, Popover} from 'react-bootstrap';
-import moment from 'moment';
-import DayPicker, { DateUtils } from 'react-day-picker';
+import DateTime from 'logic/datetimes/DateTime';
+import DayPicker from 'react-day-picker';
 
 import 'react-day-picker/lib/style.css';
 
@@ -17,16 +17,28 @@ const DatePicker = React.createClass({
   render() {
     let selectedDate;
     if (this.props.date) {
-      selectedDate = moment(this.props.date, this.props.dateFormatString).toDate();
+      try {
+        selectedDate = DateTime.parseFromString(this.props.date);
+      } catch (e) {
+        // don't do anything
+      }
     }
+
+    const modifiers = {
+      selected: date => {
+        if (!selectedDate) {
+          return false;
+        }
+        const dateTime = DateTime.ignoreTZ(date);
+        return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
+      },
+    };
 
     const dayPickerFrom = (
       <Popover id={this.props.id} placement="bottom" positionTop={25} title="">
-        <DayPicker initialMonth={selectedDate}
+        <DayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
                    onDayClick={this.props.onChange}
-                   modifiers={{
-                     selected: date => selectedDate && DateUtils.isSameDay(selectedDate, date),
-                   }}
+                   modifiers={modifiers}
                    enableOutsideDays/>
       </Popover>
     );

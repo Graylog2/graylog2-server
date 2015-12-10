@@ -1,4 +1,4 @@
-import momentHelper from 'legacy/moment-helper';
+import DateTime from 'logic/datetimes/DateTime';
 import moment from 'moment';
 
 export default {
@@ -35,7 +35,7 @@ export default {
       var formattedDate;
 
       if (tzOffset === null) {
-        momentDate = momentHelper.toUserTimeZone(date);
+        momentDate = new DateTime(date).toMoment();
       } else {
         momentDate = moment(date);
         momentDate.utcOffset(tzOffset);
@@ -62,8 +62,8 @@ export default {
       var endMoment;
 
       if (tzOffset === null) {
-        runningMoment = momentHelper.toUserTimeZone(initDateTime);
-        endMoment = momentHelper.toUserTimeZone(endDateTime);
+        runningMoment = new DateTime(initDateTime).toMoment();
+        endMoment = new DateTime(endDateTime).toMoment();
       } else {
         runningMoment = moment(initDateTime);
         endMoment = moment(endDateTime);

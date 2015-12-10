@@ -1,4 +1,3 @@
-/* global momentHelper */
 /* jshint -W107, -W079 */
 
 'use strict';
@@ -21,6 +20,7 @@ var SourceLineChart = require('./SourceLineChart');
 
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 var moment = require('moment');
+import DateTime from 'logic/datetimes/DateTime';
 
 var SupportLink = require('../support/SupportLink');
 var Spinner = require('../common/Spinner');
@@ -72,12 +72,9 @@ var SourceOverview = React.createClass({
         };
         var onLineChartFiltered = (filter) => {
             if (filter) {
-                var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
-                var toDateTime = momentHelper.toUserTimeZone(filter[1]);
-
                 SearchStore.changeTimeRange('absolute', {
-                    from: fromDateTime.format(momentHelper.DATE_FORMAT_TZ),
-                    to: toDateTime.format(momentHelper.DATE_FORMAT_TZ)
+                    from: new DateTime(filter[0]).toString(),
+                    to: new DateTime(filter[1]).toString(),
                 });
             } else {
                 this.syncRangeWithQuery();

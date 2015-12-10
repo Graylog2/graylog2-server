@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Button } from 'react-bootstrap';
-import moment from 'moment';
+import {Timestamp} from 'components/common';
 
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 
@@ -27,7 +27,7 @@ const Notification = React.createClass({
           {notificationView.title}{' '}
 
           <span className="notification-timestamp">
-            (triggered {moment(notification.timestamp).fromNow()})
+            (triggered <Timestamp dateTime={notification.timestamp} relative/>)
           </span>
         </h3>
         <div className="notification-description">

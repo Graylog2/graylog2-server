@@ -1,7 +1,7 @@
 import React from 'react';
 import MessageDetail from './MessageDetail';
 import Immutable from 'immutable';
-import momentHelper from 'legacy/moment-helper';
+import {Timestamp} from 'components/common';
 
 const MessageTableEntry = React.createClass({
   shouldComponentUpdate(newProps) {
@@ -58,13 +58,6 @@ const MessageTableEntry = React.createClass({
       return String(origValue);
     }
   },
-  _getFormattedTime() {
-    if (this.formattedTime === undefined) {
-      this.formattedTime = momentHelper.toUserTimeZone(this.props.message.fields['timestamp']).format('YYYY-MM-DD HH:mm:ss.SSS');
-    }
-
-    return this.formattedTime;
-  },
   _toggleDetail() {
     this.props.toggleDetail(this.props.message.id);
   },
@@ -79,7 +72,7 @@ const MessageTableEntry = React.createClass({
       <tbody className={classes}>
       <tr className="fields-row" onClick={this._toggleDetail}>
         <td><strong>
-          <time title={this.props.message.fields['timestamp']} dateTime={this.props.message.fields['timestamp']}>{this._getFormattedTime()}</time>
+          <Timestamp dateTime={this.props.message.fields.timestamp}/>
         </strong></td>
         { this.props.selectedFields.toSeq().map(selectedFieldName => <td
           key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }

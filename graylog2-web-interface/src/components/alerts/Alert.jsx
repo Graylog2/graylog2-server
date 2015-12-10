@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import $ from 'jquery';
-import momentHelper from 'legacy/moment-helper';
+import {Timestamp} from 'components/common';
 
 import AlarmCallbackHistoryOverview from 'components/alarmcallbacks/AlarmCallbackHistoryOverview';
 
@@ -35,15 +35,12 @@ const Alert = React.createClass({
   render() {
     const alert = this.props.alert;
     const toggleHistoryText = this.state.showAlarmCallbackHistory ? 'Hide callbacks' : 'Show callbacks';
-    const alertTriggeredAt = momentHelper.toUserTimeZone(alert.triggered_at);
     const alarmCallbackHistory = this.state.showAlarmCallbackHistory ? this._getAlarmCallbackHistory(alert) : null;
     return (
       <tbody>
       <tr>
         <td style={{borderTop: 0}}>
-          <time title={alertTriggeredAt.format()} dateTime={alertTriggeredAt.format()}>
-            {alertTriggeredAt.fromNow()}
-          </time>
+          <Timestamp dateTime={alert.triggered_at} relative/>
         </td>
         <td style={{borderTop: 0}}>
           <a href="#" onClick={this._onClickConditionId.bind(this, alert.condition_id)}>{alert.condition_id}</a>

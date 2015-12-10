@@ -1,6 +1,6 @@
 import Rickshaw from 'rickshaw';
 import rickshawHelper from 'legacy/rickshaw-helper';
-import momentHelper from 'legacy/moment-helper';
+import DateTime from 'logic/datetimes/DateTime';
 import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
 import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
 import numeral from 'numeral';
@@ -82,8 +82,8 @@ const resultHistogram = {
         new Rickshaw.Graph.HoverDetail({
             graph: resultGraph,
             formatter: function(series, x, y) {
-                var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
-                var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
+                var dateString = new DateTime(x * 1000).toString(DateTime.Formats.COMPLETE);
+                var date = '<span class="date">' + dateString + '</span>';
                 var swatch = '<span class="detail_swatch"></span>';
                 var content = numeral(parseInt(y)).format("0,0") + ' messages<br>' + date;
                 return content;

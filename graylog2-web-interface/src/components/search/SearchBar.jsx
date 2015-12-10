@@ -3,7 +3,6 @@ import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
-import moment from 'moment';
 
 import {ChosenSelectInput, DatePicker} from 'components/common';
 import QueryInput from './QueryInput';
@@ -17,7 +16,7 @@ import SavedSearchesActions from 'actions/search/SavedSearchesActions';
 
 import UIUtils from 'util/UIUtils';
 
-import momentHelper from 'legacy/moment-helper.js';
+import DateTime from 'logic/datetimes/DateTime';
 
 const SearchBar = React.createClass({
   propTypes: {
@@ -79,8 +78,23 @@ const SearchBar = React.createClass({
   },
   _rangeParamsChanged(key) {
     return () => {
-      const ref = (key === 'from' || key === 'to') ? key + 'Formatted' : key;
-      SearchStore.rangeParams = this.state.rangeParams.set(key, this.refs[ref].getValue());
+      let refInput;
+
+      switch (key) {
+        case 'from':
+        case 'to':
+          const ref = `${key}Formatted`;
+          refInput = this.refs[ref];
+          if (!this._isValidDateString(refInput.getValue())) {
+            refInput.getInputDOMNode().setCustomValidity('Invalid date time provided');
+          } else {
+            refInput.getInputDOMNode().setCustomValidity('');
+          }
+          break;
+        default:
+          refInput = this.refs[key];
+      }
+      SearchStore.rangeParams = this.state.rangeParams.set(key, refInput.getValue());
     };
   },
   _keywordSearchChanged() {
@@ -99,8 +113,8 @@ const SearchBar = React.createClass({
     this.setState({keywordPreview: Immutable.Map()});
   },
   _onKeywordPreviewLoaded(data) {
-    const from = momentHelper.toUserTimeZone(data.from).format(momentHelper.DATE_FORMAT_NO_MS);
-    const to = momentHelper.toUserTimeZone(data.to).format(momentHelper.DATE_FORMAT_NO_MS);
+    const from = DateTime.fromUTCDateTime(data.from).toString();
+    const to = DateTime.fromUTCDateTime(data.to).toString();
     this.setState({keywordPreview: Immutable.Map({from: from, to: to})});
   },
   _formattedDateStringInUserTZ(field) {
@@ -113,8 +127,7 @@ const SearchBar = React.createClass({
     // We only format the original dateTime, as datepicker will format the date in another way, and we
     // don't want to annoy users trying to guess what they are typing.
     if (this.initialSearchParams.rangeParams.get(field) === dateString) {
-      const originalDateTime = momentHelper.parseFromString(dateString);
-      return momentHelper.toUserTimeZone(originalDateTime).format(momentHelper.DATE_FORMAT_TZ);
+      return DateTime.parseFromString(dateString).toString();
     }
 
     return dateString;
@@ -122,7 +135,7 @@ const SearchBar = React.createClass({
   _setDateTimeToNow(field) {
     return () => {
       const inputNode = this.refs[field + 'Formatted'].getInputDOMNode();
-      inputNode.value = momentHelper.toUserTimeZone().format(momentHelper.DATE_FORMAT_TZ);
+      inputNode.value = new DateTime().toString(DateTime.Formats.DATETIME);
       this._rangeParamsChanged(field)();
     };
   },
@@ -130,19 +143,23 @@ const SearchBar = React.createClass({
     return this._isValidDateString(this._formattedDateStringInUserTZ(field));
   },
   _isValidDateString(dateString) {
-    return dateString === undefined || momentHelper.parseFromString(dateString).isValid();
+    try {
+      if (dateString !== undefined) {
+        DateTime.parseFromString(dateString);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
   },
-  _prepareSearch() {
+  _prepareSearch(event) {
     // Convert from and to values to UTC
     if (this.state.rangeType === 'absolute') {
       const fromInput = this.refs.fromFormatted.getValue();
       const toInput = this.refs.toFormatted.getValue();
 
-      const fromMoment = momentHelper.parseUserLocalFromString(fromInput);
-      this.refs.from.getInputDOMNode().value = fromMoment.toISOString();
-
-      const toMoment = momentHelper.parseUserLocalFromString(toInput);
-      this.refs.to.getInputDOMNode().value = toMoment.toISOString();
+      this.refs.from.getInputDOMNode().value = DateTime.parseFromString(fromInput).toISOString();;
+      this.refs.to.getInputDOMNode().value = DateTime.parseFromString(toInput).toISOString();;
     }
 
     this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
@@ -156,10 +173,9 @@ const SearchBar = React.createClass({
 
   _onDateSelected(field) {
     return (event, date) => {
-      const dateString = moment(date).format();
-      const parsedDate = momentHelper.parseUserLocalFromString(dateString);
       const inputField = this.refs[`${field}Formatted`].getInputDOMNode();
-      inputField.value = parsedDate.format(momentHelper.DATE_FORMAT_TZ);
+      const midnightDate = date.setHours(0);
+      inputField.value = DateTime.ignoreTZ(midnightDate).toString(DateTime.Formats.DATETIME);
       this._rangeParamsChanged(field)();
     };
   },
@@ -205,13 +221,12 @@ const SearchBar = React.createClass({
               <DatePicker id="searchFromDatePicker"
                           title="Search start date"
                           date={this.state.rangeParams.get('from')}
-                          dateFormatString={momentHelper.DATE_FORMAT_TZ}
                           onChange={this._onDateSelected('from')} >
                 <Input type="text"
                        ref="fromFormatted"
                        value={this._formattedDateStringInUserTZ('from')}
                        onChange={this._rangeParamsChanged('from')}
-                       placeholder={momentHelper.DATE_FORMAT}
+                       placeholder={DateTime.Formats.DATETIME}
                        buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
                        bsStyle={this._isValidDateField('from') ? null : 'error'}
                        bsSize="small"
@@ -227,13 +242,12 @@ const SearchBar = React.createClass({
               <DatePicker id="searchToDatePicker"
                           title="Search end date"
                           date={this.state.rangeParams.get('to')}
-                          dateFormatString={momentHelper.DATE_FORMAT_TZ}
                           onChange={this._onDateSelected('to')} >
                 <Input type="text"
                        ref="toFormatted"
                        value={this._formattedDateStringInUserTZ('to')}
                        onChange={this._rangeParamsChanged('to')}
-                       placeholder={momentHelper.DATE_FORMAT}
+                       placeholder={DateTime.Formats.DATETIME}
                        buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
                        bsStyle={this._isValidDateField('to') ? null : 'error'}
                        bsSize="small"
