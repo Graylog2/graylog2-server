@@ -3,7 +3,6 @@ import { Alert, Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
-import momentHelper from 'legacy/moment-helper';
 
 import IndexerFailuresStore from 'stores/indexers/IndexerFailuresStore';
 

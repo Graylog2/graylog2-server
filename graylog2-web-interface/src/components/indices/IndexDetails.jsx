@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { IndicesActions } from 'actions/indices';
