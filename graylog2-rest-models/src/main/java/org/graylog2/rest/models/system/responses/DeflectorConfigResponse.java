@@ -18,16 +18,35 @@
 package org.graylog2.rest.models.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.Period;
 
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = MessageCountRotationStrategyResponse.class, name = "count"),
-        @JsonSubTypes.Type(value = TimeBasedRotationStrategyResponse.class, name = "time"),
-        @JsonSubTypes.Type(value = SizeBasedRotationStrategyResponse.class, name = "size")
-})
-public abstract class DeflectorConfigResponse {
-        public int maxNumberOfIndices;
+public class DeflectorConfigResponse {
+        @JsonProperty("type")
+        private final String type;
+
+        @JsonProperty("max_number_of_indices")
+        private final int maxNumberOfIndices;
+
+        @JsonProperty("max_docs_per_index")
+        private final int maxDocsPerIndex;
+
+        @JsonProperty("max_time_per_index")
+        private final Period maxTimePerIndex;
+
+        @JsonProperty("max_size_per_index")
+        private final long maxSizePerIndex;
+
+        public DeflectorConfigResponse(String type,
+                                       int maxDocsPerIndex,
+                                       int maxNumberOfIndices,
+                                       long maxSizePerIndex,
+                                       Period maxTimePerIndex) {
+                this.type = type;
+                this.maxDocsPerIndex = maxDocsPerIndex;
+                this.maxNumberOfIndices = maxNumberOfIndices;
+                this.maxSizePerIndex = maxSizePerIndex;
+                this.maxTimePerIndex = maxTimePerIndex;
+        }
 }
