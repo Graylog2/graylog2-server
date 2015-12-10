@@ -54,7 +54,8 @@ const IndexSummary = React.createClass({
     }
     return <span><i className="fa fa-caret-right"/> Show Details / Actions</span>;
   },
-  _toggleShowDetails() {
+  _toggleShowDetails(event) {
+    event.preventDefault();
     this.setState({ showDetails: !this.state.showDetails });
   },
   render() {
@@ -73,7 +74,7 @@ const IndexSummary = React.createClass({
 
             <IndexSizeSummary index={index} />
 
-            <a onClick={this._toggleShowDetails}>{this._formatShowDetailsLink()}</a>
+            <a onClick={this._toggleShowDetails} href="#">{this._formatShowDetailsLink()}</a>
           </small>
         </h2>
 
