@@ -17,6 +17,7 @@ export { default as SortableList } from './SortableList';
 export { default as SortableListItem } from './SortableListItem';
 export { default as Spinner } from './Spinner';
 export { default as TableList } from './TableList';
+export { default as Timestamp } from './Timestamp';
 export { default as TimezoneSelect } from './TimezoneSelect';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';
