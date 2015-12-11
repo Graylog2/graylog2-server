@@ -78,22 +78,25 @@ public class ClusterInputStatesResource {
     @RequiresPermissions(RestPermissions.INPUTS_READ)
     public Map<String, Set<InputStateSummary>> get() {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, Set<InputStateSummary>> result = nodes.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
-            final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
-                    this.authenticationToken,
-                    RemoteInputStatesResource.class);
-            try {
-                final Response<InputStatesList> response = remoteInputStatesResource.list().execute();
-                if (response.isSuccess()) {
-                    return response.body().states();
-                } else {
-                    LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": " + response);
-                }
-            } catch (IOException e) {
-                LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": ", e);
-            }
-            return null;
-        }));
+        final Map<String, Set<InputStateSummary>> result = nodes.entrySet()
+                .stream()
+                .parallel()
+                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                    final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
+                            this.authenticationToken,
+                            RemoteInputStatesResource.class);
+                    try {
+                        final Response<InputStatesList> response = remoteInputStatesResource.list().execute();
+                        if (response.isSuccess()) {
+                            return response.body().states();
+                        } else {
+                            LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": " + response);
+                        }
+                    } catch (IOException e) {
+                        LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": ", e);
+                    }
+                    return null;
+                }));
         return result;
     }
 }
