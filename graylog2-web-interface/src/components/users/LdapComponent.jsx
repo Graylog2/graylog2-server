@@ -79,11 +79,27 @@ const LdapComponent = React.createClass({
       <span>The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@@some.domain</code>.<br/>
       This needs to match the <code>userPrincipalName</code> of that user.</span>),
     SYSTEM_PASSWORD: ('The password for the initial connection to the Active Directory server.'),
+    SEARCH_BASE: (
+      <span>The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>),
+    SEARCH_PATTERN: (<span>For example <code>
+      (&amp;(objectclassName=user)(sAMAccountName={0}))</code>. The string <code>{0}</code>
+                            will be replaced by the entered username.</span>),
+    DISPLAY_NAME: (
+      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>
+        displayName</code>.</span>),
   },
   helpTextsLDAP: {
     SYSTEM_USERNAME: (
       <span>The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>),
     SYSTEM_PASSWORD: ('The password for the initial connection to the LDAP server.'),
+    SEARCH_BASE: (
+      <span>The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
+    ),
+    SEARCH_PATTERN: (
+      <span>For example <code>(&amp;(objectclassName=inetOrgPerson)(uid={"\u007B0\u007D"}))</code>.The string <code>"{"\u007B0\u007D"}"</code> will be replaced by the entered username.</span>
+    ),
+    DISPLAY_NAME: (
+      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.</span>),
   },
   render() {
     if (this._isLoading()) {
@@ -174,26 +190,54 @@ const LdapComponent = React.createClass({
             </div>
           </fieldset>
           <fieldset>
-              <legend className="col-sm-12">2. Connection Test</legend>
-              <div className="form-group">
-                <div className="col-sm-offset-3 col-sm-9">
-                  <button type="button" id="ldap-test-connection" className="btn btn-warning" disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
-                    Test Server Connection
-                  </button>
-                  <span className="help-block">Performs a background connection check with the address and credentials above.</span>
-                  <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
-                </div>
+            <legend className="col-sm-12">2. Connection Test</legend>
+            <div className="form-group">
+              <div className="col-sm-offset-3 col-sm-9">
+                <button type="button" id="ldap-test-connection" className="btn btn-warning"
+                        disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
+                  Test Server Connection
+                </button>
+                <span className="help-block">Performs a background connection check with the address and credentials above.</span>
+                <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
               </div>
+            </div>
 
           </fieldset>
 
           <fieldset>
             <legend className="col-sm-12">3. User mapping</legend>
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="search_base">Search Base DN</label>
+              <div className="col-sm-9">
+                <input type="text" id="search_base" className="form-control" name="search_base" placeholder="Search Base"
+                       value={this.state.ldapSettings.search_base} onChange={this._bindValue} required/>
+                <span className="help-block">{help.SEARCH_BASE}</span>
+              </div>
+            </div>
 
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="search_pattern">User Search Pattern</label>
+              <div className="col-sm-9">
+                <input type="text" id="search_pattern" name="search_pattern" className="form-control"
+                       placeholder="Search Pattern" value={this.state.ldapSettings.search_pattern} onChange={this._bindValue} required/>
+                <span className="help-block">{help.SEARCH_PATTERN}</span>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="display_name_attribute">Display Name attribute</label>
+              <div className="col-sm-9">
+                <input type="text" id="display_name_attribute" name="display_name_attribute" className="form-control"
+                       placeholder="Display Name Attribute" value={this.state.ldapSettings.display_name_attribute} onChange={this._bindValue} required/>
+                <span className="help-block">{help.DISPLAY_NAME}</span>
+              </div>
+            </div>
           </fieldset>
 
           <fieldset>
-            <legend className="col-sm-12">4. Group Mapping <small>(optional)</small></legend>
+            <legend className="col-sm-12">4. Group Mapping
+              <small>(optional)</small>
+            </legend>
 
           </fieldset>
 
