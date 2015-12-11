@@ -27,7 +27,7 @@ const InputTypesStore = Reflux.createStore({
         this.trigger({inputTypes: this.inputTypes});
       })
       .catch(error => {
-        UserNotification.error('Fetching Inputs failed with status: ' + error,
+        UserNotification.error('Fetching Input Types failed with status: ' + error,
           'Could not retrieve Inputs');
       });
 
