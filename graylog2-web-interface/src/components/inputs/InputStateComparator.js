@@ -14,7 +14,7 @@ class InputStateComparator {
   }
 
   compare(state1, state2) {
-    return this.mapping(state1) - this.mapping(state2);
+    return this.mapping[state1.toUpperCase()] - this.mapping[state2.toUpperCase()];
   }
 }
 
