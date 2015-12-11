@@ -31,18 +31,18 @@ const InputsList = React.createClass({
   _splitInputs(state) {
     const inputs = state.inputs;
     const globalInputs = inputs
-      .filter(input => input.message_input.global === true)
-      .sort((inputA, inputB) => naturalSort(inputA.message_input.title, inputB.message_input.title));
+      .filter(input => input.global === true)
+      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
     const localInputs = inputs
-      .filter((input) => input.message_input.global === false)
-      .sort((inputA, inputB) => naturalSort(inputA.message_input.title, inputB.message_input.title));
+      .filter((input) => input.global === false)
+      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
     this.setState({globalInputs: globalInputs, localInputs: localInputs});
   },
   _isLoading() {
     return !(this.state.localInputs && this.state.globalInputs && this.state.node);
   },
   _formatInput(input) {
-    return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
+    return <InputListItem key={input.input_id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
   },
   render() {
     if (this._isLoading()) {
@@ -60,7 +60,7 @@ const InputsList = React.createClass({
             <h2>
               Global inputs
               &nbsp;
-              <small>{this.state.globalInputs.length} configured on this node</small>
+              <small>{this.state.globalInputs.length} configured</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
                         items={this.state.globalInputs.map(input => this._formatInput(input))} />
@@ -71,7 +71,7 @@ const InputsList = React.createClass({
             <h2>
               Local inputs
               &nbsp;
-              <small>{this.state.localInputs.length} configured on this node</small>
+              <small>{this.state.localInputs.length} configured</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no local inputs."
                         items={this.state.localInputs.map(input => this._formatInput(input))} />

@@ -1,12 +1,16 @@
 import React, {PropTypes} from 'react';
 import {Label, Button, DropdownButton, MenuItem, Col, Well} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
-import EntityListItem from 'components/common/EntityListItem';
+
+import { EntityListItem } from 'components/common';
+
 import PermissionsMixin from 'util/PermissionsMixin';
 import jsRoutes from 'routing/jsRoutes';
 import Routes from 'routing/Routes';
 
 import InputsActions from 'actions/inputs/InputsActions';
+
+import { InputStateBadge } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -15,21 +19,8 @@ const InputListItem = React.createClass({
     permissions: PropTypes.array.isRequired,
   },
   mixins: [PermissionsMixin],
-  _labelClassForState(state) {
-    switch (state) {
-      case 'RUNNING':
-        return 'success';
-      case 'FAILED':
-        return 'danger';
-      case 'STARTING':
-        return 'info';
-      default:
-        return 'warning';
-    }
-  },
-
   _deleteInput() {
-    if (window.confirm(`Do you really want to delete input '${this.props.input.message_input.title}'?`)) {
+    if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete.triggerPromise(this.props.input);
     }
   },
@@ -40,7 +31,7 @@ const InputListItem = React.createClass({
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
       items.push(<MenuItem key={`edit-input-${this.props.input.id}`}>Edit input</MenuItem>);
     }
-    if (!this.props.input.message_input.global) {
+    if (!this.props.input.global) {
       items.push(<MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>);
     }
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
@@ -69,10 +60,9 @@ const InputListItem = React.createClass({
 
     const titleSuffix = (
       <span>
-        {this.props.input.message_input.name}
+        {this.props.input.name}
         &nbsp;
-        <Label bsStyle={this._labelClassForState(this.props.input.state)}
-               bsSize="xsmall">{this.props.input.state.toLowerCase()}</Label>
+        <InputStateBadge input={this.props.input} />
       </span>
     );
 
@@ -90,7 +80,7 @@ const InputListItem = React.createClass({
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
       let extractorRoute;
 
-      if (this.props.input.message_input.global) {
+      if (this.props.input.global) {
         extractorRoute = Routes.global_input_extractors(this.props.input.id);
       } else {
         extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
@@ -114,7 +104,7 @@ const InputListItem = React.createClass({
 
     let subtitle;
 
-    if (!this.props.input.message_input.global) {
+    if (!this.props.input.global) {
       subtitle = (
         <span title={this.props.currentNode.node_id}>
           On node{' '}
@@ -131,7 +121,7 @@ const InputListItem = React.createClass({
         <Col md={8}>
           <Well bsSize="small" className="configuration-well">
             <ul>
-              {this._getConfigurationOptions(this.props.input.message_input.attributes)}
+              {this._getConfigurationOptions(this.props.input.attributes)}
             </ul>
           </Well>
         </Col>
@@ -147,10 +137,10 @@ const InputListItem = React.createClass({
 
     return (
       <EntityListItem key={`entry-list-${this.props.input.id}`}
-                      title={this.props.input.message_input.title}
+                      title={this.props.input.title}
                       titleSuffix={titleSuffix}
                       description={subtitle}
-                      createdFromContentPack={!!this.props.input.message_input.content_pack}
+                      createdFromContentPack={!!this.props.input.content_pack}
                       actions={actions}
                       contentRow={additionalContent}/>
     );
