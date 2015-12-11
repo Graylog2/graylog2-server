@@ -55,7 +55,7 @@ const InputsStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Input '${input.title}' launched successfully`);
-        InputsActions.list();
+        InputsActions.list.triggerPromise(true);
       })
       .catch(error => {
         UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
@@ -73,7 +73,7 @@ const InputsStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Input '${inputTitle}' deleted successfully`);
-        InputsActions.list();
+        InputsActions.list.triggerPromise(true);
       })
       .catch(error => {
         UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
