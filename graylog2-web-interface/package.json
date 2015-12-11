@@ -56,7 +56,8 @@
     "superagent": "^1.4.0",
     "superagent-bluebird-promise": "^2.1.0",
     "toastr": "^2.1.2",
-    "typeahead.js": "^0.11.1"
+    "typeahead.js": "^0.11.1",
+    "urijs": "^1.17.0"
   },
   "devDependencies": {
     "babel-core": "^5.8.25",
