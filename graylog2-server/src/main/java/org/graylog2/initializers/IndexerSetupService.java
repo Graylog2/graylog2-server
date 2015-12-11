@@ -36,6 +36,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.DocsHelper;
@@ -69,6 +70,7 @@ public class IndexerSetupService extends AbstractIdleService {
     private final NotificationService notificationService;
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final Indices indices;
 
     @Inject
     public IndexerSetupService(final Node node,
@@ -76,8 +78,9 @@ public class IndexerSetupService extends AbstractIdleService {
                                final BufferSynchronizerService bufferSynchronizerService,
                                final NotificationService notificationService,
                                @Named("systemHttpClient") final OkHttpClient httpClient,
-                               final MetricRegistry metricRegistry) {
-        this(node, configuration, bufferSynchronizerService, notificationService, httpClient, new ObjectMapper(), metricRegistry);
+                               final MetricRegistry metricRegistry,
+                               final Indices indices) {
+        this(node, configuration, bufferSynchronizerService, notificationService, httpClient, new ObjectMapper(), metricRegistry, indices);
     }
 
     @VisibleForTesting
@@ -87,12 +90,14 @@ public class IndexerSetupService extends AbstractIdleService {
                         final NotificationService notificationService,
                         final OkHttpClient httpClient,
                         final ObjectMapper objectMapper,
-                        final MetricRegistry metricRegistry) {
+                        final MetricRegistry metricRegistry,
+                        final Indices indices) {
         this.node = node;
         this.configuration = configuration;
         this.notificationService = notificationService;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
+        this.indices = indices;
 
         // Shutdown after the BufferSynchronizerService has stopped to avoid shutting down ES too early.
         bufferSynchronizerService.addListener(new ShutdownListener(this.node), executorService(metricRegistry));
@@ -140,6 +145,9 @@ public class IndexerSetupService extends AbstractIdleService {
                 LOG.warn("The Elasticsearch cluster state is RED which means shards are unassigned.");
                 LOG.info("This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will write into the local disk journal.");
                 LOG.info("See {} for details.", DocsHelper.PAGE_ES_CONFIGURATION);
+            } else {
+                // Install our internal Elasticsearch template as early as possible.
+                indices.createIndexTemplate();
             }
         } catch (ElasticsearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");

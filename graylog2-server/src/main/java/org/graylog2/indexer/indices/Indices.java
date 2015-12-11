@@ -46,6 +46,7 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -98,6 +99,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 public class Indices implements IndexManagement {
 
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
+
+    private static final String GRAYLOG_INTERNAL_TEMPLATE_NAME = "graylog-internal";
 
     private final Client c;
     private final ElasticsearchConfiguration configuration;
@@ -211,6 +214,26 @@ public class Indices implements IndexManagement {
         return response.getAliases().isEmpty() ? null : response.getAliases().keysIt().next();
     }
 
+    public boolean createIndexTemplate() {
+        final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(), configuration.getAnalyzer());
+        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(GRAYLOG_INTERNAL_TEMPLATE_NAME)
+                .setOrder(-99) // Make sure templates with "order: 0" are applied after our template!
+                .setSource(template)
+                .request();
+
+        try {
+            final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
+            if (acknowledged) {
+                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", GRAYLOG_INTERNAL_TEMPLATE_NAME);
+            }
+            return acknowledged;
+        } catch (Exception e) {
+            LOG.error("Unable to create the Graylog index template: " + GRAYLOG_INTERNAL_TEMPLATE_NAME, e);
+        }
+
+        return false;
+    }
+
     public boolean create(String indexName) {
         final Map<String, String> keywordLowercase = ImmutableMap.of(
                 "tokenizer", "keyword",
@@ -219,11 +242,9 @@ public class Indices implements IndexManagement {
                 "number_of_shards", configuration.getShards(),
                 "number_of_replicas", configuration.getReplicas(),
                 "index.analysis.analyzer.analyzer_keyword", keywordLowercase);
-        final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
 
         final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
                 .setSettings(settings)
-                .addMapping(IndexMapping.TYPE_MESSAGE, messageMapping)
                 .request();
 
         return c.admin().indices().create(cir).actionGet().isAcknowledged();
