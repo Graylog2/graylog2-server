@@ -81,25 +81,43 @@ const LdapComponent = React.createClass({
     SYSTEM_PASSWORD: ('The password for the initial connection to the Active Directory server.'),
     SEARCH_BASE: (
       <span>The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>),
-    SEARCH_PATTERN: (<span>For example <code>
-      {'(&(objectclassName=user)(sAMAccountName={0}))'}</code>. The string <code>{'{0}'}</code>
+    SEARCH_PATTERN: (<span>For example <code className="text-nowrap">{'(&(objectclassName=user)(sAMAccountName={0}))'}</code>. The string <code>{'{0}'}</code>
                             will be replaced by the entered username.</span>),
     DISPLAY_NAME: (
-      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>
-        displayName</code>.</span>),
+      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which Active Directory attribute to use for the full name of the user in Graylog, e.g.
+        <code>displayName</code>.</span>),
+    GROUP_SEARCH_BASE: (<span>The base tree to limit the Active Directory group search query to, e.g. <code>
+      cn=users,dc=example,dc=com</code></span>),
+    GROUP_PATTERN: (
+      <span>The search pattern used to find groups in Active Directory for mapping to Graylog roles, e.g. <code className="text-nowrap">(objectclassName=group)</code> or
+        <code className="text-nowrap">(&amp;(objectclassName=group)(cn=graylog*))</code></span>),
+    GROUP_ID: (
+      <span>Which Active Directory attribute to use for the full name of the group, usually <code>cn</code>.</span>),
+    DEFAULT_GROUP: (<span>The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
+                            You can assign additional permissions by <a href="">mapping Active Directory groups to
+        Graylog roles</a>, or you can assign additional Graylog roles to Active Directory users below.</span>),
+    ADDITIONAL_GROUPS: ('Choose the additional roles each Active Directory user will have by default, leave it empty if you want to map Active Directory groups to Graylog roles.'),
   },
   helpTextsLDAP: {
     SYSTEM_USERNAME: (
-      <span>The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>),
+      <span>The username for the initial connection to the LDAP server, e.g. <code className="text-nowrap">uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>),
     SYSTEM_PASSWORD: ('The password for the initial connection to the LDAP server.'),
     SEARCH_BASE: (
-      <span>The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
+      <span>The base tree to limit the LDAP search query to, e.g. <code className="text-nowrap">cn=users,dc=example,dc=com</code></span>
     ),
     SEARCH_PATTERN: (
-      <span>For example <code>{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.The string <code>{'{0}'}</code> will be replaced by the entered username.</span>
+      <span>For example <code className="text-nowrap">{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.The string <code>{'{0}'}</code> will be replaced by the entered username.</span>
     ),
     DISPLAY_NAME: (
       <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.</span>),
+    GROUP_SEARCH_BASE: (<span>The base tree to limit the LDAP group search query to, e.g. <code>
+      cn=users,dc=example,dc=com</code></span>),
+    GROUP_PATTERN: (<span>The search pattern used to find groups in LDAP for mapping to Graylog roles, e.g. <code>(objectclassName=groupOfNames)</code> or
+      <code className="text-nowrap">(&amp;(objectclassName=groupOfNames)(cn=graylog*))</code></span>),
+    GROUP_ID: (<span>Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.</span>),
+    DEFAULT_GROUP: (<span>The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
+                            You can assign additional permissions by <a href="">mapping LDAP groups to Graylog roles</a>, or you can assign additional Graylog roles to LDAP users below.</span>),
+    ADDITIONAL_GROUPS: ('Choose the additional roles each LDAP user will have by default, leave it empty if you want to map LDAP groups to Graylog roles.'),
   },
   render() {
     if (this._isLoading()) {
@@ -209,7 +227,8 @@ const LdapComponent = React.createClass({
             <div className="form-group">
               <label className="col-sm-3 control-label" htmlFor="search_base">Search Base DN</label>
               <div className="col-sm-9">
-                <input type="text" id="search_base" className="form-control" name="search_base" placeholder="Search Base"
+                <input type="text" id="search_base" className="form-control" name="search_base"
+                       placeholder="Search Base" disabled={disabled}
                        value={this.state.ldapSettings.search_base} onChange={this._bindValue} required/>
                 <span className="help-block">{help.SEARCH_BASE}</span>
               </div>
@@ -219,7 +238,8 @@ const LdapComponent = React.createClass({
               <label className="col-sm-3 control-label" htmlFor="search_pattern">User Search Pattern</label>
               <div className="col-sm-9">
                 <input type="text" id="search_pattern" name="search_pattern" className="form-control"
-                       placeholder="Search Pattern" value={this.state.ldapSettings.search_pattern} onChange={this._bindValue} required/>
+                       placeholder="Search Pattern" value={this.state.ldapSettings.search_pattern} disabled={disabled}
+                       onChange={this._bindValue} required/>
                 <span className="help-block">{help.SEARCH_PATTERN}</span>
               </div>
             </div>
@@ -228,7 +248,8 @@ const LdapComponent = React.createClass({
               <label className="col-sm-3 control-label" htmlFor="display_name_attribute">Display Name attribute</label>
               <div className="col-sm-9">
                 <input type="text" id="display_name_attribute" name="display_name_attribute" className="form-control"
-                       placeholder="Display Name Attribute" value={this.state.ldapSettings.display_name_attribute} onChange={this._bindValue} required/>
+                       placeholder="Display Name Attribute" value={this.state.ldapSettings.display_name_attribute}
+                       onChange={this._bindValue} disabled={disabled} required/>
                 <span className="help-block">{help.DISPLAY_NAME}</span>
               </div>
             </div>
@@ -238,7 +259,79 @@ const LdapComponent = React.createClass({
             <legend className="col-sm-12">4. Group Mapping
               <small>(optional)</small>
             </legend>
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="group_search_base">Group Search Base DN</label>
+              <div className="col-sm-9">
+                <input type="text" id="group_search_base" className="form-control" name="group_search_base" disabled={disabled}
+                       placeholder="Group Search Base" value={this.state.ldapSettings.group_search_base} onChange={this._bindValue}/>
+                <span className="help-block">{help.GROUP_SEARCH_BASE}</span>
+              </div>
+            </div>
 
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="group_search_pattern">Group Search Pattern</label>
+              <div className="col-sm-9">
+                <input type="text" id="group_search_pattern" className="form-control" name="group_search_pattern" disabled={disabled}
+                       placeholder="Group Search Pattern" value={this.state.ldapSettings.group_search_pattern} onChange={this._bindValue}/>
+                <span className="help-block">{help.GROUP_PATTERN}</span>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="group_id_attribute">Group Name Attribute</label>
+              <div className="col-sm-9">
+                <input type="text" id="group_id_attribute" name="group_id_attribute" className="form-control" disabled={disabled}
+                       placeholder="Group Id Attribute" value={this.state.ldapSettings.group_id_attribute} onChange={this._bindValue}/>
+                <span className="help-block">{help.GROUP_ID}</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="default_group">Default User Role</label>
+              <div className="col-sm-9">
+                <div className="row">
+                  <div className="col-sm-4">
+                    <select id="default_group" name="default_group" className="form-control" required
+                            value={this.state.ldapSettings.default_group} disabled={disabled}
+                            onChange={(ev) => this._setSetting('default_group', ev.target.value)}>
+                      <option value="Reader">Reader - basic access</option>
+                      <option value="Admin">Administrator - complete access</option>
+                    </select>
+                  </div>
+                </div>
+                <span className="help-block">{help.DEFAULT_GROUP}</span>
+                <div className="panel panel-info">
+                  <div className="panel-body">
+                    <p>Changing the static role assignment will only affect to new users created via LDAP/Active
+                      Directory!<br/>
+                      Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="additional_default_groups">Additional Default
+                Roles</label>
+              <div className="col-sm-9">
+                <div className="row">
+                  <div className="col-sm-4">
+                    <select id="additional_default_groups" name="additional_default_groups" className="chosen-select text-nowrap"
+                            data-placeholder="Choose static roles" disabled={disabled} multiple>
+                      <option>todo</option>
+                    </select>
+                  </div>
+                </div>
+                <span className="help-block ">{help.ADDITIONAL_GROUPS}</span>
+                <div className="panel panel-info">
+                  <div className="panel-body">
+                    <p>Changing the static role assignment will only affect to new users created via LDAP/Active
+                      Directory!<br/>
+                      Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </fieldset>
 
           <fieldset>
