@@ -2,7 +2,8 @@ import React from 'react';
 
 import { Row, Col, Input, Button} from 'react-bootstrap';
 
-import Spinner from '../common/Spinner';
+import Spinner from 'components/common/Spinner';
+import MultiSelect from 'components/common/MultiSelect';
 
 import RolesStore from 'stores/users/RolesStore';
 import LdapStore from 'stores/users/LdapStore';
@@ -13,6 +14,7 @@ const LdapComponent = React.createClass({
   getInitialState() {
     return {
       ldapSettings: null,
+      roles: null,
     };
   },
 
@@ -21,10 +23,20 @@ const LdapComponent = React.createClass({
       settings.ldap_uri = new URI(settings.ldap_uri);
       this.setState({ldapSettings: settings});
     });
+    RolesStore.loadRoles().then((response) => {
+      this.setState({
+        roles: response.roles
+          .sort((r1, r2) => r1.name.localeCompare(r2.name))
+          .filter((r) => !(r.name.toLowerCase() === 'reader' || r.name.toLowerCase() === 'admin'))
+          .map((r) => {
+            return {label: r.name, value: r.name};
+          }),
+      });
+    });
   },
 
   _isLoading() {
-    return !this.state.ldapSettings;
+    return !this.state.ldapSettings || !this.state.roles;
   },
 
   _bindChecked(ev, value) {
@@ -74,6 +86,13 @@ const LdapComponent = React.createClass({
   _uriPort() {
     return this.state.ldapSettings.ldap_uri.port();
   },
+
+  _setAdditionalDefaultGroups(rolesString) {
+    // only keep non-empty entries
+    const roles = rolesString.split(',').filter((v) => v !== '');
+    this._setSetting('additional_default_groups', roles);
+  },
+
   helpTextsAD: {
     SYSTEM_USERNAME: (
       <span>The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@@some.domain</code>.<br/>
@@ -127,6 +146,8 @@ const LdapComponent = React.createClass({
     const isAD = this.state.ldapSettings.active_directory;
     const disabled = !this.state.ldapSettings.enabled;
     const help = isAD ? this.helpTextsAD : this.helpTextsLDAP;
+
+    const rolesOptions = this.state.roles;
 
     return (<Row>
       <Col lg={8}>
@@ -293,8 +314,8 @@ const LdapComponent = React.createClass({
                     <select id="default_group" name="default_group" className="form-control" required
                             value={this.state.ldapSettings.default_group} disabled={disabled}
                             onChange={(ev) => this._setSetting('default_group', ev.target.value)}>
-                      <option value="Reader">Reader - basic access</option>
-                      <option value="Admin">Administrator - complete access</option>
+                      <option value="reader">Reader - basic access</option>
+                      <option value="admin">Administrator - complete access</option>
                     </select>
                   </div>
                 </div>
@@ -310,15 +331,17 @@ const LdapComponent = React.createClass({
               </div>
             </div>
             <div className="form-group">
-              <label className="col-sm-3 control-label" htmlFor="additional_default_groups">Additional Default
-                Roles</label>
+              <label className="col-sm-3 control-label" htmlFor="additional_default_groups">Additional Default Roles</label>
               <div className="col-sm-9">
                 <div className="row">
                   <div className="col-sm-4">
-                    <select id="additional_default_groups" name="additional_default_groups" className="chosen-select text-nowrap"
-                            data-placeholder="Choose static roles" disabled={disabled} multiple>
-                      <option>todo</option>
-                    </select>
+                    <MultiSelect
+                      ref="select"
+                      options={rolesOptions}
+                      value={this.state.ldapSettings.additional_default_groups}
+                      onChange={(roles) => this._setAdditionalDefaultGroups(roles)}
+                      placeholder="Choose additional roles..."
+                    />
                   </div>
                 </div>
                 <span className="help-block ">{help.ADDITIONAL_GROUPS}</span>
