@@ -82,7 +82,7 @@ const LdapComponent = React.createClass({
     SEARCH_BASE: (
       <span>The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>),
     SEARCH_PATTERN: (<span>For example <code>
-      (&amp;(objectclassName=user)(sAMAccountName={"\u007B0\u007D"}))</code>. The string <code>{"\u007B0\u007D"}</code>
+      {'(&(objectclassName=user)(sAMAccountName={0}))'}</code>. The string <code>{'{0}'}</code>
                             will be replaced by the entered username.</span>),
     DISPLAY_NAME: (
       <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>
@@ -96,7 +96,7 @@ const LdapComponent = React.createClass({
       <span>The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
     ),
     SEARCH_PATTERN: (
-      <span>For example <code>(&amp;(objectclassName=inetOrgPerson)(uid={"\u007B0\u007D"}))</code>.The string <code>"{"\u007B0\u007D"}"</code> will be replaced by the entered username.</span>
+      <span>For example <code>{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.The string <code>{'{0}'}</code> will be replaced by the entered username.</span>
     ),
     DISPLAY_NAME: (
       <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.</span>),
