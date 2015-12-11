@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Input } from 'react-bootstrap';
+import { Row, Col, Input, Button} from 'react-bootstrap';
 
 import Spinner from '../common/Spinner';
 
@@ -104,7 +104,7 @@ const LdapComponent = React.createClass({
                  onChange={this._bindChecked}/>
 
           <fieldset>
-            <legend className="col-sm-offset-3 col-sm-9">Server configuration</legend>
+            <legend className="col-sm-12">1. Server configuration</legend>
             <div className="form-group">
               <label className="col-sm-3 control-label">Server Type</label>
               <Col sm={9}>
@@ -172,19 +172,41 @@ const LdapComponent = React.createClass({
                 <span className="help-block">{help.SYSTEM_PASSWORD}</span>
               </div>
             </div>
-
-            <div className="form-group">
-              <div className="col-sm-offset-3 col-sm-9">
-                <button type="button" id="ldap-test-connection" className="btn btn-warning" disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
-                  Test Server Connection
-                </button>
-                <span className="help-block">Performs a background connection check with the address and credentials above.</span>
-                <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
+          </fieldset>
+          <fieldset>
+              <legend className="col-sm-12">2. Connection Test</legend>
+              <div className="form-group">
+                <div className="col-sm-offset-3 col-sm-9">
+                  <button type="button" id="ldap-test-connection" className="btn btn-warning" disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
+                    Test Server Connection
+                  </button>
+                  <span className="help-block">Performs a background connection check with the address and credentials above.</span>
+                  <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
+                </div>
               </div>
-            </div>
+
           </fieldset>
 
+          <fieldset>
+            <legend className="col-sm-12">3. User mapping</legend>
 
+          </fieldset>
+
+          <fieldset>
+            <legend className="col-sm-12">4. Group Mapping <small>(optional)</small></legend>
+
+          </fieldset>
+
+          <fieldset>
+            <legend className="col-sm-12">5. Login test</legend>
+
+          </fieldset>
+
+          <div className="form-group">
+            <div className="col-sm-offset-3 col-sm-9">
+              <Button bsStyle="success">Save LDAP settings</Button>
+            </div>
+          </div>
         </form>
       </Col>
     </Row>);
