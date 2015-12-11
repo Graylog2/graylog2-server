@@ -31,6 +31,10 @@ const LdapComponent = React.createClass({
     this._setSetting(ev.target.name, typeof value === 'undefined' ? ev.target.checked : value);
   },
 
+  _bindValue(ev) {
+    this._setSetting(ev.target.name, ev.target.value);
+  },
+
   _updateSsl(ev) {
     this._setUriScheme(ev.target.checked ? 'ldaps' : 'ldap');
   },
@@ -70,11 +74,26 @@ const LdapComponent = React.createClass({
   _uriPort() {
     return this.state.ldapSettings.ldap_uri.port();
   },
-
+  helpTextsAD: {
+    SYSTEM_USERNAME: (
+      <span>The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@@some.domain</code>.<br/>
+      This needs to match the <code>userPrincipalName</code> of that user.</span>),
+    SYSTEM_PASSWORD: ('The password for the initial connection to the Active Directory server.'),
+  },
+  helpTextsLDAP: {
+    SYSTEM_USERNAME: (
+      <span>The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>),
+    SYSTEM_PASSWORD: ('The password for the initial connection to the LDAP server.'),
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
     }
+
+    const isAD = this.state.ldapSettings.active_directory;
+    const disabled = !this.state.ldapSettings.enabled;
+    const help = isAD ? this.helpTextsAD : this.helpTextsLDAP;
+
     return (<Row>
       <Col lg={8}>
         <form id="ldap-settings-form" className="form-horizontal">
@@ -91,15 +110,15 @@ const LdapComponent = React.createClass({
               <Col sm={9}>
                 <label className="radio-inline">
                   <input type="radio" name="active_directory"
-                         checked={!this.state.ldapSettings.active_directory}
+                         checked={!isAD} disabled={disabled}
                          onChange={(ev) => this._bindChecked(ev, false)}/>
-                  <span>LDAP</span>
+                  LDAP
                 </label>
                 <label className="radio-inline">
                   <input type="radio" name="active_directory"
-                         checked={this.state.ldapSettings.active_directory}
+                         checked={isAD} disabled={disabled}
                          onChange={(ev) => this._bindChecked(ev, true)}/>
-                  <span>Active Directory</span>
+                  Active Directory
                 </label>
               </Col>
             </div>
@@ -109,25 +128,60 @@ const LdapComponent = React.createClass({
               <Col sm={9}>
                 <div className="input-group">
                   <span className="input-group-addon">{this._uriScheme()}</span>
-                  <input type="text" className="form-control" id="ldap-uri-host" value={this._uriHost()} placeholder="Hostname" required onChange={(ev) => this._setUriHost(ev.target.value)}/>
+                  <input type="text" className="form-control" id="ldap-uri-host" value={this._uriHost()}
+                         placeholder="Hostname" required onChange={(ev) => this._setUriHost(ev.target.value)}
+                         disabled={disabled}/>
                   <span className="input-group-addon input-group-separator">:</span>
-                  <input type="number" className="form-control" id="ldap-uri-port" value={this._uriPort()} min="1" max="65535" placeholder="Port"
-                         required style={{width: 120}} onChange={(ev) => this._setUriPort(ev.target.value)}/>
+                  <input type="number" className="form-control" id="ldap-uri-port" value={this._uriPort()} min="1"
+                         max="65535" placeholder="Port"
+                         required style={{width: 120}} onChange={(ev) => this._setUriPort(ev.target.value)}
+                         disabled={disabled}/>
                 </div>
                 <label className="checkbox-inline">
-                  <input type="checkbox" name="ssl" checked={this.state.ldapSettings.ssl} onChange={this._updateSsl}/> SSL
+                  <input type="checkbox" name="ssl" checked={this.state.ldapSettings.ssl} onChange={this._updateSsl}
+                         disabled={disabled}/> SSL
                 </label>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="use_start_tls" value="true" id="ldap-uri-starttls"
-                         checked={this.state.ldapSettings.use_start_tls} onChange={this._bindChecked}/> StartTLS
+                         checked={this.state.ldapSettings.use_start_tls} onChange={this._bindChecked}
+                         disabled={disabled}/> StartTLS
                 </label>
                 <label className="checkbox-inline">
                   <input type="checkbox" name="trust_all_certificates" value="true" id="trust-all-certificates"
-                         checked={this.state.ldapSettings.trust_all_certificates} onChange={this._bindChecked}/> Allow self-signed certificates
+                         checked={this.state.ldapSettings.trust_all_certificates} onChange={this._bindChecked}
+                         disabled={disabled}/> Allow self-signed certificates
                 </label>
               </Col>
             </div>
 
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="system_username">System Username</label>
+              <div className="col-sm-9">
+                <input type="text" id="system_username" className="form-control"
+                       value={this.state.ldapSettings.system_username} name="system_username"
+                       placeholder="System User DN" onChange={this._bindValue} disabled={disabled}/>
+                <span className="help-block">{help.SYSTEM_USERNAME}</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="col-sm-3 control-label" htmlFor="system_password">System Password</label>
+              <div className="col-sm-9">
+                <input type="password" id="system_password" className="form-control"
+                       value={this.state.ldapSettings.system_password} name="system_password"
+                       placeholder="System Password" onChange={this._bindValue} disabled={disabled}/>
+                <span className="help-block">{help.SYSTEM_PASSWORD}</span>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="col-sm-offset-3 col-sm-9">
+                <button type="button" id="ldap-test-connection" className="btn btn-warning" disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
+                  Test Server Connection
+                </button>
+                <span className="help-block">Performs a background connection check with the address and credentials above.</span>
+                <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
+              </div>
+            </div>
           </fieldset>
 
 
