@@ -35,7 +35,7 @@ const UsageStatsOptOut = React.createClass({
     this.setState({optOutStateLoaded: true, optOutState: {opt_out: true}});
   },
   render() {
-    var content = null;
+    let content = null;
 
     if (this.state.optOutStateLoaded) {
       // We only show the opt-out form if there is no opt-out state!
