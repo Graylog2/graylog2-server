@@ -24,6 +24,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
@@ -64,7 +65,10 @@ public class NodePingThread extends Periodical {
             nodeService.markAsAlive(node, isMaster, configuration.getRestTransportUri());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            nodeService.registerServer(serverStatus.getNodeId().toString(), isMaster, configuration.getRestTransportUri());
+            nodeService.registerServer(serverStatus.getNodeId().toString(),
+                    isMaster,
+                    configuration.getRestTransportUri(),
+                    Tools.getLocalCanonicalHostname());
         }
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)

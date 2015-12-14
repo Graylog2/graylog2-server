@@ -45,6 +45,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
@@ -130,7 +131,10 @@ public class Server extends ServerBootstrap {
         final NodeService nodeService = injector.getInstance(NodeService.class);
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
-        nodeService.registerServer(serverStatus.getNodeId().toString(), configuration.isMaster(), configuration.getRestTransportUri());
+        nodeService.registerServer(serverStatus.getNodeId().toString(),
+                configuration.isMaster(),
+                configuration.getRestTransportUri(),
+                Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
         if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "

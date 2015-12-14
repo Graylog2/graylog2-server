@@ -76,6 +76,11 @@ public class NodeImpl extends PersistedImpl implements Node {
     }
 
     @Override
+    public String getHostname() {
+        return (String)fields.get("hostname");
+    }
+
+    @Override
     @JsonIgnore
     public Map<String, Validator> getValidations() {
         return Collections.emptyMap();
