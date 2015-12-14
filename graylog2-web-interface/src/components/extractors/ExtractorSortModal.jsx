@@ -24,7 +24,7 @@ const ExtractorSortModal = React.createClass({
     if (!this.sortedExtractors) {
       this.close();
     }
-    const promise = ExtractorsActions.order.triggerPromise(this.props.input.input_id, this.sortedExtractors);
+    const promise = ExtractorsActions.order.triggerPromise(this.props.input.id, this.sortedExtractors);
     promise.then(() => this.close());
   },
   render() {

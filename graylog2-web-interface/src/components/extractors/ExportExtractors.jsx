@@ -14,7 +14,7 @@ const ExportExtractors = React.createClass({
   },
   mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
   componentDidMount() {
-    ExtractorsActions.list.triggerPromise(this.props.input.input_id);
+    ExtractorsActions.list.triggerPromise(this.props.input.id);
   },
   _isLoading() {
     return !this.state.extractors;

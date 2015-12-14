@@ -19,11 +19,11 @@ const ExtractorsList = React.createClass({
   },
   mixins: [Reflux.connect(ExtractorsStore), Reflux.ListenerMethods],
   componentDidMount() {
-    ExtractorsActions.list.triggerPromise(this.props.input.input_id);
+    ExtractorsActions.list.triggerPromise(this.props.input.id);
   },
   _formatExtractor(extractor) {
     return (
-      <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.input_id}
+      <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.id}
                           nodeId={this.props.node.node_id}/>
     );
   },
@@ -53,7 +53,7 @@ const ExtractorsList = React.createClass({
 
     return (
       <div>
-        <AddExtractorWizard inputId={this.props.input.input_id}/>
+        <AddExtractorWizard inputId={this.props.input.id}/>
         <Row className="content extractor-list">
           <Col md={12}>
             <Row className="row-sm">

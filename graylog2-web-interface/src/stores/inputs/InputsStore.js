@@ -66,8 +66,8 @@ const InputsStore = Reflux.createStore({
   },
 
   delete(input) {
-    const inputId = input.id ? input.id : input.input_id;
-    const inputTitle = input.title ? input.title : input.message_input.title;
+    const inputId = input.id;
+    const inputTitle = input.title;
 
     const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
     promise
@@ -87,7 +87,7 @@ const InputsStore = Reflux.createStore({
 InputsStore.inputsAsMap = (inputsList) => {
   const inputsMap = {};
   inputsList.forEach(input => {
-    inputsMap[input.input_id] = input;
+    inputsMap[input.id] = input;
   });
   return inputsMap;
 };

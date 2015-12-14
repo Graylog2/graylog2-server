@@ -25,9 +25,6 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-/**
- * Created by dennis on 12/12/14.
- */
 @JsonAutoDetect
 @AutoValue
 public abstract class InputSummary {
@@ -42,7 +39,7 @@ public abstract class InputSummary {
     @JsonProperty
     @Nullable
     public abstract String contentPack();
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String inputId();
     @JsonProperty
     public abstract DateTime createdAt();
@@ -61,7 +58,7 @@ public abstract class InputSummary {
                                       @JsonProperty("global") Boolean global,
                                       @JsonProperty("name") String name,
                                       @JsonProperty("content_pack") @Nullable String contentPack,
-                                      @JsonProperty("input_id") String inputId,
+                                      @JsonProperty("id") String inputId,
                                       @JsonProperty("created_at") DateTime createdAt,
                                       @JsonProperty("type") String type,
                                       @JsonProperty("creator_user_id") String creatorUserId,

@@ -42,7 +42,7 @@ const InputsList = React.createClass({
     return !(this.state.localInputs && this.state.globalInputs && this.state.node);
   },
   _formatInput(input) {
-    return <InputListItem key={input.input_id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
+    return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
   },
   render() {
     if (this._isLoading()) {
