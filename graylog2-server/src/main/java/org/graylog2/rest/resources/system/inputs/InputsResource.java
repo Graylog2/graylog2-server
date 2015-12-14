@@ -193,7 +193,6 @@ public class InputsResource extends RestResource {
 
     private InputSummary getInputSummary(Input input) {
         return InputSummary.create(input.getTitle(),
-                input.getId(),
                 input.isGlobal(),
                 input.getType(),
                 input.getContentPack(),

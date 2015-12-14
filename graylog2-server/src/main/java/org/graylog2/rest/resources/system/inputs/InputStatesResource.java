@@ -129,7 +129,7 @@ public class InputStatesResource extends RestResource {
                 inputState.getState().toString(),
                 inputState.getStartedAt(),
                 inputState.getDetailedMessage(),
-                InputSummary.create(messageInput.getTitle(), messageInput.getPersistId(), messageInput.isGlobal(),
+                InputSummary.create(messageInput.getTitle(), messageInput.isGlobal(),
                         messageInput.getName(), messageInput.getContentPack(), messageInput.getId(),
                         messageInput.getCreatedAt(), messageInput.getType(), messageInput.getCreatorUserId(),
                         messageInput.getConfiguration().getSource(), messageInput.getStaticFields()));
