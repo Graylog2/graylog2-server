@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import {Label, Button, DropdownButton, MenuItem, Col, Well} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
 
-import { EntityListItem } from 'components/common';
+import { EntityListItem, LinkToNode } from 'components/common';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import jsRoutes from 'routing/jsRoutes';
@@ -104,14 +104,10 @@ const InputListItem = React.createClass({
 
     let subtitle;
 
-    if (!this.props.input.global) {
+    if (!this.props.input.global && this.props.input.node) {
       subtitle = (
-        <span title={this.props.currentNode.node_id}>
-          On node{' '}
-          {this.props.currentNode.is_master && <i className="fa fa-star master-node" title="Master Node"></i>}
-          <LinkContainer to={Routes.node(this.props.currentNode.node_id)}>
-            <a>{this.props.currentNode.short_node_id}</a>
-          </LinkContainer>
+        <span>
+          On node{' '}<LinkToNode nodeId={this.props.input.node}/>
         </span>
       );
     }

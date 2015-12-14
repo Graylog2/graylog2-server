@@ -1,13 +1,15 @@
 import React from 'react';
 import Reflux from 'reflux';
-import {Button, Row, Col} from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 
-import {Select} from 'components/common';
-import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
+import { Select } from 'components/common';
 
 import InputTypesActions from 'actions/inputs/InputTypesActions';
-import InputTypesStore from 'stores/inputs/InputTypesStore';
 import InputsActions from 'actions/inputs/InputsActions';
+
+import InputTypesStore from 'stores/inputs/InputTypesStore';
+
+import { CreateInputForm } from 'components/inputs';
 
 const CreateInputControl = React.createClass({
   mixins: [Reflux.connect(InputTypesStore), Reflux.ListenerMethods],
@@ -40,21 +42,20 @@ const CreateInputControl = React.createClass({
     this.refs.configurationForm.open();
   },
   _createInput(data) {
-    data.global = false;
-    InputsActions.create.triggerPromise(data);
+    InputsActions.create(data);
   },
   render() {
     let inputModal;
     if (this.state.selectedInputDefinition) {
       const inputTypeName = this.state.inputTypes[this.state.selectedInput];
       inputModal = (
-        <ConfigurationForm ref="configurationForm"
-                           key="configuration-form-input"
-                           configFields={this.state.selectedInputDefinition.requested_configuration}
-                           title={<span>Launch new <em>{inputTypeName}</em> input</span>}
-                           helpBlock={"Select a name of your new input that describes it."}
-                           typeName={this.state.selectedInput}
-                           submitAction={this._createInput}/>
+        <CreateInputForm ref="configurationForm"
+                         key="configuration-form-input"
+                         configFields={this.state.selectedInputDefinition.requested_configuration}
+                         title={<span>Launch new <em>{inputTypeName}</em> input</span>}
+                         helpBlock={"Select a name of your new input that describes it."}
+                         typeName={this.state.selectedInput}
+                         submitAction={this._createInput}/>
       );
     }
     return (
