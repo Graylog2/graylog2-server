@@ -36,6 +36,8 @@ public abstract class NodeSummary {
     public abstract String lastSeen();
     @JsonProperty
     public abstract String shortNodeId();
+    @JsonProperty
+    public abstract String hostname();
 
     @JsonCreator
     public static NodeSummary create(@JsonProperty("cluster_id") String clusterId,
@@ -44,7 +46,8 @@ public abstract class NodeSummary {
                                      @JsonProperty("is_master") boolean isMaster,
                                      @JsonProperty("transport_address") String transportAddress,
                                      @JsonProperty("last_seen") String lastSeen,
-                                     @JsonProperty("short_node_id") String shortNodeId) {
-        return new AutoValue_NodeSummary(clusterId, nodeId, type, isMaster, transportAddress, lastSeen, shortNodeId);
+                                     @JsonProperty("short_node_id") String shortNodeId,
+                                     @JsonProperty("hostname") String hostname) {
+        return new AutoValue_NodeSummary(clusterId, nodeId, type, isMaster, transportAddress, lastSeen, shortNodeId, hostname);
     }
 }

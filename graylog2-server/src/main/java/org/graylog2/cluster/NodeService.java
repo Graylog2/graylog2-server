@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Map;
 
 public interface NodeService extends PersistedService {
-    String registerServer(String nodeId, boolean isMaster, URI restTransportUri);
+    String registerServer(String nodeId, boolean isMaster, URI restTransportUri, String hostname);
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 

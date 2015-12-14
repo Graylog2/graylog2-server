@@ -119,7 +119,8 @@ public class ClusterResource extends RestResource {
                 node.isMaster(),
                 node.getTransportAddress(),
                 Tools.getISO8601String(node.getLastSeen()),
-                node.getShortNodeId()
+                node.getShortNodeId(),
+                Tools.getLocalCanonicalHostname()
         );
     }
 }

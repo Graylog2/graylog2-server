@@ -42,13 +42,14 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isMaster, URI restTransportUri) {
+    public String registerServer(String nodeId, boolean isMaster, URI restTransportUri, String hostname) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
         fields.put("type", Node.Type.SERVER.toString());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restTransportUri.toString());
+        fields.put("hostname", hostname);
 
         try {
             return save(new NodeImpl(fields));
