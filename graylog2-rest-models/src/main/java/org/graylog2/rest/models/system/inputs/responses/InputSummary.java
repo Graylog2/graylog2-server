@@ -49,6 +49,9 @@ public abstract class InputSummary {
     public abstract Map<String, Object> attributes();
     @JsonProperty
     public abstract Map<String, String> staticFields();
+    @JsonProperty
+    @Nullable
+    public abstract String node();
 
     @JsonCreator
     public static InputSummary create(@JsonProperty("title") String title,
@@ -60,7 +63,8 @@ public abstract class InputSummary {
                                       @JsonProperty("type") String type,
                                       @JsonProperty("creator_user_id") String creatorUserId,
                                       @JsonProperty("attributes") Map<String, Object> attributes,
-                                      @JsonProperty("static_fields") Map<String, String> staticFields) {
-        return new AutoValue_InputSummary(title, global, name, contentPack, inputId, createdAt, type, creatorUserId, attributes, staticFields);
+                                      @JsonProperty("static_fields") Map<String, String> staticFields,
+                                      @JsonProperty("node") @Nullable String node) {
+        return new AutoValue_InputSummary(title, global, name, contentPack, inputId, createdAt, type, creatorUserId, attributes, staticFields, node);
     }
 }

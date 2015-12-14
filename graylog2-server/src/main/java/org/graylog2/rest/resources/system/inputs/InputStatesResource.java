@@ -132,6 +132,6 @@ public class InputStatesResource extends RestResource {
                 InputSummary.create(messageInput.getTitle(), messageInput.isGlobal(),
                         messageInput.getName(), messageInput.getContentPack(), messageInput.getId(),
                         messageInput.getCreatedAt(), messageInput.getType(), messageInput.getCreatorUserId(),
-                        messageInput.getConfiguration().getSource(), messageInput.getStaticFields()));
+                        messageInput.getConfiguration().getSource(), messageInput.getStaticFields(), messageInput.getNodeId()));
     }
 }
