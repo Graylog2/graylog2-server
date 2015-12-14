@@ -17,13 +17,15 @@ const LinkToNode = React.createClass({
       return <Spinner />;
     }
     const node = this.state.nodes[this.props.nodeId];
-    // TODO: fix display of hostname
-    return (
-      <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
-        <i class="fa fa-code-fork"/>
-        {node.short_node_id} / {node.hostname}
-      </Link>
-    );
+    if (node) {
+      return (
+        <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
+          <i class="fa fa-code-fork"/>
+          {node.short_node_id} / {node.hostname}
+        </Link>
+      );
+    }
+    return <i>Unknown Node</i>;
   },
 });
 
