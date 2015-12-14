@@ -4,7 +4,7 @@ import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { InputStatesStore } from 'stores/inputs';
 
-import { Spinner } from 'components/common';
+import { LinkToNode, Spinner } from 'components/common';
 
 import InputStateComparator from 'components/inputs/InputStateComparator';
 
@@ -39,7 +39,7 @@ const InputStateBadge = React.createClass({
     }
 
     const input = this.props.input;
-    const inputId = input.input_id;
+    const inputId = input.id;
 
     const inputStates = {};
     if (this.state.inputStates[inputId]) {
@@ -58,16 +58,18 @@ const InputStateBadge = React.createClass({
 
     if (sorted.length > 0) {
       const popOverText = sorted.map(state => {
-        return state.state + ': ' + inputStates[state.state].join(', ');
-      }).join('\n ');
+        return inputStates[state.state].map(node => {
+          return <span><LinkToNode nodeId={node} />: {state.state}<br/></span>;
+        });
+      });
       const popover = (
-        <Popover>
+        <Popover title={'Input States for ' + input.title}>
           {popOverText}
         </Popover>
       );
       return (
-        <OverlayTrigger trigger="hover" placement="bottom" overlay={popover}>
-          <Label bsStyle={this._labelClassForState(sorted[0].state)}
+        <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+          <Label bsStyle={this._labelClassForState(sorted[0].state)} title="Click to show details"
                  bsSize="xsmall">{this._textForState(sorted)}</Label>
         </OverlayTrigger>
       );
