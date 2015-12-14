@@ -24,17 +24,23 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.Set;
 
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
+    private static final Logger log = LoggerFactory.getLogger(IndexCreatingDatabaseOperation.class);
+
     private final DatabaseOperation<Client> databaseOperation;
+    private final ElasticsearchConfiguration config;
     private final Client client;
     private final Set<String> indexes;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, ElasticsearchConfiguration config, Set<String> indexes) {
         this.databaseOperation = databaseOperation;
+        this.config = config;
         this.client = databaseOperation.connectionManager();
         this.indexes = ImmutableSet.copyOf(indexes);
     }
@@ -51,7 +57,9 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            Indices indices = new Indices(client, new ElasticsearchConfiguration(), new IndexMapping());
+            Indices indices = new Indices(client, config, new IndexMapping());
+            indices.createIndexTemplate();
+            log.info("Create index {}", index);
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }

@@ -56,7 +56,7 @@ public class IndicesTest {
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
 
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
-    private static final String INDEX_NAME = "graylog";
+    private static final String INDEX_NAME = "graylog_0";
     private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
         @Override
         public String getIndexPrefix() {
@@ -73,7 +73,7 @@ public class IndicesTest {
 
     public IndicesTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(CONFIG, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
@@ -143,7 +143,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
@@ -152,7 +152,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
