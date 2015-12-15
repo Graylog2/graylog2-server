@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.responses;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+package org.graylog2.indexer.rotation;
 
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = DeflectorConfigResponse.TYPE_FIELD, visible = true)
-public interface DeflectorConfigResponse {
-    String TYPE_FIELD = "type";
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
+import org.graylog2.plugin.PluginModule;
 
-    @JsonProperty(TYPE_FIELD)
-    String type();
+public class RotationStrategyBindings extends PluginModule {
+    @Override
+    protected void configure() {
+        addRotationStrategy(MessageCountRotationStrategy.class);
+        addRotationStrategy(SizeBasedRotationStrategy.class);
+        addRotationStrategy(TimeBasedRotationStrategy.class);
+    }
 
-    @JsonProperty("max_number_of_indices")
-    int maxNumberOfIndices();
 }

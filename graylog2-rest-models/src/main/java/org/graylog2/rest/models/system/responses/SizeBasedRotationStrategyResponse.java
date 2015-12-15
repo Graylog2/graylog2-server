@@ -14,16 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.graylog2.rest.models.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
+@AutoValue
 @JsonAutoDetect
-public class SizeBasedRotationStrategyResponse extends DeflectorConfigResponse {
-    public final long maxSizePerIndex;
+public abstract class SizeBasedRotationStrategyResponse implements DeflectorConfigResponse {
+    @JsonProperty("max_size_per_index")
+    public abstract long maxSizePerIndex();
 
-    public SizeBasedRotationStrategyResponse(long maxSizePerIndex) {
-        this.maxSizePerIndex = maxSizePerIndex;
+    public static SizeBasedRotationStrategyResponse create(@JsonProperty(TYPE_FIELD) String type,
+                                                           @JsonProperty("max_number_of_indices") int maxNumberOfIndices,
+                                                           @JsonProperty("max_size_per_index") long maxSizePerIndex) {
+        return new AutoValue_SizeBasedRotationStrategyResponse(type, maxNumberOfIndices, maxSizePerIndex);
+    }
+
+    public static SizeBasedRotationStrategyResponse create(@JsonProperty("max_number_of_indices") int maxNumberOfIndices,
+                                                           @JsonProperty("max_size_per_index") long maxSizePerIndex) {
+        return create(SizeBasedRotationStrategyResponse.class.getCanonicalName(), maxNumberOfIndices, maxSizePerIndex);
     }
 }

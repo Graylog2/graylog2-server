@@ -14,17 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.graylog2.rest.models.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
+@AutoValue
 @JsonAutoDetect
-public class MessageCountRotationStrategyResponse extends DeflectorConfigResponse {
-    public final int maxDocsPerIndex;
+public abstract class MessageCountRotationStrategyResponse implements DeflectorConfigResponse {
+    @JsonProperty("max_docs_per_index")
+    public abstract int maxDocsPerIndex();
 
-    public MessageCountRotationStrategyResponse(int maxDocsPerIndex) {
-        this.maxDocsPerIndex = maxDocsPerIndex;
+    public static MessageCountRotationStrategyResponse create(@JsonProperty(TYPE_FIELD) String type,
+                                                              @JsonProperty("max_number_of_indices") int maxNumberOfIndices,
+                                                              @JsonProperty("max_docs_per_index") int maxDocsPerIndex) {
+        return new AutoValue_MessageCountRotationStrategyResponse(type, maxNumberOfIndices, maxDocsPerIndex);
+    }
+
+    public static MessageCountRotationStrategyResponse create(@JsonProperty("max_number_of_indices") int maxNumberOfIndices,
+                                                              @JsonProperty("max_docs_per_index") int maxDocsPerIndex) {
+        return create(MessageCountRotationStrategyResponse.class.getCanonicalName(), maxNumberOfIndices, maxDocsPerIndex);
     }
 }

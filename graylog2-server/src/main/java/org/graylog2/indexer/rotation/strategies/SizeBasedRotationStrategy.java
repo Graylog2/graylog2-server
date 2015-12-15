@@ -14,34 +14,50 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.rotation;
 
-import org.graylog2.configuration.ElasticsearchConfiguration;
+package org.graylog2.indexer.rotation.strategies;
+
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-@Singleton
-public class SizeBasedRotationStrategy implements RotationStrategy {
+public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(SizeBasedRotationStrategy.class);
 
     private final Indices indices;
-    private final long maxSize;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SizeBasedRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
+    public SizeBasedRotationStrategy(Indices indices,
+                                     Deflector deflector,
+                                     ClusterConfigService clusterConfigService) {
+        super(deflector);
         this.indices = indices;
-        maxSize = configuration.getMaxSizePerIndex();
+        this.clusterConfigService = clusterConfigService;
+    }
+
+    @Override
+    public Class<?> configurationClass() {
+        return SizeBasedRotationStrategyConfig.class;
     }
 
     @Nullable
     @Override
-    public Result shouldRotate(final String index) {
+    protected Result shouldRotate(final String index) {
+        final SizeBasedRotationStrategyConfig config = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
+
+        if (config == null) {
+            LOG.warn("No rotation strategy configuration found, not running index rotation!");
+            return null;
+        }
 
         final IndexStatistics indexStats = indices.getIndexStats(index);
         if (indexStats == null) {
@@ -50,7 +66,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
 
         final long sizeInBytes = indexStats.primaries().getStore().getSizeInBytes();
 
-        final boolean shouldRotate = sizeInBytes > maxSize;
+        final boolean shouldRotate = sizeInBytes > config.maxSize();
 
         return new Result() {
             public final MessageFormat ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH);
@@ -62,7 +78,7 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
                 return format.format(new Object[] {
                         index,
                         sizeInBytes,
-                        maxSize
+                        config.maxSize()
                 });
             }
 

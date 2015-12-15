@@ -30,6 +30,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -188,6 +189,14 @@ public abstract class Graylog2Module extends AbstractModule {
                 TypeLiteral.get(String.class),
                 new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                 });
+    }
+
+    protected MapBinder<String, RotationStrategy> rotationStrategiesMapBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, RotationStrategy.class);
+    }
+
+    protected void installRotationStrategy(MapBinder<String, RotationStrategy> mapBinder, Class<? extends RotationStrategy> target) {
+        mapBinder.addBinding(target.getCanonicalName()).to(target);
     }
 
     protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,

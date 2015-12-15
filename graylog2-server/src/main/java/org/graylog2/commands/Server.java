@@ -31,7 +31,7 @@ import org.graylog2.bindings.MessageOutputBindings;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
-import org.graylog2.bindings.RotationStrategyBindings;
+import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bootstrap.Main;

@@ -16,21 +16,21 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.initializers.IndexerSetupService;
+import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.shared.system.activities.NullActivityWriter;
-import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.annotation.Nullable;
 import javax.inject.Provider;
 
 import static org.mockito.Mockito.mock;
@@ -49,6 +49,8 @@ public class IndexRotationThreadTest {
     private Indices indices;
     @Mock
     private Cluster cluster;
+    @Mock
+    private ClusterConfigService clusterConfigService;
 
     @Test
     public void testFailedRotation() {
@@ -56,14 +58,19 @@ public class IndexRotationThreadTest {
             @Override
             public RotationStrategy get() {
                 return new RotationStrategy() {
-                    @Nullable
                     @Override
-                    public Result shouldRotate(String index) {
+                    public void rotate() {
+                    }
+
+                    @Override
+                    public Class<?> configurationClass() {
                         return null;
                     }
                 };
             }
         };
+
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -71,7 +78,8 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
-                provider
+                clusterConfigService,
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
         rotationThread.checkForRotation();
@@ -85,24 +93,20 @@ public class IndexRotationThreadTest {
             @Override
             public RotationStrategy get() {
                 return new RotationStrategy() {
-                    @Nullable
                     @Override
-                    public Result shouldRotate(String index) {
-                        return new Result() {
-                            @Override
-                            public String getDescription() {
-                                return "performed";
-                            }
+                    public void rotate() {
+                        deflector.cycle();
+                    }
 
-                            @Override
-                            public boolean shouldRotate() {
-                                return true;
-                            }
-                        };
+                    @Override
+                    public Class<?> configurationClass() {
+                        return null;
                     }
                 };
             }
         };
+
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -110,7 +114,8 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
-                provider
+                clusterConfigService,
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
         when(deflector.getNewestTargetName()).thenReturn("some_index");
@@ -118,7 +123,6 @@ public class IndexRotationThreadTest {
         rotationThread.checkForRotation();
 
         verify(deflector, times(1)).cycle();
-        verify(deflector, times(1)).getNewestTargetName();
     }
 
     @Test
@@ -127,24 +131,19 @@ public class IndexRotationThreadTest {
             @Override
             public RotationStrategy get() {
                 return new RotationStrategy() {
-                    @Nullable
                     @Override
-                    public Result shouldRotate(String index) {
-                        return new Result() {
-                            @Override
-                            public String getDescription() {
-                                return "performed";
-                            }
+                    public void rotate() {
+                    }
 
-                            @Override
-                            public boolean shouldRotate() {
-                                return false;
-                            }
-                        };
+                    @Override
+                    public Class<?> configurationClass() {
+                        return null;
                     }
                 };
             }
         };
+
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -152,7 +151,8 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
-                provider
+                clusterConfigService,
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
         when(deflector.getNewestTargetName()).thenReturn("some_index");
@@ -160,7 +160,6 @@ public class IndexRotationThreadTest {
         rotationThread.checkForRotation();
 
         verify(deflector, never()).cycle();
-        verify(deflector, times(1)).getNewestTargetName();
     }
 
     @Test
@@ -168,6 +167,7 @@ public class IndexRotationThreadTest {
         final Provider<RotationStrategy> provider = mock(Provider.class);
         when(cluster.isConnected()).thenReturn(false);
         when(cluster.isHealthy()).thenReturn(false);
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -175,7 +175,8 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
-                provider
+                clusterConfigService,
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
         rotationThread.doRun();
