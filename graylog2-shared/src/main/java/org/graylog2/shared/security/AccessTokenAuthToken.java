@@ -14,26 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.security;
+package org.graylog2.shared.security;
 
 import com.google.common.base.MoreObjects;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
 import java.util.Objects;
 
-public class SessionIdToken implements HostAuthenticationToken {
-
-    private final String sessionId;
+public class AccessTokenAuthToken implements HostAuthenticationToken {
+    private final String token;
     private final String host;
 
-    public SessionIdToken(String sessionId, String host) {
-        this.sessionId = sessionId;
+    public AccessTokenAuthToken(String token, String host) {
+        this.token = token;
         this.host = host;
     }
 
     @Override
     public Object getPrincipal() {
-        return sessionId;
+        return token;
     }
 
     @Override
@@ -41,8 +40,8 @@ public class SessionIdToken implements HostAuthenticationToken {
         return null;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public String getToken() {
+        return token;
     }
 
     @Override
@@ -54,20 +53,20 @@ public class SessionIdToken implements HostAuthenticationToken {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SessionIdToken that = (SessionIdToken) o;
-        return Objects.equals(sessionId, that.sessionId) &&
+        AccessTokenAuthToken that = (AccessTokenAuthToken) o;
+        return Objects.equals(token, that.token) &&
                 Objects.equals(host, that.host);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sessionId, host);
+        return Objects.hash(token, host);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("sessionId", sessionId)
+                .add("token", token)
                 .add("host", host)
                 .toString();
     }

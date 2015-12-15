@@ -16,20 +16,33 @@
  */
 package org.graylog2.shared.security;
 
-import org.apache.shiro.authz.aop.PermissionAnnotationHandler;
 import org.apache.shiro.subject.Subject;
+
+import java.security.Principal;
 
 import static java.util.Objects.requireNonNull;
 
-public class ContextAwarePermissionAnnotationHandler extends PermissionAnnotationHandler {
-    private final ShiroSecurityContext context;
+public class ShiroPrincipal implements Principal {
+    private final Subject subject;
 
-    public ContextAwarePermissionAnnotationHandler(ShiroSecurityContext context) {
-        this.context = requireNonNull(context);
+    public ShiroPrincipal(Subject subject) {
+        this.subject = requireNonNull(subject);
     }
 
     @Override
-    protected Subject getSubject() {
-        return context.getSubject();
+    public String getName() {
+        final Object principal = subject.getPrincipal();
+        return principal == null ? null : principal.toString();
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    @Override
+    public String toString() {
+
+        return "ShiroPrincipal[" + getName() + "]";
+
     }
 }

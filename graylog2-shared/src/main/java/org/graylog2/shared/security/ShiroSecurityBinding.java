@@ -23,13 +23,12 @@ import org.apache.shiro.util.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.container.*;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
-/**
- * @author Kay Roepke <kay@torch.sh>
- */
 public class ShiroSecurityBinding implements DynamicFeature {
     private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityBinding.class);
 
@@ -38,8 +37,9 @@ public class ShiroSecurityBinding implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         final Method resourceMethod = resourceInfo.getResourceMethod();
 
-        if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) ||
-                resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
+        context.register(ShiroSecurityContextFilter.class, 0);
+
+        if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) || resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
             if (resourceMethod.isAnnotationPresent(RequiresGuest.class)) {
                 LOG.debug("Resource method {}#{} is marked as unauthenticated, skipping setting filter.");
             } else {
@@ -47,21 +47,18 @@ public class ShiroSecurityBinding implements DynamicFeature {
                 context.register(new ShiroAuthenticationFilter());
             }
         }
-        if (resourceMethod.isAnnotationPresent(RequiresPermissions.class) ||
-                resourceClass.isAnnotationPresent(RequiresPermissions.class)) {
-            RequiresPermissions a = resourceClass.getAnnotation(RequiresPermissions.class);
-            if (a == null) {
-                a = resourceMethod.getAnnotation(RequiresPermissions.class);
+
+        if (resourceMethod.isAnnotationPresent(RequiresPermissions.class) || resourceClass.isAnnotationPresent(RequiresPermissions.class)) {
+            RequiresPermissions requiresPermissions = resourceClass.getAnnotation(RequiresPermissions.class);
+            if (requiresPermissions == null) {
+                requiresPermissions = resourceMethod.getAnnotation(RequiresPermissions.class);
             }
+
             LOG.debug("Resource method {}#{} requires an authorization checks.", resourceClass.getCanonicalName(), resourceMethod.getName());
-            context.register(new ShiroAuthorizationFilter(a));
+            context.register(new ShiroAuthorizationFilter(requiresPermissions));
         }
+
         // TODO this is the wrong approach, we should have an Environment and proper request wrapping
-        context.register(new ContainerResponseFilter() {
-            @Override
-            public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-                ThreadContext.unbindSubject();
-            }
-        });
+        context.register((ContainerResponseFilter) (requestContext, responseContext) -> ThreadContext.unbindSubject());
     }
 }
