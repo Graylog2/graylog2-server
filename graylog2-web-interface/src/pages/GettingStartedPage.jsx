@@ -9,7 +9,7 @@ import Routes from 'routing/Routes';
 
 import SystemStore from 'stores/system/SystemStore';
 
-const GETTING_STARTED_URL = 'https://gettingstarted.graylog.com/';
+const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
