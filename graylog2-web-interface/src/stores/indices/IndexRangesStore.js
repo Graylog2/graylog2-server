@@ -30,8 +30,26 @@ const IndexRangesStore = Reflux.createStore({
   recalculate() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexRangesApiController.rebuild().url);
     const promise = fetch ('POST', url);
+    promise
+      .then(UserNotification.success('Index ranges will be recalculated shortly'))
+      .catch((error) => {
+        UserNotification.error(`Could not create a job to start index ranges recalculation, reason: ${error}`,
+          'Error starting index ranges recalculation');
+      });
 
     IndexRangesActions.recalculate.promise(promise);
+  },
+  recalculateIndex(indexName) {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexRangesApiController.rebuildSingle(indexName).url);
+    const promise = fetch ('POST', url);
+    promise
+      .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))
+      .catch((error) => {
+        UserNotification.error(`Could not create a job to start index ranges recalculation for ${indexName}, reason: ${error}`,
+          `Error starting index ranges recalculation for ${indexName}`);
+      });
+
+    IndexRangesActions.recalculateIndex.promise(promise);
   },
 });
 

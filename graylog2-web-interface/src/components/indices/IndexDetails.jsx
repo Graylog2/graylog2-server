@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 
-import { IndicesActions } from 'actions/indices';
+import { IndicesActions, IndexRangesActions } from 'actions/indices';
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
@@ -23,10 +23,16 @@ const IndexDetails = React.createClass({
 
     return (
       <span>
+        <Button bsStyle="warning" bsSize="xs" onClick={this._onRecalculateIndex}>Recalculate index ranges</Button>{' '}
         <Button bsStyle="warning" bsSize="xs" onClick={this._onCloseIndex}>Close index</Button>{' '}
         <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
       </span>
     );
+  },
+  _onRecalculateIndex() {
+    if (window.confirm('Really recalculate the index ranges for index ' + this.props.index.name + '?')) {
+      IndexRangesActions.recalculateIndex(this.props.index.name);
+    }
   },
   _onCloseIndex() {
     if (window.confirm('Really close index ' + this.props.index.name + '?')) {

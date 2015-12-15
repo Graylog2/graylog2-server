@@ -53,6 +53,7 @@ const jsRoutes = {
       IndexRangesApiController: {
         list: () => { return {url: '/system/indices/ranges'}; },
         rebuild: () => { return {url: '/system/indices/ranges/rebuild'}; },
+        rebuildSingle: (index) => { return {url: `/system/indices/ranges/${index}/rebuild`}; },
       },
       IndicesApiController: {
         close: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/close'}; },
