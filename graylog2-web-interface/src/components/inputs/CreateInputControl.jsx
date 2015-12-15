@@ -68,7 +68,7 @@ const CreateInputControl = React.createClass({
             &nbsp;
             <Button bsStyle="success" disabled={!this.state.selectedInput} onClick={this._openModal}>Launch new input</Button>
             <Button href="https://marketplace.graylog.org/" target="_blank" bsStyle="info" style={{marginLeft: 10}}>
-              <i className="fa fa-external-link"></i>&nbsp;Find more inputs
+              <i className="fa fa-external-link"/>&nbsp;Find more inputs
             </Button>
           </div>
           {inputModal}

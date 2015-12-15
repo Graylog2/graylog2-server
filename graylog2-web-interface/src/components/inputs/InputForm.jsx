@@ -12,7 +12,8 @@ const InputForm = React.createClass({
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {
-      global: false
+      global: this.props.globalValue !== undefined ? this.props.globalValue : false,
+      node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
     };
   },
   _handleChange(field, value) {
@@ -31,11 +32,14 @@ const InputForm = React.createClass({
     if (!this.state.nodes) {
       return <Spinner />;
     }
-    const values = this.refs.configurationForm ? this.refs.configurationForm.getValue() : {title: '', configuration: {}};
+    const values = this.props.values ? this.props.values :
+      (this.refs.configurationForm ? this.refs.configurationForm.getValue().configuration : {});
+    const titleValue = this.props.titleValue ? this.props.titleValue :
+      (this.refs.configurationForm ? this.refs.configurationForm.getValue().titleValue : '');
     return (
-      <ConfigurationForm {...this.props} ref="configurationForm" values={values.configuration} titleValue={values.title}
+      <ConfigurationForm {...this.props} ref="configurationForm" values={values} titleValue={titleValue}
                          submitAction={this._onSubmit}>
-        <NodeOrGlobalSelect onChange={this._handleChange} />
+        <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node}/>
       </ConfigurationForm>
     );
   },

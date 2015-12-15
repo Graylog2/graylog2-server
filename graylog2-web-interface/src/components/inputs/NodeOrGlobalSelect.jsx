@@ -10,8 +10,8 @@ const NodeOrGlobalSelect = React.createClass({
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {
-      global: false,
-      node: 'placeholder',
+      global: this.props.global !== undefined ? this.props.global : false,
+      node: this.props.node !== undefined ? this.props.node : 'placeholder',
     };
   },
   _onChangeGlobal(evt) {

@@ -1,16 +1,18 @@
-import React, {PropTypes} from 'react';
-import {Label, Button, DropdownButton, MenuItem, Col, Well} from 'react-bootstrap';
-import {LinkContainer} from 'react-router-bootstrap';
-
-import { EntityListItem, LinkToNode } from 'components/common';
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Button, DropdownButton, MenuItem, Col, Well } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import jsRoutes from 'routing/jsRoutes';
 import Routes from 'routing/Routes';
 
+import InputTypesStore from 'stores/inputs/InputTypesStore';
+
 import InputsActions from 'actions/inputs/InputsActions';
 
-import { InputStateBadge } from 'components/inputs';
+import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
+import { InputForm, InputStateBadge } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -18,31 +20,11 @@ const InputListItem = React.createClass({
     currentNode: PropTypes.object.isRequired,
     permissions: PropTypes.array.isRequired,
   },
-  mixins: [PermissionsMixin],
+  mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
   _deleteInput() {
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
-      InputsActions.delete.triggerPromise(this.props.input);
+      InputsActions.delete(this.props.input);
     }
-  },
-
-  _getMoreActionsItems() {
-    const items = [];
-
-    if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-      items.push(<MenuItem key={`edit-input-${this.props.input.id}`}>Edit input</MenuItem>);
-    }
-    if (!this.props.input.global) {
-      items.push(<MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>);
-    }
-    if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-      items.push(<MenuItem key={`add-static-field-${this.props.input.id}`}>Add static field</MenuItem>);
-    }
-    if (this.isPermitted(this.props.permissions, [`inputs:terminate`])) {
-      items.push(<MenuItem key={`divider-${this.props.input.id}`} divider/>);
-      items.push(<MenuItem key={`delete-input-${this.props.input.id}`} onClick={this._deleteInput}>Delete input</MenuItem>);
-    }
-
-    return items;
   },
 
   _getConfigurationOptions(inputAttributes) {
@@ -51,10 +33,24 @@ const InputListItem = React.createClass({
       return <li key={`${attribute}-${this.props.input.id}`}>{attribute}: {inputAttributes[attribute]}</li>;
     });
   },
+  _editInput() {
+    this.refs.configurationForm.open();
+  },
+  _updateInput(data) {
+    data.title = this.props.input.title;
+    InputsActions.update(this.props.input.id, data);
+  },
   render() {
     // TODO:
     // - Input state controls
     // - Input metrics
+
+    if (!this.state.inputTypes) {
+      return <Spinner />;
+    }
+
+    const input = this.props.input;
+    const definition = this.state.inputDescriptions[input.type];
 
     const titleSuffix = (
       <span>
@@ -96,7 +92,24 @@ const InputListItem = React.createClass({
                       title="More actions"
                       id={`more-actions-dropdown-${this.props.input.id}`}
                       pullRight>
-        {this._getMoreActionsItems()}
+        <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
+          <MenuItem key={`edit-input-${this.props.input.id}`} onClick={this._editInput}>
+            Edit input
+          </MenuItem>
+        </IfPermitted>
+
+        {this.props.input.global && <MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>}
+
+        <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
+          <MenuItem key={`add-static-field-${this.props.input.id}`}>Add static field</MenuItem>
+        </IfPermitted>
+
+        <IfPermitted permissions="inputs:terminate">
+          <MenuItem key={`divider-${this.props.input.id}`} divider/>
+        </IfPermitted>
+        <IfPermitted permissions="inputs:terminate">
+          <MenuItem key={`delete-input-${this.props.input.id}`} onClick={this._deleteInput}>Delete input</MenuItem>
+        </IfPermitted>
       </DropdownButton>
     );
 
@@ -126,6 +139,12 @@ const InputListItem = React.createClass({
                  data-node-id="@inputState.getNode.getNodeId"></div>
           </div>
         </Col>
+        <InputForm ref="configurationForm" key={'edit-form-input-' + input.id}
+                   globalValue={input.global} nodeValue={input.node}
+                   configFields={definition.requested_configuration}
+                   title={'Editing Input ' + input.title}
+                   typeName={input.type} includeTitleField={false}
+                   submitAction={this._updateInput} values={input.attributes} />
       </div>
     );
 
