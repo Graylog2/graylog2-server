@@ -41,8 +41,6 @@ import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
@@ -303,26 +301,6 @@ public class Indices {
 
         final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
                 .setSettings(sb)
-                .request();
-        c.admin().indices().updateSettings(request).actionGet();
-    }
-
-    public boolean isReadOnly(String index) {
-        final GetSettingsRequest request = c.admin().indices().prepareGetSettings(index).request();
-        final GetSettingsResponse response = c.admin().indices().getSettings(request).actionGet();
-
-        return response.getIndexToSettings().get(index).getAsBoolean("index.blocks.write", false);
-    }
-
-    public void setReadWrite(String index) {
-        Settings settings = Settings.builder()
-                .put("index.blocks.write", false)
-                .put("index.blocks.read", false)
-                .put("index.blocks.metadata", false)
-                .build();
-
-        final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
-                .setSettings(settings)
                 .request();
         c.admin().indices().updateSettings(request).actionGet();
     }
