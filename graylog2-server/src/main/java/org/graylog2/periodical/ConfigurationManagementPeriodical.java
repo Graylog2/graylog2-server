@@ -118,8 +118,8 @@ public class ConfigurationManagementPeriodical extends Periodical {
                     retentionStrategyClass = DeletionRetentionStrategy.class;
             }
 
-            final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName(),
-                    retentionStrategyClass.getCanonicalName());
+        final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName(),
+                    retentionStrategyClass.getCanonicalName(), elasticsearchConfiguration.performRetention());
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
         //}

@@ -24,6 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.junit.Test;
@@ -40,7 +41,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IndexRotationThreadTest {
+public class IndexManagementThreadTest {
+    private static Provider<RetentionStrategy> NULL_RETENTION_PROVIDER = new Provider<RetentionStrategy>() {
+        @Override
+        public RetentionStrategy get() {
+            return new RetentionStrategy() {
+                @Override
+                public void retain() {
+                }
+
+                @Override
+                public Class<?> configurationClass() {
+                    return null;
+                }
+            };
+        }
+    };
+
     @Mock
     private Deflector deflector;
     @Mock
@@ -70,19 +87,21 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        final IndexManagementConfig config = IndexManagementConfig.create("strategy", "retention", true);
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(config);
 
-        final IndexRotationThread rotationThread = new IndexRotationThread(
+        final IndexManagementThread rotationThread = new IndexManagementThread(
                 notificationService,
                 indices,
                 deflector,
                 cluster,
                 new NullActivityWriter(),
                 clusterConfigService,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                ImmutableMap.<String, Provider<RetentionStrategy>>builder().put("strategy", NULL_RETENTION_PROVIDER).build()
         );
 
-        rotationThread.checkForRotation();
+        rotationThread.checkForRotation(config);
 
         verify(deflector, never()).cycle();
     }
@@ -106,21 +125,23 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        final IndexManagementConfig config = IndexManagementConfig.create("strategy", "retention", true);
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(config);
 
-        final IndexRotationThread rotationThread = new IndexRotationThread(
+        final IndexManagementThread rotationThread = new IndexManagementThread(
                 notificationService,
                 indices,
                 deflector,
                 cluster,
                 new NullActivityWriter(),
                 clusterConfigService,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                ImmutableMap.<String, Provider<RetentionStrategy>>builder().put("strategy", NULL_RETENTION_PROVIDER).build()
         );
 
         when(deflector.getNewestTargetName()).thenReturn("some_index");
 
-        rotationThread.checkForRotation();
+        rotationThread.checkForRotation(config);
 
         verify(deflector, times(1)).cycle();
     }
@@ -143,21 +164,23 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        final IndexManagementConfig config = IndexManagementConfig.create("strategy", "retention", true);
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(config);
 
-        final IndexRotationThread rotationThread = new IndexRotationThread(
+        final IndexManagementThread rotationThread = new IndexManagementThread(
                 notificationService,
                 indices,
                 deflector,
                 cluster,
                 new NullActivityWriter(),
                 clusterConfigService,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                ImmutableMap.<String, Provider<RetentionStrategy>>builder().put("strategy", NULL_RETENTION_PROVIDER).build()
         );
 
         when(deflector.getNewestTargetName()).thenReturn("some_index");
 
-        rotationThread.checkForRotation();
+        rotationThread.checkForRotation(config);
 
         verify(deflector, never()).cycle();
     }
@@ -165,18 +188,20 @@ public class IndexRotationThreadTest {
     @Test
     public void testDontPerformRotationIfClusterIsDown() throws NoTargetIndexException {
         final Provider<RotationStrategy> provider = mock(Provider.class);
+        final IndexManagementConfig config = IndexManagementConfig.create("strategy", "retention", true);
         when(cluster.isConnected()).thenReturn(false);
         when(cluster.isHealthy()).thenReturn(false);
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(config);
 
-        final IndexRotationThread rotationThread = new IndexRotationThread(
+        final IndexManagementThread rotationThread = new IndexManagementThread(
                 notificationService,
                 indices,
                 deflector,
                 cluster,
                 new NullActivityWriter(),
                 clusterConfigService,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                ImmutableMap.<String, Provider<RetentionStrategy>>builder().put("strategy", NULL_RETENTION_PROVIDER).build()
         );
 
         rotationThread.doRun();
