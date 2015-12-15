@@ -69,7 +69,7 @@ const Navigation = React.createClass({
   render() {
     const logoUrl = require('images/toplogo.png');
     const brand = (
-      <LinkContainer to={Routes.HOME}>
+      <LinkContainer to={Routes.STARTPAGE}>
         <a><img src={logoUrl}/></a>
       </LinkContainer>);
     // TODO: fix permission names
@@ -167,7 +167,7 @@ const Navigation = React.createClass({
                 <GlobalThroughput />
               </NavItem>
             </LinkContainer>
-            <HelpMenu active={this._isActive('/gettingstarted')}/>
+            <HelpMenu active={this._isActive(Routes.GETTING_STARTED)}/>
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
           </Nav>
         </Navbar.Collapse>

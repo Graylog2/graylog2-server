@@ -1,5 +1,5 @@
 const Routes = {
-  HOME: '/',
+  STARTPAGE: '/',
   SEARCH: '/search',
   STREAMS: '/streams',
   SOURCES: '/sources',
@@ -53,6 +53,7 @@ const Routes = {
   edit_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
+  getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
 };
 
 export default Routes;
