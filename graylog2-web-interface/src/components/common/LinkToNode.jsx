@@ -20,7 +20,7 @@ const LinkToNode = React.createClass({
     if (node) {
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
-          <i class="fa fa-code-fork"/>
+          <i className="fa fa-code-fork"/>
           {node.short_node_id} / {node.hostname}
         </Link>
       );
