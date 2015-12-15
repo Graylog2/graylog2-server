@@ -51,12 +51,10 @@ const InputListItem = React.createClass({
       return <li key={`${attribute}-${this.props.input.id}`}>{attribute}: {inputAttributes[attribute]}</li>;
     });
   },
-
   render() {
     // TODO:
     // - Input state controls
     // - Input metrics
-    // - Show number of nodes where global input is running
 
     const titleSuffix = (
       <span>
