@@ -4,7 +4,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "0"
           }
@@ -22,7 +22,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "1"
           }
@@ -41,7 +41,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "2"
           }
@@ -60,7 +60,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "3"
           }
@@ -79,7 +79,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "4"
           }
@@ -98,7 +98,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "5"
           }
@@ -116,7 +116,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "6"
           }
@@ -135,7 +135,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "7"
           }
@@ -154,7 +154,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "8"
           }
@@ -173,7 +173,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog",
+            "indexName": "graylog_0",
             "indexType": "message",
             "indexId": "9"
           }
