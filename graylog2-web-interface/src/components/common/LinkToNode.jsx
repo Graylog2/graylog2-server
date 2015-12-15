@@ -8,19 +8,28 @@ import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 
 const LinkToNode = React.createClass({
-  mixins: [Reflux.connect(NodesStore)],
   propTypes: {
     nodeId: React.PropTypes.string.isRequired,
   },
+  mixins: [Reflux.connect(NodesStore)],
   render() {
     if (!this.state.nodes) {
       return <Spinner />;
     }
     const node = this.state.nodes[this.props.nodeId];
+
+    let icon;
+    if (node.is_master) {
+      icon = <i className="fa fa-star master-node"/>;
+    } else {
+      icon = <i className="fa fa-code-fork"/>;
+    }
+
     if (node) {
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
-          <i className="fa fa-code-fork"/>
+          {icon}
+          {' '}
           {node.short_node_id} / {node.hostname}
         </Link>
       );
