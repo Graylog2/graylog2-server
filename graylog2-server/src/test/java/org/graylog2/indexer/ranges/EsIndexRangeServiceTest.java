@@ -79,7 +79,7 @@ public class EsIndexRangeServiceTest {
 
     public EsIndexRangeServiceTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(INDEX_NAMES));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(ELASTICSEARCH_CONFIGURATION, INDEX_NAMES));
     }
 
     @Before

@@ -26,6 +26,7 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.elasticsearch.client.Client;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -69,7 +70,7 @@ public class SearchesTest {
     @Rule
     public ElasticsearchRule elasticsearchRule;
 
-    private static final String INDEX_NAME = "graylog";
+    private static final String INDEX_NAME = "graylog_0";
     private static final SortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet
             .orderedBy(new IndexRangeComparator())
             .add(new IndexRange() {
@@ -99,6 +100,13 @@ public class SearchesTest {
                 }
             }).build();
 
+    private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
+        @Override
+        public String getIndexPrefix() {
+            return "graylog";
+        }
+    };
+
     @Mock
     private Deflector deflector;
     @Mock
@@ -112,7 +120,7 @@ public class SearchesTest {
 
     public SearchesTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(CONFIG, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
