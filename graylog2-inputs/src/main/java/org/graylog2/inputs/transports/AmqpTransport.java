@@ -53,6 +53,7 @@ public class AmqpTransport extends ThrottleableTransport {
     public static final String CK_PASSWORD = "broker_password";
     public static final String CK_PREFETCH = "prefetch";
     public static final String CK_EXCHANGE = "exchange";
+    public static final String CK_EXCHANGE_BIND = "exchange_bind";
     public static final String CK_QUEUE = "queue";
     public static final String CK_ROUTING_KEY = "routing_key";
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
@@ -160,6 +161,7 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getInt(CK_PREFETCH),
                 configuration.getString(CK_QUEUE),
                 configuration.getString(CK_EXCHANGE),
+                configuration.getBoolean(CK_EXCHANGE_BIND),
                 configuration.getString(CK_ROUTING_KEY),
                 configuration.getInt(CK_PARALLEL_QUEUES),
                 configuration.getBoolean(CK_TLS),
@@ -288,6 +290,15 @@ public class AmqpTransport extends ThrottleableTransport {
                             defaultExchangeName(),
                             "Name of exchange to bind to.",
                             ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new BooleanField(
+                            CK_EXCHANGE_BIND,
+                            "Bind to exchange",
+                            false,
+                            "Binds the queue to the configured exchange. The exchange must already exist."
                     )
             );
 
