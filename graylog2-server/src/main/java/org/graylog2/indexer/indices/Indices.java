@@ -217,7 +217,7 @@ public class Indices implements IndexManagement {
     public boolean createIndexTemplate() {
         final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(), configuration.getAnalyzer());
         final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(GRAYLOG_INTERNAL_TEMPLATE_NAME)
-                .setOrder(-99) // Make sure templates with "order: 0" are applied after our template!
+                .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
                 .setSource(template)
                 .request();
 
