@@ -9,10 +9,10 @@ import { LinkToNode, Spinner } from 'components/common';
 import InputStateComparator from 'components/inputs/InputStateComparator';
 
 const InputStateBadge = React.createClass({
-  mixins: [Reflux.connect(InputStatesStore)],
   propTypes: {
     input: React.PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(InputStatesStore)],
   getInitialState() {
     return {};
   },
@@ -68,9 +68,9 @@ const InputStateBadge = React.createClass({
         </Popover>
       );
       return (
-        <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+        <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose>
           <Label bsStyle={this._labelClassForState(sorted[0].state)} title="Click to show details"
-                 bsSize="xsmall">{this._textForState(sorted)}</Label>
+                 bsSize="xsmall" style={{cursor: 'pointer'}}>{this._textForState(sorted)}</Label>
         </OverlayTrigger>
       );
     } else {
