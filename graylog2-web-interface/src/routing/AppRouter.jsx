@@ -7,6 +7,7 @@ import {createHistory} from 'history';
 
 import Routes from 'routing/Routes';
 
+import StartPage from 'pages/StartPage';
 import SearchPage from 'pages/SearchPage';
 import ShowMessagePage from 'pages/ShowMessagePage';
 import StreamsPage from 'pages/StreamsPage';
@@ -45,8 +46,8 @@ const AppRouter = React.createClass({
     return (
       <Router history={createHistory()}>
         <Route path="/" component={App}>
+          <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
-            <IndexRoute component={SearchPage}/>
             <Route path={Routes.SEARCH} component={SearchPage}/>
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
