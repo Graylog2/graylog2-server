@@ -23,6 +23,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.indexer.rotation.strategies.RotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
@@ -38,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -53,19 +56,19 @@ public class DeflectorResource extends RestResource {
 
     private final Deflector deflector;
     private final ActivityWriter activityWriter;
-    private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
+    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration configuration;
 
     @Inject
     public DeflectorResource(Deflector deflector,
                              ActivityWriter activityWriter,
-                             Map<String, Provider<RotationStrategy>> rotationStrategyMap,
+                             Map<String, Provider<RotationStrategy>> rotationStrategies,
                              ClusterConfigService clusterConfigService,
                              ElasticsearchConfiguration configuration) {
         this.deflector = deflector;
         this.activityWriter = activityWriter;
-        this.rotationStrategyMap = rotationStrategyMap;
+        this.rotationStrategies = rotationStrategies;
         this.clusterConfigService = clusterConfigService;
         this.configuration = configuration;
     }
@@ -75,7 +78,7 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public DeflectorSummary deflector() {
+    public DeflectorSummary deflector() throws ClassNotFoundException {
         return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex(), this.config());
     }
 
@@ -86,10 +89,20 @@ public class DeflectorResource extends RestResource {
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
     @RestrictToMaster
-    public DeflectorConfigResponse config() {
-        // TODO This is still based on the config file and will go away once we have pluggable UI and the indices management has been rewritten.
-        return new DeflectorConfigResponse(configuration.getRotationStrategy(), configuration.getMaxDocsPerIndex(),
-                configuration.getMaxNumberOfIndices(), configuration.getMaxSizePerIndex(), configuration.getMaxTimePerIndex());
+    public DeflectorConfigResponse config() throws ClassNotFoundException {
+        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
+        if (indexManagementConfig == null) {
+            throw new InternalServerErrorException("Invalid index management configuration");
+        } else {
+            final Provider<RotationStrategy> provider = rotationStrategies.get(indexManagementConfig.rotationStrategy());
+            if (provider == null) {
+                throw new InternalServerErrorException("Unknown index rotation strategy: " + indexManagementConfig.rotationStrategy());
+            }
+            final Class<RotationStrategyConfig> strategy = (Class<RotationStrategyConfig>) provider.get().configurationClass();
+            final RotationStrategyConfig config = clusterConfigService.get(strategy);
+
+            return config.toDeflectorConfigResponse(configuration.getMaxNumberOfIndices());
+        }
     }
 
     @POST

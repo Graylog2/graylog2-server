@@ -21,16 +21,30 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
+import org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse;
+import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse;
 import org.joda.time.Period;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class TimeBasedRotationStrategyConfig {
+public abstract class TimeBasedRotationStrategyConfig implements RotationStrategyConfig {
     @JsonProperty("rotation_period")
     public abstract Period rotationPeriod();
 
     @JsonCreator
+    public static TimeBasedRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
+                                                         @JsonProperty("rotation_period") Period maxTimePerIndex) {
+        return new AutoValue_TimeBasedRotationStrategyConfig(type, maxTimePerIndex);
+    }
+
+    @JsonCreator
     public static TimeBasedRotationStrategyConfig create(@JsonProperty("rotation_period") Period maxTimePerIndex) {
-        return new AutoValue_TimeBasedRotationStrategyConfig(maxTimePerIndex);
+        return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex);
+    }
+
+    @Override
+    public DeflectorConfigResponse toDeflectorConfigResponse(int maxNumberOfIndices) {
+        return TimeBasedRotationStrategyResponse.create(maxNumberOfIndices, rotationPeriod());
     }
 }

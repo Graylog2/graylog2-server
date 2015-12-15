@@ -42,6 +42,11 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
         this.clusterConfigService = clusterConfigService;
     }
 
+    @Override
+    public Class<?> configurationClass() {
+        return MessageCountRotationStrategyConfig.class;
+    }
+
     @Nullable
     @Override
     protected Result shouldRotate(String index) {

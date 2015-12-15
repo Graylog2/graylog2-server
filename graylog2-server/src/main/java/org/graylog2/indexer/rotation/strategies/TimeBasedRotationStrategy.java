@@ -62,6 +62,11 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         this.indices = indices;
     }
 
+    @Override
+    public Class<?> configurationClass() {
+        return TimeBasedRotationStrategyConfig.class;
+    }
+
     /**
      * Determines the starting point ("anchor") for a period.
      *

@@ -21,15 +21,28 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
+import org.graylog2.rest.models.system.responses.SizeBasedRotationStrategyResponse;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class SizeBasedRotationStrategyConfig {
+public abstract class SizeBasedRotationStrategyConfig implements RotationStrategyConfig {
     @JsonProperty("max_size")
     public abstract long maxSize();
 
     @JsonCreator
+    public static SizeBasedRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
+                                                         @JsonProperty("max_size") long maxSize) {
+        return new AutoValue_SizeBasedRotationStrategyConfig(type, maxSize);
+    }
+
+    @JsonCreator
     public static SizeBasedRotationStrategyConfig create(@JsonProperty("max_size") long maxSize) {
-        return new AutoValue_SizeBasedRotationStrategyConfig(maxSize);
+        return create(SizeBasedRotationStrategyConfig.class.getCanonicalName(), maxSize);
+    }
+
+    @Override
+    public DeflectorConfigResponse toDeflectorConfigResponse(int maxNumberOfIndices) {
+        return SizeBasedRotationStrategyResponse.create(maxNumberOfIndices, maxSize());
     }
 }

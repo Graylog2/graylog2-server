@@ -60,7 +60,11 @@ public class IndexRotationThreadTest {
                 return new RotationStrategy() {
                     @Override
                     public void rotate() {
+                    }
 
+                    @Override
+                    public Class<?> configurationClass() {
+                        return null;
                     }
                 };
             }
@@ -93,6 +97,11 @@ public class IndexRotationThreadTest {
                     public void rotate() {
                         deflector.cycle();
                     }
+
+                    @Override
+                    public Class<?> configurationClass() {
+                        return null;
+                    }
                 };
             }
         };
@@ -124,7 +133,11 @@ public class IndexRotationThreadTest {
                 return new RotationStrategy() {
                     @Override
                     public void rotate() {
+                    }
 
+                    @Override
+                    public Class<?> configurationClass() {
+                        return null;
                     }
                 };
             }

@@ -44,6 +44,11 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
         this.clusterConfigService = clusterConfigService;
     }
 
+    @Override
+    public Class<?> configurationClass() {
+        return SizeBasedRotationStrategyConfig.class;
+    }
+
     @Nullable
     @Override
     protected Result shouldRotate(final String index) {
