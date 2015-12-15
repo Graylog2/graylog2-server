@@ -63,7 +63,7 @@ const InputStateBadge = React.createClass({
         });
       });
       const popover = (
-        <Popover title={'Input States for ' + input.title}>
+        <Popover id="inputstate-badge-details" title={'Input States for ' + input.title}>
           {popOverText}
         </Popover>
       );
