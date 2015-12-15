@@ -8,7 +8,7 @@ import { Spinner } from 'components/common';
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { BooleanField, ConfigurationForm, DropdownField } from 'components/configurationforms';
 
-const CreateInputForm = React.createClass({
+const InputForm = React.createClass({
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {
@@ -41,4 +41,4 @@ const CreateInputForm = React.createClass({
   },
 });
 
-export default CreateInputForm;
+export default InputForm;

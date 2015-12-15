@@ -9,7 +9,7 @@ import InputsActions from 'actions/inputs/InputsActions';
 
 import InputTypesStore from 'stores/inputs/InputTypesStore';
 
-import { CreateInputForm } from 'components/inputs';
+import { InputForm } from 'components/inputs';
 
 const CreateInputControl = React.createClass({
   mixins: [Reflux.connect(InputTypesStore), Reflux.ListenerMethods],
@@ -49,13 +49,13 @@ const CreateInputControl = React.createClass({
     if (this.state.selectedInputDefinition) {
       const inputTypeName = this.state.inputTypes[this.state.selectedInput];
       inputModal = (
-        <CreateInputForm ref="configurationForm"
-                         key="configuration-form-input"
-                         configFields={this.state.selectedInputDefinition.requested_configuration}
-                         title={<span>Launch new <em>{inputTypeName}</em> input</span>}
-                         helpBlock={"Select a name of your new input that describes it."}
-                         typeName={this.state.selectedInput}
-                         submitAction={this._createInput}/>
+        <InputForm ref="configurationForm"
+                   key="configuration-form-input"
+                   configFields={this.state.selectedInputDefinition.requested_configuration}
+                   title={<span>Launch new <em>{inputTypeName}</em> input</span>}
+                   helpBlock={"Select a name of your new input that describes it."}
+                   typeName={this.state.selectedInput}
+                   submitAction={this._createInput}/>
       );
     }
     return (
