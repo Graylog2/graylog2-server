@@ -58,8 +58,6 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             }
 
             Indices indices = new Indices(client, config, new IndexMapping());
-            indices.createIndexTemplate();
-            log.info("Create index {}", index);
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }
