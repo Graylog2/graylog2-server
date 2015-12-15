@@ -3,6 +3,8 @@ import Reflux from 'reflux';
 import { Button, DropdownButton, MenuItem, Col, Well } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
+
 import PermissionsMixin from 'util/PermissionsMixin';
 import jsRoutes from 'routing/jsRoutes';
 import Routes from 'routing/Routes';
@@ -11,8 +13,7 @@ import InputTypesStore from 'stores/inputs/InputTypesStore';
 
 import InputsActions from 'actions/inputs/InputsActions';
 
-import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
-import { InputForm, InputStateBadge, StaticFieldForm } from 'components/inputs';
+import { InputForm, InputStateBadge, InputStaticFields, StaticFieldForm } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -135,6 +136,7 @@ const InputListItem = React.createClass({
             </ul>
           </Well>
           <StaticFieldForm ref="staticFieldForm" input={this.props.input}/>
+          <InputStaticFields input={this.props.input}/>
         </Col>
         <Col md={4}>
           <div className="graylog-input-metrics">
