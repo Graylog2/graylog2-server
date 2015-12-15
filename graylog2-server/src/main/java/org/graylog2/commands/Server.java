@@ -31,7 +31,6 @@ import org.graylog2.bindings.MessageOutputBindings;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
-import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bootstrap.Main;
@@ -41,6 +40,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
+import org.graylog2.indexer.retention.RetentionStrategyBindings;
+import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
@@ -108,6 +109,7 @@ public class Server extends ServerBootstrap {
                 new InitializerBindings(),
                 new MessageOutputBindings(configuration),
                 new RotationStrategyBindings(),
+                new RetentionStrategyBindings(),
                 new PeriodicalBindings(),
                 new ServerObjectMapperModule(),
                 new RestApiBindings(),

@@ -15,25 +15,28 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.indexer.management;
+package org.graylog2.indexer.retention.strategies;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class IndexManagementConfig {
-    @JsonProperty("rotation_strategy")
-    public abstract String rotationStrategy();
-
-    @JsonProperty("retention_strategy")
-    public abstract String retentionStrategy();
+public abstract class DeletionRetentionStrategyConfig implements RetentionStrategyConfig {
+    @JsonProperty("max_number_of_indices")
+    public abstract int maxNumberOfIndices();
 
     @JsonCreator
-    public static IndexManagementConfig create(@JsonProperty("rotation_strategy") String rotationStrategy,
-                                               @JsonProperty("retention_strategy") String retentionStrategy) {
-        return new AutoValue_IndexManagementConfig(rotationStrategy, retentionStrategy);
+    public static DeletionRetentionStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
+                                                         @JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+        return new AutoValue_DeletionRetentionStrategyConfig(type, maxNumberOfIndices);
+    }
+
+    @JsonCreator
+    public static DeletionRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+        return new AutoValue_DeletionRetentionStrategyConfig(DeletionRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
     }
 }

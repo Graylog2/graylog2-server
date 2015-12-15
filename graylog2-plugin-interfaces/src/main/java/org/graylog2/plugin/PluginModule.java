@@ -28,6 +28,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -67,6 +68,10 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addRotationStrategy(Class<? extends RotationStrategy> rotationStrategyClass) {
         installRotationStrategy(rotationStrategiesMapBinder(), rotationStrategyClass);
+    }
+
+    protected void addRetentionStrategy(Class<? extends RetentionStrategy> retentionStrategyClass) {
+        installRetentionStrategy(retentionStrategyMapBinder(), retentionStrategyClass);
     }
 
     protected void addAlarmCallback(Class<? extends AlarmCallback> alarmCallbackClass) {

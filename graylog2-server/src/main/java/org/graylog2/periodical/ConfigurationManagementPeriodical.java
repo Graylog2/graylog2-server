@@ -19,6 +19,10 @@ package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
@@ -26,6 +30,7 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
@@ -69,11 +74,28 @@ public class ConfigurationManagementPeriodical extends Periodical {
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
         //}
 
-        // Selected rotation strategy.
+        // All default retention strategy settings
+        final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
+        final DeletionRetentionStrategy deletionRetentionStrategy = clusterConfigService.get(DeletionRetentionStrategy.class);
+
+        //if (closingRetentionStrategyConfig == null) {
+            final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
+            clusterConfigService.write(closingConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", closingConfig);
+        //}
+
+        //if (deletionRetentionStrategy == null) {
+            final DeletionRetentionStrategyConfig deletionConfig = DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
+            clusterConfigService.write(deletionConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", deletionConfig);
+        //}
+
+        // Selected rotation and retention strategies.
         final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
 
         //if (indexManagementConfig == null) {
             final Class<? extends RotationStrategy> rotationStrategyClass;
+            final Class<? extends RetentionStrategy> retentionStrategyClass;
 
             switch (elasticsearchConfiguration.getRotationStrategy()) {
                 case "size":
@@ -87,9 +109,19 @@ public class ConfigurationManagementPeriodical extends Periodical {
                     rotationStrategyClass = MessageCountRotationStrategy.class;
             }
 
-            final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName());
+            switch (elasticsearchConfiguration.getRetentionStrategy()) {
+                case "close":
+                    retentionStrategyClass = ClosingRetentionStrategy.class;
+                    break;
+                case "delete":
+                default:
+                    retentionStrategyClass = DeletionRetentionStrategy.class;
+            }
+
+            final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName(),
+                    retentionStrategyClass.getCanonicalName());
             clusterConfigService.write(config);
-            LOG.info("Migrated \"{}\" setting: {}", "rotation_strategy", config);
+            LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
         //}
     }
 
