@@ -119,7 +119,7 @@ const ConfigurationForm = React.createClass({
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {titleElement}
-          {this.props.additionalFields}
+          {this.props.children}
           {configFields}
         </fieldset>
       </BootstrapModalForm>
