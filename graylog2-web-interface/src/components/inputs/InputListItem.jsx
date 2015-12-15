@@ -12,7 +12,7 @@ import InputTypesStore from 'stores/inputs/InputTypesStore';
 import InputsActions from 'actions/inputs/InputsActions';
 
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
-import { InputForm, InputStateBadge } from 'components/inputs';
+import { InputForm, InputStateBadge, StaticFieldForm } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -25,6 +25,10 @@ const InputListItem = React.createClass({
     if (window.confirm(`Do you really want to delete input '${this.props.input.title}'?`)) {
       InputsActions.delete(this.props.input);
     }
+  },
+
+  _openStaticFieldForm() {
+    this.refs.staticFieldForm.open();
   },
 
   _getConfigurationOptions(inputAttributes) {
@@ -100,7 +104,7 @@ const InputListItem = React.createClass({
         {this.props.input.global && <MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>}
 
         <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`}>Add static field</MenuItem>
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onClick={this._openStaticFieldForm}>Add static field</MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions="inputs:terminate">
@@ -130,6 +134,7 @@ const InputListItem = React.createClass({
               {this._getConfigurationOptions(this.props.input.attributes)}
             </ul>
           </Well>
+          <StaticFieldForm ref="staticFieldForm" input={this.props.input}/>
         </Col>
         <Col md={4}>
           <div className="graylog-input-metrics">

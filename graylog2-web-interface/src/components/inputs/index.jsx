@@ -7,3 +7,4 @@ export { default as InputsList } from './InputsList';
 export { default as InputStateBadge } from './InputStateBadge';
 export { default as InputStateComparator } from './InputStateComparator';
 export { default as NodeOrGlobalSelect } from './NodeOrGlobalSelect';
+export { default as StaticFieldForm } from './StaticFieldForm';
