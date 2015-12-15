@@ -37,7 +37,6 @@ const InputListItem = React.createClass({
     this.refs.configurationForm.open();
   },
   _updateInput(data) {
-    data.title = this.props.input.title;
     InputsActions.update(this.props.input.id, data);
   },
   render() {
@@ -143,7 +142,8 @@ const InputListItem = React.createClass({
                    globalValue={input.global} nodeValue={input.node}
                    configFields={definition.requested_configuration}
                    title={'Editing Input ' + input.title}
-                   typeName={input.type} includeTitleField={false}
+                   titleValue={input.title}
+                   typeName={input.type} includeTitleField
                    submitAction={this._updateInput} values={input.attributes} />
       </div>
     );
