@@ -17,14 +17,11 @@
 package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,26 +35,17 @@ public class IndexRetentionThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
     private final ElasticsearchConfiguration configuration;
-    private final Deflector deflector;
     private final Cluster cluster;
-    private final ActivityWriter activityWriter;
     private final ClusterConfigService clusterConfigService;
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
-    private final Indices indices;
 
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
-                                Deflector deflector,
-                                Indices indices,
                                 Cluster cluster,
-                                ActivityWriter activityWriter,
                                 ClusterConfigService clusterConfigService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap) {
         this.configuration = configuration;
-        this.deflector = deflector;
-        this.indices = indices;
         this.cluster = cluster;
-        this.activityWriter = activityWriter;
         this.clusterConfigService = clusterConfigService;
         this.retentionStrategyMap = retentionStrategyMap;
     }
