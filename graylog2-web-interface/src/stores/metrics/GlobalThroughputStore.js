@@ -1,8 +1,6 @@
 import Reflux from 'reflux';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
-import NodesStore from 'stores/nodes/NodesStore';
-
 import MetricsActions from 'actions/metrics/MetricsActions';
 
 const GlobalThroughputStore = Reflux.createStore({
@@ -13,18 +11,12 @@ const GlobalThroughputStore = Reflux.createStore({
   },
 
   init() {
-    this.listenTo(NodesStore, this.updateNodes);
+    MetricsActions.addGlobal(this.metrics.input);
+    MetricsActions.addGlobal(this.metrics.output);
     this.listenTo(MetricsStore, this.updateMetrics);
     setInterval(MetricsActions.list, this.INTERVAL);
   },
   INTERVAL: 2000,
-  updateNodes(update) {
-    const nodeIds = Object.keys(update.nodes);
-    nodeIds.forEach((nodeId) => {
-      MetricsActions.add(nodeId, this.metrics.input);
-      MetricsActions.add(nodeId, this.metrics.output);
-    });
-  },
   updateMetrics(update) {
     if (!update.metrics) {
       return;
