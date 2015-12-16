@@ -17,6 +17,7 @@
 package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.rest.models.system.responses.IOStateSummary;
@@ -24,20 +25,18 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
-/**
- * Created by dennis on 12/12/14.
- */
 @JsonAutoDetect
 @AutoValue
 public abstract class InputStateSummary extends IOStateSummary {
     @JsonProperty
     public abstract InputSummary messageInput();
 
-    public static InputStateSummary create(String id,
-                                           String state,
-                                           DateTime startedAt,
-                                           @Nullable String detailedMessage,
-                                           InputSummary messageInput) {
+    @JsonCreator
+    public static InputStateSummary create(@JsonProperty("id") String id,
+                                           @JsonProperty("state") String state,
+                                           @JsonProperty("started_at") DateTime startedAt,
+                                           @JsonProperty("detailed_message") @Nullable String detailedMessage,
+                                           @JsonProperty("message_input") InputSummary messageInput) {
         return new AutoValue_InputStateSummary(id, state, startedAt, detailedMessage, messageInput);
     }
 }

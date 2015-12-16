@@ -67,6 +67,9 @@ const jsRoutes = {
         get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
+      ClusterInputStatesController: {
+        list: () => { return {url: '/cluster/inputstates'}; },
+      },
       MessageFieldsApiController: {
         list: () => { return {url: '/system/fields'}; },
       },

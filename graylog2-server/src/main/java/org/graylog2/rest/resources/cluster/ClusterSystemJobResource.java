@@ -26,6 +26,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit.Response;
@@ -45,7 +46,7 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Cluster/Jobs", description = "Cluster-wide System Jobs")
 @Path("/cluster/jobs")
-public class ClusterSystemJobResource {
+public class ClusterSystemJobResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemJobResource.class);
 
     private final NodeService nodeService;

@@ -21,18 +21,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.Set;
-
-@JsonAutoDetect
 @AutoValue
-public abstract class InputsList {
+@JsonAutoDetect
+public abstract class InputDeleted {
+
     @JsonProperty
-    public abstract Set<InputSummary> inputs();
-    @JsonProperty
-    public abstract int total();
+    public abstract String id();
 
     @JsonCreator
-    public static InputsList create(@JsonProperty("inputs") Set<InputSummary> inputs) {
-        return new AutoValue_InputsList(inputs, inputs.size());
+    public static InputDeleted create(@JsonProperty("id") String id) {
+        return new AutoValue_InputDeleted(id);
     }
 }

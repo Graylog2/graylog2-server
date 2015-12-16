@@ -4,6 +4,7 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
+import InputStaticFieldsStore from 'stores/inputs/InputStaticFieldsStore';
 import InputsActions from 'actions/inputs/InputsActions';
 
 const InputsStore = Reflux.createStore({
@@ -14,12 +15,13 @@ const InputsStore = Reflux.createStore({
 
   init() {
     this.trigger({inputs: this.inputs, input: this.input});
+    this.listenTo(InputStaticFieldsStore, this.list);
   },
 
-  list(completeInput) {
+  list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl))
       .then(response => {
-        this.inputs = (completeInput ? response.inputs : response.inputs.map((input) => input.message_input));
+        this.inputs = response.inputs;
         this.trigger({inputs: this.inputs});
 
         return this.inputs;
@@ -55,7 +57,7 @@ const InputsStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Input '${input.title}' launched successfully`);
-        InputsActions.list.triggerPromise(true);
+        InputsActions.list();
       })
       .catch(error => {
         UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
@@ -66,14 +68,14 @@ const InputsStore = Reflux.createStore({
   },
 
   delete(input) {
-    const inputId = input.id ? input.id : input.input_id;
-    const inputTitle = input.title ? input.title : input.message_input.title;
+    const inputId = input.id;
+    const inputTitle = input.title;
 
     const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
     promise
       .then(() => {
         UserNotification.success(`Input '${inputTitle}' deleted successfully`);
-        InputsActions.list.triggerPromise(true);
+        InputsActions.list();
       })
       .catch(error => {
         UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
@@ -82,12 +84,27 @@ const InputsStore = Reflux.createStore({
 
     InputsActions.delete.promise(promise);
   },
+
+  update(id, input) {
+    const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${id}`), input);
+    promise
+      .then(() => {
+        UserNotification.success(`Input '${input.title}' updated successfully`);
+        InputsActions.list();
+      })
+      .catch(error => {
+        UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
+          'Could not update input');
+      });
+
+    InputsActions.update.promise(promise);
+  }
 });
 
 InputsStore.inputsAsMap = (inputsList) => {
   const inputsMap = {};
   inputsList.forEach(input => {
-    inputsMap[input.input_id] = input;
+    inputsMap[input.id] = input;
   });
   return inputsMap;
 };

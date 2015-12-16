@@ -23,16 +23,14 @@ import com.google.auto.value.AutoValue;
 
 import java.util.Set;
 
-@JsonAutoDetect
 @AutoValue
-public abstract class InputsList {
-    @JsonProperty
-    public abstract Set<InputSummary> inputs();
-    @JsonProperty
-    public abstract int total();
+@JsonAutoDetect
+public abstract class InputStatesList {
+    @JsonProperty("states")
+    public abstract Set<InputStateSummary> states();
 
     @JsonCreator
-    public static InputsList create(@JsonProperty("inputs") Set<InputSummary> inputs) {
-        return new AutoValue_InputsList(inputs, inputs.size());
+    public static InputStatesList create(@JsonProperty("states") Set<InputStateSummary> states) {
+        return new AutoValue_InputStatesList(states);
     }
 }

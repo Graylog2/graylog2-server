@@ -10,24 +10,27 @@ const InputTypesStore = Reflux.createStore({
   listenables: [InputTypesActions],
   sourceUrl: '/system/inputs/types',
   inputTypes: undefined,
+  inputDescriptions: undefined,
 
   init() {
     this.list();
   },
 
   getInitialState() {
-    return {inputTypes: this.inputTypes};
+    return {inputTypes: this.inputTypes, inputDescriptions: this.inputDescriptions};
   },
 
   list() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
-    promise
-      .then(response => {
-        this.inputTypes = response.types;
-        this.trigger({inputTypes: this.inputTypes});
+    const promiseTypes = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+    const promiseDescriptions = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/all'));
+    const promise = Promise.all([promiseTypes, promiseDescriptions])
+      .then(responses => {
+        this.inputTypes = responses[0].types;
+        this.inputDescriptions = responses[1];
+        this.trigger(this.getInitialState());
       })
       .catch(error => {
-        UserNotification.error('Fetching Inputs failed with status: ' + error,
+        UserNotification.error('Fetching Input Types failed with status: ' + error,
           'Could not retrieve Inputs');
       });
 

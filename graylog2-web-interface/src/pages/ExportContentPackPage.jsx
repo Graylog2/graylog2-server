@@ -27,7 +27,7 @@ const ExportContentPackPage = React.createClass({
     GrokPatternsStore.loadPatterns((grokPatterns) => {
       this.setState({grok_patterns: grokPatterns});
     });
-    InputsActions.list.triggerPromise();
+    InputsActions.list();
     OutputsStore.load((resp) => {
       this.setState({outputs: resp.outputs});
     });
@@ -97,8 +97,8 @@ const ExportContentPackPage = React.createClass({
   },
   formatInput(input) {
     return (
-      <div className="checkbox" key={'input_checkbox-' + input.input_id}>
-        <label className="checkbox"><input ref={'inputs.' + input.input_id} type="checkbox" name="inputs" id={'input_' + input.input_id} value={input.input_id}/>{input.title}</label>
+      <div className="checkbox" key={'input_checkbox-' + input.id}>
+        <label className="checkbox"><input ref={'inputs.' + input.id} type="checkbox" name="inputs" id={'input_' + input.id} value={input.id}/>{input.title}</label>
         <span className="help-inline">({this.inputDetails(input)})</span>
       </div>
     );

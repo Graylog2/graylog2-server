@@ -53,6 +53,7 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.plugin.BaseConfiguration;
@@ -194,6 +195,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindEventBusListeners() {
         bind(InputStateListener.class).asEagerSingleton();
+        bind(InputEventListener.class).asEagerSingleton();
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
     }

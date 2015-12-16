@@ -40,6 +40,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "System/Inputs/Types", description = "Message input types of this node")
@@ -62,6 +63,22 @@ public class InputTypesResource extends RestResource {
         for (Map.Entry<String, InputDescription> entry : messageInputFactory.getAvailableInputs().entrySet())
             types.put(entry.getKey(), entry.getValue().getName());
         return InputTypesSummary.create(types);
+    }
+
+    @GET
+    @Timed
+    @Path("/all")
+    @ApiOperation(value = "Get information about all input types")
+    public Map<String, InputTypeInfo> all() {
+        final Map<String, InputDescription> availableTypes = messageInputFactory.getAvailableInputs();
+        return availableTypes
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                    final InputDescription description = entry.getValue();
+                    return InputTypeInfo.create(entry.getKey(), description.getName(), description.isExclusive(),
+                            description.getRequestedConfiguration(), description.getLinkToDocs());
+                }));
     }
 
     @GET

@@ -5,6 +5,7 @@ const InputsActions = Reflux.createActions({
   'get': {asyncResult: true},
   'create': {asyncResult: true},
   'delete': {asyncResult: true},
+  'update': {asyncResult: true},
 });
 
 export default InputsActions;

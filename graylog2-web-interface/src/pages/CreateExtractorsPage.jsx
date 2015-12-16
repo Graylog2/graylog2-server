@@ -72,7 +72,7 @@ const CreateExtractorsPage = React.createClass({
         </PageHeader>
         <EditExtractor action="create"
                        extractor={this.state.extractor}
-                       inputId={this.state.input.input_id}
+                       inputId={this.state.input.id}
                        exampleMessage={this.state.exampleMessage.fields[this.state.field]}
                        onSave={this._extractorSaved}/>
       </div>

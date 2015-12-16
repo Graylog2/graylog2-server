@@ -14,25 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.inputs.responses;
+package org.graylog2.rest.resources.system.inputs;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
+import retrofit.Call;
+import retrofit.http.GET;
 
-import java.util.Set;
-
-@JsonAutoDetect
-@AutoValue
-public abstract class InputsList {
-    @JsonProperty
-    public abstract Set<InputSummary> inputs();
-    @JsonProperty
-    public abstract int total();
-
-    @JsonCreator
-    public static InputsList create(@JsonProperty("inputs") Set<InputSummary> inputs) {
-        return new AutoValue_InputsList(inputs, inputs.size());
-    }
+public interface RemoteInputStatesResource {
+    @GET("/system/inputstates")
+    Call<InputStatesList> list();
 }

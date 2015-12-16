@@ -1,13 +1,15 @@
 import React from 'react';
 import Reflux from 'reflux';
-import {Button, Row, Col} from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 
-import {Select} from 'components/common';
-import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
+import { Select } from 'components/common';
 
 import InputTypesActions from 'actions/inputs/InputTypesActions';
-import InputTypesStore from 'stores/inputs/InputTypesStore';
 import InputsActions from 'actions/inputs/InputsActions';
+
+import InputTypesStore from 'stores/inputs/InputTypesStore';
+
+import { InputForm } from 'components/inputs';
 
 const CreateInputControl = React.createClass({
   mixins: [Reflux.connect(InputTypesStore), Reflux.ListenerMethods],
@@ -40,21 +42,20 @@ const CreateInputControl = React.createClass({
     this.refs.configurationForm.open();
   },
   _createInput(data) {
-    data.global = false;
-    InputsActions.create.triggerPromise(data);
+    InputsActions.create(data);
   },
   render() {
     let inputModal;
     if (this.state.selectedInputDefinition) {
       const inputTypeName = this.state.inputTypes[this.state.selectedInput];
       inputModal = (
-        <ConfigurationForm ref="configurationForm"
-                           key="configuration-form-input"
-                           configFields={this.state.selectedInputDefinition.requested_configuration}
-                           title={<span>Launch new <em>{inputTypeName}</em> input</span>}
-                           helpBlock={"Select a name of your new input that describes it."}
-                           typeName={this.state.selectedInput}
-                           submitAction={this._createInput}/>
+        <InputForm ref="configurationForm"
+                   key="configuration-form-input"
+                   configFields={this.state.selectedInputDefinition.requested_configuration}
+                   title={<span>Launch new <em>{inputTypeName}</em> input</span>}
+                   helpBlock={"Select a name of your new input that describes it."}
+                   typeName={this.state.selectedInput}
+                   submitAction={this._createInput}/>
       );
     }
     return (
@@ -67,7 +68,7 @@ const CreateInputControl = React.createClass({
             &nbsp;
             <Button bsStyle="success" disabled={!this.state.selectedInput} onClick={this._openModal}>Launch new input</Button>
             <Button href="https://marketplace.graylog.org/" target="_blank" bsStyle="info" style={{marginLeft: 10}}>
-              <i className="fa fa-external-link"></i>&nbsp;Find more inputs
+              <i className="fa fa-external-link"/>&nbsp;Find more inputs
             </Button>
           </div>
           {inputModal}
