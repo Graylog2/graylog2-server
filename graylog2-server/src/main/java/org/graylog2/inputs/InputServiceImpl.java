@@ -224,16 +224,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public Input disable(Input input) {
-        return null;
-    }
-
-    @Override
-    public Input enable(Input input) {
-        return null;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public List<Extractor> getExtractors(Input input) {
         if (input.getFields().get(InputImpl.EMBEDDED_EXTRACTORS) == null) {

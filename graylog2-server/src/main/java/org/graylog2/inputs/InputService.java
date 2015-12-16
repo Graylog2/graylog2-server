@@ -98,7 +98,4 @@ public interface InputService extends PersistedService {
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
 
     List<Map.Entry<String, String>> getStaticFields(Input input);
-
-    Input disable(Input input);
-    Input enable(Input input);
 }
