@@ -18,17 +18,11 @@ const LinkToNode = React.createClass({
     }
     const node = this.state.nodes[this.props.nodeId];
 
-    let icon;
-    if (node.is_master) {
-      icon = <i className="fa fa-star master-node"/>;
-    } else {
-      icon = <i className="fa fa-code-fork"/>;
-    }
-
     if (node) {
+      const iconClass = node.is_master ? 'fa fa-star master-node' : 'fa fa-code-fork';
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
-          {icon}
+          <i className={iconClass} />
           {' '}
           {node.short_node_id} / {node.hostname}
         </Link>
