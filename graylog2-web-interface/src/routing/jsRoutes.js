@@ -189,7 +189,6 @@ const jsRoutes = {
         load: (username) => { return {url: '/users/' + username}; },
         delete: (username) => { return {url: '/users/' + username}; },
         update: (username) => { return {url: '/users/' + username}; },
-        updateRoles: (username) => { return {url: '/users/' + username + '/roles'}; },
       },
     },
     DashboardsController: {

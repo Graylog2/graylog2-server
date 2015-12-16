@@ -83,7 +83,7 @@ const UsersStore = {
   },
 
   updateRoles(username: string, roles: string[]): void {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.updateRoles(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.update(username).url);
     const promise = fetch('PUT', url, {roles: roles});
 
     return promise;
