@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 
 import UsersStore from 'stores/users/UsersStore';
@@ -8,10 +8,12 @@ import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 import UserForm from 'components/users/UserForm';
 
-import UserPreferencesModal from 'components/users/UserPreferencesModal';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const EditUsersPage = React.createClass({
+  propTypes: {
+    username: PropTypes.string.isRequired,
+  },
   getInitialState() {
     return {
       user: undefined,
@@ -60,7 +62,7 @@ const EditUsersPage = React.createClass({
 
         <UserForm user={this.state.user} />
       </span>
-    )
+    );
   },
 });
 
