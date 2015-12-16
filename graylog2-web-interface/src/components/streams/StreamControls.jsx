@@ -5,6 +5,8 @@ import { IfPermitted } from 'components/common';
 import StreamForm from './StreamForm';
 import PermissionsMixin from 'util/PermissionsMixin';
 
+import StartpageStore from 'stores/users/StartpageStore';
+
 const StreamControls = React.createClass({
   propTypes: {
     stream: PropTypes.object.isRequired,
@@ -37,6 +39,10 @@ const StreamControls = React.createClass({
     event.preventDefault();
     this.props.onQuickAdd(this.props.stream.id);
   },
+  _setStartpage(event) {
+    event.preventDefault();
+    StartpageStore.set(this.props.user.username, 'stream', this.props.stream.id);
+  },
   render() {
     const stream = this.props.stream;
 
@@ -53,7 +59,7 @@ const StreamControls = React.createClass({
             <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
               <MenuItem key={`cloneStream-${stream.id}`} onSelect={this._onClone}>Clone this stream</MenuItem>
             </IfPermitted>
-            <MenuItem key={`setAsStartpage-${stream.id}`} disabled={this.props.user.readonly}>
+            <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={this.props.user.read_only}>
               Set as startpage
             </MenuItem>
             <IfPermitted permissions={`streams:edit:${stream.id}`}>
