@@ -13,6 +13,7 @@ const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions],
   namespace: 'org.graylog2',
   registrations: {},
+  globalRegistrations: {},
 
   init() {
     this.listenTo(NodesStore, this.updateNodes);
@@ -25,17 +26,36 @@ const MetricsStore = Reflux.createStore({
     MetricsActions.names();
   },
   list() {
-    const promise = Promise.all(Object.keys(this.registrations)
+    const metricsToFetch = {};
+    Object.keys(this.registrations)
       .filter((nodeId) => Object.keys(this.registrations[nodeId]).length > 0)
+      .forEach(nodeId => {
+        metricsToFetch[nodeId] = Object.keys(this.registrations[nodeId]).filter(metricName => this.registrations[nodeId][metricName] > 0);
+      });
+    const globalMetrics = Object.keys(this.globalRegistrations).filter(metricName => this.globalRegistrations[metricName] > 0);
+    Object.keys(this.nodes).forEach(nodeId => {
+      globalMetrics.forEach(metricName => {
+        if (!metricsToFetch[nodeId]) {
+          metricsToFetch[nodeId] = [];
+        }
+        if (metricsToFetch[nodeId].indexOf(metricName) == -1) {
+          metricsToFetch[nodeId].push(metricName);
+        }
+      });
+    });
+
+    const promises = Object.keys(metricsToFetch)
       .map((nodeId) => {
         const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterMetricsApiController.multiple(nodeId).url);
-        const body = {metrics: Object.keys(this.registrations[nodeId]).filter((metricName) => this.registrations[nodeId][metricName] > 0)};
+        const body = {metrics: metricsToFetch[nodeId]};
         return fetch('POST', url, body).then((response) => {
           const metrics = {};
           response.metrics.forEach((metric) => metrics[metric.full_name] = metric);
           return {nodeId: nodeId, metrics: metrics};
         });
-      })).then((responses) => {
+      });
+
+    const promise = Promise.all(promises).then((responses) => {
         const metrics = {};
         responses.forEach((response) => {
           metrics[response.nodeId] = response.metrics;
@@ -72,6 +92,13 @@ const MetricsStore = Reflux.createStore({
     }
     this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] ? this.registrations[nodeId][metricName] + 1 : 1;
   },
+  addGlobal(metricName) {
+    if (!this.globalRegistrations[metricName]) {
+      this.globalRegistrations[metricName] = 1;
+    } else {
+      this.globalRegistrations[metricName] += 1;
+    }
+  },
   remove(nodeId, metricName) {
     if (!this.registrations[nodeId]) {
       return;
@@ -79,6 +106,15 @@ const MetricsStore = Reflux.createStore({
     this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] > 0 ? this.registrations[nodeId][metricName] - 1 : 0;
     if (this.registrations[nodeId][metricName] === 0) {
       delete this.registrations[nodeId][metricName];
+    }
+  },
+  removeGlobal(metricName) {
+    if (!this.globalRegistrations[metricName]) {
+      return;
+    }
+    this.globalRegistrations[metricName] = this.globalRegistrations[metricName] > 0 ? this.globalRegistrations[metricName] - 1 : 0;
+    if (this.globalRegistrations[metricName] === 0) {
+      delete this.globalRegistrations[metricName];
     }
   },
 });
