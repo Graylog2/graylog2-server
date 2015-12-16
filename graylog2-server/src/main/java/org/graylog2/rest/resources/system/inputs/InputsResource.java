@@ -32,6 +32,7 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
@@ -74,11 +75,13 @@ public class InputsResource extends RestResource {
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
+    private final Map<String, InputDescription> availableInputs;
 
     @Inject
     public InputsResource(InputService inputService, MessageInputFactory messageInputFactory) {
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
+        this.availableInputs = messageInputFactory.getAvailableInputs();
     }
 
     @GET
@@ -104,7 +107,6 @@ public class InputsResource extends RestResource {
         final Set<InputSummary> inputs = inputService.all().stream()
                 .map(input -> getInputSummary(input))
                 .collect(Collectors.toSet());
-
 
         return InputsList.create(inputs);
     }
@@ -192,9 +194,11 @@ public class InputsResource extends RestResource {
     }
 
     private InputSummary getInputSummary(Input input) {
+        final InputDescription inputDescription = this.availableInputs.get(input.getType());
+        final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
-                input.getType(),
+                name,
                 input.getContentPack(),
                 input.getId(),
                 input.getCreatedAt(),
