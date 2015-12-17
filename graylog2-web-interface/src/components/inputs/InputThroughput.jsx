@@ -119,15 +119,18 @@ const InputThroughput = React.createClass({
     );
   },
   _formatNodeDetails(nodeId, metrics) {
+    const openConnections = this._getValueFromMetric(metrics[this._prefix('open_connections')]);
+    const totalConnections = this._getValueFromMetric(metrics[this._prefix('total_connections')]);
     const writtenBytes1Sec = this._getValueFromMetric(metrics[this._prefix('written_bytes_1sec')]);
     const writtenBytesTotal = this._getValueFromMetric(metrics[this._prefix('written_bytes_total')]);
     const readBytes1Sec = this._getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
     const readBytesTotal = this._getValueFromMetric(metrics[this._prefix('read_bytes_total')]);
     return (
       <span key={this.props.inputId + nodeId}>
-          <strong><LinkToNode nodeId={nodeId} /></strong>
-          <br/>
-        {this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
+        <strong><LinkToNode nodeId={nodeId} /></strong>
+        <br/>
+        {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
+        {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
         <br/>
       </span>
     );
