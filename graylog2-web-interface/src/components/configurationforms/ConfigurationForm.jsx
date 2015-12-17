@@ -37,10 +37,11 @@ const ConfigurationForm = React.createClass({
     return data;
   },
   _copyStateFromProps(props) {
+    const effectiveTitleValue = (this.state && this.state.titleValue !== undefined ? this.state.titleValue : props.titleValue);
     return {
       configFields: $.extend({}, props.configFields),
       values: $.extend({}, props.values),
-      titleValue: props.titleValue,
+      titleValue: effectiveTitleValue,
     };
   },
   _sortByOptionality(x1, x2) {
