@@ -13,7 +13,7 @@ import InputTypesStore from 'stores/inputs/InputTypesStore';
 
 import InputsActions from 'actions/inputs/InputsActions';
 
-import { InputForm, InputStateBadge, InputStaticFields, StaticFieldForm } from 'components/inputs';
+import { InputForm, InputStateBadge, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -139,11 +139,7 @@ const InputListItem = React.createClass({
           <InputStaticFields input={this.props.input}/>
         </Col>
         <Col md={4}>
-          <div className="graylog-input-metrics">
-            <h3>Throughput / Metrics</h3>
-            <div className="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType"
-                 data-node-id="@inputState.getNode.getNodeId"></div>
-          </div>
+          <InputThroughput input={input} />
         </Col>
         <InputForm ref="configurationForm" key={'edit-form-input-' + input.id}
                    globalValue={input.global} nodeValue={input.node}
