@@ -39,7 +39,7 @@ const WidgetHeader = React.createClass({
         <div className="clearfix"></div>
       </div>
     );
-  }
+  },
 });
 
 export default WidgetHeader;
