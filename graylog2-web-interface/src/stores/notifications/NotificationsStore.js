@@ -9,11 +9,9 @@ import NotificationsActions from 'actions/notifications/NotificationsActions';
 const NotificationsStore = Reflux.createStore({
   listenables: [NotificationsActions],
   notifications: undefined,
-  POLL_INTERVAL: 3000,
 
   init() {
     this.list();
-    setInterval(this.list, this.POLL_INTERVAL);
   },
   getInitialState() {
     if (this.notifications) {

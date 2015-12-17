@@ -22,6 +22,15 @@ const Navigation = React.createClass({
 
   mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
 
+  componentDidMount() {
+    this.interval = setInterval(NotificationsStore.list, this.POLL_INTERVAL);
+  },
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  },
+
+  POLL_INTERVAL: 3000,
+
   _isActive(prefix) {
     return this.props.requestPath.indexOf(prefix) === 0;
   },
