@@ -24,6 +24,11 @@ const StartPage = React.createClass({
   componentDidMount() {
     GettingStartedActions.getStatus();
   },
+  componentDidUpdate() {
+    if (!this._isLoading()) {
+      this._redirect();
+    }
+  },
   onGettingStartedUpdate(state) {
     this.setState({gettingStarted: state.status});
   },
@@ -41,9 +46,6 @@ const StartPage = React.createClass({
     return !this.state.currentUser || !this.state.gettingStarted;
   },
   render() {
-    if (!this._isLoading()) {
-      this._redirect();
-    }
     return <Spinner/>;
   },
 });
