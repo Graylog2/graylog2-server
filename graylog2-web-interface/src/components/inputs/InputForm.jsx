@@ -6,7 +6,7 @@ import NodesStore from 'stores/nodes/NodesStore';
 
 import { Spinner } from 'components/common';
 import { NodeOrGlobalSelect } from 'components/inputs';
-import { BooleanField, ConfigurationForm, DropdownField } from 'components/configurationforms';
+import { ConfigurationForm } from 'components/configurationforms';
 
 const InputForm = React.createClass({
   mixins: [Reflux.connect(NodesStore)],
