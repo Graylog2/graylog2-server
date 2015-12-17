@@ -42,6 +42,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -169,6 +170,7 @@ public class IndicesTest {
     }
 
     @Test
+    @Ignore("Currently cannot be run twice in a row without purging the Elasticsearch data dir in between test runs.")
     public void testCreateEnsuresIndexTemplateExists() throws Exception {
         final String templateName = CONFIG.getTemplateName();
         final IndicesAdminClient client = this.client.admin().indices();
