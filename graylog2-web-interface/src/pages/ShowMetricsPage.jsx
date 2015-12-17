@@ -19,6 +19,7 @@ const ShowMetricsPage = React.createClass({
     const node = this.state.nodes[nodeId];
     const namespace = MetricsStore.namespace;
     const names = this.state.metricsNames[nodeId];
+    const filter = this.props.location.query.filter;
     return (
       <span>
         <PageHeader title={'Metrics of ' + node.short_node_id}>
@@ -29,7 +30,7 @@ const ShowMetricsPage = React.createClass({
           <span>This node is reporting a total of {names.length} metrics.</span>
         </PageHeader>
 
-        <MetricsComponent names={names} namespace={namespace} nodeId={nodeId}/>
+        <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
       </span>
     );
   },

@@ -15,6 +15,9 @@ const MetricsComponent = React.createClass({
   },
   mixins: [LinkedStateMixin],
   getInitialState() {
+    return { filter: this.props.filter };
+  },
+  getDefaultProps() {
     return { filter: '' };
   },
   render() {
