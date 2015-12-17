@@ -16,7 +16,10 @@ const StartpageStore = Reflux.createStore({
     }
     const promise = fetch('PUT', url, {startpage: payload})
       .then(
-        () => UserNotification.success('Your start page was changed successfully'),
+        () => {
+          this.trigger();
+          UserNotification.success('Your start page was changed successfully')
+        },
         (error) => UserNotification.error(`Changing your start page failed with error: ${error}`, 'Could not change your start page')
       );
 
