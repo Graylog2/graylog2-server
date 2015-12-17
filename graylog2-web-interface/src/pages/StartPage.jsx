@@ -26,21 +26,41 @@ const StartPage = React.createClass({
   },
   componentDidUpdate() {
     if (!this._isLoading()) {
-      this._redirect();
+      this._redirectToStartpage();
     }
   },
   onGettingStartedUpdate(state) {
     this.setState({gettingStarted: state.status});
   },
-  _redirect() {
+  _redirect(page) {
+    this.props.history.pushState(null, page);
+  },
+  _redirectToStartpage() {
+    // Show getting started page if user is an admin and getting started wasn't dismissed
     if (PermissionsMixin.isPermitted(this.state.currentUser.permissions, ['INPUTS_CREATE'])) {
       if (!!this.state.gettingStarted.show) {
-        this.props.history.pushState(null, Routes.GETTING_STARTED);
+        this._redirect(Routes.GETTING_STARTED);
         return;
       }
     }
 
-    this.props.history.pushState(null, Routes.SEARCH);
+    // Show custom startpage if it was set
+    const startpage = this.state.currentUser.startpage;
+    if (startpage !== null && Object.keys(startpage).length > 0) {
+      if (startpage.type === 'stream') {
+        this._redirect(Routes.stream_search(startpage.id));
+      } else {
+        this._redirect(Routes.dashboard_show(startpage.id));
+      }
+      return;
+    }
+
+    // Show search page if permitted, or streams page in other case
+    if (PermissionsMixin.isAnyPermitted(this.state.currentUser.permissions, ['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD'])) {
+      this._redirect(Routes.SEARCH);
+    } else {
+      this._redirect(Routes.STREAMS);
+    }
   },
   _isLoading() {
     return !this.state.currentUser || !this.state.gettingStarted;
