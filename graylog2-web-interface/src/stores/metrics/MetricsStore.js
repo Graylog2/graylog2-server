@@ -8,9 +8,10 @@ import fetch from 'logic/rest/FetchProvider';
 import NodesStore from 'stores/nodes/NodesStore';
 
 import MetricsActions from 'actions/metrics/MetricsActions';
+import SessionActions from 'actions/sessions/SessionActions';
 
 const MetricsStore = Reflux.createStore({
-  listenables: [MetricsActions],
+  listenables: [MetricsActions, SessionActions],
   namespace: 'org.graylog2',
   registrations: {},
   globalRegistrations: {},
@@ -24,6 +25,10 @@ const MetricsStore = Reflux.createStore({
   updateNodes(update) {
     this.nodes = update.nodes;
     MetricsActions.names();
+  },
+  logout() {
+    this.registrations = {};
+    this.globalRegistrations = {};
   },
   list() {
     const metricsToFetch = {};
