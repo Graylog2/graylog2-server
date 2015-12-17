@@ -62,7 +62,6 @@ import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -70,6 +69,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -109,13 +109,13 @@ public class Indices {
     }
 
     public void move(String source, String target) {
-        QueryBuilder qb = matchAllQuery();
-
         SearchResponse scrollResp = c.prepareSearch(source)
-                .setSearchType(SearchType.SCAN)
-                .setScroll(new TimeValue(10000))
-                .setQuery(qb)
-                .setSize(350).execute().actionGet();
+                .setScroll(TimeValue.timeValueSeconds(10L))
+                .setQuery(matchAllQuery())
+                .addSort(SortBuilders.fieldSort("_doc"))
+                .setSize(350)
+                .execute()
+                .actionGet();
 
         while (true) {
             scrollResp = c.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
