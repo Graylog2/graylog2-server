@@ -79,6 +79,7 @@ public class InputEventListener {
         final MessageInput messageInput;
         try {
             messageInput = inputService.getMessageInput(input);
+            messageInput.initialize();
         } catch (NoSuchInputTypeException e) {
             LOG.warn("Newly created input is of invalid type: " + input.getType(), e);
             return;
