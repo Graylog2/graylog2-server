@@ -1,11 +1,14 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
 
+import CurrentUserStore from 'stores/users/CurrentUserStore';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
+import StartpageStore from 'stores/users/StartpageStore';
 
 import Routes from 'routing/Routes';
 import jsRoutes from 'routing/jsRoutes';
@@ -15,7 +18,15 @@ const Dashboard = React.createClass({
     dashboard: React.PropTypes.object,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string),
   },
-  mixins: [PermissionsMixin],
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+  _setStartpage() {
+    StartpageStore.set(this.state.currentUser.username, 'dashboard', this.props.dashboard.id);
+  },
+  _onDashboardDelete() {
+    if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
+      DashboardsStore.remove(this.props.dashboard);
+    }
+  },
   _getDashboardActions() {
     let dashboardActions;
 
@@ -26,9 +37,7 @@ const Dashboard = React.createClass({
                                      description={this.props.dashboard.description} buttonClass="btn-info"/>
           &nbsp;
           <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
-            <LinkContainer to={Routes.startpage_set('dashboard', this.props.dashboard.id)}>
-              <MenuItem>Set as startpage</MenuItem>
-            </LinkContainer>
+            <MenuItem onSelect={this._setStartpage} disabled={this.state.currentUser.read_only}>Set as startpage</MenuItem>
             <MenuItem divider/>
             <MenuItem onSelect={this._onDashboardDelete}>Delete this dashboard</MenuItem>
           </DropdownButton>
@@ -68,11 +77,6 @@ const Dashboard = React.createClass({
         </div>
       </li>
     );
-  },
-  _onDashboardDelete() {
-    if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
-      DashboardsStore.remove(this.props.dashboard);
-    }
   },
 });
 

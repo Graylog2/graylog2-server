@@ -37,7 +37,6 @@ const Routes = {
   stream_outputs: (streamId) => '/streams/' + streamId + '/outputs',
   stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',
   stream_search: (streamId) => '/streams/' + streamId + '/search',
-  startpage_set: (type, id) => '/startpage/set/' + type + '/' + id,
 
   dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
 

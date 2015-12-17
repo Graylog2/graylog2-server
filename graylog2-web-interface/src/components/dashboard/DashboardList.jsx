@@ -13,6 +13,11 @@ const DashboardList = React.createClass({
     permissions: React.PropTypes.arrayOf(React.PropTypes.string),
   },
   mixins: [PermissionsMixin],
+  _formatDashboard(dashboard) {
+    return (
+      <Dashboard key={`dashboard-${dashboard.id}`} dashboard={dashboard} permissions={this.props.permissions}/>
+    );
+  },
   render() {
     if (this.props.dashboards.isEmpty()) {
       let createDashboardButton;
@@ -42,11 +47,6 @@ const DashboardList = React.createClass({
       <ul className="streams">
         {dashboardList}
       </ul>
-    );
-  },
-  _formatDashboard(dashboard) {
-    return (
-      <Dashboard key={`dashboard-${dashboard.id}`} dashboard={dashboard} permissions={this.props.permissions}/>
     );
   },
 });

@@ -1,24 +1,36 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
+import {Button} from 'react-bootstrap';
 
 import UsersStore from 'stores/users/UsersStore';
+import StartpageStore from 'stores/users/StartpageStore';
 
 import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 import UserForm from 'components/users/UserForm';
 
-import UserPreferencesModal from 'components/users/UserPreferencesModal';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const EditUsersPage = React.createClass({
+  propTypes: {
+    username: PropTypes.string.isRequired,
+  },
   getInitialState() {
     return {
       user: undefined,
     };
   },
   componentDidMount() {
+    this._loadUser();
+  },
+  _loadUser() {
     UsersStore.load(this.props.params.username).then((user) => {
       this.setState({user: user});
     });
+  },
+  _resetStartpage() {
+    if (window.confirm('Are you sure you want to reset your current start page?')) {
+      StartpageStore.set(this.props.params.username).then(() => this._loadUser());
+    }
   },
   render() {
     if (!this.state.user) {
@@ -26,11 +38,11 @@ const EditUsersPage = React.createClass({
     }
 
     const user = this.state.user;
-    const resetStartpageButton = (!user.read_only && user.startpage !== null && Object.keys(user.startpage).length > 0) ?
-      <button type="submit" className="btn btn-info" data-confirm="Really reset startpage?">
-        Reset custom startpage
-      </button>
-      : null;
+    let resetStartpageButton;
+    if (!user.read_only && user.startpage !== null && Object.keys(user.startpage).length > 0) {
+      resetStartpageButton = <Button bsStyle="info" onClick={this._resetStartpage}>Reset custom startpage</Button>;
+    }
+
     const userPreferencesButton = !user.read_only ?
       <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
         <UserPreferencesButton userName={user.username}/>
@@ -50,7 +62,7 @@ const EditUsersPage = React.createClass({
 
         <UserForm user={this.state.user} />
       </span>
-    )
+    );
   },
 });
 
