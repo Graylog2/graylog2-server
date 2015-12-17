@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import IndexerClusterStore from 'stores/indexers/IndexerClusterStore';
 
 import { Spinner } from 'components/common';
-import { DocumentationLink, SmallSupportLink } from 'components/support'
+import { DocumentationLink, SmallSupportLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 

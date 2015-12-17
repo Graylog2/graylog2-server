@@ -1,5 +1,5 @@
-export IndexerClusterHealth from './IndexerClusterHealth';
-export IndexerClusterHealthSummary from './IndexerClusterHealthSummary';
-export IndexerFailure from './IndexerFailure';
-export IndexerFailuresComponent from './IndexerFailuresComponent';
-export IndexerFailuresList from './IndexerFailuresList';
+export { default as IndexerClusterHealth } from './IndexerClusterHealth';
+export { default as IndexerClusterHealthSummary } from './IndexerClusterHealthSummary';
+export { default as IndexerFailure } from './IndexerFailure';
+export { default as IndexerFailuresComponent } from './IndexerFailuresComponent';
+export { default as IndexerFailuresList } from './IndexerFailuresList';
