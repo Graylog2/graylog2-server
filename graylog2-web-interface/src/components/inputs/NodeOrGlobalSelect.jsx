@@ -7,6 +7,11 @@ import NodesStore from 'stores/nodes/NodesStore';
 import { Spinner } from 'components/common';
 
 const NodeOrGlobalSelect = React.createClass({
+  propTypes: {
+    global: React.PropTypes.bool,
+    onChange: React.PropTypes.func.isRequired,
+    node: React.PropTypes.string,
+  },
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {

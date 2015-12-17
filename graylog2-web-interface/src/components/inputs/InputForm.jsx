@@ -9,6 +9,13 @@ import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
 
 const InputForm = React.createClass({
+  propTypes: {
+    globalValue: React.PropTypes.bool,
+    nodeValue: React.PropTypes.string,
+    titleValue: React.PropTypes.string,
+    submitAction: React.PropTypes.func.isRequired,
+    values: React.PropTypes.object,
+  },
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {

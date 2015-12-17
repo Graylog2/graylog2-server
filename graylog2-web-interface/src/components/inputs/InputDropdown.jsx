@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Button, Input } from 'react-bootstrap';
-import Immutable from 'immutable';
 
 import Spinner from 'components/common/Spinner';
 

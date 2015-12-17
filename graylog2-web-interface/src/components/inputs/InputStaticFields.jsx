@@ -22,7 +22,7 @@ const InputStaticFields = React.createClass({
     );
   },
   _formatStaticFields(staticFields) {
-    //<a href="/system/inputs/3c1749a2-b7ae-4e23-b761-f0b666e50e36/52f007d2e4b0fa0558898b9b/staticfields/test/delete" class="remove-static-field" data-confirm="Really delete static field?">
+    // <a href="/system/inputs/3c1749a2-b7ae-4e23-b761-f0b666e50e36/52f007d2e4b0fa0558898b9b/staticfields/test/delete" class="remove-static-field" data-confirm="Really delete static field?">
     const formattedFields = [];
     const staticFieldNames = Object.keys(staticFields);
 

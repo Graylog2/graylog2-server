@@ -74,7 +74,7 @@ const InputStateBadge = React.createClass({
         </OverlayTrigger>
       );
     } else {
-      const text = input.global || input.node === undefined ? "0 RUNNING" : "NOT RUNNING";
+      const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
       return (
         <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
       );

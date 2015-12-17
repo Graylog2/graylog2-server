@@ -11,12 +11,12 @@ const InputThroughput = React.createClass({
   propTypes: {
     input: React.PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(MetricsStore)],
   getInitialState() {
     return {
       showDetails: false,
     };
   },
-  mixins: [Reflux.connect(MetricsStore)],
   componentWillMount() {
     this._metricNames().forEach(metricName => MetricsActions.addGlobal(metricName));
   },
@@ -31,7 +31,7 @@ const InputThroughput = React.createClass({
       this._prefix('written_bytes_1sec'),
       this._prefix('written_bytes_total'),
       this._prefix('read_bytes_1sec'),
-      this._prefix('read_bytes_total')
+      this._prefix('read_bytes_total'),
     ];
   },
   _prefix(metric) {
@@ -44,6 +44,8 @@ const InputThroughput = React.createClass({
         return metric.metric.rate.mean;
       case 'gauge':
         return metric.metric.value;
+      default:
+        return undefined;
     }
   },
   _calculateMetrics(metrics) {
@@ -126,7 +128,7 @@ const InputThroughput = React.createClass({
     const readBytes1Sec = this._getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
     const readBytesTotal = this._getValueFromMetric(metrics[this._prefix('read_bytes_total')]);
     return (
-      <span key={this.props.inputId + nodeId}>
+      <span key={this.props.input.id + nodeId}>
         <strong><LinkToNode nodeId={nodeId} /></strong>
         <br/>
         {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
@@ -160,7 +162,7 @@ const InputThroughput = React.createClass({
           {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
           {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
           {!isNaN(writtenBytes1Sec) && this.state.showDetails && this._formatAllNodeDetails(this.state.metrics)}
-          {!isNaN(writtenBytes1Sec) && this.props.input.global && <a href="" onClick={this._toggleShowDetails}>{this.state.showDetails ? 'Hide': 'Show'} details</a>}
+          {!isNaN(writtenBytes1Sec) && this.props.input.global && <a href="" onClick={this._toggleShowDetails}>{this.state.showDetails ? 'Hide' : 'Show'} details</a>}
         </span>
       </div>
     );
