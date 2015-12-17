@@ -106,6 +106,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_analyzer", required = true)
     private String analyzer = "standard";
 
+    @Parameter(value = "elasticsearch_template_name")
+    private String templateName = "graylog-internal";
+
     @Parameter(value = "no_retention")
     private boolean noRetention = false;
 
@@ -218,6 +221,10 @@ public class ElasticsearchConfiguration {
 
     public String getAnalyzer() {
         return analyzer;
+    }
+
+    public String getTemplateName() {
+        return templateName;
     }
 
     public String getRotationStrategy() {

@@ -93,10 +93,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 @Singleton
 public class Indices {
-
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
-
-    private static final String GRAYLOG_INTERNAL_TEMPLATE_NAME = "graylog-internal";
 
     private final Client c;
     private final ElasticsearchConfiguration configuration;
@@ -220,20 +217,20 @@ public class Indices {
         // done by users.
         try {
             final GetIndexTemplatesResponse getIndexTemplatesResponse = c.admin().indices()
-                    .prepareGetTemplates(GRAYLOG_INTERNAL_TEMPLATE_NAME)
+                    .prepareGetTemplates(configuration.getTemplateName())
                     .get();
 
             final List<IndexTemplateMetaData> existingTemplate = getIndexTemplatesResponse.getIndexTemplates();
 
             if (existingTemplate.size() > 0) {
-                LOG.debug("Index template \"{}\" exists, not installing it again.", GRAYLOG_INTERNAL_TEMPLATE_NAME);
+                LOG.debug("Index template \"{}\" exists, not installing it again.", configuration.getTemplateName());
                 return;
             }
         } catch (Exception e) {
-            LOG.error("Unable to get index template \"" + GRAYLOG_INTERNAL_TEMPLATE_NAME + "\" from Elasticsearch.", e);
+            LOG.error("Unable to get index template \"" + configuration.getTemplateName() + "\" from Elasticsearch.", e);
         }
 
-        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(GRAYLOG_INTERNAL_TEMPLATE_NAME)
+        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(configuration.getTemplateName())
                 .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
                 .setSource(template)
                 .request();
@@ -241,10 +238,10 @@ public class Indices {
         try {
             final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
             if (acknowledged) {
-                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", GRAYLOG_INTERNAL_TEMPLATE_NAME);
+                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", configuration.getTemplateName());
             }
         } catch (Exception e) {
-            LOG.error("Unable to create the Graylog index template: " + GRAYLOG_INTERNAL_TEMPLATE_NAME, e);
+            LOG.error("Unable to create the Graylog index template: " + configuration.getTemplateName(), e);
         }
     }
 

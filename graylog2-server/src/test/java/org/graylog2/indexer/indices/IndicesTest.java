@@ -26,8 +26,13 @@ import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateResponse;
+import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
+import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
@@ -162,5 +167,29 @@ public class IndicesTest {
     @Test(expected = IndexNotFoundException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
         indices.timestampStatsOfIndex("does-not-exist");
+    }
+
+    @Test
+    public void testCreateEnsuresIndexTemplateExists() throws Exception {
+        final String templateName = CONFIG.getTemplateName();
+        final IndicesAdminClient client = this.client.admin().indices();
+        final GetIndexTemplatesRequest request = client.prepareGetTemplates(templateName).request();
+        final GetIndexTemplatesResponse responseBefore = client.getTemplates(request).actionGet();
+
+        assertThat(responseBefore.getIndexTemplates()).isEmpty();
+
+        indices.create("index_template_test");
+
+        final GetIndexTemplatesResponse responseAfter = client.getTemplates(request).actionGet();
+        assertThat(responseAfter.getIndexTemplates()).hasSize(1);
+        final IndexTemplateMetaData templateMetaData = responseAfter.getIndexTemplates().get(0);
+        assertThat(templateMetaData.getName()).isEqualTo(templateName);
+        assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
+
+        final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
+        final DeleteIndexTemplateResponse deleteResponse = client.deleteTemplate(deleteRequest).actionGet();
+        assertThat(deleteResponse.isAcknowledged()).isTrue();
+
+        indices.delete("index_template_test");
     }
 }
