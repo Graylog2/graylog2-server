@@ -1,0 +1,14 @@
+{
+  "filters": [
+    {
+      "_id": {"$oid": "54e9deadbeefdeadbeefaffe"},
+      "type" : "regex",
+      "creator_user_id" : "admin",
+      "created_at" : "2015-12-18T12:54:03.911Z",
+      "name" : "Testfilter",
+      "description" : "A basic Regex filter for testing",
+      "field_name" : "message",
+      "pattern" : "posts"
+    }
+  ]
+}
