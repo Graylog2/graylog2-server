@@ -31,7 +31,11 @@ const InputStateBadge = React.createClass({
   },
 
   _textForState(sortedStates) {
-    return sortedStates.map(state => state.count + ' ' + state.state).join(', ');
+    if (this.props.input.global) {
+      return sortedStates.map(state => state.count + ' ' + state.state).join(', ');
+    } else {
+      return sortedStates[0].state;
+    }
   },
   render() {
     if (!this.state.inputStates) {
@@ -63,7 +67,7 @@ const InputStateBadge = React.createClass({
         });
       });
       const popover = (
-        <Popover id="inputstate-badge-details" title={'Input States for ' + input.title}>
+        <Popover id="inputstate-badge-details" title={'Input States for ' + input.title} style={{fontSize: 12}}>
           {popOverText}
         </Popover>
       );
