@@ -45,10 +45,6 @@ const InputListItem = React.createClass({
     InputsActions.update(this.props.input.id, data);
   },
   render() {
-    // TODO:
-    // - Input state controls
-    // - Input metrics
-
     if (!this.state.inputTypes) {
       return <Spinner />;
     }

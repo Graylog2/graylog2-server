@@ -31,10 +31,10 @@ const InputStateControl = React.createClass({
     return isInputRunning;
   },
   _startInput() {
-    console.log('starting input', this.props.input.id);
+    InputStatesStore.start(this.props.input);
   },
   _stopInput() {
-    console.log('stopping input', this.props.input.id);
+    InputStatesStore.stop(this.props.input);
   },
   render() {
     if (this._isInputRunning()) {
