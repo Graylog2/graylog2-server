@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { InputStatesStore } from 'stores/inputs';
+import NodesStore from 'stores/nodes/NodesStore';
 
 import { LinkToNode, Spinner } from 'components/common';
 
@@ -12,12 +13,18 @@ const InputStateBadge = React.createClass({
   propTypes: {
     input: React.PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(InputStatesStore)],
-  getInitialState() {
-    return {};
-  },
+  mixins: [Reflux.connect(InputStatesStore), Reflux.connect(NodesStore)],
   comparator: new InputStateComparator(),
-  _labelClassForState(state) {
+  _labelClassForState(sortedStates) {
+    const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => {
+      return numberOfNodes + state.count;
+    }, 0);
+
+    if (this.props.input.global && nodesWithKnownState !== Object.keys(this.state.nodes).length) {
+      return 'warning';
+    }
+
+    const state = sortedStates[0].state;
     switch (state) {
       case 'RUNNING':
         return 'success';
@@ -35,8 +42,11 @@ const InputStateBadge = React.createClass({
     }
     return sortedStates[0].state;
   },
+  _isLoading() {
+    return !(this.state.inputStates && this.state.nodes);
+  },
   render() {
-    if (!this.state.inputStates) {
+    if (this._isLoading()) {
       return <Spinner />;
     }
 
@@ -71,7 +81,7 @@ const InputStateBadge = React.createClass({
       );
       return (
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose>
-          <Label bsStyle={this._labelClassForState(sorted[0].state)} title="Click to show details"
+          <Label bsStyle={this._labelClassForState(sorted)} title="Click to show details"
                  bsSize="xsmall" style={{cursor: 'pointer'}}>{this._textForState(sorted)}</Label>
         </OverlayTrigger>
       );
