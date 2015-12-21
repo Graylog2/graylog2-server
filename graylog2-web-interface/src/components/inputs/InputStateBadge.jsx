@@ -29,13 +29,11 @@ const InputStateBadge = React.createClass({
         return 'warning';
     }
   },
-
   _textForState(sortedStates) {
     if (this.props.input.global) {
       return sortedStates.map(state => state.count + ' ' + state.state).join(', ');
-    } else {
-      return sortedStates[0].state;
     }
+    return sortedStates[0].state;
   },
   render() {
     if (!this.state.inputStates) {
