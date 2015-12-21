@@ -61,15 +61,15 @@ const MetricsStore = Reflux.createStore({
       });
 
     const promise = Promise.all(promises).then((responses) => {
-        const metrics = {};
-        responses.forEach((response) => {
-          metrics[response.nodeId] = response.metrics;
-        });
-
-        this.trigger({metrics: metrics});
-        this.metrics = metrics;
-        return metrics;
+      const metrics = {};
+      responses.forEach((response) => {
+        metrics[response.nodeId] = response.metrics;
       });
+
+      this.trigger({metrics: metrics});
+      this.metrics = metrics;
+      return metrics;
+    });
 
     MetricsActions.list.promise(promise);
   },
