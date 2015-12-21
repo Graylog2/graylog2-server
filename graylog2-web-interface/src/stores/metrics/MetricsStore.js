@@ -38,16 +38,19 @@ const MetricsStore = Reflux.createStore({
         metricsToFetch[nodeId] = Object.keys(this.registrations[nodeId]).filter(metricName => this.registrations[nodeId][metricName] > 0);
       });
     const globalMetrics = Object.keys(this.globalRegistrations).filter(metricName => this.globalRegistrations[metricName] > 0);
-    Object.keys(this.nodes).forEach(nodeId => {
-      globalMetrics.forEach(metricName => {
-        if (!metricsToFetch[nodeId]) {
-          metricsToFetch[nodeId] = [];
-        }
-        if (metricsToFetch[nodeId].indexOf(metricName) == -1) {
-          metricsToFetch[nodeId].push(metricName);
-        }
+
+    if (this.nodes) {
+      Object.keys(this.nodes).forEach(nodeId => {
+        globalMetrics.forEach(metricName => {
+          if (!metricsToFetch[nodeId]) {
+            metricsToFetch[nodeId] = [];
+          }
+          if (metricsToFetch[nodeId].indexOf(metricName) == -1) {
+            metricsToFetch[nodeId].push(metricName);
+          }
+        });
       });
-    });
+    }
 
     const promises = Object.keys(metricsToFetch)
       .map((nodeId) => {
