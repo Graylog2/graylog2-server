@@ -3,7 +3,7 @@ import { Input } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { Widget } from 'components/widgets';
+import Widget from 'components/widgets/Widget';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
