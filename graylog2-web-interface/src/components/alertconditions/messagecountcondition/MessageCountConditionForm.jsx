@@ -24,8 +24,8 @@ const MessageCountConditionForm = React.createClass({
   getValue() {
     return jQuery.extend({
       threshold_type: this.refs.threshold_type.value,
-      threshold: this.refs.threshold.value,
-      time: this.refs.time.value,
+      threshold: Number(this.refs.threshold.value),
+      time: Number(this.refs.time.value),
     }, this.refs.gracePeriod.getValue());
   },
   _onTypeChanged(evt) {
