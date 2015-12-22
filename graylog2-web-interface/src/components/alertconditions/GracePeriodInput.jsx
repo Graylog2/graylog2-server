@@ -19,13 +19,15 @@ const GracePeriodInput = React.createClass({
       backlog: Number(this.refs.backlog.value),
     };
   },
+  _getDefaultValue(field) {
+    return this.props.alertCondition[field] || this.props.parameters[field];
+  },
   render() {
-    const parameters = this.props.alertCondition;
     return (
       <span>
          and <br /> then wait at least{' '}
         <input ref="grace" name="grace" type="number" className="form-control pluralsingular validatable"
-               data-pluralsingular="grace-descr" data-validate="not_negative_number" defaultValue={parameters.grace}/>{' '}
+               data-pluralsingular="grace-descr" data-validate="not_negative_number" defaultValue={this._getDefaultValue('grace')}/>{' '}
         <span className="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
           a new alert. (grace period)
 
@@ -33,7 +35,7 @@ const GracePeriodInput = React.createClass({
 
           When sending an alert, include the last{' '}
         <input ref="backlog" name="backlog" type="number" className="form-control pluralsingular validatable"
-               data-pluralsingular="backlog-descr" data-validate="not_negative_number" defaultValue={parameters.backlog}/>{' '}
+               data-pluralsingular="backlog-descr" data-validate="not_negative_number" defaultValue={this._getDefaultValue('backlog')}/>{' '}
         <span className="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
       </span>
     );
