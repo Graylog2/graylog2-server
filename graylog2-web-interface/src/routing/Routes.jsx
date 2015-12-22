@@ -34,6 +34,7 @@ const Routes = {
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => '/streams/' + streamId + '/edit',
+  stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId) => '/streams/' + streamId + '/outputs',
   stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',
   stream_search: (streamId) => '/streams/' + streamId + '/search',

@@ -11,7 +11,7 @@ import StartPage from 'pages/StartPage';
 import SearchPage from 'pages/SearchPage';
 import ShowMessagePage from 'pages/ShowMessagePage';
 import StreamsPage from 'pages/StreamsPage';
-import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
+import StreamEditPage from 'pages/StreamEditPage';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
 import StreamAlertsPage from 'pages/StreamAlertsPage';
 import StreamSearchPage from 'pages/StreamSearchPage';
@@ -56,7 +56,7 @@ const AppRouter = React.createClass({
           <Route component={AppWithoutSearchBar}>
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage}/>
             <Route path={Routes.STREAMS} component={StreamsPage}/>
-            <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
+            <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage}/>
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>

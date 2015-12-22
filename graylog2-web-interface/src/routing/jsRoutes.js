@@ -213,9 +213,6 @@ const jsRoutes = {
     RadiosController: {
       show: (nodeId) => { return {url: `/system/radios/${nodeId}`}; },
     },
-    StreamRulesController: {
-      index: (streamId) => { return {url: `/streams/${streamId}/rules`}; },
-    },
     SearchController: {
       index: (query, rangetype, timerange) => {
         let route;
