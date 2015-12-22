@@ -24,7 +24,7 @@ const StreamAlertsPage = React.createClass({
   propTypes: {
     params: React.PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(AlertConditionsStore, "onAlertConditionsList")],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(AlertConditionsStore, 'onAlertConditionsList')],
   getInitialState() {
     return {
       stream: undefined,
@@ -34,24 +34,24 @@ const StreamAlertsPage = React.createClass({
     StreamsStore.onChange(this.loadData);
     this.loadData();
   },
-  loadData() {
-    StreamsStore.get(this.props.params.streamId, (stream) => {
-      this.setState({stream: stream});
-    });
-
-    AlertConditionsActions.list(this.props.params.streamId);
-  },
   onAlertConditionsList(response) {
     this.setState({alertConditions: response.alertConditions.sort((a1, a2) => a1.id.localeCompare(a2.id))});
   },
   _onSendDummyAlert() {
     const stream = this.state.stream;
     StreamsStore.sendDummyAlert(stream.id).then(() => {
-      UserNotification.success('Sent dummy alert for stream »' + stream.title + '«', "Success!");
+      UserNotification.success('Sent dummy alert for stream »' + stream.title + '«', 'Success!');
     }, (error) => {
       UserNotification.error('Unable to send dummy alert for stream »' + stream.title + '«: ' + error.message,
-        'Sendin dummy alert failed!');
+        'Sending dummy alert failed!');
     });
+  },
+  loadData() {
+    StreamsStore.get(this.props.params.streamId, (stream) => {
+      this.setState({stream: stream});
+    });
+
+    AlertConditionsActions.list(this.props.params.streamId);
   },
   render() {
     if (!this.state.stream || !this.state.alertConditions) {
