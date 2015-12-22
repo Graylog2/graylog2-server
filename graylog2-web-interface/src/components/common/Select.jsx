@@ -1,5 +1,5 @@
 import React from 'react';
-const ReactSelect = require('react-select');
+import ReactSelect from 'react-select';
 
 const propTypes = ReactSelect.propTypes;
 propTypes.onValueChange = React.PropTypes.func;
@@ -11,13 +11,13 @@ const Select = React.createClass({
       value: this.props.value,
     };
   },
+  componentDidMount() {
+    this.reactSelectStyles.use();
+  },
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
       this.setState({value: nextProps.value});
     }
-  },
-  componentDidMount() {
-    this.reactSelectStyles.use();
   },
   componentWillUnmount() {
     this.reactSelectStyles.unuse();
