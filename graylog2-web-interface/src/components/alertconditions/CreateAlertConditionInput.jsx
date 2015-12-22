@@ -48,7 +48,7 @@ const CreateAlertConditionInput = React.createClass({
             Configure conditions that will trigger stream alerts when they are fulfilled.
           </p>
 
-          <form className="form-inline" onSubmit={this.props.onSubmit}>
+          <form className="form-inline" onSubmit={this._onSubmit}>
             <div className="form-group" style={{display: 'block'}}>
               <Input type="select" className="add-alert-type form-control" value={this.state.type} onChange={this._onChange}>
                 <option value={this.PLACEHOLDER} disabled>Select Alert Condition Type</option>
