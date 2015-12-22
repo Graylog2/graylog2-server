@@ -18,6 +18,7 @@ const Stream = React.createClass({
       stream: PropTypes.object.isRequired,
       permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
       onResume: PropTypes.func.isRequired,
+      user: PropTypes.object.isRequired,
     };
   },
   mixins: [PermissionsMixin],
