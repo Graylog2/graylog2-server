@@ -12,7 +12,7 @@ import InputTypesStore from 'stores/inputs/InputTypesStore';
 import { InputForm } from 'components/inputs';
 
 const CreateInputControl = React.createClass({
-  mixins: [Reflux.connect(InputTypesStore), Reflux.ListenerMethods],
+  mixins: [Reflux.connect(InputTypesStore)],
   getInitialState() {
     return {
       selectedInput: undefined,
@@ -35,6 +35,10 @@ const CreateInputControl = React.createClass({
     return options;
   },
   _onInputSelect(selectedInput) {
+    if (selectedInput === '') {
+      this.setState(this.getInitialState());
+    }
+
     this.setState({selectedInput: selectedInput});
     InputTypesActions.get.triggerPromise(selectedInput).then(inputDefinition => this.setState({selectedInputDefinition: inputDefinition}));
   },
@@ -44,7 +48,7 @@ const CreateInputControl = React.createClass({
   },
   _createInput(data) {
     InputsActions.create(data).then(() => {
-      this.setState({selectedInput: undefined});
+      this.setState(this.getInitialState());
     });
   },
   render() {
