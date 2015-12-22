@@ -16,7 +16,10 @@ const StreamStateBadge = React.createClass({
     }
 
     return (
-      <span className="badge alert-danger stream-stopped" onClick={this._onClick} style={{marginLeft: 5}}>stopped</span>
+      <span className="badge alert-danger stream-stopped" onClick={this._onClick} title="Click here to start the stream"
+            style={{marginLeft: 5, cursor: 'pointer'}}>
+        stopped
+      </span>
     );
   },
 });
