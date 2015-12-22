@@ -91,6 +91,15 @@ const InputListItem = React.createClass({
       );
     }
 
+    let showMetricsMenuItem;
+    if (!this.props.input.global) {
+      showMetricsMenuItem = (
+        <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>
+          <MenuItem key={`show-metrics-${this.props.input.id}`}>Show metrics</MenuItem>
+        </LinkContainer>
+      );
+    }
+
     actions.push(
       <DropdownButton key={`more-actions-${this.props.input.id}`}
                       title="More actions"
@@ -102,7 +111,7 @@ const InputListItem = React.createClass({
           </MenuItem>
         </IfPermitted>
 
-        {this.props.input.global && <MenuItem key={`show-metrics-${this.props.input.id}`} href="">Show metrics</MenuItem>}
+        {showMetricsMenuItem}
 
         <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
           <MenuItem key={`add-static-field-${this.props.input.id}`} onClick={this._openStaticFieldForm}>Add static field</MenuItem>
