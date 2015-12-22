@@ -38,11 +38,14 @@ const CreateInputControl = React.createClass({
     this.setState({selectedInput: selectedInput});
     InputTypesActions.get.triggerPromise(selectedInput).then(inputDefinition => this.setState({selectedInputDefinition: inputDefinition}));
   },
-  _openModal() {
+  _openModal(event) {
+    event.preventDefault();
     this.refs.configurationForm.open();
   },
   _createInput(data) {
-    InputsActions.create(data);
+    InputsActions.create(data).then(() => {
+      this.setState({selectedInput: undefined});
+    });
   },
   render() {
     let inputModal;
@@ -61,16 +64,16 @@ const CreateInputControl = React.createClass({
     return (
       <Row className="content input-new">
         <Col md={12}>
-          <div className="form-inline">
+          <form className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{width: 300}}>
-              <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label" onValueChange={this._onInputSelect}/>
+              <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label" onValueChange={this._onInputSelect} value={this.state.selectedInput}/>
             </div>
             &nbsp;
-            <Button bsStyle="success" disabled={!this.state.selectedInput} onClick={this._openModal}>Launch new input</Button>
+            <Button bsStyle="success" type="submit" disabled={!this.state.selectedInput}>Launch new input</Button>
             <Button href="https://marketplace.graylog.org/" target="_blank" bsStyle="info" style={{marginLeft: 10}}>
               <i className="fa fa-external-link"/>&nbsp;Find more inputs
             </Button>
-          </div>
+          </form>
           {inputModal}
         </Col>
       </Row>
