@@ -17,7 +17,7 @@ const CreateAlertConditionInput = React.createClass({
       type: this.PLACEHOLDER,
     };
   },
-  PLACEHOLDER: "placeholder",
+  PLACEHOLDER: 'placeholder',
   alertConditionsFactory: new AlertConditionsFactory(),
   _onChange(evt) {
     this.setState({type: evt.target.value});
@@ -27,7 +27,7 @@ const CreateAlertConditionInput = React.createClass({
     const request = {
       type: this.state.type,
       parameters: this.refs.conditionForm.getValue(),
-    }
+    };
     AlertConditionsActions.save(this.props.streamId, request);
   },
   _formatConditionForm(type) {
@@ -44,6 +44,9 @@ const CreateAlertConditionInput = React.createClass({
           <h2 style={{marginBotton: '10px'}}>
             Add new alert condition
           </h2>
+          <p className="description">
+            Configure conditions that will trigger stream alerts when they are fulfilled.
+          </p>
 
           <form className="form-inline" onSubmit={this.props.onSubmit}>
             <div className="form-group" style={{display: 'block'}}>
