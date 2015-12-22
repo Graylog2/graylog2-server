@@ -17,7 +17,6 @@ const Stream = React.createClass({
     return {
       stream: PropTypes.object.isRequired,
       permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-      onResume: PropTypes.func.isRequired,
       user: PropTypes.object.isRequired,
     };
   },
@@ -73,7 +72,7 @@ const Stream = React.createClass({
             <a>{stream.title}</a>
           </LinkContainer>
 
-          <StreamStateBadge stream={stream} onClick={this.props.onResume}/>
+          <StreamStateBadge stream={stream} onClick={this._onResume}/>
         </h2>
 
         <div className="stream-data">

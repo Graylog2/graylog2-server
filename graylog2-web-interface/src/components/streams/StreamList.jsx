@@ -13,9 +13,7 @@ var StreamList = React.createClass({
     },
     _formatStream(stream) {
         return <Stream key={"stream-" + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
-                       permissions={this.props.permissions} user={this.props.user}
-                       onDelete={this.props.onDelete} onResume={this.props.onResume} onPause={this.props.onPause}
-                       onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>;
+                       permissions={this.props.permissions} user={this.props.user}/>;
     },
     _sortByTitle(stream1, stream2) {
         return stream1.title.localeCompare(stream2.title);
