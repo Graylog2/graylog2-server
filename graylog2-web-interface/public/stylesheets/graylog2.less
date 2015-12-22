@@ -1603,10 +1603,6 @@ table .dc-table-column {
   padding-left: 10px;
 }
 
-.threshold-type {
-  margin-left: 5px;
-}
-
 .alerts {
   margin-top: 15px;
 }
@@ -2394,16 +2390,27 @@ dl.system-system, dl.system-rest {
   cursor: pointer;
 }
 
-form.alert-type-form {
+.alert-type-form {
   line-height: 26px;
 }
 
-form.alert-type-form label.radio-inline {
+.alert-type-form label.radio-inline {
   margin-right: 0;
 }
 
-form.alert-type-form div.well {
+.alert-type-form .radio-inline input[type=radio] {
+  position: relative;
+  margin-left: -15px;
+  margin-right: 5px;
+}
+
+.alert-type-form div.well {
   margin-bottom: 0;
+}
+
+.alert-type-form .threshold-type {
+  margin-left: 5px;
+  vertical-align: baseline;
 }
 
 .no-alarm-callbacks {
