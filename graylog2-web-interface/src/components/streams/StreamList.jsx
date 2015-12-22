@@ -7,6 +7,9 @@ var PermissionsMixin = require('../../util/PermissionsMixin');
 var CreateStreamButton = require('./CreateStreamButton');
 
 var StreamList = React.createClass({
+    propTypes: {
+      onStreamSave: React.PropTypes.func.isRequired,
+    },
     mixins: [PermissionsMixin],
     getInitialState() {
         return {};
@@ -34,8 +37,7 @@ var StreamList = React.createClass({
                     <span>
                         <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
                                         buttonText="Create one now" ref='createStreamButton'
-                                        onSave={this.props.onStreamCreated} />
-                        .
+                                        onSave={this.props.onStreamSave} />
                     </span>
                 );
             }

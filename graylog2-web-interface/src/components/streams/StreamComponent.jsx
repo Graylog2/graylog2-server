@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { Col } from 'react-bootstrap';
 
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -11,7 +11,8 @@ import Spinner from 'components/common/Spinner';
 
 const StreamComponent = React.createClass({
   propTypes: {
-    currentUser: React.PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
+    onStreamSave: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {};
@@ -27,11 +28,6 @@ const StreamComponent = React.createClass({
   loadData() {
     StreamsStore.load((streams) => {
       this.setState({streams: streams});
-    });
-  },
-  _onSave(streamId, stream) {
-    StreamsStore.save(stream, () => {
-      UserNotification.success('Stream has been successfully created.', 'Success');
     });
   },
   _isLoading() {
@@ -50,7 +46,7 @@ const StreamComponent = React.createClass({
       <Col md={12}>
         <StreamList streams={this.state.streams} streamRuleTypes={this.state.streamRuleTypes}
                     permissions={this.props.currentUser.permissions} user={this.props.currentUser}
-                    onStreamCreated={this._onSave}/>
+                    onStreamSave={this.props.onStreamSave}/>
       </Col>
     );
   },
