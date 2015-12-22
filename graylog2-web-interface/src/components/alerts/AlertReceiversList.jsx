@@ -11,8 +11,14 @@ import AlertReceiver from 'components/alerts/AlertReceiver';
 
 const AlertReceiversList = React.createClass({
   propTypes: {
-    receivers: React.PropTypes.object.isRequired,
+    receivers: React.PropTypes.object,
     streamId: React.PropTypes.string.isRequired,
+  },
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+  getDefaultProps() {
+    return {
+      receivers: {users: [], emails: []},
+    };
   },
   getInitialState() {
     return {
@@ -20,7 +26,6 @@ const AlertReceiversList = React.createClass({
       emailReceiver: '',
     };
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
   _onChangeUser(evt) {
     this.setState({userReceiver: evt.target.value});
   },
