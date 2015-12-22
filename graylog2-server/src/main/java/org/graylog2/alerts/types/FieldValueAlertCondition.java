@@ -76,9 +76,9 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
-        this.time = (Integer) parameters.get("time");
+        this.time = Integer.parseInt(String.valueOf(parameters.get("time")));
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = (Number) parameters.get("threshold");
+        this.threshold = Double.parseDouble(String.valueOf(parameters.get("threshold")));
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase(Locale.ENGLISH));
         this.field = (String) parameters.get("field");
 
