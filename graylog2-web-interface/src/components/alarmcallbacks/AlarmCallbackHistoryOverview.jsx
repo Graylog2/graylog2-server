@@ -21,8 +21,8 @@ const AlarmCallbackHistoryOverview = React.createClass({
     this.loadData();
   },
   loadData() {
-    AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((result) => {
-      this.setState({histories: result.histories});
+    AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((histories) => {
+      this.setState({histories: histories});
     });
   },
   _formatHistory(history) {

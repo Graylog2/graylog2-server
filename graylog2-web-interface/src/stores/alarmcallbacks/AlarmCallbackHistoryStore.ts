@@ -11,7 +11,11 @@ class AlarmCallbackHistoryStore {
         };
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
 
-        return fetch('GET', url).catch(failCallback);
+        return fetch('GET', url)
+          .then(
+            response => response.histories,
+            failCallback
+          );
     }
 }
 const alarmCallbackHistoryStore = new AlarmCallbackHistoryStore();
