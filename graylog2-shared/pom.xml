@@ -48,10 +48,6 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-inputs</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -232,6 +228,23 @@
         <dependency>
             <groupId>com.squareup.retrofit</groupId>
             <artifactId>retrofit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>syslog4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
         </dependency>
     </dependencies>
 
