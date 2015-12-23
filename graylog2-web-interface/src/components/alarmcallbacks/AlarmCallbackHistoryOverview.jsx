@@ -28,8 +28,11 @@ const AlarmCallbackHistoryOverview = React.createClass({
   _formatHistory(history) {
     return <AlarmCallbackHistory key={history._id} alarmCallbackHistory={history} types={this.state.types}/>;
   },
+  _isLoading() {
+    return !(this.state.histories && this.state.types);
+  },
   render() {
-    if (!this.state.histories && !this.state.types) {
+    if (this._isLoading()) {
       return <Spinner />;
     }
 
