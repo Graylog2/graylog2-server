@@ -36,7 +36,7 @@ const AlarmCallbackHistoryOverview = React.createClass({
       return <Spinner />;
     }
 
-    if (this.state.histories.length > 0) {
+    if (this.state.histories.length === 0) {
       return (
         <div><i>No history available.</i></div>
       );
