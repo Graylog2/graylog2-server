@@ -10,7 +10,7 @@ const TypeAheadInput = React.createClass({
     label: PropTypes.string.isRequired,
     onKeyPress: PropTypes.func,
     displayKey: PropTypes.string,
-    suggestions: PropTypes.array,
+    suggestions: PropTypes.array, // [ "some string", "otherstring" ]
     suggestionText: PropTypes.string,
     onTypeaheadLoaded: PropTypes.func,
     onSuggestionSelected: PropTypes.func,
@@ -43,8 +43,6 @@ const TypeAheadInput = React.createClass({
 
     const $fieldInput = $(this.fieldInput);
 
-    // props.suggestions:
-    // [ "some string", "otherstring" ]
     $fieldInput.typeahead({
       hint: true,
       highlight: true,
