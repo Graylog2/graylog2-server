@@ -1,6 +1,7 @@
 import React from 'react';
 import jQuery from 'jquery';
 
+import {Pluralize} from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
 
 const FieldValueConditionForm = React.createClass({
@@ -11,7 +12,7 @@ const FieldValueConditionForm = React.createClass({
     return {
       alertCondition: {
         field: '',
-        time: 0,
+        time: 1,
         threshold: 0,
         threshold_type: 'LOWER',
         type: 'MEAN',
@@ -21,6 +22,7 @@ const FieldValueConditionForm = React.createClass({
   getInitialState() {
     return {
       thresholdType: this.props.alertCondition.threshold_type,
+      time: this.props.alertCondition.time,
     };
   },
   getValue() {
@@ -52,7 +54,7 @@ const FieldValueConditionForm = React.createClass({
       <span className="threshold-type">
         {this.thresholdTypes.map((type) =>
           <label key={'threshold-label-' + type} className="radio-inline">
-            <input key={'threshold-type-' + type} ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChanged}
+            <input key={'threshold-type-' + type} ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChange}
                    value={type} checked={this.state.thresholdType === type}/>
             {type.toLowerCase()}
           </label>
@@ -60,26 +62,31 @@ const FieldValueConditionForm = React.createClass({
       </span>
     );
   },
-  _onTypeChanged(evt) {
-    this.setState({threshold_type: evt.target.value});
+  _onTypeChange(event) {
+    this.setState({thresholdType: event.target.value});
+  },
+  _onTimeChange(event) {
+    this.setState({time: event.target.value});
   },
   render() {
     const alertCondition = this.props.alertCondition;
     return (
       <span>
-        Trigger alert when the field{' '}
-        <input ref="field" name="field" type="text" className="form-control typeahead-fields" autoComplete="off" required defaultValue={alertCondition.field}/>
+        Trigger alert when the field
+        {' '}
+        <input ref="field" name="field" type="text" className="form-control typeahead-fields" autoComplete="off"
+               defaultValue={alertCondition.field} required/>
         <br />
         has a {this._formatCheckType()}
         <br />
-        that was {this._formatThresholdType()} {' '}
-        <input ref="threshold" name="threshold" type="number" className="form-control pluralsingular validatable"
-               data-validate="number" data-pluralsingular="threshold-descr" defaultValue={alertCondition.threshold} />
-        {' '}<span className="threshold-descr" data-plural="messages" data-singular="message">messages</span>{' '}
-        in the last{' '}
-        <input ref="time" name="time" type="number" className="form-control pluralsingular validatable"
-               data-validate="positive_number" data-pluralsingular="time-descr" defaultValue={alertCondition.time} />{' '}
-        <span className="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+        that was {this._formatThresholdType()} than{' '}
+        <input ref="threshold" name="threshold" type="number" className="form-control"
+               defaultValue={alertCondition.threshold} required/>
+        {' '}in the last{' '}
+        <input ref="time" name="time" type="number" min="1" className="form-control"
+               defaultValue={alertCondition.time} onChange={this._onTimeChange} required/>
+        {' '}
+        <Pluralize singular="minute" plural="minutes" value={this.state.time}/>
         {' '}
         <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
       </span>
