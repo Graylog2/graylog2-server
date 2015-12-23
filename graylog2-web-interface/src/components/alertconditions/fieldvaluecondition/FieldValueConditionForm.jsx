@@ -1,7 +1,7 @@
 import React from 'react';
 import jQuery from 'jquery';
 
-import {Pluralize} from 'components/common';
+import {Pluralize, TypeAheadFieldInput} from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
 
 const FieldValueConditionForm = React.createClass({
@@ -22,12 +22,13 @@ const FieldValueConditionForm = React.createClass({
   getInitialState() {
     return {
       thresholdType: this.props.alertCondition.threshold_type,
+      field: this.props.alertCondition.field,
       time: this.props.alertCondition.time,
     };
   },
   getValue() {
     return jQuery.extend({
-      field: this.refs.field.value,
+      field: this.state.field,
       time: Number(this.refs.time.value),
       threshold: parseFloat(this.refs.threshold.value),
       threshold_type: this.state.thresholdType,
@@ -62,6 +63,9 @@ const FieldValueConditionForm = React.createClass({
       </span>
     );
   },
+  _onFieldChange(event) {
+    this.setState({field: event.target.value});
+  },
   _onTypeChange(event) {
     this.setState({thresholdType: event.target.value});
   },
@@ -74,8 +78,12 @@ const FieldValueConditionForm = React.createClass({
       <span>
         Trigger alert when the field
         {' '}
-        <input ref="field" name="field" type="text" className="form-control typeahead-fields" autoComplete="off"
-               defaultValue={alertCondition.field} required/>
+        <TypeAheadFieldInput ref="fieldInput"
+                             type="text"
+                             autoComplete="off"
+                             defaultValue={alertCondition.field}
+                             onChange={this._onFieldChange}
+                             required />
         <br />
         has a {this._formatCheckType()}
         <br />
