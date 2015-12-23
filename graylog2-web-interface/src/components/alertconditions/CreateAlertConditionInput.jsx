@@ -54,12 +54,10 @@ const CreateAlertConditionInput = React.createClass({
                 <option value={this.PLACEHOLDER} disabled>Select Alert Condition Type</option>
                 {availableTypes}
               </Input>
-              {' '}
-              <Button type="submit" bsStyle="success" className="form-control add-alert" disabled={this.state.type === this.PLACEHOLDER}>
-                Create new alert condition
-              </Button>
-
               {conditionForm}
+              {conditionForm !== null && <Button type="submit" bsStyle="success" className="form-control add-alert">
+                Create new alert condition
+              </Button>}
             </div>
           </form>
         </Col>
