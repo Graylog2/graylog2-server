@@ -45,13 +45,15 @@ const UsersStore = {
 
   loadUsers(): Promise<User[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.list().url);
-    const promise = fetch('GET', url);
-    promise.catch((error) => {
-      if (error.additional.status !== 404) {
-        UserNotification.error("Loading user list failed with status: " + error,
-          "Could not load user list");
-      }
-    });
+    const promise = fetch('GET', url)
+      .then(
+        response => response.users,
+        (error) => {
+          if (error.additional.status !== 404) {
+            UserNotification.error("Loading user list failed with status: " + error,
+              "Could not load user list");
+          }
+        });
     return promise;
   },
 

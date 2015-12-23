@@ -35,8 +35,7 @@ const UserList = React.createClass({
   },
   loadUsers() {
     const promise = UsersStore.loadUsers();
-    promise.done((response) => {
-      const users = response.users;
+    promise.done((users) => {
       this.setState({
         users: users,
       });
