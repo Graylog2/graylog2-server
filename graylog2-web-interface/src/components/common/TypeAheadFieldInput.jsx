@@ -1,38 +1,44 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input } from 'react-bootstrap';
+import $ from 'jquery';
+import Typeahead from 'typeahead.js'; // Need to import this to load typeahead, even if the variable is never used
+
 import UniversalSearch from 'logic/search/UniversalSearch';
 
 import jsRoutes from 'routing/jsRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/typeahead.jquery.min.js');
-
 const TypeAheadFieldInput = React.createClass({
+  propTypes: {
+    valueLink: PropTypes.object,
+    autoFocus: PropTypes.bool,
+  },
   componentDidMount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
       fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.fields().url))
-        .then((data) => {
-          fieldInput.typeahead({
-              hint: true,
-              highlight: true,
-              minLength: 1
-            },
-            {
-              name: 'fields',
-              displayKey: 'value',
-              source: UniversalSearch.substringMatcher(data.fields, 'value', 6)
-            });
+        .then(
+          (data) => {
+            fieldInput.typeahead(
+              {
+                hint: true,
+                highlight: true,
+                minLength: 1,
+              },
+              {
+                name: 'fields',
+                displayKey: 'value',
+                source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
+              });
 
-          if (this.props.autoFocus) {
-            fieldInput.focus();
-            fieldInput.typeahead('close');
-          }
-        });
+            if (this.props.autoFocus) {
+              fieldInput.focus();
+              fieldInput.typeahead('close');
+            }
+          });
 
       const fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
@@ -62,11 +68,13 @@ const TypeAheadFieldInput = React.createClass({
   },
 
   render() {
-    return <Input ref="fieldInput"
-                  wrapperClassName="typeahead-wrapper"
-                  defaultValue={this.props.valueLink.value}
-      {...this._getFilteredProps()}/>;
-  }
+    return (
+      <Input ref="fieldInput"
+             wrapperClassName="typeahead-wrapper"
+             defaultValue={this.props.valueLink.value}
+        {...this._getFilteredProps()}/>
+    );
+  },
 });
 
 export default TypeAheadFieldInput;
