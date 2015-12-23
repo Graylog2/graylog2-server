@@ -20,7 +20,7 @@ const FieldValueConditionForm = React.createClass({
   },
   getInitialState() {
     return {
-      threshold_type: this.props.alertCondition.threshold_type,
+      thresholdType: this.props.alertCondition.threshold_type,
     };
   },
   getValue() {
@@ -28,7 +28,7 @@ const FieldValueConditionForm = React.createClass({
       field: this.refs.field.value,
       time: Number(this.refs.time.value),
       threshold: parseFloat(this.refs.threshold.value),
-      threshold_type: this.refs.threshold_type.value,
+      threshold_type: this.state.thresholdType,
       type: this.refs.check_type.value,
     }, this.refs.gracePeriod.getValue());
   },
@@ -53,7 +53,7 @@ const FieldValueConditionForm = React.createClass({
         {this.thresholdTypes.map((type) =>
           <label key={'threshold-label-' + type} className="radio-inline">
             <input key={'threshold-type-' + type} ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChanged}
-                   value={type} checked={this.state.threshold_type === type}/>
+                   value={type} checked={this.state.thresholdType === type}/>
             {type.toLowerCase()}
           </label>
         )}
