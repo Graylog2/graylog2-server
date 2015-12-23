@@ -63,7 +63,6 @@ const AlertCondition = React.createClass({
             <Button bsStyle="danger" onClick={this._onDelete}>Delete condition</Button>
           </Col>
         </Row>
-        <hr />
       </span>
     );
   },

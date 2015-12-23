@@ -18,10 +18,15 @@ const AlertConditionsList = React.createClass({
     }
 
     return (
-      <span>
-        {this.props.alertConditions.map((alertCondition) => <AlertCondition key={'alertCondition-' + alertCondition.id}
-                                                                            alertCondition={alertCondition} />)}
-      </span>
+      <ul style={{padding: 0}}>
+        {this.props.alertConditions.map((alertCondition) => {
+          return (
+            <li key={'alertCondition-' + alertCondition.id} className="alert-condition-item">
+              <AlertCondition alertCondition={alertCondition}/>
+            </li>
+          );
+        })}
+      </ul>
     );
   },
 });
