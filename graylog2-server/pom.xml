@@ -54,10 +54,6 @@
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-bootstrap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-inputs</artifactId>
         </dependency>
         <dependency>
@@ -68,7 +64,10 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-rest-models</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.airlift</groupId>
+            <artifactId>airline</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -308,6 +307,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jul</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.assertj</groupId>
@@ -345,6 +348,11 @@
             <groupId>com.squareup.retrofit</groupId>
             <artifactId>converter-jackson</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.graylog.repackaged</groupId>
+            <artifactId>os-platform-finder</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -355,6 +363,16 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
             </resource>
         </resources>
         <plugins>
@@ -414,6 +432,33 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <finalName>graylog</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>${mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useLastCommittedRevision>true</useLastCommittedRevision>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

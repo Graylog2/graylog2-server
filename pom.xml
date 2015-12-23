@@ -42,7 +42,6 @@
         <module>graylog2-shared</module>
         <module>graylog2-server</module>
         <module>graylog2-inputs</module>
-        <module>graylog2-bootstrap</module>
         <module>graylog2-rest-models</module>
         <module>integration-tests</module>
     </modules>
@@ -161,11 +160,6 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -873,22 +867,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-        </resources>
-
         <!-- To define the plugin version in your parent POM -->
         <pluginManagement>
             <plugins>
