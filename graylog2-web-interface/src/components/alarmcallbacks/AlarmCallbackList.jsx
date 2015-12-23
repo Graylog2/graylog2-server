@@ -13,14 +13,21 @@ const AlarmCallbackList = React.createClass({
   },
   render() {
     const alarmCallbacks = this.props.alarmCallbacks.map((alarmCallback) => {
-      return (<AlarmCallback key={'alarmCallback-' + alarmCallback.id} alarmCallback={alarmCallback} streamId={this.props.streamId}
-                            types={this.props.types} deleteAlarmCallback={this.props.onDelete} updateAlarmCallback={this.props.onUpdate} />);
+      return (
+        <li key={'alarmCallback-' + alarmCallback.id}>
+          <AlarmCallback alarmCallback={alarmCallback} streamId={this.props.streamId}
+                         types={this.props.types} deleteAlarmCallback={this.props.onDelete}
+                         updateAlarmCallback={this.props.onUpdate}/>
+        </li>
+      );
     });
 
     if (alarmCallbacks.length > 0) {
       return (
         <div className="alert-callbacks">
-          {alarmCallbacks}
+          <ul className="alarm-callbacks">
+            {alarmCallbacks}
+          </ul>
         </div>
       );
     }

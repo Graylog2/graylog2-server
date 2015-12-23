@@ -101,8 +101,6 @@ const AlarmCallback = React.createClass({
         </Row>
 
         {this._renderConfiguration(alarmCallback)}
-
-        <hr />
       </div>
     );
   },

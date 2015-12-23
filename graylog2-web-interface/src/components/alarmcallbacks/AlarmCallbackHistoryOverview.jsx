@@ -26,7 +26,11 @@ const AlarmCallbackHistoryOverview = React.createClass({
     });
   },
   _formatHistory(history) {
-    return <AlarmCallbackHistory key={history._id} alarmCallbackHistory={history} types={this.state.types}/>;
+    return (
+      <li key={history._id}>
+        <AlarmCallbackHistory alarmCallbackHistory={history} types={this.state.types}/>
+      </li>
+    );
   },
   _isLoading() {
     return !(this.state.histories && this.state.types);
@@ -46,7 +50,9 @@ const AlarmCallbackHistoryOverview = React.createClass({
     return (
       <Row>
         <Col md={12}>
-          {histories}
+          <ul className="alarm-callbacks">
+            {histories}
+          </ul>
         </Col>
       </Row>
     );
