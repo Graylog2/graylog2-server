@@ -45,6 +45,7 @@ const MessageCountConditionForm = React.createClass({
     return (
         <span>
           Trigger alert when there are
+          {' '}
           <span className="threshold-type">
             <label className="radio-inline">
               <input ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChanged} value="more"
