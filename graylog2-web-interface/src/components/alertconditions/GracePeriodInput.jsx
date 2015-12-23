@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Pluralize} from 'components/common';
+
 const GracePeriodInput = React.createClass({
   propTypes: {
     parameters: React.PropTypes.object,
@@ -13,6 +15,12 @@ const GracePeriodInput = React.createClass({
       },
     };
   },
+  getInitialState() {
+    return {
+      grace: this.props.parameters.grace,
+      backlog: this.props.parameters.backlog,
+    };
+  },
   getValue() {
     return {
       grace: Number(this.refs.grace.value),
@@ -22,21 +30,27 @@ const GracePeriodInput = React.createClass({
   _getDefaultValue(field) {
     return this.props.alertCondition[field] || this.props.parameters[field];
   },
+  _onGraceChange(event) {
+    this.setState({grace: event.target.value});
+  },
+  _onBacklogChange(event) {
+    this.setState({backlog: event.target.value});
+  },
   render() {
     return (
       <span>
-         and <br /> then wait at least{' '}
-        <input ref="grace" name="grace" type="number" className="form-control pluralsingular validatable"
-               data-pluralsingular="grace-descr" data-validate="not_negative_number" defaultValue={this._getDefaultValue('grace')}/>{' '}
-        <span className="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
-          a new alert. (grace period)
+        and <br /> then wait at least{' '}
+        <input ref="grace" name="grace" type="number" min="0" className="form-control"
+               defaultValue={this._getDefaultValue('grace')} onChange={this._onGraceChange}/>
+        {' '}
+        <Pluralize singular="minute" plural="minutes" value={this.state.grace}/> until triggering a new alert. (grace period)
+        <br />
 
-          <br />
-
-          When sending an alert, include the last{' '}
-        <input ref="backlog" name="backlog" type="number" className="form-control pluralsingular validatable"
-               data-pluralsingular="backlog-descr" data-validate="not_negative_number" defaultValue={this._getDefaultValue('backlog')}/>{' '}
-        <span className="backlog-descr" data-plural="messages" data-singular="message">messages</span> of the stream evaluated for this alert condition.
+        When sending an alert, include the last{' '}
+        <input ref="backlog" name="backlog" type="number" min="0" className="form-control"
+               defaultValue={this._getDefaultValue('backlog')} onChange={this._onBacklogChange}/>
+        {' '}
+        <Pluralize singular="message" plural="messages" value={this.state.backlog}/> of the stream evaluated for this alert condition.
       </span>
     );
   },
