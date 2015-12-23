@@ -20,17 +20,24 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JsonProcessingExceptionMapperTest {
+    @BeforeClass
+    public static void setUpInjector() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
 
     @Test
     public void testToResponse() throws Exception {
@@ -43,7 +50,7 @@ public class JsonProcessingExceptionMapperTest {
         assertTrue(response.hasEntity());
         assertTrue(response.getEntity() instanceof ApiError);
 
-        final ApiError responseEntity = (ApiError)response.getEntity();
+        final ApiError responseEntity = (ApiError) response.getEntity();
         assertTrue(responseEntity.message.startsWith("Boom!"));
     }
 }

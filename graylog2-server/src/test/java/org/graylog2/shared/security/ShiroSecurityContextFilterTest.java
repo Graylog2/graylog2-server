@@ -18,7 +18,9 @@ package org.graylog2.shared.security;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -33,6 +35,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.SecurityContext;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -48,6 +51,11 @@ public class ShiroSecurityContextFilterTest {
     private SecurityContext securityContext;
 
     private ShiroSecurityContextFilter filter;
+
+    @BeforeClass
+    public static void setUpInjector() {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
 
     @Before
     public void setUp() throws Exception {

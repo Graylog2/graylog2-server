@@ -39,7 +39,6 @@
 
     <modules>
         <module>graylog2-plugin-interfaces</module>
-        <module>graylog2-shared</module>
         <module>graylog2-server</module>
         <module>integration-tests</module>
     </modules>
@@ -158,11 +157,6 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
