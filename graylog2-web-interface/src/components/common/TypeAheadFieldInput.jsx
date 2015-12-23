@@ -15,6 +15,7 @@ const TypeAheadFieldInput = React.createClass({
   propTypes: {
     valueLink: PropTypes.object,
     autoFocus: PropTypes.bool,
+    onChange: PropTypes.func,
   },
   componentDidMount() {
     if (this.refs.fieldInput) {
@@ -42,6 +43,9 @@ const TypeAheadFieldInput = React.createClass({
 
       const fieldFormGroup = ReactDOM.findDOMNode(this.refs.fieldInput);
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
+        if (this.props.onChange) {
+          this.props.onChange(event);
+        }
         if (this.props.valueLink) {
           this.props.valueLink.requestChange(event.target.value);
         }
@@ -60,9 +64,11 @@ const TypeAheadFieldInput = React.createClass({
   _getFilteredProps() {
     let props = Immutable.fromJS(this.props);
 
-    if (props.has('valueLink')) {
-      props = props.delete('valueLink');
-    }
+    ['valueLink', 'onChange'].forEach((key) => {
+      if (props.has(key)) {
+        props = props.delete(key);
+      }
+    });
 
     return props.toJS();
   },
@@ -71,7 +77,7 @@ const TypeAheadFieldInput = React.createClass({
     return (
       <Input ref="fieldInput"
              wrapperClassName="typeahead-wrapper"
-             defaultValue={this.props.valueLink.value}
+             defaultValue={this.props.valueLink ? this.props.valueLink.value : null}
         {...this._getFilteredProps()}/>
     );
   },
