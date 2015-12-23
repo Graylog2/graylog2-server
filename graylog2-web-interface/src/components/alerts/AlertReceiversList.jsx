@@ -5,8 +5,10 @@ import { Row, Col, Input, Alert, Button } from 'react-bootstrap';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
+import UsersStore from 'stores/users/UsersStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
+import {TypeAheadInput} from 'components/common';
 import AlertReceiver from 'components/alerts/AlertReceiver';
 
 const AlertReceiversList = React.createClass({
@@ -22,9 +24,21 @@ const AlertReceiversList = React.createClass({
   },
   getInitialState() {
     return {
+      usernames: [],
       userReceiver: '',
       emailReceiver: '',
     };
+  },
+  componentDidMount() {
+    UsersStore.loadUsers().then((users) => this.setState({usernames: users.map(user => user.username)}));
+  },
+  _getEffectiveReceivers(receivers) {
+    const effectiveReceivers = {};
+
+    effectiveReceivers.users = receivers.users ? receivers.users : [];
+    effectiveReceivers.emails = receivers.emails ? receivers.emails : [];
+
+    return effectiveReceivers;
   },
   _onChangeUser(evt) {
     this.setState({userReceiver: evt.target.value});
@@ -34,23 +48,28 @@ const AlertReceiversList = React.createClass({
   },
   _addUserReceiver(evt) {
     evt.preventDefault();
-    StreamsStore.addReceiver(this.props.streamId, 'users', this.refs.user.getValue());
-    this.setState({userReceiver: ''});
+    StreamsStore.addReceiver(this.props.streamId, 'users', this.refs.user.getValue(), () => {
+      this.refs.user.clear();
+      this.setState({userReceiver: ''});
+    });
   },
   _addEmailReceiver(evt) {
     evt.preventDefault();
-    StreamsStore.addReceiver(this.props.streamId, 'emails', this.refs.email.getValue());
-    this.setState({emailReceiver: ''});
+    StreamsStore.addReceiver(this.props.streamId, 'emails', this.refs.email.getValue(), () => {
+      this.setState({emailReceiver: ''});
+    });
   },
   _formatReceiverList(receivers) {
     if (!receivers || (receivers.users.length === 0 && receivers.emails.length === 0)) {
       return <Alert bsStyle="info">No configured alert receivers.</Alert>;
     }
 
-    const userReceivers = this.props.receivers.users ? this.props.receivers.users
-      .map((receiver) => <AlertReceiver key={'users-' + receiver} type="users" receiver={receiver} streamId={this.props.streamId}/>) : null;
-    const emailReceivers = this.props.receivers.emails ? this.props.receivers.emails
-      .map((receiver) => <AlertReceiver key={'email-' + receiver} type="emails" receiver={receiver} streamId={this.props.streamId}/>) : null;
+    const userReceivers = receivers.users.map((receiver) => {
+      return <AlertReceiver key={'users-' + receiver} type="users" receiver={receiver} streamId={this.props.streamId}/>;
+    });
+    const emailReceivers = receivers.emails.map((receiver) => {
+      return <AlertReceiver key={'email-' + receiver} type="emails" receiver={receiver} streamId={this.props.streamId}/>;
+    });
     return (
       <ul className="alert-receivers">
         {userReceivers}
@@ -58,16 +77,25 @@ const AlertReceiversList = React.createClass({
       </ul>
     );
   },
+  _getSuggestions() {
+    const effectiveReceivers = this._getEffectiveReceivers(this.props.receivers);
+    return this.state.usernames.filter(user => effectiveReceivers.users.indexOf(user) === -1);
+  },
   render() {
     return (
       <span>
-        {this._formatReceiverList(this.props.receivers)}
+        {this._formatReceiverList(this._getEffectiveReceivers(this.props.receivers))}
         {this.isPermitted(this.state.currentUser.permissions, 'streams:edit:' + this.props.streamId) &&
           <Row id="add-alert-receivers" className="row-sm">
 
             <Col md={6}>
               <form className="form-inline" onSubmit={this._addUserReceiver} >
-                <Input ref="user" label="Username:" type="text" autoComplete="off" value={this.state.userReceiver} onChange={this._onChangeUser}/>
+                <TypeAheadInput ref="user"
+                                suggestions={this._getSuggestions()}
+                                label="Username:"
+                                displayKey="value"
+                                autoComplete="off"
+                                required/>
                 {' '}
                 <Button type="submit" bsStyle="success">Subscribe</Button>
               </form>
