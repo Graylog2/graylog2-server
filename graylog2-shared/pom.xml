@@ -52,10 +52,6 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-inputs</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-rest-models</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -64,6 +60,14 @@
         <dependency>
             <groupId>com.github.rholder</groupId>
             <artifactId>guava-retrying</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
         </dependency>
 
         <dependency>

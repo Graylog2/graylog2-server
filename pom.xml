@@ -42,7 +42,6 @@
         <module>graylog2-shared</module>
         <module>graylog2-server</module>
         <module>graylog2-inputs</module>
-        <module>graylog2-rest-models</module>
         <module>integration-tests</module>
     </modules>
 
@@ -175,16 +174,6 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-rest-models</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-rest-routes</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -61,10 +61,6 @@
             <artifactId>graylog2-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-rest-models</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>airline</artifactId>
         </dependency>
