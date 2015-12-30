@@ -1,5 +1,6 @@
 package org.graylog.plugins.messageprocessor.rest;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -9,6 +10,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class RuleSource {
 
     @JsonProperty("_id")

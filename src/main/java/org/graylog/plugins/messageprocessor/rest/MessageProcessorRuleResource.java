@@ -26,6 +26,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 
 @Api(value = "MessageProcessing", description = "Message processing pipeline")
 @Path("/messageprocessors")
@@ -48,7 +49,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/rule")
     @POST
-    public RuleSource createFromParser(@ApiParam(name = "processingRule", required = true) @NotNull String ruleSource) throws ParseException {
+    public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull String ruleSource) throws ParseException {
         try {
             ruleParser.parseRule(ruleSource);
         } catch (ParseException e) {
@@ -62,6 +63,15 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
         final RuleSource save = ruleSourceService.save(newRuleSource);
         log.info("Created new rule {}", save);
         return save;
+    }
+
+    @ApiOperation(value = "Get all processing rules")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/rule")
+    @GET
+    public Collection<RuleSource> getAll() {
+        return ruleSourceService.loadAll();
     }
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
@@ -78,9 +88,19 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/rule/{id}")
     @PUT
-    public Response update(@ApiParam(name = "id") @PathParam("id") String id) {
-        // TODO
-        return Response.ok().build();
+    public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
+                             @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
+        final RuleSource ruleSource = ruleSourceService.load(id);
+        try {
+            ruleParser.parseRule(update.source());
+        } catch (ParseException e) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
+        }
+        final RuleSource toSave = ruleSource.toBuilder()
+                .source(update.source())
+                .modifiedAt(DateTime.now())
+                .build();
+        return ruleSourceService.save(toSave);
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
@@ -89,7 +109,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     @Path("/rule/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) {
-        // TODO
+        ruleSourceService.delete(id);
     }
 
 

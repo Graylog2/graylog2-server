@@ -54,4 +54,8 @@ public class RuleSourceService {
             return Collections.emptySet();
         }
     }
+
+    public void delete(String id) {
+        dbCollection.removeById(id);
+    }
 }

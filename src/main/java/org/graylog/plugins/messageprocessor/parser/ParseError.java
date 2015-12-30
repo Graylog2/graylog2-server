@@ -6,10 +6,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 public abstract class ParseError {
 
+    @JsonProperty
+    private final String type;
+
     @JsonIgnore
     private final ParserRuleContext ctx;
 
-    protected ParseError(ParserRuleContext ctx) {
+    protected ParseError(String type, ParserRuleContext ctx) {
+        this.type = type;
         this.ctx = ctx;
     }
 
