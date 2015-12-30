@@ -4,11 +4,11 @@ import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog2.plugin.Message;
 
 public class EqualityExpression extends BinaryExpression implements LogicalExpression {
-    private final boolean equal;
+    private final boolean checkEquality;
 
-    public EqualityExpression(Expression left, Expression right, boolean equal) {
+    public EqualityExpression(Expression left, Expression right, boolean checkEquality) {
         super(left, right);
-        this.equal = equal;
+        this.checkEquality = checkEquality;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
     @Override
     public boolean evaluateBool(EvaluationContext context, Message message) {
         final boolean equals = left.evaluate(context, message).equals(right.evaluate(context, message));
-        if (equal) {
+        if (checkEquality) {
             return equals;
         }
         return !equals;
@@ -27,6 +27,6 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     @Override
     public String toString() {
-        return left.toString() + (equal ? " == " : " != ") + right.toString();
+        return left.toString() + (checkEquality ? " == " : " != ") + right.toString();
     }
 }

@@ -1,17 +1,17 @@
 package org.graylog.plugins.messageprocessor;
 
+import com.google.common.collect.Sets;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.Set;
 
 public class ProcessorPluginMetaData implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return "org.graylog.plugins.messageprocessor.ProcessorPluginPlugin";
+        return "org.graylog.plugins.messageprocessor.ProcessorPlugin";
     }
 
     @Override
@@ -46,6 +46,6 @@ public class ProcessorPluginMetaData implements PluginMetaData {
 
     @Override
     public Set<ServerStatus.Capability> getRequiredCapabilities() {
-        return Collections.emptySet();
+        return Sets.newHashSet(ServerStatus.Capability.SERVER);
     }
 }

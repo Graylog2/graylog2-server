@@ -1,9 +1,297 @@
 package org.graylog.plugins.messageprocessor.parser;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.graylog.plugins.messageprocessor.ast.Rule;
+import org.graylog.plugins.messageprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.BooleanExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.ComparisonExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.DoubleExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.EqualityExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
+import org.graylog.plugins.messageprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.LogicalExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.LongExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.MessageRefExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.NotExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.OrExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.StringExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.VarRefExpression;
+import org.graylog.plugins.messageprocessor.ast.statements.FunctionStatement;
+import org.graylog.plugins.messageprocessor.ast.statements.Statement;
+import org.graylog.plugins.messageprocessor.ast.statements.VarAssignStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class RuleParser {
 
-    public void parseRule(String rule) {
+    private static final Logger log = LoggerFactory.getLogger(RuleParser.class);
+    public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
+    public Rule parseRule(String rule) throws ParseException {
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(rule));
+        final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
+
+        final RuleLangParser.RuleDeclarationContext ruleDeclaration = parser.ruleDeclaration();
+
+        final ParseContext parseContext = new ParseContext();
+
+        // parsing stages:
+        // 1. build AST nodes, checks for invalid var refs
+        // 2. checker: static type check w/ coercion nodes
+        // 3. optimizer: TODO
+
+        WALKER.walk(new AstBuilder(parseContext), ruleDeclaration);
+        WALKER.walk(new SanityCheck(parseContext), ruleDeclaration);
+
+        if (parseContext.getErrors().isEmpty()) {
+            return parseContext.getRule();
+        }
+        throw new ParseException(parseContext.getErrors());
+    }
+
+    private static class AstBuilder extends RuleLangBaseListener {
+
+        private final ParseContext parseContext;
+        private final ParseTreeProperty<List<Expression>> args;
+        private final ParseTreeProperty<Expression> exprs;
+
+        private final Set<String> definedVars = Sets.newHashSet();
+
+        public AstBuilder(ParseContext parseContext) {
+            this.parseContext = parseContext;
+            args = parseContext.arguments();
+            exprs = parseContext.expressions();
+        }
+
+        @Override
+        public void exitFuncStmt(RuleLangParser.FuncStmtContext ctx) {
+            final Expression expr = exprs.get(ctx.functionCall());
+            final FunctionStatement functionStatement = new FunctionStatement(expr);
+            parseContext.statements.add(functionStatement);
+        }
+
+        @Override
+        public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
+            final String name = ctx.varName.getText();
+            final Expression expr = exprs.get(ctx.expression());
+            definedVars.add(name);
+            parseContext.statements.add(new VarAssignStatement(name, expr));
+        }
+
+        @Override
+        public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
+            final String name = ctx.funcName.getText();
+            final List<Expression> args = this.args.get(ctx.arguments());
+            final FunctionExpression expr = new FunctionExpression(name, args);
+            log.info("FUNC: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitArguments(RuleLangParser.ArgumentsContext ctx) {
+            // collect all expressions into the args list to pass to function AST node
+            List<Expression> argExprs = ctx.expression().stream().map(exprs::get).collect(Collectors.toList());
+            args.put(ctx, argExprs);
+        }
+
+        @Override
+        public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
+            final Rule.Builder ruleBuilder = Rule.builder();
+            ruleBuilder.name(ctx.name.getText());
+            if (ctx.stage != null) {
+                ruleBuilder.stage(Integer.parseInt(ctx.stage.getText()));
+            }
+            ruleBuilder.when((LogicalExpression) exprs.get(ctx.condition));
+            ruleBuilder.then(parseContext.statements);
+            final Rule rule = ruleBuilder.build();
+            parseContext.setRule(rule);
+            log.info("Declaring rule {}", rule);
+        }
+
+        @Override
+        public void exitNot(RuleLangParser.NotContext ctx) {
+            final LogicalExpression expression = (LogicalExpression) exprs.get(ctx.expression());
+            final NotExpression expr = new NotExpression(expression);
+            log.info("NOT: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitAnd(RuleLangParser.AndContext ctx) {
+            final LogicalExpression left = (LogicalExpression) exprs.get(ctx.left);
+            final LogicalExpression right = (LogicalExpression) exprs.get(ctx.right);
+            final AndExpression expr = new AndExpression(left, right);
+            log.info("AND: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitOr(RuleLangParser.OrContext ctx) {
+            final LogicalExpression left = (LogicalExpression) exprs.get(ctx.left);
+            final LogicalExpression right = (LogicalExpression) exprs.get(ctx.right);
+            final OrExpression expr = new OrExpression(left, right);
+            log.info("OR: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitEquality(RuleLangParser.EqualityContext ctx) {
+            final Expression left = exprs.get(ctx.left);
+            final Expression right = exprs.get(ctx.right);
+            final boolean equals = ctx.equality.getText().equals("==");
+            final EqualityExpression expr = new EqualityExpression(left, right, equals);
+            log.info("EQUAL: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitComparison(RuleLangParser.ComparisonContext ctx) {
+            final Expression left = exprs.get(ctx.left);
+            final Expression right = exprs.get(ctx.right);
+            final String operator = ctx.comparison.getText();
+            final ComparisonExpression expr = new ComparisonExpression(left, right, operator);
+            log.info("COMPARE: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitInteger(RuleLangParser.IntegerContext ctx) {
+            final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
+            log.info("INT: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitFloat(RuleLangParser.FloatContext ctx) {
+            final DoubleExpression expr = new DoubleExpression(Double.parseDouble(ctx.getText()));
+            log.info("FLOAT: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitChar(RuleLangParser.CharContext ctx) {
+            // TODO
+            super.exitChar(ctx);
+        }
+
+        @Override
+        public void exitString(RuleLangParser.StringContext ctx) {
+            final StringExpression expr = new StringExpression(ctx.getText());
+            log.info("STRING: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitBoolean(RuleLangParser.BooleanContext ctx) {
+            final BooleanExpression expr = new BooleanExpression(Boolean.valueOf(ctx.getText()));
+            log.info("BOOL: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitLiteralPrimary(RuleLangParser.LiteralPrimaryContext ctx) {
+            // nothing to do, just propagate the ConstantExpression
+            exprs.put(ctx, exprs.get(ctx.literal()));
+        }
+
+        @Override
+        public void exitParenExpr(RuleLangParser.ParenExprContext ctx) {
+            // nothing to do, just propagate
+            exprs.put(ctx, exprs.get(ctx.expression()));
+        }
+
+        @Override
+        public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
+            final MessageRefExpression expr = new MessageRefExpression();
+            log.info("$MSG: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
+            final String variableName = ctx.Identifier().getText();
+            if (!definedVars.contains(variableName)) {
+                parseContext.addError(new InvalidReference(ctx));
+            }
+            final VarRefExpression expr = new VarRefExpression(variableName);
+            log.info("VAR: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitPrimaryExpression(RuleLangParser.PrimaryExpressionContext ctx) {
+            // nothing to do, just propagate
+            exprs.put(ctx, exprs.get(ctx.primary()));
+        }
+
+        @Override
+        public void exitFunc(RuleLangParser.FuncContext ctx) {
+            // nothing to do, just propagate
+            exprs.put(ctx, exprs.get(ctx.functionCall()));
+        }
+
+        @Override
+        public void exitNull(RuleLangParser.NullContext ctx) {
+            // TODO
+            super.exitNull(ctx);
+        }
+    }
+
+    private static class SanityCheck extends RuleLangBaseListener {
+        private final ParseContext parseContext;
+
+        public SanityCheck(ParseContext parseContext) {
+            this.parseContext = parseContext;
+        }
+
+
+    }
+
+    /**
+     * Contains meta data about the parse tree, such as AST nodes, link to the function registry etc.
+     *
+     * Being used by tree walkers or visitors to perform AST construction, type checking and so on.
+     */
+    private static class ParseContext {
+        private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
+        private final ParseTreeProperty<List<Expression>> args = new ParseTreeProperty<>();
+        private List<ParseError> errors = Lists.newArrayList();
+
+        public List<Statement> statements = Lists.newArrayList();
+        public Rule rule;
+
+        public ParseTreeProperty<Expression> expressions() {
+            return exprs;
+        }
+
+        public ParseTreeProperty<List<Expression>> arguments() {
+            return args;
+        }
+
+        public Rule getRule() {
+            return rule;
+        }
+
+        public void setRule(Rule rule) {
+            this.rule = rule;
+        }
+
+        public List<ParseError> getErrors() {
+            return errors;
+        }
+
+        public void addError(ParseError error) {
+            errors.add(error);
+        }
     }
 
 }

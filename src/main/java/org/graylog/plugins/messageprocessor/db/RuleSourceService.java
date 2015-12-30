@@ -2,7 +2,7 @@ package org.graylog.plugins.messageprocessor.db;
 
 import com.google.common.collect.Sets;
 import com.mongodb.MongoException;
-import org.graylog.plugins.messageprocessor.rest.ProcessingRule;
+import org.graylog.plugins.messageprocessor.rest.RuleSource;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -21,34 +21,34 @@ public class RuleSourceService {
 
     public static final String COLLECTION = "message_processor_rules";
 
-    private final JacksonDBCollection<ProcessingRule, String> dbCollection;
+    private final JacksonDBCollection<RuleSource, String> dbCollection;
 
     @Inject
     public RuleSourceService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
-                ProcessingRule.class,
+                RuleSource.class,
                 String.class,
                 mapper.get());
     }
 
-    public ProcessingRule save(ProcessingRule rule) {
-        final WriteResult<ProcessingRule, String> save = dbCollection.save(rule);
+    public RuleSource save(RuleSource rule) {
+        final WriteResult<RuleSource, String> save = dbCollection.save(rule);
         return rule.withId(save.getSavedId());
     }
 
-    public ProcessingRule load(String id) throws NotFoundException {
-        final ProcessingRule rule = dbCollection.findOneById(id);
+    public RuleSource load(String id) throws NotFoundException {
+        final RuleSource rule = dbCollection.findOneById(id);
         if (rule == null) {
             throw new NotFoundException("No rule with id " + id);
         }
         return rule;
     }
 
-    public Collection<ProcessingRule> loadAll() {
+    public Collection<RuleSource> loadAll() {
         try {
-            final DBCursor<ProcessingRule> processingRules = dbCollection.find();
-            return Sets.newHashSet(processingRules.iterator());
+            final DBCursor<RuleSource> ruleSources = dbCollection.find();
+            return Sets.newHashSet(ruleSources.iterator());
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);
             return Collections.emptySet();

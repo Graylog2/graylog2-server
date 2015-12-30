@@ -7,6 +7,7 @@
     </Appenders>
     <Loggers>
         <Logger name="org.graylog2" level="info"/>
+        <Logger name="org.graylog" level="info"/>
         <Root level="warn">
             <AppenderRef ref="STDOUT"/>
         </Root>

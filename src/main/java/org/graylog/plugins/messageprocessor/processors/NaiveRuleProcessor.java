@@ -4,6 +4,7 @@ import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.db.RuleSourceService;
+import org.graylog.plugins.messageprocessor.parser.ParseException;
 import org.graylog.plugins.messageprocessor.parser.RuleParser;
 import org.graylog.plugins.messageprocessor.rest.RuleSource;
 import org.graylog2.plugin.Message;
@@ -29,7 +30,13 @@ public class NaiveRuleProcessor implements MessageProcessor {
     @Override
     public Messages process(Messages messages) {
         for (RuleSource ruleSource : ruleSourceService.loadAll()) {
-            Rule rule = ruleParser.parseRule(ruleSource.source());
+            final Rule rule;
+            try {
+                rule = ruleParser.parseRule(ruleSource.source());
+            } catch (ParseException parseException) {
+                log.error("Unable to parse rule: " + parseException.getMessage());
+                continue;
+            }
             log.info("Evaluation rule {}", rule.name());
 
             for (Message message : messages) {
