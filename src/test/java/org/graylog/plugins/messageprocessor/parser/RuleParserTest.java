@@ -3,10 +3,12 @@ package org.graylog.plugins.messageprocessor.parser;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
+import org.graylog2.plugin.Message;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +22,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +41,7 @@ public class RuleParserTest {
         final Map<String, Function> functions = Maps.newHashMap();
         functions.put("nein", new Function() {
             @Override
-            public Object evaluate(List<Expression> args) {
+            public Object evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
                 return false;
             }
 

@@ -1,6 +1,7 @@
 package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -27,14 +28,17 @@ import org.graylog.plugins.messageprocessor.ast.statements.VarAssignStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class RuleParser {
 
     private final FunctionRegistry functionRegistry;
 
+    @Inject
     public RuleParser(FunctionRegistry functionRegistry) {
         this.functionRegistry = functionRegistry;
     }
@@ -67,7 +71,7 @@ public class RuleParser {
     private class AstBuilder extends RuleLangBaseListener {
 
         private final ParseContext parseContext;
-        private final ParseTreeProperty<List<Expression>> args;
+        private final ParseTreeProperty<Map<String, Expression>> args;
         private final ParseTreeProperty<Expression> exprs;
 
         private final Set<String> definedVars = Sets.newHashSet();
@@ -96,7 +100,7 @@ public class RuleParser {
         @Override
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final String name = ctx.funcName.getText();
-            final List<Expression> args = this.args.get(ctx.arguments());
+            final Map<String, Expression> args = this.args.get(ctx.arguments());
             final FunctionExpression expr = new FunctionExpression(name, args);
 
             if (functionRegistry.resolve(name) == null) {
@@ -107,10 +111,25 @@ public class RuleParser {
         }
 
         @Override
-        public void exitArguments(RuleLangParser.ArgumentsContext ctx) {
-            // collect all expressions into the args list to pass to function AST node
-            List<Expression> argExprs = ctx.expression().stream().map(exprs::get).collect(Collectors.toList());
-            args.put(ctx, argExprs);
+        public void exitNamedArgs(RuleLangParser.NamedArgsContext ctx) {
+            final Map<String, Expression> argMap = Maps.newHashMap();
+            final int argCount = ctx.Identifier().size();
+            for (int i = 0; i < argCount; i++) {
+                final String argName = ctx.Identifier(i).getText();
+                final Expression argValue = exprs.get(ctx.expression(i));
+                argMap.put(argName, argValue);
+            }
+            args.put(ctx, argMap);
+        }
+
+        @Override
+        public void exitSingleDefaultArg(RuleLangParser.SingleDefaultArgContext ctx) {
+            final Expression expr = exprs.get(ctx.expression());
+            final HashMap<String, Expression> singleArg = Maps.newHashMap();
+            // null key means to use the single declared argument for this function, it's syntactic sugar
+            // this gets validated and expanded in a later parsing stage
+            singleArg.put(null, expr);
+            args.put(ctx, singleArg);
         }
 
         @Override
@@ -195,7 +214,8 @@ public class RuleParser {
 
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
-            final StringExpression expr = new StringExpression(ctx.getText());
+            final String text = ctx.getText();
+            final StringExpression expr = new StringExpression(text.substring(1, text.length()-1));
             log.info("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -273,7 +293,7 @@ public class RuleParser {
      */
     private static class ParseContext {
         private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
-        private final ParseTreeProperty<List<Expression>> args = new ParseTreeProperty<>();
+        private final ParseTreeProperty<Map<String, Expression>> args = new ParseTreeProperty<>();
         private List<ParseError> errors = Lists.newArrayList();
 
         public List<Statement> statements = Lists.newArrayList();
@@ -283,7 +303,7 @@ public class RuleParser {
             return exprs;
         }
 
-        public ParseTreeProperty<List<Expression>> arguments() {
+        public ParseTreeProperty<Map<String, Expression>> arguments() {
             return args;
         }
 

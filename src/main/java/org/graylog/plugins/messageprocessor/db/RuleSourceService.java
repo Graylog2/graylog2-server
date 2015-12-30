@@ -34,7 +34,7 @@ public class RuleSourceService {
 
     public RuleSource save(RuleSource rule) {
         final WriteResult<RuleSource, String> save = dbCollection.save(rule);
-        return rule.withId(save.getSavedId());
+        return save.getSavedObject();
     }
 
     public RuleSource load(String id) throws NotFoundException {

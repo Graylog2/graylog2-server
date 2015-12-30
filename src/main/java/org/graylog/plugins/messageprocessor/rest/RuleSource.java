@@ -4,14 +4,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
+import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class RuleSource {
 
-    @JsonProperty
+    @JsonProperty("_id")
     @Nullable
+    @ObjectId
     public abstract String id();
 
     @JsonProperty
@@ -30,7 +32,10 @@ public abstract class RuleSource {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static RuleSource create(@JsonProperty("id") @Nullable String id, @JsonProperty("source") String source, @JsonProperty("created_at") DateTime createdAt, @JsonProperty("modified_at") DateTime modifiedAt) {
+    public static RuleSource create(@JsonProperty("_id") @ObjectId @Nullable String id,
+                                    @JsonProperty("source") String source,
+                                    @JsonProperty("created_at") DateTime createdAt,
+                                    @JsonProperty("modified_at") DateTime modifiedAt) {
         return builder()
                 .id(id)
                 .source(source)

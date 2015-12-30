@@ -68,7 +68,8 @@ functionCall
     ;
 
 arguments
-    :   expression (',' expression)*
+    :   Identifier ':' expression (',' Identifier ':' expression)*  # NamedArgs
+    |   expression                                                  # SingleDefaultArg
     ;
 
 literal

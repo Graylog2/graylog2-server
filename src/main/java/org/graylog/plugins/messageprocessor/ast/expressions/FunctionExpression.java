@@ -5,13 +5,13 @@ import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.FieldSet;
 import org.graylog2.plugin.Message;
 
-import java.util.List;
+import java.util.Map;
 
 public class FunctionExpression implements Expression {
     private final String name;
-    private final List<Expression> args;
+    private final Map<String, Expression> args;
 
-    public FunctionExpression(String name, List<Expression> args) {
+    public FunctionExpression(String name, Map<String, Expression> args) {
         this.name = name;
         this.args = args;
     }
@@ -23,7 +23,7 @@ public class FunctionExpression implements Expression {
 
     @Override
     public Object evaluate(EvaluationContext context, Message message) {
-        return FieldSet.empty();
+        return context.invokeFunction(context, message, name, args);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class FunctionExpression implements Expression {
     public String toString() {
         String join = "";
         if (args != null) {
-            join = Joiner.on(", ").join(args);
+            join = Joiner.on(", ").withKeyValueSeparator(": ").join(args); // TODO order arg names
         }
         return name  + "(" + join + ")";
     }
