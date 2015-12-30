@@ -43,17 +43,20 @@ public class NaiveRuleProcessor implements MessageProcessor {
             log.info("Evaluation rule {}", rule.name());
 
             for (Message message : messages) {
-                final EvaluationContext context = new EvaluationContext(functionRegistry);
-                if (rule.when().evaluateBool(context, message)) {
-                    log.info("[✓] Message {} matches condition", message.getId());
+                try {
+                    final EvaluationContext context = new EvaluationContext(functionRegistry);
+                    if (rule.when().evaluateBool(context, message)) {
+                        log.info("[✓] Message {} matches condition", message.getId());
 
-                    for (Statement statement : rule.then()) {
-                        statement.evaluate(context, message);
+                        for (Statement statement : rule.then()) {
+                            statement.evaluate(context, message);
+                        }
+
+                    } else {
+                        log.info("[✕] Message {} does not match condition", message.getId());
                     }
-
-
-                } else {
-                    log.info("[✕] Message {} does not match condition", message.getId());
+                } catch (Exception e) {
+                    log.error("Unable to process message", e);
                 }
             }
         }

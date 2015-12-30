@@ -14,6 +14,8 @@ import org.graylog.plugins.messageprocessor.ast.expressions.ComparisonExpression
 import org.graylog.plugins.messageprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.EqualityExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
+import org.graylog.plugins.messageprocessor.ast.expressions.FieldAccessExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.FunctionExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.LongExpression;
@@ -75,6 +77,9 @@ public class RuleParser {
         private final ParseTreeProperty<Expression> exprs;
 
         private final Set<String> definedVars = Sets.newHashSet();
+
+        // this is true for nested field accesses
+        private boolean idIsFieldAccess = false;
 
         public AstBuilder(ParseContext parseContext) {
             this.parseContext = parseContext;
@@ -144,6 +149,22 @@ public class RuleParser {
             final Rule rule = ruleBuilder.build();
             parseContext.setRule(rule);
             log.info("Declaring rule {}", rule);
+        }
+
+        @Override
+        public void enterNested(RuleLangParser.NestedContext ctx) {
+            // nested field access is ok, these are not rule variables
+            idIsFieldAccess = true;
+        }
+
+        @Override
+        public void exitNested(RuleLangParser.NestedContext ctx) {
+            idIsFieldAccess = false; // reset for error checks
+            final Expression object = exprs.get(ctx.fieldSet);
+            final Expression field = exprs.get(ctx.field);
+            final FieldAccessExpression expr = new FieldAccessExpression(object, field);
+            log.info("NOT: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
         }
 
         @Override
@@ -249,10 +270,15 @@ public class RuleParser {
         @Override
         public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
             final String variableName = ctx.Identifier().getText();
-            if (!definedVars.contains(variableName)) {
+            if (!idIsFieldAccess && !definedVars.contains(variableName)) {
                 parseContext.addError(new UndeclaredVariable(ctx));
             }
-            final VarRefExpression expr = new VarRefExpression(variableName);
+            final Expression expr;
+            if (idIsFieldAccess) {
+                expr = new FieldRefExpression(variableName);
+            } else {
+                expr = new VarRefExpression(variableName);
+            }
             log.info("VAR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
