@@ -1,5 +1,8 @@
 package org.graylog.plugins.messageprocessor;
 
+import com.google.inject.Binder;
+import com.google.inject.multibindings.MapBinder;
+import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.processors.NaiveRuleProcessor;
 import org.graylog.plugins.messageprocessor.rest.MessageProcessorRuleResource;
 import org.graylog2.plugin.PluginConfigBean;
@@ -18,7 +21,23 @@ public class ProcessorPluginModule extends PluginModule {
     @Override
     protected void configure() {
         addMessageProcessor(NaiveRuleProcessor.class);
-
         addRestResource(MessageProcessorRuleResource.class);
+
+        // built-in functions
+        addMessageProcessorFunction("", Function.class);
+
+    }
+
+    protected void addMessageProcessorFunction(String name, Class<? extends Function> functionClass) {
+        addMessageProcessorFunction(binder(), name, functionClass);
+    }
+
+    public static MapBinder<String, Function> processorFunctionBinder(Binder binder) {
+        return MapBinder.newMapBinder(binder, String.class, Function.class);
+    }
+
+    public static void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function> functionClass) {
+        processorFunctionBinder(binder).addBinding(name).to(functionClass);
+
     }
 }

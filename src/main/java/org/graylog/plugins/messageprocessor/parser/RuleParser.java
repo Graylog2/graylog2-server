@@ -33,6 +33,12 @@ import java.util.stream.Collectors;
 
 public class RuleParser {
 
+    private final FunctionRegistry functionRegistry;
+
+    public RuleParser(FunctionRegistry functionRegistry) {
+        this.functionRegistry = functionRegistry;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(RuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
@@ -45,7 +51,7 @@ public class RuleParser {
         final ParseContext parseContext = new ParseContext();
 
         // parsing stages:
-        // 1. build AST nodes, checks for invalid var refs
+        // 1. build AST nodes, checks for invalid var, function refs
         // 2. checker: static type check w/ coercion nodes
         // 3. optimizer: TODO
 
@@ -58,7 +64,7 @@ public class RuleParser {
         throw new ParseException(parseContext.getErrors());
     }
 
-    private static class AstBuilder extends RuleLangBaseListener {
+    private class AstBuilder extends RuleLangBaseListener {
 
         private final ParseContext parseContext;
         private final ParseTreeProperty<List<Expression>> args;
@@ -92,6 +98,10 @@ public class RuleParser {
             final String name = ctx.funcName.getText();
             final List<Expression> args = this.args.get(ctx.arguments());
             final FunctionExpression expr = new FunctionExpression(name, args);
+
+            if (functionRegistry.resolve(name) == null) {
+                parseContext.addError(new UndeclaredFunction(ctx));
+            }
             log.info("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -220,7 +230,7 @@ public class RuleParser {
         public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
             final String variableName = ctx.Identifier().getText();
             if (!definedVars.contains(variableName)) {
-                parseContext.addError(new InvalidReference(ctx));
+                parseContext.addError(new UndeclaredVariable(ctx));
             }
             final VarRefExpression expr = new VarRefExpression(variableName);
             log.info("VAR: ctx {} => {}", ctx, expr);
@@ -246,7 +256,7 @@ public class RuleParser {
         }
     }
 
-    private static class SanityCheck extends RuleLangBaseListener {
+    private class SanityCheck extends RuleLangBaseListener {
         private final ParseContext parseContext;
 
         public SanityCheck(ParseContext parseContext) {
