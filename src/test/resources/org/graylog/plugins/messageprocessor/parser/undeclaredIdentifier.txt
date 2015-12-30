@@ -1,0 +1,5 @@
+rule "identifier"
+when true
+then
+    some_func(x);
+end
