@@ -14,6 +14,7 @@ import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BooleanExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.BooleanValuedFunctionWrapper;
 import org.graylog.plugins.messageprocessor.ast.expressions.ComparisonExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.EqualityExpression;
@@ -164,7 +165,17 @@ public class RuleParser {
             if (ctx.stage != null) {
                 ruleBuilder.stage(Integer.parseInt(ctx.stage.getText()));
             }
-            ruleBuilder.when((LogicalExpression) exprs.get(ctx.condition));
+            final Expression expr = exprs.get(ctx.condition);
+
+            LogicalExpression condition;
+            if (expr instanceof LogicalExpression) {
+                condition = (LogicalExpression) expr;
+            } else if (expr.getType().equals(Boolean.class)) {
+                condition = new BooleanValuedFunctionWrapper(expr);
+            } else {
+                throw new RuntimeException("Unable to create condition, this is a bug");
+            }
+            ruleBuilder.when(condition);
             ruleBuilder.then(parseContext.statements);
             final Rule rule = ruleBuilder.build();
             parseContext.setRule(rule);

@@ -62,6 +62,21 @@ public class RuleParserTest {
                         .build();
             }
         });
+        functions.put("doch", new Function<Boolean>() {
+            @Override
+            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                return true;
+            }
+
+            @Override
+            public FunctionDescriptor<Boolean> descriptor() {
+                return FunctionDescriptor.<Boolean>builder()
+                        .name("doch")
+                        .returnType(Boolean.class)
+                        .params(ImmutableList.of())
+                        .build();
+            }
+        });
         functions.put("double_valued_func", new Function<Double>() {
             @Override
             public Double evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
@@ -195,6 +210,18 @@ public class RuleParserTest {
             assertEquals(2, e.getErrors().size());
             assertTrue("Should only find IncompatibleArgumentType errors",
                        e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType));
+        }
+    }
+
+    @Test
+    public void booleanValuedFunctionAsCondition() throws Exception {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+
+            evaluateRule(rule);
+            assertTrue("actions should have triggered", actionsTriggered.get());
+        } catch (ParseException e) {
+            fail("Should not fail to parse");
         }
     }
 
