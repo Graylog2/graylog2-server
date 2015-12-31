@@ -1,15 +1,15 @@
 package org.graylog.plugins.messageprocessor.parser;
 
-import java.util.List;
+import java.util.Set;
 
 public class ParseException extends RuntimeException {
-    private final List<ParseError> errors;
+    private final Set<ParseError> errors;
 
-    public ParseException(List<ParseError> errors) {
+    public ParseException(Set<ParseError> errors) {
         this.errors = errors;
     }
 
-    public List<ParseError> getErrors() {
+    public Set<ParseError> getErrors() {
         return errors;
     }
 

@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 public class FunctionRegistry {
+
     private final Map<String, Function> functions;
 
     @Inject
@@ -16,5 +17,13 @@ public class FunctionRegistry {
 
     public Function resolve(String name) {
         return functions.get(name);
+    }
+
+    public Function resolveOrError(String name) {
+        final Function function = resolve(name);
+        if (function == null) {
+            return Function.ERROR_FUNCTION;
+        }
+        return function;
     }
 }

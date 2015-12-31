@@ -14,4 +14,7 @@ public abstract class BinaryExpression extends UnaryExpression {
         return left.isConstant() && right.isConstant();
     }
 
+    public Expression left() {
+        return left;
+    }
 }

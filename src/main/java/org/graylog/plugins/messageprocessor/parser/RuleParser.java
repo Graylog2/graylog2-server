@@ -5,10 +5,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.mina.util.IdentityHashSet;
 import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.ComparisonExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.DoubleExpression;
@@ -62,7 +66,7 @@ public class RuleParser {
         // 3. optimizer: TODO
 
         WALKER.walk(new AstBuilder(parseContext), ruleDeclaration);
-        WALKER.walk(new SanityCheck(parseContext), ruleDeclaration);
+        WALKER.walk(new TypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
             return parseContext.getRule();
@@ -106,11 +110,13 @@ public class RuleParser {
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final String name = ctx.funcName.getText();
             final Map<String, Expression> args = this.args.get(ctx.arguments());
-            final FunctionExpression expr = new FunctionExpression(name, args);
 
             if (functionRegistry.resolve(name) == null) {
                 parseContext.addError(new UndeclaredFunction(ctx));
             }
+
+            final FunctionExpression expr = new FunctionExpression(name, args, functionRegistry.resolveOrError(name));
+
             log.info("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -252,12 +258,14 @@ public class RuleParser {
         public void exitLiteralPrimary(RuleLangParser.LiteralPrimaryContext ctx) {
             // nothing to do, just propagate the ConstantExpression
             exprs.put(ctx, exprs.get(ctx.literal()));
+            parseContext.addInnerNode(ctx);
         }
 
         @Override
         public void exitParenExpr(RuleLangParser.ParenExprContext ctx) {
             // nothing to do, just propagate
             exprs.put(ctx, exprs.get(ctx.expression()));
+            parseContext.addInnerNode(ctx);
         }
 
         @Override
@@ -287,12 +295,14 @@ public class RuleParser {
         public void exitPrimaryExpression(RuleLangParser.PrimaryExpressionContext ctx) {
             // nothing to do, just propagate
             exprs.put(ctx, exprs.get(ctx.primary()));
+            parseContext.addInnerNode(ctx);
         }
 
         @Override
         public void exitFunc(RuleLangParser.FuncContext ctx) {
             // nothing to do, just propagate
             exprs.put(ctx, exprs.get(ctx.functionCall()));
+            parseContext.addInnerNode(ctx);
         }
 
         @Override
@@ -302,13 +312,66 @@ public class RuleParser {
         }
     }
 
-    private class SanityCheck extends RuleLangBaseListener {
+    private class TypeChecker extends RuleLangBaseListener {
         private final ParseContext parseContext;
-
-        public SanityCheck(ParseContext parseContext) {
+        StringBuffer sb = new StringBuffer();
+        public TypeChecker(ParseContext parseContext) {
             this.parseContext = parseContext;
         }
 
+        @Override
+        public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
+            log.info("Type tree {}", sb.toString());
+        }
+
+        @Override
+        public void exitAnd(RuleLangParser.AndContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        @Override
+        public void exitOr(RuleLangParser.OrContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        @Override
+        public void exitComparison(RuleLangParser.ComparisonContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        @Override
+        public void exitEquality(RuleLangParser.EqualityContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        private void checkBinaryExpression(RuleLangParser.ExpressionContext ctx) {
+            final BinaryExpression binaryExpr = (BinaryExpression) parseContext.expressions().get(ctx);
+            final Class leftType = binaryExpr.left().getType();
+            final Class rightType = binaryExpr.right().getType();
+
+            if (!leftType.equals(rightType)) {
+                parseContext.addError(new IncompatibleTypes(ctx, binaryExpr));
+            }
+        }
+
+        @Override
+        public void enterEveryRule(ParserRuleContext ctx) {
+            final Expression expression = parseContext.expressions().get(ctx);
+            if (expression != null && !parseContext.isInnerNode(ctx)) {
+                sb.append(" ( ");
+                sb.append(expression.getClass().getSimpleName());
+                sb.append(":").append(ctx.getClass().getSimpleName()).append(" ");
+                sb.append(" <").append(expression.getType().getSimpleName()).append(">");
+            }
+        }
+
+        @Override
+        public void exitEveryRule(ParserRuleContext ctx) {
+            final Expression expression = parseContext.expressions().get(ctx);
+            if (expression != null && !parseContext.isInnerNode(ctx)) {
+                sb.append(" ) ");
+            }
+        }
 
     }
 
@@ -320,8 +383,9 @@ public class RuleParser {
     private static class ParseContext {
         private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
         private final ParseTreeProperty<Map<String, Expression>> args = new ParseTreeProperty<>();
-        private List<ParseError> errors = Lists.newArrayList();
-
+        private Set<ParseError> errors = Sets.newHashSet();
+        // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
+        private Set<RuleContext> innerNodes = new IdentityHashSet<>();
         public List<Statement> statements = Lists.newArrayList();
         public Rule rule;
 
@@ -341,12 +405,20 @@ public class RuleParser {
             this.rule = rule;
         }
 
-        public List<ParseError> getErrors() {
+        public Set<ParseError> getErrors() {
             return errors;
         }
 
         public void addError(ParseError error) {
             errors.add(error);
+        }
+
+        public void addInnerNode(RuleContext node) {
+            innerNodes.add(node);
+        }
+
+        public boolean isInnerNode(RuleContext node) {
+            return innerNodes.contains(node);
         }
     }
 

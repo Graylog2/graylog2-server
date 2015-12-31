@@ -29,6 +29,10 @@
 
 grammar RuleLang;
 
+@header {
+import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
+}
+
 ruleDeclaration
     :   Rule name=String
         (During Stage stage=Integer)?

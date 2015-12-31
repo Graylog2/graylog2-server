@@ -9,7 +9,7 @@ import org.graylog2.plugin.Message;
 
 import java.util.Map;
 
-public class DropMessageFunction implements Function {
+public class DropMessageFunction implements Function<Void> {
 
     public static final String NAME = "drop_message";
 
@@ -20,8 +20,8 @@ public class DropMessageFunction implements Function {
     }
 
     @Override
-    public FunctionDescriptor descriptor() {
-        return FunctionDescriptor.builder()
+    public FunctionDescriptor<Void> descriptor() {
+        return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .pure(true)
                 .returnType(Void.class)

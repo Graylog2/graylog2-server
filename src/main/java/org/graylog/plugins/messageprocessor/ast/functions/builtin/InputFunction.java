@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 
-public class InputFunction implements Function {
+public class InputFunction implements Function<MessageInput> {
 
     public static final String NAME = "input";
 
@@ -27,15 +27,15 @@ public class InputFunction implements Function {
     }
 
     @Override
-    public Object evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+    public MessageInput evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
         final Object id = args.get("id").evaluate(context, message);
         final IOState<MessageInput> inputState = inputRegistry.getInputState(id.toString());
         return inputState.getStoppable();
     }
 
     @Override
-    public FunctionDescriptor descriptor() {
-        return FunctionDescriptor.builder()
+    public FunctionDescriptor<MessageInput> descriptor() {
+        return FunctionDescriptor.<MessageInput>builder()
                 .name(NAME)
                 .returnType(MessageInput.class)
                 .params(of(ParameterDescriptor.string("id")))

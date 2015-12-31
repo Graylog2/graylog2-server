@@ -19,6 +19,11 @@ public class NotExpression extends UnaryExpression implements LogicalExpression 
     }
 
     @Override
+    public Class getType() {
+        return Boolean.class;
+    }
+
+    @Override
     public String toString() {
         return "NOT " + right.toString();
     }

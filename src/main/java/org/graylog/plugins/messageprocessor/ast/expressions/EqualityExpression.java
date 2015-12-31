@@ -17,6 +17,11 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
     }
 
     @Override
+    public Class getType() {
+        return Boolean.class;
+    }
+
+    @Override
     public boolean evaluateBool(EvaluationContext context, Message message) {
         final boolean equals = left.evaluate(context, message).equals(right.evaluate(context, message));
         if (checkEquality) {

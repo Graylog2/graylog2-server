@@ -2,7 +2,8 @@ package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.FieldSet;
+import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.Message;
 
 import java.util.Map;
@@ -10,10 +11,14 @@ import java.util.Map;
 public class FunctionExpression implements Expression {
     private final String name;
     private final Map<String, Expression> args;
+    private final Function function;
+    private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(String name, Map<String, Expression> args) {
+    public FunctionExpression(String name, Map<String, Expression> args, Function function) {
         this.name = name;
         this.args = args;
+        this.function = function;
+        this.descriptor = function.descriptor();
     }
 
     @Override
@@ -23,12 +28,12 @@ public class FunctionExpression implements Expression {
 
     @Override
     public Object evaluate(EvaluationContext context, Message message) {
-        return context.invokeFunction(context, message, name, args);
+        return descriptor.returnType().cast(function.evaluate(args, context, message));
     }
 
     @Override
     public Class getType() {
-        return FieldSet.class;
+        return descriptor.returnType();
     }
 
     @Override

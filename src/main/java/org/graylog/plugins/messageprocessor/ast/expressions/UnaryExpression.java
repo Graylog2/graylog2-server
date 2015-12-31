@@ -17,4 +17,8 @@ public abstract class UnaryExpression implements Expression {
     public Class getType() {
         return right.getType();
     }
+
+    public Expression right() {
+        return right;
+    }
 }

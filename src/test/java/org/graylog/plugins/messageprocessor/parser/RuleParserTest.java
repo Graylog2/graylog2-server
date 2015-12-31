@@ -1,6 +1,7 @@
 package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
@@ -8,6 +9,7 @@ import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
 import org.junit.After;
 import org.junit.Assert;
@@ -39,16 +41,48 @@ public class RuleParserTest {
     @BeforeClass
     public static void registerFunctions() {
         final Map<String, Function> functions = Maps.newHashMap();
-        functions.put("nein", new Function() {
+        functions.put("nein", new Function<Boolean>() {
             @Override
-            public Object evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
                 return false;
             }
 
             @Override
-            public FunctionDescriptor descriptor() {
-                return FunctionDescriptor.builder()
+            public FunctionDescriptor<Boolean> descriptor() {
+                return FunctionDescriptor.<Boolean>builder()
                         .name("nein")
+                        .returnType(Boolean.class)
+                        .params(ImmutableList.of())
+                        .build();
+            }
+        });
+        functions.put("double_valued_func", new Function<Double>() {
+            @Override
+            public Double evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                return 0d;
+            }
+
+            @Override
+            public FunctionDescriptor<Double> descriptor() {
+                return FunctionDescriptor.<Double>builder()
+                        .name("double_valued_func")
+                        .returnType(Double.class)
+                        .params(ImmutableList.of())
+                        .build();
+            }
+        });
+        functions.put("one_arg", new Function<String>() {
+            @Override
+            public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                return "return";
+            }
+
+            @Override
+            public FunctionDescriptor<String> descriptor() {
+                return FunctionDescriptor.<String>builder()
+                        .name("one_arg")
+                        .returnType(String.class)
+                        .params(ImmutableList.of(ParameterDescriptor.string("one")))
                         .build();
             }
         });
@@ -97,8 +131,9 @@ public class RuleParserTest {
             parser.parseRule(ruleForTest());
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
-            assertEquals(1, e.getErrors().size());
-            assertTrue("Should find error UndeclaredFunction", Iterables.getOnlyElement(e.getErrors()) instanceof UndeclaredFunction);
+            assertEquals(2, e.getErrors().size());
+            assertTrue("Should find error UndeclaredFunction", Iterables.getFirst(e.getErrors(), null) instanceof UndeclaredFunction);
+            assertTrue("Should find error IncompatibleTypes", Iterables.get(e.getErrors(), 1, null) instanceof IncompatibleTypes);
         }
     }
     private String ruleForTest() {

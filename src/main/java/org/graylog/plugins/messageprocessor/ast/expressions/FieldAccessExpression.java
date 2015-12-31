@@ -1,13 +1,12 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class FieldAccessExpression implements Expression {
     private static final Logger log = LoggerFactory.getLogger(FieldAccessExpression.class);
@@ -30,10 +29,11 @@ public class FieldAccessExpression implements Expression {
         final Object bean = this.object.evaluate(context, message);
         final String fieldName = field.evaluate(context, message).toString();
         try {
-            final Method method = bean.getClass().getMethod("get"+ StringUtils.capitalize(fieldName));
-            return method.invoke(bean);
+            final Object property = PropertyUtils.getProperty(bean, fieldName);
+            log.debug("[field access] property {} of bean {}: {}", fieldName, bean.getClass().getTypeName(), property);
+            return property;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            log.error("Oops");
+            log.error("Unable to read property {} from {}", fieldName, bean);
             return null;
         }
     }

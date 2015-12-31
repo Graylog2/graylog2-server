@@ -20,6 +20,11 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
     }
 
     @Override
+    public Class getType() {
+        return Boolean.class;
+    }
+
+    @Override
     public boolean evaluateBool(EvaluationContext context, Message message) {
         if (!numericArgs) {
             return false;

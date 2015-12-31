@@ -20,6 +20,11 @@ public class AndExpression extends BinaryExpression implements LogicalExpression
     }
 
     @Override
+    public Class getType() {
+        return Boolean.class;
+    }
+
+    @Override
     public String toString() {
         return left.toString() + " AND " + right.toString();
     }
