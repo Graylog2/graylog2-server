@@ -1,12 +1,15 @@
 package org.graylog.plugins.messageprocessor.rest;
 
+import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog.plugins.messageprocessor.db.RuleSourceService;
+import org.graylog.plugins.messageprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.messageprocessor.parser.ParseException;
 import org.graylog.plugins.messageprocessor.parser.RuleParser;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -36,11 +39,15 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
 
     private final RuleSourceService ruleSourceService;
     private final RuleParser ruleParser;
+    private final EventBus clusterBus;
 
     @Inject
-    public MessageProcessorRuleResource(RuleSourceService ruleSourceService, RuleParser ruleParser) {
+    public MessageProcessorRuleResource(RuleSourceService ruleSourceService,
+                                        RuleParser ruleParser,
+                                        @ClusterEventBus EventBus clusterBus) {
         this.ruleSourceService = ruleSourceService;
         this.ruleParser = ruleParser;
+        this.clusterBus = clusterBus;
     }
 
 
@@ -61,6 +68,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
                 .modifiedAt(DateTime.now())
                 .build();
         final RuleSource save = ruleSourceService.save(newRuleSource);
+        clusterBus.post(RulesChangedEvent.updatedRuleId(save.id()));
         log.info("Created new rule {}", save);
         return save;
     }
@@ -100,7 +108,10 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
                 .source(update.source())
                 .modifiedAt(DateTime.now())
                 .build();
-        return ruleSourceService.save(toSave);
+        final RuleSource savedRule = ruleSourceService.save(toSave);
+        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+
+        return savedRule;
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
@@ -110,6 +121,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) {
         ruleSourceService.delete(id);
+        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 
 
