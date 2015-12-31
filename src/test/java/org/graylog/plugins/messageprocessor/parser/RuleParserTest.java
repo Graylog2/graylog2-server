@@ -2,7 +2,6 @@ package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
@@ -81,7 +80,7 @@ public class RuleParserTest {
         functions.put("one_arg", new Function<String>() {
             @Override
             public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-                return args.get("one").toString();
+                return (String) args.get("one").evaluate(context, message);
             }
 
             @Override
@@ -136,8 +135,8 @@ public class RuleParserTest {
             parser.parseRule(ruleForTest());
             fail("should throw error: undeclared variable x");
         } catch (ParseException e) {
-            assertEquals(1, e.getErrors().size());
-            assertTrue("Should find error UndeclaredVariable", Iterables.getOnlyElement(e.getErrors()) instanceof UndeclaredVariable);
+            assertEquals(2, e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
+            assertTrue("Should find error UndeclaredVariable", e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
         }
     }
 
@@ -177,9 +176,31 @@ public class RuleParserTest {
         }
     }
 
+    @Test
+    public void inferVariableType() throws Exception {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+
+            evaluateRule(rule);
+        } catch (ParseException e) {
+            fail("Should not fail to parse");
+        }
+    }
+
+    @Test
+    public void invalidArgType() throws Exception {
+        try {
+            parser.parseRule(ruleForTest());
+        } catch (ParseException e) {
+            assertEquals(2, e.getErrors().size());
+            assertTrue("Should only find IncompatibleArgumentType errors",
+                       e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType));
+        }
+    }
+
     @Nullable
     private Message evaluateRule(Rule rule) {
-        final EvaluationContext context = new EvaluationContext(functionRegistry);
+        final EvaluationContext context = new EvaluationContext();
         final Message message = new Message("hello test", "source", DateTime.now());
         if (rule.when().evaluateBool(context, message)) {
 

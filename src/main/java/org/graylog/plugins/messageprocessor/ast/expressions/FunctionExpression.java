@@ -11,18 +11,22 @@ import java.util.Map;
 public class FunctionExpression implements Expression {
     private final String name;
     private final Map<String, Expression> args;
-    private final Function function;
+    private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(String name, Map<String, Expression> args, Function function) {
+    public FunctionExpression(String name, Map<String, Expression> args, Function<?> function) {
         this.name = name;
         this.args = args;
         this.function = function;
         this.descriptor = function.descriptor();
     }
 
-    public Function getFunction() {
+    public Function<?> getFunction() {
         return function;
+    }
+
+    public Map<String, Expression> getArgs() {
+        return args;
     }
 
     @Override

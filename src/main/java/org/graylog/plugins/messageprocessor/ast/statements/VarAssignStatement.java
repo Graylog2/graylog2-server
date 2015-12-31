@@ -14,9 +14,9 @@ public class VarAssignStatement implements Statement {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
+    public Void evaluate(EvaluationContext context, Message message) {
         final Object result = expr.evaluate(context, message);
-        context.define(name, result);
+        context.define(name, expr.getType(), result);
         return null;
     }
 

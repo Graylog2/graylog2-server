@@ -29,6 +29,7 @@ import org.graylog.plugins.messageprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.messageprocessor.ast.statements.FunctionStatement;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
@@ -64,10 +65,12 @@ public class RuleParser {
 
         // parsing stages:
         // 1. build AST nodes, checks for invalid var, function refs
-        // 2. checker: static type check w/ coercion nodes
-        // 3. optimizer: TODO
+        // 2. type annotator: infer type information from var refs, func refs
+        // 3. checker: static type check w/ coercion nodes
+        // 4. optimizer: TODO
 
         WALKER.walk(new AstBuilder(parseContext), ruleDeclaration);
+        WALKER.walk(new TypeAnnotator(parseContext), ruleDeclaration);
         WALKER.walk(new TypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
@@ -104,6 +107,7 @@ public class RuleParser {
         public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
             final String name = ctx.varName.getText();
             final Expression expr = exprs.get(ctx.expression());
+            parseContext.defineVar(name, expr);
             definedVars.add(name);
             parseContext.statements.add(new VarAssignStatement(name, expr));
         }
@@ -322,6 +326,30 @@ public class RuleParser {
         }
     }
 
+    private class TypeAnnotator extends RuleLangBaseListener {
+        private final ParseContext parseContext;
+
+        public TypeAnnotator(ParseContext parseContext) {
+            this.parseContext = parseContext;
+        }
+
+        @Override
+        public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
+            final Expression expr = parseContext.expressions().get(ctx);
+            if (expr instanceof VarRefExpression) {
+                final VarRefExpression varRefExpression = (VarRefExpression) expr;
+                final String name = varRefExpression.varName();
+                final Expression expression = parseContext.getDefinedVar(name);
+                if (expression == null) {
+                    log.error("Unable to retrieve expression for variable {}, this is a bug", name);
+                    return;
+                }
+                log.info("Inferred type of variable {} to {}", name, expression.getType().getSimpleName());
+                varRefExpression.setType(expression.getType());
+            }
+        }
+    }
+
     private class TypeChecker extends RuleLangBaseListener {
         private final ParseContext parseContext;
         StringBuffer sb = new StringBuffer();
@@ -365,6 +393,19 @@ public class RuleParser {
         }
 
         @Override
+        public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
+            final FunctionExpression expr = (FunctionExpression) parseContext.expressions().get(ctx);
+            final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
+            final Map<String, Expression> args = expr.getArgs();
+            for (ParameterDescriptor p : descriptor.params()) {
+                final Expression argExpr = args.get(p.name());
+                if (!argExpr.getType().equals(p.type())) {
+                    parseContext.addError(new IncompatibleArgumentType(ctx, expr, p, argExpr));
+                }
+            }
+        }
+
+        @Override
         public void enterEveryRule(ParserRuleContext ctx) {
             final Expression expression = parseContext.expressions().get(ctx);
             if (expression != null && !parseContext.isInnerNode(ctx)) {
@@ -398,6 +439,7 @@ public class RuleParser {
         private Set<RuleContext> innerNodes = new IdentityHashSet<>();
         public List<Statement> statements = Lists.newArrayList();
         public Rule rule;
+        private Map<String, Expression> varDecls = Maps.newHashMap();
 
         public ParseTreeProperty<Expression> expressions() {
             return exprs;
@@ -429,6 +471,20 @@ public class RuleParser {
 
         public boolean isInnerNode(RuleContext node) {
             return innerNodes.contains(node);
+        }
+
+        /**
+         * Links the declared var to its expression.
+         * @param name var name
+         * @param expr expression
+         * @return true if successful, false if previously declared
+         */
+        public boolean defineVar(String name, Expression expr) {
+            return varDecls.put(name, expr) == null;
+        }
+
+        public Expression getDefinedVar(String name) {
+            return varDecls.get(name);
         }
     }
 

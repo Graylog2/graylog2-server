@@ -58,7 +58,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
 
             for (Message message : messages) {
                 try {
-                    final EvaluationContext context = new EvaluationContext(functionRegistry);
+                    final EvaluationContext context = new EvaluationContext();
                     if (rule.when().evaluateBool(context, message)) {
                         log.info("[✓] Message {} matches condition", message.getId());
 
