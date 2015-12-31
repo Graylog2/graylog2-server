@@ -1,15 +1,9 @@
-# Graylog ProcessorPlugin Plugin
-
-Welcome to your new Graylog plugin!
-
-Please refer to http://docs.graylog.org/en/latest/pages/plugins.html for documentation on how to write
-plugins for Graylog.
-
+# Graylog Message Processor Plugin
 
 Getting started
 ---------------
 
-This project is using Maven 3 and requires Java 7 or higher. The plugin will require Graylog 1.0.0 or higher.
+This project is using Maven 3 and requires Java 8 or higher. The plugin will require Graylog 2.0.0 or higher.
 
 * Clone this repository.
 * Run `mvn package` to build a JAR file.
