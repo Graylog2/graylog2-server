@@ -128,6 +128,10 @@ public class RuleParser {
                     final ParameterDescriptor param = function.descriptor().params().get(0);
                     args.put(param.name(), argExpr);
                 }
+                // check for the right number of arguments to the function
+                if (args != null && function.descriptor().params().size() != args.size()) {
+                    parseContext.addError(new WrongNumberOfArgs(ctx, function, args));
+                }
             }
 
             final FunctionExpression expr = new FunctionExpression(name, args, functionRegistry.resolveOrError(name));
@@ -294,8 +298,16 @@ public class RuleParser {
         }
 
         @Override
+        public void enterMessageRef(RuleLangParser.MessageRefContext ctx) {
+            // nested field access is ok, these are not rule variables
+            idIsFieldAccess = true;
+        }
+
+        @Override
         public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
-            final MessageRefExpression expr = new MessageRefExpression();
+            idIsFieldAccess = false; // reset for error checks
+            final Expression fieldExpr = exprs.get(ctx.field);
+            final MessageRefExpression expr = new MessageRefExpression(fieldExpr);
             log.info("$MSG: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -390,7 +402,8 @@ public class RuleParser {
 
         @Override
         public void exitEquality(RuleLangParser.EqualityContext ctx) {
-            checkBinaryExpression(ctx);
+            // TODO equality allows arbitrary types, in the future optimize by using specialized operators
+//            checkBinaryExpression(ctx, true);
         }
 
         private void checkBinaryExpression(RuleLangParser.ExpressionContext ctx) {
@@ -410,9 +423,17 @@ public class RuleParser {
             final Map<String, Expression> args = expr.getArgs();
             for (ParameterDescriptor p : descriptor.params()) {
                 final Expression argExpr = args.get(p.name());
-                if (!argExpr.getType().equals(p.type())) {
+                if (argExpr != null && !p.type().isAssignableFrom(argExpr.getType())) {
                     parseContext.addError(new IncompatibleArgumentType(ctx, expr, p, argExpr));
                 }
+            }
+        }
+
+        @Override
+        public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
+            final MessageRefExpression expr = (MessageRefExpression) parseContext.expressions().get(ctx);
+            if (!expr.getFieldExpr().getType().equals(String.class)) {
+                parseContext.addError(new IncompatibleType(ctx, String.class, expr.getFieldExpr().getType()));
             }
         }
 

@@ -46,10 +46,14 @@ public class FunctionExpression implements Expression {
 
     @Override
     public String toString() {
-        String join = "";
+        String argsString = "";
         if (args != null) {
-            join = Joiner.on(", ").withKeyValueSeparator(": ").join(args); // TODO order arg names
+            if (args.containsKey(null)) {
+                argsString = args.get(null).toString();
+            } else {
+                argsString = Joiner.on(", ").withKeyValueSeparator(": ").join(args); // TODO order arg names
+            }
         }
-        return descriptor.name()  + "(" + join + ")";
+        return descriptor.name()  + "(" + argsString + ")";
     }
 }

@@ -5,12 +5,9 @@ import org.graylog2.plugin.Message;
 
 public class ComparisonExpression extends BinaryExpression implements LogicalExpression {
     private final String operator;
-    private final boolean numericArgs;
 
     public ComparisonExpression(Expression left, Expression right, String operator) {
         super(left, right);
-        this.numericArgs = left instanceof NumericExpression && right instanceof NumericExpression;
-
         this.operator = operator;
     }
 
@@ -26,15 +23,13 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
 
     @Override
     public boolean evaluateBool(EvaluationContext context, Message message) {
-        if (!numericArgs) {
-            return false;
-        }
-        final NumericExpression numericLeft = (NumericExpression) this.left;
-        final NumericExpression numericRight = (NumericExpression) this.right;
-        if (numericLeft.isFloatingPoint() || numericRight.isFloatingPoint()) {
-            return compareDouble(operator, numericLeft.doubleValue(), numericRight.doubleValue());
+
+        final Object leftValue = this.left.evaluate(context, message);
+        final Object rightValue = this.right.evaluate(context, message);
+        if (leftValue instanceof Double || rightValue instanceof Double) {
+            return compareDouble(operator, (double) leftValue, (double) rightValue);
         } else {
-            return compareLong(operator, numericLeft.longValue(), numericRight.longValue());
+            return compareLong(operator, (long) leftValue, (long) rightValue);
         }
     }
 

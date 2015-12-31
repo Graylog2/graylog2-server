@@ -9,6 +9,9 @@ import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.messageprocessor.ast.functions.builtin.HasField;
+import org.graylog.plugins.messageprocessor.ast.functions.builtin.LongCoercion;
+import org.graylog.plugins.messageprocessor.ast.functions.builtin.SetField;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
@@ -123,6 +126,9 @@ public class RuleParserTest {
                         .build();
             }
         });
+        functions.put(LongCoercion.NAME, new LongCoercion());
+        functions.put(SetField.NAME, new SetField());
+        functions.put(HasField.NAME, new HasField());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -170,11 +176,8 @@ public class RuleParserTest {
             parser.parseRule(ruleForTest());
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
-            assertEquals(2, e.getErrors().size());
             assertTrue("Should find error UndeclaredFunction",
                        e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction));
-            assertTrue("Should find error IncompatibleTypes",
-                       e.getErrors().stream().anyMatch(input -> input instanceof IncompatibleTypes));
         }
     }
 
@@ -225,10 +228,19 @@ public class RuleParserTest {
         }
     }
 
-    @Nullable
-    private Message evaluateRule(Rule rule) {
+    @Test
+    public void messageRef() throws Exception {
+        final Rule rule = parser.parseRule(ruleForTest());
+        Message message = new Message("hello test", "source", DateTime.now());
+        message.addField("responseCode", 500);
+        final Message processedMsg = evaluateRule(rule, message);
+
+        assertNotNull(processedMsg);
+        assertEquals("server_error", processedMsg.getField("response_category"));
+    }
+
+    private Message evaluateRule(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext();
-        final Message message = new Message("hello test", "source", DateTime.now());
         if (rule.when().evaluateBool(context, message)) {
 
             for (Statement statement : rule.then()) {
@@ -238,6 +250,12 @@ public class RuleParserTest {
         } else {
             return null;
         }
+    }
+
+    @Nullable
+    private Message evaluateRule(Rule rule) {
+        final Message message = new Message("hello test", "source", DateTime.now());
+        return evaluateRule(rule, message);
     }
 
     private String ruleForTest() {

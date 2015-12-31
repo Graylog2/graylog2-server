@@ -5,7 +5,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class ParameterDescriptor {
 
-    public abstract Class type();
+    public abstract Class<?> type();
 
     public abstract String name();
 
@@ -17,9 +17,13 @@ public abstract class ParameterDescriptor {
         return builder().string(name).build();
     }
 
+    public static ParameterDescriptor object(String name) {
+        return builder().name(name).type(Object.class).build();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
-        public abstract Builder type(Class type);
+        public abstract Builder type(Class<?> type);
         public abstract Builder name(String name);
         public abstract ParameterDescriptor build();
 

@@ -44,6 +44,7 @@ ruleDeclaration
 
 expression
     :   primary                                                         # PrimaryExpression
+    |   MessageRef '.' field=expression                                 # MessageRef
     |   fieldSet=expression '.' field=expression                        # Nested
     |   fieldSet=expression '[' expression ']'                          # Array
     |   functionCall                                                    # Func
@@ -55,10 +56,9 @@ expression
     ;
 
 primary
-    :   '(' expression ')'      # ParenExpr
-    |   literal                 # LiteralPrimary
-    |   Identifier              # Identifier
-    |   MessageRef              # MessageRef
+    :   '(' expression ')'              # ParenExpr
+    |   literal                         # LiteralPrimary
+    |   Identifier                      # Identifier
     ;
 
 statement
