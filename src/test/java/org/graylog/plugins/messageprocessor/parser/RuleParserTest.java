@@ -10,7 +10,9 @@ import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,8 +28,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -38,9 +43,11 @@ public class RuleParserTest {
     private RuleParser parser;
     private static FunctionRegistry functionRegistry;
 
+    private static final AtomicBoolean actionsTriggered = new AtomicBoolean(false);
+
     @BeforeClass
     public static void registerFunctions() {
-        final Map<String, Function> functions = Maps.newHashMap();
+        final Map<String, Function<?>> functions = Maps.newHashMap();
         functions.put("nein", new Function<Boolean>() {
             @Override
             public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
@@ -74,7 +81,7 @@ public class RuleParserTest {
         functions.put("one_arg", new Function<String>() {
             @Override
             public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-                return "return";
+                return args.get("one").toString();
             }
 
             @Override
@@ -86,12 +93,30 @@ public class RuleParserTest {
                         .build();
             }
         });
+        functions.put("trigger_test", new Function<Void>() {
+            @Override
+            public Void evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                actionsTriggered.set(true);
+                return null;
+            }
+
+            @Override
+            public FunctionDescriptor<Void> descriptor() {
+                return FunctionDescriptor.<Void>builder()
+                        .name("trigger_test")
+                        .returnType(Void.class)
+                        .params(ImmutableList.of())
+                        .build();
+            }
+        });
         functionRegistry = new FunctionRegistry(functions);
     }
 
     @Before
     public void setup() {
         parser = new RuleParser(functionRegistry);
+        // initialize before every test!
+        actionsTriggered.set(false);
     }
 
     @After
@@ -132,10 +157,41 @@ public class RuleParserTest {
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
             assertEquals(2, e.getErrors().size());
-            assertTrue("Should find error UndeclaredFunction", Iterables.getFirst(e.getErrors(), null) instanceof UndeclaredFunction);
-            assertTrue("Should find error IncompatibleTypes", Iterables.get(e.getErrors(), 1, null) instanceof IncompatibleTypes);
+            assertTrue("Should find error UndeclaredFunction",
+                       e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction));
+            assertTrue("Should find error IncompatibleTypes",
+                       e.getErrors().stream().anyMatch(input -> input instanceof IncompatibleTypes));
         }
     }
+
+    @Test
+    public void singleArgFunction() throws Exception {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+            final Message message = evaluateRule(rule);
+
+            assertNotNull(message);
+            assertTrue("actions should have triggered", actionsTriggered.get());
+        } catch (ParseException e) {
+            fail("Should not fail to parse");
+        }
+    }
+
+    @Nullable
+    private Message evaluateRule(Rule rule) {
+        final EvaluationContext context = new EvaluationContext(functionRegistry);
+        final Message message = new Message("hello test", "source", DateTime.now());
+        if (rule.when().evaluateBool(context, message)) {
+
+            for (Statement statement : rule.then()) {
+                statement.evaluate(context, message);
+            }
+            return message;
+        } else {
+            return null;
+        }
+    }
+
     private String ruleForTest() {
         try {
             final URL resource = this.getClass().getResource(name.getMethodName().concat(".txt"));

@@ -28,6 +28,8 @@ import org.graylog.plugins.messageprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.VarRefExpression;
+import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.messageprocessor.ast.statements.FunctionStatement;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.ast.statements.VarAssignStatement;
@@ -111,8 +113,16 @@ public class RuleParser {
             final String name = ctx.funcName.getText();
             final Map<String, Expression> args = this.args.get(ctx.arguments());
 
-            if (functionRegistry.resolve(name) == null) {
+            final Function<?> function = functionRegistry.resolve(name);
+            if (function == null) {
                 parseContext.addError(new UndeclaredFunction(ctx));
+            } else {
+                // convert null key, single arg style to default named args for single arg functions
+                if (args != null && args.containsKey(null) && function.descriptor().params().size() == 1) {
+                    final Expression argExpr = args.remove(null);
+                    final ParameterDescriptor param = function.descriptor().params().get(0);
+                    args.put(param.name(), argExpr);
+                }
             }
 
             final FunctionExpression expr = new FunctionExpression(name, args, functionRegistry.resolveOrError(name));

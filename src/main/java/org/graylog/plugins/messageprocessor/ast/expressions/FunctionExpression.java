@@ -21,6 +21,10 @@ public class FunctionExpression implements Expression {
         this.descriptor = function.descriptor();
     }
 
+    public Function getFunction() {
+        return function;
+    }
+
     @Override
     public boolean isConstant() {
         return false;
@@ -42,6 +46,6 @@ public class FunctionExpression implements Expression {
         if (args != null) {
             join = Joiner.on(", ").withKeyValueSeparator(": ").join(args); // TODO order arg names
         }
-        return name  + "(" + join + ")";
+        return descriptor.name()  + "(" + join + ")";
     }
 }
