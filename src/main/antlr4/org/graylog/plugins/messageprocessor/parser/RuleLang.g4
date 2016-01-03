@@ -73,6 +73,7 @@ functionCall
 
 arguments
     :   Identifier ':' expression (',' Identifier ':' expression)*  # NamedArgs
+    |   expression (',' expression)+                                # PositionalArgs
     |   expression                                                  # SingleDefaultArg
     ;
 

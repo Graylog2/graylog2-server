@@ -1,0 +1,5 @@
+rule "positional args"
+when concat("a", 1, true) == concat(one: "a", two: 1, three: true)
+then
+trigger_test();
+end

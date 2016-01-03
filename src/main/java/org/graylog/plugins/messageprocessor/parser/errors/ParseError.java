@@ -1,4 +1,4 @@
-package org.graylog.plugins.messageprocessor.parser;
+package org.graylog.plugins.messageprocessor.parser.errors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

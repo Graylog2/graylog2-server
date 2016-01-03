@@ -9,13 +9,11 @@ import org.graylog2.plugin.Message;
 import java.util.Map;
 
 public class FunctionExpression implements Expression {
-    private final String name;
     private final Map<String, Expression> args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(String name, Map<String, Expression> args, Function<?> function) {
-        this.name = name;
+    public FunctionExpression(Function<?> function, Map<String, Expression> args) {
         this.args = args;
         this.function = function;
         this.descriptor = function.descriptor();

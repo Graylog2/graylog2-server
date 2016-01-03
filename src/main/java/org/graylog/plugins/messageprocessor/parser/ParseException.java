@@ -1,5 +1,7 @@
 package org.graylog.plugins.messageprocessor.parser;
 
+import org.graylog.plugins.messageprocessor.parser.errors.ParseError;
+
 import java.util.Set;
 
 public class ParseException extends RuntimeException {

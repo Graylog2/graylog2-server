@@ -35,6 +35,13 @@ import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.messageprocessor.ast.statements.FunctionStatement;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.ast.statements.VarAssignStatement;
+import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleArgumentType;
+import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleType;
+import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleTypes;
+import org.graylog.plugins.messageprocessor.parser.errors.ParseError;
+import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
+import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
+import org.graylog.plugins.messageprocessor.parser.errors.WrongNumberOfArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RuleParser {
 
@@ -84,6 +92,7 @@ public class RuleParser {
 
         private final ParseContext parseContext;
         private final ParseTreeProperty<Map<String, Expression>> args;
+        private final ParseTreeProperty<List<Expression>> argsList;
         private final ParseTreeProperty<Expression> exprs;
 
         private final Set<String> definedVars = Sets.newHashSet();
@@ -94,6 +103,7 @@ public class RuleParser {
         public AstBuilder(ParseContext parseContext) {
             this.parseContext = parseContext;
             args = parseContext.arguments();
+            argsList = parseContext.argumentLists();
             exprs = parseContext.expressions();
         }
 
@@ -116,25 +126,40 @@ public class RuleParser {
         @Override
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final String name = ctx.funcName.getText();
-            final Map<String, Expression> args = this.args.get(ctx.arguments());
+            Map<String, Expression> args = this.args.get(ctx.arguments());
+            final List<Expression> positionalArgs = this.argsList.get(ctx.arguments());
 
             final Function<?> function = functionRegistry.resolve(name);
             if (function == null) {
                 parseContext.addError(new UndeclaredFunction(ctx));
             } else {
                 // convert null key, single arg style to default named args for single arg functions
-                if (args != null && args.containsKey(null) && function.descriptor().params().size() == 1) {
-                    final Expression argExpr = args.remove(null);
-                    final ParameterDescriptor param = function.descriptor().params().get(0);
-                    args.put(param.name(), argExpr);
-                }
-                // check for the right number of arguments to the function
-                if (args != null && function.descriptor().params().size() != args.size()) {
-                    parseContext.addError(new WrongNumberOfArgs(ctx, function, args));
+                if (args != null) {
+                    if (args.containsKey(null) && function.descriptor().params().size() == 1) {
+                        final Expression argExpr = args.remove(null);
+                        final ParameterDescriptor param = function.descriptor().params().get(0);
+                        args.put(param.name(), argExpr);
+                    }
+                    // check for the right number of arguments to the function
+                    if (function.descriptor().params().size() != args.size()) {
+                        parseContext.addError(new WrongNumberOfArgs(ctx, function, args.size()));
+                    }
+                } else if (positionalArgs != null) {
+                    // use descriptor to turn positional arguments into a map
+                    args = Maps.newHashMap();
+                    if (positionalArgs.size() != function.descriptor().params().size()) {
+                        parseContext.addError(new WrongNumberOfArgs(ctx, function, positionalArgs.size()));
+                    }
+                    int i = 0;
+                    for (ParameterDescriptor p : function.descriptor().params()) {
+                        final Expression argExpr = positionalArgs.get(i);
+                        args.put(p.name(), argExpr);
+                        i++;
+                    }
                 }
             }
 
-            final FunctionExpression expr = new FunctionExpression(name, args, functionRegistry.resolveOrError(name));
+            final FunctionExpression expr = new FunctionExpression(functionRegistry.resolveOrError(name), args);
 
             log.info("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -160,6 +185,13 @@ public class RuleParser {
             // this gets validated and expanded in a later parsing stage
             singleArg.put(null, expr);
             args.put(ctx, singleArg);
+        }
+
+        @Override
+        public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
+            List<Expression> expressions = Lists.newArrayListWithCapacity(ctx.expression().size());
+            expressions.addAll(ctx.expression().stream().map(exprs::get).collect(Collectors.toList()));
+            argsList.put(ctx, expressions);
         }
 
         @Override
@@ -466,6 +498,7 @@ public class RuleParser {
     private static class ParseContext {
         private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
         private final ParseTreeProperty<Map<String, Expression>> args = new ParseTreeProperty<>();
+        private ParseTreeProperty<List<Expression>> argsLists = new ParseTreeProperty<>();
         private Set<ParseError> errors = Sets.newHashSet();
         // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
         private Set<RuleContext> innerNodes = new IdentityHashSet<>();
@@ -517,6 +550,10 @@ public class RuleParser {
 
         public Expression getDefinedVar(String name) {
             return varDecls.get(name);
+        }
+
+        public ParseTreeProperty<List<Expression>> argumentLists() {
+            return argsLists;
         }
     }
 

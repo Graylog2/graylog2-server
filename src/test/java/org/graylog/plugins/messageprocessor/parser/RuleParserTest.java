@@ -13,6 +13,9 @@ import org.graylog.plugins.messageprocessor.ast.functions.builtin.HasField;
 import org.graylog.plugins.messageprocessor.ast.functions.builtin.LongCoercion;
 import org.graylog.plugins.messageprocessor.ast.functions.builtin.SetField;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
+import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleArgumentType;
+import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
+import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -110,6 +113,28 @@ public class RuleParserTest {
                         .build();
             }
         });
+        functions.put("concat", new Function<String>() {
+            @Override
+            public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                final Object one = args.get("one").evaluate(context, message);
+                final Object two = args.get("two").evaluate(context, message);
+                final Object three = args.get("three").evaluate(context, message);
+                return one.toString() + two.toString() + three.toString();
+            }
+
+            @Override
+            public FunctionDescriptor<String> descriptor() {
+                return FunctionDescriptor.<String>builder()
+                        .name("concat")
+                        .returnType(String.class)
+                        .params(ImmutableList.of(
+                                ParameterDescriptor.string("one"),
+                                ParameterDescriptor.object("two"),
+                                ParameterDescriptor.object("three")
+                        ))
+                        .build();
+            }
+        });
         functions.put("trigger_test", new Function<Void>() {
             @Override
             public Void evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
@@ -189,6 +214,18 @@ public class RuleParserTest {
 
             assertNotNull(message);
             assertTrue("actions should have triggered", actionsTriggered.get());
+        } catch (ParseException e) {
+            fail("Should not fail to parse");
+        }
+    }
+
+    @Test
+    public void positionalArguments() throws Exception {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+            evaluateRule(rule);
+
+            assertTrue(actionsTriggered.get());
         } catch (ParseException e) {
             fail("Should not fail to parse");
         }
