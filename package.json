@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Containing helpers to streamline plugin development",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.5",
     "html-webpack-plugin": "^1.7.0",
-    "webpack": "^1.12.9"
+    "webpack": "^1.12.9",
+    "webpack-merge": "^0.7.1"
   }
 }
