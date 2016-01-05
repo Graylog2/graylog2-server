@@ -3,12 +3,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const path = require('path');
 
-const PluginWebpackConfig = function(fqcn, buildPath, additionalConfig) {
+const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
-    entry: './src/mount.jsx',
+    entry: options.entry_path,
     output: {
-      path: buildPath,
+      path: options.build_path,
       filename: 'plugin.[hash].js',
       publicPath: '/plugin/' + fqcn + '/',
     },
