@@ -313,6 +313,32 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
     }
 
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void removeDoesNothingIfConfigDoesNotExist() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+
+        assertThat(collection.count()).isEqualTo(0L);
+        assertThat(clusterConfigService.remove(CustomConfig.class)).isEqualTo(0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void removeSuccessfullyRemovesConfig() throws Exception {
+        DBObject dbObject = new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get();
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(dbObject);
+
+        assertThat(collection.count()).isEqualTo(1L);
+        assertThat(clusterConfigService.remove(CustomConfig.class)).isEqualTo(1);
+        assertThat(collection.count()).isEqualTo(0L);
+    }
+
     public static class ClusterConfigChangedEventHandler {
         public volatile ClusterConfigChangedEvent event;
 
