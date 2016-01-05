@@ -165,7 +165,7 @@ const QuickValuesVisualization = React.createClass({
     this.pieChart.render();
   },
   _formatGraphTooltip(d) {
-    const valueText = d.data.key + ': ' + NumberUtils.formatNumber(d.value) + '<br>';
+    const valueText = `${d.data.key}: ${NumberUtils.formatNumber(d.value)}`;
 
     return `<div class="datapoint-info">${valueText}</div>`;
   },

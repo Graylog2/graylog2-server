@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import numeral from 'numeral';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
+import jQuery from 'jquery';
 
 import D3Utils from 'util/D3Utils';
 import NumberUtils from 'util/NumberUtils';
@@ -38,7 +39,7 @@ const GraphFactory = {
         D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
         break;
       default:
-        throw "Unsupported renderer '" + config.renderer + "'";
+        throw new Error("Unsupported renderer '" + config.renderer + "'");
     }
 
     if (config.renderer === 'line' || config.renderer === 'area') {
@@ -55,13 +56,20 @@ const GraphFactory = {
 };
 
 const GraphVisualization = React.createClass({
+  propTypes: {
+    id: PropTypes.string.isRequired,
+    data: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired,
+    height: PropTypes.number,
+    width: PropTypes.number,
+  },
   statics: {
     getReadableFieldChartStatisticalFunction(statisticalFunction) {
       switch (statisticalFunction) {
-        case "count":
-          return "total";
-        case "total":
-          return "sum";
+        case 'count':
+          return 'total';
+        case 'total':
+          return 'sum';
         default:
           return statisticalFunction;
       }
@@ -79,83 +87,43 @@ const GraphVisualization = React.createClass({
   },
   componentDidMount() {
     this.renderGraph();
-    const dataPoints = $.map(this.props.data, (value, timestamp) => {
-      return {x: Number(timestamp), y: value[this.props.config.valuetype]};
-    });
-
-    this.setState({dataPoints: this._normalizeData(dataPoints)}, this.drawData);
-
+    this._updateData(this.props.data, this.props.config);
   },
   componentWillReceiveProps(nextProps) {
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
-    const dataPoints = $.map(this.props.data, (value, timestamp) => {
-      return {x: Number(timestamp), y: value[this.props.config.valuetype]};
+    this._updateData(nextProps.data, nextProps.config);
+  },
+  _updateData(data, config) {
+    const dataPoints = jQuery.map(data, (value, timestamp) => {
+      return {x: Number(timestamp), y: value[config.valuetype]};
     });
     this.setState({dataPoints: this._normalizeData(dataPoints)}, this.drawData);
   },
   _normalizeData(data) {
     if (data === null || data === undefined || !Array.isArray(data)) {
-      return;
+      return [];
     }
     return data.map((dataPoint) => {
       dataPoint.y = NumberUtils.normalizeGraphNumber(dataPoint.y);
       return dataPoint;
     });
   },
-  renderGraph() {
-    var graphDomNode = ReactDOM.findDOMNode(this);
-
-    this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
-    this.graph
-      .width(this.props.width)
-      .height(this.props.height)
-      .margins({left: 50, right: 15, top: 10, bottom: 35})
-      .dimension(this.dimension)
-      .group(this.group)
-      .x(d3.time.scale())
-      .elasticX(true)
-      .elasticY(true)
-      .renderHorizontalGridLines(true)
-      .brushOn(false)
-      .xAxisLabel("Time")
-      .yAxisLabel(this.props.config.field)
-      .renderTitle(false)
-      .colors(D3Utils.glColourPalette());
-
-    $(graphDomNode).tooltip({
-      'selector': '[rel="tooltip"]',
-      'container': 'body',
-      'placement': 'auto',
-      'delay': {show: 300, hide: 100},
-      'html': true
-    });
-
-    this.graph.xAxis()
-      .ticks(graphHelper.customTickInterval())
-      .tickFormat(graphHelper.customDateTimeFormat());
-    this.graph.yAxis()
-      .ticks(3)
-      .tickFormat((value) => {
-        return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format(".2s")(value);
-      });
-    this.graph.render();
-  },
   _formatTooltipTitle(d) {
-    var formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.HUMAN_TZ);
+    const formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.HUMAN_TZ);
 
-    var formattedValue;
+    let formattedValue;
     try {
-      formattedValue = numeral(d.y).format("0,0.[00]");
+      formattedValue = numeral(d.y).format('0,0.[00]');
     } catch (e) {
-      formattedValue = d3.format(".2r")(d.y);
+      formattedValue = d3.format('.2r')(d.y);
     }
 
-    var valueText = GraphVisualization.getReadableFieldChartStatisticalFunction(this.props.config.valuetype) + " " + this.props.config.field + ": " + formattedValue + "<br>";
-    var keyText = "<span class=\"date\">" + formattedKey + "</span>";
+    const valueText = `${GraphVisualization.getReadableFieldChartStatisticalFunction(this.props.config.valuetype)} ${this.props.config.field}: ${formattedValue}`;
+    const keyText = `<span class="date">${formattedKey}</span>`;
 
-    return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
+    return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
   },
   _resizeVisualization(width, height) {
     this.graph
@@ -177,9 +145,47 @@ const GraphVisualization = React.createClass({
       this.graph.redraw();
     }
   },
+  renderGraph() {
+    const graphDomNode = ReactDOM.findDOMNode(this);
+
+    this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
+    this.graph
+      .width(this.props.width)
+      .height(this.props.height)
+      .margins({left: 50, right: 15, top: 10, bottom: 35})
+      .dimension(this.dimension)
+      .group(this.group)
+      .x(d3.time.scale())
+      .elasticX(true)
+      .elasticY(true)
+      .renderHorizontalGridLines(true)
+      .brushOn(false)
+      .xAxisLabel('Time')
+      .yAxisLabel(this.props.config.field)
+      .renderTitle(false)
+      .colors(D3Utils.glColourPalette());
+
+    $(graphDomNode).tooltip({
+      'selector': '[rel="tooltip"]',
+      'container': 'body',
+      'placement': 'auto',
+      'delay': {show: 300, hide: 100},
+      'html': true,
+    });
+
+    this.graph.xAxis()
+      .ticks(graphHelper.customTickInterval())
+      .tickFormat(graphHelper.customDateTimeFormat());
+    this.graph.yAxis()
+      .ticks(3)
+      .tickFormat((value) => {
+        return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format('.2s')(value);
+      });
+    this.graph.render();
+  },
   render() {
     return (
-      <div id={"visualization-" + this.props.id} className={"graph " + this.props.config.renderer}/>
+      <div id={`visualization-${this.props.id}`} className={`graph ${this.props.config.renderer}`}/>
     );
   },
 });
