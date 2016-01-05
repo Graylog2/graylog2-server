@@ -124,8 +124,8 @@ const ShowDashboardPage = React.createClass({
     }
   },
   _toggleUpdateInBackground() {
-    const forceUpdate = this.state.forceUpdateInBackground;
-    this.setState({forceUpdateInBackground: !forceUpdate});
+    const forceUpdate = !this.state.forceUpdateInBackground;
+    this.setState({forceUpdateInBackground: forceUpdate});
     UserNotification.success('Graphs will be updated ' + (forceUpdate ? 'even' : 'only')
       + ' when the browser is in the ' + (forceUpdate ? 'background' : 'foreground'), '');
   },
