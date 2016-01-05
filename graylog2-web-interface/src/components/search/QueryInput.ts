@@ -7,6 +7,8 @@ import FieldsStore = require('../../stores/fields/FieldsStore');
 import queryParser = require('../../logic/search/queryParser');
 import SerializeVisitor = require('../../logic/search/visitors/SerializeVisitor');
 import DumpVisitor = require('../../logic/search/visitors/DumpVisitor');
+const $ = require('jquery');
+const Typeahead = require('typeahead.js');
 
 interface Match {
     match: string;
@@ -55,7 +57,7 @@ class QueryInput {
     }
 
     display() {
-        this.fieldsPromise.done((fields) => {
+        this.fieldsPromise.then((fields) => {
             this.fields = fields;
             $(this.queryInputContainer).typeahead(this.typeAheadConfig, this.typeAheadSource);
         });
