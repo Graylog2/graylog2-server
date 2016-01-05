@@ -42,8 +42,8 @@ import java.nio.file.Path;
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
-    protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
-    protected static final int GRAYLOG2_DEFAULT_WEB_PORT = 9000;
+    protected static final int GRAYLOG_DEFAULT_PORT = 12900;
+    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -169,7 +169,7 @@ public abstract class BaseConfiguration {
     }
 
     public URI getRestTransportUri() {
-        return Tools.getUriWithPort(restTransportUri, GRAYLOG2_DEFAULT_PORT);
+        return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
     }
 
     public void setRestTransportUri(final URI restTransportUri) {
@@ -194,7 +194,7 @@ public abstract class BaseConfiguration {
             }
 
             transportUri = Tools.getUriWithPort(
-                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG2_DEFAULT_PORT);
+                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG_DEFAULT_PORT);
         } else {
             transportUri = listenUri;
         }

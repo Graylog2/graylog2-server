@@ -32,10 +32,10 @@ import java.util.Locale;
 
 public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_cluster_name")
-    private String clusterName = "graylog2";
+    private String clusterName = "graylog";
 
     @Parameter(value = "elasticsearch_node_name")
-    private String nodeName = "graylog2-server";
+    private String nodeName = "graylog-server";
 
     @Parameter(value = "elasticsearch_node_master")
     private boolean masterNode = false;
@@ -83,7 +83,7 @@ public class ElasticsearchConfiguration {
     private Path configFile; // = "/etc/graylog/server/elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
-    private String indexPrefix = "graylog2";
+    private String indexPrefix = "graylog";
 
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
