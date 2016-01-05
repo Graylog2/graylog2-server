@@ -37,14 +37,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   start(input) {
-    let url;
-
-    if (input.global) {
-      url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterInputStatesController.start(input.id).url);
-    } else {
-      url = URLUtils.qualifyUrl(jsRoutes.controllers.api.InputStatesController.start(input.id).url);
-    }
-
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterInputStatesController.start(input.id).url);
     return fetch('PUT', url)
       .then(
         () => {
@@ -57,14 +50,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   stop(input) {
-    let url;
-
-    if (input.global) {
-      url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterInputStatesController.stop(input.id).url);
-    } else {
-      url = URLUtils.qualifyUrl(jsRoutes.controllers.api.InputStatesController.stop(input.id).url);
-    }
-
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterInputStatesController.stop(input.id).url);
     return fetch('DELETE', url)
       .then(
         () => {
