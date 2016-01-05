@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Optional;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -116,9 +117,9 @@ public class ClusterInputStatesResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input."),
     })
-    public Map<String, InputCreated> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, InputCreated> result = nodes.entrySet()
+        final Map<String, Optional<InputCreated>> result = nodes.entrySet()
                 .stream()
                 .parallel()
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
@@ -128,14 +129,14 @@ public class ClusterInputStatesResource {
                     try {
                         final Response<InputCreated> response = remoteInputStatesResource.start(inputId).execute();
                         if (response.isSuccess()) {
-                            return response.body();
+                            return Optional.of(response.body());
                         } else {
                             LOG.warn("Unable to start input on node " + entry.getKey() + ": " + response.message());
                         }
                     } catch (IOException e) {
                         LOG.warn("Unable to start input on node " + entry.getKey() + ": ", e);
                     }
-                    return null;
+                    return Optional.absent();
                 }));
         return result;
     }
@@ -147,9 +148,9 @@ public class ClusterInputStatesResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input."),
     })
-    public Map<String, InputDeleted> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Optional<InputDeleted>> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, InputDeleted> result = nodes.entrySet()
+        final Map<String, Optional<InputDeleted>> result = nodes.entrySet()
                 .stream()
                 .parallel()
                 .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
@@ -159,14 +160,14 @@ public class ClusterInputStatesResource {
                     try {
                         final Response<InputDeleted> response = remoteInputStatesResource.stop(inputId).execute();
                         if (response.isSuccess()) {
-                            return response.body();
+                            return Optional.of(response.body());
                         } else {
                             LOG.warn("Unable to stop input on node " + entry.getKey() + ": " + response.message());
                         }
                     } catch (IOException e) {
                         LOG.warn("Unable to stop input on node " + entry.getKey() + ": ", e);
                     }
-                    return null;
+                    return Optional.absent();
                 }));
         return result;
     }
