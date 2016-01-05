@@ -4,6 +4,7 @@ const merge = require('webpack-merge');
 const path = require('path');
 
 const PluginWebpackConfig = function(fqcn, buildPath, additionalConfig) {
+  const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
     entry: './src/mount.jsx',
     output: {
@@ -23,7 +24,7 @@ const PluginWebpackConfig = function(fqcn, buildPath, additionalConfig) {
     },
     plugins: [
       new WebpackCleanupPlugin({}),
-      new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template'}),
+      new HtmlWebpackPlugin({filename: 'module.json', template: moduleJsonTemplate}),
     ],
     resolve: {
       extensions: ['', '.js', '.json', '.jsx'],
