@@ -86,8 +86,6 @@ public abstract class CmdLineTool implements CliCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
 
-    protected static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
-    protected static final String PROPERTIES_PREFIX = "graylog2.";
     protected static final Version version = Version.CURRENT_CLASSPATH;
     protected static final String FILE_SEPARATOR = System.getProperty("file.separator");
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
@@ -308,8 +306,11 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository(ENVIRONMENT_PREFIX),
-                new SystemPropertiesRepository(PROPERTIES_PREFIX),
+                new EnvironmentRepository("GRAYLOG_"),
+                new SystemPropertiesRepository("graylog."),
+                // Legacy prefixes
+                new EnvironmentRepository("GRAYLOG2_"),
+                new SystemPropertiesRepository("graylog2."),
                 new PropertiesRepository(configFile)
         );
     }
