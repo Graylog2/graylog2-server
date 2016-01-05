@@ -4,7 +4,9 @@
   "description": "Containing helpers to streamline plugin development",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,8 @@
     "webpack": "^1.12.9",
     "webpack-cleanup-plugin": "^0.1.1",
     "webpack-merge": "^0.7.1"
+  },
+  "devDependencies": {
+    "babel": "^5.8.34"
   }
 }

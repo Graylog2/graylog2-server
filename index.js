@@ -1,5 +1,3 @@
-const PluginWebpackConfig = require('./lib/PluginWebpackConfig');
-
 module.exports = {
-  PluginWebpackConfig: PluginWebpackConfig,
+  PluginWebpackConfig: require('./lib/PluginWebpackConfig'),
 };
