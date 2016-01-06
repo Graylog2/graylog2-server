@@ -1,4 +1,4 @@
-package org.graylog.plugins.messageprocessor.ast.functions.builtin;
+package org.graylog.plugins.messageprocessor.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.messageprocessor.EvaluationContext;

@@ -1,6 +1,6 @@
-package org.graylog.plugins.messageprocessor.ast.functions.builtin;
+package org.graylog.plugins.messageprocessor.functions;
 
-import com.google.common.primitives.Longs;
+import com.google.common.primitives.Doubles;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
@@ -14,29 +14,29 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.builder;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.object;
 
-public class LongCoercion implements Function<Long> {
+public class DoubleCoercion implements Function<Double> {
 
-    public static final String NAME = "long";
+    public static final String NAME = "double";
 
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";
 
     @Override
-    public Long evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+    public Double evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
         final Expression value = args.get(VALUE);
         final Object evaluated = value.evaluate(context, message);
-        return (Long) firstNonNull(Longs.tryParse(evaluated.toString()), args.get(DEFAULT).evaluate(context, message));
-   }
+        return (Double) firstNonNull(Doubles.tryParse(evaluated.toString()), args.get(DEFAULT).evaluate(context, message));
+    }
 
     @Override
-    public FunctionDescriptor<Long> descriptor() {
-        return FunctionDescriptor.<Long>builder()
+    public FunctionDescriptor<Double> descriptor() {
+        return FunctionDescriptor.<Double>builder()
                 .name(NAME)
-                .returnType(Long.class)
+                .returnType(Double.class)
                 .params(of(
                         object(VALUE),
-                        builder().name(DEFAULT).type(Long.class).build()
-                        ))
+                        builder().name(DEFAULT).type(Double.class).build()
+                ))
                 .build();
     }
 }

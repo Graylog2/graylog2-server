@@ -1,4 +1,4 @@
-package org.graylog.plugins.messageprocessor.ast.functions.builtin;
+package org.graylog.plugins.messageprocessor.functions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
