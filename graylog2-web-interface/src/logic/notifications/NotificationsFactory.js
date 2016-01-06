@@ -157,7 +157,7 @@ class NotificationsFactory {
             <span>
               There were multiple graylog2-server instances configured as master in your Graylog cluster. The cluster handles
               this automatically by launching new nodes as slaves if there already is a master but you should still fix this.
-              Check the graylog2.conf of every node and make sure that only one instance has is_master set to true. Close this
+              Check the graylog.conf of every node and make sure that only one instance has is_master set to true. Close this
               notification if you think you resolved the problem. It will pop back up if you start a second master node again.
             </span>
           ),

@@ -59,7 +59,7 @@
             <fileMode>0755</fileMode>
         </file>
         <file>
-            <source>${project.basedir}/../misc/graylog2.conf</source>
+            <source>${project.basedir}/../misc/graylog.conf</source>
             <destName>graylog.conf.example</destName>
             <outputDirectory>/</outputDirectory>
         </file>

@@ -82,7 +82,7 @@ public class EsNodeProviderTest {
         Map<String, String> settings = Maps.newHashMap();
         Map<String, String> esPropNames = Maps.newHashMap();
 
-        // add all ES settings here that are configurable via graylog2.conf
+        // add all ES settings here that are configurable via graylog.conf
         addEsConfig(esPropNames, settings, "cluster.name", "elasticsearch_cluster_name", "garylog5");
         addEsConfig(esPropNames, settings, "node.name", "elasticsearch_node_name", "garylord");
         addEsConfig(esPropNames, settings, "node.master", "elasticsearch_node_master", "true");
