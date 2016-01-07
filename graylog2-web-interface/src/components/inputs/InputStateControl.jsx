@@ -21,14 +21,14 @@ const InputStateControl = React.createClass({
     }
 
     const nodeIDs = Object.keys(this.state.inputState);
-    let isInputRunning = true;
-
-    for (let i = 0; i < nodeIDs.length && isInputRunning; i++) {
-      const nodeState = this.state.inputState[nodeIDs[i]];
-      isInputRunning = nodeState.state === 'RUNNING';
+    if (nodeIDs.length === 0) {
+      return false;
     }
 
-    return isInputRunning;
+    return nodeIDs.some(nodeID => {
+      const nodeState = this.state.inputState[nodeID];
+      return nodeState.state === 'RUNNING';
+    });
   },
   _startInput() {
     InputStatesStore.start(this.props.input);
