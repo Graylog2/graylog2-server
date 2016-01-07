@@ -1,15 +1,17 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
+import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 const WidgetConfigModal = React.createClass({
   propTypes: {
-    boundToStream: React.PropTypes.bool.isRequired,
-    metricsAction: React.PropTypes.func.isRequired,
-    widget: React.PropTypes.object.isRequired,
+    boundToStream: PropTypes.bool.isRequired,
+    widget: PropTypes.object.isRequired,
+    dashboardId: PropTypes.string.isRequired,
   },
   open() {
     this.refs.configModal.open();
@@ -49,7 +51,7 @@ const WidgetConfigModal = React.createClass({
       return String(value);
     }
 
-    if (typeof value === 'object') {
+    if (typeof value === 'object' || typeof value === 'boolean') {
       return JSON.stringify(value, null, 1);
     }
 
@@ -77,7 +79,7 @@ const WidgetConfigModal = React.createClass({
     return (
       <BootstrapModalWrapper ref="configModal">
         <Modal.Header closeButton>
-          <Modal.Title>{`Widget "${this.props.widget.title}" configuration`}</Modal.Title>
+          <Modal.Title><span>Widget <em>{this.props.widget.description}</em> configuration</span></Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="configuration">
@@ -85,9 +87,9 @@ const WidgetConfigModal = React.createClass({
             <div>More details:
               <dl className="dl-horizontal">
                 <dt>Widget ID:</dt>
-                <dd>{this.props.widget.widgetId}</dd>
+                <dd>{this.props.widget.id}</dd>
                 <dt>Dashboard ID:</dt>
-                <dd>{this.props.widget.dashboardId}</dd>
+                <dd>{this.props.dashboardId}</dd>
                 {this._getConfigAsDescriptionList()}
               </dl>
             </div>
@@ -95,7 +97,9 @@ const WidgetConfigModal = React.createClass({
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" onClick={this.hide}>Close</Button>
-          <Button type="button" bsStyle="info" onClick={this.props.metricsAction}>Show widget metrics</Button>
+          <LinkContainer to={Routes.filtered_metrics('master', `org.graylog2.dashboards.widgets.*.${this.props.widget.id}`)}>
+            <Button type="button" bsStyle="info">Show widget metrics</Button>
+          </LinkContainer>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

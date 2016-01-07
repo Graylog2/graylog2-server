@@ -203,21 +203,8 @@ const Widget = React.createClass({
 
     return URLUtils.appPrefixed(path + '?' + queryString);
   },
-  metricsUrl() {
-    // TODO: replace with react router link
-    const url = '/system/metrics/master';
-    const query = {
-      // TODO: replace hardcoded metric name
-      prefilter: 'org.graylog2.dashboards.widgets.*.' + this.props.widget.id,
-    };
-
-    return URLUtils.appPrefixed(url + '?' + Qs.stringify(query));
-  },
   _replaySearch(e) {
     URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
-  },
-  _goToWidgetMetrics() {
-    URLUtils.openLink(this.metricsUrl(), false);
   },
   _showConfig() {
     this.refs.configModal.open();
@@ -248,9 +235,9 @@ const Widget = React.createClass({
     }
     const showConfigModal = (
       <WidgetConfigModal ref="configModal"
+                         dashboardId={this.props.dashboardId}
                          widget={this.props.widget}
-                         boundToStream={this._isBoundToStream()}
-                         metricsAction={this._goToWidgetMetrics}/>
+                         boundToStream={this._isBoundToStream()}/>
     );
 
     const editConfigModal = (
