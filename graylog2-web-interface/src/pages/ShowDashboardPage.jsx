@@ -95,14 +95,10 @@ const ShowDashboardPage = React.createClass({
       return this.emptyDashboard();
     }
 
-    let positions;
-
-    if (Object.keys(dashboard.positions).length > 0) {
-      positions = dashboard.positions;
-    } else {
-      positions = {};
-      dashboard.widgets.forEach(widget => positions[widget.id] = this._defaultWidgetDimensions(widget));
-    }
+    const positions = {};
+    dashboard.widgets.forEach(widget => {
+      positions[widget.id] = dashboard.positions[widget.id] || this._defaultWidgetDimensions(widget);
+    });
 
     const widgets = dashboard.widgets.sort((d1, d2) => {
       if (d1.col === d2.col) {
