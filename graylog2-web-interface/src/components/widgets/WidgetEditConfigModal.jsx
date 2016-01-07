@@ -9,7 +9,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const WidgetEditConfigModal = React.createClass({
   propTypes: {
-    onModalHidden: React.PropTypes.func.isRequired,
+    onModalHidden: React.PropTypes.func,
     onUpdate: React.PropTypes.func.isRequired,
     widget: React.PropTypes.object.isRequired,
     widgetTypes: React.PropTypes.object.isRequired,
