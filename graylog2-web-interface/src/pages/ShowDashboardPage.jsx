@@ -93,6 +93,10 @@ const ShowDashboardPage = React.createClass({
       </Row>
     );
   },
+  _unlockDashboard(event) {
+    event.preventDefault();
+    this.setState({locked: false});
+  },
   _onUnlock() {
     const locked = !this.state.locked;
     this.setState({locked: locked});
@@ -155,7 +159,7 @@ const ShowDashboardPage = React.createClass({
     const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id)
       && dashboard.widgets.length > 0 ?
       (<div id="drag-widgets-description">
-          Drag widgets to any position you like in <a role="button" onClick={() => this.setState({locked: false})}>
+          Drag widgets to any position you like in <a href="#" role="button" onClick={this._unlockDashboard}>
           unlock / edit</a>{' '}
           mode.
       </div>) : null;
@@ -163,6 +167,7 @@ const ShowDashboardPage = React.createClass({
     const dashboardTitle = (
       <span>
         <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
+        &nbsp;
         {!this.state.locked &&
         <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
                                    description={dashboard.description} buttonClass="btn-info btn-xs">
