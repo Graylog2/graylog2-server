@@ -66,12 +66,45 @@ const ShowDashboardPage = React.createClass({
       </Row>
     );
   },
+  _defaultWidgetDimensions(widget) {
+    const dimensions = {col: 0, row: 0};
+
+    switch (widget.type.toUpperCase()) {
+      case Widget.Type.SEARCH_RESULT_CHART:
+      case Widget.Type.STACKED_CHART:
+      case Widget.Type.FIELD_CHART:
+        dimensions.width = 2;
+        dimensions.height = 1;
+        break;
+      case Widget.Type.QUICKVALUES:
+        dimensions.width = 1;
+        dimensions.height = (widget.config.show_pie_chart && widget.config.show_data_table ? 3 : 2);
+        break;
+      case Widget.Type.SEARCH_RESULT_COUNT:
+      case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
+      case Widget.Type.STATS_COUNT:
+      default:
+        dimensions.width = 1;
+        dimensions.height = 1;
+    }
+
+    return dimensions;
+  },
   formatDashboard(dashboard) {
     if (dashboard.widgets.length === 0) {
       return this.emptyDashboard();
     }
 
-    const widgets = this.state.dashboard.widgets.sort((d1, d2) => {
+    let positions;
+
+    if (Object.keys(dashboard.positions) > 0) {
+      positions = dashboard.positions;
+    } else {
+      positions = {};
+      dashboard.widgets.forEach(widget => positions[widget.id] = this._defaultWidgetDimensions(widget));
+    }
+
+    const widgets = dashboard.widgets.sort((d1, d2) => {
       if (d1.col === d2.col) {
         return d1.row < d2.row;
       }
@@ -83,10 +116,11 @@ const ShowDashboardPage = React.createClass({
                 locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
       );
     });
+
     return (
       <Row>
         <div className="dashboard">
-          <GridsterContainer ref="gridsterContainer" positions={this.state.dashboard.positions}>
+          <GridsterContainer ref="gridsterContainer" positions={positions}>
             {widgets}
           </GridsterContainer>
         </div>
