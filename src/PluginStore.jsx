@@ -15,7 +15,8 @@ class PluginStore {
   
   static exports(entity) {
     return [].concat.apply([], get()
-      .map((plugin) => plugin.exports && plugin.exports[entity] ? plugin.exports[entity] : []);
+      .map((plugin) => plugin.exports && plugin.exports[entity] ? plugin.exports[entity] : [])
+    );
   }
 }
 
