@@ -48,11 +48,6 @@ const Widget = React.createClass({
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
-
-    if (this.props.dashboardGrid) {
-      this.props.dashboardGrid.add_widget();
-    }
-
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentDidUpdate() {
@@ -160,7 +155,7 @@ const Widget = React.createClass({
                                                    width={this.state.width}/>);
         break;
       default:
-        throw('Error: Widget type "' + this.props.widget.type + '" not supported');
+        throw new Error(`Error: Widget type '${this.props.widget.type}' not supported`);
     }
 
     return visualization;
@@ -215,13 +210,7 @@ const Widget = React.createClass({
   updateWidget(newWidgetData) {
     newWidgetData.id = this.props.widget.id;
 
-    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData).then(() => {
-      this.setState({
-        title: newWidgetData.title,
-        cacheTime: newWidgetData.cacheTime,
-        config: newWidgetData.config,
-      });
-    });
+    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData);
   },
   deleteWidget() {
     if (window.confirm('Do you really want to delete "' + this.props.widget.description + '"?')) {
