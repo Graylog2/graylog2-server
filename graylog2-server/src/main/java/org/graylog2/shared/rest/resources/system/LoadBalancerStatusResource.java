@@ -58,7 +58,7 @@ public class LoadBalancerStatusResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get status of this graylog2-server node for load balancers. " +
+    @ApiOperation(value = "Get status of this Graylog server node for load balancers. " +
             "Returns either ALIVE with HTTP 200 or DEAD with HTTP 503.")
     public Response status() {
         final LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
@@ -76,7 +76,7 @@ public class LoadBalancerStatusResource extends RestResource {
     @RequiresAuthentication
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Override load balancer status of this graylog2-server node. Next lifecycle " +
+    @ApiOperation(value = "Override load balancer status of this Graylog server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE or DEAD.")
     @Path("/override/{status}")
     public void override(@ApiParam(name = "status") @PathParam("status") String status) {

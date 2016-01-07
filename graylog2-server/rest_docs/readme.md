@@ -1,1 +1,1 @@
-## graylog2-server REST documentation
+## Graylog REST API documentation

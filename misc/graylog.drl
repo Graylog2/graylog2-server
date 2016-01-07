@@ -7,7 +7,7 @@
 rule "Rewrite localhost host"
     when
         m : Message( source == "localhost" )
-    then 
+    then
         m.addField("source", "localhost.example.com" );
         log.info( "[Overwrite localhost rule fired] : " + m.toString() );
 end

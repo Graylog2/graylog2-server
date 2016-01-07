@@ -10,11 +10,11 @@ class NotificationsFactory {
     switch(notification.type) {
       case 'check_server_clocks':
         return {
-          title: 'Check the system clocks of your graylog2-server nodes.',
+          title: 'Check the system clocks of your Graylog server nodes.',
           description: (
             <span>
-              A graylog2-server node detected a condition where it was deemed to be inactive immediately after being active.
-              This usually indicates either a significant jump in system time, e.g. via NTP, or that a second graylog2-server node
+              A Graylog server node detected a condition where it was deemed to be inactive immediately after being active.
+              This usually indicates either a significant jump in system time, e.g. via NTP, or that a second Graylog server node
               is active on a system that has a different system time. Please make sure that the clocks of graylog2 systems are synchronized.
             </span>
           ),
@@ -152,10 +152,10 @@ class NotificationsFactory {
         };
       case 'multi_master':
         return {
-          title: 'Multiple graylog2-server masters in the cluster',
+          title: 'Multiple Graylog server masters in the cluster',
           description: (
             <span>
-              There were multiple graylog2-server instances configured as master in your Graylog cluster. The cluster handles
+              There were multiple Graylog server instances configured as master in your Graylog cluster. The cluster handles
               this automatically by launching new nodes as slaves if there already is a master but you should still fix this.
               Check the graylog.conf of every node and make sure that only one instance has is_master set to true. Close this
               notification if you think you resolved the problem. It will pop back up if you start a second master node again.
@@ -175,11 +175,11 @@ class NotificationsFactory {
         };
       case 'no_master':
         return {
-          title: 'There was no master graylog2-server node detected in the cluster.',
+          title: 'There was no master Graylog server node detected in the cluster.',
           description: (
             <span>
-              Certain operations of graylog2-server require the presence of a master node, but no such master was started.
-              Please ensure that one of your graylog2-server nodes contains the setting <code>is_master = true</code> in its
+              Certain operations of Graylog server require the presence of a master node, but no such master was started.
+              Please ensure that one of your Graylog server nodes contains the setting <code>is_master = true</code> in its
               configuration and that it is running. Until this is resolved index cycling will not be able to run, which
               means that the index retention mechanism is also not running, leading to increased index sizes. Certain
               maintenance functions as well as a variety of web interface pages (e.g. Dashboards) are unavailable.
