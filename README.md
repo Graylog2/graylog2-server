@@ -19,3 +19,5 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 
 module.exports = new PluginWebpackConfig('my.fully.qualified.plugin.classname', BUILD_PATH);
 ```
+
+This module is used in conjunction with the maven archetype which can be found [here](https://github.com/Graylog2/graylog-plugin-archetype).
