@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 
 import { GridsterWidget } from 'components/common';
@@ -8,8 +8,9 @@ require('!script!../../../public/javascripts/jquery.gridster.min.js');
 
 const GridsterContainer = React.createClass({
   propTypes: {
-    positions: React.PropTypes.object.isRequired,
-    children: React.PropTypes.node.isRequired,
+    positions: PropTypes.object.isRequired,
+    children: PropTypes.node.isRequired,
+    onPositionsChange: PropTypes.func.isRequired,
   },
   getInitialState() {
     return { grid: undefined };
@@ -28,20 +29,20 @@ const GridsterContainer = React.createClass({
       widget_base_dimensions: [410, 200],
       resize: {
         enabled: true,
-        stop: this._onPositionsChanged,
+        stop: this._onPositionsChange,
       },
       draggable: {
-        stop: this._onPositionsChanged,
+        stop: this._onPositionsChange,
       },
-      serialize_params: function(widgetListItem, pos) {
+      serialize_params: (widgetListItem, position) => {
         const widget = $('.widget', widgetListItem);
 
         return {
           id: widget.attr('data-widget-id'),
-          col: pos.col,
-          row: pos.row,
-          size_x: pos.size_x,
-          size_y: pos.size_y,
+          col: position.col,
+          row: position.row,
+          size_x: position.size_x,
+          size_y: position.size_y,
         };
       },
     }).data('gridster');
@@ -59,6 +60,13 @@ const GridsterContainer = React.createClass({
   _unlockGrid(grid) {
     grid.enable();
     grid.enable_resize();
+  },
+  _onPositionsChange() {
+    const positions = this.state.grid.serialize().map((position) => {
+      return {id: position.id, col: position.col, row: position.row, width: position.size_x, height: position.size_y};
+    });
+    console.log(positions);
+    this.props.onPositionsChange(positions);
   },
 
   render() {

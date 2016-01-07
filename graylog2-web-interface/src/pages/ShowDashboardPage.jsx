@@ -120,7 +120,7 @@ const ShowDashboardPage = React.createClass({
     return (
       <Row>
         <div className="dashboard">
-          <GridsterContainer ref="gridsterContainer" positions={positions}>
+          <GridsterContainer ref="gridsterContainer" positions={positions} onPositionsChange={this._onPositionsChange}>
             {widgets}
           </GridsterContainer>
         </div>
@@ -141,13 +141,8 @@ const ShowDashboardPage = React.createClass({
       this.refs.gridsterContainer.unlockGrid();
     }
   },
-  _onPositionsChanged() {
-    const positions = this.state.dashboardGrid.serialize().map((position) => {
-      return {id: position.id, col: position.col, row: position.row, width: position.size_x, height: position.size_y};
-    });
-    const dashboard = this.state.dashboard;
-
-    DashboardsStore.updatePositions(dashboard, positions);
+  _onPositionsChange(newPositions) {
+    DashboardsStore.updatePositions(this.state.dashboard, newPositions);
   },
   _toggleFullscreen() {
     const element = document.documentElement;
