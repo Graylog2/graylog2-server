@@ -6,7 +6,9 @@ const path = require('path');
 const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
-    entry: options.entry_path,
+    entry: {
+      plugin: options.entry_path,
+    },
     output: {
       path: options.build_path,
       filename: 'plugin.[hash].js',

@@ -12,6 +12,11 @@ class PluginStore {
     }
     return window.plugins;
   }
+  
+  static exports(export) {
+    return [].concat.apply([], get()
+      .map((plugin) => plugin.exports && plugin.exports[export] ? plugin.exports[export] : []);
+  }
 }
 
 export default PluginStore;
