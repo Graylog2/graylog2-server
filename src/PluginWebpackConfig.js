@@ -11,8 +11,8 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
     },
     output: {
       path: options.build_path,
-      filename: 'plugin.[hash].js',
-      publicPath: '/plugin/' + fqcn + '/',
+      filename: '[name].[hash].js',
+      publicPath: '',
     },
     module: {
       loaders: [
@@ -30,7 +30,7 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
     ],
     resolve: {
       extensions: ['', '.js', '.json', '.jsx'],
-      modulesDirectories: ['src', 'node_modules'],
+      modulesDirectories: ['src/web', 'node_modules'],
     },
   };
   
