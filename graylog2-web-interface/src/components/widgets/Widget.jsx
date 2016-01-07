@@ -63,7 +63,7 @@ const Widget = React.createClass({
     clearInterval(this.loadValueInterval);
     $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
-  WxIDGET_DATA_REFRESH: 30 * 1000,
+
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
   WIDGET_HEADER_HEIGHT: 25,
   WIDGET_FOOTER_HEIGHT: 20,
