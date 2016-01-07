@@ -97,7 +97,7 @@ const ShowDashboardPage = React.createClass({
 
     let positions;
 
-    if (Object.keys(dashboard.positions) > 0) {
+    if (Object.keys(dashboard.positions).length > 0) {
       positions = dashboard.positions;
     } else {
       positions = {};
