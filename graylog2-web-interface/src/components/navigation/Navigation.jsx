@@ -7,6 +7,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
 import NotificationsStore from 'stores/notifications/NotificationsStore';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
@@ -82,6 +83,15 @@ const Navigation = React.createClass({
         <a><img src={logoUrl}/></a>
       </LinkContainer>);
     // TODO: fix permission names
+
+    const pluginNavigations = PluginStore.exports('navigation')
+      .map((pluginRoute) => {
+        return (
+          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+            <NavItem>{pluginRoute.description}</NavItem>
+          </LinkContainer>
+        );
+      });
     return (
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
@@ -107,6 +117,9 @@ const Navigation = React.createClass({
                 <NavItem>Sources</NavItem>
               </LinkContainer>
             }
+
+            {pluginNavigations}
+
             <NavDropdown navItem title={this._systemTitle()} id="system-menu-dropdown">
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
