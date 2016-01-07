@@ -42,6 +42,7 @@ import org.graylog.plugins.messageprocessor.parser.errors.ParseError;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.messageprocessor.parser.errors.WrongNumberOfArgs;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -346,15 +347,17 @@ public class RuleParser {
 
         @Override
         public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
-            final String variableName = ctx.Identifier().getText();
-            if (!idIsFieldAccess && !definedVars.contains(variableName)) {
+            // unquote identifier if necessary
+            final String identifierName = Tools.unquote(ctx.Identifier().getText(), '`');
+
+            if (!idIsFieldAccess && !definedVars.contains(identifierName)) {
                 parseContext.addError(new UndeclaredVariable(ctx));
             }
             final Expression expr;
             if (idIsFieldAccess) {
-                expr = new FieldRefExpression(variableName);
+                expr = new FieldRefExpression(identifierName);
             } else {
-                expr = new VarRefExpression(variableName);
+                expr = new VarRefExpression(identifierName);
             }
             log.info("VAR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);

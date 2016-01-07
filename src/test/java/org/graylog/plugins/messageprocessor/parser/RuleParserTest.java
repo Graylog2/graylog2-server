@@ -13,6 +13,7 @@ import org.graylog.plugins.messageprocessor.functions.HasField;
 import org.graylog.plugins.messageprocessor.functions.LongCoercion;
 import org.graylog.plugins.messageprocessor.functions.SetField;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
+import org.graylog.plugins.messageprocessor.functions.StringCoercion;
 import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
@@ -152,6 +153,7 @@ public class RuleParserTest {
             }
         });
         functions.put(LongCoercion.NAME, new LongCoercion());
+        functions.put(StringCoercion.NAME, new StringCoercion());
         functions.put(SetField.NAME, new SetField());
         functions.put(HasField.NAME, new HasField());
         functionRegistry = new FunctionRegistry(functions);
@@ -274,6 +276,16 @@ public class RuleParserTest {
 
         assertNotNull(processedMsg);
         assertEquals("server_error", processedMsg.getField("response_category"));
+    }
+
+    @Test
+    public void messageRefQuotedField() throws Exception {
+        final Rule rule = parser.parseRule(ruleForTest());
+        Message message = new Message("hello test", "source", DateTime.now());
+        message.addField("@specialfieldname", "string");
+        evaluateRule(rule, message);
+
+        assertTrue(actionsTriggered.get());
     }
 
     private Message evaluateRule(Rule rule, Message message) {
