@@ -1,7 +1,7 @@
 {
   "name": "graylog-web-plugin",
-  "version": "0.0.12",
-  "description": "Containing helpers to streamline plugin development",
+  "version": "0.0.13",
+  "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
