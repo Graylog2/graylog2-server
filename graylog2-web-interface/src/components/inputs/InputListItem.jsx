@@ -13,7 +13,7 @@ import InputTypesStore from 'stores/inputs/InputTypesStore';
 
 import InputsActions from 'actions/inputs/InputsActions';
 
-import { InputForm, InputStateBadge, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
+import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 
 const InputListItem = React.createClass({
   propTypes: {
@@ -45,10 +45,6 @@ const InputListItem = React.createClass({
     InputsActions.update(this.props.input.id, data);
   },
   render() {
-    // TODO:
-    // - Input state controls
-    // - Input metrics
-
     if (!this.state.inputTypes) {
       return <Spinner />;
     }
@@ -89,6 +85,8 @@ const InputListItem = React.createClass({
           <Button bsStyle="info">Manage extractors</Button>
         </LinkContainer>
       );
+
+      actions.push(<InputStateControl key={`input-state-control-${this.props.input.id}`} input={this.props.input}/>);
     }
 
     let showMetricsMenuItem;

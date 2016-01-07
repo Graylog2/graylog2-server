@@ -67,8 +67,14 @@ const jsRoutes = {
         get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
       },
+      InputStatesController: {
+        start: (inputId) => { return {url: `/system/inputstates/${inputId}`}; },
+        stop: (inputId) => { return {url: `/system/inputstates/${inputId}`}; },
+      },
       ClusterInputStatesController: {
         list: () => { return {url: '/cluster/inputstates'}; },
+        start: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
+        stop: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
       },
       MessageFieldsApiController: {
         list: () => { return {url: '/system/fields'}; },

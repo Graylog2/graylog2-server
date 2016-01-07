@@ -24,8 +24,6 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -101,7 +99,7 @@ public class InputStatesResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
-        final Input input = inputService.find(inputId);
+        inputService.find(inputId);
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
 
@@ -116,7 +114,7 @@ public class InputStatesResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
-        final Input input = inputService.find(inputId);
+        inputService.find(inputId);
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
 
