@@ -123,7 +123,7 @@ const WidgetCreationModal = React.createClass({
         title = 'combined graph';
         break;
       default:
-        throw ('Unsupported widget type ' + this.props.widgetType);
+        throw new Error('Unsupported widget type ' + this.props.widgetType);
     }
 
     return StringUtils.capitalizeFirstLetter(title);

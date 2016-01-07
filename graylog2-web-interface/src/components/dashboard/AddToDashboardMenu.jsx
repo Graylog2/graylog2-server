@@ -35,7 +35,11 @@ const AddToDashboardMenu = React.createClass({
   },
   _saveWidget(title, configuration) {
     let widgetConfig = Immutable.Map(this.props.configuration);
-    const searchParams = Immutable.Map(this.searchParams);
+    let searchParams = Immutable.Map(this.searchParams);
+    // Stores stream ID with the right key name for the add widget request
+    if (searchParams.has('streamId')) {
+      searchParams = searchParams.set('stream_id', searchParams.get('streamId')).delete('streamId');
+    }
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
     const promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
