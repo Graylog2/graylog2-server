@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Qs from 'qs';
@@ -19,11 +19,10 @@ import WidgetsActions from 'actions/widgets/WidgetsActions';
 
 const Widget = React.createClass({
   propTypes: {
-    widget: React.PropTypes.object.isRequired,
-    dashboardGrid: React.PropTypes.object,
-    dashboardId: React.PropTypes.string.isRequired,
-    shouldUpdate: React.PropTypes.bool.isRequired,
-    locked: React.PropTypes.bool.isRequired,
+    widget: PropTypes.object.isRequired,
+    dashboardId: PropTypes.string.isRequired,
+    shouldUpdate: PropTypes.bool.isRequired,
+    locked: PropTypes.bool.isRequired,
   },
   statics: {
     Type: {
@@ -225,15 +224,6 @@ const Widget = React.createClass({
   },
   _showEditConfig() {
     this.refs.editModal.open();
-
-    // Ugly workaround to avoid being able to move a widget when the modal is shown :(
-    this._disableGridster();
-  },
-  _disableGridster() {
-    this.props.dashboardGrid.disable();
-  },
-  _enableGridster() {
-    this.props.dashboardGrid.enable();
   },
   updateWidget(newWidgetData) {
     newWidgetData.id = this.props.widget.id;
@@ -267,8 +257,7 @@ const Widget = React.createClass({
       <WidgetEditConfigModal ref="editModal"
                              widgetTypes={this.constructor.Type}
                              widget={this.props.widget}
-                             onUpdate={this.updateWidget}
-                             onModalHidden={this._enableGridster}/>
+                             onUpdate={this.updateWidget}/>
     );
 
     return (
