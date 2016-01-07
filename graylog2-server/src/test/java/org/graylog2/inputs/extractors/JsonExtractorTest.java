@@ -71,7 +71,7 @@ public class JsonExtractorTest {
 
     @Test
     public void testRunWithArray() throws Exception {
-        final String value = "{\"array\": [\"foobar\", \"foobaz\"]}";
+        final String value = "{\"array\": [\"foobar\", \"foobaz\", null]}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(new Extractor.Result("foobar, foobaz", "array", -1, -1));
@@ -106,7 +106,15 @@ public class JsonExtractorTest {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", ImmutableMap.<String, Object>of("flatten", true), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
                 "");
-        final String value = "{\"object\": {\"text\": \"foobar\", \"number\": 1234.5678, \"bool\": true, \"nested\": {\"text\": \"foobar\"}}}";
+        final String value = "{"
+                + "\"object\": {"
+                + "\"text\": \"foobar\", "
+                + "\"number\": 1234.5678, "
+                + "\"bool\": true, "
+                + "\"null\": null, "
+                + "\"nested\": {\"text\": \"foobar\"}"
+                + "}"
+                + "}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
