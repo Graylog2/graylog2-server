@@ -21,8 +21,9 @@ const MetricsComponent = React.createClass({
     return { filter: '' };
   },
   render() {
+    const filter = new RegExp(this.state.filter, 'i');
     const filteredNames = this.props.names
-      .filter((metric) => String(metric.full_name).contains(this.state.filter));
+      .filter((metric) => String(metric.full_name).match(filter));
     return (
       <Row className="content">
         <Col md={12}>
