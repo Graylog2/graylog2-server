@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
@@ -9,12 +8,13 @@ import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.functions.HasField;
 import org.graylog.plugins.messageprocessor.functions.LongCoercion;
 import org.graylog.plugins.messageprocessor.functions.SetField;
-import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.functions.StringCoercion;
 import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleArgumentType;
+import org.graylog.plugins.messageprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
 import org.graylog2.plugin.Message;
@@ -36,6 +36,8 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.param;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -65,7 +67,7 @@ public class RuleParserTest {
                 return FunctionDescriptor.<Boolean>builder()
                         .name("nein")
                         .returnType(Boolean.class)
-                        .params(ImmutableList.of())
+                        .params(of())
                         .build();
             }
         });
@@ -80,7 +82,7 @@ public class RuleParserTest {
                 return FunctionDescriptor.<Boolean>builder()
                         .name("doch")
                         .returnType(Boolean.class)
-                        .params(ImmutableList.of())
+                        .params(of())
                         .build();
             }
         });
@@ -95,7 +97,7 @@ public class RuleParserTest {
                 return FunctionDescriptor.<Double>builder()
                         .name("double_valued_func")
                         .returnType(Double.class)
-                        .params(ImmutableList.of())
+                        .params(of())
                         .build();
             }
         });
@@ -110,7 +112,7 @@ public class RuleParserTest {
                 return FunctionDescriptor.<String>builder()
                         .name("one_arg")
                         .returnType(String.class)
-                        .params(ImmutableList.of(ParameterDescriptor.string("one")))
+                        .params(of(ParameterDescriptor.string("one")))
                         .build();
             }
         });
@@ -128,7 +130,7 @@ public class RuleParserTest {
                 return FunctionDescriptor.<String>builder()
                         .name("concat")
                         .returnType(String.class)
-                        .params(ImmutableList.of(
+                        .params(of(
                                 ParameterDescriptor.string("one"),
                                 ParameterDescriptor.object("two"),
                                 ParameterDescriptor.object("three")
@@ -148,7 +150,27 @@ public class RuleParserTest {
                 return FunctionDescriptor.<Void>builder()
                         .name("trigger_test")
                         .returnType(Void.class)
-                        .params(ImmutableList.of())
+                        .params(of())
+                        .build();
+            }
+        });
+        functions.put("optional", new Function<Boolean>() {
+            @Override
+            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                return true;
+            }
+
+            @Override
+            public FunctionDescriptor<Boolean> descriptor() {
+                return FunctionDescriptor.<Boolean>builder()
+                        .name("optional")
+                        .returnType(Boolean.class)
+                        .params(of(
+                                ParameterDescriptor.bool("a"),
+                                ParameterDescriptor.string("b"),
+                                param().floating("c").optional().build(),
+                                ParameterDescriptor.integer("d")
+                        ))
                         .build();
             }
         });
@@ -286,6 +308,26 @@ public class RuleParserTest {
         evaluateRule(rule, message);
 
         assertTrue(actionsTriggered.get());
+    }
+
+    @Test
+    public void optionalArguments() throws Exception {
+        final Rule rule = parser.parseRule(ruleForTest());
+
+        Message message = new Message("hello test", "source", DateTime.now());
+        evaluateRule(rule, message);
+        assertTrue(actionsTriggered.get());
+    }
+
+    @Test
+    public void optionalParamsMustBeNamed() throws Exception {
+        try {
+            parser.parseRule(ruleForTest());
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().stream().count());
+            assertTrue(e.getErrors().stream().allMatch(error -> error instanceof OptionalParametersMustBeNamed));
+        }
+
     }
 
     private Message evaluateRule(Rule rule, Message message) {

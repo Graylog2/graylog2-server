@@ -1,5 +1,6 @@
 package org.graylog.plugins.messageprocessor.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -38,6 +39,8 @@ import org.graylog.plugins.messageprocessor.ast.statements.VarAssignStatement;
 import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleType;
 import org.graylog.plugins.messageprocessor.parser.errors.IncompatibleTypes;
+import org.graylog.plugins.messageprocessor.parser.errors.MissingRequiredParam;
+import org.graylog.plugins.messageprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.messageprocessor.parser.errors.ParseError;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.messageprocessor.parser.errors.UndeclaredVariable;
@@ -134,28 +137,53 @@ public class RuleParser {
             if (function == null) {
                 parseContext.addError(new UndeclaredFunction(ctx));
             } else {
+                final ImmutableList<ParameterDescriptor> params = function.descriptor().params();
+                final boolean hasOptionalParams = params.stream().anyMatch(ParameterDescriptor::optional);
+
                 // convert null key, single arg style to default named args for single arg functions
                 if (args != null) {
-                    if (args.containsKey(null) && function.descriptor().params().size() == 1) {
+                    if (args.containsKey(null) && params.size() == 1) {
                         final Expression argExpr = args.remove(null);
-                        final ParameterDescriptor param = function.descriptor().params().get(0);
+                        final ParameterDescriptor param = params.get(0);
                         args.put(param.name(), argExpr);
                     }
-                    // check for the right number of arguments to the function
-                    if (function.descriptor().params().size() != args.size()) {
+
+                    // check for the right number of arguments to the function if the function only has required params
+                    if (!hasOptionalParams && params.size() != args.size()) {
                         parseContext.addError(new WrongNumberOfArgs(ctx, function, args.size()));
+                    } else {
+                        // there are optional parameters, check that all required ones are present
+                        final Map<String, Expression> givenArguments = args;
+                        final List<ParameterDescriptor> missingParams =
+                                params.stream()
+                                        .filter(p -> !p.optional())
+                                        .map(p -> givenArguments.containsKey(p.name()) ? null : p)
+                                        .filter(p -> p != null)
+                                        .collect(Collectors.toList());
+                        for (ParameterDescriptor param : missingParams) {
+                            parseContext.addError(new MissingRequiredParam(ctx, function, param));
+                        }
+
                     }
                 } else if (positionalArgs != null) {
                     // use descriptor to turn positional arguments into a map
                     args = Maps.newHashMap();
-                    if (positionalArgs.size() != function.descriptor().params().size()) {
+                    if (!hasOptionalParams && positionalArgs.size() != params.size()) {
                         parseContext.addError(new WrongNumberOfArgs(ctx, function, positionalArgs.size()));
                     }
-                    int i = 0;
-                    for (ParameterDescriptor p : function.descriptor().params()) {
-                        final Expression argExpr = positionalArgs.get(i);
-                        args.put(p.name(), argExpr);
-                        i++;
+                    if (hasOptionalParams) {
+                        parseContext.addError(new OptionalParametersMustBeNamed(ctx, function));
+                    } else {
+                        int i = 0;
+                        for (ParameterDescriptor p : params) {
+                            if (i >= params.size()) {
+                                // avoid index out of bounds, we've added an error anyway
+                                break;
+                            }
+                            final Expression argExpr = positionalArgs.get(i);
+                            args.put(p.name(), argExpr);
+                            i++;
+                        }
                     }
                 }
             }
@@ -210,7 +238,8 @@ public class RuleParser {
             } else if (expr.getType().equals(Boolean.class)) {
                 condition = new BooleanValuedFunctionWrapper(expr);
             } else {
-                throw new RuntimeException("Unable to create condition, this is a bug");
+                condition = new BooleanExpression(false);
+                log.debug("Unable to create condition, replacing with 'false'");
             }
             ruleBuilder.when(condition);
             ruleBuilder.then(parseContext.statements);

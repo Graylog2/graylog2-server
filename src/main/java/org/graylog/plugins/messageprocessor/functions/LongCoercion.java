@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.builder;
+import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.param;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.object;
 
 public class LongCoercion implements Function<Long> {
@@ -35,7 +35,7 @@ public class LongCoercion implements Function<Long> {
                 .returnType(Long.class)
                 .params(of(
                         object(VALUE),
-                        builder().name(DEFAULT).type(Long.class).build()
+                        param().name(DEFAULT).type(Long.class).build()
                         ))
                 .build();
     }

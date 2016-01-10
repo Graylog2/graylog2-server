@@ -15,12 +15,13 @@ public class BooleanValuedFunctionWrapper implements LogicalExpression {
 
     @Override
     public boolean evaluateBool(EvaluationContext context, Message message) {
-        return (Boolean) expr.evaluate(context, message);
+        final Object value = expr.evaluate(context, message);
+        return value != null && (Boolean) value;
     }
 
     @Override
     public boolean isConstant() {
-        return false;
+        return expr.isConstant();
     }
 
     @Override
