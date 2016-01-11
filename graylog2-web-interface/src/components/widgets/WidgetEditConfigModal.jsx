@@ -1,7 +1,11 @@
-/* global momentHelper */
 import React from 'react';
 import { Input } from 'react-bootstrap';
-import S from 'string';
+
+import DateTime from 'logic/datetimes/DateTime';
+
+import StringUtils from 'util/StringUtils';
+import ObjectUtils from 'util/ObjectUtils';
+import NumberUtils from 'util/NumberUtils';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
@@ -18,8 +22,8 @@ const WidgetEditConfigModal = React.createClass({
     return {
       description: this.props.widget.description,
       type: this.props.widget.type,
-      cacheTime: this.props.widget.cacheTime,
-      config: this.props.widget.config,
+      cache_time: this.props.widget.cache_time,
+      config: ObjectUtils.clone(this.props.widget.config), // clone config to not modify it accidentally
       errors: {},
     };
   },
@@ -52,12 +56,13 @@ const WidgetEditConfigModal = React.createClass({
     this.setState({description: event.target.value});
   },
   _onCacheTimeChange(event) {
-    this.setState({cacheTime: event.target.value});
+    const numericValue = NumberUtils.isNumber(event.target.value) ? Number(event.target.value) : undefined;
+    this.setState({cache_time: numericValue});
   },
   _onConfigurationChange(key, value) {
-    const config = this.state.config;
-    config[key] = value;
-    this.setState({config: config});
+    const newConfig = ObjectUtils.clone(this.state.config);
+    newConfig[key] = value;
+    this.setState({config: newConfig});
   },
   _onQueryChange(event) {
     this._onConfigurationChange('query', event.target.value);
@@ -67,39 +72,47 @@ const WidgetEditConfigModal = React.createClass({
       this._onConfigurationChange(key, event.target.checked);
     };
   },
+  _onTimeRangeParamChange(key, value) {
+    const newTimeRange = ObjectUtils.clone(this.state.config.timerange);
+    newTimeRange[key] = value;
+    this._onConfigurationChange('timerange', newTimeRange);
+  },
   _onRelativeTimeRangeChange(event) {
-    this._onConfigurationChange('range', event.target.value);
+    const numericValue = NumberUtils.isNumber(event.target.value) ? Number(event.target.value) : undefined;
+    this._onTimeRangeParamChange('range', numericValue);
   },
   _onAbsoluteTimeRangeFromChange(event) {
-    const from = momentHelper.parseUserLocalFromString(event.target.value);
-    const hasError = !from.isValid();
+    const errors = ObjectUtils.clone(this.state.errors);
 
-    // FIXME: operating on referenced state object
-    const errors = this.state.errors;
-    errors.from = hasError;
-    this.setState({errors: errors});
-    if (!hasError) {
-      this._onConfigurationChange('from', from.tz('utc').format());
+    try {
+      const from = DateTime.parseFromString(event.target.value).toISOString();
+      this._onTimeRangeParamChange('from', from);
+      errors.from = false;
+    } catch (e) {
+      errors.from = true;
     }
+
+    this.setState({errors: errors});
   },
   _onAbsoluteTimeRangeToChange(event) {
-    const to = momentHelper.parseUserLocalFromString(event.target.value);
-    const hasError = !to.isValid();
+    const errors = ObjectUtils.clone(this.state.errors);
 
-    // FIXME: operating on referenced state object
-    const errors = this.state.errors;
-    errors.to = hasError;
-    this.setState({errors: errors});
-    if (!hasError) {
-      this._onConfigurationChange('to', to.tz('utc').format());
+    try {
+      const to = DateTime.parseFromString(event.target.value).toISOString();
+      this._onTimeRangeParamChange('to', to);
+      errors.to = false;
+    } catch (e) {
+      errors.to = true;
     }
+
+    this.setState({errors: errors});
   },
   _onKeywordTimeRangeChange(event) {
-    this._onConfigurationChange('keyword', event.target.value);
+    this._onTimeRangeParamChange('keyword', event.target.value);
   },
   _onSeriesChange(seriesNo, field) {
     return (event) => {
-      const newSeries = this.state.config.series;
+      const newSeries = ObjectUtils.clone(this.state.config.series);
       newSeries[seriesNo][field] = event.target.value;
 
       this._onConfigurationChange('series', newSeries);
@@ -111,14 +124,18 @@ const WidgetEditConfigModal = React.createClass({
     };
   },
   _formatDateTime(dateTime) {
-    return momentHelper.toUserTimeZone(dateTime).format(momentHelper.DATE_FORMAT_NO_MS);
+    try {
+      return DateTime.parseFromString(dateTime).toString();
+    } catch (e) {
+      return dateTime;
+    }
   },
   _getTimeRangeFormControls() {
     const rangeTypeSelector = (
       <Input type="text"
              label="Time range type"
              disabled
-             value={S(this.state.config.timerange.type).capitalize()}
+             value={StringUtils.capitalizeFirstLetter(this.state.config.timerange.type)}
              help="Type of time range to use in the widget."/>
     );
 
@@ -143,14 +160,14 @@ const WidgetEditConfigModal = React.createClass({
                    label="Search from"
                    required
                    bsStyle={this.state.errors.from === true ? 'error' : null}
-                   defaultValue={this._formatDateTime(this.state.config.from)}
+                   defaultValue={this._formatDateTime(this.state.config.timerange.from)}
                    onChange={this._onAbsoluteTimeRangeFromChange}
                    help="Earliest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
             <Input type="text"
                    label="Search to"
                    required
                    bsStyle={this.state.errors.to === true ? 'error' : null}
-                   defaultValue={this._formatDateTime(this.state.config.to)}
+                   defaultValue={this._formatDateTime(this.state.config.timerange.to)}
                    onChange={this._onAbsoluteTimeRangeToChange}
                    help="Latest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
           </div>
@@ -161,7 +178,7 @@ const WidgetEditConfigModal = React.createClass({
           <Input type="text"
                  label="Search keyword"
                  required
-                 defaultValue={this.state.config.keyword}
+                 defaultValue={this.state.config.timerange.keyword}
                  onChange={this._onKeywordTimeRangeChange}
                  help="Search keyword representing the time to be included in the search. E.g. last day"/>
         );
@@ -327,7 +344,7 @@ const WidgetEditConfigModal = React.createClass({
                  min="1"
                  required
                  label="Cache time"
-                 defaultValue={this.state.cacheTime}
+                 defaultValue={this.state.cache_time}
                  onChange={this._onCacheTimeChange}
                  help="Number of seconds the widget value will be cached."/>
           {this._getTimeRangeFormControls()}
