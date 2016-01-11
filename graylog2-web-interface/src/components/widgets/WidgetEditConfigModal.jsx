@@ -191,7 +191,7 @@ const WidgetEditConfigModal = React.createClass({
       );
     }
 
-    switch (this.state.type) {
+    switch (this.state.type.toUpperCase()) {
       case this.props.widgetTypes.STATS_COUNT:
         const defaultStatisticalFunction = this.state.config.stats_function === 'stddev' ? 'std_deviation' : this.state.config.stats_function;
         controls.push(

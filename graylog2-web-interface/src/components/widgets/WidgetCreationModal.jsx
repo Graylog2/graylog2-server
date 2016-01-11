@@ -88,7 +88,7 @@ const WidgetCreationModal = React.createClass({
   _getDefaultWidgetTitle() {
     let title = '';
 
-    switch (this.props.widgetType) {
+    switch (this.props.widgetType.toUpperCase()) {
       case Widget.Type.SEARCH_RESULT_COUNT:
         title = 'message count';
         break;
