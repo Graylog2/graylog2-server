@@ -24,14 +24,14 @@ const WidgetConfigModal = React.createClass({
     if (this.props.boundToStream) {
       basicConfigurationMessage = (
         <p>
-          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cacheTime} seconds.&nbsp;
+          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cache_time} seconds.&nbsp;
           Widget is bound to stream {this.props.widget.config.stream_id}.
         </p>
       );
     } else {
       basicConfigurationMessage = (
         <p>
-          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cacheTime} seconds.&nbsp;
+          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cache_time} seconds.&nbsp;
           Widget is <strong>not</strong> bound to a stream.
         </p>
       );
