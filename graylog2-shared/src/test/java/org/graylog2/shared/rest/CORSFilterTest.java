@@ -44,6 +44,8 @@ public class CORSFilterTest {
         assertThat(responseHeaders.getFirst("Access-Control-Allow-Credentials")).isEqualTo(true);
         assertThat((String) responseHeaders.getFirst("Access-Control-Allow-Headers"))
                 .contains("Authorization", "Content-Type", "X-Graylog2-No-Session-Extension");
+        assertThat((String) responseHeaders.getFirst("Access-Control-Allow-Methods"))
+                .contains("GET", "POST", "PUT", "DELETE", "OPTIONS");
     }
 
     @Test
