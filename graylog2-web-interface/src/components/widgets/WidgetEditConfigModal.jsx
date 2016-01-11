@@ -16,7 +16,7 @@ const WidgetEditConfigModal = React.createClass({
   },
   getInitialState() {
     return {
-      title: this.props.widget.title,
+      description: this.props.widget.description,
       type: this.props.widget.type,
       cacheTime: this.props.widget.cacheTime,
       config: this.props.widget.config,
@@ -49,7 +49,7 @@ const WidgetEditConfigModal = React.createClass({
     this.hide();
   },
   _onTitleChange(event) {
-    this.setState({title: event.target.value});
+    this.setState({description: event.target.value});
   },
   _onCacheTimeChange(event) {
     this.setState({cacheTime: event.target.value});
@@ -311,7 +311,7 @@ const WidgetEditConfigModal = React.createClass({
   render() {
     return (
       <BootstrapModalForm ref="editModal"
-                          title={`Edit widget "${this.state.title}"`}
+                          title={`Edit widget "${this.state.description}"`}
                           onSubmitForm={this.save}
                           onModalClose={this.props.onModalHidden}
                           submitButtonText="Update">
@@ -319,7 +319,7 @@ const WidgetEditConfigModal = React.createClass({
           <Input type="text"
                  label="Title"
                  required
-                 defaultValue={this.state.title}
+                 defaultValue={this.state.description}
                  onChange={this._onTitleChange}
                  help="Type a name that describes your widget."
                  autoFocus />
