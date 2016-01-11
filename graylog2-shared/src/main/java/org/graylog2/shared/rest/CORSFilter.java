@@ -19,19 +19,19 @@ package org.graylog2.shared.rest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class CORSFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        String origin = requestContext.getHeaders().getFirst("Origin");
+        final MultivaluedMap<String, String> headers = requestContext.getHeaders();
+        final String origin = headers.getFirst("Origin");
         if (origin != null && !origin.isEmpty()) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
             responseContext.getHeaders().add("Access-Control-Allow-Credentials", true);
-            responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization");
+            responseContext.getHeaders().add("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Graylog2-No-Session-Extension");
+            responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         }
     }
 }
