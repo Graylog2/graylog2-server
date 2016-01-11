@@ -507,7 +507,7 @@
             <dependency>
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
-                <version>3.5.7</version>
+                <version>3.6.0</version>
             </dependency>
 
             <dependency>
