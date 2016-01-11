@@ -6,11 +6,12 @@ import dc from 'dc';
 import d3 from 'd3';
 import jQuery from 'jquery';
 
+import DateTime from 'logic/datetimes/DateTime';
+
 import D3Utils from 'util/D3Utils';
 import NumberUtils from 'util/NumberUtils';
 
 import graphHelper from 'legacy/graphHelper';
-import momentHelper from 'legacy/moment-helper';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap.min.js');
@@ -78,7 +79,7 @@ const GraphVisualization = React.createClass({
   getInitialState() {
     this.triggerRender = true;
     this.graphData = crossfilter();
-    this.dimension = this.graphData.dimension((d) => momentHelper.toUserTimeZone(d.x * 1000));
+    this.dimension = this.graphData.dimension((d) => d.x * 1000);
     this.group = this.dimension.group().reduceSum((d) => d.y);
 
     return {
@@ -111,7 +112,7 @@ const GraphVisualization = React.createClass({
     });
   },
   _formatTooltipTitle(d) {
-    const formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.HUMAN_TZ);
+    const formattedKey = d.x === undefined ? d.x : new DateTime(d.x).toString(DateTime.Formats.COMPLETE);
 
     let formattedValue;
     try {

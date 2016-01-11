@@ -5,9 +5,10 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 
+import DateTime from 'logic/datetimes/DateTime';
+
 import D3Utils from 'util/D3Utils';
 
-import momentHelper from 'legacy/moment-helper';
 import graphHelper from 'legacy/graphHelper';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
@@ -23,7 +24,7 @@ const HistogramVisualization = React.createClass({
   getInitialState() {
     this.triggerRender = true;
     this.histogramData = crossfilter();
-    this.dimension = this.histogramData.dimension((d) => momentHelper.toUserTimeZone(d.x * 1000));
+    this.dimension = this.histogramData.dimension((d) => d.x * 1000);
     this.group = this.dimension.group().reduceSum((d) => d.y);
 
     return {
@@ -89,7 +90,7 @@ const HistogramVisualization = React.createClass({
       .on('renderlet', () => {
         const formatTitle = (d) => {
           const valueText = `${numeral(d.y).format('0,0')} messages`;
-          const keyText = `<span class="date">${d.x.format(momentHelper.HUMAN_TZ)}</span>`;
+          const keyText = `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`;
 
           return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
         };
