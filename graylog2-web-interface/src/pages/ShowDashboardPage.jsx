@@ -90,8 +90,11 @@ const ShowDashboardPage = React.createClass({
 
     return dimensions;
   },
+  _dashboardIsEmpty(dashboard) {
+    return dashboard.widgets.length === 0;
+  },
   formatDashboard(dashboard) {
-    if (dashboard.widgets.length === 0) {
+    if (this._dashboardIsEmpty(dashboard)) {
       return this.emptyDashboard();
     }
 
@@ -193,7 +196,7 @@ const ShowDashboardPage = React.createClass({
       <span>
         <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
         &nbsp;
-        {!this.state.locked &&
+        {!this.state.locked && !this._dashboardIsEmpty(dashboard) &&
         <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
                                    description={dashboard.description} buttonClass="btn-info btn-xs">
           <i className="fa fa-pencil"/>
