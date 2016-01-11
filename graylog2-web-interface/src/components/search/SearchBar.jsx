@@ -158,8 +158,8 @@ const SearchBar = React.createClass({
       const fromInput = this.refs.fromFormatted.getValue();
       const toInput = this.refs.toFormatted.getValue();
 
-      this.refs.from.getInputDOMNode().value = DateTime.parseFromString(fromInput).toISOString();;
-      this.refs.to.getInputDOMNode().value = DateTime.parseFromString(toInput).toISOString();;
+      this.refs.from.getInputDOMNode().value = DateTime.parseFromString(fromInput).toISOString();
+      this.refs.to.getInputDOMNode().value = DateTime.parseFromString(toInput).toISOString();
     }
 
     this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
