@@ -36,6 +36,10 @@ const AddToDashboardMenu = React.createClass({
   _saveWidget(title, configuration) {
     let widgetConfig = Immutable.Map(this.props.configuration);
     let searchParams = Immutable.Map(this.searchParams);
+    // Changes the "relative" key used to store relative time-range to "range"
+    if (searchParams.has('relative')) {
+      searchParams = searchParams.set('range', searchParams.get('relative')).delete('relative');
+    }
     // Stores stream ID with the right key name for the add widget request
     if (searchParams.has('streamId')) {
       searchParams = searchParams.set('stream_id', searchParams.get('streamId')).delete('streamId');
