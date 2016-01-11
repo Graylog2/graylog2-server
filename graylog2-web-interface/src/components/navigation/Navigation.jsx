@@ -92,6 +92,16 @@ const Navigation = React.createClass({
           </LinkContainer>
         );
       });
+
+    const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+      .map((pluginRoute) => {
+        return (
+          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+            <NavItem>{pluginRoute.description}</NavItem>
+          </LinkContainer>
+        );
+      });
+
     return (
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
@@ -172,6 +182,7 @@ const Navigation = React.createClass({
                 <MenuItem>Grok Patterns</MenuItem>
               </LinkContainer>
               }
+              {pluginSystemNavigations}
             </NavDropdown>
           </Nav>
 
