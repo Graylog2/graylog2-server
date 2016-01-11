@@ -26,6 +26,7 @@
     "history": "^1.17.0",
     "immutable": "^3.7.5",
     "javascript-natural-sort": "^0.7.1",
+    "jquery-ui": "^1.10.5",
     "markdown": "^0.5.0",
     "md5": "^2.0.0",
     "moment": "2.10.6",

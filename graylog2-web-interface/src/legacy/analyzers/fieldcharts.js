@@ -1,4 +1,5 @@
-import jQuery from 'jquery'; // We need to use this jQuery to send custom events
+import jQuery from 'jquery';
+import jQueryUI from 'jquery-ui';
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
@@ -13,10 +14,6 @@ import fetch from 'logic/rest/FetchProvider';
 import jsRoutes from 'routing/jsRoutes';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
-
-// We need to require the other jQuery to make jQuery UI work :/
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/jquery-ui.min.js');
 
 function generateShortId() {
     return Math.random().toString(36).substr(2, 9);
@@ -134,16 +131,16 @@ export const FieldChart = {
 
     _onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, data) {
         if (opts.query.trim().length > 0) {
-            $(".field-graph-query", $graphContainer).text(opts.query);
+            jQuery(".field-graph-query", $graphContainer).text(opts.query);
         } else {
-            $(".field-graph-query", $graphContainer).text("*");
+            jQuery(".field-graph-query", $graphContainer).text("*");
         }
 
         var lines = [];
         lines.push(JSON.stringify(opts));
         $graphContainer.attr("data-lines", lines);
 
-        $(".type-description", $graphContainer).text("[" + GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype) + "] " + opts.field + ", ");
+        jQuery(".type-description", $graphContainer).text("[" + GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype) + "] " + opts.field + ", ");
 
         // Do not add from time when we search in all messages
         var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
@@ -214,9 +211,9 @@ export const FieldChart = {
             scope: "#field-graphs",
             revert: "invalid", // return to position when not dropped on a droppable.
             opacity: 0.5,
-            containment: $("#field-graphs"),
+            containment: jQuery("#field-graphs"),
             axis: "y",
-            snap: $(".field-graph-container"),
+            snap: jQuery(".field-graph-container"),
             snapMode: "inner"
         });
 
@@ -228,27 +225,27 @@ export const FieldChart = {
             tolerance: "intersect",
             activate(event, ui) {
                 // Show merge hints on all charts except the dragged one when dragging starts.
-                $("#field-graphs .merge-hint").not($(".merge-hint", ui.draggable)).show();
+                jQuery("#field-graphs .merge-hint").not(jQuery(".merge-hint", ui.draggable)).show();
             },
             deactivate() {
                 // Hide all merge hints when dragging stops.
-                $("#field-graphs .merge-hint").hide();
+                jQuery("#field-graphs .merge-hint").hide();
             },
             over() {
-                $(this).css("background-color", "#C7E2ED");
-                $(".merge-hint span", $(this)).switchClass("alpha80", "merge-drop-ready");
+                jQuery(this).css("background-color", "#C7E2ED");
+                jQuery(".merge-hint span", jQuery(this)).switchClass("alpha80", "merge-drop-ready");
             },
             out() {
-                $(this).css("background-color", "#fff");
-                $(".merge-hint span", $(this)).switchClass("merge-drop-ready", "alpha80");
+                jQuery(this).css("background-color", "#fff");
+                jQuery(".merge-hint span", jQuery(this)).switchClass("merge-drop-ready", "alpha80");
             },
             drop(event, ui) {
                 // Merge charts.
-                var target = $(this).attr("data-chart-id");
+                var target = jQuery(this).attr("data-chart-id");
                 var dragged = ui.draggable.attr("data-chart-id");
 
                 ui.draggable.hide();
-                $(this).css("background-color", "#fff");
+                jQuery(this).css("background-color", "#fff");
 
                 that._mergeCharts(target, dragged);
             },
@@ -259,7 +256,7 @@ export const FieldChart = {
         if (error.additional && error.additional.status === 400) {
             sendFailureEvent(opts.chartid, "Field graphs are only available for numeric fields.");
         } else {
-            var alert = $('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
+            var alert = jQuery('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
             $graphElement.html(alert);
             const errorMessage = (error.additional ? ` with status ${error.additional.status}` : ` with error: ${error.message}`);
             UserNotification.error(`Loading field graph for '${opts.field}' failed ${errorMessage}`);
@@ -284,23 +281,23 @@ export const FieldChart = {
     },
 
     _insertSpinner($graphContainer) {
-        var spinnerElement = $(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
+        var spinnerElement = jQuery(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
         $graphContainer.append(spinnerElement);
     },
 
     _deleteSpinner($graphContainer) {
-        $(".spinner", $graphContainer).remove();
+        jQuery(".spinner", $graphContainer).remove();
     },
 
     renderFieldChart(opts, graphContainer, renderingOptions) {
         var field = opts.field;
-        var $graphContainer = $(graphContainer);
+        var $graphContainer = jQuery(graphContainer);
 
         this._insertSpinner($graphContainer);
 
         // Delete a possibly already existing graph to manage updates.
-        var $graphElement = $('.field-graph', $graphContainer);
-        var $graphYAxis = $('.field-graph-y-axis', $graphContainer);
+        var $graphElement = jQuery('.field-graph', $graphContainer);
+        var $graphYAxis = jQuery('.field-graph-y-axis', $graphContainer);
         $graphElement.html("");
         $graphYAxis.html("");
         $graphYAxis.hide();
@@ -401,7 +398,7 @@ export const FieldChart = {
         var targetChart = this.fieldGraphs[targetId];
         var draggedChart = this.fieldGraphs[draggedId];
 
-        var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
+        var targetElem = jQuery('.field-graph-container[data-chart-id="' + targetId + '"]');
 
         for (var i = 0; i < draggedChart.series.length; i++) {
             var lineColor = this.palette.color();
@@ -417,7 +414,7 @@ export const FieldChart = {
               + "<span class=\"type-description\">[" + StringUtils.escapeHTML(series.valuetype) + "] " + series.field + ", </span> "
               + "Query: <span class='field-graph-query'>" + StringUtils.escapeHTML(query) + "</span>";
 
-            $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
+            jQuery("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
 
             var addSeries = {
                 name: "value" + i,
@@ -443,7 +440,7 @@ export const FieldChart = {
 
     stackGraphs(targetGraphId, sourceGraphId) {
         this._mergeCharts(targetGraphId, sourceGraphId);
-        const sourceGraphElement = $('.field-graph-container[data-chart-id="' + sourceGraphId + '"]');
+        const sourceGraphElement = jQuery('.field-graph-container[data-chart-id="' + sourceGraphId + '"]');
         sourceGraphElement.hide();
     },
 };
@@ -466,37 +463,37 @@ function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
 }
 
 // Changing type of value graphs.
-$(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
+jQuery(document).on("click", ".field-graph-container ul.renderer-selector li a", function (e) {
     e.preventDefault();
 
-    var graphContainer = $(this).closest(".field-graph-container");
-    var type = $(this).attr("data-type");
+    var graphContainer = jQuery(this).closest(".field-graph-container");
+    var type = jQuery(this).attr("data-type");
     FieldChart.changeRenderer(graphContainer, type);
 });
 
 // Changing interpolation of value graphs.
-$(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
+jQuery(document).on("click", ".field-graph-container ul.interpolation-selector li a", function (e) {
     e.preventDefault();
 
-    var graphContainer = $(this).closest(".field-graph-container");
-    var interpolation = $(this).attr('data-type');
+    var graphContainer = jQuery(this).closest(".field-graph-container");
+    var interpolation = jQuery(this).attr('data-type');
     FieldChart.changeInterpolation(graphContainer, interpolation);
 });
 
 // Changing interval of value graphs.
-$(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
+jQuery(document).on("click", ".field-graph-container ul.interval-selector li a", function (e) {
     e.preventDefault();
 
-    var graphContainer = $(this).closest(".field-graph-container");
-    var interval = $(this).attr("data-type");
+    var graphContainer = jQuery(this).closest(".field-graph-container");
+    var interval = jQuery(this).attr("data-type");
     FieldChart.changeResolution(graphContainer, interval);
 });
 
 // Changing value type of value graphs.
-$(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
+jQuery(document).on("click", ".field-graph-container ul.valuetype-selector li a", function (e) {
     e.preventDefault();
 
-    var graphContainer = $(this).closest(".field-graph-container");
-    var valuetype = $(this).attr("data-type");
+    var graphContainer = jQuery(this).closest(".field-graph-container");
+    var valuetype = jQuery(this).attr("data-type");
     FieldChart.changeStatisticalFunction(graphContainer, valuetype);
 });
