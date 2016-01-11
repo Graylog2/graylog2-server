@@ -86,7 +86,7 @@ public class DashboardWidgetCreator {
         final TimeRange timeRange;
         switch (rangeType) {
             case "relative":
-                timeRange = new RelativeRange(Integer.parseInt(String.valueOf(timerangeConfig.get("relative"))));
+                timeRange = new RelativeRange(Integer.parseInt(String.valueOf(timerangeConfig.get("range"))));
                 break;
             case "keyword":
                 timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
