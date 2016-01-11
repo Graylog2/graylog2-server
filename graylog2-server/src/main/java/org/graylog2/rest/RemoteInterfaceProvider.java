@@ -17,16 +17,15 @@
 package org.graylog2.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.graylog2.cluster.Node;
-import retrofit.JacksonConverterFactory;
-import retrofit.Retrofit;
+import retrofit2.JacksonConverterFactory;
+import retrofit2.Retrofit;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 public class RemoteInterfaceProvider {
     private final ObjectMapper objectMapper;
@@ -40,23 +39,21 @@ public class RemoteInterfaceProvider {
     }
 
     public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
-        final OkHttpClient okHttpClient = this.okHttpClient.clone();
-        okHttpClient.interceptors().add(new Interceptor() {
-            @Override
-            public Response intercept(Interceptor.Chain chain) throws IOException {
-                final Request original = chain.request();
+        final OkHttpClient okHttpClient = this.okHttpClient.newBuilder()
+                .addInterceptor(chain -> {
+                    final Request original = chain.request();
 
-                Request.Builder builder = original.newBuilder()
-                        .header("Accept", "application/json")
-                        .method(original.method(), original.body());
+                    Request.Builder builder = original.newBuilder()
+                            .header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString())
+                            .method(original.method(), original.body());
 
-                if (authorizationToken != null) {
-                    builder = builder.header("Authorization", authorizationToken);
-                }
+                    if (authorizationToken != null) {
+                        builder = builder.header(HttpHeaders.AUTHORIZATION, authorizationToken);
+                    }
 
-                return chain.proceed(builder.build());
-            }
-        });
+                    return chain.proceed(builder.build());
+                })
+                .build();
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(node.getTransportAddress())
                 .addConverterFactory(JacksonConverterFactory.create(objectMapper))

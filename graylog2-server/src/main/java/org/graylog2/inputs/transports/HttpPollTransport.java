@@ -23,10 +23,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -126,12 +126,7 @@ public class HttpPollTransport extends ThrottleableTransport {
 
     @Override
     public void doLaunch(final MessageInput input) throws MisfireException {
-        serverStatus.awaitRunning(new Runnable() {
-            @Override
-            public void run() {
-                lifecycleStateChange(Lifecycle.RUNNING);
-            }
-        });
+        serverStatus.awaitRunning(() -> lifecycleStateChange(Lifecycle.RUNNING));
 
         // listen for lifecycle changes
         serverEventBus.register(this);
@@ -151,34 +146,30 @@ public class HttpPollTransport extends ThrottleableTransport {
         }
         remoteAddress = remoteAddress1;
 
+        final Runnable task = () -> {
+            if (paused) {
+                LOG.debug("Message processing paused, not polling HTTP resource {}.", url);
+                return;
+            }
+            if (isThrottled()) {
+                // this transport won't block, but we can simply skip this iteration
+                LOG.debug("Not polling HTTP resource {} because we are throttled.", url);
+            }
 
-        final Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                if (paused) {
-                    LOG.debug("Message processing paused, not polling HTTP resource {}.", url);
-                    return;
+            final Request.Builder requestBuilder = new Request.Builder().get()
+                    .url(url)
+                    .headers(Headers.of(headers));
+
+            try {
+                final Response r = httpClient.newCall(requestBuilder.build()).execute();
+
+                if (!r.isSuccessful()) {
+                    throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
                 }
-                if (isThrottled()) {
-                    // this transport won't block, but we can simply skip this iteration
-                    LOG.debug("Not polling HTTP resource {} because we are throttled.", url);
-                }
 
-                final Request.Builder requestBuilder = new Request.Builder().get()
-                        .url(url)
-                        .headers(Headers.of(headers));
-
-                try {
-                    final Response r = httpClient.newCall(requestBuilder.build()).execute();
-
-                    if (!r.isSuccessful()) {
-                        throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
-                    }
-
-                    input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
-                } catch (IOException e) {
-                    LOG.error("Could not fetch HTTP resource at " + url, e);
-                }
+                input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
+            } catch (IOException e) {
+                LOG.error("Could not fetch HTTP resource at " + url, e);
             }
         };
 

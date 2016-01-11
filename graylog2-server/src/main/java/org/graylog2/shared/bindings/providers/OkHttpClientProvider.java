@@ -17,7 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.squareup.okhttp.OkHttpClient;
+import okhttp3.OkHttpClient;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,10 +28,10 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
- * Provider for a configured {@link com.squareup.okhttp.OkHttpClient}.
+ * Provider for a configured {@link okhttp3.OkHttpClient}.
  *
  * @see org.graylog2.plugin.BaseConfiguration#getHttpConnectTimeout()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpReadTimeout()
@@ -50,25 +50,25 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
                                 @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
-        this.connectTimeout = checkNotNull(connectTimeout);
-        this.readTimeout = checkNotNull(readTimeout);
-        this.writeTimeout = checkNotNull(writeTimeout);
+        this.connectTimeout = requireNonNull(connectTimeout);
+        this.readTimeout = requireNonNull(readTimeout);
+        this.writeTimeout = requireNonNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
     }
 
     @Override
     public OkHttpClient get() {
-        final OkHttpClient client = new OkHttpClient();
-        client.setRetryOnConnectionFailure(true);
-        client.setConnectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit());
-        client.setWriteTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit());
-        client.setReadTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
+        final OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true)
+                .connectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit())
+                .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
+                .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());
 
         if (httpProxyUri != null) {
             final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort()));
-            client.setProxy(proxy);
+            clientBuilder.proxy(proxy);
         }
 
-        return client;
+        return clientBuilder.build();
     }
 }

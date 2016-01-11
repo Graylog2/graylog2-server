@@ -29,7 +29,7 @@ import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.Response;
+import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

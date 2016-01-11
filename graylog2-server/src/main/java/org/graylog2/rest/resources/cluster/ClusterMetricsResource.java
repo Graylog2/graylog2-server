@@ -34,7 +34,7 @@ import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.security.RestPermissions;
-import retrofit.Response;
+import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

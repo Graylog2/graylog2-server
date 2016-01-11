@@ -37,7 +37,7 @@ import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.Response;
+import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -88,10 +88,10 @@ public class ClusterInputStatesResource {
     @RequiresPermissions(RestPermissions.INPUTS_READ)
     public Map<String, Set<InputStateSummary>> get() {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, Set<InputStateSummary>> result = nodes.entrySet()
+        return nodes.entrySet()
                 .stream()
                 .parallel()
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
                             this.authenticationToken,
                             RemoteInputStatesResource.class);
@@ -107,7 +107,6 @@ public class ClusterInputStatesResource {
                     }
                     return Collections.emptySet();
                 }));
-        return result;
     }
 
     @PUT
@@ -119,10 +118,10 @@ public class ClusterInputStatesResource {
     })
     public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, Optional<InputCreated>> result = nodes.entrySet()
+        return nodes.entrySet()
                 .stream()
                 .parallel()
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
                             this.authenticationToken,
                             RemoteInputStatesResource.class);
@@ -138,7 +137,6 @@ public class ClusterInputStatesResource {
                     }
                     return Optional.absent();
                 }));
-        return result;
     }
 
     @DELETE
@@ -150,10 +148,10 @@ public class ClusterInputStatesResource {
     })
     public Map<String, Optional<InputDeleted>> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final Map<String, Node> nodes = nodeService.allActive();
-        final Map<String, Optional<InputDeleted>> result = nodes.entrySet()
+        return nodes.entrySet()
                 .stream()
                 .parallel()
-                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
                             this.authenticationToken,
                             RemoteInputStatesResource.class);
@@ -169,6 +167,5 @@ public class ClusterInputStatesResource {
                     }
                     return Optional.absent();
                 }));
-        return result;
     }
 }
