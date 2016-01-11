@@ -25,7 +25,6 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsCollectionContaining;
-import org.mockito.internal.matchers.Not;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,6 +32,8 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import static org.hamcrest.core.IsNot.not;
 
 public class BaseRestTestHelper {
     /**
@@ -89,21 +90,11 @@ public class BaseRestTestHelper {
     }
 
     public static ResponseAwareMatcher<Response> setContainsEntry(final String entry) {
-        return new ResponseAwareMatcher<Response>() {
-            @Override
-            public Matcher<?> matcher(Response response) throws Exception {
-                return IsCollectionContaining.hasItem(entry);
-            }
-        };
+        return response -> IsCollectionContaining.hasItem(entry);
     }
 
     public static ResponseAwareMatcher<Response> setDoesNotContain(final String entry) {
-        return new ResponseAwareMatcher<Response>() {
-            @Override
-            public Matcher<?> matcher(Response response) throws Exception {
-                return new Not(IsCollectionContaining.hasItem(entry));
-            }
-        };
+        return response -> not(IsCollectionContaining.hasItem(entry));
     }
     /**
      * Use this method to load a json file from the classpath.
@@ -195,7 +186,8 @@ public class BaseRestTestHelper {
                 @Override
                 public boolean matches(Object item) {
                     if (item instanceof Map) {
-                        final Set keySet = ((Map) item).keySet();
+                        @SuppressWarnings("unchecked")
+                        final Set<? extends String> keySet = ((Map) item).keySet();
                         difference = Sets.symmetricDifference(keySet, keys);
                         return difference.isEmpty();
                     }
