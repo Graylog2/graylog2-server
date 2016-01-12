@@ -45,7 +45,13 @@ const NodeListItem = React.createClass({
         </IfPermitted>
 
         <IfPermitted permissions="lbstatus:change">
-          <MenuItem>Override LB status</MenuItem>
+          <li className="dropdown-submenu left-submenu">
+            <a href="#">Override LB status</a>
+            <ul className="dropdown-menu">
+              <MenuItem>ALIVE</MenuItem>
+              <MenuItem>DEAD</MenuItem>
+            </ul>
+          </li>
         </IfPermitted>
 
         <IfPermitted permissions="node:shutdown">
