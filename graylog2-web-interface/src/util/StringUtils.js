@@ -11,6 +11,9 @@ const StringUtils = {
     this.tempDocument.innerHTML = text;
     return this.tempDocument.textContent;
   },
+  pluralize(number, singular, plural) {
+    return (number === 1 || number === '1' ? singular : plural);
+  },
 };
 
 export default StringUtils;

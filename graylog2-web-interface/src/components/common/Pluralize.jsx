@@ -1,5 +1,7 @@
 import React, {PropTypes} from 'react';
 
+import StringUtils from 'util/StringUtils';
+
 const Pluralize = React.createClass({
   propTypes: {
     singular: PropTypes.string.isRequired,
@@ -10,7 +12,7 @@ const Pluralize = React.createClass({
     ]).isRequired,
   },
   render() {
-    return <span>{this.props.value === 1 || this.props.value === '1' ? this.props.singular : this.props.plural}</span>;
+    return <span>{StringUtils.pluralize(this.props.value, this.props.singular, this.props.plural)}</span>;
   },
 });
 
