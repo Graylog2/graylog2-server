@@ -15,10 +15,10 @@ const webpackConfig = {
   entry: {
     app: APP_PATH,
     config: 'config.js',
+    vendor: ['react', 'react-bootstrap', 'react-router', 'reflux'],
   },
   output: {
     path: BUILD_PATH,
-    vendor: ['react', 'react-router', 'react-bootstrap'],
     filename: '[name].[hash].js',
     publicPath: '/',
   },
@@ -109,7 +109,7 @@ if (TARGET === 'test') {
 }
 
 if (TARGET === 'start' || TARGET === 'build') {
-  module.exports = merge(commonConfigs, module.exports);
+  module.exports = merge(module.exports, commonConfigs);
 }
 
 if (Object.keys(module.exports).length === 0) {
