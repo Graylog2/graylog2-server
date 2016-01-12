@@ -1,7 +1,7 @@
 import $ = require('jquery');
 import UserNotification = require('util/UserNotification');
 import URLUtils = require('util/URLUtils');
-import StringUtils = require('util/StringUtils');
+const StringUtils = require('util/StringUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface Source {
