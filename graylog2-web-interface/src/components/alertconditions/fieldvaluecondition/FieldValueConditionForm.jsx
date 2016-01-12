@@ -88,7 +88,7 @@ const FieldValueConditionForm = React.createClass({
         has a {this._formatCheckType()}
         <br />
         that was {this._formatThresholdType()} than{' '}
-        <input ref="threshold" name="threshold" type="number" className="form-control"
+        <input ref="threshold" name="threshold" step="0.01" type="number" className="form-control"
                defaultValue={alertCondition.threshold} required/>
         {' '}in the last{' '}
         <input ref="time" name="time" type="number" min="1" className="form-control"
