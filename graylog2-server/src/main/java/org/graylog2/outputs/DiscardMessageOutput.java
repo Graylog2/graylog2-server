@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -24,29 +27,29 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.journal.Journal;
 
-import java.util.List;
-import java.util.Locale;
 import javax.inject.Inject;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 
+import static com.codahale.metrics.MetricRegistry.name;
 
 public class DiscardMessageOutput implements MessageOutput {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final Journal journal;
+    private final Meter messagesDiscarded;
 
     @AssistedInject
     public DiscardMessageOutput(final Journal journal,
-				@Assisted Stream stream,
-				@Assisted Configuration configuration) {
-        this(journal);
+                                final MetricRegistry metricRegistry,
+                                @Assisted Stream stream,
+                                @Assisted Configuration configuration) {
+        this(journal, metricRegistry);
     }
 
     @Inject
-    public DiscardMessageOutput(final Journal journal) {
+    public DiscardMessageOutput(final Journal journal, final MetricRegistry metricRegistry) {
         this.journal = journal;
+        this.messagesDiscarded = metricRegistry.meter(name(this.getClass(), "messagesDiscarded"));
         isRunning.set(true);
     }
 
@@ -63,6 +66,7 @@ public class DiscardMessageOutput implements MessageOutput {
     @Override
     public void write(Message message) throws Exception {
         journal.markJournalOffsetCommitted(message.getJournalOffset());
+        messagesDiscarded.mark();
     }
 
     @Override
@@ -74,6 +78,7 @@ public class DiscardMessageOutput implements MessageOutput {
         }
 
         journal.markJournalOffsetCommitted(maxOffset);
+        messagesDiscarded.mark(messages.size());
     }
 
     public interface Factory extends MessageOutput.Factory<GelfOutput> {
