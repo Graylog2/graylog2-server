@@ -40,6 +40,7 @@ import LoggersPage from 'pages/LoggersPage';
 import GettingStartedPage from 'pages/GettingStartedPage';
 import ShowMetricsPage from 'pages/ShowMetricsPage';
 import ShowNodePage from 'pages/ShowNodePage';
+import NodesPage from 'pages/NodesPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -76,6 +77,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage}/>
             <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage}/>
             <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage}/>
+            <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage}/>
             <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
