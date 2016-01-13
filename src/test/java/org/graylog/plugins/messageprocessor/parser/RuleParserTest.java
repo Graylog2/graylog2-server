@@ -174,6 +174,21 @@ public class RuleParserTest {
                         .build();
             }
         });
+        functions.put("customObject", new Function<CustomObject>() {
+            @Override
+            public CustomObject evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+                return new CustomObject((String) args.get("default").evaluate(context, message));
+            }
+
+            @Override
+            public FunctionDescriptor<CustomObject> descriptor() {
+                return FunctionDescriptor.<CustomObject>builder()
+                        .name("customObject")
+                        .returnType(CustomObject.class)
+                        .params(of(ParameterDescriptor.string("default")))
+                        .build();
+            }
+        });
         functions.put(LongCoercion.NAME, new LongCoercion());
         functions.put(StringCoercion.NAME, new StringCoercion());
         functions.put(SetField.NAME, new SetField());
@@ -330,6 +345,17 @@ public class RuleParserTest {
 
     }
 
+    @Test
+    public void typedFieldAccess() throws Exception {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+            evaluateRule(rule, new Message("hallo", "test", DateTime.now()));
+            assertTrue("condition should be true", actionsTriggered.get());
+        } catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+
     private Message evaluateRule(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext();
         if (rule.when().evaluateBool(context, message)) {
@@ -360,4 +386,15 @@ public class RuleParserTest {
         }
     }
 
+    public static class CustomObject {
+        private final String id;
+
+        public CustomObject(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+    }
 }

@@ -98,7 +98,7 @@ When: W H E N;
 Then: T H E N;
 End: E N D;
 Let: L E T;
-MessageRef: '$message';
+MessageRef: 'message';
 
 Boolean
     :   'true'|'false'
