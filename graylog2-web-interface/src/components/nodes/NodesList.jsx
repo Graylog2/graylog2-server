@@ -19,7 +19,7 @@ const NodesList = React.createClass({
     const nodeIDs = Object.keys(nodes);
 
     return nodeIDs.map(nodeID => {
-      return <NodeListItem key={nodeID} node={nodes[nodeID]} permissions={this.props.permissions}/>;
+      return <NodeListItem key={nodeID} node={nodes[nodeID]}/>;
     });
   },
   render() {
