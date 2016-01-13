@@ -4,6 +4,7 @@ import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
 
 import { EntityListItem, IfPermitted, LinkToNode } from 'components/common';
 import SystemOverview from './SystemOverview';
+import JvmHeapUsage from './JvmHeapUsage';
 
 import Routes from 'routing/Routes';
 
@@ -79,6 +80,9 @@ const NodeListItem = React.createClass({
       <div>
         <Col md={3}>
           <SystemOverview information={this.props.systemOverview}/>
+        </Col>
+        <Col md={9}>
+          <JvmHeapUsage nodeId={this.props.node.node_id}/>
         </Col>
       </div>
     );
