@@ -24,6 +24,9 @@ const JvmHeapUsage = React.createClass({
 
     this.metricNames.forEach(metricName => MetricsActions.add(this.props.nodeId, metricName));
   },
+  componentWillUnmount() {
+    this.metricNames.forEach(metricName => MetricsActions.remove(this.props.nodeId, metricName));
+  },
   _extractMetricValues() {
     const nodeId = this.props.nodeId;
     const nodeMetrics = this.state.metrics[nodeId];
