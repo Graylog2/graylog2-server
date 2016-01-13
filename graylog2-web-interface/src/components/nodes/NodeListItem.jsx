@@ -1,14 +1,16 @@
 import React, {PropTypes} from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
 
 import { EntityListItem, IfPermitted, LinkToNode } from 'components/common';
+import SystemOverview from './SystemOverview';
 
 import Routes from 'routing/Routes';
 
 const NodeListItem = React.createClass({
   propTypes: {
     node: PropTypes.object.isRequired,
+    systemOverview: PropTypes.object.isRequired,
   },
   render() {
     const node = this.props.node;
@@ -48,8 +50,8 @@ const NodeListItem = React.createClass({
           <li className="dropdown-submenu left-submenu">
             <a href="#">Override LB status</a>
             <ul className="dropdown-menu">
-              <MenuItem>ALIVE</MenuItem>
-              <MenuItem>DEAD</MenuItem>
+              {this.props.systemOverview.lb_status !== 'alive' && <MenuItem>ALIVE</MenuItem>}
+              {this.props.systemOverview.lb_status !== 'dead' && <MenuItem>DEAD</MenuItem>}
             </ul>
           </li>
         </IfPermitted>
@@ -73,10 +75,19 @@ const NodeListItem = React.createClass({
       </DropdownButton>
     );
 
+    const additionalContent = (
+      <div>
+        <Col md={3}>
+          <SystemOverview information={this.props.systemOverview}/>
+        </Col>
+      </div>
+    );
+
     return (
       <EntityListItem key={`entry-list-${node.node_id}`}
                       title={title}
-                      actions={actions}/>
+                      actions={actions}
+                      contentRow={additionalContent}/>
     );
   },
 });
