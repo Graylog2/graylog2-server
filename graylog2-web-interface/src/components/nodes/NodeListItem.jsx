@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
+import { EntityListItem, IfPermitted, LinkToNode } from 'components/common';
 
 import Routes from 'routing/Routes';
 
