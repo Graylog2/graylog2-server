@@ -3,7 +3,8 @@ import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import { IndexRoute, Router, Route } from 'react-router';
-import {createHistory} from 'history';
+import { createHistory } from 'history';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 
@@ -44,6 +45,9 @@ import NodesPage from 'pages/NodesPage';
 
 const AppRouter = React.createClass({
   render() {
+    const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
+      return <Route key={pluginRoute.component.displayName} path={pluginRoute.path} component={pluginRoute.component} />;
+    });
     return (
       <Router history={createHistory()}>
         <Route path="/" component={App}>
@@ -85,6 +89,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
+            {pluginRoutes}
           </Route>
         </Route>
       </Router>
