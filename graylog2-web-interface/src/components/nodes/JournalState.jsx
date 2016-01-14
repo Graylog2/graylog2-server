@@ -4,6 +4,8 @@ import numeral from 'numeral';
 
 import { Pluralize } from 'components/common';
 
+import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+
 import MetricsStore from 'stores/metrics/MetricsStore';
 
 import MetricsActions from 'actions/metrics/MetricsActions';
@@ -25,24 +27,6 @@ const JournalState = React.createClass({
   componentWillUnmount() {
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
   },
-  _extractMetricValues() {
-    const nodeId = this.props.nodeId;
-    const nodeMetrics = this.state.metrics[nodeId];
-    if (nodeMetrics === null || nodeMetrics === undefined || Object.keys(nodeMetrics).length === 0) {
-      return {};
-    }
-
-    const metrics = {};
-    Object.keys(this.metricNames).forEach(metricShortName => {
-      const metricFullName = this.metricNames[metricShortName];
-      const metricObject = nodeMetrics[metricFullName];
-      if (metricObject) {
-        metrics[metricShortName] = metricObject.metric.value;
-      }
-    });
-
-    return metrics;
-  },
   _isLoading() {
     return !this.state.metrics;
   },
@@ -51,7 +35,9 @@ const JournalState = React.createClass({
       return <span>Loading journal metrics...</span>;
     }
 
-    const metrics = this._extractMetricValues();
+    const nodeId = this.props.nodeId;
+    const nodeMetrics = this.state.metrics[nodeId];
+    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
 
     if (Object.keys(metrics).length === 0) {
       return <span>Journal metrics unavailable.</span>;

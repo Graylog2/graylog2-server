@@ -2,13 +2,11 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
+import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+
 import MetricsStore from 'stores/metrics/MetricsStore';
 
 import MetricsActions from 'actions/metrics/MetricsActions';
-
-const HEAP_USED_INDEX = 0;
-const HEAP_COMMITTED_INDEX = 1;
-const HEAP_MAX_INDEX = 2;
 
 const JvmHeapUsage = React.createClass({
   propTypes: {
@@ -16,53 +14,26 @@ const JvmHeapUsage = React.createClass({
   },
   mixins: [Reflux.connect(MetricsStore)],
   componentWillMount() {
-    this.metricNames = [
-      'jvm.memory.heap.used',
-      'jvm.memory.heap.committed',
-      'jvm.memory.heap.max',
-    ];
+    this.metricNames = {
+      usedMemory: 'jvm.memory.heap.used',
+      committedMemory: 'jvm.memory.heap.committed',
+      maxMemory: 'jvm.memory.heap.max',
+    };
 
-    this.metricNames.forEach(metricName => MetricsActions.add(this.props.nodeId, metricName));
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
   componentWillUnmount() {
-    this.metricNames.forEach(metricName => MetricsActions.remove(this.props.nodeId, metricName));
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
   },
   _extractMetricValues() {
     const nodeId = this.props.nodeId;
     const nodeMetrics = this.state.metrics[nodeId];
-    if (nodeMetrics === null || nodeMetrics === undefined || Object.keys(nodeMetrics).length === 0) {
-      return {};
-    }
+    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
 
-    let used = 0;
-    let committed = 0;
-    let max = 0;
+    metrics.usedPercentage = metrics.maxMemory === 0 ? 0 : (metrics.usedMemory / metrics.maxMemory) * 100;
+    metrics.committedPercentage = metrics.maxMemory === 0 ? 0 : (metrics.committedMemory / metrics.maxMemory) * 100;
 
-    const usedMetricObject = nodeMetrics[this.metricNames[HEAP_USED_INDEX]];
-    if (usedMetricObject) {
-      used = usedMetricObject.metric.value;
-    }
-
-    const committedMetricObject = nodeMetrics[this.metricNames[HEAP_COMMITTED_INDEX]];
-    if (committedMetricObject) {
-      committed = committedMetricObject.metric.value;
-    }
-
-    const maxMetricObject = nodeMetrics[this.metricNames[HEAP_MAX_INDEX]];
-    if (maxMetricObject) {
-      max = maxMetricObject.metric.value;
-    }
-
-    const usedPercentage = max === 0 ? 0 : (used / max) * 100;
-    const committedPercentage = max === 0 ? 0 : (committed / max) * 100;
-
-    return {
-      usedMemory: used,
-      usedPercentage: usedPercentage,
-      committedMemory: committed,
-      committedPercentage: committedPercentage,
-      maxMemory: max,
-    };
+    return metrics;
   },
   render() {
     let progressBar;
