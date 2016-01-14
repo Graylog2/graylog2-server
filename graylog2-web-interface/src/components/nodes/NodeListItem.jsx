@@ -6,6 +6,7 @@ import { EntityListItem, IfPermitted, LinkToNode } from 'components/common';
 import SystemOverview from './SystemOverview';
 import JvmHeapUsage from './JvmHeapUsage';
 import JournalState from './JournalState';
+import NodeThroughput from 'components/throughput/NodeThroughput';
 
 import Routes from 'routing/Routes';
 
@@ -18,6 +19,7 @@ const NodeListItem = React.createClass({
     const node = this.props.node;
     const title = <LinkToNode nodeId={node.node_id}/>;
 
+    const nodeThroughput = <NodeThroughput nodeId={node.node_id}/>;
     const journalState = <JournalState nodeId={node.node_id}/>;
 
     const actions = [];
@@ -93,6 +95,7 @@ const NodeListItem = React.createClass({
     return (
       <EntityListItem key={`entry-list-${node.node_id}`}
                       title={title}
+                      titleSuffix={nodeThroughput}
                       description={journalState}
                       actions={actions}
                       contentRow={additionalContent}/>

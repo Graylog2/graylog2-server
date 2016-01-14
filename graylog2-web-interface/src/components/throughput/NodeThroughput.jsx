@@ -1,60 +1,69 @@
 import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
 import numeral from 'numeral';
+
+import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+
 import MetricsStore from 'stores/metrics/MetricsStore';
 
-const metricsStore = MetricsStore.instance;
+import MetricsActions from 'actions/metrics/MetricsActions';
 
 // TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
 const NodeThroughput = React.createClass({
   propTypes: {
     nodeId: PropTypes.string.isRequired,
+    longFormat: PropTypes.bool,
   },
-  getInitialState() {
+  mixins: [Reflux.connect(MetricsStore)],
+  getDefaultProps() {
     return {
-      initialized: false,
-      totalIn: 0,
-      totalOut: 0,
-      hasError: false,
+      longFormat: false,
     };
   },
   componentWillMount() {
-    metricsStore.listen({
-      nodeId: this.props.nodeId,
-      metricNames: ['org.graylog2.throughput.input.1-sec-rate', 'org.graylog2.throughput.output.1-sec-rate'],
-      callback: (update, hasError) => {
-        if (hasError) {
-          this.setState({hasError: hasError});
-          return;
-        }
-        // update is [{nodeId, values: [{name, value: {metric}}]} ...]
-        // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
-        let throughIn = 0;
-        let throughOut = 0;
-        // we will only get 0 or 1 node here.
-        update.forEach((perNode) => {
-          perNode.values.forEach((namedMetric) => {
-            if (namedMetric.name === "org.graylog2.throughput.input.1-sec-rate") {
-              throughIn += namedMetric.metric.value;
-            } else if (namedMetric.name === "org.graylog2.throughput.output.1-sec-rate") {
-              throughOut += namedMetric.metric.value;
-            }
-          });
-        });
-        this.setState({initialized: true, totalIn: throughIn, totalOut: throughOut, hasError: hasError});
-      },
-    });
+    this.metricNames = {
+      totalIn: 'org.graylog2.throughput.input.1-sec-rate',
+      totalOut: 'org.graylog2.throughput.output.1-sec-rate',
+    };
+
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+  },
+  componentWillUnmount() {
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+  },
+  _isLoading() {
+    return !this.state.metrics;
+  },
+  _formatThroughput(metrics) {
+    if (this.props.longFormat) {
+      return (
+        <span>
+          Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and <strong>
+          {numeral(metrics.totalOut).format('0,0')}</strong> outgoing msg/s.
+        </span>
+      );
+    } else {
+      return (
+        <span>
+          In {numeral(metrics.totalIn).format('0,0')} / Out {numeral(metrics.totalOut).format('0,0')} msg/s.
+        </span>
+      );
+    }
   },
   render() {
-    if (this.state.hasError) {
+    if (this._isLoading()) {
+      return (<span><i className="fa fa-spin fa-spinner"/> Loading throughput...</span>);
+    }
+
+    const nodeId = this.props.nodeId;
+    const nodeMetrics = this.state.metrics[nodeId];
+    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
+
+    if (Object.keys(metrics).length === 0) {
       return (<span>Unable to load throughput.</span>);
     }
-    if (!this.state.initialized) {
-      return (<span><i className="fa fa-spin fa-spinner"></i> Loading throughput...</span>);
-    }
-    return (<span>
-            Processing <strong>{numeral(this.state.totalIn).format("0,0")}</strong> incoming and <strong>
-      {numeral(this.state.totalOut).format("0,0")}</strong> outgoing msg/s.
-        </span>);
+
+    return this._formatThroughput(metrics);
   },
 });
 
