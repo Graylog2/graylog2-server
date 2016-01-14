@@ -1,67 +1,68 @@
 import React, {PropTypes} from 'react';
-import MetricsStore from 'stores/metrics/MetricsStore';
+import Reflux from 'reflux';
 import numeral from 'numeral';
 
-const metricsStore = MetricsStore.instance;
+import { Pluralize } from 'components/common';
+
+import MetricsStore from 'stores/metrics/MetricsStore';
+
+import MetricsActions from 'actions/metrics/MetricsActions';
 
 const JournalState = React.createClass({
   propTypes: {
     nodeId: PropTypes.string.isRequired,
   },
-  getInitialState() {
-    return ({
-      initialized: false,
-      hasError: false,
-      append: 0,
-      read: 0,
-      segments: 0,
-      entriesUncommitted: 0,
-    });
-  },
-
+  mixins: [Reflux.connect(MetricsStore)],
   componentWillMount() {
-    const metricNames = [
-      'org.graylog2.journal.append.1-sec-rate',
-      'org.graylog2.journal.read.1-sec-rate',
-      'org.graylog2.journal.segments',
-      'org.graylog2.journal.entries-uncommitted',
-    ];
-    metricsStore.listen({
-      nodeId: this.props.nodeId,
-      metricNames: metricNames,
-      callback: (update, hasError) => {
-        if (hasError) {
-          this.setState({hasError: hasError});
-          return;
-        }
-        // update is [{nodeId, values: [{name, value: {metric}}]} ...]
-        // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
-
-        const newState = {
-          initialized: true,
-          hasError: hasError,
-        };
-        // we will only get one result, because we ask for only one node
-        // get the base name from the metric name, and put the gauge metrics into our new state.
-        update[0].values.forEach((namedMetric) => {
-          const baseName = namedMetric.name.replace('org.graylog2.journal.', '').replace('.1-sec-rate', '');
-          const camelCase = this.camelCase(baseName);
-          newState[camelCase] = namedMetric.metric.value;
-        });
-        this.setState(newState);
-      },
-    });
+    this.metricNames = {
+      append: 'org.graylog2.journal.append.1-sec-rate',
+      read: 'org.graylog2.journal.read.1-sec-rate',
+      segments: 'org.graylog2.journal.segments',
+      entriesUncommited: 'org.graylog2.journal.entries-uncommitted',
+    };
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
-  camelCase(input) {
-    return input.toLowerCase().replace(/-(.)/g, (match, group1) => group1.toUpperCase());
+  componentWillUnmount() {
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+  },
+  _extractMetricValues() {
+    const nodeId = this.props.nodeId;
+    const nodeMetrics = this.state.metrics[nodeId];
+    if (nodeMetrics === null || nodeMetrics === undefined || Object.keys(nodeMetrics).length === 0) {
+      return {};
+    }
+
+    const metrics = {};
+    Object.keys(this.metricNames).forEach(metricShortName => {
+      const metricFullName = this.metricNames[metricShortName];
+      const metricObject = nodeMetrics[metricFullName];
+      if (metricObject) {
+        metrics[metricShortName] = metricObject.metric.value;
+      }
+    });
+
+    return metrics;
+  },
+  _isLoading() {
+    return !this.state.metrics;
   },
   render() {
+    if (this._isLoading()) {
+      return <span>Loading journal metrics...</span>;
+    }
+
+    const metrics = this._extractMetricValues();
+
+    if (Object.keys(metrics).length === 0) {
+      return <span>Journal metrics unavailable.</span>;
+    }
+
     return (
       <span>
-        <strong>{numeral(this.state.entriesUncommitted).format('0,0')} unprocessed messages</strong> are currently in the journal, in {this.state.segments}
-        segments. <strong>
-        {numeral(this.state.append).format('0,0')} messages</strong> have been appended to, and <strong>
-        {numeral(this.state.read).format('0,0')} messages</strong> have been read from the journal in the last second.
+        The journal contains <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in {metrics.segments}
+        {' '}<Pluralize value={metrics.segments} singular="segment" plural="segments"/>.{' '}
+        <strong>{numeral(metrics.append).format('0,0')} messages</strong> appended, <strong>
+        {numeral(metrics.read).format('0,0')} messages</strong> read in the last second.
       </span>
     );
   },

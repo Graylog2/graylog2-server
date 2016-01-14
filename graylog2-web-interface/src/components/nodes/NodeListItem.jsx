@@ -5,6 +5,7 @@ import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
 import { EntityListItem, IfPermitted, LinkToNode } from 'components/common';
 import SystemOverview from './SystemOverview';
 import JvmHeapUsage from './JvmHeapUsage';
+import JournalState from './JournalState';
 
 import Routes from 'routing/Routes';
 
@@ -16,6 +17,8 @@ const NodeListItem = React.createClass({
   render() {
     const node = this.props.node;
     const title = <LinkToNode nodeId={node.node_id}/>;
+
+    const journalState = <JournalState nodeId={node.node_id}/>;
 
     const actions = [];
 
@@ -90,6 +93,7 @@ const NodeListItem = React.createClass({
     return (
       <EntityListItem key={`entry-list-${node.node_id}`}
                       title={title}
+                      description={journalState}
                       actions={actions}
                       contentRow={additionalContent}/>
     );
