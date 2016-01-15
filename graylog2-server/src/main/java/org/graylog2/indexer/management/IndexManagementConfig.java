@@ -31,9 +31,13 @@ public abstract class IndexManagementConfig {
     @JsonProperty("retention_strategy")
     public abstract String retentionStrategy();
 
+    @JsonProperty("perform_retention")
+    public abstract boolean performRetention();
+
     @JsonCreator
     public static IndexManagementConfig create(@JsonProperty("rotation_strategy") String rotationStrategy,
-                                               @JsonProperty("retention_strategy") String retentionStrategy) {
-        return new AutoValue_IndexManagementConfig(rotationStrategy, retentionStrategy);
+                                               @JsonProperty("retention_strategy") String retentionStrategy,
+                                               @JsonProperty("perform_retention") boolean performRetention) {
+        return new AutoValue_IndexManagementConfig(rotationStrategy, retentionStrategy, performRetention);
     }
 }

@@ -23,7 +23,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.periodical.IndexRetentionThread;
+import org.graylog2.periodical.IndexManagementThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -71,7 +71,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         final String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). " +
                 "Running retention for " + removeCount + " indices.";
         LOG.info(msg);
-        activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+        activityWriter.write(new Activity(msg, IndexManagementThread.class));
 
         try {
             runRetention(deflectorIndices, removeCount);
@@ -100,7 +100,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             final String msg = "Running retention strategy [" + this.getClass().getCanonicalName() + "] " +
                     "for index <" + indexName + ">";
             LOG.info(msg);
-            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+            activityWriter.write(new Activity(msg, IndexManagementThread.class));
 
             // Sorry if this should ever go mad. Run retention strategy!
             retain(indexName);
