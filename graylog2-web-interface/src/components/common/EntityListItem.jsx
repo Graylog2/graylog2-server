@@ -6,7 +6,7 @@ const EntityListItem = React.createClass({
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     titleSuffix: PropTypes.any,
     description: PropTypes.any,
-    actions: PropTypes.array,
+    actions: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
     createdFromContentPack: PropTypes.bool,
     contentRow: PropTypes.node,
   },
