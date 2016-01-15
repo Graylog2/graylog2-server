@@ -6,6 +6,7 @@ import { IfPermitted } from 'components/common';
 
 import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
 import SystemLoadBalancerStore from 'stores/load-balancer/SystemLoadBalancerStore';
+import SystemShutdownStore from 'stores/system-shutdown/SystemShutdownStore';
 
 import Routes from 'routing/Routes';
 
@@ -29,6 +30,11 @@ const NodesActions = React.createClass({
         SystemLoadBalancerStore.override(this.props.node.node_id, status);
       }
     };
+  },
+  _shutdown() {
+    if (prompt('Do you really want to shutdown this node? Confirm by typing "SHUTDOWN".') === 'SHUTDOWN') {
+      SystemShutdownStore.shutdown(this.props.node.node_id);
+    }
   },
   render() {
     return (
@@ -63,7 +69,7 @@ const NodesActions = React.createClass({
           </IfPermitted>
 
           <IfPermitted permissions="node:shutdown">
-            <MenuItem>Graceful shutdown</MenuItem>
+            <MenuItem onSelect={this._shutdown}>Graceful shutdown</MenuItem>
           </IfPermitted>
 
           <IfPermitted permissions={['processing:changestate', 'lbstatus:change', 'node:shutdown']} anyPermissions>
