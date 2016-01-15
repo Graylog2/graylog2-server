@@ -75,7 +75,7 @@ public class ClusterSystemShutdownResource {
     @ApiOperation(value = "Shutdown node gracefully.",
             notes = "Attempts to process all buffered and cached messages before exiting, " +
                     "shuts down inputs first to make sure that no new messages are accepted.")
-    public void shutdown(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    public void shutdown(@ApiParam(name = "nodeId", value = "The id of the node to shutdown.", required = true)
                          @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 

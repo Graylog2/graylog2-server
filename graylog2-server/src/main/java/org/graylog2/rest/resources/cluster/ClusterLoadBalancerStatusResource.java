@@ -77,7 +77,7 @@ public class ClusterLoadBalancerStatusResource {
     @ApiOperation(value = "Override load balancer status of this graylog2-server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE or DEAD.")
     @Path("/override/{status}")
-    public void override(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    public void override(@ApiParam(name = "nodeId", value = "The id of the node whose LB status will be changed", required = true)
                          @PathParam("nodeId") String nodeId,
                          @ApiParam(name = "status") @PathParam("status") String status) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
