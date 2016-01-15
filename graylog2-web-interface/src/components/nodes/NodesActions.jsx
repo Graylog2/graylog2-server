@@ -47,7 +47,7 @@ const NodesActions = React.createClass({
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${this.props.node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">
-            <MenuItem onClick={this._toggleMessageProcessing}>
+            <MenuItem onSelect={this._toggleMessageProcessing}>
               {this.props.systemOverview.is_processing ? 'Pause' : 'Resume'} message processing
             </MenuItem>
           </IfPermitted>
@@ -56,8 +56,8 @@ const NodesActions = React.createClass({
             <li className="dropdown-submenu left-submenu">
               <a href="#">Override LB status</a>
               <ul className="dropdown-menu">
-                <MenuItem onClick={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
-                <MenuItem onClick={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
+                <MenuItem onSelect={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
+                <MenuItem onSelect={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
               </ul>
             </li>
           </IfPermitted>
