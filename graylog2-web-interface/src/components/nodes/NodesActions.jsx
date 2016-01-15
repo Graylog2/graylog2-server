@@ -4,12 +4,23 @@ import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
 
+import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
+
 import Routes from 'routing/Routes';
 
 const NodesActions = React.createClass({
   propTypes: {
     node: PropTypes.object.isRequired,
     systemOverview: PropTypes.object.isRequired,
+  },
+  _toggleMessageProcessing() {
+    if (confirm(`You are about to ${this.props.systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`)) {
+      if (this.props.systemOverview.is_processing) {
+        SystemProcessingStore.pause(this.props.node.node_id);
+      } else {
+        SystemProcessingStore.resume(this.props.node.node_id);
+      }
+    }
   },
   render() {
     return (
@@ -28,8 +39,9 @@ const NodesActions = React.createClass({
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${this.props.node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">
-            {this.props.systemOverview.is_processing ? <MenuItem>Pause message processing</MenuItem> :
-              <MenuItem>Resume message processing</MenuItem>}
+            <MenuItem onClick={this._toggleMessageProcessing}>
+              {this.props.systemOverview.is_processing ? 'Pause' : 'Resume'} message processing
+            </MenuItem>
           </IfPermitted>
 
           <IfPermitted permissions="lbstatus:change">

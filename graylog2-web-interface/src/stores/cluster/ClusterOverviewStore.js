@@ -3,12 +3,15 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
+import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
+
 const ClusterOverviewStore = Reflux.createStore({
   sourceUrl: '/cluster',
   clusterOverview: undefined,
 
   init() {
     this.cluster();
+    this.listenTo(SystemProcessingStore, this.cluster);
   },
 
   getInitialState() {
