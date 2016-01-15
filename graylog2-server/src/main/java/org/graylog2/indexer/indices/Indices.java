@@ -491,7 +491,7 @@ public class Indices {
             if (settings == null) {
                 return null;
             }
-            return new DateTime(settings.getAsLong("creation_date", 0L), DateTimeZone.UTC);
+            return new DateTime(settings.getAsLong("index.creation_date", 0L), DateTimeZone.UTC);
         } catch (ElasticsearchException e) {
             LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
             return null;
