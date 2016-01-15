@@ -6,6 +6,7 @@ const SystemOverview = React.createClass({
     information: PropTypes.object.isRequired,
   },
   render() {
+    const lbStatus = this.props.information.lb_status.toUpperCase();
     return (
       <dl className="graylog-node-state">
         <dt>Current lifecycle state:</dt>
@@ -13,7 +14,7 @@ const SystemOverview = React.createClass({
         <dt>Message processing:</dt>
         <dd>{this.props.information.is_processing ? 'Enabled' : 'Disabled'}</dd>
         <dt>Load balancer indication:</dt>
-        <dd>{this.props.information.lb_status.toUpperCase()}</dd>
+        <dd className={lbStatus === 'DEAD' ? 'text-danger' : ''}>{lbStatus}</dd>
       </dl>
     );
   },

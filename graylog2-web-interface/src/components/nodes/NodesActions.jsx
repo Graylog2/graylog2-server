@@ -5,6 +5,7 @@ import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import { IfPermitted } from 'components/common';
 
 import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
+import SystemLoadBalancerStore from 'stores/load-balancer/SystemLoadBalancerStore';
 
 import Routes from 'routing/Routes';
 
@@ -21,6 +22,13 @@ const NodesActions = React.createClass({
         SystemProcessingStore.resume(this.props.node.node_id);
       }
     }
+  },
+  _changeLBStatus(status) {
+    return () => {
+      if (confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
+        SystemLoadBalancerStore.override(this.props.node.node_id, status);
+      }
+    };
   },
   render() {
     return (
@@ -48,8 +56,8 @@ const NodesActions = React.createClass({
             <li className="dropdown-submenu left-submenu">
               <a href="#">Override LB status</a>
               <ul className="dropdown-menu">
-                {this.props.systemOverview.lb_status !== 'alive' && <MenuItem>ALIVE</MenuItem>}
-                {this.props.systemOverview.lb_status !== 'dead' && <MenuItem>DEAD</MenuItem>}
+                <MenuItem onClick={this._changeLBStatus('ALIVE')}>ALIVE</MenuItem>
+                <MenuItem onClick={this._changeLBStatus('DEAD')}>DEAD</MenuItem>
               </ul>
             </li>
           </IfPermitted>
