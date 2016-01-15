@@ -193,4 +193,23 @@ public class IndicesTest {
 
         indices.delete("index_template_test");
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        indices.create("index_creation_date_test");
+
+        final DateTime indexCreationDate = indices.indexCreationDate("index_creation_date_test");
+        org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now);
+
+        indices.delete("index_creation_date_test");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void indexCreationDateReturnsNullForNonExistingIndex() {
+        final DateTime indexCreationDate = indices.indexCreationDate("index_missing");
+        assertThat(indexCreationDate).isNull();
+    }
 }
