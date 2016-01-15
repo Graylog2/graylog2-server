@@ -1,20 +1,16 @@
 class AppConfig {
   private appConfig: any;
 
-  constructor() {
-    this.appConfig = window['appConfig'];
-  }
-
   gl2ServerUrl() : string {
-    return this.appConfig['gl2ServerUrl'];
+    return window['appConfig']['gl2ServerUrl'];
   }
 
   gl2AppPathPrefix() : string {
-    return this.appConfig['gl2AppPathPrefix'];
+    return window['appConfig']['gl2AppPathPrefix'];
   }
 
   rootTimeZone(): string {
-    return this.appConfig['rootTimeZone'];
+    return window['appConfig']['rootTimeZone'];
   }
 }
 
