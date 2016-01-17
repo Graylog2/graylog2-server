@@ -31,6 +31,7 @@ import org.graylog.plugins.messageprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.messageprocessor.ast.statements.FunctionStatement;
@@ -50,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +130,7 @@ public class RuleParser {
         @Override
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final String name = ctx.funcName.getText();
-            Map<String, Expression> args = this.args.get(ctx.arguments());
+            Map<String, Expression> argsMap = this.args.get(ctx.arguments());
             final List<Expression> positionalArgs = this.argsList.get(ctx.arguments());
 
             final Function<?> function = functionRegistry.resolve(name);
@@ -140,20 +140,13 @@ public class RuleParser {
                 final ImmutableList<ParameterDescriptor> params = function.descriptor().params();
                 final boolean hasOptionalParams = params.stream().anyMatch(ParameterDescriptor::optional);
 
-                // convert null key, single arg style to default named args for single arg functions
-                if (args != null) {
-                    if (args.containsKey(null) && params.size() == 1) {
-                        final Expression argExpr = args.remove(null);
-                        final ParameterDescriptor param = params.get(0);
-                        args.put(param.name(), argExpr);
-                    }
-
+                if (argsMap != null) {
                     // check for the right number of arguments to the function if the function only has required params
-                    if (!hasOptionalParams && params.size() != args.size()) {
-                        parseContext.addError(new WrongNumberOfArgs(ctx, function, args.size()));
+                    if (!hasOptionalParams && params.size() != argsMap.size()) {
+                        parseContext.addError(new WrongNumberOfArgs(ctx, function, argsMap.size()));
                     } else {
                         // there are optional parameters, check that all required ones are present
-                        final Map<String, Expression> givenArguments = args;
+                        final Map<String, Expression> givenArguments = argsMap;
                         final List<ParameterDescriptor> missingParams =
                                 params.stream()
                                         .filter(p -> !p.optional())
@@ -163,32 +156,57 @@ public class RuleParser {
                         for (ParameterDescriptor param : missingParams) {
                             parseContext.addError(new MissingRequiredParam(ctx, function, param));
                         }
-
                     }
                 } else if (positionalArgs != null) {
                     // use descriptor to turn positional arguments into a map
-                    args = Maps.newHashMap();
+                    argsMap = Maps.newHashMap();
+                    // if we only have required parameters and the number doesn't match, complain
                     if (!hasOptionalParams && positionalArgs.size() != params.size()) {
                         parseContext.addError(new WrongNumberOfArgs(ctx, function, positionalArgs.size()));
                     }
+                    // if optional parameters precede any required ones, the function must used named parameters
+                    boolean hasError = false;
                     if (hasOptionalParams) {
-                        parseContext.addError(new OptionalParametersMustBeNamed(ctx, function));
-                    } else {
+                        // find the index of the first optional parameter
+                        // then check if any non-optional come after it, if so, complain
+                        int firstOptional = Integer.MAX_VALUE;
+                        boolean requiredAfterOptional = false;
+                        int i = 0;
+                        for (ParameterDescriptor param : params) {
+                            i++;
+                            if (param.optional()) {
+                                firstOptional = Math.min(firstOptional, i);
+                            } else {
+                                if (i > firstOptional) {
+                                    requiredAfterOptional = true;
+                                }
+                            }
+                        }
+                        if (requiredAfterOptional) {
+                            parseContext.addError(new OptionalParametersMustBeNamed(ctx, function));
+                            hasError = true;
+                        }
+                    }
+
+                    if (!hasError) {
+                        // only try to assign params if we didn't encounter a problem with position optional params above
                         int i = 0;
                         for (ParameterDescriptor p : params) {
-                            if (i >= params.size()) {
+                            if (i >= positionalArgs.size()) {
                                 // avoid index out of bounds, we've added an error anyway
+                                // the remaining parameters were optional, so we can safely skip them
                                 break;
                             }
                             final Expression argExpr = positionalArgs.get(i);
-                            args.put(p.name(), argExpr);
+                            argsMap.put(p.name(), argExpr);
                             i++;
                         }
                     }
                 }
             }
 
-            final FunctionExpression expr = new FunctionExpression(functionRegistry.resolveOrError(name), args);
+            final FunctionExpression expr = new FunctionExpression(functionRegistry.resolveOrError(name),
+                                                                   new FunctionArgs(argsMap));
 
             log.info("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -206,15 +224,15 @@ public class RuleParser {
             args.put(ctx, argMap);
         }
 
-        @Override
-        public void exitSingleDefaultArg(RuleLangParser.SingleDefaultArgContext ctx) {
-            final Expression expr = exprs.get(ctx.expression());
-            final HashMap<String, Expression> singleArg = Maps.newHashMap();
-            // null key means to use the single declared argument for this function, it's syntactic sugar
-            // this gets validated and expanded in a later parsing stage
-            singleArg.put(null, expr);
-            args.put(ctx, singleArg);
-        }
+//        @Override
+//        public void exitSingleDefaultArg(RuleLangParser.SingleDefaultArgContext ctx) {
+//            final Expression expr = exprs.get(ctx.expression());
+//            final HashMap<String, Expression> singleArg = Maps.newHashMap();
+//            // null key means to use the single declared argument for this function, it's syntactic sugar
+//            // this gets validated and expanded in a later parsing stage
+//            singleArg.put(null, expr);
+//            args.put(ctx, singleArg);
+//        }
 
         @Override
         public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
@@ -260,7 +278,7 @@ public class RuleParser {
             final Expression object = exprs.get(ctx.fieldSet);
             final Expression field = exprs.get(ctx.field);
             final FieldAccessExpression expr = new FieldAccessExpression(object, field);
-            log.info("NOT: ctx {} => {}", ctx, expr);
+            log.info("FIELDACCESS: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -333,7 +351,7 @@ public class RuleParser {
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
             final String text = ctx.getText();
-            final StringExpression expr = new StringExpression(text.substring(1, text.length()-1));
+            final StringExpression expr = new StringExpression(text.substring(1, text.length() - 1));
             log.info("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -440,6 +458,7 @@ public class RuleParser {
     private class TypeChecker extends RuleLangBaseListener {
         private final ParseContext parseContext;
         StringBuffer sb = new StringBuffer();
+
         public TypeChecker(ParseContext parseContext) {
             this.parseContext = parseContext;
         }
@@ -484,9 +503,9 @@ public class RuleParser {
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final FunctionExpression expr = (FunctionExpression) parseContext.expressions().get(ctx);
             final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
-            final Map<String, Expression> args = expr.getArgs();
+            final FunctionArgs args = expr.getArgs();
             for (ParameterDescriptor p : descriptor.params()) {
-                final Expression argExpr = args.get(p.name());
+                final Expression argExpr = args.expression(p.name());
                 if (argExpr != null && !p.type().isAssignableFrom(argExpr.getType())) {
                     parseContext.addError(new IncompatibleArgumentType(ctx, expr, p, argExpr));
                 }
@@ -572,6 +591,7 @@ public class RuleParser {
 
         /**
          * Links the declared var to its expression.
+         *
          * @param name var name
          * @param expr expression
          * @return true if successful, false if previously declared

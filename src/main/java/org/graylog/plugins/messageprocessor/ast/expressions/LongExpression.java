@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class LongExpression extends ConstantExpression implements NumericExpression {
     private final long value;
@@ -12,7 +11,7 @@ public class LongExpression extends ConstantExpression implements NumericExpress
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
+    public Object evaluate(EvaluationContext context) {
         return value;
     }
 

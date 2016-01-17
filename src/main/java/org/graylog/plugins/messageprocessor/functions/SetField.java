@@ -1,12 +1,11 @@
 package org.graylog.plugins.messageprocessor.functions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
-import org.graylog2.plugin.Message;
 
-import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.object;
@@ -19,10 +18,12 @@ public class SetField implements Function<Void> {
     public static final String VALUE = "value";
 
     @Override
-    public Void evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-        final Object field = args.get(FIELD).evaluate(context, message);
-        final Object value = args.get(VALUE).evaluate(context, message);
-        message.addField(field.toString(), value);
+    public Void evaluate(FunctionArgs args, EvaluationContext context) {
+        final Optional<Object> field = args.evaluated(FIELD, context, Object.class);
+        final Optional<Object> value = args.evaluated(VALUE, context, Object.class);
+
+        context.currentMessage().addField(field.get().toString(), value.get());
+
         return null;
     }
 

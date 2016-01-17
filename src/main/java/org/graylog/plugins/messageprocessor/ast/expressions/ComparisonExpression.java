@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class ComparisonExpression extends BinaryExpression implements LogicalExpression {
     private final String operator;
@@ -12,8 +11,8 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return evaluateBool(context, message);
+    public Object evaluate(EvaluationContext context) {
+        return evaluateBool(context);
     }
 
     @Override
@@ -22,10 +21,10 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
     }
 
     @Override
-    public boolean evaluateBool(EvaluationContext context, Message message) {
+    public boolean evaluateBool(EvaluationContext context) {
 
-        final Object leftValue = this.left.evaluate(context, message);
-        final Object rightValue = this.right.evaluate(context, message);
+        final Object leftValue = this.left.evaluate(context);
+        final Object rightValue = this.right.evaluate(context);
         if (leftValue instanceof Double || rightValue instanceof Double) {
             return compareDouble(operator, (double) leftValue, (double) rightValue);
         } else {

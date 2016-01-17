@@ -1,17 +1,15 @@
 package org.graylog.plugins.messageprocessor.functions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.IOState;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -27,9 +25,9 @@ public class InputFunction implements Function<MessageInput> {
     }
 
     @Override
-    public MessageInput evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-        final Object id = args.get("id").evaluate(context, message);
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(id.toString());
+    public MessageInput evaluate(FunctionArgs args, EvaluationContext context) {
+        final String id = args.evaluated("id", context, String.class).orElse("");
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(id);
         return inputState.getStoppable();
     }
 

@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class MessageRefExpression implements Expression {
     private final Expression fieldExpr;
@@ -16,9 +15,9 @@ public class MessageRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        final Object fieldName = fieldExpr.evaluate(context, message);
-        return message.getField(fieldName.toString());
+    public Object evaluate(EvaluationContext context) {
+        final Object fieldName = fieldExpr.evaluate(context);
+        return context.currentMessage().getField(fieldName.toString());
     }
 
     @Override

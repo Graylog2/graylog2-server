@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class BooleanExpression extends ConstantExpression implements LogicalExpression {
     private final boolean value;
@@ -12,13 +11,13 @@ public class BooleanExpression extends ConstantExpression implements LogicalExpr
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
+    public Object evaluate(EvaluationContext context) {
         return value;
     }
 
 
     @Override
-    public boolean evaluateBool(EvaluationContext context, Message message) {
+    public boolean evaluateBool(EvaluationContext context) {
         return value;
     }
 

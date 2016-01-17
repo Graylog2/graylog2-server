@@ -44,6 +44,11 @@
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
             </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jool</artifactId>
+                <version>0.9.9</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -112,6 +117,10 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jool</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

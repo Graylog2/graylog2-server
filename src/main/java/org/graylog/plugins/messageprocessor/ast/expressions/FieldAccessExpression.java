@@ -2,7 +2,6 @@ package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +24,9 @@ public class FieldAccessExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        final Object bean = this.object.evaluate(context, message);
-        final String fieldName = field.evaluate(context, message).toString();
+    public Object evaluate(EvaluationContext context) {
+        final Object bean = this.object.evaluate(context);
+        final String fieldName = field.evaluate(context).toString();
         try {
             final Object property = PropertyUtils.getProperty(bean, fieldName);
             log.debug("[field access] property {} of bean {}: {}", fieldName, bean.getClass().getTypeName(), property);

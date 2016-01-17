@@ -2,7 +2,6 @@ package org.graylog.plugins.messageprocessor.ast.statements;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
-import org.graylog2.plugin.Message;
 
 public class FunctionStatement implements Statement {
     private final Expression functionExpression;
@@ -12,8 +11,8 @@ public class FunctionStatement implements Statement {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return functionExpression.evaluate(context, message);
+    public Object evaluate(EvaluationContext context) {
+        return functionExpression.evaluate(context);
     }
 
     @Override

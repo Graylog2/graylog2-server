@@ -2,21 +2,21 @@ package org.graylog.plugins.messageprocessor.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
-import org.graylog2.plugin.Message;
 
-import java.util.Map;
+import java.util.Optional;
 
 public class HasField implements Function<Boolean> {
 
     public static final String NAME = "has_field";
 
     @Override
-    public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-        return message.hasField((String) args.get("field").evaluate(context, message));
+    public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+        final Optional<String> field = args.evaluated("field", context, String.class);
+        return context.currentMessage().hasField(field.orElse(null));
     }
 
     @Override

@@ -71,12 +71,12 @@ public class NaiveRuleProcessor implements MessageProcessor {
 
             for (Message message : messages) {
                 try {
-                    final EvaluationContext context = new EvaluationContext();
-                    if (rule.when().evaluateBool(context, message)) {
+                    final EvaluationContext context = new EvaluationContext(message);
+                    if (rule.when().evaluateBool(context)) {
                         log.info("[✓] Message {} matches condition", message.getId());
 
                         for (Statement statement : rule.then()) {
-                            statement.evaluate(context, message);
+                            statement.evaluate(context);
                         }
 
                     } else {

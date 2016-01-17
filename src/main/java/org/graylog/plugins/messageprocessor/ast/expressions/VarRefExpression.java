@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public class VarRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
+    public Object evaluate(EvaluationContext context) {
         final EvaluationContext.TypedValue typedValue = context.get(identifier);
         if (typedValue != null) {
             return typedValue.getValue();

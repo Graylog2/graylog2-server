@@ -1,12 +1,9 @@
 package org.graylog.plugins.messageprocessor.functions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
-import org.graylog2.plugin.Message;
-
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.object;
@@ -17,9 +14,8 @@ public class BooleanCoercion implements Function<Boolean> {
     private static final String VALUE = "value";
 
     @Override
-    public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-        final Expression value = args.get(VALUE);
-        final Object evaluated = value.evaluate(context, message);
+    public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse("false");
         return Boolean.parseBoolean(evaluated.toString());
     }
 

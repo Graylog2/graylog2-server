@@ -4,8 +4,8 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.messageprocessor.ast.statements.Statement;
@@ -58,7 +58,7 @@ public class RuleParserTest {
         final Map<String, Function<?>> functions = Maps.newHashMap();
         functions.put("nein", new Function<Boolean>() {
             @Override
-            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return false;
             }
 
@@ -73,7 +73,7 @@ public class RuleParserTest {
         });
         functions.put("doch", new Function<Boolean>() {
             @Override
-            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return true;
             }
 
@@ -88,7 +88,7 @@ public class RuleParserTest {
         });
         functions.put("double_valued_func", new Function<Double>() {
             @Override
-            public Double evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Double evaluate(FunctionArgs args, EvaluationContext context) {
                 return 0d;
             }
 
@@ -103,8 +103,8 @@ public class RuleParserTest {
         });
         functions.put("one_arg", new Function<String>() {
             @Override
-            public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-                return (String) args.get("one").evaluate(context, message);
+            public String evaluate(FunctionArgs args, EvaluationContext context) {
+                return args.evaluated("one", context, String.class).orElse("");
             }
 
             @Override
@@ -118,10 +118,10 @@ public class RuleParserTest {
         });
         functions.put("concat", new Function<String>() {
             @Override
-            public String evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-                final Object one = args.get("one").evaluate(context, message);
-                final Object two = args.get("two").evaluate(context, message);
-                final Object three = args.get("three").evaluate(context, message);
+            public String evaluate(FunctionArgs args, EvaluationContext context) {
+                final Object one = args.evaluated("one", context, Object.class).orElse("");
+                final Object two = args.evaluated("two", context, Object.class).orElse("");
+                final Object three = args.evaluated("three", context, Object.class).orElse("");
                 return one.toString() + two.toString() + three.toString();
             }
 
@@ -140,7 +140,7 @@ public class RuleParserTest {
         });
         functions.put("trigger_test", new Function<Void>() {
             @Override
-            public Void evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Void evaluate(FunctionArgs args, EvaluationContext context) {
                 actionsTriggered.set(true);
                 return null;
             }
@@ -156,7 +156,7 @@ public class RuleParserTest {
         });
         functions.put("optional", new Function<Boolean>() {
             @Override
-            public Boolean evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
+            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return true;
             }
 
@@ -176,8 +176,8 @@ public class RuleParserTest {
         });
         functions.put("customObject", new Function<CustomObject>() {
             @Override
-            public CustomObject evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-                return new CustomObject((String) args.get("default").evaluate(context, message));
+            public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
+                return new CustomObject(args.evaluated("default", context, String.class).orElse(""));
             }
 
             @Override
@@ -357,11 +357,11 @@ public class RuleParserTest {
     }
 
     private Message evaluateRule(Rule rule, Message message) {
-        final EvaluationContext context = new EvaluationContext();
-        if (rule.when().evaluateBool(context, message)) {
+        final EvaluationContext context = new EvaluationContext(message);
+        if (rule.when().evaluateBool(context)) {
 
             for (Statement statement : rule.then()) {
-                statement.evaluate(context, message);
+                statement.evaluate(context);
             }
             return message;
         } else {

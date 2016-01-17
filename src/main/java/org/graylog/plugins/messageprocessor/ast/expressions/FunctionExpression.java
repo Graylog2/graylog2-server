@@ -3,17 +3,15 @@ package org.graylog.plugins.messageprocessor.ast.expressions;
 import com.google.common.base.Joiner;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
-import org.graylog2.plugin.Message;
-
-import java.util.Map;
 
 public class FunctionExpression implements Expression {
-    private final Map<String, Expression> args;
+    private final FunctionArgs args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(Function<?> function, Map<String, Expression> args) {
+    public FunctionExpression(Function<?> function, FunctionArgs args) {
         this.args = args;
         this.function = function;
         this.descriptor = function.descriptor();
@@ -23,7 +21,7 @@ public class FunctionExpression implements Expression {
         return function;
     }
 
-    public Map<String, Expression> getArgs() {
+    public FunctionArgs getArgs() {
         return args;
     }
 
@@ -33,8 +31,8 @@ public class FunctionExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return descriptor.returnType().cast(function.evaluate(args, context, message));
+    public Object evaluate(EvaluationContext context) {
+        return descriptor.returnType().cast(function.evaluate(args, context));
     }
 
     @Override
@@ -46,12 +44,8 @@ public class FunctionExpression implements Expression {
     public String toString() {
         String argsString = "";
         if (args != null) {
-            if (args.containsKey(null)) {
-                argsString = args.get(null).toString();
-            } else {
-                argsString = Joiner.on(", ").withKeyValueSeparator(": ").join(args); // TODO order arg names
-            }
+            argsString = Joiner.on(", ").withKeyValueSeparator(": ").join(args.getArgs()); // TODO order arg names
         }
-        return descriptor.name()  + "(" + argsString + ")";
+        return descriptor.name() + "(" + argsString + ")";
     }
 }

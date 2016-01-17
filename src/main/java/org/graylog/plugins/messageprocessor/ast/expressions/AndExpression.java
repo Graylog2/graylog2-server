@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class AndExpression extends BinaryExpression implements LogicalExpression {
     public AndExpression(LogicalExpression left,
@@ -10,13 +9,13 @@ public class AndExpression extends BinaryExpression implements LogicalExpression
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return evaluateBool(context, message);
+    public Object evaluate(EvaluationContext context) {
+        return evaluateBool(context);
     }
 
     @Override
-    public boolean evaluateBool(EvaluationContext context, Message message) {
-        return ((LogicalExpression)left).evaluateBool(context, message) && ((LogicalExpression)right).evaluateBool(context, message);
+    public boolean evaluateBool(EvaluationContext context) {
+        return ((LogicalExpression)left).evaluateBool(context) && ((LogicalExpression)right).evaluateBool(context);
     }
 
     @Override

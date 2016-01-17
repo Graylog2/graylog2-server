@@ -2,16 +2,12 @@ package org.graylog.plugins.messageprocessor.ast.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
-import org.graylog2.plugin.Message;
-
-import java.util.Map;
 
 public interface Function<T> {
 
     Function ERROR_FUNCTION = new Function<Void>() {
         @Override
-        public Void evaluate(Map args, EvaluationContext context, Message message) {
+        public Void evaluate(FunctionArgs args, EvaluationContext context) {
             return null;
         }
 
@@ -25,7 +21,7 @@ public interface Function<T> {
         }
     };
 
-    T evaluate(Map<String, Expression> args, EvaluationContext context, Message message);
+    T evaluate(FunctionArgs args, EvaluationContext context);
 
     FunctionDescriptor<T> descriptor();
 

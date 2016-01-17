@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class BooleanValuedFunctionWrapper implements LogicalExpression {
     private final Expression expr;
@@ -14,8 +13,8 @@ public class BooleanValuedFunctionWrapper implements LogicalExpression {
     }
 
     @Override
-    public boolean evaluateBool(EvaluationContext context, Message message) {
-        final Object value = expr.evaluate(context, message);
+    public boolean evaluateBool(EvaluationContext context) {
+        final Object value = expr.evaluate(context);
         return value != null && (Boolean) value;
     }
 
@@ -25,8 +24,8 @@ public class BooleanValuedFunctionWrapper implements LogicalExpression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return evaluateBool(context, message);
+    public Object evaluate(EvaluationContext context) {
+        return evaluateBool(context);
     }
 
     @Override

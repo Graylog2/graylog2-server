@@ -1,18 +1,15 @@
 package org.graylog.plugins.messageprocessor.functions;
 
-import com.google.common.primitives.Longs;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
+import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
-import org.graylog2.plugin.Message;
-
-import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.param;
+import static com.google.common.primitives.Longs.tryParse;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.object;
+import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.param;
 
 public class LongCoercion implements Function<Long> {
 
@@ -22,11 +19,12 @@ public class LongCoercion implements Function<Long> {
     private static final String DEFAULT = "default";
 
     @Override
-    public Long evaluate(Map<String, Expression> args, EvaluationContext context, Message message) {
-        final Expression value = args.get(VALUE);
-        final Object evaluated = value.evaluate(context, message);
-        return (Long) firstNonNull(Longs.tryParse(evaluated.toString()), args.get(DEFAULT).evaluate(context, message));
-   }
+    public Long evaluate(FunctionArgs args, EvaluationContext context) {
+        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse(new Object());
+        final Long defaultValue = args.evaluated(DEFAULT, context, Long.class).orElse(0L);
+
+        return firstNonNull(tryParse(evaluated.toString()), defaultValue);
+    }
 
     @Override
     public FunctionDescriptor<Long> descriptor() {
@@ -35,8 +33,8 @@ public class LongCoercion implements Function<Long> {
                 .returnType(Long.class)
                 .params(of(
                         object(VALUE),
-                        param().name(DEFAULT).type(Long.class).build()
-                        ))
+                        param().optional().integer(DEFAULT).build()
+                ))
                 .build();
     }
 }

@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class EqualityExpression extends BinaryExpression implements LogicalExpression {
     private final boolean checkEquality;
@@ -12,8 +11,8 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
-        return evaluateBool(context, message);
+    public Object evaluate(EvaluationContext context) {
+        return evaluateBool(context);
     }
 
     @Override
@@ -22,8 +21,8 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
     }
 
     @Override
-    public boolean evaluateBool(EvaluationContext context, Message message) {
-        final boolean equals = left.evaluate(context, message).equals(right.evaluate(context, message));
+    public boolean evaluateBool(EvaluationContext context) {
+        final boolean equals = left.evaluate(context).equals(right.evaluate(context));
         if (checkEquality) {
             return equals;
         }

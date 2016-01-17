@@ -1,7 +1,6 @@
 package org.graylog.plugins.messageprocessor.ast.expressions;
 
 import org.graylog.plugins.messageprocessor.EvaluationContext;
-import org.graylog2.plugin.Message;
 
 public class FieldRefExpression implements Expression {
     private final String variableName;
@@ -16,7 +15,7 @@ public class FieldRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context, Message message) {
+    public Object evaluate(EvaluationContext context) {
         return variableName;
     }
 
