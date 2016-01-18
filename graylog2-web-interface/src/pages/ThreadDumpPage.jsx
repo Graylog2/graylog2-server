@@ -11,7 +11,7 @@ import SystemThreadDumpStore from 'stores/cluster/SystemThreadDumpStore';
 import DateTime from 'logic/datetimes/DateTime';
 
 function nodeFilter(state) {
-  return state.nodes[this.props.params.nodeId];
+  return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
 }
 
 const ThreadDumpPage = React.createClass({
