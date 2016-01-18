@@ -1,5 +1,3 @@
-const path = require('path');
-
 const create = (metadata, exports) => {
   return {
     metadata: metadata,
