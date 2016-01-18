@@ -44,7 +44,11 @@ public class FunctionExpression implements Expression {
     public String toString() {
         String argsString = "";
         if (args != null) {
-            argsString = Joiner.on(", ").withKeyValueSeparator(": ").join(args.getArgs()); // TODO order arg names
+            argsString = Joiner.on(", ")
+                    .withKeyValueSeparator(": ")
+                    .join(args.getArgs().entrySet().stream()
+                                  .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+                                  .iterator());
         }
         return descriptor.name() + "(" + argsString + ")";
     }
