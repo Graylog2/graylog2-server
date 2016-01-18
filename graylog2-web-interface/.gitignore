@@ -8,4 +8,5 @@ sandbox.js
 npm-debug.log
 build
 node
+manifests/*-manifest.json
 

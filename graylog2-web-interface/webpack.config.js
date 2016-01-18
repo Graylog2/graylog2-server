@@ -8,9 +8,10 @@ const merge = require('webpack-merge');
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
-const VENDOR_MANIFEST_PATH = path.resolve(BUILD_PATH, 'vendor-manifest.json');
+const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
+const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
-const SHARED_MANIFEST_PATH = path.resolve(BUILD_PATH, 'shared-manifest.json');
+const SHARED_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'shared-manifest.json');
 const SHARED_MANIFEST = require(SHARED_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
@@ -87,7 +88,6 @@ if (TARGET === 'build') {
   console.log('Running in production mode');
   module.exports = merge(webpackConfig, {
     plugins: [
-      new Clean([BUILD_PATH]),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
         sourceMap: false,

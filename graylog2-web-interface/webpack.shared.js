@@ -5,7 +5,8 @@ const Clean = require('clean-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
-const VENDOR_MANIFEST = require('./build/vendor-manifest.json');
+const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
+const VENDOR_MANIFEST = require(path.resolve(MANIFESTS_PATH, 'vendor-manifest.json'));
 
 console.log('Building shared bundle.');
 
@@ -42,7 +43,7 @@ const webpackConfig = {
     new Clean([path.resolve(BUILD_PATH, 'shared.*.js')]),
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: path.resolve(__dirname) }),
     new webpack.DllPlugin({
-      path: path.resolve(BUILD_PATH, '[name]-manifest.json'),
+      path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
   ],

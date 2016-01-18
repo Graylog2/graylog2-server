@@ -5,6 +5,7 @@ const Clean = require('clean-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
 
@@ -25,7 +26,7 @@ const webpackConfig = {
   plugins: [
     new Clean([path.resolve(BUILD_PATH, 'vendor.*.js')]),
     new webpack.DllPlugin({
-      path: path.resolve(BUILD_PATH, '[name]-manifest.json'),
+      path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
   ],
