@@ -423,12 +423,6 @@ public class RuleParser {
             exprs.put(ctx, exprs.get(ctx.functionCall()));
             parseContext.addInnerNode(ctx);
         }
-
-        @Override
-        public void exitNull(RuleLangParser.NullContext ctx) {
-            // TODO
-            super.exitNull(ctx);
-        }
     }
 
     private class TypeAnnotator extends RuleLangBaseListener {

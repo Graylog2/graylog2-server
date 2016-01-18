@@ -82,7 +82,6 @@ literal
     |   Char        # Char
     |   String      # String
     |   Boolean     # Boolean
-    |   'null'      # Null
     ;
 
 // Lexer
