@@ -79,7 +79,9 @@ const NodesActions = React.createClass({
           </IfPermitted>
 
           <IfPermitted permissions="inputs:read">
-            <MenuItem>Local message inputs</MenuItem>
+            <LinkContainer to={Routes.node_inputs(this.props.node.node_id)}>
+              <MenuItem>Local message inputs</MenuItem>
+            </LinkContainer>
           </IfPermitted>
           <IfPermitted permissions="threads:dump">
             <LinkContainer to={Routes.SYSTEM.THREADDUMP(this.props.node.node_id)}>

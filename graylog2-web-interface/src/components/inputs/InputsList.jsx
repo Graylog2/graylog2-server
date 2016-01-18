@@ -16,6 +16,7 @@ import SingleNodeStore from 'stores/nodes/SingleNodeStore';
 const InputsList = React.createClass({
   propTypes: {
     permissions: PropTypes.array.isRequired,
+    node: PropTypes.object,
   },
   mixins: [Reflux.connect(SingleNodeStore), Reflux.listenTo(InputsStore, '_splitInputs')],
   getInitialState() {
@@ -33,9 +34,14 @@ const InputsList = React.createClass({
     const globalInputs = inputs
       .filter(input => input.global === true)
       .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
-    const localInputs = inputs
+    let localInputs = inputs
       .filter((input) => input.global === false)
       .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
+
+    if (this.props.node) {
+      localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
+    }
+
     this.setState({globalInputs: globalInputs, localInputs: localInputs});
   },
   _isLoading() {
@@ -51,16 +57,18 @@ const InputsList = React.createClass({
 
     return (
       <div>
+        {!this.props.node &&
         <IfPermitted permissions="inputs:create">
           <CreateInputControl/>
         </IfPermitted>
+        }
 
         <Row className="content input-list">
           <Col md={12}>
             <h2>
               Global inputs
               &nbsp;
-              <small>{this.state.globalInputs.length} configured</small>
+              <small>{this.state.globalInputs.length} configured {this.props.node && 'on this node'}</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
                         items={this.state.globalInputs.map(input => this._formatInput(input))} />
@@ -71,9 +79,9 @@ const InputsList = React.createClass({
             <h2>
               Local inputs
               &nbsp;
-              <small>{this.state.localInputs.length} configured</small>
+              <small>{this.state.localInputs.length} configured {this.props.node && 'on this node'}</small>
             </h2>
-            <EntityList bsNoItemsStyle="info" noItemsText="There are no local inputs."
+            <EntityList bsNoItemsStyle="info" noItemsText={`There are no local inputs${this.props.node && ' on this node'}.`}
                         items={this.state.localInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>

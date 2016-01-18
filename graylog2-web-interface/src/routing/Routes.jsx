@@ -44,6 +44,7 @@ const Routes = {
 
   node: (nodeId) => `/system/nodes/${nodeId}`,
 
+  node_inputs: (nodeId) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
   global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
