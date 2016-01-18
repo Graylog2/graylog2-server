@@ -18,10 +18,14 @@
 package org.graylog2.shared.rest.resources.system;
 
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface RemoteSystemResource {
     @GET("/system")
     Call<SystemOverviewResponse> system();
+
+    @GET("/system/threaddump")
+    Call<SystemThreadDumpResponse> threadDump();
 }

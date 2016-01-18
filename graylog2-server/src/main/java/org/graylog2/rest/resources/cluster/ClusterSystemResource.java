@@ -21,13 +21,17 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
-import org.graylog2.rest.resources.system.RemoteSystemResource;
+import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
+import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
@@ -35,6 +39,7 @@ import retrofit2.Response;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -94,6 +99,28 @@ public class ClusterSystemResource {
                     }
                     return Optional.absent();
                 }));
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get a thread dump of the given node")
+    @RequiresPermissions(RestPermissions.THREADS_DUMP)
+    @Path("{nodeId}/threaddump")
+    public SystemThreadDumpResponse threadDump(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+                             @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
+        final Node targetNode = nodeService.byNodeId(nodeId);
+
+        final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(targetNode,
+                this.authenticationToken,
+                RemoteSystemResource.class);
+        final Response<SystemThreadDumpResponse> response = remoteSystemResource.threadDump().execute();
+        if (response.isSuccess()) {
+            return response.body();
+        } else {
+            LOG.warn("Unable to get thread dump on node " + nodeId + ": " + response.message());
+        }
+
+        return null;
     }
 }
 
