@@ -82,7 +82,9 @@ const NodesActions = React.createClass({
             <MenuItem>Local message inputs</MenuItem>
           </IfPermitted>
           <IfPermitted permissions="threads:dump">
-            <MenuItem>Get thread dump</MenuItem>
+            <LinkContainer to={Routes.SYSTEM.THREADDUMP(this.props.node.node_id)}>
+              <MenuItem>Get thread dump</MenuItem>
+            </LinkContainer>
           </IfPermitted>
         </DropdownButton>
       </div>

@@ -23,6 +23,7 @@ const Routes = {
       LIST: '/system/nodes',
       SHOW: (nodeId) => '/system/nodes/' + nodeId,
     },
+    THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     ROLES: '/system/roles',
