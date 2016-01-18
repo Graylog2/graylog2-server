@@ -2,6 +2,9 @@ const WebpackCleanupPlugin = require('webpack-cleanup-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const path = require('path');
+const VENDOR_MANIFEST = require('graylog-web-manifests/vendor-manifest.json');
+const SHARED_MANIFEST = require('graylog-web-manifests/shared-manifest.json');
+const TARGET = process.env.npm_lifecycle_event;
 
 const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
@@ -24,19 +27,26 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
       ],
     },
     plugins: [
-      new WebpackCleanupPlugin({}),
       new HtmlWebpackPlugin({filename: 'module.json', template: moduleJsonTemplate}),
+      new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
+      new webpack.DllReferencePlugin({ manifest: SHARED_MANIFEST, context: options.root_path }),
     ],
     resolve: {
       extensions: ['', '.js', '.json', '.jsx'],
       modulesDirectories: ['src/web', 'node_modules'],
     },
   };
-  config.entry['plugin.' + fqcn] = options.entry_path;
   
-  if (additionalConfig) {
-    return merge(config, additionalConfig);
+  config.entry['plugin.' + fqcn] = options.entry_path;
+
+  if (TARGET === 'build') {
+    config.plugins.push(new WebpackCleanupPlugin({}));
   }
+
+  if (additionalConfig) {
+    return merge.smart(config, additionalConfig);
+  }
+  
   
   return config;
 }
