@@ -11,8 +11,10 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.mina.util.IdentityHashSet;
+import org.graylog.plugins.messageprocessor.ast.expressions.MapExpression;
 import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.ArrayExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BooleanValuedFunctionWrapper;
@@ -51,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,7 +123,7 @@ public class RuleParser {
 
         @Override
         public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
-            final String name = ctx.varName.getText();
+            final String name = Tools.unquote(ctx.varName.getText(), '`');
             final Expression expr = exprs.get(ctx.expression());
             parseContext.defineVar(name, expr);
             definedVars.add(name);
@@ -215,24 +218,13 @@ public class RuleParser {
         @Override
         public void exitNamedArgs(RuleLangParser.NamedArgsContext ctx) {
             final Map<String, Expression> argMap = Maps.newHashMap();
-            final int argCount = ctx.Identifier().size();
-            for (int i = 0; i < argCount; i++) {
-                final String argName = ctx.Identifier(i).getText();
-                final Expression argValue = exprs.get(ctx.expression(i));
+            for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
+                final String argName = Tools.unquote(propAssignmentContext.Identifier().getText(), '`');
+                final Expression argValue = exprs.get(propAssignmentContext.expression());
                 argMap.put(argName, argValue);
             }
             args.put(ctx, argMap);
         }
-
-//        @Override
-//        public void exitSingleDefaultArg(RuleLangParser.SingleDefaultArgContext ctx) {
-//            final Expression expr = exprs.get(ctx.expression());
-//            final HashMap<String, Expression> singleArg = Maps.newHashMap();
-//            // null key means to use the single declared argument for this function, it's syntactic sugar
-//            // this gets validated and expanded in a later parsing stage
-//            singleArg.put(null, expr);
-//            args.put(ctx, singleArg);
-//        }
 
         @Override
         public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
@@ -371,6 +363,23 @@ public class RuleParser {
         }
 
         @Override
+        public void exitArrayLiteralExpr(RuleLangParser.ArrayLiteralExprContext ctx) {
+            final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(Collectors.toList());
+            exprs.put(ctx, new ArrayExpression(elements));
+        }
+
+        @Override
+        public void exitMapLiteralExpr(RuleLangParser.MapLiteralExprContext ctx) {
+            final HashMap<String, Expression> map = Maps.newHashMap();
+            for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
+                final String key = Tools.unquote(propAssignmentContext.Identifier().getText(), '`');
+                final Expression value = exprs.get(propAssignmentContext.expression());
+                map.put(key, value);
+            }
+            exprs.put(ctx, new MapExpression(map));
+        }
+
+        @Override
         public void exitParenExpr(RuleLangParser.ParenExprContext ctx) {
             // nothing to do, just propagate
             exprs.put(ctx, exprs.get(ctx.expression()));
@@ -408,13 +417,6 @@ public class RuleParser {
             }
             log.info("VAR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
-        }
-
-        @Override
-        public void exitPrimaryExpression(RuleLangParser.PrimaryExpressionContext ctx) {
-            // nothing to do, just propagate
-            exprs.put(ctx, exprs.get(ctx.primary()));
-            parseContext.addInnerNode(ctx);
         }
 
         @Override

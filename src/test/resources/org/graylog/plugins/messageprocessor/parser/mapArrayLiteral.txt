@@ -1,0 +1,5 @@
+rule "mapliteral"
+when sort(keys({some_identifier: 1, `something with spaces`: "some expression"})) == ["some_identifier", "something with spaces"]
+then
+    trigger_test();
+end

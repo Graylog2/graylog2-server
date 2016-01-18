@@ -1,7 +1,9 @@
 package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
 import org.graylog.plugins.messageprocessor.ast.Rule;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
@@ -33,7 +35,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -186,6 +192,38 @@ public class RuleParserTest {
                         .name("customObject")
                         .returnType(CustomObject.class)
                         .params(of(ParameterDescriptor.string("default")))
+                        .build();
+            }
+        });
+        functions.put("keys", new Function<List>() {
+            @Override
+            public List evaluate(FunctionArgs args, EvaluationContext context) {
+                final Optional<Map> map = args.evaluated("map", context, Map.class);
+                return Lists.newArrayList(map.orElse(Collections.emptyMap()).keySet());
+            }
+
+            @Override
+            public FunctionDescriptor<List> descriptor() {
+                return FunctionDescriptor.<List>builder()
+                        .name("keys")
+                        .returnType(List.class)
+                        .params(of(param().name("map").type(Map.class).build()))
+                        .build();
+            }
+        });
+        functions.put("sort", new Function<Collection>() {
+            @Override
+            public Collection evaluate(FunctionArgs args, EvaluationContext context) {
+                final Collection collection = args.evaluated("collection", context, Collection.class).orElse(Collections.emptyList());
+                return Ordering.natural().sortedCopy(collection);
+            }
+
+            @Override
+            public FunctionDescriptor<Collection> descriptor() {
+                return FunctionDescriptor.<Collection>builder()
+                        .name("sort")
+                        .returnType(Collection.class)
+                        .params(of(param().name("collection").type(Collection.class).build()))
                         .build();
             }
         });
@@ -343,6 +381,14 @@ public class RuleParserTest {
             assertTrue(e.getErrors().stream().allMatch(error -> error instanceof OptionalParametersMustBeNamed));
         }
 
+    }
+
+    @Test
+    public void mapArrayLiteral() {
+        final Rule rule = parser.parseRule(ruleForTest());
+        Message message = new Message("hello test", "source", DateTime.now());
+        evaluateRule(rule, message);
+        assertTrue(actionsTriggered.get());
     }
 
     @Test

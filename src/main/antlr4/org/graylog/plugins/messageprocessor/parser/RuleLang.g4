@@ -33,18 +33,35 @@ grammar RuleLang;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 }
 
+file
+    :   ruleDeclaration* pipelineDecl* EOF
+    ;
+
+pipelineDecl
+    :   'pipeline' name=Identifier
+        (When condition=expression)?
+        'run'
+            ruleRef*
+        End
+    ;
+
+ruleRef
+    :   Identifier ';'
+    |   ';'
+    ;
+
 ruleDeclaration
-    :   Rule name=String
+    :   Rule name=Identifier
+            title=String?
+            description=String?
         (During Stage stage=Integer)?
         When condition=expression
         Then actions=statement*
         End
-        EOF
     ;
 
 expression
-    :   primary                                                         # PrimaryExpression
-    |   MessageRef '.' field=expression                                 # MessageRef
+    :   MessageRef '.' field=expression                                 # MessageRef
     |   fieldSet=expression '.' field=expression                        # Nested
     |   fieldSet=expression '[' expression ']'                          # Array
     |   functionCall                                                    # Func
@@ -53,12 +70,15 @@ expression
     |   left=expression and=And right=expression                        # And
     |   left=expression or=Or right=expression                          # Or
     |   not=Not expression                                              # Not
+    |   Identifier                                                      # Identifier
+    |   literal                                                         # LiteralPrimary
+    |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
+    |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
+    |   '(' expression ')'                                              # ParenExpr
     ;
 
-primary
-    :   '(' expression ')'              # ParenExpr
-    |   literal                         # LiteralPrimary
-    |   Identifier                      # Identifier
+propAssignment
+    :   Identifier ':' expression
     ;
 
 statement
@@ -72,8 +92,8 @@ functionCall
     ;
 
 arguments
-    :   Identifier ':' expression (',' Identifier ':' expression)*  # NamedArgs
-    |   expression (',' expression)*                                # PositionalArgs
+    :   propAssignment (',' propAssignment)*    # NamedArgs
+    |   expression (',' expression)*            # PositionalArgs
     ;
 
 literal
