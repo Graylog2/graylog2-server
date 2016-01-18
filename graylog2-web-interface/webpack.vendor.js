@@ -8,6 +8,8 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 
 const vendorModules = require('./vendor.modules');
 
+console.log('Building vendor bundle.');
+
 const webpackConfig = {
   entry: {
     //app: APP_PATH,

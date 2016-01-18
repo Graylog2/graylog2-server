@@ -5,13 +5,9 @@ const Clean = require('clean-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
-const SHARED_PATH = path.resolve(ROOT_PATH, 'src', 'components', 'common');
-const UTIL_PATH = path.resolve(ROOT_PATH, 'src', 'util');
-const LOGIC_PATH = path.resolve(ROOT_PATH, 'src', 'logic');
-
 const VENDOR_MANIFEST = require('./build/vendor-manifest.json');
 
-const vendorModules = require('./vendor.modules.js');
+console.log('Building shared bundle.');
 
 const webpackConfig = {
   entry: {
