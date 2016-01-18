@@ -33,31 +33,13 @@ grammar RuleLang;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 }
 
-file
-    :   ruleDeclaration* pipelineDecl* EOF
-    ;
-
-pipelineDecl
-    :   'pipeline' name=Identifier
-        (When condition=expression)?
-        'run'
-            ruleRef*
-        End
-    ;
-
-ruleRef
-    :   Identifier ';'
-    |   ';'
-    ;
-
 ruleDeclaration
-    :   Rule name=Identifier
-            title=String?
-            description=String?
+    :   Rule name=String
         (During Stage stage=Integer)?
         When condition=expression
         Then actions=statement*
         End
+        EOF
     ;
 
 expression
