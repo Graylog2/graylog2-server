@@ -15,7 +15,7 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.rest.resources.system;
+package org.graylog2.shared.rest.resources.system;
 
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import retrofit2.Call;
