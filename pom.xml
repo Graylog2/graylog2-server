@@ -937,6 +937,9 @@
                             <include>**/src/main/java/**</include>
                             <include>**/src/test/java/**</include>
                         </includes>
+                        <excludes>
+                            <exclude>graylog2-web-interface/plugin/**</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
