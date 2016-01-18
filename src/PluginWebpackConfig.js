@@ -7,7 +7,6 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
     entry: {
-      plugin: options.entry_path,
     },
     output: {
       path: options.build_path,
@@ -33,6 +32,7 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
       modulesDirectories: ['src/web', 'node_modules'],
     },
   };
+  config.entry['plugin.' + fqcn] = options.entry_path;
   
   if (additionalConfig) {
     return merge(config, additionalConfig);
