@@ -67,7 +67,7 @@ public class IndexRetentionThread extends Periodical {
         final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategy());
 
         if (retentionStrategyProvider == null) {
-            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.retentionStrategy());
+            LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategy());
             return;
         }
 
