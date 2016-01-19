@@ -1,0 +1,13 @@
+{
+  "nodes": [
+    {
+      "_id" : { "$oid": "569e0f60c83026b93fb2ecb6"},
+      "is_master" : true,
+      "last_seen" : 1453209426,
+      "transport_address" : "http://10.0.0.1:12900",
+      "type" : "SERVER",
+      "hostname": "host.example.com",
+      "node_id" : "28164cbe-4ad9-4c9c-a76e-088655aa7889"
+    }
+  ]
+}

@@ -52,7 +52,16 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         fields.put("hostname", hostname);
 
         try {
-            return save(new NodeImpl(fields));
+            Node node;
+            try {
+                // Update existing node object.
+                final String objectId = byNodeId(nodeId).getId();
+                node = new NodeImpl(new ObjectId(objectId), fields);
+            } catch (NodeNotFoundException e) {
+                // Create new node object.
+                node = new NodeImpl(fields);
+            }
+            return save(node);
         } catch (ValidationException e) {
             throw new RuntimeException("Validation failed.", e);
         }
