@@ -1,0 +1,5 @@
+rule "test"
+when string(message.`@specialfieldname`, "empty") == "string"
+then
+    trigger_test();
+end

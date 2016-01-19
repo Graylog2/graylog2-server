@@ -1,0 +1,5 @@
+rule "optionalParamsMustBeNamed"
+when
+    optional(false, "string", 3)
+then
+end

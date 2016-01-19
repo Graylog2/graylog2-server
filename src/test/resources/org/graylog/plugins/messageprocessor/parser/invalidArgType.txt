@@ -1,0 +1,6 @@
+rule "invalid arg type"
+when one_arg(0d) == "0"   // one_arg needs a String argument, but 0d is Double
+then
+    let x = double_valued_func();
+    one_arg(x); // this needs a String argument, but x resolves to Double
+end

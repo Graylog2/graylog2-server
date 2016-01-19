@@ -32,11 +32,10 @@ Usage
 
 __Use this paragraph to document the usage of your plugin__
 
-
 Getting started
 ---------------
 
-This project is using Maven 3 and requires Java 7 or higher.
+This project is using Maven 3 and requires Java 8 or higher. The plugin will require Graylog 2.0.0 or higher.
 
 * Clone this repository.
 * Run `mvn package` to build a JAR file.
@@ -56,3 +55,4 @@ $ mvn release:perform
 ```
 
 This sets the version numbers, creates a tag and pushes to GitHub. Travis CI will build the release artifacts and upload to GitHub automatically.
+

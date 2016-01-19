@@ -1,0 +1,6 @@
+rule "something"
+during stage 0
+when double_valued_func() > 1.0d AND false == true
+then
+double_valued_func();
+end
