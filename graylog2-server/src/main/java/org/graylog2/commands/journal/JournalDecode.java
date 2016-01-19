@@ -16,7 +16,6 @@
  */
 package org.graylog2.commands.journal;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
@@ -25,12 +24,12 @@ import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
-import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -52,7 +51,7 @@ public class JournalDecode extends AbstractJournalCommand {
     protected List<Module> getCommandBindings() {
         final ArrayList<Module> modules = Lists.newArrayList(super.getCommandBindings());
         modules.add(new CodecsModule());
-        modules.add(new ServerObjectMapperModule());
+        modules.add(new ObjectMapperModule());
         return modules;
     }
 
