@@ -47,6 +47,7 @@ import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.UI;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -110,6 +111,7 @@ public class Server extends ServerBootstrap {
                 new RotationStrategyBindings(),
                 new RetentionStrategyBindings(),
                 new PeriodicalBindings(),
+                new ObjectMapperModule(),
                 new RestApiBindings(),
                 new PasswordAlgorithmBindings()
         );
