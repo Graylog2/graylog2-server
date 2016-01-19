@@ -16,7 +16,7 @@ const NodeOrGlobalSelect = React.createClass({
   getInitialState() {
     return {
       global: this.props.global !== undefined ? this.props.global : false,
-      node: this.props.node !== undefined ? this.props.node : 'placeholder',
+      node: this.props.node,
     };
   },
   _onChangeGlobal(evt) {
@@ -46,8 +46,8 @@ const NodeOrGlobalSelect = React.createClass({
 
     const nodeSelect = !this.state.global ? (
       <Input type="select" label="Node" placeholder="placeholder" value={this.state.node}
-             help="On which node should this input start" onChange={this._onChangeNode}>
-        <option key="placeholder" disabled value="placeholder">Select Node</option>
+             help="On which node should this input start" onChange={this._onChangeNode} required>
+        <option key="placeholder" value="">Select Node</option>
         {options}
       </Input>
     ) : null;
