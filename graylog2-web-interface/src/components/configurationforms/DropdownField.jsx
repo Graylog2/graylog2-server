@@ -25,7 +25,7 @@ const DropdownField = React.createClass({
   },
   _formatOption(value, key) {
     return (
-      <option key={this.state.typeName + '-' + this.state.field + '-' + key}value={key} id={key}>{value}</option>
+      <option key={this.state.typeName + '-' + this.state.field + '-' + key} value={key} id={key}>{value}</option>
     );
   },
   handleChange(evt) {
