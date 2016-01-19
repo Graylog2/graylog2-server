@@ -21,12 +21,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.shared.jackson.SizeSerializer;
+import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
@@ -36,13 +39,22 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
     public ObjectMapperProvider() {
-        this.objectMapper = new ObjectMapper()
+        this(ObjectMapperProvider.class.getClassLoader());
+    }
+
+    @Inject
+    public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
+
+        this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
+                .setTypeFactory(typeFactory)
                 .registerModule(new JodaModule())
                 .registerModule(new GuavaModule())
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-                .registerModule(new SimpleModule()
+                .registerModule(new SimpleModule("Graylog")
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer()));
