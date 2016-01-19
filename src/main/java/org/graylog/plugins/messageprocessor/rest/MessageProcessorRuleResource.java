@@ -7,7 +7,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog.plugins.messageprocessor.db.RuleSourceService;
 import org.graylog.plugins.messageprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.messageprocessor.parser.ParseException;
-import org.graylog.plugins.messageprocessor.parser.RuleParser;
+import org.graylog.plugins.messageprocessor.parser.PipelineRuleParser;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -38,15 +38,15 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     private static final Logger log = LoggerFactory.getLogger(MessageProcessorRuleResource.class);
 
     private final RuleSourceService ruleSourceService;
-    private final RuleParser ruleParser;
+    private final PipelineRuleParser pipelineRuleParser;
     private final EventBus clusterBus;
 
     @Inject
     public MessageProcessorRuleResource(RuleSourceService ruleSourceService,
-                                        RuleParser ruleParser,
+                                        PipelineRuleParser pipelineRuleParser,
                                         @ClusterEventBus EventBus clusterBus) {
         this.ruleSourceService = ruleSourceService;
-        this.ruleParser = ruleParser;
+        this.pipelineRuleParser = pipelineRuleParser;
         this.clusterBus = clusterBus;
     }
 
@@ -58,7 +58,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
     @POST
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull String ruleSource) throws ParseException {
         try {
-            ruleParser.parseRule(ruleSource);
+            pipelineRuleParser.parseRule(ruleSource);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
@@ -100,7 +100,7 @@ public class MessageProcessorRuleResource extends RestResource implements Plugin
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         final RuleSource ruleSource = ruleSourceService.load(id);
         try {
-            ruleParser.parseRule(update.source());
+            pipelineRuleParser.parseRule(update.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }

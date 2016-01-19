@@ -15,7 +15,7 @@ import org.graylog.plugins.messageprocessor.ast.statements.Statement;
 import org.graylog.plugins.messageprocessor.db.RuleSourceService;
 import org.graylog.plugins.messageprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.messageprocessor.parser.ParseException;
-import org.graylog.plugins.messageprocessor.parser.RuleParser;
+import org.graylog.plugins.messageprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.messageprocessor.rest.RuleSource;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
@@ -47,7 +47,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
 
     @Inject
     public NaiveRuleProcessor(RuleSourceService ruleSourceService,
-                              RuleParser ruleParser,
+                              PipelineRuleParser pipelineRuleParser,
                               Journal journal,
                               MetricRegistry metricRegistry,
                               @Named("daemonScheduler") ScheduledExecutorService scheduledExecutorService,
@@ -56,7 +56,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         clusterBus.register(this);
         ruleCache = CacheBuilder.newBuilder()
-                .build(asyncReloading(new RuleLoader(ruleSourceService, ruleParser), scheduledExecutorService));
+                .build(asyncReloading(new RuleLoader(ruleSourceService, pipelineRuleParser), scheduledExecutorService));
         // prime the cache with all presently stored rules
         try {
             ruleCache.getAll(Collections.emptyList());
@@ -110,11 +110,11 @@ public class NaiveRuleProcessor implements MessageProcessor {
 
     private static class RuleLoader extends CacheLoader<String, Rule> {
         private final RuleSourceService ruleSourceService;
-        private final RuleParser ruleParser;
+        private final PipelineRuleParser pipelineRuleParser;
 
-        public RuleLoader(RuleSourceService ruleSourceService, RuleParser ruleParser) {
+        public RuleLoader(RuleSourceService ruleSourceService, PipelineRuleParser pipelineRuleParser) {
             this.ruleSourceService = ruleSourceService;
-            this.ruleParser = ruleParser;
+            this.pipelineRuleParser = pipelineRuleParser;
         }
 
         @Override
@@ -128,7 +128,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
                     }
                 }
                 try {
-                    all.put(ruleSource.id(), ruleParser.parseRule(ruleSource.source()));
+                    all.put(ruleSource.id(), pipelineRuleParser.parseRule(ruleSource.source()));
                 } catch (ParseException e) {
                     log.error("Unable to parse rule: " + e.getMessage());
                 }
@@ -140,7 +140,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
         public Rule load(@Nullable String ruleId) throws Exception {
             final RuleSource ruleSource = ruleSourceService.load(ruleId);
             try {
-                return ruleParser.parseRule(ruleSource.source());
+                return pipelineRuleParser.parseRule(ruleSource.source());
             } catch (ParseException e) {
                 log.error("Unable to parse rule: " + e.getMessage());
                 throw e;

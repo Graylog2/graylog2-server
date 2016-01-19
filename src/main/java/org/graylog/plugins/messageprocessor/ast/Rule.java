@@ -11,21 +11,18 @@ public abstract class Rule {
 
     public abstract String name();
 
-    public abstract int stage();
-
     public abstract LogicalExpression when();
 
     public abstract Collection<Statement> then();
 
     public static Builder builder() {
-        return new AutoValue_Rule.Builder().stage(0);
+        return new AutoValue_Rule.Builder();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
 
         public abstract Builder name(String name);
-        public abstract Builder stage(int stage);
         public abstract Builder when(LogicalExpression condition);
         public abstract Builder then(Collection<Statement> actions);
 

@@ -33,13 +33,41 @@ grammar RuleLang;
 import org.graylog.plugins.messageprocessor.ast.expressions.Expression;
 }
 
+file
+    :   (   ruleDeclaration
+        |   pipelineDeclaration
+        )+
+        EOF
+    ;
+
+pipelineDecls
+    :   pipelineDeclaration+ EOF
+    ;
+
+pipelineDeclaration
+    :   Pipeline name=String
+        stageDeclaration+
+        End
+    ;
+
+stageDeclaration
+    :   Stage stage=Integer Match modifier=(All|Either)
+        ruleRef+
+    ;
+
+ruleRef
+    :   Rule name=String
+    ;
+
+ruleDecls
+    :   ruleDeclaration+ EOF
+    ;
+
 ruleDeclaration
     :   Rule name=String
-        (During Stage stage=Integer)?
         When condition=expression
-        Then actions=statement*
+        (Then actions=statement*)?
         End
-        EOF
     ;
 
 expression
@@ -88,9 +116,12 @@ literal
 
 // Lexer
 
+All : A L L;
+Either: E I T H E R;
 And : A N D | '&&';
 Or: O R | '||';
 Not: N O T | '!';
+Pipeline: P I P E L I N E;
 Rule: R U L E;
 During: D U R I N G;
 Stage: S T A G E;
@@ -98,6 +129,7 @@ When: W H E N;
 Then: T H E N;
 End: E N D;
 Let: L E T;
+Match: M A T C H;
 MessageRef: 'message';
 
 Boolean

@@ -1,11 +1,14 @@
 package org.graylog.plugins.messageprocessor.parser;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.graylog.plugins.messageprocessor.EvaluationContext;
+import org.graylog.plugins.messageprocessor.ast.Pipeline;
 import org.graylog.plugins.messageprocessor.ast.Rule;
+import org.graylog.plugins.messageprocessor.ast.Stage;
 import org.graylog.plugins.messageprocessor.ast.functions.Function;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.messageprocessor.ast.functions.FunctionDescriptor;
@@ -44,17 +47,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.messageprocessor.ast.functions.ParameterDescriptor.param;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class RuleParserTest {
+public class PipelineRuleParserTest {
 
     @org.junit.Rule
     public TestName name = new TestName();
 
-    private RuleParser parser;
+    private PipelineRuleParser parser;
     private static FunctionRegistry functionRegistry;
 
     private static final AtomicBoolean actionsTriggered = new AtomicBoolean(false);
@@ -214,7 +218,9 @@ public class RuleParserTest {
         functions.put("sort", new Function<Collection>() {
             @Override
             public Collection evaluate(FunctionArgs args, EvaluationContext context) {
-                final Collection collection = args.evaluated("collection", context, Collection.class).orElse(Collections.emptyList());
+                final Collection collection = args.evaluated("collection",
+                                                             context,
+                                                             Collection.class).orElse(Collections.emptyList());
                 return Ordering.natural().sortedCopy(collection);
             }
 
@@ -236,7 +242,7 @@ public class RuleParserTest {
 
     @Before
     public void setup() {
-        parser = new RuleParser(functionRegistry);
+        parser = new PipelineRuleParser(functionRegistry);
         // initialize before every test!
         actionsTriggered.set(false);
     }
@@ -258,8 +264,10 @@ public class RuleParserTest {
             parser.parseRule(ruleForTest());
             fail("should throw error: undeclared variable x");
         } catch (ParseException e) {
-            assertEquals(2, e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
-            assertTrue("Should find error UndeclaredVariable", e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
+            assertEquals(2,
+                         e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
+            assertTrue("Should find error UndeclaredVariable",
+                       e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
         }
     }
 
@@ -400,6 +408,26 @@ public class RuleParserTest {
         } catch (ParseException e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void pipelineDeclaration() throws Exception {
+        final List<Pipeline> pipelines = parser.parsePipelines(ruleForTest());
+        assertEquals(1, pipelines.size());
+        final Pipeline pipeline = Iterables.getOnlyElement(pipelines);
+        assertEquals("cisco", pipeline.name());
+        assertEquals(2, pipeline.stages().size());
+        final Stage stage1 = pipeline.stages().get(0);
+        final Stage stage2 = pipeline.stages().get(1);
+
+        assertEquals(true, stage1.matchAll());
+        assertEquals(1, stage1.stage());
+        assertArrayEquals(new Object[]{"check_ip_whitelist", "cisco_device"}, stage1.ruleReferences().toArray());
+
+        assertEquals(false, stage2.matchAll());
+        assertEquals(2, stage2.stage());
+        assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"},
+                          stage2.ruleReferences().toArray());
     }
 
     private Message evaluateRule(Rule rule, Message message) {

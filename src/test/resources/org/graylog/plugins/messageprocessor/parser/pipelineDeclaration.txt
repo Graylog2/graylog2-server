@@ -1,0 +1,11 @@
+pipeline "cisco"
+stage 1 match all
+    rule "check_ip_whitelist"
+    rule "cisco_device"
+stage 2 match either
+    rule "parse_cisco_time"
+    rule "extract_src_dest"
+    rule "normalize_src_dest"
+    rule "lookup_ips"
+    rule "resolve_ips"
+end

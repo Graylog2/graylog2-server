@@ -11,8 +11,9 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.mina.util.IdentityHashSet;
-import org.graylog.plugins.messageprocessor.ast.expressions.MapExpression;
+import org.graylog.plugins.messageprocessor.ast.Pipeline;
 import org.graylog.plugins.messageprocessor.ast.Rule;
+import org.graylog.plugins.messageprocessor.ast.Stage;
 import org.graylog.plugins.messageprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.ArrayExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.BinaryExpression;
@@ -27,6 +28,7 @@ import org.graylog.plugins.messageprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.FunctionExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.LongExpression;
+import org.graylog.plugins.messageprocessor.ast.expressions.MapExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.MessageRefExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.messageprocessor.ast.expressions.OrExpression;
@@ -57,18 +59,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class RuleParser {
+import static java.util.stream.Collectors.toList;
+
+public class PipelineRuleParser {
 
     private final FunctionRegistry functionRegistry;
 
     @Inject
-    public RuleParser(FunctionRegistry functionRegistry) {
+    public PipelineRuleParser(FunctionRegistry functionRegistry) {
         this.functionRegistry = functionRegistry;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(RuleParser.class);
+    private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
     public Rule parseRule(String rule) throws ParseException {
@@ -90,7 +93,22 @@ public class RuleParser {
         WALKER.walk(new TypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
-            return parseContext.getRule();
+            return parseContext.getRules().get(0);
+        }
+        throw new ParseException(parseContext.getErrors());
+    }
+
+    public List<Pipeline> parsePipelines(String pipeline) throws ParseException {
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipeline));
+        final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
+
+        final RuleLangParser.PipelineDeclsContext pipelineDeclsContext = parser.pipelineDecls();
+        final ParseContext parseContext = new ParseContext();
+
+        WALKER.walk(new AstBuilder(parseContext), pipelineDeclsContext);
+
+        if (parseContext.getErrors().isEmpty()) {
+            return parseContext.pipelines;
         }
         throw new ParseException(parseContext.getErrors());
     }
@@ -112,6 +130,55 @@ public class RuleParser {
             args = parseContext.arguments();
             argsList = parseContext.argumentLists();
             exprs = parseContext.expressions();
+        }
+
+        @Override
+        public void exitPipelineDeclaration(RuleLangParser.PipelineDeclarationContext ctx) {
+            final Pipeline.Builder builder = Pipeline.builder();
+
+            builder.name(Tools.unquote(ctx.name.getText(), '"'));
+            List<Stage> stages = Lists.newArrayList();
+            for (RuleLangParser.StageDeclarationContext stage : ctx.stageDeclaration()) {
+                final Stage.Builder stageBuilder = Stage.builder();
+
+                final int stageNumber = Integer.parseInt(stage.stage.getText());
+                stageBuilder.stage(stageNumber);
+
+                final boolean isAllModifier = stage.modifier.getText().equalsIgnoreCase("all");
+                stageBuilder.matchAll(isAllModifier);
+
+                final List<String> ruleRefs = stage.ruleRef().stream()
+                        .map(ruleRefContext -> Tools.unquote(ruleRefContext.name.getText(), '"'))
+                        .collect(toList());
+                stageBuilder.ruleReferences(ruleRefs);
+
+                stages.add(stageBuilder.build());
+            }
+
+            builder.stages(stages);
+            parseContext.pipelines.add(builder.build());
+        }
+
+        @Override
+        public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
+            final Rule.Builder ruleBuilder = Rule.builder();
+            ruleBuilder.name(Tools.unquote(ctx.name.getText(), '"'));
+            final Expression expr = exprs.get(ctx.condition);
+
+            LogicalExpression condition;
+            if (expr instanceof LogicalExpression) {
+                condition = (LogicalExpression) expr;
+            } else if (expr.getType().equals(Boolean.class)) {
+                condition = new BooleanValuedFunctionWrapper(expr);
+            } else {
+                condition = new BooleanExpression(false);
+                log.debug("Unable to create condition, replacing with 'false'");
+            }
+            ruleBuilder.when(condition);
+            ruleBuilder.then(parseContext.statements);
+            final Rule rule = ruleBuilder.build();
+            parseContext.addRule(rule);
+            log.info("Declaring rule {}", rule);
         }
 
         @Override
@@ -155,7 +222,7 @@ public class RuleParser {
                                         .filter(p -> !p.optional())
                                         .map(p -> givenArguments.containsKey(p.name()) ? null : p)
                                         .filter(p -> p != null)
-                                        .collect(Collectors.toList());
+                                        .collect(toList());
                         for (ParameterDescriptor param : missingParams) {
                             parseContext.addError(new MissingRequiredParam(ctx, function, param));
                         }
@@ -229,33 +296,8 @@ public class RuleParser {
         @Override
         public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
             List<Expression> expressions = Lists.newArrayListWithCapacity(ctx.expression().size());
-            expressions.addAll(ctx.expression().stream().map(exprs::get).collect(Collectors.toList()));
+            expressions.addAll(ctx.expression().stream().map(exprs::get).collect(toList()));
             argsList.put(ctx, expressions);
-        }
-
-        @Override
-        public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
-            final Rule.Builder ruleBuilder = Rule.builder();
-            ruleBuilder.name(ctx.name.getText());
-            if (ctx.stage != null) {
-                ruleBuilder.stage(Integer.parseInt(ctx.stage.getText()));
-            }
-            final Expression expr = exprs.get(ctx.condition);
-
-            LogicalExpression condition;
-            if (expr instanceof LogicalExpression) {
-                condition = (LogicalExpression) expr;
-            } else if (expr.getType().equals(Boolean.class)) {
-                condition = new BooleanValuedFunctionWrapper(expr);
-            } else {
-                condition = new BooleanExpression(false);
-                log.debug("Unable to create condition, replacing with 'false'");
-            }
-            ruleBuilder.when(condition);
-            ruleBuilder.then(parseContext.statements);
-            final Rule rule = ruleBuilder.build();
-            parseContext.setRule(rule);
-            log.info("Declaring rule {}", rule);
         }
 
         @Override
@@ -322,6 +364,7 @@ public class RuleParser {
 
         @Override
         public void exitInteger(RuleLangParser.IntegerContext ctx) {
+            // TODO handle different radix and length
             final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
             log.info("INT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -342,8 +385,8 @@ public class RuleParser {
 
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
-            final String text = ctx.getText();
-            final StringExpression expr = new StringExpression(text.substring(1, text.length() - 1));
+            final String text = Tools.unquote(ctx.getText(), '\"');
+            final StringExpression expr = new StringExpression(text);
             log.info("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -364,7 +407,7 @@ public class RuleParser {
 
         @Override
         public void exitArrayLiteralExpr(RuleLangParser.ArrayLiteralExprContext ctx) {
-            final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(Collectors.toList());
+            final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(toList());
             exprs.put(ctx, new ArrayExpression(elements));
         }
 
@@ -550,8 +593,9 @@ public class RuleParser {
         // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
         private Set<RuleContext> innerNodes = new IdentityHashSet<>();
         public List<Statement> statements = Lists.newArrayList();
-        public Rule rule;
+        public List<Rule> rules = Lists.newArrayList();
         private Map<String, Expression> varDecls = Maps.newHashMap();
+        public List<Pipeline> pipelines = Lists.newArrayList();
 
         public ParseTreeProperty<Expression> expressions() {
             return exprs;
@@ -561,12 +605,19 @@ public class RuleParser {
             return args;
         }
 
-        public Rule getRule() {
-            return rule;
+        public List<Rule> getRules() {
+            return rules;
         }
 
-        public void setRule(Rule rule) {
-            this.rule = rule;
+        public void setRules(List<Rule> rules) {
+            this.rules = rules;
+        }
+        public void addRule(Rule rule) {
+            this.rules.add(rule);
+        }
+
+        public List<Pipeline> getPipelines() {
+            return pipelines;
         }
 
         public Set<ParseError> getErrors() {
