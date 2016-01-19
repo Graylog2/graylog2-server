@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.eaio.uuid.UUID;
-import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -34,16 +33,15 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -52,9 +50,6 @@ import java.util.Map;
 @Path("/system/cluster")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterResource extends RestResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
-
     private final NodeService nodeService;
     private final NodeId nodeId;
     private final ClusterId clusterId;
@@ -73,11 +68,10 @@ public class ClusterResource extends RestResource {
     @Path("/nodes")
     @ApiOperation(value = "List all active nodes in this cluster.")
     public NodeSummaryList nodes() {
-        final List<NodeSummary> nodeList = Lists.newArrayList();
-
         final Map<String, Node> nodes = nodeService.allActive(Node.Type.SERVER);
-        for (Map.Entry<String, Node> e : nodes.entrySet()) {
-            nodeList.add(nodeSummary(e.getValue()));
+        final List<NodeSummary> nodeList = new ArrayList<>(nodes.size());
+        for (Node node : nodes.values()) {
+            nodeList.add(nodeSummary(node));
         }
 
         return NodeSummaryList.create(nodeList);
@@ -102,12 +96,7 @@ public class ClusterResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Node not found.")
     })
-    public NodeSummary node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) throws NodeNotFoundException {
-        if (nodeId == null || nodeId.isEmpty()) {
-            LOG.error("Missing nodeId. Returning HTTP 400.");
-            throw new BadRequestException();
-        }
-
+    public NodeSummary node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId) throws NodeNotFoundException {
         return nodeSummary(nodeService.byNodeId(nodeId));
     }
 
