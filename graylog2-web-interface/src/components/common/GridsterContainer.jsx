@@ -65,7 +65,6 @@ const GridsterContainer = React.createClass({
     const positions = this.state.grid.serialize().map((position) => {
       return {id: position.id, col: position.col, row: position.row, width: position.size_x, height: position.size_y};
     });
-    console.log(positions);
     this.props.onPositionsChange(positions);
   },
 

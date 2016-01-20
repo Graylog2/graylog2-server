@@ -2,7 +2,7 @@ const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
 
-const pluginConfigs = glob.sync('./plugin/*/webpack.config.js');
+const pluginConfigs = glob.sync('../../graylog-plugin-*/webpack.config.js');
 
 module.exports = ['./webpack.config.js']
   .concat(pluginConfigs)
