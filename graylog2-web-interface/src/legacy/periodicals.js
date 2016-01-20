@@ -11,7 +11,7 @@ $(document).ready(function() {
                 var logs = $(this);
                 $.ajax({
                     url: appPrefixed('/a/system/internallogs/' + encodeURIComponent(nodeId)),
-                    headers: { "X-Graylog2-No-Session-Extension" : "true"},
+                    headers: { "X-Graylog-No-Session-Extension" : "true"},
                     success: function(data) {
                         logs.intChange(numeral(data.total).format("0,0"));
                     }
@@ -33,7 +33,7 @@ $(document).ready(function() {
                 var theseMetrics = $(this);
                 $.ajax({
                     url: appPrefixed('/a/system/internallogs/' + encodeURIComponent(nodeId) + '/metrics'),
-                    headers: { "X-Graylog2-No-Session-Extension" : "true"},
+                    headers: { "X-Graylog-No-Session-Extension" : "true"},
                     success: function(data) {
                         for (var level in data) {
                             var metrics = data[level];
