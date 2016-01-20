@@ -38,6 +38,7 @@ import java.util.Set;
 @Singleton
 public class RestApiService extends AbstractJerseyService {
     private static final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
+    public static final String PLUGIN_PREFIX = "/plugins";
 
     private final BaseConfiguration configuration;
     private final Map<String, Set<PluginRestResource>> pluginRestResources;
@@ -72,7 +73,7 @@ public class RestApiService extends AbstractJerseyService {
                 configuration.getRestMaxHeaderSize(),
                 configuration.isRestEnableGzip(),
                 configuration.isRestEnableCors(),
-                prefixPluginResources("/plugins", pluginRestResources),
+                prefixPluginResources(PLUGIN_PREFIX, pluginRestResources),
                 restControllerPackages);
 
         httpServer.start();
