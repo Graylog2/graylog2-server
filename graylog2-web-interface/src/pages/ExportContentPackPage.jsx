@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 
+import FileSaver from 'logic/files/FileSaver';
 import UserNotification from 'util/UserNotification';
 
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
@@ -12,6 +13,7 @@ import OutputsStore from 'stores/outputs/OutputsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
 import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
+import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
 
 import PageHeader from 'components/common/PageHeader';
 
@@ -58,12 +60,8 @@ const ExportContentPackPage = React.createClass({
     });
     ConfigurationBundlesActions.export.triggerPromise(request)
       .then((response) => {
-        UserNotification.success('Successfully export content pack. Starting download ...', 'Success!');
-
-        var link = document.createElement('a');
-        link.download = 'content_pack.json';
-        link.href = 'data:application/x-force-download;charset=utf-8,' + encodeURIComponent(response);
-        link.click();
+        UserNotification.success('Successfully export content pack. Starting download...', 'Success!');
+        FileSaver.save(response, 'content_pack.json', 'application/json', 'utf-8');
       });
   },
   isEmpty(obj) {
@@ -249,7 +247,7 @@ const ExportContentPackPage = React.createClass({
 
               <div className="form-group">
                 <Col smOffset={2} sm={10}>
-                  <Button download="data:application/csv;charset=utf-8,foo,bar,baz" bsStyle="success" type="submit">
+                  <Button bsStyle="success" type="submit">
                     <i className="fa fa-cloud-download"/> Download my content pack
                   </Button>
 
