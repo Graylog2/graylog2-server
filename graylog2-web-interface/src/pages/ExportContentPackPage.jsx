@@ -119,7 +119,7 @@ const ExportContentPackPage = React.createClass({
   },
   selectAll(group) {
     Object.keys(this.refs).forEach((key) => {
-      if (key.startsWith(group)) {
+      if (key.indexOf(group) === 0) {
         this.refs[key].checked = true;
       }
     });
