@@ -289,11 +289,6 @@
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog.plugins</groupId>
-            <artifactId>usage-statistics</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.wordnik</groupId>
             <artifactId>swagger-annotations</artifactId>
         </dependency>
@@ -436,7 +431,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <attach>false</attach>
+                    <attach>true</attach>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
                         <descriptor>src/main/assembly/graylog.xml</descriptor>

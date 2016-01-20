@@ -1057,7 +1057,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <attach>false</attach>
+                    <attach>true</attach>
                     <appendAssemblyId>false</appendAssemblyId>
                     <!-- we don't care about assembling the parent, just run the goal on the project, pretty please -->
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
