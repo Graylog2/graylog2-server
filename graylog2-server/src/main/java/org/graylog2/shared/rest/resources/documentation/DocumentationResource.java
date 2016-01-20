@@ -21,6 +21,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -32,19 +33,40 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static org.graylog2.shared.initializers.RestApiService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
 public class DocumentationResource extends RestResource {
 
     private BaseConfiguration configuration;
-    private final String[] restControllerPackages;
+    private final Set<String> restControllerPackages = new HashSet<>();
+    private final Map<Class<?>, String> pluginRestControllerMapping = new HashMap<>();
 
     @Inject
-    public DocumentationResource(BaseConfiguration configuration, @Named("RestControllerPackages") String[] restControllerPackages) {
+    public DocumentationResource(BaseConfiguration configuration,
+                                 @Named("RestControllerPackages") String[] restControllerPackages,
+                                 Map<String, Set<PluginRestResource>> pluginRestResources) {
+
         this.configuration = configuration;
-        this.restControllerPackages = restControllerPackages;
+
+        this.restControllerPackages.addAll(Arrays.asList(restControllerPackages));
+
+        // All plugin resources get the plugin prefix + the plugin package.
+        for (Map.Entry<String, Set<PluginRestResource>> entry : pluginRestResources.entrySet()) {
+            final String pluginPackage = entry.getKey();
+            this.restControllerPackages.add(pluginPackage);
+
+            for (PluginRestResource pluginRestResource : entry.getValue()) {
+                this.pluginRestControllerMapping.put(pluginRestResource.getClass(), pluginPackage);
+            }
+        }
     }
 
     @GET
@@ -52,7 +74,7 @@ public class DocumentationResource extends RestResource {
     @ApiOperation(value = "Get API documentation")
     @Produces(MediaType.APPLICATION_JSON)
     public Response overview() {
-        return buildSuccessfulCORSResponse(new Generator(restControllerPackages, objectMapper).generateOverview());
+        return buildSuccessfulCORSResponse(new Generator(restControllerPackages, pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper).generateOverview());
     }
 
     @GET
@@ -63,7 +85,7 @@ public class DocumentationResource extends RestResource {
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route) {
         return buildSuccessfulCORSResponse(
-                new Generator(restControllerPackages, objectMapper).generateForRoute(route, configuration.getRestTransportUri().toString())
+                new Generator(restControllerPackages, pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper).generateForRoute(route, configuration.getRestTransportUri().toString())
         );
     }
 
