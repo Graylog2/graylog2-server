@@ -93,6 +93,8 @@ public class SystemJobManager {
                     LOG.info(msg);
                     activityWriter.write(new Activity(msg, SystemJobManager.class));
                 } catch (SystemJobConcurrencyException ignored) {
+                } catch (Exception e) {
+                    LOG.error("Unhandled error while running SystemJob <" + job.getId() + "> [" + jobClass + "]", e);
                 } finally {
                     jobs.remove(job.getId());
                 }
