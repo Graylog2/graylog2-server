@@ -67,7 +67,7 @@ public abstract class BaseConfiguration {
     private String inputBufferWaitStrategy = "blocking";
 
     @Parameter(value = "rest_enable_cors")
-    private boolean restEnableCors = false;
+    private boolean restEnableCors = true;
 
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
