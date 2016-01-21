@@ -2,12 +2,10 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
-import { Spinner } from 'components/common';
-
 import { InputStatesStore } from 'stores/inputs';
 
 function inputStateFilter(state) {
-  return state.inputStates[this.props.input.id];
+  return state.inputStates ? state.inputStates[this.props.input.id] : undefined;
 }
 
 const InputStateControl = React.createClass({
