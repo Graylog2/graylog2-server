@@ -30,6 +30,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -38,18 +39,17 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
-
 @RequiresAuthentication
 @Api(value = "System", description = "System information of this node.")
 @Path("/system")
+@Produces(MediaType.APPLICATION_JSON)
 public class SystemResource extends RestResource {
     private final ServerStatus serverStatus;
     private final ClusterId clusterId;
@@ -63,7 +63,6 @@ public class SystemResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get system overview")
-    @Produces(APPLICATION_JSON)
     public SystemOverviewResponse system() {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
@@ -86,7 +85,6 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get JVM information")
     @Path("/jvm")
     @Timed
-    @Produces(APPLICATION_JSON)
     public SystemJVMResponse jvm() {
         checkPermission(RestPermissions.JVMSTATS_READ, serverStatus.getNodeId().toString());
 
@@ -105,8 +103,7 @@ public class SystemResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a thread dump")
     @Path("/threaddump")
-    @Produces(TEXT_PLAIN)
-    public String threaddump() {
+    public SystemThreadDumpResponse threaddump() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
 
         // The ThreadDump is built by internal codahale.metrics servlet library we are abusing.
@@ -114,7 +111,7 @@ public class SystemResource extends RestResource {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         threadDump.dump(output);
-        return new String(output.toByteArray(), StandardCharsets.UTF_8);
+        return SystemThreadDumpResponse.create(new String(output.toByteArray(), StandardCharsets.UTF_8));
     }
 
     private Map<String, Long> bytesToValueMap(long bytes) {

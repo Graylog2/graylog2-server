@@ -1,72 +1,57 @@
-'use strict';
+import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
+import numeral from 'numeral';
 
-var React = require('react');
-//noinspection JSUnusedGlobalSymbols
-var MetricsStore = require('../../stores/metrics/MetricsStore');
-var numeral = require('numeral');
+import { Pluralize, Spinner } from 'components/common';
 
-var metricsStore = MetricsStore.instance;
+import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-var JournalState = React.createClass({
-    getInitialState() {
-        return ({
-            initialized: false,
-            hasError: false,
-            append: 0,
-            read: 0,
-            segments: 0,
-            entriesUncommitted: 0
-        });
-    },
+import MetricsStore from 'stores/metrics/MetricsStore';
 
-    componentWillMount() {
-        var metricNames = [
-            "org.graylog2.journal.append.1-sec-rate",
-            "org.graylog2.journal.read.1-sec-rate",
-            "org.graylog2.journal.segments",
-            "org.graylog2.journal.entries-uncommitted"
-        ];
-        metricsStore.listen({
-            nodeId: this.props.nodeId,
-            metricNames: metricNames,
-            callback: (update, hasError) => {
-                if (hasError) {
-                    this.setState({hasError: hasError});
-                    return;
-                }
-                // update is [{nodeId, values: [{name, value: {metric}}]} ...]
-                // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
+import MetricsActions from 'actions/metrics/MetricsActions';
 
-                var newState = {
-                    initialized: true,
-                    hasError: hasError
-                };
-                // we will only get one result, because we ask for only one node
-                // get the base name from the metric name, and put the gauge metrics into our new state.
-                update[0].values.forEach((namedMetric) => {
-                    var baseName = namedMetric.name.replace('org.graylog2.journal.', '').replace('.1-sec-rate', '');
-                    var camelCase = this.camelCase(baseName);
-                    newState[camelCase] = namedMetric.metric.value;
-                });
-                this.setState(newState);
-            }
-        });
-    },
-
-    render() {
-        return (<span>
-            <strong>{numeral(this.state.entriesUncommitted).format('0,0')} unprocessed messages</strong> are currently in the journal, in {this.state.segments} segments. <strong>
-            {numeral(this.state.append).format('0,0')} messages</strong> have been appended to, and <strong>
-            {numeral(this.state.read).format('0,0')} messages</strong> have been read from the journal in the last second.
-            </span>
-        );
-    },
-    camelCase(input) {
-        return input.toLowerCase().replace(/-(.)/g, function(match, group1) {
-            return group1.toUpperCase();
-        });
+const JournalState = React.createClass({
+  propTypes: {
+    nodeId: PropTypes.string.isRequired,
+  },
+  mixins: [Reflux.connect(MetricsStore)],
+  componentWillMount() {
+    this.metricNames = {
+      append: 'org.graylog2.journal.append.1-sec-rate',
+      read: 'org.graylog2.journal.read.1-sec-rate',
+      segments: 'org.graylog2.journal.segments',
+      entriesUncommited: 'org.graylog2.journal.entries-uncommitted',
+    };
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+  },
+  componentWillUnmount() {
+    Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+  },
+  _isLoading() {
+    return !this.state.metrics;
+  },
+  render() {
+    if (this._isLoading()) {
+      return <Spinner text="Loading journal metrics..."/>;
     }
+
+    const nodeId = this.props.nodeId;
+    const nodeMetrics = this.state.metrics[nodeId];
+    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
+
+    if (Object.keys(metrics).length === 0) {
+      return <span>Journal metrics unavailable.</span>;
+    }
+
+    return (
+      <span>
+        The journal contains <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in {metrics.segments}
+        {' '}<Pluralize value={metrics.segments} singular="segment" plural="segments"/>.{' '}
+        <strong>{numeral(metrics.append).format('0,0')} messages</strong> appended, <strong>
+        {numeral(metrics.read).format('0,0')} messages</strong> read in the last second.
+      </span>
+    );
+  },
 });
 
-module.exports = JournalState;
-
+export default JournalState;

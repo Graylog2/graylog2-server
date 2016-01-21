@@ -20,6 +20,7 @@ import DashboardsPage from 'pages/DashboardsPage';
 import ShowDashboardPage from 'pages/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
 import InputsPage from 'pages/InputsPage';
+import NodeInputsPage from 'pages/NodeInputsPage';
 import ExtractorsPage from 'pages/ExtractorsPage';
 import CreateExtractorsPage from 'pages/CreateExtractorsPage';
 import EditExtractorsPage from 'pages/EditExtractorsPage';
@@ -42,6 +43,7 @@ import GettingStartedPage from 'pages/GettingStartedPage';
 import ShowMetricsPage from 'pages/ShowMetricsPage';
 import ShowNodePage from 'pages/ShowNodePage';
 import NodesPage from 'pages/NodesPage';
+import ThreadDumpPage from 'pages/ThreadDumpPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -67,6 +69,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage}/>
+            <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage}/>
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage}/>
@@ -89,6 +92,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
+            <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
             {pluginRoutes}
           </Route>
         </Route>
