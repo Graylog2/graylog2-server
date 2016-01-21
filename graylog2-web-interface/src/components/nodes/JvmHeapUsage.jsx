@@ -59,14 +59,14 @@ const JvmHeapUsage = React.createClass({
         detail = (
           <p>
             The JVM is using{' '}
-            <span className="blob" style={{backgroundColor: '#9e1f63'}}/>
-            <strong><span className="heap-used"> {numeral(metrics.usedMemory).format('0.0 b')}</span></strong>
+            <span className="blob used-memory"/>
+            <strong> {numeral(metrics.usedMemory).format('0.0 b')}</strong>
             {' '}of{' '}
-            <span className="blob" style={{backgroundColor: '#f7941e'}}/>
-            <strong><span className="heap-total"> {numeral(metrics.committedMemory).format('0.0 b')}</span></strong>
+            <span className="blob committed-memory"/>
+            <strong> {numeral(metrics.committedMemory).format('0.0 b')}</strong>
             {' '}heap space and will not attempt to use more than{' '}
-            <span className="blob" style={{backgroundColor: '#f5f5f5'}}/>
-            <strong><span className="heap-max"> {numeral(metrics.maxMemory).format('0.0 b')}</span></strong>
+            <span className="blob max-memory" style={{border: '1px solid #ccc'}}/>
+            <strong> {numeral(metrics.maxMemory).format('0.0 b')}</strong>
           </p>
         );
       }
