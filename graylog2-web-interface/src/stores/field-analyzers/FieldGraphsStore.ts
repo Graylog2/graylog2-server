@@ -8,7 +8,7 @@ const fieldCharts = require('legacy/analyzers/fieldcharts');
 const generateId = fieldCharts.generateId;
 const FieldChart = fieldCharts.FieldChart;
 
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 
 interface CreateFieldChartWidgetRequestParams {
     widgetType: string;

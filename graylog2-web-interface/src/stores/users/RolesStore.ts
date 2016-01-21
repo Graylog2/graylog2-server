@@ -1,4 +1,4 @@
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 import UsersStore = require('stores/users/UsersStore');
 import jsRoutes = require('routing/jsRoutes');

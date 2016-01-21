@@ -1,6 +1,6 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;

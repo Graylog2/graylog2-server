@@ -3,7 +3,7 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import Immutable = require('immutable');
-import UserNotification = require("util/UserNotification");
+const UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
 const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;

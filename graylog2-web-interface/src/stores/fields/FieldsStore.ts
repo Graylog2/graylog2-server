@@ -3,7 +3,7 @@
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 import Immutable = require('immutable');
-import UserNotification = require("util/UserNotification");
+const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
 
 var FieldsStore = {

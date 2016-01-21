@@ -1,6 +1,6 @@
 import jsRoutes = require('routing/jsRoutes');
 
-import UserNotification = require("../../util/UserNotification");
+const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 

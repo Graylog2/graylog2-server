@@ -4,7 +4,7 @@ import jsRoutes = require('routing/jsRoutes');
 const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
-import UserNotification = require("../../util/UserNotification");
+const UserNotification = require('util/UserNotification');
 
 export interface UsageStatsOptOutState {
     opt_out: boolean

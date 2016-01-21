@@ -6,7 +6,7 @@ const fetch = require('logic/rest/FetchProvider').default;
 import Immutable = require('immutable');
 import jsRoutes = require('routing/jsRoutes');
 const URLUtils = require('util/URLUtils');
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 import SearchStore = require('stores/search/SearchStore');
 const Qs = require('qs');
 

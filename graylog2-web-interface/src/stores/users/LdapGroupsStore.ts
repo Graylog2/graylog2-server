@@ -3,7 +3,7 @@
 declare var $: any;
 declare var jsRoutes: any;
 
-import UserNotification = require("../../util/UserNotification");
+const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 
 
