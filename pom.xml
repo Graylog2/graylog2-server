@@ -769,12 +769,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.graylog.plugins</groupId>
-                <artifactId>usage-statistics</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.mindrot</groupId>
                 <artifactId>jbcrypt</artifactId>
                 <version>0.3m</version>
@@ -1057,7 +1051,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <attach>false</attach>
+                    <attach>true</attach>
                     <appendAssemblyId>false</appendAssemblyId>
                     <!-- we don't care about assembling the parent, just run the goal on the project, pretty please -->
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
