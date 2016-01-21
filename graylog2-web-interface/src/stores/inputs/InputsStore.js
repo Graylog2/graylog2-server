@@ -19,17 +19,19 @@ const InputsStore = Reflux.createStore({
   },
 
   list() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl))
-      .then(response => {
-        this.inputs = response.inputs;
-        this.trigger({inputs: this.inputs});
+    const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+    promise
+      .then(
+        response => {
+          this.inputs = response.inputs;
+          this.trigger({inputs: this.inputs});
 
-        return this.inputs;
-      })
-      .catch(error => {
-        UserNotification.error('Fetching Inputs failed with status: ' + error,
-          'Could not retrieve Inputs');
-      });
+          return this.inputs;
+        },
+        error => {
+          UserNotification.error('Fetching Inputs failed with status: ' + error,
+            'Could not retrieve Inputs');
+        });
 
     InputsActions.list.promise(promise);
   },
@@ -38,16 +40,17 @@ const InputsStore = Reflux.createStore({
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
     promise
-      .then(response => {
-        this.input = response;
-        this.trigger({input: this.input});
+      .then(
+        response => {
+          this.input = response;
+          this.trigger({input: this.input});
 
-        return this.input;
-      })
-      .catch(error => {
-        UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
-          'Could not retrieve input');
-      });
+          return this.input;
+        },
+        error => {
+          UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
+            'Could not retrieve input');
+        });
 
     InputsActions.get.promise(promise);
   },
@@ -55,14 +58,15 @@ const InputsStore = Reflux.createStore({
   create(input) {
     const promise = fetch('POST', URLUtils.qualifyUrl(this.sourceUrl), input);
     promise
-      .then(() => {
-        UserNotification.success(`Input '${input.title}' launched successfully`);
-        InputsActions.list();
-      })
-      .catch(error => {
-        UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
-          'Could not launch input');
-      });
+      .then(
+        () => {
+          UserNotification.success(`Input '${input.title}' launched successfully`);
+          InputsActions.list();
+        },
+        error => {
+          UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
+            'Could not launch input');
+        });
 
     InputsActions.create.promise(promise);
   },
@@ -73,14 +77,15 @@ const InputsStore = Reflux.createStore({
 
     const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
     promise
-      .then(() => {
-        UserNotification.success(`Input '${inputTitle}' deleted successfully`);
-        InputsActions.list();
-      })
-      .catch(error => {
-        UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
-          'Could not delete input');
-      });
+      .then(
+        () => {
+          UserNotification.success(`Input '${inputTitle}' deleted successfully`);
+          InputsActions.list();
+        },
+        error => {
+          UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
+            'Could not delete input');
+        });
 
     InputsActions.delete.promise(promise);
   },
@@ -88,17 +93,18 @@ const InputsStore = Reflux.createStore({
   update(id, input) {
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${id}`), input);
     promise
-      .then(() => {
-        UserNotification.success(`Input '${input.title}' updated successfully`);
-        InputsActions.list();
-      })
-      .catch(error => {
-        UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
-          'Could not update input');
-      });
+      .then(
+        () => {
+          UserNotification.success(`Input '${input.title}' updated successfully`);
+          InputsActions.list();
+        },
+        error => {
+          UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
+            'Could not update input');
+        });
 
     InputsActions.update.promise(promise);
-  }
+  },
 });
 
 InputsStore.inputsAsMap = (inputsList) => {
