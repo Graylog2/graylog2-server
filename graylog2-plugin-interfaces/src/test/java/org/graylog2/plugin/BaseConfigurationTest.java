@@ -57,12 +57,12 @@ public class BaseConfigurationTest {
 
         @Override
         public URI getRestListenUri() {
-            return Tools.getUriWithPort(restListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_PORT);
+            return Tools.getUriWithPort(restListenUri, BaseConfiguration.GRAYLOG_DEFAULT_PORT);
         }
 
         @Override
         public URI getWebListenUri() {
-            return Tools.getUriWithPort(webListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_WEB_PORT);
+            return Tools.getUriWithPort(webListenUri, BaseConfiguration.GRAYLOG_DEFAULT_WEB_PORT);
         }
     }
 

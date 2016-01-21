@@ -50,7 +50,7 @@ const WidgetsStore = Reflux.createStore({
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
         const promise = new Builder('GET', url)
             .authenticated()
-            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .setHeader('X-Graylog-No-Session-Extension', 'true')
             .json()
             .build();
 
@@ -83,7 +83,7 @@ const WidgetsStore = Reflux.createStore({
 
         return new Builder('GET', url)
             .authenticated()
-            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .setHeader('X-Graylog-No-Session-Extension', 'true')
             .json()
             .build();
     },

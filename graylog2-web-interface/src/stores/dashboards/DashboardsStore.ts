@@ -106,7 +106,7 @@ class DashboardsStore {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
     const promise = new Builder('GET', url)
         .authenticated()
-        .setHeader('X-Graylog2-No-Session-Extension', 'true')
+        .setHeader('X-Graylog-No-Session-Extension', 'true')
         .json()
         .build();
 

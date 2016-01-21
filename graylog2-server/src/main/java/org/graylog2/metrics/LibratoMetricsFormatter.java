@@ -47,7 +47,7 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
         //this.counter = counter;
         this.streamFilter = streamFilter;
         this.hostFilter = hostFilter;
-        this.source = prefix + "graylog2-server";
+        this.source = prefix + "graylog-server";
         this.streamNames = streamNames;
     }
     

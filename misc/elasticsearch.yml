@@ -1,8 +1,8 @@
 # this must be the same as for your elasticsearch cluster
-cluster.name: graylog2
+cluster.name: graylog
 
-# you could also leave this out, but makes it easier to identify the graylog2 client instance
-node.name: "graylog2-server"
+# you could also leave this out, but makes it easier to identify the Graylog embedded Elasticsearch node
+node.name: "graylog-server"
 
 # we don't want the graylog2 client to store any data, or be master node
 node.master: false

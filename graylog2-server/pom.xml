@@ -439,7 +439,7 @@
                     <attach>false</attach>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
-                        <descriptor>src/main/assembly/graylog2.xml</descriptor>
+                        <descriptor>src/main/assembly/graylog.xml</descriptor>
                     </descriptors>
                     <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
                     <outputDirectory>${project.parent.build.directory}/assembly</outputDirectory>
