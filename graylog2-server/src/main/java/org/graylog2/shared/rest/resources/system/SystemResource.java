@@ -68,7 +68,7 @@ public class SystemResource extends RestResource {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
 
-        return SystemOverviewResponse.create("graylog2-server",
+        return SystemOverviewResponse.create("graylog-server",
                 ServerVersion.CODENAME,
                 serverStatus.getNodeId().toString(),
                 clusterId.clusterId(),

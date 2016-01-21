@@ -52,7 +52,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog2 metrics")
+@Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog metrics")
 @Path("/cluster/{nodeId}/metrics")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterMetricsResource extends RestResource {

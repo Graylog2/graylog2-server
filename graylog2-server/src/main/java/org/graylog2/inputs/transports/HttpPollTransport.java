@@ -219,7 +219,7 @@ public class HttpPollTransport extends ThrottleableTransport {
                     CK_HEADERS,
                     "Additional HTTP headers",
                     "",
-                    "Add a comma separated list of additional HTTP headers. For example: Accept: application/json, X-Requester: Graylog2",
+                    "Add a comma separated list of additional HTTP headers. For example: Accept: application/json, X-Requester: Graylog",
                     ConfigurationField.Optional.OPTIONAL
             ));
 
