@@ -1,1 +1,0 @@
-## Graylog REST API documentation
