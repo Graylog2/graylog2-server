@@ -11,11 +11,19 @@ import NodeThroughput from 'components/throughput/NodeThroughput';
 const NodeListItem = React.createClass({
   propTypes: {
     node: PropTypes.object.isRequired,
-    systemOverview: PropTypes.object.isRequired,
+    systemOverview: PropTypes.object,
   },
   render() {
     const node = this.props.node;
     const title = <LinkToNode nodeId={node.node_id}/>;
+
+    if (!this.props.systemOverview) {
+      return (
+        <EntityListItem key={`entry-list-${node.node_id}`}
+                        title={title}
+                        description="System information is currently unavailable."/>
+      );
+    }
 
     const nodeThroughput = <NodeThroughput nodeId={node.node_id}/>;
     const journalState = <JournalState nodeId={node.node_id}/>;
