@@ -2,7 +2,6 @@ import moment from 'moment-timezone';
 import AppConfig from 'util/AppConfig';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
-const appConfig = new AppConfig();
 let currentUser = CurrentUserStore.get();
 CurrentUserStore.listen(state => currentUser = state.currentUser);
 
@@ -60,7 +59,7 @@ class DateTime {
   }
 
   static getUserTimezone() {
-    return currentUser ? currentUser.timezone : appConfig.rootTimeZone();
+    return currentUser ? currentUser.timezone : AppConfig.rootTimeZone();
   }
 
   constructor(dateTime) {

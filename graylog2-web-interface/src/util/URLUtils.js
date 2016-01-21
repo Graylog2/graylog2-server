@@ -1,14 +1,12 @@
 import Qs from 'qs';
 import AppConfig from 'util/AppConfig';
 
-const appConfig = new AppConfig();
-
 const URLUtils = {
   qualifyUrl(url) {
-    return appConfig.gl2ServerUrl() + this.appPrefixed(url);
+    return AppConfig.gl2ServerUrl() + this.appPrefixed(url);
   },
   appPrefixed(url) {
-    return this.concatURLPath(appConfig.gl2AppPathPrefix(), url);
+    return this.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
   },
   openLink(url, newWindow) {
     if (newWindow) {
