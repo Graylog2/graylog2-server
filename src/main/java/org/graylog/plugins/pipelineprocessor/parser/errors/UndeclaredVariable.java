@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.parser.errors;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.pipelineprocessor.parser.RuleLangParser;
 
-import java.util.Collection;
-import java.util.Collections;
+public class UndeclaredVariable extends ParseError {
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+    @JsonIgnore
+    private final RuleLangParser.IdentifierContext ctx;
+
+    public UndeclaredVariable(RuleLangParser.IdentifierContext ctx) {
+        super("undeclared_variable", ctx);
+        this.ctx = ctx;
     }
 
+    @JsonProperty("reason")
     @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    public String toString() {
+        return "Undeclared variable " + ctx.Identifier().getText() + positionString();
     }
+
 }

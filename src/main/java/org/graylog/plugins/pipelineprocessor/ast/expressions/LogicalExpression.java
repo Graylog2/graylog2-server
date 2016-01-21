@@ -14,26 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-import java.util.Collection;
-import java.util.Collections;
+public interface LogicalExpression extends Expression {
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
-    }
-
-    @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
-    }
+    boolean evaluateBool(EvaluationContext context);
 }

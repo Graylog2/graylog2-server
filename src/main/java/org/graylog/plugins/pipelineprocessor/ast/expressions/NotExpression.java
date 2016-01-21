@@ -14,26 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-import java.util.Collection;
-import java.util.Collections;
-
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+public class NotExpression extends UnaryExpression implements LogicalExpression {
+    public NotExpression(LogicalExpression right) {
+        super(right);
     }
 
     @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    public Object evaluate(EvaluationContext context) {
+        return !evaluateBool(context);
+    }
+
+    @Override
+    public boolean evaluateBool(EvaluationContext context) {
+        return !((LogicalExpression)right).evaluateBool(context);
+    }
+
+    @Override
+    public Class getType() {
+        return Boolean.class;
+    }
+
+    @Override
+    public String toString() {
+        return "NOT " + right.toString();
     }
 }

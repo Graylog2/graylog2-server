@@ -14,26 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.ast;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.google.auto.value.AutoValue;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+@AutoValue
+public abstract class Pipeline {
+
+    public abstract String name();
+    public abstract List<Stage> stages();
+
+    public static Builder builder() {
+        return new AutoValue_Pipeline.Builder();
     }
 
-    @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Pipeline build();
+
+        public abstract Builder name(String name);
+
+        public abstract Builder stages(List<Stage> stages);
     }
 }

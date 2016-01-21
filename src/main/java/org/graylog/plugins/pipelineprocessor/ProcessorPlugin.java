@@ -23,17 +23,14 @@ import org.graylog2.plugin.PluginModule;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
+public class ProcessorPlugin implements Plugin {
     @Override
     public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+        return new ProcessorPluginMetaData();
     }
 
     @Override
     public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+        return Collections.<PluginModule>singletonList(new ProcessorPluginModule());
     }
 }

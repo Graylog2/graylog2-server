@@ -14,26 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.ast;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
+import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 
 import java.util.Collection;
-import java.util.Collections;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+@AutoValue
+public abstract class Rule {
+
+    public abstract String name();
+
+    public abstract LogicalExpression when();
+
+    public abstract Collection<Statement> then();
+
+    public static Builder builder() {
+        return new AutoValue_Rule.Builder();
     }
 
-    @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder name(String name);
+        public abstract Builder when(LogicalExpression condition);
+        public abstract Builder then(Collection<Statement> actions);
+
+        public abstract Rule build();
     }
+
 }

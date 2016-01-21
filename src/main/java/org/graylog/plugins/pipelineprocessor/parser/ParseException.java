@@ -14,26 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.parser;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+public class ParseException extends RuntimeException {
+    private final Set<ParseError> errors;
+
+    public ParseException(Set<ParseError> errors) {
+        this.errors = errors;
+    }
+
+    public Set<ParseError> getErrors() {
+        return errors;
     }
 
     @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    public String getMessage() {
+        StringBuilder sb = new StringBuilder("Errors:\n");
+        for (ParseError parseError : getErrors()) {
+            sb.append(" ").append(parseError).append("\n");
+        }
+        return sb.toString();
     }
 }

@@ -170,12 +170,14 @@
 
     <build>
         <resources>
-            <resource><directory>build</directory></resource>
             <resource>
-              <directory>src/main/resources</directory>
-              <excludes>
-                <exclude>**/*.properties</exclude>
-              </excludes>
+                <directory>build</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
             </resource>
         </resources>
         <pluginManagement>
@@ -185,49 +187,81 @@
                     <artifactId>antlr4-maven-plugin</artifactId>
                     <version>4.5</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.11</version>
+                    <configuration>
+                        <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header>
+                        <properties>
+                            <owner>${project.organization.name}</owner>
+                            <project.name>Graylog Pipeline Processor</project.name>
+                        </properties>
+                        <includes>
+                            <include>**/src/main/java/**</include>
+                            <include>**/src/test/java/**</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
-          <plugin>
-              <groupId>com.github.eirslett</groupId>
-              <artifactId>frontend-maven-plugin</artifactId>
-              <version>0.0.26</version>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <skipAssembly>true</skipAssembly>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>0.0.26</version>
 
-              <executions>
-                  <execution>
-                      <id>install node and npm</id>
-                      <goals>
-                          <goal>install-node-and-npm</goal>
-                      </goals>
-                      <configuration>
-                          <nodeVersion>v0.12.5</nodeVersion>
-                          <npmVersion>2.11.2</npmVersion>
-                      </configuration>
-                  </execution>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v0.12.5</nodeVersion>
+                            <npmVersion>2.11.2</npmVersion>
+                        </configuration>
+                    </execution>
 
-                  <execution>
-                      <id>npm install</id>
-                      <goals>
-                          <goal>npm</goal>
-                      </goals>
-                      <!-- Optional configuration which provides for running any npm command -->
-                      <configuration>
-                          <arguments>install</arguments>
-                      </configuration>
-                  </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <!-- Optional configuration which provides for running any npm command -->
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
 
-                  <execution>
-                      <id>npm run build</id>
-                      <goals>
-                          <goal>npm</goal>
-                      </goals>
-                      <configuration>
-                          <arguments>run build</arguments>
-                      </configuration>
-                  </execution>
-              </executions>
-          </plugin>
-          <plugin>
+                    <execution>
+                        <id>npm run build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

@@ -14,26 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.ast.statements;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
-import java.util.Collection;
-import java.util.Collections;
+public class VarAssignStatement implements Statement {
+    private final String name;
+    private final Expression expr;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+    public VarAssignStatement(String name, Expression expr) {
+        this.name = name;
+        this.expr = expr;
     }
 
     @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+    public Void evaluate(EvaluationContext context) {
+        final Object result = expr.evaluate(context);
+        context.define(name, expr.getType(), result);
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "let " + name + " = " + expr.toString();
     }
 }

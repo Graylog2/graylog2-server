@@ -14,26 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor;
+package org.graylog.plugins.pipelineprocessor.parser;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 
-import java.util.Collection;
-import java.util.Collections;
+import javax.inject.Inject;
+import java.util.Map;
 
-/**
- * Implement the Plugin interface here.
- */
-public class PipelineProcessorPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new PipelineProcessorMetaData();
+public class FunctionRegistry {
+
+    private final Map<String, Function<?>> functions;
+
+    @Inject
+    public FunctionRegistry(Map<String, Function<?>> functions) {
+        this.functions = functions;
     }
 
-    @Override
-    public Collection<PluginModule> modules () {
-        return Collections.<PluginModule>singletonList(new PipelineProcessorModule());
+
+    public Function<?> resolve(String name) {
+        return functions.get(name);
+    }
+
+    public Function<?> resolveOrError(String name) {
+        final Function<?> function = resolve(name);
+        if (function == null) {
+            return Function.ERROR_FUNCTION;
+        }
+        return function;
     }
 }

@@ -1,0 +1,64 @@
+/**
+ * This file is part of Graylog Pipeline Processor.
+ *
+ * Graylog Pipeline Processor is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog Pipeline Processor is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog.plugins.pipelineprocessor.ast.expressions;
+
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class VarRefExpression implements Expression {
+    private static final Logger log = LoggerFactory.getLogger(VarRefExpression.class);
+    private final String identifier;
+    private Class type = Object.class;
+
+    public VarRefExpression(String identifier) {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public boolean isConstant() {
+        return false;
+    }
+
+    @Override
+    public Object evaluate(EvaluationContext context) {
+        final EvaluationContext.TypedValue typedValue = context.get(identifier);
+        if (typedValue != null) {
+            return typedValue.getValue();
+        }
+        log.error("Unable to retrieve value for variable {}", identifier);
+        return null;
+    }
+
+    @Override
+    public Class getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return identifier;
+    }
+
+    public String varName() {
+        return identifier;
+    }
+
+    public void setType(Class type) {
+        this.type = type;
+    }
+}
