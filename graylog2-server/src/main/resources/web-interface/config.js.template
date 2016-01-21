@@ -1,4 +1,4 @@
-const appConfig = {
+var appConfig = {
   gl2ServerUrl: '${serverUri}',
   gl2AppPathPrefix: '${appPathPrefix}',
   rootTimeZone: '${rootTimeZone}',
