@@ -19,7 +19,6 @@ process.env.BABEL_ENV = TARGET;
 const webpackConfig = {
   entry: {
     app: APP_PATH,
-    config: 'config.js',
   },
   output: {
     path: BUILD_PATH,
@@ -63,9 +62,6 @@ const commonConfigs = {
       { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
     ],
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin('config', 'config.js', ['config']),
-  ],
 };
 
 if (TARGET === 'start') {

@@ -11,6 +11,7 @@
     {% } %}
   </head>
   <body>
+    <script src="/config.js"></script>
     <script src="/build/vendor.js"></script>
     <script src="/build/shared.js"></script>
     {% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
