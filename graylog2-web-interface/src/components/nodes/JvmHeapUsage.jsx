@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
+import { ProgressBar } from 'react-bootstrap';
 import numeral from 'numeral';
 
 import { Spinner } from 'components/common';
@@ -49,11 +50,10 @@ const JvmHeapUsage = React.createClass({
         detail = <p>Heap information unavailable.</p>;
       } else {
         progressBar = (
-          <div className="progress">
-            <div className="progress-bar heap-used-percent" style={{width: `${metrics.usedPercentage}%`}}></div>
-            <div className="progress-bar progress-bar-warning heap-total-percent"
-                 style={{width: `${(metrics.committedPercentage - metrics.usedPercentage)}%`}}></div>
-          </div>
+          <ProgressBar>
+            <ProgressBar className="used-memory" now={metrics.usedPercentage}/>
+            <ProgressBar className="committed-memory" now={metrics.committedPercentage - metrics.usedPercentage}/>
+          </ProgressBar>
         );
 
         detail = (
@@ -71,7 +71,7 @@ const JvmHeapUsage = React.createClass({
         );
       }
     } else {
-      progressBar = <div className="progress"></div>;
+      progressBar = <ProgressBar/>;
       detail = <p><Spinner text="Loading heap usage information..."/></p>;
     }
 
