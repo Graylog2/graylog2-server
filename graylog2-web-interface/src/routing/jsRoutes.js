@@ -142,6 +142,7 @@ const jsRoutes = {
       },
       SystemApiController: {
         info: () => { return {url: '/system'}; },
+        jvm: () => { return {url: '/system/jvm'}; },
         fields: () => { return {url: '/system/fields'}; },
       },
       SystemJobsApiController: {
