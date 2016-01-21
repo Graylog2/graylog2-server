@@ -769,12 +769,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.graylog.plugins</groupId>
-                <artifactId>usage-statistics</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.mindrot</groupId>
                 <artifactId>jbcrypt</artifactId>
                 <version>0.3m</version>
