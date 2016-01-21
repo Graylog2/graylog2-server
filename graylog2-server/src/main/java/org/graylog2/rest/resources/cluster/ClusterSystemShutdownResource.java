@@ -27,6 +27,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteSystemShutdownResource;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
@@ -40,7 +41,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.List;
 
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 
@@ -48,26 +48,19 @@ import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 @Api(value = "Cluster/Shutdown", description = "Shutdown gracefully nodes in cluster")
 @Path("/cluster/{nodeId}/shutdown")
 @Produces(MediaType.APPLICATION_JSON)
-public class ClusterSystemShutdownResource {
+public class ClusterSystemShutdownResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemShutdownResource.class);
 
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
-    private final String authenticationToken;
 
     @Inject
     public ClusterSystemShutdownResource(NodeService nodeService,
                                          RemoteInterfaceProvider remoteInterfaceProvider,
                                          @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
+        super(httpHeaders);
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
-
-        final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
-        if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.authenticationToken = authenticationTokens.get(0);
-        } else {
-            this.authenticationToken = null;
-        }
     }
 
     @POST
