@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = function loadBuildConfig(filename) {
   try {
-    const buildConfig = require(path.resolve(module.parent.parent.filename, '../', filename));
+    const buildConfig = require(filename));
     if (!buildConfig.web_src_path || !fs.lstatSync(buildConfig.web_src_path).isDirectory()) {
       console.error("Path to graylog web interface sources is not defined, does not exist or is not a directory: (", buildConfig.web_src_path, ').');
       console.error("Please configure it in a file named `build.config.js` before trying to build the plugin.");
