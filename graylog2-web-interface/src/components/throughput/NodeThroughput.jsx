@@ -2,6 +2,8 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
+import { Spinner } from 'components/common';
+
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
@@ -52,7 +54,7 @@ const NodeThroughput = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return (<span><i className="fa fa-spin fa-spinner"/> Loading throughput...</span>);
+      return <Spinner text="Loading throughput..."/>;
     }
 
     const nodeId = this.props.nodeId;

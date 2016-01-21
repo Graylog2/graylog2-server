@@ -2,6 +2,8 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
+import { Spinner } from 'components/common';
+
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
@@ -70,7 +72,7 @@ const JvmHeapUsage = React.createClass({
       }
     } else {
       progressBar = <div className="progress"></div>;
-      detail = <p><i className="fa fa-spin fa-spinner"/> Loading heap usage information...</p>;
+      detail = <p><Spinner text="Loading heap usage information..."/></p>;
     }
 
     return (

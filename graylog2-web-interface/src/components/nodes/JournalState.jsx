@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
-import { Pluralize } from 'components/common';
+import { Pluralize, Spinner } from 'components/common';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
@@ -32,7 +32,7 @@ const JournalState = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <span>Loading journal metrics...</span>;
+      return <Spinner text="Loading journal metrics..."/>;
     }
 
     const nodeId = this.props.nodeId;
