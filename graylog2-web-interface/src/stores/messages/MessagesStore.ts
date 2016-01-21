@@ -5,7 +5,7 @@ const moment = require('moment');
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 import UserNotification = require("util/UserNotification");
-import URLUtils = require("util/URLUtils");
+const URLUtils = require('util/URLUtils');
 const MessageFieldsFilter = require('logic/message/MessageFieldsFilter');
 
 interface Field {

@@ -1,6 +1,6 @@
 import $ = require('jquery');
 import UserNotification = require('util/UserNotification');
-import URLUtils = require('util/URLUtils');
+const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
 const DEFAULT_MAX_DATA_POINTS = 4000;

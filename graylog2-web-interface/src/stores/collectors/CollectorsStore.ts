@@ -1,5 +1,5 @@
 import UserNotification = require('util/UserNotification');
-import URLUtils = require('util/URLUtils');
+const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface NodeDetails {

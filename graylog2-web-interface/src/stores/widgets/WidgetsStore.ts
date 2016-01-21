@@ -4,7 +4,7 @@ const Reflux = require('reflux');
 
 import UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require('util/URLUtils');
+const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const WidgetsActions = require('actions/widgets/WidgetsActions');

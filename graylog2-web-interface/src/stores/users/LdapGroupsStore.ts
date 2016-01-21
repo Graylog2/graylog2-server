@@ -4,7 +4,7 @@ declare var $: any;
 declare var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+const URLUtils = require('util/URLUtils');
 
 
 export var LdapGroupsStore = {
