@@ -7,7 +7,15 @@ const VENDOR_MANIFEST = require('graylog-web-manifests/vendor-manifest.json');
 const SHARED_MANIFEST = require('graylog-web-manifests/shared-manifest.json');
 const TARGET = process.env.npm_lifecycle_event;
 
-const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
+const defaultRootPath = path.resolve(module.parent.parent.filename, '../');
+const defaultOptions = {
+  root_path: defaultRootPath,
+  entry_path: path.resolve(defaultRootPath, 'src/web/index.jsx'),
+  build_path: path.resolve(defaultRootPath, 'build'),
+};
+
+const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
+  const options = merge(defaultOptions, _options);
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
     entry: {
@@ -31,10 +39,13 @@ const PluginWebpackConfig = function(fqcn, options, additionalConfig) {
       new HtmlWebpackPlugin({filename: 'module.json', template: moduleJsonTemplate}),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
       new webpack.DllReferencePlugin({ manifest: SHARED_MANIFEST, context: options.root_path }),
+      new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path}),
+      new webpack.DllReferencePlugin({ manifest: SHARED_MANIFEST, context: options.web_src_path })
     ],
     resolve: {
+      root: [path.resolve(options.web_src_path, 'src')],
       extensions: ['', '.js', '.json', '.jsx'],
-      modulesDirectories: ['src/web', 'node_modules'],
+      modulesDirectories: ['src/web', 'node_modules', 'src'],
     },
   };
   
