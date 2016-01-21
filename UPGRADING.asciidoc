@@ -3,6 +3,24 @@ Upgrading
 
 ## From Graylog 1.x to 2.0.x
 
+### Removed configuration settings
+
+Some settings, which have been deprecated in previous versions, have finally
+been removed from the Graylog configuration file.
+
+.Removed configuration settings
+|===
+| Setting name       | Replacement
+
+| `mongodb_host`     | `mongodb_uri`
+| `mongodb_port`     | `mongodb_uri`
+| `mongodb_database` | `mongodb_uri`
+| `mongodb_useauth`  | `mongodb_uri`
+| `mongodb_user`     | `mongodb_uri`
+| `mongodb_password` | `mongodb_uri`
+|===
+
+
 ### Changed configuration defaults
 
 For better consistency, the defaults of some configuration settings have been
@@ -10,11 +28,12 @@ changed after the project has been renamed from _Graylog2_ to _Graylog_.
 
 .Configuration defaults
 |===
-| Setting name                 | Old default       | New default
+| Setting name                 | Old default                    | New default
 
-| `elasticsearch_cluster_name` | `graylog2`        | `graylog`
-| `elasticsearch_node_name`    | `graylog2-server` | `graylog-server`
-| `elasticsearch_index_prefix` | `graylog2`        | `graylog`
+| `elasticsearch_cluster_name` | `graylog2`                     | `graylog`
+| `elasticsearch_node_name`    | `graylog2-server`              | `graylog-server`
+| `elasticsearch_index_prefix` | `graylog2`                     | `graylog`
+| `mongodb_uri`                | `mongodb://127.0.0.1/graylog2` | `mongodb://localhost/graylog`
 |===
 
 
