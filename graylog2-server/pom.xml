@@ -432,7 +432,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <attach>true</attach>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <appendAssemblyId>true</appendAssemblyId>
                     <descriptors>
                         <descriptor>src/main/assembly/graylog.xml</descriptor>
                     </descriptors>
