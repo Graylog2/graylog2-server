@@ -16,21 +16,28 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.DropMessageFunction;
+import org.graylog.plugins.pipelineprocessor.functions.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.InputFunction;
+import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.processors.NaiveRuleProcessor;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
+import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
 import java.util.Collections;
 import java.util.Set;
 
-/**
- * Extend the PluginModule abstract class here to add you plugin to the system.
- */
 public class PipelineProcessorModule extends PluginModule {
-    /**
-     * Returns all configuration beans required by this plugin.
-     *
-     * Implementing this method is optional. The default method returns an empty {@link Set}.
-     */
+
     @Override
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
@@ -38,23 +45,31 @@ public class PipelineProcessorModule extends PluginModule {
 
     @Override
     protected void configure() {
-        /*
-         * Register your plugin types here.
-         *
-         * Examples:
-         *
-         * addMessageInput(Class<? extends MessageInput>);
-         * addMessageFilter(Class<? extends MessageFilter>);
-         * addMessageOutput(Class<? extends MessageOutput>);
-         * addPeriodical(Class<? extends Periodical>);
-         * addAlarmCallback(Class<? extends AlarmCallback>);
-         * addInitializer(Class<? extends Service>);
-         * addRestResource(Class<? extends PluginRestResource>);
-         *
-         *
-         * Add all configuration beans returned by getConfigBeans():
-         *
-         * addConfigBeans();
-         */
+        addMessageProcessor(NaiveRuleProcessor.class);
+        addRestResource(RuleResource.class);
+        addRestResource(PipelineResource.class);
+
+        // built-in functions
+        addMessageProcessorFunction(BooleanCoercion.NAME, BooleanCoercion.class);
+        addMessageProcessorFunction(DoubleCoercion.NAME, DoubleCoercion.class);
+        addMessageProcessorFunction(LongCoercion.NAME, LongCoercion.class);
+        addMessageProcessorFunction(StringCoercion.NAME, StringCoercion.class);
+
+        addMessageProcessorFunction(HasField.NAME, HasField.class);
+        addMessageProcessorFunction(InputFunction.NAME, InputFunction.class);
+        addMessageProcessorFunction(DropMessageFunction.NAME, DropMessageFunction.class);
+    }
+
+    protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
+        addMessageProcessorFunction(binder(), name, functionClass);
+    }
+
+    public static MapBinder<String, Function<?>> processorFunctionBinder(Binder binder) {
+        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<Function<?>>() {});
+    }
+
+    public static void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {
+        processorFunctionBinder(binder).addBinding(name).to(functionClass);
+
     }
 }

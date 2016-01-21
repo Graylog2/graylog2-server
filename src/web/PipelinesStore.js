@@ -19,12 +19,6 @@ const PipelinesStore = Reflux.createStore({
     });
   },
 
-  getInitialState() {
-    return {
-      pipelines: this.pipelines,
-    }
-  },
-
   list() {
     const failCallback = (error) => {
       UserNotification.error('Fetching pipelines failed with status: ' + error.message,

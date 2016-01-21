@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 @Api(value = "Pipeline Rules", description = "Rules for the pipeline message processor")
-@Path("/system/pipelines/rule")
+@Path("/system/pipelines")
 public class RuleResource extends RestResource implements PluginRestResource {
 
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
@@ -71,6 +71,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     @POST
+    @Path("/rule")
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull String ruleSource) throws ParseException {
         try {
             pipelineRuleParser.parseRule(ruleSource);
@@ -92,6 +93,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @GET
+    @Path("/rule")
     public Collection<RuleSource> getAll() {
         return ruleSourceService.loadAll();
     }
@@ -99,7 +101,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{id}")
+    @Path("/rule/{id}")
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         return ruleSourceService.load(id);
@@ -108,7 +110,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{id}")
+    @Path("/rule/{id}")
     @PUT
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
@@ -131,7 +133,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{id}")
+    @Path("/rule/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) {
         ruleSourceService.delete(id);
