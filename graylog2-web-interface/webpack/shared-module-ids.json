@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 266,
+  "nextFreeModuleId": 273,
   "modules": {
     "byIdentifier": {
       "delegated 1 from dll-reference __vendor": 1,
@@ -267,7 +267,14 @@
       "node_modules/webpack/node_modules/node-libs-browser/node_modules/util/support/isBufferBrowser.js": 263,
       "node_modules/webpack/node_modules/node-libs-browser/node_modules/util/util.js": 264,
       "src/logic /.[jt]s(x)?$": 265,
-      "dll shared": 0
+      "dll shared": 0,
+      "node_modules/babel-loader/index.js!src/logic/files/FileSaver.js": 266,
+      "node_modules/babel-loader/index.js!src/logic/metrics/MetricsExtractor.js": 267,
+      "node_modules/babel-loader/index.js!src/util/AppConfig.js": 268,
+      "node_modules/babel-loader/index.js!src/util/URLUtils.js": 269,
+      "node_modules/babel-loader/index.js!src/util/UserNotification.js": 270,
+      "node_modules/babel-loader/index.js!src/util/DocsHelper.js": 271,
+      "node_modules/babel-loader/index.js!src/util/Version.js": 272
     }
   },
   "nextFreeChunkId": 1,
