@@ -21,9 +21,7 @@ const PipelinesPage = React.createClass({
   },
 
   loadData() {
-    PipelinesActions.list.triggerPromise().then((pipelines) => {
-      this.setState({pipelines: pipelines});
-    });
+    PipelinesActions.list();
   },
 
   render() {

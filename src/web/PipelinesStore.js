@@ -12,13 +12,6 @@ const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],
   pipelines: undefined,
 
-  init() {
-    this.list().then((pipelines) => {
-      this.pipelines = pipelines;
-      this.trigger({pipelines: pipelines});
-    });
-  },
-
   list() {
     const failCallback = (error) => {
       UserNotification.error('Fetching pipelines failed with status: ' + error.message,
@@ -26,14 +19,11 @@ const PipelinesStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/pipeline');
-    const promise = fetch('GET', url).then((response) => {
-      return response.pipelines;
+    return fetch('GET', url).then((response) => {
+      this.pipelines = response;
+      this.trigger({pipelines: response});
     }, failCallback);
-
-    PipelinesActions.list.promise(promise);
-
-    return promise;
- },
+  },
 
   get(pipelineId) {
 
