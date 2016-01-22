@@ -9,6 +9,7 @@ import MetricsStore from 'stores/metrics/MetricsStore';
 import MetricsActions from 'actions/metrics/MetricsActions';
 
 import Routes from 'routing/Routes';
+import NumberUtils from 'util/NumberUtils';
 import { Spinner } from 'components/common';
 
 const BufferUsage = React.createClass({
@@ -34,22 +35,24 @@ const BufferUsage = React.createClass({
     }
     const nodeId = this.props.nodeId;
     const usageMetric = this.state.metrics[nodeId][this._metricPrefix() + 'usage'];
-    const usagePercentage = usageMetric ? usageMetric.metric.value : NaN;
-    const percentLabel = numeral(usagePercentage / 100).format('0.0 %');
+    const usage = usageMetric ? usageMetric.metric.value : NaN;
     const sizeMetric = this.state.metrics[nodeId][this._metricPrefix() + 'size'];
     const size = sizeMetric ? sizeMetric.metric.value : NaN;
+    const usagePercentage = (!isNaN(usage) && !isNaN(size) ? usage / size : 0);
+    const percentLabel = NumberUtils.formatPercentage(usagePercentage);
+
     return (
       <div>
-        <LinkContainer to={Routes.SYSTEM.METRIC(nodeId)}>
+        <LinkContainer to={Routes.filtered_metrics(nodeId, this._metricPrefix())}>
           <Button bsSize="xsmall" className="pull-right">Metrics</Button>
         </LinkContainer>
         <h3>{this.props.title}</h3>
         <div className="node-buffer-usage">
-          <ProgressBar now={usagePercentage}
+          <ProgressBar now={usagePercentage * 100}
                        bsStyle="warning"
                        label={percentLabel} />
         </div>
-        <span><strong>{size} messages</strong> in {this.props.title.toLowerCase()}, {percentLabel} utilized.</span>
+        <span><strong>{usage} messages</strong> in {this.props.title.toLowerCase()}, {percentLabel} utilized.</span>
       </div>);
   },
 });
