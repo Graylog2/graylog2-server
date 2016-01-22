@@ -3,7 +3,7 @@ import { Col } from 'react-bootstrap';
 
 import { EntityListItem, LinkToNode } from 'components/common';
 import NodesActions from './NodesActions';
-import SystemOverview from './SystemOverview';
+import SystemOverviewSummary from './SystemOverviewSummary';
 import JvmHeapUsage from './JvmHeapUsage';
 import JournalState from './JournalState';
 import NodeThroughput from 'components/throughput/NodeThroughput';
@@ -32,7 +32,7 @@ const NodeListItem = React.createClass({
     const additionalContent = (
       <div>
         <Col md={3}>
-          <SystemOverview information={this.props.systemOverview}/>
+          <SystemOverviewSummary information={this.props.systemOverview}/>
         </Col>
         <Col md={9}>
           <JvmHeapUsage nodeId={this.props.node.node_id}/>

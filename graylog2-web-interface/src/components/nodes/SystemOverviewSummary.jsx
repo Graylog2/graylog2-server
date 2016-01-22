@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import StringUtils from 'util/StringUtils';
 
-const SystemOverview = React.createClass({
+const SystemOverviewSummary = React.createClass({
   propTypes: {
     information: PropTypes.object.isRequired,
   },
@@ -20,4 +20,4 @@ const SystemOverview = React.createClass({
   },
 });
 
-export default SystemOverview;
+export default SystemOverviewSummary;
