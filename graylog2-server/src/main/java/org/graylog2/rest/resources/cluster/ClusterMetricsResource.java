@@ -89,7 +89,7 @@ public class ClusterMetricsResource extends RestResource {
         if (result.isSuccess()) {
             return result.body();
         } else {
-            throw new WebApplicationException(result.message(), result.code());
+            throw new WebApplicationException(result.message(), 503);
         }
     }
 
