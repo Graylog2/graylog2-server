@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
@@ -31,6 +32,25 @@ import org.joda.time.Duration;
 import java.io.File;
 
 public class KafkaJournalConfiguration {
+
+    public KafkaJournalConfiguration() { }
+
+    @JsonCreator
+    public KafkaJournalConfiguration(@JsonProperty("directory") File messageJournalDir,
+                                     @JsonProperty("segment_size") long messageJournalSegmentSize,
+                                     @JsonProperty("segment_age") Duration messageJournalSegmentAge,
+                                     @JsonProperty("max_size") long messageJournalMaxSize,
+                                     @JsonProperty("max_age") Duration messageJournalMaxAge,
+                                     @JsonProperty("flush_interval") long messageJournalFlushInterval,
+                                     @JsonProperty("flush_age") Duration messageJournalFlushAge) {
+        this.messageJournalDir = messageJournalDir;
+        this.messageJournalSegmentSize = Size.bytes(messageJournalSegmentSize);
+        this.messageJournalSegmentAge = messageJournalSegmentAge;
+        this.messageJournalMaxSize = Size.bytes(messageJournalMaxSize);
+        this.messageJournalMaxAge = messageJournalMaxAge;
+        this.messageJournalFlushInterval = messageJournalFlushInterval;
+        this.messageJournalFlushAge = messageJournalFlushAge;
+    }
 
     @Parameter(value = "message_journal_dir", required = true)
     @JsonProperty("directory")
