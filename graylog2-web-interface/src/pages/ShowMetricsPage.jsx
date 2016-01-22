@@ -28,12 +28,13 @@ const ShowMetricsPage = React.createClass({
     }
 
     const node = this.state.nodes[nodeId];
+    const title = <span>Metrics of node {node.short_node_id} / {node.hostname}</span>;
     const namespace = MetricsStore.namespace;
     const names = this.state.metricsNames[nodeId];
     const filter = this.props.location.query.filter;
     return (
       <span>
-        <PageHeader title={'Metrics of ' + node.short_node_id}>
+        <PageHeader title={title}>
           <span>
             All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
             all metrics via JMX, too.
