@@ -1,6 +1,5 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
