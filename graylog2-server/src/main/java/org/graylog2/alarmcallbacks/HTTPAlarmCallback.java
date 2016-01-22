@@ -78,6 +78,7 @@ public class HTTPAlarmCallback implements AlarmCallback {
                     .post(RequestBody.create(CONTENT_TYPE, body))
                     .build();
             r = httpClient.newCall(request).execute();
+            r.body().close();
         } catch (JsonProcessingException e) {
             throw new AlarmCallbackException("Unable to serialize alarm", e);
         } catch (MalformedURLException e) {
