@@ -40,7 +40,7 @@ export class Builder {
 
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
-        if (error.status === 401) {
+        if (SessionStore.isLoggedIn() && error.status === 401) {
           SessionActions.logout(SessionStore.getSessionId());
         }
 
@@ -56,9 +56,18 @@ export class Builder {
 }
 
 export default function fetch(method, url, body) {
-  const builder = new Builder(method, url)
+  const promise = () => new Builder(method, url)
     .authenticated()
-    .json(body);
+    .json(body)
+    .build();
 
-  return builder.build();
+  if (!SessionStore.isLoggedIn()) {
+    return new Promise((resolve, reject) => {
+      SessionActions.login.completed.listen(() => {
+        promise().then(resolve, reject);
+      });
+    });
+  } else {
+    return promise();
+  }
 }
