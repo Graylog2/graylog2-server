@@ -20,6 +20,15 @@ const ShowNodePage = React.createClass({
     params: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connectFilter(NodesStore, 'node', nodeFilter), Reflux.connectFilter(ClusterOverviewStore, 'systemOverview', clusterOverviewFilter)],
+  getInitialState() {
+    return {
+      jvmInformation: undefined,
+    };
+  },
+  componentWillMount() {
+    ClusterOverviewStore.jvm(this.props.params.nodeId)
+      .then(jvmInformation => this.setState({jvmInformation: jvmInformation}));
+  },
   _isLoading() {
     return !(this.state.node && this.state.systemOverview);
   },
@@ -41,7 +50,8 @@ const ShowNodePage = React.createClass({
           </span>
           <span><NodeMaintenanceDropdown node={node}/></span>
         </PageHeader>
-        <NodeOverview node={node} systemOverview={this.state.systemOverview}/>
+        <NodeOverview node={node} systemOverview={this.state.systemOverview}
+                      jvmInformation={this.state.jvmInformation}/>
       </div>
     );
   },

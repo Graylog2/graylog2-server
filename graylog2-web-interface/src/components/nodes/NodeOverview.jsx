@@ -4,11 +4,14 @@ import { Row, Col } from 'react-bootstrap';
 import BufferUsage from './BufferUsage';
 import SystemOverviewDetails from './SystemOverviewDetails';
 import JvmHeapUsage from './JvmHeapUsage';
+import SystemInformation from './SystemInformation';
+import RestApiOverview from './RestApiOverview';
 
 const NodeOverview = React.createClass({
   propTypes: {
     node: PropTypes.object.isRequired,
     systemOverview: PropTypes.object.isRequired,
+    jvmInformation: PropTypes.object,
   },
   render() {
     const node = this.props.node;
@@ -47,6 +50,17 @@ const NodeOverview = React.createClass({
                 <BufferUsage nodeId={node.node_id} title="Output buffer" bufferType="output"/>
               </Col>
             </Row>
+          </Col>
+        </Row>
+
+        <Row className="content">
+          <Col md={6}>
+            <h2>System</h2>
+            <SystemInformation node={node} systemInformation={systemOverview} jvmInformation={this.props.jvmInformation}/>
+          </Col>
+          <Col md={6}>
+            <h2>REST API</h2>
+            <RestApiOverview node={node}/>
           </Col>
         </Row>
       </div>

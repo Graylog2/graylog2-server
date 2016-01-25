@@ -32,6 +32,13 @@ const ClusterOverviewStore = Reflux.createStore({
 
     return promise;
   },
+
+  jvm(nodeId) {
+    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
+    promise.catch(error => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
+
+    return promise;
+  },
 });
 
 export default ClusterOverviewStore;
