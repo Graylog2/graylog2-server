@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-public class DropMessageFunction implements Function<Void> {
+public class DropMessage implements Function<Void> {
 
     public static final String NAME = "drop_message";
 

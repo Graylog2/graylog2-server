@@ -17,10 +17,12 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @AutoValue
 public abstract class Rule {
@@ -35,6 +37,9 @@ public abstract class Rule {
         return new AutoValue_Rule.Builder();
     }
 
+    public static Rule alwaysFalse(String name) {
+        return builder().name(name).when(new BooleanExpression(false)).then(Collections.emptyList()).build();
+    }
     @AutoValue.Builder
     public abstract static class Builder {
 

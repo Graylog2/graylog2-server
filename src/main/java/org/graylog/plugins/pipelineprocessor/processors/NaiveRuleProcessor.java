@@ -45,11 +45,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.cache.CacheLoader.asyncReloading;
@@ -75,7 +76,9 @@ public class NaiveRuleProcessor implements MessageProcessor {
                 .build(asyncReloading(new RuleLoader(ruleSourceService, pipelineRuleParser), scheduledExecutorService));
         // prime the cache with all presently stored rules
         try {
-            ruleCache.getAll(Collections.emptyList());
+            final List<String> ruleIds = ruleSourceService.loadAll().stream().map(RuleSource::id).collect(Collectors.toList());
+            log.info("Compiling {} processing rules", ruleIds.size());
+            ruleCache.getAll(ruleIds);
         } catch (ExecutionException ignored) {}
     }
 
@@ -147,6 +150,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
                     all.put(ruleSource.id(), pipelineRuleParser.parseRule(ruleSource.source()));
                 } catch (ParseException e) {
                     log.error("Unable to parse rule: " + e.getMessage());
+                    all.put(ruleSource.id(), Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id()));
                 }
             }
             return all;
@@ -159,7 +163,8 @@ public class NaiveRuleProcessor implements MessageProcessor {
                 return pipelineRuleParser.parseRule(ruleSource.source());
             } catch (ParseException e) {
                 log.error("Unable to parse rule: " + e.getMessage());
-                throw e;
+                // return dummy rule
+                return Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id());
             }
         }
     }
