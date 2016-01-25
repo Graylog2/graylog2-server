@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.functions.DropMessageFunction;
 import org.graylog.plugins.pipelineprocessor.functions.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.InputFunction;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.processors.NaiveRuleProcessor;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
@@ -56,8 +57,9 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessorFunction(StringCoercion.NAME, StringCoercion.class);
 
         addMessageProcessorFunction(HasField.NAME, HasField.class);
-        addMessageProcessorFunction(InputFunction.NAME, InputFunction.class);
+        addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(DropMessageFunction.NAME, DropMessageFunction.class);
+        addMessageProcessorFunction(InputFunction.NAME, InputFunction.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

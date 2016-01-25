@@ -22,6 +22,7 @@ const RuleForm = React.createClass({
   getDefaultProps() {
     return {
       rule: {
+        id: '',
         title: '',
         description: '',
         source: '',
@@ -30,9 +31,15 @@ const RuleForm = React.createClass({
   },
 
   getInitialState() {
+    const rule = this.props.rule;
     return {
       // when editing, take the rule that's been passed in
-      rule: this.props.rule,
+      rule: {
+        id: rule.id,
+        title: rule.title,
+        description: rule.description,
+        source: rule.source
+      },
       error: false,
       error_message: '',
     }
@@ -103,7 +110,7 @@ const RuleForm = React.createClass({
                             submitButtonText="Save">
           <fieldset>
             <Input type="text"
-                   id={this._getId('rule-name')}
+                   id={this._getId('title')}
                    label="Name"
                    onChange={this._onTitleChange}
                    value={this.state.rule.title}
@@ -120,9 +127,9 @@ const RuleForm = React.createClass({
             <label>Rule source</label>
             <div style={{border: "1px solid lightgray", borderRadius: 5}}>
               <AceEditor
-                mode="javascript"
-                theme="github"
-                name="source"
+                mode="text"
+                theme="chrome"
+                name={"source" + (this.props.create ? "-create" : "-edit")}
                 fontSize={11}
                 height="14em"
                 width="100%"

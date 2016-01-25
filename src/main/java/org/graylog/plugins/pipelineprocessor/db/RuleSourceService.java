@@ -72,6 +72,9 @@ public class RuleSourceService {
     }
 
     public void delete(String id) {
-        dbCollection.removeById(id);
+        final WriteResult<RuleSource, String> result = dbCollection.removeById(id);
+        if (result.getN() != 1) {
+            log.error("Unable to delete rule {}", id);
+        }
     }
 }

@@ -25,19 +25,54 @@ const RulesStore = Reflux.createStore({
     }, failCallback);
   },
 
-  get(pipelineId) {
+  get(ruleId) {
 
   },
 
-  save(pipelineSource) {
-
+  save(ruleSource) {
+    const failCallback = (error) => {
+      UserNotification.error('Saving rule failed with status: ' + error.message,
+        'Could not save processing rule');
+    };
+    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule');
+    const rule = {
+      title: ruleSource.title,
+      description: ruleSource.description,
+      source: ruleSource.source
+    };
+    return fetch('POST', url, rule).then((response) => {
+      this.rules = response;
+      this.trigger({rules: response});
+    }, failCallback);
   },
 
-  update(pipelineId) {
-
+  update(ruleSource) {
+    const failCallback = (error) => {
+      UserNotification.error('Updating rule failed with status: ' + error.message,
+        'Could not update processing rule');
+    };
+    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/' + ruleSource.id);
+    const rule = {
+      id: ruleSource.id,
+      title: ruleSource.title,
+      description: ruleSource.description,
+      source: ruleSource.source
+    };
+    return fetch('PUT', url, rule).then((response) => {
+      this.rules = this.rules.map((e) => e.id === response.id ? response : e);
+      this.trigger({rules: this.rules});
+    }, failCallback);
   },
-  delete(pipelineId) {
-
+  delete(ruleId) {
+    const failCallback = (error) => {
+      UserNotification.error('Updating rule failed with status: ' + error.message,
+        'Could not update processing rule');
+    };
+    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/' + ruleId);
+    return fetch('DELETE', url).then(() => {
+      this.rules = this.rules.filter((el) => el.id !== ruleId);
+      this.trigger({rules: this.rules});
+    }, failCallback);
   },
 });
 

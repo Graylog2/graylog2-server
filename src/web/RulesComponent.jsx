@@ -5,6 +5,7 @@ import { Input, Alert } from 'react-bootstrap';
 
 import RulesActions from 'RulesActions';
 import RuleForm from 'RuleForm';
+import Rule from 'Rule';
 
 const RulesComponent = React.createClass({
   propTypes: {
@@ -12,7 +13,12 @@ const RulesComponent = React.createClass({
   },
 
   _formatRule(rule) {
-    return <Rule key={"rule-" + rule._id} rule={rule} user={this.props.user} />;
+    return <Rule key={"rule-" + rule.id}
+                 rule={rule}
+                 user={this.props.user}
+                 delete={this._delete}
+                 save={this._save}
+                 validateName={this._validateName}/>;
   },
 
   _sortByTitle(rule1, rule2) {
@@ -21,7 +27,16 @@ const RulesComponent = React.createClass({
 
   _save(rule, callback) {
     console.log(rule);
+    if (rule.id) {
+      RulesActions.update(rule);
+    } else {
+      RulesActions.save(rule);
+    }
     callback();
+  },
+
+  _delete(rule) {
+    RulesActions.delete(rule.id);
   },
 
   // TODO this should really validate the rule (as in parsing it server side)
