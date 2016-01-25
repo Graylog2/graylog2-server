@@ -24,6 +24,7 @@ const Rule = React.createClass({
       <Row>
         <Col md={3}>{this.props.rule.description}</Col>
         <Col md={8}>
+          <label>Rule source</label>
           <div style={{border: "1px solid lightgray", borderRadius: 5, width: 502}}>
             <AceEditor
               mode="text"
@@ -33,6 +34,7 @@ const Rule = React.createClass({
               height="14em"
               width="500px"
               readonly
+              editorProps={{ $blockScrolling: "Infinity" }}
               value={this.props.rule.source}
             />
           </div>

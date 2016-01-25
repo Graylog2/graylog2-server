@@ -133,6 +133,7 @@ const RuleForm = React.createClass({
                 fontSize={11}
                 height="14em"
                 width="100%"
+                editorProps={{ $blockScrolling: "Infinity" }}
                 value={this.state.rule.source}
                 onChange={this._onSourceChange}
               />
