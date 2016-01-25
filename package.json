@@ -16,6 +16,7 @@
   "author": "Kay Roepke <kay@graylog.com>",
   "license": "GPL-3.0",
   "dependencies": {
+    "brace": "^0.7.0",
     "react": "0.14.x",
     "react-ace": "^3.1.0",
     "react-bootstrap": "^0.28.1",
