@@ -18,7 +18,6 @@ package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
@@ -28,37 +27,72 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import static java.util.Objects.requireNonNull;
+
 public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
-
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
 
-    private final OrderedMessageProcessors orderedMessageProcessors;
+    private final Iterable<MessageProcessor> messageProcessors;
     private final OutputBuffer outputBuffer;
+    private final boolean sanitizeFieldNames;
+    private final String replacement;
 
     @Inject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
-                                        OrderedMessageProcessors orderedMessageProcessors,
-                                        OutputBuffer outputBuffer) {
+                                        Iterable<MessageProcessor> messageProcessors,
+                                        OutputBuffer outputBuffer,
+                                        @Named("elasticsearch_sanitize_field_names") boolean sanitizeFieldNames,
+                                        @Named("elasticsearch_invalid_character_replacement") String replacement) {
         super(metricRegistry);
-        this.orderedMessageProcessors = orderedMessageProcessors;
-        this.outputBuffer = outputBuffer;
+        this.messageProcessors = requireNonNull(messageProcessors);
+        this.outputBuffer = requireNonNull(outputBuffer);
+        this.sanitizeFieldNames = sanitizeFieldNames;
+        this.replacement = requireNonNull(replacement);
     }
 
     @Override
     protected void handleMessage(@Nonnull Message msg) {
         Messages messages = msg;
 
-        for (MessageProcessor messageProcessor : orderedMessageProcessors) {
+        if (sanitizeFieldNames) {
+            for (Message message : messages) {
+                replaceInvalidFieldNames(message);
+            }
+        }
+        for (MessageProcessor messageProcessor : messageProcessors) {
             messages = messageProcessor.process(messages);
         }
         for (Message message : messages) {
-            LOG.debug("Finished processing message. Writing to output buffer.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Finished processing message <{}>. Writing to output buffer.", message.getId());
+            }
             outputBuffer.insertBlocking(message);
         }
     }
 
+    private void replaceInvalidFieldNames(Message message) {
+        final Map<String, Object> fields = message.getFields();
+        for (Map.Entry<String, Object> field : fields.entrySet()) {
+            final String fieldName = field.getKey();
+            if (fieldName.contains(".")) {
+                final String sanitizedFieldName = fieldName.replace(".", replacement);
+                final Object value = field.getValue();
+                message.removeField(fieldName);
+                final Object oldFieldValue = message.addField(sanitizedFieldName, value);
+
+                if (LOG.isWarnEnabled() && oldFieldValue != null) {
+                    LOG.warn("Overwrote existing field [{}] after renaming [{}] in message <{}>",
+                            sanitizedFieldName, fieldName, message.getId());
+                }
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Replaced field name [{}] with [{}] in message <{}>",
+                            fieldName, sanitizedFieldName, message.getId());
+                }
+            }
+        }
+    }
 }

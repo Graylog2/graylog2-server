@@ -16,14 +16,16 @@
  */
 package org.graylog2.messageprocessors;
 
+import com.google.inject.TypeLiteral;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
 
 public class MessageProcessorModule extends PluginModule {
     @Override
     protected void configure() {
         addMessageProcessor(MessageFilterChainProcessor.class);
 
-        bind(OrderedMessageProcessors.class).asEagerSingleton();
+        // TODO: Use marker interface?
+        bind(new TypeLiteral<Iterable<MessageProcessor>>() {}).to(OrderedMessageProcessors.class).asEagerSingleton();
     }
-
 }
