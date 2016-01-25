@@ -103,18 +103,22 @@ public class Messages {
     }
 
     public boolean bulkIndex(final List<Message> messages) {
+        return bulkIndex(deflectorName, messages);
+    }
+
+    public boolean bulkIndex(final String indexName, final List<Message> messages) {
         if (messages.isEmpty()) {
             return true;
         }
 
         final BulkRequestBuilder requestBuilder = c.prepareBulk().setConsistencyLevel(WriteConsistencyLevel.ONE);
         for (Message msg : messages) {
-            requestBuilder.add(buildIndexRequest(deflectorName, msg.toElasticSearchObject(), msg.getId()));
+            requestBuilder.add(buildIndexRequest(indexName, msg.toElasticSearchObject(), msg.getId()));
         }
 
         final BulkResponse response = runBulkRequest(requestBuilder.request());
 
-        LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
+        LOG.debug("Index {}: Bulk indexed {} messages, took {} ms, failures: {}", indexName,
                 response.getItems().length, response.getTookInMillis(), response.hasFailures());
         if (response.hasFailures()) {
             propagateFailure(response.getItems(), response.buildFailureMessage());
