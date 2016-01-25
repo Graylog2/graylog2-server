@@ -50,6 +50,9 @@ const InputsList = React.createClass({
   _formatInput(input) {
     return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
   },
+  _nodeAffix() {
+    return (this.props.node ? ' on this node' : '');
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -68,7 +71,7 @@ const InputsList = React.createClass({
             <h2>
               Global inputs
               &nbsp;
-              <small>{this.state.globalInputs.length} configured {this.props.node && 'on this node'}</small>
+              <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
             </h2>
             <EntityList bsNoItemsStyle="info" noItemsText="There are no global inputs."
                         items={this.state.globalInputs.map(input => this._formatInput(input))} />
@@ -79,9 +82,9 @@ const InputsList = React.createClass({
             <h2>
               Local inputs
               &nbsp;
-              <small>{this.state.localInputs.length} configured {this.props.node && 'on this node'}</small>
+              <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
             </h2>
-            <EntityList bsNoItemsStyle="info" noItemsText={`There are no local inputs${this.props.node && ' on this node'}.`}
+            <EntityList bsNoItemsStyle="info" noItemsText={`There are no local inputs${this._nodeAffix()}.`}
                         items={this.state.localInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
