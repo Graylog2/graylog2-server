@@ -20,7 +20,7 @@ const DataTable = React.createClass({
     filterBy: React.PropTypes.string,
     filterLabel: React.PropTypes.string.isRequired,
     filterKeys: React.PropTypes.array.isRequired,
-    filterSuggestions: React.PropTypes.string,
+    filterSuggestions: React.PropTypes.array,
     headerCellFormatter: React.PropTypes.func.isRequired,
     headers: React.PropTypes.array.isRequired,
     id: React.PropTypes.string,
