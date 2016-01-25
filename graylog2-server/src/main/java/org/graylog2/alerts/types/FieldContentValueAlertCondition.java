@@ -97,7 +97,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
             if (backlogEnabled) {
                 summaries = Lists.newArrayListWithCapacity(result.getResults().size());
                 for (ResultMessage resultMessage : result.getResults()) {
-                    final Message msg = new Message(resultMessage.getMessage());
+                    final Message msg = resultMessage.getMessage();
                     searchHits.add(msg);
                     summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                 }

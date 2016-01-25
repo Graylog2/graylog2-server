@@ -29,6 +29,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
@@ -41,6 +42,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +54,7 @@ import static com.google.common.base.Predicates.not;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
-public class Message {
+public class Message implements Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
     public static final String FIELD_ID = "_id";
@@ -436,6 +438,14 @@ public class Message {
 
     private boolean shouldNotRecord(ServerStatus serverStatus) {
         return !serverStatus.getDetailedMessageRecordingStrategy().shouldRecord(this);
+    }
+
+    @Override
+    public Iterator<Message> iterator() {
+        if (getFilterOut()) {
+            return Collections.emptyIterator();
+        }
+        return Iterators.singletonIterator(this);
     }
 
     public static abstract class Recording {

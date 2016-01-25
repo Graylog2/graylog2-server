@@ -74,6 +74,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final HashMap<String, Object> source = Maps.newHashMap();
         source.put("message", "something is in here");
 
+        when(searchHit.getId()).thenReturn("some id");
         when(searchHit.getSource()).thenReturn(source);
         when(searchHit.getIndex()).thenReturn("graylog_test");
         when(searchHits.iterator()).thenReturn(Iterators.singletonIterator(searchHit));
