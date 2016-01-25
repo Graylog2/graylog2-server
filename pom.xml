@@ -107,12 +107,6 @@
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-shared</artifactId>
-            <version>${graylog2.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
             <version>${graylog2.version}</version>
             <scope>provided</scope>
