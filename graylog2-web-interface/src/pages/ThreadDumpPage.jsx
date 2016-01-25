@@ -6,7 +6,7 @@ import { PageHeader, Spinner } from 'components/common';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import NodesStore from 'stores/nodes/NodesStore';
-import SystemThreadDumpStore from 'stores/cluster/SystemThreadDumpStore';
+import ClusterOverviewStore from 'stores/cluster/ClusterOverviewStore';
 
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -20,7 +20,7 @@ const ThreadDumpPage = React.createClass({
   },
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
   componentDidMount() {
-    SystemThreadDumpStore.get(this.props.params.nodeId).then(threadDump => this.setState({threadDump: threadDump}));
+    ClusterOverviewStore.threadDump(this.props.params.nodeId).then(threadDump => this.setState({threadDump: threadDump}));
   },
   _isLoading() {
     return !this.state.node;

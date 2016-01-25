@@ -33,6 +33,18 @@ const ClusterOverviewStore = Reflux.createStore({
     return promise;
   },
 
+  threadDump(nodeId) {
+    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
+      .then(
+        (response) => {
+          return response.threaddump;
+        },
+        (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump')
+      );
+
+    return promise;
+  },
+
   jvm(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
     promise.catch(error => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
