@@ -25,6 +25,7 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -39,6 +40,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -62,6 +64,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.nullToEmpty;
 
 /**
  * This is generating API information in Swagger format.
@@ -81,18 +86,40 @@ public class Generator {
     private static Map<String, Object> overviewResult = Maps.newHashMap();
     private static Reflections reflections;
 
+    private final Map<Class<?>, String> pluginMapping;
+    private final String pluginPathPrefix;
     private final ObjectMapper mapper;
 
-    public Generator(String[] packageNames, ObjectMapper mapper) {
+    public Generator(Set<String> packageNames, Map<Class<?>, String> pluginMapping, String pluginPathPrefix, ObjectMapper mapper) {
+        this.pluginMapping = pluginMapping;
+        this.pluginPathPrefix = pluginPathPrefix;
         this.mapper = mapper;
 
         if (reflections == null) {
-            reflections = new Reflections((Object[]) packageNames);
+            reflections = new Reflections(packageNames.toArray(),
+                    pluginMapping.keySet().stream().map(Class::getClassLoader).collect(Collectors.toSet()));
         }
     }
 
     public Generator(String packageName, ObjectMapper mapper) {
-        this(new String[]{packageName}, mapper);
+        this(ImmutableSet.of(packageName), ImmutableMap.of(), "", mapper);
+    }
+
+    private String prefixedPath(Class<?> resourceClass, @Nullable String resourceAnnotationPath) {
+        final String resourcePath = nullToEmpty(resourceAnnotationPath);
+        final StringBuilder prefixedPath = new StringBuilder();
+
+        if (pluginMapping.containsKey(resourceClass)) {
+            prefixedPath.append(pluginPathPrefix);
+            prefixedPath.append("/");
+            prefixedPath.append(pluginMapping.get(resourceClass));
+        }
+
+        if (!resourcePath.startsWith("/")) {
+            prefixedPath.append("/");
+        }
+
+        return prefixedPath.append(resourcePath).toString();
     }
 
     public synchronized Map<String, Object> generateOverview() {
@@ -110,9 +137,10 @@ public class Generator {
                 continue;
             }
 
+            final String prefixedPath = prefixedPath(clazz, path.value());
             final Map<String, Object> apiDescription = Maps.newHashMap();
-            apiDescription.put("name", info.value());
-            apiDescription.put("path", path.value());
+            apiDescription.put("name", prefixedPath.startsWith(pluginPathPrefix) ? "Plugins/" + info.value() : info.value());
+            apiDescription.put("path", prefixedPath);
             apiDescription.put("description", info.description());
 
             apis.add(apiDescription);
@@ -149,7 +177,9 @@ public class Generator {
                 continue;
             }
 
-            if (cleanRoute(route).equals(cleanRoute(path.value()))) {
+            final String prefixedPath = prefixedPath(clazz, path.value());
+
+            if (cleanRoute(route).equals(cleanRoute(prefixedPath))) {
                 // This is the class representing the given route. Get all methods.
                 LOG.debug("Found corresponding REST resource class: <{}>", clazz.getCanonicalName());
 
@@ -177,13 +207,13 @@ public class Generator {
 
                         if (clazz.isAnnotationPresent(Path.class)) {
                             // The class has a Path, too. Prepend.
-                            String classPath = cleanRoute(clazz.getAnnotation(Path.class).value());
+                            String classPath = cleanRoute(prefixedPath(clazz, clazz.getAnnotation(Path.class).value()));
                             methodPath = classPath + methodPath;
                         }
                     } else {
                         // Method has no annotated Path. We read from it's class.
                         if (clazz.isAnnotationPresent(Path.class)) {
-                            methodPath = cleanRoute(clazz.getAnnotation(Path.class).value());
+                            methodPath = cleanRoute(prefixedPath(clazz, clazz.getAnnotation(Path.class).value()));
                         } else {
                             LOG.debug("Method <{}> has no Path annotation. Skipping.", method.toGenericString());
                             continue;
