@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -75,8 +76,10 @@ public class MessageFilterChainProcessor implements MessageProcessor {
 
     @Override
     public Messages process(Messages messages) {
+        final Iterator<Message> it = messages.iterator();
 
-        for (Message msg : messages) {
+        while (it.hasNext()) {
+            final Message msg = it.next();
             for (final MessageFilter filter : filterRegistry) {
                 final String timerName = name(filter.getClass(), "executionTime");
                 final Timer timer = metricRegistry.timer(timerName);
@@ -89,11 +92,10 @@ public class MessageFilterChainProcessor implements MessageProcessor {
                         LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.",
                                   filter.getName(),
                                   msg.getId());
+                        it.remove();
                         filteredOutMessages.mark();
                         journal.markJournalOffsetCommitted(msg.getJournalOffset());
-                        continue;
                     }
-                    return msg;
                 } catch (Exception e) {
                     LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",
                               e);
