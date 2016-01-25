@@ -6,16 +6,23 @@ import SystemOverviewDetails from './SystemOverviewDetails';
 import JvmHeapUsage from './JvmHeapUsage';
 import SystemInformation from './SystemInformation';
 import RestApiOverview from './RestApiOverview';
+import PluginsDataTable from './PluginsDataTable';
 
 const NodeOverview = React.createClass({
   propTypes: {
     node: PropTypes.object.isRequired,
     systemOverview: PropTypes.object.isRequired,
     jvmInformation: PropTypes.object,
+    plugins: PropTypes.array,
   },
   render() {
     const node = this.props.node;
     const systemOverview = this.props.systemOverview;
+
+    let pluginCount;
+    if (this.props.plugins) {
+      pluginCount = `${this.props.plugins.length} plugins installed`;
+    }
 
     return (
       <div>
@@ -61,6 +68,13 @@ const NodeOverview = React.createClass({
           <Col md={6}>
             <h2>REST API</h2>
             <RestApiOverview node={node}/>
+          </Col>
+        </Row>
+
+        <Row className="content">
+          <Col md={12}>
+            <h2>Installed plugins <small>{pluginCount}</small></h2>
+            <PluginsDataTable plugins={this.props.plugins}/>
           </Col>
         </Row>
       </div>

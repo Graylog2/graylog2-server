@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 
 import NodesStore from 'stores/nodes/NodesStore';
 import ClusterOverviewStore from 'stores/cluster/ClusterOverviewStore';
+import PluginsStore from 'stores/plugins/PluginsStore';
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { PageHeader, Spinner } from 'components/common';
@@ -23,11 +24,13 @@ const ShowNodePage = React.createClass({
   getInitialState() {
     return {
       jvmInformation: undefined,
+      plugins: undefined,
     };
   },
   componentWillMount() {
     ClusterOverviewStore.jvm(this.props.params.nodeId)
       .then(jvmInformation => this.setState({jvmInformation: jvmInformation}));
+    PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({plugins: plugins}));
   },
   _isLoading() {
     return !(this.state.node && this.state.systemOverview);
@@ -51,7 +54,7 @@ const ShowNodePage = React.createClass({
           <span><NodeMaintenanceDropdown node={node}/></span>
         </PageHeader>
         <NodeOverview node={node} systemOverview={this.state.systemOverview}
-                      jvmInformation={this.state.jvmInformation}/>
+                      jvmInformation={this.state.jvmInformation} plugins={this.state.plugins}/>
       </div>
     );
   },
