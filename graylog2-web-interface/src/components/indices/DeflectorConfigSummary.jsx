@@ -12,17 +12,17 @@ const DeflectorConfigSummary = React.createClass({
       case 'org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse':
         return (
           <strong>Your current configuration is {numeral(config.max_docs_per_index).format('0,0')} documents per index
-            and a maximum number of {config.max_number_of_indices} indices.</strong>
+            {' '}and a maximum number of {config.max_number_of_indices} indices.</strong>
         );
       case 'org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse':
         return (
           <strong>Your current configuration rotates the indices every {moment.duration(config.max_time_per_index).humanize()}
-            and keeps a maximum number of {config.max_number_of_indices} indices.</strong>
+            {' '}and keeps a maximum number of {config.max_number_of_indices} indices.</strong>
         );
       case 'org.graylog2.rest.models.system.responses.SizeBasedRotationStrategyResponse':
         return (
           <strong>Your current configuration is {numeral(config.max_size_per_index).format('0,0')} bytes per index and a
-            maximum number of {config.max_number_of_indices} indices.</strong>
+            {' '}maximum number of {config.max_number_of_indices} indices.</strong>
         );
     }
   },
