@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -76,11 +75,9 @@ public class MessageFilterChainProcessor implements MessageProcessor {
 
     @Override
     public Messages process(Messages messages) {
-        final Iterator<Message> it = messages.iterator();
 
-        while (it.hasNext()) {
-            final Message msg = it.next();
-            for (final MessageFilter filter : filterRegistry) {
+        for (final MessageFilter filter : filterRegistry) {
+            for (Message msg : messages) {
                 final String timerName = name(filter.getClass(), "executionTime");
                 final Timer timer = metricRegistry.timer(timerName);
                 final Timer.Context timerContext = timer.time();
@@ -90,15 +87,15 @@ public class MessageFilterChainProcessor implements MessageProcessor {
 
                     if (filter.filter(msg)) {
                         LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.",
-                                  filter.getName(),
-                                  msg.getId());
-                        it.remove();
+                                filter.getName(),
+                                msg.getId());
+                        msg.setFilterOut(true);
                         filteredOutMessages.mark();
                         journal.markJournalOffsetCommitted(msg.getJournalOffset());
                     }
                 } catch (Exception e) {
                     LOG.error("Could not apply filter [" + filter.getName() + "] on message <" + msg.getId() + ">: ",
-                              e);
+                            e);
                 } finally {
                     final long elapsedNanos = timerContext.stop();
                     msg.recordTiming(serverStatus, timerName, elapsedNanos);
