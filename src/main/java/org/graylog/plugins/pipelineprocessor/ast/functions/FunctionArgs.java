@@ -48,7 +48,7 @@ public class FunctionArgs {
             return Optional.empty();
         }
         final Object value = valueExpr.evaluate(context);
-        return Optional.of(argumentType.cast(value));
+        return Optional.ofNullable(argumentType.cast(value));
     }
 
     public boolean isPresent(String key) {

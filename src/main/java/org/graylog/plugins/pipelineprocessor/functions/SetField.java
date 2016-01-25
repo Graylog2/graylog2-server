@@ -38,8 +38,9 @@ public class SetField implements Function<Void> {
         final Optional<Object> field = args.evaluated(FIELD, context, Object.class);
         final Optional<Object> value = args.evaluated(VALUE, context, Object.class);
 
-        context.currentMessage().addField(field.get().toString(), value.get());
-
+        if (!field.isPresent() && !field.get().toString().isEmpty()) {
+            context.currentMessage().addField(field.get().toString(), value.get());
+        }
         return null;
     }
 

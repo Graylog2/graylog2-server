@@ -102,7 +102,7 @@ public class NaiveRuleProcessor implements MessageProcessor {
                         log.info("[✕] Message {} does not match condition", message.getId());
                     }
                 } catch (Exception e) {
-                    log.error("Unable to process message", e);
+                    log.error("Unable to process message " + message.getId() + ", running rule " + rule.name(), e);
                 }
                 if (message.getFilterOut()) {
                     log.info("[✝] Message {} was filtered out", message.getId());
