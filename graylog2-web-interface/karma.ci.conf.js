@@ -1,5 +1,4 @@
 var karmaSharedConfig = require('./karma.shared');
-var merge = require('webpack-merge');
 
 module.exports = function(config) {
   karmaSharedConfig(config);

@@ -1,4 +1,22 @@
-var webpackSharedConfig = require('./webpack.config');
+var merge = require('webpack-merge');
+var webpackSharedConfig = merge(require('./webpack.config'), {
+  module: {
+    noParse: [
+      /node_modules\/sinon\//,
+    ]
+  },
+  resolve: {
+    alias: {
+      'sinon': 'sinon/pkg/sinon'
+    }
+  },
+  externals: {
+    'jsdom': 'window',
+    'cheerio': 'window',
+    'react/lib/ExecutionEnvironment': true,
+    'react/lib/ReactContext': true,
+  }
+});
 
 module.exports = function(config) {
   config.set({
@@ -15,11 +33,15 @@ module.exports = function(config) {
       'test/shim/server-side-global-vars.js',
       'test/src/*.js',
       'test/src/**/*.js',
+      'test/src/*.jsx',
+      'test/src/**/*.jsx',
     ],
 
     preprocessors: {
       'test/src/*.js': ['webpack'],
       'test/src/**/*.js': ['webpack'],
+      'test/src/*.jsx': ['webpack'],
+      'test/src/**/*.jsx': ['webpack'],
     },
 
     reporters: ['progress'],
@@ -29,10 +51,6 @@ module.exports = function(config) {
     colors: true,
 
     logLevel: config.LOG_INFO,
-
-    autoWatch: false,
-
-    browsers: ['PhantomJS'],
 
     captureTimeout: 60000,
 
