@@ -231,11 +231,6 @@
                     <version>3.5</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.16</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>cobertura-maven-plugin</artifactId>
                     <version>2.7</version>
@@ -462,22 +457,6 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <failOnViolation>false</failOnViolation>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <configuration>
-                            <failOnViolation>false</failOnViolation>
-                            <logViolationsToConsole>false</logViolationsToConsole>
-                            <configLocation>config/checkstyle.xml</configLocation>
                         </configuration>
                         <executions>
                             <execution>
