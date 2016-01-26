@@ -7,10 +7,12 @@ const NodesStore = Reflux.createStore({
   listenables: [NodesActions],
   sourceUrl: '/system/cluster',
   nodes: undefined,
+  INTERVAL: 5000, // 5 seconds
 
   init() {
     if (this.nodes === undefined) {
       NodesActions.list();
+      setInterval(NodesActions.list, this.INTERVAL);
     }
   },
 

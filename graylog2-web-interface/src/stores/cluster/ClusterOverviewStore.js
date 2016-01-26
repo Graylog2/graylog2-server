@@ -5,6 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
 import SystemLoadBalancerStore from 'stores/load-balancer/SystemLoadBalancerStore';
+import NodesStore from 'stores/nodes/NodesStore';
 
 const ClusterOverviewStore = Reflux.createStore({
   sourceUrl: '/cluster',
@@ -14,6 +15,7 @@ const ClusterOverviewStore = Reflux.createStore({
     this.cluster();
     this.listenTo(SystemProcessingStore, this.cluster);
     this.listenTo(SystemLoadBalancerStore, this.cluster);
+    this.listenTo(NodesStore, this.cluster);
   },
 
   getInitialState() {
