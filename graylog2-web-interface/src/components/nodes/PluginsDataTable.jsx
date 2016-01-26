@@ -26,7 +26,7 @@ const PluginsDataTable = React.createClass({
   },
   render() {
     if (!this.props.plugins) {
-      return <Spinner text="Loading plugins on this node"/>;
+      return <Spinner text="Loading plugins on this node..."/>;
     }
 
     if (this.props.plugins.length === 0) {
