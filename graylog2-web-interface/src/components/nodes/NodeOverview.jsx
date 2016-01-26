@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 
 import BufferUsage from './BufferUsage';
 import SystemOverviewDetails from './SystemOverviewDetails';
@@ -7,6 +8,9 @@ import JvmHeapUsage from './JvmHeapUsage';
 import SystemInformation from './SystemInformation';
 import RestApiOverview from './RestApiOverview';
 import PluginsDataTable from './PluginsDataTable';
+import InputTypesDataTable from './InputTypesDataTable';
+
+import Routes from 'routing/Routes';
 
 const NodeOverview = React.createClass({
   propTypes: {
@@ -14,6 +18,8 @@ const NodeOverview = React.createClass({
     systemOverview: PropTypes.object.isRequired,
     jvmInformation: PropTypes.object,
     plugins: PropTypes.array,
+    inputDescriptions: PropTypes.object,
+    inputStates: PropTypes.array,
   },
   render() {
     const node = this.props.node;
@@ -22,6 +28,12 @@ const NodeOverview = React.createClass({
     let pluginCount;
     if (this.props.plugins) {
       pluginCount = `${this.props.plugins.length} plugins installed`;
+    }
+
+    let inputCount;
+    if (this.props.inputStates) {
+      const runningInputs = this.props.inputStates.filter(inputState => inputState.state.toUpperCase() === 'RUNNING');
+      inputCount = `${runningInputs.length} inputs running on this node`;
     }
 
     return (
@@ -75,6 +87,18 @@ const NodeOverview = React.createClass({
           <Col md={12}>
             <h2>Installed plugins <small>{pluginCount}</small></h2>
             <PluginsDataTable plugins={this.props.plugins}/>
+          </Col>
+        </Row>
+
+        <Row className="content">
+          <Col md={12}>
+            <span className="pull-right">
+              <LinkContainer to={Routes.node_inputs(node.node_id)}>
+                <Button bsStyle="success" bsSize="small">Manage inputs</Button>
+              </LinkContainer>
+            </span>
+            <h2 style={{marginBottom: 15}}>Available input types <small>{inputCount}</small></h2>
+            <InputTypesDataTable inputDescriptions={this.props.inputDescriptions}/>
           </Col>
         </Row>
       </div>
