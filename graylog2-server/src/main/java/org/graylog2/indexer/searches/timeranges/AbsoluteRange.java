@@ -16,96 +16,105 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import com.google.common.base.MoreObjects;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+@AutoValue
+@JsonTypeName(value = AbsoluteRange.ABSOLUTE)
+public abstract class AbsoluteRange extends TimeRange {
 
-public class AbsoluteRange implements TimeRange {
+    public static final String ABSOLUTE = "absolute";
 
-    private final DateTime from;
-    private final DateTime to;
+    @JsonProperty
+    public abstract String type();
 
-    public AbsoluteRange(DateTime from, DateTime to) {
-        this.from = checkNotNull(from);
-        this.to = checkNotNull(to);
+    @JsonProperty
+    public abstract DateTime from();
+
+    @JsonProperty
+    public abstract DateTime to();
+
+    public static Builder builder() {
+        return new AutoValue_AbsoluteRange.Builder();
     }
 
-    public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
-        if (from == null || from.isEmpty() || to == null || to.isEmpty()) {
-            throw new InvalidRangeParametersException();
-        }
+    @JsonCreator
+    public static AbsoluteRange create(@JsonProperty("type") String type,
+                                       @JsonProperty("from") DateTime from,
+                                       @JsonProperty("to") DateTime to) {
+        return builder().type(type).from(from).to(to).build();
+    }
 
-        try {
-            if (from.contains("T")) {
-                this.from = DateTime.parse(from, ISODateTimeFormat.dateTime());
-            } else {
-                this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
-            }
-            if (to.contains("T")) {
-                this.to = DateTime.parse(to, ISODateTimeFormat.dateTime());
-            } else {
-                this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
-            }
-        } catch (IllegalArgumentException e) {
-            throw new InvalidRangeParametersException();
-        }
+    public static AbsoluteRange create(DateTime from, DateTime to) {
+        return builder().type(ABSOLUTE).from(from).to(to).build();
+    }
+
+    public static AbsoluteRange create(String from, String to) throws InvalidRangeParametersException {
+        return builder().type(ABSOLUTE).from(from).to(to).build();
     }
 
     @Override
-    public Type getType() {
-        return Type.ABSOLUTE;
+    public DateTime getFrom() {
+        return from();
+    }
+
+    @Override
+    public DateTime getTo() {
+        return to();
     }
 
     @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>of(
-                "type", getType().toString().toLowerCase(Locale.ENGLISH),
+                "type", ABSOLUTE,
                 "from", getFrom(),
                 "to", getTo());
     }
 
-    public DateTime getFrom() {
-        return from;
-    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract AbsoluteRange build();
 
-    public DateTime getTo() {
-        return to;
-    }
+        public abstract Builder type(String type);
 
-    public Map<String, DateTime> getLimits() {
-        return ImmutableMap.of(
-                "from", getFrom(),
-                "to", getTo());
-    }
+        public abstract Builder to(DateTime to);
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("from", getFrom())
-                .add("to", getTo())
-                .toString();
-    }
+        public abstract Builder from(DateTime to);
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        // TODO replace with custom build()
+        public Builder to(String to) throws InvalidRangeParametersException {
+            try {
+                return to(parseDateTime(to));
+            } catch (IllegalArgumentException e) {
+                throw new InvalidRangeParametersException();
+            }
+        }
 
-        AbsoluteRange that = (AbsoluteRange) o;
-        return from.equals(that.from) && to.equals(that.to);
+        // TODO replace with custom build()
+        public Builder from(String from) throws InvalidRangeParametersException {
+            try {
+                return from(parseDateTime(from));
+            } catch (IllegalArgumentException e) {
+                throw new InvalidRangeParametersException();
+            }
+        }
 
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(from, to);
+        private DateTime parseDateTime(String to) {
+            DateTime ts;
+            if (to.contains("T")) {
+                ts = DateTime.parse(to, ISODateTimeFormat.dateTime());
+            } else {
+                ts = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+            }
+            return ts;
+        }
     }
 }

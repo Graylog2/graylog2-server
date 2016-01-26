@@ -79,7 +79,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     protected CheckResult runCheck() {
         try {
             final String filter = "streams:" + stream.getId();
-            final CountResult result = searches.count("*", new RelativeRange(time * 60), filter);
+            final CountResult result = searches.count("*", RelativeRange.create(time * 60), filter);
             final long count = result.count();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
@@ -99,7 +99,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             if (triggered) {
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 if (getBacklog() > 0) {
-                    final SearchResult backlogResult = searches.search("*", filter, new RelativeRange(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
+                    final SearchResult backlogResult = searches.search("*", filter,
+                                                                       RelativeRange.create(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
                         final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));

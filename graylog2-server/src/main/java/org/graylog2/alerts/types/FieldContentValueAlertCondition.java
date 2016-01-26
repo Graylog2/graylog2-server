@@ -86,7 +86,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
             SearchResult result = searches.search(
                     query,
                     filter,
-                    new RelativeRange(configuration.getAlertCheckInterval()),
+                    RelativeRange.create(configuration.getAlertCheckInterval()),
                     searchLimit,
                     0,
                     new Sorting("timestamp", Sorting.Direction.DESC)

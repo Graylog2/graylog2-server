@@ -16,27 +16,32 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public interface TimeRange {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
+        @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
+        @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class)
+})
+public abstract class TimeRange {
 
-    public enum Type {
-        RELATIVE,
-        ABSOLUTE,
-        KEYWORD
-    }
+    @JsonProperty
+    public abstract String type();
 
-    public Type getType();
+    @JsonIgnore
+    public abstract DateTime getFrom();
 
-    public Map<String, Object> getPersistedConfig();
+    @JsonIgnore
+    public abstract DateTime getTo();
 
-    public DateTime getFrom();
-
-    public DateTime getTo();
+    @JsonIgnore
+    public abstract Map<String, Object> getPersistedConfig();
 
 }

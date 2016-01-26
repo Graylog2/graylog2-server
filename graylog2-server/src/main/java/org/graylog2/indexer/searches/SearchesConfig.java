@@ -16,57 +16,81 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * @author Bernd Ahlers <bernd@torch.sh>
- */
-public class SearchesConfig {
-    private final String query;
-    private final String filter;
-    private final List<String> fields;
-    private final TimeRange range;
-    private final int limit;
-    private final int offset;
-    private final Sorting sorting;
+@AutoValue
+public abstract class SearchesConfig {
+    private final static int LIMIT = 150;
 
-    public SearchesConfig(String query, String filter, List<String> fields, TimeRange range, int limit, int offset, Sorting sorting) {
-        this.query = query;
-        this.filter = filter;
-        this.fields = fields;
-        this.range = range;
-        this.limit = limit;
-        this.offset = offset;
-        this.sorting = sorting;
+    @JsonProperty
+    public abstract String query();
+
+    @JsonProperty
+    @Nullable
+    public abstract String filter();
+
+    @JsonProperty
+    @Nullable
+    public abstract List<String> fields();
+
+    @JsonProperty
+    public abstract TimeRange range();
+
+    @JsonProperty
+    public abstract int limit();
+
+    @JsonProperty
+    public abstract int offset();
+
+    @JsonProperty
+    @Nullable
+    public abstract Sorting sorting();
+
+    @JsonCreator
+    public SearchesConfig create(@JsonProperty("query") String query,
+                                 @JsonProperty("filter") @Nullable String filter,
+                                 @JsonProperty("fields") @Nullable List<String> fields,
+                                 @JsonProperty("range") TimeRange timeRange,
+                                 @JsonProperty("limit") int limit,
+                                 @JsonProperty("offset") int offset,
+                                 @JsonProperty("sorting") @Nullable Sorting sorting) {
+        return builder()
+                .query(query)
+                .filter(filter)
+                .fields(fields)
+                .range(timeRange)
+                .limit(limit > 0 ? limit : LIMIT)
+                .offset(offset)
+                .sorting(sorting)
+                .build();
     }
 
-    public String query() {
-        return query;
+    public static Builder builder() {
+        return new AutoValue_SearchesConfig.Builder().limit(LIMIT);
     }
 
-    public String filter() {
-        return filter;
-    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder query(String query);
 
-    public List<String> fields() {
-        return fields;
-    }
+        public abstract Builder filter(String filter);
 
-    public TimeRange range() {
-        return range;
-    }
+        public abstract Builder fields(List<String> fields);
 
-    public int limit() {
-        return limit;
-    }
+        public abstract Builder range(TimeRange timeRange);
 
-    public int offset() {
-        return offset;
-    }
+        public abstract Builder limit(int limit);
 
-    public Sorting sorting() {
-        return sorting;
+        public abstract Builder offset(int offset);
+
+        public abstract Builder sorting(Sorting sorting);
+
+        public abstract SearchesConfig build();
     }
 }

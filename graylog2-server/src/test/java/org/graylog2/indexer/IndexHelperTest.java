@@ -114,9 +114,9 @@ public class IndexHelperTest {
         when(indexRangeService.get("graylog_2")).thenReturn(indexRangeLatest);
         when(deflector.getCurrentActualTargetIndex()).thenReturn("graylog_2");
 
-        final TimeRange absoluteRange = new AbsoluteRange(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = new KeywordRange("1 day ago");
-        final TimeRange relativeRange = new RelativeRange(3600);
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, deflector, absoluteRange))
                 .containsExactly(indexRangeLatest, indexRange0, indexRange1);
@@ -139,9 +139,9 @@ public class IndexHelperTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
         when(deflector.getCurrentActualTargetIndex()).thenReturn(null);
 
-        final TimeRange absoluteRange = new AbsoluteRange(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = new KeywordRange("1 day ago");
-        final TimeRange relativeRange = new RelativeRange(3600);
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, deflector, absoluteRange))
                 .containsExactly(indexRange0, indexRange1);
@@ -166,9 +166,9 @@ public class IndexHelperTest {
         when(indexRangeService.get("graylog_2")).thenReturn(indexRangeLatest);
         when(deflector.getCurrentActualTargetIndex()).thenReturn("graylog_2");
 
-        final TimeRange absoluteRange = new AbsoluteRange(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = new KeywordRange("1 day ago");
-        final TimeRange relativeRange = new RelativeRange(3600);
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(IndexHelper.determineAffectedIndices(indexRangeService, deflector, absoluteRange))
                 .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
@@ -191,9 +191,9 @@ public class IndexHelperTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
         when(deflector.getCurrentActualTargetIndex()).thenReturn(null);
 
-        final TimeRange absoluteRange = new AbsoluteRange(now.minusDays(1), now.plusDays(1));
-        final TimeRange keywordRange = new KeywordRange("1 day ago");
-        final TimeRange relativeRange = new RelativeRange(3600);
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final TimeRange keywordRange = KeywordRange.create("1 day ago");
+        final TimeRange relativeRange = RelativeRange.create(3600);
 
         assertThat(IndexHelper.determineAffectedIndices(indexRangeService, deflector, absoluteRange))
                 .containsOnly(indexRange0.indexName(), indexRange1.indexName());

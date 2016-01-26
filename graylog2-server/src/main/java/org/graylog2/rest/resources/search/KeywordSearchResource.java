@@ -28,7 +28,6 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.SearchesConfigBuilder;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
@@ -89,14 +88,14 @@ public class KeywordSearchResource extends SearchResource {
         final List<String> fieldList = parseOptionalFields(fields);
         final Sorting sorting = buildSorting(sort);
         final TimeRange timeRange = buildKeywordTimeRange(keyword);
-        final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
-                .setQuery(query)
-                .setFilter(filter)
-                .setFields(fieldList)
-                .setRange(timeRange)
-                .setLimit(limit)
-                .setOffset(offset)
-                .setSorting(sorting)
+        final SearchesConfig searchesConfig = SearchesConfig.builder()
+                .query(query)
+                .filter(filter)
+                .fields(fieldList)
+                .range(timeRange)
+                .limit(limit)
+                .offset(offset)
+                .sorting(sorting)
                 .build();
 
         try {
@@ -296,7 +295,7 @@ public class KeywordSearchResource extends SearchResource {
 
     private TimeRange buildKeywordTimeRange(String keyword) {
         try {
-            return new KeywordRange(keyword);
+            return KeywordRange.create(keyword);
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);
