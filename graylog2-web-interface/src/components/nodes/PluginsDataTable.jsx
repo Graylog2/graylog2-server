@@ -14,8 +14,8 @@ const PluginsDataTable = React.createClass({
     return (
       <tr key={plugin.name}>
         <td className="limited">{plugin.name}</td>
-        <td className="limited">{plugin.author}</td>
         <td className="limited">{plugin.version}</td>
+        <td className="limited">{plugin.author}</td>
         <td className="limited" style={{width: '50%'}}>
           {plugin.description}
           &nbsp;
@@ -33,7 +33,7 @@ const PluginsDataTable = React.createClass({
       return <Alert bsStyle="info"><i className="fa fa-info-circle"/>&nbsp; This node has not any installed plugins.</Alert>;
     }
 
-    const headers = ['Name', 'Author', 'Version', 'Description'];
+    const headers = ['Name', 'Version', 'Author', 'Description'];
 
     return (
       <DataTable id="plugin-list"
