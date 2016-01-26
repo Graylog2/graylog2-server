@@ -99,7 +99,7 @@
         <surefire.version>2.18.1</surefire.version>
         <guice.version>4.0</guice.version>
         <drools.version>6.3.0.Final</drools.version>
-        <slf4j.version>1.7.13</slf4j.version>
+        <slf4j.version>1.7.14</slf4j.version>
         <log4j.version>2.5</log4j.version>
         <mongojack.version>2.3.0</mongojack.version>
         <swagger.version>1.3.12</swagger.version>
