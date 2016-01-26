@@ -37,6 +37,7 @@ const PluginsDataTable = React.createClass({
 
     return (
       <DataTable id="plugin-list"
+                 rowClassName="row-sm"
                  className="table-hover table-condensed table-striped"
                  headers={headers}
                  headerCellFormatter={this._headerCellFormatter}
