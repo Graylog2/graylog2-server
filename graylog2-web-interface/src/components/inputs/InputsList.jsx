@@ -66,7 +66,7 @@ const InputsList = React.createClass({
         </IfPermitted>
         }
 
-        <Row className="content input-list">
+        <Row id="global-inputs" className="content input-list">
           <Col md={12}>
             <h2>
               Global inputs
@@ -77,7 +77,7 @@ const InputsList = React.createClass({
                         items={this.state.globalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>
-        <Row className="content input-list">
+        <Row id="local-inputs" className="content input-list">
           <Col md={12}>
             <h2>
               Local inputs
