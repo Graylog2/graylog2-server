@@ -17,9 +17,9 @@
 package org.graylog2.shared.rest.resources.documentation;
 
 import com.codahale.metrics.annotation.Timed;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.documentation.generator.Generator;

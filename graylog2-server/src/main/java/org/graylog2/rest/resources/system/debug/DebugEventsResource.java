@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.system.debug;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.eventbus.EventBus;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
