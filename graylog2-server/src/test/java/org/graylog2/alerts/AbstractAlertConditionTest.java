@@ -16,14 +16,12 @@
  */
 package org.graylog2.alerts;
 
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
@@ -73,11 +71,6 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
 
             @Override
             protected AlertCondition.CheckResult runCheck() {
-                return null;
-            }
-
-            @Override
-            public List<Message> getSearchHits() {
                 return null;
             }
         };

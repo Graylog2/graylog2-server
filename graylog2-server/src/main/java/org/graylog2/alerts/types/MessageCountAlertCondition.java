@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +55,6 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
-    private List<Message> searchHits = Collections.emptyList();
     private final Searches searches;
 
     @AssistedInject
@@ -125,10 +123,4 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             return null;
         }
     }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return Lists.newArrayList(searchHits);
-    }
-
 }
