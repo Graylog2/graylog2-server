@@ -40,6 +40,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -80,10 +81,9 @@ public class ClusterJournalResource extends ProxiedResource {
         if (response.isSuccess()) {
             return response.body();
         } else {
-            LOG.warn("Unable to get message journal information on node " + nodeId + ": " + response.message());
+            LOG.warn("Unable to get message journal information on node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), response.code());
         }
-
-        return null;
     }
 }
 
