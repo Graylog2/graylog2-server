@@ -4,7 +4,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 const JournalStore = Reflux.createStore({
-  sourceUrl: (nodeId) => `/cluster/journal/${nodeId}`,
+  sourceUrl: (nodeId) => `/cluster/${nodeId}/journal`,
 
   get(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId)));

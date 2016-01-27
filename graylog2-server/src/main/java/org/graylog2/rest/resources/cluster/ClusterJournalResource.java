@@ -48,7 +48,7 @@ import java.io.IOException;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Journal", description = "Journal information of any nodes in the cluster")
-@Path("/cluster/journal")
+@Path("/cluster/{nodeId}/journal")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterJournalResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterJournalResource.class);
@@ -69,7 +69,6 @@ public class ClusterJournalResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get message journal information of a given node")
     @RequiresPermissions(RestPermissions.JOURNAL_READ)
-    @Path("{nodeId}")
     public JournalSummaryResponse get(@ApiParam(name = "nodeId", value = "The id of the node to get message journal information.", required = true)
                                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
