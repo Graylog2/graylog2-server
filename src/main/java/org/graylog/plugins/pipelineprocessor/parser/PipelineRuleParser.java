@@ -96,22 +96,16 @@ public class PipelineRuleParser {
 
     public Rule parseRule(String rule) throws ParseException {
         final ParseContext parseContext = new ParseContext();
+        final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
         final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(rule));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errorListener);
+
         final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
         parser.setErrorHandler(new DefaultErrorStrategy());
         parser.removeErrorListeners();
-        parser.addErrorListener(new BaseErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer,
-                                    Object offendingSymbol,
-                                    int line,
-                                    int charPositionInLine,
-                                    String msg,
-                                    RecognitionException e) {
-                parseContext.addError(new SyntaxError(offendingSymbol, line, charPositionInLine, msg, e));
-            }
-        });
+        parser.addErrorListener(errorListener);
 
         final RuleLangParser.RuleDeclarationContext ruleDeclaration = parser.ruleDeclaration();
 
@@ -152,6 +146,24 @@ public class PipelineRuleParser {
             return string.substring(1, string.length() - 1);
         }
         return string;
+    }
+
+    private static class SyntaxErrorListener extends BaseErrorListener {
+        private final ParseContext parseContext;
+
+        public SyntaxErrorListener(ParseContext parseContext) {
+            this.parseContext = parseContext;
+        }
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer,
+                                Object offendingSymbol,
+                                int line,
+                                int charPositionInLine,
+                                String msg,
+                                RecognitionException e) {
+            parseContext.addError(new SyntaxError(offendingSymbol, line, charPositionInLine, msg, e));
+        }
     }
 
 
