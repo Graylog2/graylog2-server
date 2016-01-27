@@ -137,7 +137,7 @@ public class SearchesTest {
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
-        assertThat(result.getCount()).isEqualTo(10L);
+        assertThat(result.count()).isEqualTo(10L);
     }
 
     @Test

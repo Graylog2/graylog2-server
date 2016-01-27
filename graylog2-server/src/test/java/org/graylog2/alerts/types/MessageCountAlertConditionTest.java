@@ -148,7 +148,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
     protected void searchCountShouldReturn(long count) {
         final CountResult countResult = mock(CountResult.class);
-        when(countResult.getCount()).thenReturn(count);
+        when(countResult.count()).thenReturn(count);
 
         try {
             when(searches.count(anyString(), any(TimeRange.class), anyString())).thenReturn(countResult);

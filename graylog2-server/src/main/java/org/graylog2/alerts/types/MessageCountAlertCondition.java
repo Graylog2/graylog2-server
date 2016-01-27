@@ -80,7 +80,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         try {
             final String filter = "streams:" + stream.getId();
             final CountResult result = searches.count("*", new RelativeRange(time * 60), filter);
-            final long count = result.getCount();
+            final long count = result.count();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 

@@ -69,6 +69,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -112,7 +113,7 @@ public class Indices {
         SearchResponse scrollResp = c.prepareSearch(source)
                 .setScroll(TimeValue.timeValueSeconds(10L))
                 .setQuery(matchAllQuery())
-                .addSort(SortBuilders.fieldSort("_doc"))
+                .addSort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
                 .setSize(350)
                 .execute()
                 .actionGet();
