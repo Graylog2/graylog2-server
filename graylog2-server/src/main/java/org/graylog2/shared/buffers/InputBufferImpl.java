@@ -17,7 +17,7 @@
 package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Gauge;
-import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -34,14 +34,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
-
 
 @Singleton
 public class InputBufferImpl implements InputBuffer {
@@ -59,22 +56,21 @@ public class InputBufferImpl implements InputBuffer {
         final Disruptor<RawMessageEvent> disruptor = new Disruptor<>(
                 RawMessageEvent.FACTORY,
                 configuration.getInputBufferRingSize(),
-                executorService(metricRegistry),
+                threadFactory(metricRegistry),
                 ProducerType.MULTI,
                 configuration.getInputBufferWaitStrategy());
-        disruptor.handleExceptionsWith(new LoggingExceptionHandler(LOG));
+        disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
         final int numberOfHandlers = configuration.getInputbufferProcessors();
         if (configuration.isMessageJournalEnabled()) {
             LOG.info("Message journal is enabled.");
 
             final RawMessageEncoderHandler[] handlers = new RawMessageEncoderHandler[numberOfHandlers];
-            for (int i = 0 ; i < numberOfHandlers; i++) {
+            for (int i = 0; i < numberOfHandlers; i++) {
                 handlers[i] = rawMessageEncoderHandlerProvider.get();
             }
-            disruptor.handleEventsWithWorkerPool(handlers)
-                    .then(spoolingMessageHandlerProvider.get());
-        } else{
+            disruptor.handleEventsWithWorkerPool(handlers).then(spoolingMessageHandlerProvider.get());
+        } else {
             LOG.info("Message journal is disabled.");
             final DirectMessageHandler[] handlers = new DirectMessageHandler[numberOfHandlers];
             for (int i = 0; i < numberOfHandlers; i++) {
@@ -86,19 +82,14 @@ public class InputBufferImpl implements InputBuffer {
         ringBuffer = disruptor.start();
 
         incomingMessages = metricRegistry.meter(name(InputBufferImpl.class, "incomingMessages"));
-        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_USAGE, new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return InputBufferImpl.this.getUsage();
-            }
-        });
+        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_USAGE, (Gauge<Long>) this::getUsage);
         safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_SIZE, constantGauge(ringBuffer.getBufferSize()));
 
         LOG.info("Initialized {} with ring size <{}> and wait strategy <{}>, running {} parallel message handlers.",
-                 this.getClass().getSimpleName(),
-                 configuration.getInputBufferRingSize(),
-                 configuration.getInputBufferWaitStrategy().getClass().getSimpleName(),
-                 numberOfHandlers);
+                this.getClass().getSimpleName(),
+                configuration.getInputBufferRingSize(),
+                configuration.getInputBufferWaitStrategy().getClass().getSimpleName(),
+                numberOfHandlers);
     }
 
     public void insert(RawMessage message) {
@@ -111,9 +102,9 @@ public class InputBufferImpl implements InputBuffer {
         return ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 
-    private ExecutorService executorService(final MetricRegistry metricRegistry) {
+    private ThreadFactory threadFactory(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("inputbufferprocessor-%d").build();
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry, name(this.getClass(), "executor-service"));
+        return new InstrumentedThreadFactory(threadFactory, metricRegistry, name(this.getClass(), "thread-factory"));
     }
 
 }

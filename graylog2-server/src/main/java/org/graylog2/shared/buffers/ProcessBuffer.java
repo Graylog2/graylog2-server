@@ -17,7 +17,7 @@
 package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Gauge;
-import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -26,7 +26,6 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.plugin.GlobalMetricNames;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.journal.RawMessage;
@@ -40,61 +39,46 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import javax.inject.Singleton;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
+@Singleton
 public class ProcessBuffer extends Buffer {
-    private final Timer parseTime;
-    private final Timer decodeTime;
-
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
-
-    private final ExecutorService executor;
 
     private final Meter incomingMessages;
 
     @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
-                         ServerStatus serverStatus,
                          DecodingProcessor.Factory decodingProcessorFactory,
                          Provider<ProcessBufferProcessor> bufferProcessorFactory,
                          @Named("processbuffer_processors") int processorCount,
                          @Named("ring_size") int ringSize,
                          @Named("processor_wait_strategy") String waitStrategyName) {
         this.ringBufferSize = ringSize;
-
-        this.executor = executorService(metricRegistry);
         this.incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
 
-        this.parseTime = metricRegistry.timer(name(ProcessBuffer.class, "parseTime"));
-        this.decodeTime = metricRegistry.timer(name(ProcessBuffer.class, "decodeTime"));
-
-        MetricUtils.safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_USAGE, new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return ProcessBuffer.this.getUsage();
-            }
-        });
+        final Timer parseTime = metricRegistry.timer(name(ProcessBuffer.class, "parseTime"));
+        final Timer decodeTime = metricRegistry.timer(name(ProcessBuffer.class, "decodeTime"));
+        MetricUtils.safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_USAGE, (Gauge<Long>) this::getUsage);
         safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_SIZE, constantGauge(ringBufferSize));
 
         final WaitStrategy waitStrategy = getWaitStrategy(waitStrategyName, "processor_wait_strategy");
         final Disruptor<MessageEvent> disruptor = new Disruptor<>(
                 MessageEvent.EVENT_FACTORY,
                 ringBufferSize,
-                executor,
+                threadFactory(metricRegistry),
                 ProducerType.MULTI,
                 waitStrategy
         );
-        disruptor.handleExceptionsWith(new LoggingExceptionHandler(LOG));
+        disruptor.setDefaultExceptionHandler(new LoggingExceptionHandler(LOG));
 
-        LOG.info("Initialized ProcessBuffer with ring size <{}> "
-                         + "and wait strategy <{}>.", ringBufferSize,
-                 waitStrategy.getClass().getSimpleName());
+        LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
+                ringBufferSize, waitStrategy.getClass().getSimpleName());
 
         final ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
@@ -107,12 +91,12 @@ public class ProcessBuffer extends Buffer {
         ringBuffer = disruptor.start();
     }
 
-    private ExecutorService executorService(MetricRegistry metricRegistry) {
+    private ThreadFactory threadFactory(MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("processbufferprocessor-%d").build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
+        return new InstrumentedThreadFactory(
+                threadFactory,
                 metricRegistry,
-                name(this.getClass(), "executor-service"));
+                name(this.getClass(), "thread-factory"));
     }
 
     public void insertBlocking(@Nonnull RawMessage rawMessage) {
@@ -127,5 +111,4 @@ public class ProcessBuffer extends Buffer {
     protected void afterInsert(int n) {
         incomingMessages.mark(n);
     }
-
 }
