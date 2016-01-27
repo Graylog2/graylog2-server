@@ -21,8 +21,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -63,6 +67,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
 import org.graylog.plugins.pipelineprocessor.parser.errors.MissingRequiredParam;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
+import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
@@ -90,12 +95,26 @@ public class PipelineRuleParser {
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
     public Rule parseRule(String rule) throws ParseException {
+        final ParseContext parseContext = new ParseContext();
+
         final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(rule));
         final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
+        parser.setErrorHandler(new DefaultErrorStrategy());
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer,
+                                    Object offendingSymbol,
+                                    int line,
+                                    int charPositionInLine,
+                                    String msg,
+                                    RecognitionException e) {
+                parseContext.addError(new SyntaxError(offendingSymbol, line, charPositionInLine, msg, e));
+            }
+        });
 
         final RuleLangParser.RuleDeclarationContext ruleDeclaration = parser.ruleDeclaration();
 
-        final ParseContext parseContext = new ParseContext();
 
         // parsing stages:
         // 1. build AST nodes, checks for invalid var, function refs
