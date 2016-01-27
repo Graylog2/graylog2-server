@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
@@ -30,7 +31,7 @@ import javax.annotation.Nullable;
 public abstract class JournalSummaryResponse {
 
     public static JournalSummaryResponse createDisabled() {
-        return new AutoValue_JournalSummaryResponse(false, 0, 0, 0, Size.bytes(0), Size.bytes(0), 0, null, null);
+        return JournalSummaryResponse.create(false, 0, 0, 0, Size.bytes(0), Size.bytes(0), 0, null, null);
     }
 
     public static JournalSummaryResponse createEnabled(long appendEventsPerSec,
@@ -41,15 +42,56 @@ public abstract class JournalSummaryResponse {
                                                        int numberOfSegments,
                                                        DateTime oldestSegment,
                                                        KafkaJournalConfiguration kafkaJournalConfiguration) {
-        return new AutoValue_JournalSummaryResponse(true,
-                                                    appendEventsPerSec,
-                                                    readEventsPerSec,
-                                                    uncommittedJournalEntries,
-                                                    journalSize,
-                                                    journalSizeLimit,
-                                                    numberOfSegments,
-                                                    oldestSegment,
-                                                    kafkaJournalConfiguration);
+        return JournalSummaryResponse.create(true,
+                appendEventsPerSec,
+                readEventsPerSec,
+                uncommittedJournalEntries,
+                journalSize,
+                journalSizeLimit,
+                numberOfSegments,
+                oldestSegment,
+                kafkaJournalConfiguration);
+    }
+
+    @JsonCreator
+    public static JournalSummaryResponse create(@JsonProperty("enabled") boolean enabled,
+                                                @JsonProperty("append_events_per_second") long appendEventsPerSec,
+                                                @JsonProperty("read_events_per_second") long readEventsPerSec,
+                                                @JsonProperty("uncommitted_journal_entries") long uncommittedJournalEntries,
+                                                @JsonProperty("journal_size") long journalSize,
+                                                @JsonProperty("journal_size_limit") long journalSizeLimit,
+                                                @JsonProperty("number_of_segments") int numberOfSegments,
+                                                @JsonProperty("oldest_segment") DateTime oldestSegment,
+                                                @JsonProperty("journal_config") KafkaJournalConfiguration kafkaJournalConfiguration) {
+        return JournalSummaryResponse.create(enabled,
+                appendEventsPerSec,
+                readEventsPerSec,
+                uncommittedJournalEntries,
+                Size.bytes(journalSize),
+                Size.bytes(journalSizeLimit),
+                numberOfSegments,
+                oldestSegment,
+                kafkaJournalConfiguration);
+    }
+
+    public static JournalSummaryResponse create(boolean enabled,
+                                                long appendEventsPerSec,
+                                                long readEventsPerSec,
+                                                long uncommittedJournalEntries,
+                                                Size journalSize,
+                                                Size journalSizeLimit,
+                                                int numberOfSegments,
+                                                DateTime oldestSegment,
+                                                KafkaJournalConfiguration kafkaJournalConfiguration) {
+        return new AutoValue_JournalSummaryResponse(enabled,
+                appendEventsPerSec,
+                readEventsPerSec,
+                uncommittedJournalEntries,
+                journalSize,
+                journalSizeLimit,
+                numberOfSegments,
+                oldestSegment,
+                kafkaJournalConfiguration);
     }
 
     // keep the fields in the same order as the auto value constructor params!
