@@ -13,7 +13,6 @@ const SystemMessage = React.createClass({
       <tr>
         <td>{moment(message.timestamp).format()}</td>
         <td>
-          <i className="fa fa-code-fork"/>{' '}
           <LinkToNode nodeId={message.node_id} />
         </td>
         <td>{message.content}</td>
