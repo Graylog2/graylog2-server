@@ -288,7 +288,7 @@
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wordnik</groupId>
+            <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
         </dependency>
         <dependency>

@@ -101,7 +101,7 @@
         <slf4j.version>1.7.18</slf4j.version>
         <log4j.version>2.5</log4j.version>
         <mongojack.version>2.5.1</mongojack.version>
-        <swagger.version>1.3.12</swagger.version>
+        <swagger.version>1.5.7</swagger.version>
         <sigar.version>1.6.4</sigar.version>
         <restassured.version>2.8.0</restassured.version>
         <elasticsearch.version>2.2.0</elasticsearch.version>
@@ -654,7 +654,7 @@
                 <version>0.1.3-graylog</version>
             </dependency>
             <dependency>
-                <groupId>com.wordnik</groupId>
+                <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
