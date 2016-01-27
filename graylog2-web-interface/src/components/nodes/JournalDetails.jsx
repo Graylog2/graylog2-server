@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { ProgressBar, Row, Col } from 'react-bootstrap';
+import { ProgressBar, Row, Col, Alert } from 'react-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';
@@ -68,14 +68,23 @@ const JournalDetails = React.createClass({
     const nodeId = this.props.nodeId;
     const nodeMetrics = this.state.metrics[nodeId];
     const journalInformation = this.state.journalInformation;
-    const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
-
-    if (Object.keys(metrics).length === 0) {
-      return <span>Journal metrics unavailable.</span>;
-    }
 
     if (!journalInformation.enabled) {
-      return <span>The disk journal is disabled for this node.</span>;
+      return (
+        <Alert bsStyle="warning">
+          <i className="fa fa-exclamation-triangle"/>&nbsp; The disk journal is disabled on this node.
+        </Alert>
+      );
+    }
+
+    const metrics = this.metricNames ? MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames) : {};
+
+    if (Object.keys(metrics).length === 0) {
+      return (
+        <Alert bsStyle="warning">
+          <i className="fa fa-exclamation-triangle"/>&nbsp; Journal metrics unavailable.
+        </Alert>
+      );
     }
 
     const oldestSegment = moment(metrics.oldestSegment);
