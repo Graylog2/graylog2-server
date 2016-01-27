@@ -24,8 +24,10 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 
 import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Calendar;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.DELETE;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.GET;
@@ -39,6 +41,7 @@ public class FakeHttpRawMessageGenerator {
     private final String source;
 
     private final Random rand = new Random(System.currentTimeMillis());
+
 
     private static final List<Resource> GET_RESOURCES = ImmutableList.of(
             new Resource("/login", "LoginController", "login", 10),
@@ -132,14 +135,14 @@ public class FakeHttpRawMessageGenerator {
                 msg = isSuccessful ? successfulDELETE(source) : failedDELETE(source);
                 break;
             case PUT:
-                msg = isSuccessful ? successfulPUT(source) : failedPUT(source);
+                msg = isSuccessful ? successfulPUT(source) : failedPUT(state, rand);
                 break;
         }
         return msg;
     }
 
-    private static String shortMessage(String method, String resource, int code, int tookMs) {
-        return method + " " + resource + " [" + code + "]" + " " + tookMs + "ms";
+    private static String shortMessage(Date ingesttime, String method, String resource, int code, int tookMs) {
+        return ingesttime + " " + method + " " + resource + " [" + code + "]" + " " + tookMs + "ms";
     }
 
     private Weighted getWeighted(List<? extends Weighted> list) {
@@ -161,7 +164,9 @@ public class FakeHttpRawMessageGenerator {
         int msBase = 100;
         int deviation = 30;
         int code = isSuccessful ? 200 : 500;
-
+        Date ingestTime = new Date();
+        Calendar ingestCalendar = Calendar.getInstance();
+        ingestCalendar.setTime(ingestTime);
         if (!isSuccessful && state.isTimeout) {
             // Simulate an internal API timeout from time to time.
             msBase = 5000;
@@ -174,10 +179,18 @@ public class FakeHttpRawMessageGenerator {
 
         int tookMs = rateDeviation(msBase, deviation, rand);
 
-        msg = new Message(shortMessage("GET", state.resource, code, tookMs), state.source, Tools.iso8601());
-
+        msg = new Message(shortMessage(ingestTime, "GET", state.resource, code, tookMs), state.source, Tools.iso8601());
+        msg.addField("ingest_time", ingestTime.toString());
+        msg.addField("ingest_time_epoch", ingestTime.getTime());
+        msg.addField("second", ingestCalendar.get(Calendar.SECOND));
+        msg.addField("minute", ingestCalendar.get(Calendar.MINUTE));
+        msg.addField("hour", ingestCalendar.get(Calendar.HOUR));
+        msg.addField("day", ingestCalendar.get(Calendar.DAY_OF_MONTH));
+        msg.addField("month", ingestCalendar.get(Calendar.MONTH));
+        msg.addField("year", ingestCalendar.get(Calendar.YEAR));
         msg.addField("http_method", "GET");
         msg.addField("http_response_code", code);
+
 
         final Resource resource = RESOURCE_MAP.get(state.resource);
         msg.addField("resource", resource.getResource());
@@ -201,10 +214,56 @@ public class FakeHttpRawMessageGenerator {
         return new Message("successful PUT", source, Tools.iso8601());
     }
 
-    private static Message failedPUT(String source) {
-        return new Message("failed PUT", source, Tools.iso8601());
+    private static Message failedPUT(GeneratorState state,
+                                     Random rand) {
+        final boolean isSuccessful = state.isSuccessful;
+
+        Message msg;
+        int msBase = 100;
+        int deviation = 15;
+        int code = isSuccessful ? 200 : 500;
+        Date ingestTime = new Date();
+        Calendar ingestCalendar = Calendar.getInstance();
+        ingestCalendar.setTime(ingestTime);
+        if (!isSuccessful && state.isTimeout) {
+            // Simulate an internal API timeout from time to time.
+            msBase = 5000;
+            deviation = 18;
+            code = 504;
+        } else if (rand.nextInt(500) == 1) {
+            // ...or just something a bit too slow
+            msBase = 400;
+        }
+
+        int tookMs = rateDeviation(msBase, deviation, rand);
+
+        msg = new Message(shortMessage(ingestTime, "PUT", state.resource, code, tookMs), state.source, Tools.iso8601());
+        msg.addField("ingest_time", ingestTime.toString());
+        msg.addField("ingest_time_epoch", ingestTime.getTime());
+        msg.addField("second", ingestCalendar.get(Calendar.SECOND));
+        msg.addField("minute", ingestCalendar.get(Calendar.MINUTE));
+        msg.addField("hour", ingestCalendar.get(Calendar.HOUR));
+        msg.addField("day", ingestCalendar.get(Calendar.DAY_OF_MONTH));
+        msg.addField("month", ingestCalendar.get(Calendar.MONTH));
+        msg.addField("year", ingestCalendar.get(Calendar.YEAR));
+        msg.addField("http_method", "PUT");
+        msg.addField("http_response_code", code);
+
+
+        final Resource resource = RESOURCE_MAP.get(state.resource);
+        msg.addField("resource", resource.getResource());
+        msg.addField("controller", resource.getController());
+        msg.addField("action", resource.getAction());
+
+        msg.addField("user_id", state.userId);
+        msg.addField("took_ms", tookMs);
+        return msg;
     }
 
+   /* private static Message failedPUT(String source) {
+        return new Message("failed PUT", source, Tools.iso8601());
+    }
+*/
     private static Message successfulDELETE(String source) {
         return new Message("successful DELETE", source, Tools.iso8601());
     }
@@ -287,3 +346,4 @@ public class FakeHttpRawMessageGenerator {
         }
     }
 }
+
