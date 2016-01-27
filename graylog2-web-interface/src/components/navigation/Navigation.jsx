@@ -203,13 +203,15 @@ const Navigation = React.createClass({
           </Nav>
 
           <Nav navbar pullRight>
-            {/* Need to add query to LinkContainer to avoid NavItem to become active */}
+            {/* Needed to replace NavItem with `li` and `a` elements to avoid LinkContainer setting NavItem as active */}
             {/* More information here: https://github.com/react-bootstrap/react-router-bootstrap/issues/134 */}
-            <LinkContainer to={Routes.SYSTEM.NODES.LIST} query="">
-              <NavItem>
-                <GlobalThroughput />
-              </NavItem>
-            </LinkContainer>
+            <li role="presentation" className="">
+              <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+                <a>
+                  <GlobalThroughput />
+                </a>
+              </LinkContainer>
+            </li>
             <HelpMenu active={this._isActive(Routes.GETTING_STARTED)}/>
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
           </Nav>
