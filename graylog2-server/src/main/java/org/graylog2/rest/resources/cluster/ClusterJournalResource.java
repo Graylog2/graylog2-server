@@ -46,6 +46,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
+
 @RequiresAuthentication
 @Api(value = "Cluster/Journal", description = "Journal information of any nodes in the cluster")
 @Path("/cluster/{nodeId}/journal")
@@ -81,7 +83,7 @@ public class ClusterJournalResource extends ProxiedResource {
             return response.body();
         } else {
             LOG.warn("Unable to get message journal information on node {}: {}", nodeId, response.message());
-            throw new WebApplicationException(response.message(), response.code());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
 }
