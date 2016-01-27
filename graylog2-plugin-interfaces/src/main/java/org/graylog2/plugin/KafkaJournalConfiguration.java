@@ -27,9 +27,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
-import com.sun.istack.internal.NotNull;
 import org.joda.time.Duration;
 
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.Objects;
 
