@@ -27,23 +27,25 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
+import com.sun.istack.internal.NotNull;
 import org.joda.time.Duration;
 
 import java.io.File;
+import java.util.Objects;
 
 public class KafkaJournalConfiguration {
 
     public KafkaJournalConfiguration() { }
 
     @JsonCreator
-    public KafkaJournalConfiguration(@JsonProperty("directory") File messageJournalDir,
+    public KafkaJournalConfiguration(@NotNull @JsonProperty("directory") File messageJournalDir,
                                      @JsonProperty("segment_size") long messageJournalSegmentSize,
                                      @JsonProperty("segment_age") Duration messageJournalSegmentAge,
                                      @JsonProperty("max_size") long messageJournalMaxSize,
                                      @JsonProperty("max_age") Duration messageJournalMaxAge,
                                      @JsonProperty("flush_interval") long messageJournalFlushInterval,
                                      @JsonProperty("flush_age") Duration messageJournalFlushAge) {
-        this.messageJournalDir = messageJournalDir;
+        this.messageJournalDir = Objects.requireNonNull(messageJournalDir);
         this.messageJournalSegmentSize = Size.bytes(messageJournalSegmentSize);
         this.messageJournalSegmentAge = messageJournalSegmentAge;
         this.messageJournalMaxSize = Size.bytes(messageJournalMaxSize);
