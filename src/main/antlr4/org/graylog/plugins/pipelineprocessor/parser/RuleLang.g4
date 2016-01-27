@@ -44,6 +44,10 @@ pipelineDecls
     :   pipelineDeclaration+ EOF
     ;
 
+pipeline
+    :   pipelineDeclaration EOF
+    ;
+
 pipelineDeclaration
     :   Pipeline name=String
         stageDeclaration+
@@ -56,7 +60,7 @@ stageDeclaration
     ;
 
 ruleRef
-    :   Rule name=String
+    :   Rule name=String ';'?
     ;
 
 ruleDecls

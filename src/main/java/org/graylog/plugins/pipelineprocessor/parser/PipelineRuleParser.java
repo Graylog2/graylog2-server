@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.mina.util.IdentityHashSet;
@@ -116,9 +117,9 @@ public class PipelineRuleParser {
         // 3. checker: static type check w/ coercion nodes
         // 4. optimizer: TODO
 
-        WALKER.walk(new AstBuilder(parseContext), ruleDeclaration);
-        WALKER.walk(new TypeAnnotator(parseContext), ruleDeclaration);
-        WALKER.walk(new TypeChecker(parseContext), ruleDeclaration);
+        WALKER.walk(new RuleAstBuilder(parseContext), ruleDeclaration);
+        WALKER.walk(new RuleTypeAnnotator(parseContext), ruleDeclaration);
+        WALKER.walk(new RuleTypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
             return parseContext.getRules().get(0);
@@ -126,17 +127,48 @@ public class PipelineRuleParser {
         throw new ParseException(parseContext.getErrors());
     }
 
-    public List<Pipeline> parsePipelines(String pipeline) throws ParseException {
-        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipeline));
+    public List<Pipeline> parsePipelines(String pipelines) throws ParseException {
+        final ParseContext parseContext = new ParseContext();
+        final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
+
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipelines));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errorListener);
+
         final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
+        parser.setErrorHandler(new DefaultErrorStrategy());
+        parser.removeErrorListeners();
+        parser.addErrorListener(errorListener);
 
         final RuleLangParser.PipelineDeclsContext pipelineDeclsContext = parser.pipelineDecls();
-        final ParseContext parseContext = new ParseContext();
 
-        WALKER.walk(new AstBuilder(parseContext), pipelineDeclsContext);
+        WALKER.walk(new PipelineAstBuilder(parseContext), pipelineDeclsContext);
 
         if (parseContext.getErrors().isEmpty()) {
             return parseContext.pipelines;
+        }
+        throw new ParseException(parseContext.getErrors());
+    }
+
+    public Pipeline parsePipeline(String pipeline) {
+        final ParseContext parseContext = new ParseContext();
+        final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
+
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipeline));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errorListener);
+
+        final RuleLangParser parser = new RuleLangParser(new CommonTokenStream(lexer));
+        parser.setErrorHandler(new DefaultErrorStrategy());
+        parser.removeErrorListeners();
+        parser.addErrorListener(errorListener);
+
+        final RuleLangParser.PipelineContext pipelineContext = parser.pipeline();
+
+        WALKER.walk(new PipelineAstBuilder(parseContext), pipelineContext);
+
+        if (parseContext.getErrors().isEmpty()) {
+            return parseContext.pipelines.get(0);
         }
         throw new ParseException(parseContext.getErrors());
     }
@@ -167,7 +199,7 @@ public class PipelineRuleParser {
     }
 
 
-    private class AstBuilder extends RuleLangBaseListener {
+    private class RuleAstBuilder extends RuleLangBaseListener {
 
         private final ParseContext parseContext;
         private final ParseTreeProperty<Map<String, Expression>> args;
@@ -179,38 +211,11 @@ public class PipelineRuleParser {
         // this is true for nested field accesses
         private boolean idIsFieldAccess = false;
 
-        public AstBuilder(ParseContext parseContext) {
+        public RuleAstBuilder(ParseContext parseContext) {
             this.parseContext = parseContext;
             args = parseContext.arguments();
             argsList = parseContext.argumentLists();
             exprs = parseContext.expressions();
-        }
-
-        @Override
-        public void exitPipelineDeclaration(RuleLangParser.PipelineDeclarationContext ctx) {
-            final Pipeline.Builder builder = Pipeline.builder();
-
-            builder.name(unquote(ctx.name.getText(), '"'));
-            List<Stage> stages = Lists.newArrayList();
-            for (RuleLangParser.StageDeclarationContext stage : ctx.stageDeclaration()) {
-                final Stage.Builder stageBuilder = Stage.builder();
-
-                final int stageNumber = Integer.parseInt(stage.stage.getText());
-                stageBuilder.stage(stageNumber);
-
-                final boolean isAllModifier = stage.modifier.getText().equalsIgnoreCase("all");
-                stageBuilder.matchAll(isAllModifier);
-
-                final List<String> ruleRefs = stage.ruleRef().stream()
-                        .map(ruleRefContext -> unquote(ruleRefContext.name.getText(), '"'))
-                        .collect(toList());
-                stageBuilder.ruleReferences(ruleRefs);
-
-                stages.add(stageBuilder.build());
-            }
-
-            builder.stages(stages);
-            parseContext.pipelines.add(builder.build());
         }
 
         @Override
@@ -524,10 +529,10 @@ public class PipelineRuleParser {
         }
     }
 
-    private class TypeAnnotator extends RuleLangBaseListener {
+    private class RuleTypeAnnotator extends RuleLangBaseListener {
         private final ParseContext parseContext;
 
-        public TypeAnnotator(ParseContext parseContext) {
+        public RuleTypeAnnotator(ParseContext parseContext) {
             this.parseContext = parseContext;
         }
 
@@ -548,11 +553,11 @@ public class PipelineRuleParser {
         }
     }
 
-    private class TypeChecker extends RuleLangBaseListener {
+    private class RuleTypeChecker extends RuleLangBaseListener {
         private final ParseContext parseContext;
         StringBuffer sb = new StringBuffer();
 
-        public TypeChecker(ParseContext parseContext) {
+        public RuleTypeChecker(ParseContext parseContext) {
             this.parseContext = parseContext;
         }
 
@@ -710,4 +715,73 @@ public class PipelineRuleParser {
         }
     }
 
+    private class PipelineAstBuilder extends RuleLangBaseListener {
+        private final ParseContext parseContext;
+
+        public PipelineAstBuilder(ParseContext parseContext) {
+            this.parseContext = parseContext;
+        }
+
+        @Override
+        public void exitPipelineDeclaration(RuleLangParser.PipelineDeclarationContext ctx) {
+            final Pipeline.Builder builder = Pipeline.builder();
+
+            builder.name(unquote(ctx.name.getText(), '"'));
+            List<Stage> stages = Lists.newArrayList();
+            for (RuleLangParser.StageDeclarationContext stage : ctx.stageDeclaration()) {
+                final Stage.Builder stageBuilder = Stage.builder();
+
+                final Token stageToken = stage.stage;
+                if (stageToken == null) {
+                    parseContext.addError(new SyntaxError(null, 0, 0, "", null));
+                    return;
+                }
+                final int stageNumber = Integer.parseInt(stageToken.getText());
+                stageBuilder.stage(stageNumber);
+
+                final Token modifier = stage.modifier;
+                if (modifier == null) {
+                    parseContext.addError(new SyntaxError(null, stageToken.getLine(), stageToken.getCharPositionInLine(), "", null));
+                    return;
+                }
+                final boolean isAllModifier = modifier.getText().equalsIgnoreCase("all");
+                stageBuilder.matchAll(isAllModifier);
+
+                final List<String> ruleRefs = stage.ruleRef().stream()
+                        .map(ruleRefContext -> {
+                            final Token name = ruleRefContext.name;
+                            if (name == null) {
+                                final Token symbol = ruleRefContext.Rule().getSymbol();
+                                parseContext.addError(new SyntaxError(symbol, symbol.getLine(), symbol.getCharPositionInLine(), "invalid rule reference", null));
+                                return "__illegal_reference";
+                            }
+                            return unquote(name.getText(), '"');
+                        })
+                        .collect(toList());
+                stageBuilder.ruleReferences(ruleRefs);
+
+                stages.add(stageBuilder.build());
+            }
+
+            builder.stages(stages);
+            parseContext.pipelines.add(builder.build());
+        }
+
+        @Override
+        public void exitInteger(RuleLangParser.IntegerContext ctx) {
+            // TODO handle different radix and length
+            final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
+            log.info("INT: ctx {} => {}", ctx, expr);
+            parseContext.exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitString(RuleLangParser.StringContext ctx) {
+            final String text = unquote(ctx.getText(), '\"');
+            final StringExpression expr = new StringExpression(text);
+            log.info("STRING: ctx {} => {}", ctx, expr);
+            parseContext.exprs.put(ctx, expr);
+        }
+
+    }
 }

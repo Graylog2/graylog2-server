@@ -1,11 +1,12 @@
 import Reflux from 'reflux';
 
-const PipelinesActions = Reflux.createActions({
+const RulesActions = Reflux.createActions({
   'delete': { asyncResult: true },
   'list': { asyncResult: true },
   'get': { asyncResult: true },
   'save': { asyncResult: true },
   'update': { asyncResult: true },
+  'parse' : { asyncResult: true },
 });
 
-export default PipelinesActions;
+export default RulesActions;
