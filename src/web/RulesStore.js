@@ -74,6 +74,29 @@ const RulesStore = Reflux.createStore({
       this.trigger({rules: this.rules});
     }, failCallback);
   },
+  parse(ruleSource, callback) {
+    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/parse');
+    const rule = {
+      title: ruleSource.title,
+      description: ruleSource.description,
+      source: ruleSource.source
+    };
+    return fetch('POST', url, rule).then(
+      (response) => {
+        console.log(response);
+        // call to clear the errors, the parsing was successful
+        callback([]);
+      },
+      (error) => {
+        console.log(error);
+        // a Bad Request indicates a parse error, set all the returned errors in the editor
+        const response = error.additional.res;
+        if (response.status === 400) {
+          callback(response.body);
+        }
+      }
+    );
+  }
 });
 
 export default RulesStore;

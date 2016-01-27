@@ -18,7 +18,8 @@ const RulesComponent = React.createClass({
                  user={this.props.user}
                  delete={this._delete}
                  save={this._save}
-                 validateName={this._validateName}/>;
+                 validateRule={this._validateRule}
+    />;
   },
 
   _sortByTitle(rule1, rule2) {
@@ -39,9 +40,8 @@ const RulesComponent = React.createClass({
     RulesActions.delete(rule.id);
   },
 
-  // TODO this should really validate the rule (as in parsing it server side)
-  _validateName(name) {
-    return true;
+  _validateRule(rule, setErrorsCb) {
+    RulesActions.parse(rule, setErrorsCb);
   },
 
   render() {
@@ -64,7 +64,8 @@ const RulesComponent = React.createClass({
           </ul>
           <RuleForm create
                     save={this._save}
-                    validateName={this._validateName}/>
+                    validateRule={this._validateRule}
+          />
         </Col>
       </Row>
     );

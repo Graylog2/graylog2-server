@@ -91,6 +91,24 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return save;
     }
 
+    @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
+    @POST
+    @Path("/rule/parse")
+    public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
+        try {
+            pipelineRuleParser.parseRule(ruleSource.source());
+        } catch (ParseException e) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
+        }
+        return RuleSource.builder()
+                .title(ruleSource.title())
+                .description(ruleSource.description())
+                .source(ruleSource.source())
+                .createdAt(DateTime.now())
+                .modifiedAt(DateTime.now())
+                .build();
+    }
+
     @ApiOperation(value = "Get all processing rules")
     @GET
     @Path("/rule")

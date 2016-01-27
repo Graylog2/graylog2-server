@@ -12,11 +12,12 @@ import 'brace/theme/chrome';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const RuleForm = React.createClass({
+  parseTimer: undefined,
   propTypes: {
     rule: PropTypes.object,
     create: React.PropTypes.bool,
     save: React.PropTypes.func.isRequired,
-    validateName: React.PropTypes.func.isRequired,
+    validateRule: React.PropTypes.func.isRequired,
   },
 
   getDefaultProps() {
@@ -26,7 +27,7 @@ const RuleForm = React.createClass({
         title: '',
         description: '',
         source: '',
-      }
+      },
     }
   },
 
@@ -40,8 +41,15 @@ const RuleForm = React.createClass({
         description: rule.description,
         source: rule.source
       },
-      error: false,
-      error_message: '',
+      editor: undefined,
+      parseErrors: [],
+    }
+  },
+
+  componentWillUnmount() {
+    if (this.parseTimer !== undefined) {
+      clearTimeout(this.parseTimer);
+      this.parseTimer = undefined;
     }
   },
 
@@ -49,10 +57,31 @@ const RuleForm = React.createClass({
     this.refs.modal.open();
   },
 
+  _updateEditor() {
+    const session = this.state.editor.session;
+    const annotations = this.state.parseErrors.map(e => {
+      return {row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: "error"}
+    });
+    session.setAnnotations(annotations);
+  },
+
+  _setParseErrors(errors) {
+    this.setState({parseErrors: errors}, this._updateEditor);
+  },
+
   _onSourceChange(value) {
+    // don't try to parse the previous value, gets reset below
+    if (this.parseTimer !== undefined) {
+      clearTimeout(this.parseTimer);
+    }
     const rule = this.state.rule;
     rule.source = value;
     this.setState({rule: rule});
+
+    if (this.props.validateRule) {
+      // have the caller validate the rule after typing stopped for a while. usually this will mean send to server to parse
+      this.parseTimer = setTimeout(() => this.props.validateRule(rule, this._setParseErrors), 500);
+    }
   },
 
   _onDescriptionChange(event) {
@@ -62,35 +91,36 @@ const RuleForm = React.createClass({
   },
 
   _onTitleChange(event) {
-    const title = event.target.value;
-
     const rule = this.state.rule;
-    rule.title = title;
+    rule.title = event.target.value;
+    this.setState({rule: rule});
+  },
 
-    if (!this.props.validateName(title)) {
-      this.setState({rule: rule, error: true, error_message: 'A rule with that title already exists!'});
-    } else {
-      this.setState({rule: rule, error: false, error_message: ''});
-    }
+  _onLoad(editor) {
+    this.setState({editor: editor});
   },
 
   _getId(prefixIdName) {
     return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
   },
+
   _closeModal() {
     this.refs.modal.close();
   },
+
   _saved() {
     this._closeModal();
     if (this.props.create) {
       this.setState({rule: {}});
     }
   },
+
   _save() {
-    if (!this.state.error) {
+    if (this.state.parseErrors.length === 0) {
       this.props.save(this.state.rule, this._saved);
     }
   },
+
   render() {
     let triggerButtonContent;
     if (this.props.create) {
@@ -133,8 +163,9 @@ const RuleForm = React.createClass({
                 fontSize={11}
                 height="14em"
                 width="100%"
-                editorProps={{ $blockScrolling: "Infinity" }}
+                editorProps={{ $blockScrolling: "Infinity"}}
                 value={this.state.rule.source}
+                onLoad={this._onLoad}
                 onChange={this._onSourceChange}
               />
             </div>

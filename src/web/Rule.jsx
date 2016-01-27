@@ -40,7 +40,8 @@ const Rule = React.createClass({
           </div>
         </Col>
         <Col md={1}>
-          <RuleForm rule={this.props.rule} save={this.props.save} validateName={this.props.validateName}/>
+          <RuleForm rule={this.props.rule} save={this.props.save}
+                    validateRule={this.props.validateRule}/>
           <Button style={{marginRight: 5}} bsStyle="primary" bsSize="xs"
                   onClick={this._delete}>
             Delete
