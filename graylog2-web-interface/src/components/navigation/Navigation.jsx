@@ -84,6 +84,16 @@ const Navigation = React.createClass({
       </LinkContainer>);
     // TODO: fix permission names
 
+    let notificationBadge;
+
+    if (this.state.total > 0) {
+      notificationBadge = (
+        <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+          <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge">{this.state.total}</span>
+        </LinkContainer>
+      );
+    }
+
     const pluginNavigations = PluginStore.exports('navigation')
       .map((pluginRoute) => {
         return (
@@ -188,9 +198,7 @@ const Navigation = React.createClass({
 
           <Nav navbar>
             <NavItem className="notification-badge-link">
-              <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-                <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge">{this.state.total}</span>
-              </LinkContainer>
+              {notificationBadge}
             </NavItem>
           </Nav>
 
