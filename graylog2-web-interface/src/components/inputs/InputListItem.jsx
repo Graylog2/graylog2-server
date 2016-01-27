@@ -104,7 +104,7 @@ const InputListItem = React.createClass({
                       id={`more-actions-dropdown-${this.props.input.id}`}
                       pullRight>
         <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
-          <MenuItem key={`edit-input-${this.props.input.id}`} onClick={this._editInput}>
+          <MenuItem key={`edit-input-${this.props.input.id}`} onSelect={this._editInput}>
             Edit input
           </MenuItem>
         </IfPermitted>
@@ -112,14 +112,14 @@ const InputListItem = React.createClass({
         {showMetricsMenuItem}
 
         <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`} onClick={this._openStaticFieldForm}>Add static field</MenuItem>
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static field</MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions="inputs:terminate">
           <MenuItem key={`divider-${this.props.input.id}`} divider/>
         </IfPermitted>
         <IfPermitted permissions="inputs:terminate">
-          <MenuItem key={`delete-input-${this.props.input.id}`} onClick={this._deleteInput}>Delete input</MenuItem>
+          <MenuItem key={`delete-input-${this.props.input.id}`} onSelect={this._deleteInput}>Delete input</MenuItem>
         </IfPermitted>
       </DropdownButton>
     );
