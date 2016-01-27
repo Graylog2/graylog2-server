@@ -47,7 +47,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
 @RequiresAuthentication
-@Api(value = "Cluster", description = "Journal information of any nodes in the cluster")
+@Api(value = "Cluster/Journal", description = "Journal information of any nodes in the cluster")
 @Path("/cluster/journal")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterJournalResource extends ProxiedResource {
