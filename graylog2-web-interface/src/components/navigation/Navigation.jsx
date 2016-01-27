@@ -203,7 +203,9 @@ const Navigation = React.createClass({
           </Nav>
 
           <Nav navbar pullRight>
-            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+            {/* Need to add query to LinkContainer to avoid NavItem to become active */}
+            {/* More information here: https://github.com/react-bootstrap/react-router-bootstrap/issues/134 */}
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST} query="">
               <NavItem>
                 <GlobalThroughput />
               </NavItem>
