@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
+import { LinkContainer } from 'react-router-bootstrap';
 import { ProgressBar, Row, Col } from 'react-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
@@ -14,7 +15,7 @@ import JournalStore from 'stores/journal/JournalStore';
 import { Spinner, Timestamp } from 'components/common';
 
 import NumberUtils from 'util/NumberUtils';
-import jsRoutes from 'routing/jsRoutes';
+import Routes from 'routing/Routes';
 
 const JournalDetails = React.createClass({
   propTypes: {
@@ -83,7 +84,7 @@ const JournalDetails = React.createClass({
       overcommittedWarning = (
         <span>
           <strong>Warning!</strong> The journal utilization is exceeding the maximum size defined.
-          <a href={jsRoutes.controllers.SystemController.index().url}> Click here</a> for more information.<br/>
+          {' '}<LinkContainer to={Routes.SYSTEM.OVERVIEW}><a>Click here</a></LinkContainer> for more information.<br/>
         </span>
       );
     }
