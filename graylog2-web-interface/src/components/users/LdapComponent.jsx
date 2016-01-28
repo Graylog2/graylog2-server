@@ -370,4 +370,4 @@ const LdapComponent = React.createClass({
   },
 });
 
-module.exports = LdapComponent;
+export default LdapComponent;
