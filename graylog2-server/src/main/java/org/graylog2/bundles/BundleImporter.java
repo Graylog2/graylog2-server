@@ -553,16 +553,16 @@ public class BundleImporter {
         final String rangeType = (String) timerangeConfig.get("type");
         switch (rangeType) {
             case "relative":
-                timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
+                timeRange = RelativeRange.create((Integer) timerangeConfig.get("range"));
                 break;
             case "keyword":
-                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
+                timeRange = KeywordRange.create((String) timerangeConfig.get("keyword"));
                 break;
             case "absolute":
                 final String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
                 final String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
 
-                timeRange = new AbsoluteRange(from, to);
+                timeRange = AbsoluteRange.create(from, to);
                 break;
             default:
                 throw new InvalidRangeParametersException("range_type not recognized");

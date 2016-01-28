@@ -163,7 +163,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
             if (trend && timeRange instanceof RelativeRange) {
                 DateTime toPrevious = timeRange.getFrom();
                 DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
-                TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
+                TimeRange previousTimeRange = AbsoluteRange.create(fromPrevious, toPrevious);
 
                 final FieldStatsResult previousFieldStatsResult =
                         getSearches().fieldStats(field,

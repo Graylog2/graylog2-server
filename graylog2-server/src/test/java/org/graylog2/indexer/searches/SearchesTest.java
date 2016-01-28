@@ -133,7 +133,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCount() throws Exception {
-        CountResult result = searches.count("*", new AbsoluteRange(
+        CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -143,7 +143,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void countRecordsMetrics() throws Exception {
-        CountResult result = searches.count("*", new AbsoluteRange(
+        CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -157,7 +157,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTerms() throws Exception {
-        TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
+        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -189,7 +189,7 @@ public class SearchesTest {
                 .build();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
-        TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
+        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -206,7 +206,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void termsRecordsMetrics() throws Exception {
-        TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
+        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -225,9 +225,9 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsStats() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                new AbsoluteRange(
-                        new DateTime(2015, 1, 1, 0, 0),
-                        new DateTime(2015, 1, 2, 0, 0))
+                                                 AbsoluteRange.create(
+                                                         new DateTime(2015, 1, 1, 0, 0),
+                                                         new DateTime(2015, 1, 2, 0, 0))
         );
 
         assertThat(r.getResults()).hasSize(2);
@@ -240,9 +240,9 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void termsStatsRecordsMetrics() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                new AbsoluteRange(
-                        new DateTime(2015, 1, 1, 0, 0),
-                        new DateTime(2015, 1, 2, 0, 0))
+                                                 AbsoluteRange.create(
+                                                         new DateTime(2015, 1, 1, 0, 0),
+                                                         new DateTime(2015, 1, 2, 0, 0))
         );
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
@@ -259,7 +259,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testFieldStats() throws Exception {
-        FieldStatsResult result = searches.fieldStats("n", "*", new AbsoluteRange(
+        FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -277,7 +277,7 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void fieldStatsRecordsMetrics() throws Exception {
-        FieldStatsResult result = searches.fieldStats("n", "*", new AbsoluteRange(
+        FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0),
                 new DateTime(2015, 1, 2, 0, 0)));
 
@@ -296,7 +296,7 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testHistogram() throws Exception {
-        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.HOUR, range);
 
         assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.HOUR);
@@ -329,7 +329,7 @@ public class SearchesTest {
                 .build();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
-        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.HOUR, range);
 
         assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.HOUR);
@@ -347,7 +347,7 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void histogramRecordsMetrics() throws Exception {
-        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
@@ -365,7 +365,7 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testFieldHistogram() throws Exception {
-        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.HOUR, null, range, false);
 
         assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.HOUR);
@@ -384,7 +384,7 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void fieldHistogramRecordsMetrics() throws Exception {
-        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);

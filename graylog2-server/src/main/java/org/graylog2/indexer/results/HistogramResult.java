@@ -54,7 +54,7 @@ public abstract class HistogramResult extends IndexQueryResult {
                 JsonNode timestampNode = rootNode.findValue("range").findValue("timestamp");
                 String from = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText());
                 String to = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText());
-                boundaries = new AbsoluteRange(from, to);
+                boundaries = AbsoluteRange.create(from, to);
             } catch (Exception ignored) {}
         }
 

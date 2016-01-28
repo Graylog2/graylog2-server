@@ -328,8 +328,13 @@ public final class Tools {
                 .toFormatter();
     }
 
-    public static DateTime iso8601() {
+    public static DateTime nowUTC() {
         return new DateTime(DateTimeZone.UTC);
+    }
+
+    @Deprecated
+    public static DateTime iso8601() {
+        return nowUTC();
     }
 
     public static String getISO8601String(DateTime time) {

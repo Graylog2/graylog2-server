@@ -16,93 +16,91 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import com.google.common.base.MoreObjects;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
 
-import java.util.Locale;
 import java.util.Map;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+@AutoValue
+@JsonTypeName(KeywordRange.KEYWORD)
+public abstract class KeywordRange extends TimeRange {
 
-public class KeywordRange implements TimeRange {
     private static final NaturalDateParser DATE_PARSER = new NaturalDateParser();
-    private final String keyword;
 
-    public KeywordRange(String keyword) throws InvalidRangeParametersException {
-        if (isNullOrEmpty(keyword)) {
-            throw new InvalidRangeParametersException();
-        }
+    public static final String KEYWORD = "keyword";
 
-        try {
-            parseKeyword(keyword);
-        } catch (NaturalDateParser.DateNotParsableException e) {
-            throw new InvalidRangeParametersException("Could not parse from natural date: " + keyword);
-        }
+    @JsonProperty
+    public abstract String type();
 
-        this.keyword = keyword;
+    @JsonProperty
+    public abstract String keyword();
+
+    @JsonIgnore
+    public abstract NaturalDateParser.Result parseResult();
+
+    @JsonCreator
+    public static KeywordRange create(@JsonProperty("type") String type, @JsonProperty("keyword") String keyword) throws InvalidRangeParametersException {
+        return builder().type(type).keyword(keyword).build();
     }
 
-    private NaturalDateParser.Result parseKeyword(String keyword) throws NaturalDateParser.DateNotParsableException {
-        return DATE_PARSER.parse(keyword);
+    public static KeywordRange create(String keyword) throws InvalidRangeParametersException {
+        return create(KEYWORD, keyword);
     }
 
-    @Override
-    public Type getType() {
-        return Type.KEYWORD;
+    private static Builder builder() {
+        return new AutoValue_KeywordRange.Builder();
+    }
+
+    public String getKeyword() {
+        return keyword();
+    }
+
+    @JsonIgnore
+    public DateTime getFrom() {
+        return parseResult().getFrom();
+    }
+
+    @JsonIgnore
+    public DateTime getTo() {
+        return parseResult().getTo();
     }
 
     @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>builder()
-                .put("type", getType().toString().toLowerCase(Locale.ENGLISH))
+                .put("type", KEYWORD)
                 .put("keyword", getKeyword())
                 .build();
     }
 
-    public String getKeyword() {
-        return keyword;
-    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder type(String type);
 
-    public DateTime getFrom() {
-        try {
-            return parseKeyword(keyword).getFrom();
-        } catch (NaturalDateParser.DateNotParsableException e) {
-            return null;
+        public abstract Builder keyword(String keyword);
+
+        abstract String keyword();
+
+        public abstract Builder parseResult(NaturalDateParser.Result result);
+
+        abstract KeywordRange autoBuild();
+
+        public KeywordRange build() throws InvalidRangeParametersException {
+            final NaturalDateParser.Result parse;
+            try {
+                parse = DATE_PARSER.parse(keyword());
+            } catch (NaturalDateParser.DateNotParsableException e) {
+                throw new InvalidRangeParametersException("Could not parse from natural date: " + keyword());
+            }
+            parseResult(parse);
+            return autoBuild();
         }
-    }
-
-    public DateTime getTo() {
-        try {
-            return parseKeyword(keyword).getTo();
-        } catch (NaturalDateParser.DateNotParsableException e) {
-            return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("keyword", getKeyword())
-                .add("from", getFrom())
-                .add("to", getTo())
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        KeywordRange that = (KeywordRange) o;
-        return keyword.equals(that.keyword);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return keyword.hashCode();
     }
 }
 
