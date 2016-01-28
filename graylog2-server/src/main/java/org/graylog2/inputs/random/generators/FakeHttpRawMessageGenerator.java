@@ -16,29 +16,26 @@
  */
 package org.graylog2.inputs.random.generators;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import static java.util.Objects.requireNonNull;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.DELETE;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.GET;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.POST;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.PUT;
 
 public class FakeHttpRawMessageGenerator {
-
+    private static final Random RANDOM = new Random();
     private static final int MAX_WEIGHT = 50;
-
-    private final String source;
-
-    private final Random rand = new Random(System.currentTimeMillis());
 
     private static final List<Resource> GET_RESOURCES = ImmutableList.of(
             new Resource("/login", "LoginController", "login", 10),
@@ -47,35 +44,27 @@ public class FakeHttpRawMessageGenerator {
             new Resource("/posts/45326", "PostsController", "show", 12),
             new Resource("/posts/45326/edit", "PostsController", "edit", 1));
 
-    private static final ImmutableMap<String, Resource> RESOURCE_MAP = Maps.uniqueIndex(GET_RESOURCES, new Function<Resource, String>() {
-        @Nullable
-        @Override
-        public String apply(@Nullable Resource input) {
-            if (input == null) {
-                throw new IllegalStateException();
-            }
-            return input.getResource();
-        }
-    });
+    private static final Map<String, Resource> RESOURCE_MAP = Maps.uniqueIndex(GET_RESOURCES, Resource::getResource);
 
-    private final List<UserId> USER_IDS = ImmutableList.of(
+    private static final List<UserId> USER_IDS = ImmutableList.of(
             new UserId(9001, 10),
             new UserId(54351, 1),
             new UserId(74422, 5),
             new UserId(6476752, 12),
             new UserId(6469981, 40));
 
+    private final String source;
+
     public FakeHttpRawMessageGenerator(String source) {
-        this.source = source;
+        this.source = requireNonNull(source);
     }
 
     public static int rateDeviation(int val, int maxDeviation, Random rand) {
-        int deviationPercent = rand.nextInt(maxDeviation);
-
-        double x = val / 100.0 * deviationPercent;
+        final int deviationPercent = rand.nextInt(maxDeviation);
+        final double x = val / 100.0 * deviationPercent;
 
         // Add or substract?
-        double result = 0;
+        final double result;
         if (rand.nextBoolean()) {
             result = val - x;
         } else {
@@ -89,24 +78,24 @@ public class FakeHttpRawMessageGenerator {
         }
     }
 
-
     public GeneratorState generateState() {
         final GeneratorState generatorState = new GeneratorState();
 
-        int methodProb = rand.nextInt(100);
-        int successProb = rand.nextInt(100);
+        final int methodProb = RANDOM.nextInt(100);
+        final int successProb = RANDOM.nextInt(100);
 
         generatorState.source = source;
         generatorState.isSuccessful = (successProb < 98);
-        if (methodProb <= 95) {
+        generatorState.isTimeout = RANDOM.nextInt(5) == 1;
+        generatorState.isSlowRequest = RANDOM.nextInt(500) == 1;
+        generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
+        generatorState.resource = ((Resource) getWeighted(GET_RESOURCES)).getResource();
+
+        if (methodProb <= 85) {
             generatorState.method = GET;
-            generatorState.isTimeout = rand.nextInt(5) == 1;
-            generatorState.isSlowRequest = rand.nextInt(500) == 1;
-            generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
-            generatorState.resource = ((Resource) getWeighted(GET_RESOURCES)).getResource();
-        } else if (methodProb > 95 && methodProb <= 98) {
+        } else if (methodProb > 85 && methodProb <= 90) {
             generatorState.method = POST;
-        } else if (methodProb == 99) {
+        } else if (methodProb > 90 && methodProb <= 95) {
             generatorState.method = DELETE;
         } else {
             generatorState.method = PUT;
@@ -116,36 +105,32 @@ public class FakeHttpRawMessageGenerator {
     }
 
     public static Message generateMessage(GeneratorState state) {
-        final Random rand = new Random();
-        final String source = state.source;
-        final boolean isSuccessful = state.isSuccessful;
-
         Message msg = null;
         switch (state.method) {
             case GET:
-                msg = get(state, rand);
+                msg = simulateGET(state, RANDOM);
                 break;
             case POST:
-                msg = isSuccessful ? successfulPOST(source) : failedPOST(source);
+                msg = simulatePOST(state, RANDOM);
                 break;
             case DELETE:
-                msg = isSuccessful ? successfulDELETE(source) : failedDELETE(source);
+                msg = simulateDELETE(state, RANDOM);
                 break;
             case PUT:
-                msg = isSuccessful ? successfulPUT(source) : failedPUT(source);
+                msg = simulatePUT(state, RANDOM);
                 break;
         }
         return msg;
     }
 
-    private static String shortMessage(String method, String resource, int code, int tookMs) {
-        return method + " " + resource + " [" + code + "]" + " " + tookMs + "ms";
+    private static String shortMessage(DateTime ingestTime, GeneratorState.Method method, String resource, int code, int tookMs) {
+        return ingestTime + " " + method + " " + resource + " [" + code + "]" + " " + tookMs + "ms";
     }
 
     private Weighted getWeighted(List<? extends Weighted> list) {
         while (true) {
-            int x = rand.nextInt(MAX_WEIGHT);
-            Weighted obj = list.get(rand.nextInt(list.size()));
+            int x = RANDOM.nextInt(MAX_WEIGHT);
+            Weighted obj = list.get(RANDOM.nextInt(list.size()));
 
             if (obj.getWeight() >= x) {
                 return obj;
@@ -153,16 +138,45 @@ public class FakeHttpRawMessageGenerator {
         }
     }
 
-    public static Message get(GeneratorState state,
-                              Random rand) {
-        final boolean isSuccessful = state.isSuccessful;
+    private static Map<String, Object> ingestTimeFields(DateTime ingestTime) {
+        return ImmutableMap.<String, Object>builder()
+                .put("ingest_time", ingestTime.toString())
+                .put("ingest_time_epoch", ingestTime.getMillis())
+                .put("ingest_time_second", ingestTime.getSecondOfMinute())
+                .put("ingest_time_minute", ingestTime.getMinuteOfHour())
+                .put("ingest_time_hour", ingestTime.getHourOfDay())
+                .put("ingest_time_day", ingestTime.getDayOfMonth())
+                .put("ingest_time_month", ingestTime.getMonthOfYear())
+                .put("ingest_time_year", ingestTime.getYear())
+                .build();
+    }
 
-        Message msg;
-        int msBase = 100;
+    private static Map<String, Object> resourceFields(Resource resource) {
+        return ImmutableMap.<String, Object>builder()
+                .put("resource", resource.getResource())
+                .put("controller", resource.getController())
+                .put("action", resource.getAction())
+                .build();
+    }
+
+    private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs, DateTime ingestTime) {
+        final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.iso8601());
+        msg.addFields(ingestTimeFields(ingestTime));
+        msg.addFields(resourceFields(resource));
+        msg.addField("ticks", System.nanoTime());
+        msg.addField("http_method", state.method.name());
+        msg.addField("http_response_code", httpCode);
+        msg.addField("user_id", state.userId);
+        msg.addField("took_ms", tookMs);
+
+        return msg;
+    }
+
+    public static Message simulateGET(GeneratorState state, Random rand) {
+        int msBase = 50;
         int deviation = 30;
-        int code = isSuccessful ? 200 : 500;
-
-        if (!isSuccessful && state.isTimeout) {
+        int code = state.isSuccessful ? 200 : 500;
+        if (!state.isSuccessful && state.isTimeout) {
             // Simulate an internal API timeout from time to time.
             msBase = 5000;
             deviation = 10;
@@ -172,45 +186,75 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        int tookMs = rateDeviation(msBase, deviation, rand);
-
-        msg = new Message(shortMessage("GET", state.resource, code, tookMs), state.source, Tools.iso8601());
-
-        msg.addField("http_method", "GET");
-        msg.addField("http_response_code", code);
-
+        final DateTime ingestTime = Tools.iso8601();
         final Resource resource = RESOURCE_MAP.get(state.resource);
-        msg.addField("resource", resource.getResource());
-        msg.addField("controller", resource.getController());
-        msg.addField("action", resource.getAction());
+        final int tookMs = rateDeviation(msBase, deviation, rand);
 
-        msg.addField("user_id", state.userId);
-        msg.addField("took_ms", tookMs);
-        return msg;
+        return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
-    private static Message successfulPOST(String source) {
-        return new Message("successful POST", source, Tools.iso8601());
+
+    private static Message simulatePOST(GeneratorState state, Random rand) {
+        int msBase = 150;
+        int deviation = 20;
+        int code = state.isSuccessful ? 201 : 500;
+        if (!state.isSuccessful && state.isTimeout) {
+            // Simulate an internal API timeout from time to time.
+            msBase = 5000;
+            deviation = 18;
+            code = 504;
+        } else if (rand.nextInt(500) == 1) {
+            // ...or just something a bit too slow
+            msBase = 400;
+        }
+
+        final DateTime ingestTime = Tools.iso8601();
+        final Resource resource = RESOURCE_MAP.get(state.resource);
+        final int tookMs = rateDeviation(msBase, deviation, rand);
+
+        return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
-    private static Message failedPOST(String source) {
-        return new Message("failed POST", source, Tools.iso8601());
+    private static Message simulatePUT(GeneratorState state, Random rand) {
+        int msBase = 100;
+        int deviation = 30;
+        int code = state.isSuccessful ? 200 : 500;
+        if (!state.isSuccessful && state.isTimeout) {
+            // Simulate an internal API timeout from time to time.
+            msBase = 5000;
+            deviation = 18;
+            code = 504;
+        } else if (rand.nextInt(500) == 1) {
+            // ...or just something a bit too slow
+            msBase = 400;
+        }
+
+        final DateTime ingestTime = Tools.iso8601();
+        final Resource resource = RESOURCE_MAP.get(state.resource);
+        final int tookMs = rateDeviation(msBase, deviation, rand);
+
+        return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
-    private static Message successfulPUT(String source) {
-        return new Message("successful PUT", source, Tools.iso8601());
-    }
+    private static Message simulateDELETE(GeneratorState state, Random rand) {
+        int msBase = 75;
+        int deviation = 40;
+        int code = state.isSuccessful ? 204 : 500;
+        if (!state.isSuccessful && state.isTimeout) {
+            // Simulate an internal API timeout from time to time.
+            msBase = 5000;
+            deviation = 18;
+            code = 504;
+        } else if (rand.nextInt(500) == 1) {
+            // ...or just something a bit too slow
+            msBase = 400;
+        }
 
-    private static Message failedPUT(String source) {
-        return new Message("failed PUT", source, Tools.iso8601());
-    }
+        final DateTime ingestTime = Tools.iso8601();
+        final Resource resource = RESOURCE_MAP.get(state.resource);
+        final int tookMs = rateDeviation(msBase, deviation, rand);
 
-    private static Message successfulDELETE(String source) {
-        return new Message("successful DELETE", source, Tools.iso8601());
-    }
-
-    private static Message failedDELETE(String source) {
-        return new Message("failed DELETE", source, Tools.iso8601());
+        return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
     private static abstract class Weighted {
