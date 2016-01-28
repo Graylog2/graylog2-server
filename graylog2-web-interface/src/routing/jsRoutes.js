@@ -59,6 +59,7 @@ const jsRoutes = {
         close: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/close'}; },
         delete: (indexName) => { return {url: '/system/indexer/indices/' + indexName}; },
         list: () => { return {url: '/system/indexer/indices'}; },
+        listOpen: () => { return {url: '/system/indexer/indices/open'}; },
         listClosed: () => { return {url: '/system/indexer/indices/closed'}; },
         reopen: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/reopen'}; },
       },

@@ -11,6 +11,7 @@ import IndicesActions from 'actions/indices/IndicesActions';
 const IndicesStore = Reflux.createStore({
   listenables: [IndicesActions],
   indices: undefined,
+  openIndices: undefined,
   closedIndices: undefined,
 
   init() {
@@ -24,11 +25,21 @@ const IndicesStore = Reflux.createStore({
     const promise = fetch('GET', urlList).then((response) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
-      this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
-      return { indices: this.indices, closedIndices: this.closedIndices };
+      this.trigger({ indices: this.indices, openIndices: this.openIndices, closedIndices: this.closedIndices });
+      return { indices: this.indices, openIndices: this.openIndices, closedIndices: this.closedIndices };
     });
 
     IndicesActions.list.promise(promise);
+  },
+  listOpen() {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.listOpen().url);
+    const promise = fetch('GET', url).then((response) => {
+      this.openIndices = response.indices;
+      this.trigger({ indices: this.indices, openIndices: this.openIndices, closedIndices: this.closedIndices });
+      return { indices: this.indices, openIndices: this.openIndices, closedIndices: this.closedIndices };
+    });
+
+    IndicesActions.listOpen.promise(promise);
   },
   close(indexName) {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.close(indexName).url);
