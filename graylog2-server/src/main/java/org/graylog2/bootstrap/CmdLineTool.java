@@ -58,6 +58,7 @@ import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.PluginBindings;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jboss.netty.logging.InternalLoggerFactory;
@@ -153,8 +154,10 @@ public abstract class CmdLineTool implements CliCommand {
     @Override
     public void run() {
         final Level logLevel = setupLogger();
+        final ClassLoader parentClassLoader = this.getClass().getClassLoader();
+        final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parentClassLoader);
 
-        final PluginBindings pluginBindings = installPluginConfigAndBindings(getPluginPath(configFile));
+        final PluginBindings pluginBindings = installPluginConfigAndBindings(getPluginPath(configFile), chainingClassLoader);
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -249,8 +252,8 @@ public abstract class CmdLineTool implements CliCommand {
         dumpCurrentConfigAndExit();
     }
 
-    private PluginBindings installPluginConfigAndBindings(String pluginPath) {
-        final Set<Plugin> plugins = loadPlugins(pluginPath);
+    private PluginBindings installPluginConfigAndBindings(String pluginPath, ChainingClassLoader classLoader) {
+        final Set<Plugin> plugins = loadPlugins(pluginPath, classLoader);
         final PluginBindings pluginBindings = new PluginBindings(plugins);
         for (final Plugin plugin : plugins) {
             for (final PluginModule pluginModule : plugin.modules()) {
@@ -280,11 +283,11 @@ public abstract class CmdLineTool implements CliCommand {
         return pluginLoaderConfig.getPluginDir();
     }
 
-    protected Set<Plugin> loadPlugins(String pluginPath) {
+    protected Set<Plugin> loadPlugins(String pluginPath, ChainingClassLoader chainingClassLoader) {
         final File pluginDir = new File(pluginPath);
         final Set<Plugin> plugins = new HashSet<>();
 
-        final PluginLoader pluginLoader = new PluginLoader(pluginDir);
+        final PluginLoader pluginLoader = new PluginLoader(pluginDir, chainingClassLoader);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
             final PluginMetaData metadata = plugin.metadata();
             if (capabilities().containsAll(metadata.getRequiredCapabilities())) {

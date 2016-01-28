@@ -39,14 +39,17 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 public class PluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
 
     private final File pluginDir;
+    private final ChainingClassLoader classLoader;
 
-    public PluginLoader(File pluginDir) {
-        this.pluginDir = pluginDir;
+    public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        this.pluginDir = requireNonNull(pluginDir);
+        this.classLoader = requireNonNull(classLoader);
     }
 
     public Set<Plugin> loadPlugins() {
@@ -79,7 +82,6 @@ public class PluginLoader {
         }
 
         LOG.debug("Loading [{}] plugins", files.length);
-        final ClassLoader classLoader = getClass().getClassLoader();
         final ImmutableSet.Builder<Plugin> plugins = ImmutableSet.builder();
         for (File jar : files) {
             if (!jar.isFile()) {
@@ -87,8 +89,9 @@ public class PluginLoader {
             } else {
                 try {
                     LOG.debug("Loading <" + jar.getAbsolutePath() + ">");
-                    final ClassLoader pluginClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()}, classLoader);
-                    final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, pluginClassLoader);
+                    final ClassLoader pluginClassLoader = URLClassLoader.newInstance(new URL[]{jar.toURI().toURL()});
+                    classLoader.addClassLoader(pluginClassLoader);
+                    final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
 
                     plugins.addAll(pluginServiceLoader);
                 } catch (MalformedURLException e) {

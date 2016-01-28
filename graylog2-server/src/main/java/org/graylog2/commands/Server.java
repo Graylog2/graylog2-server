@@ -50,6 +50,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -74,6 +75,7 @@ public class Server extends ServerBootstrap {
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
+    private final ChainingClassLoader classLoader = new ChainingClassLoader(Server.class.getClassLoader());
 
     public Server() {
         super("server", configuration);
@@ -113,7 +115,7 @@ public class Server extends ServerBootstrap {
                 new RotationStrategyBindings(),
                 new RetentionStrategyBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(),
+                new ObjectMapperModule(classLoader),
                 new RestApiBindings(),
                 new PasswordAlgorithmBindings()
         );
