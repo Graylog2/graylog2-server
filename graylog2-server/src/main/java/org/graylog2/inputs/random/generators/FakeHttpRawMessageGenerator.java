@@ -146,12 +146,12 @@ public class FakeHttpRawMessageGenerator {
         return ImmutableMap.<String, Object>builder()
                 .put("ingest_time", ingestTime.toString())
                 .put("ingest_time_epoch", ingestTime.getMillis())
-                .put("second", ingestTime.getSecondOfMinute())
-                .put("minute", ingestTime.getMinuteOfHour())
-                .put("hour", ingestTime.getHourOfDay())
-                .put("day", ingestTime.getDayOfMonth())
-                .put("month", ingestTime.getMonthOfYear())
-                .put("year", ingestTime.getYear())
+                .put("ingest_time_second", ingestTime.getSecondOfMinute())
+                .put("ingest_time_minute", ingestTime.getMinuteOfHour())
+                .put("ingest_time_hour", ingestTime.getHourOfDay())
+                .put("ingest_time_day", ingestTime.getDayOfMonth())
+                .put("ingest_time_month", ingestTime.getMonthOfYear())
+                .put("ingest_time_year", ingestTime.getYear())
                 .build();
     }
 
