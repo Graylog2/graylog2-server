@@ -27,7 +27,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
@@ -49,26 +49,19 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Cluster/Jobs", description = "Cluster-wide System Jobs")
 @Path("/cluster/jobs")
-public class ClusterSystemJobResource extends RestResource {
+public class ClusterSystemJobResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemJobResource.class);
 
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
-    private final String authenticationToken;
 
     @Inject
     public ClusterSystemJobResource(NodeService nodeService,
                                     RemoteInterfaceProvider remoteInterfaceProvider,
                                     @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
+        super(httpHeaders);
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
-
-        final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
-        if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.authenticationToken = authenticationTokens.get(0);
-        } else {
-            this.authenticationToken = null;
-        }
     }
 
     @GET
