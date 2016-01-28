@@ -16,6 +16,18 @@ import 'stylesheets/graylog2.less';
 const AppFacade = React.createClass({
   mixins: [Reflux.connect(SessionStore)],
 
+  childContextTypes: {
+    storeProvider: React.PropTypes.object,
+    actionsProvider: React.PropTypes.object,
+  },
+
+  getChildContext: function() {
+    return {
+      storeProvider: this.props.storeProvider,
+      actionsProvider: this.props.actionsProvider,
+    };
+  },
+
   render() {
     if (!this.state.sessionId) {
       return <LoginPage />;
