@@ -18,6 +18,9 @@ package org.graylog2.indexer.counts;
 
 import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.github.joschi.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
+import com.google.common.collect.ImmutableMap;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -34,6 +37,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 import static com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.github.joschi.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -59,12 +63,23 @@ public class CountsTest {
 
     @Before
     public void setUp() throws Exception {
+        final Map<String, Object> settings = ImmutableMap.of(
+                "number_of_shards", 1,
+                "index.number_of_replicas", 0);
         final CreateIndexResponse createIndexResponse = client.admin().indices()
                 .prepareCreate(INDEX_NAME)
+                .setSettings(settings)
                 .setTimeout(TimeValue.timeValueSeconds(10L))
                 .execute()
                 .get();
         assumeTrue(createIndexResponse.isAcknowledged());
+
+        final ClusterHealthResponse clusterHealthResponse = client.admin().cluster()
+                .prepareHealth(INDEX_NAME)
+                .setWaitForGreenStatus()
+                .execute()
+                .get();
+        assumeTrue(clusterHealthResponse.getStatus() == ClusterHealthStatus.GREEN);
 
         when(deflector.getAllDeflectorIndexNames()).thenReturn(new String[]{INDEX_NAME});
 
