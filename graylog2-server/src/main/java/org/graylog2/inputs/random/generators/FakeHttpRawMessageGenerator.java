@@ -163,6 +163,7 @@ public class FakeHttpRawMessageGenerator {
         final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.iso8601());
         msg.addFields(ingestTimeFields(ingestTime));
         msg.addFields(resourceFields(resource));
+        msg.addField("ticks", System.nanoTime());
         msg.addField("http_method", state.method.name());
         msg.addField("http_response_code", httpCode);
         msg.addField("user_id", state.userId);
