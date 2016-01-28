@@ -86,15 +86,16 @@ public class FakeHttpRawMessageGenerator {
 
         generatorState.source = source;
         generatorState.isSuccessful = (successProb < 98);
-        if (methodProb <= 95) {
+
+        if (methodProb <= 85) {
             generatorState.method = GET;
             generatorState.isTimeout = rand.nextInt(5) == 1;
             generatorState.isSlowRequest = rand.nextInt(500) == 1;
             generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
             generatorState.resource = ((Resource) getWeighted(GET_RESOURCES)).getResource();
-        } else if (methodProb > 95 && methodProb <= 98) {
+        } else if (methodProb > 85 && methodProb <= 90) {
             generatorState.method = POST;
-        } else if (methodProb == 99) {
+        } else if (methodProb > 90 && methodProb <= 95) {
             generatorState.method = DELETE;
         } else {
             generatorState.method = PUT;
