@@ -81,7 +81,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
                     LOG.warn("Unable to fetch system jobs from node {}: {}", entry.getKey(), response);
                 }
             } catch (IOException e) {
-                LOG.warn("Unable to fetch system jobs from node {}: {}", entry.getKey(), e);
+                LOG.warn("Unable to fetch system jobs from node {}:", entry.getKey(), e);
             }
         });
 
@@ -105,7 +105,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
                     LOG.warn("Unable to fetch system job {} from node {}: {}", jobId, entry.getKey(), response);
                 }
             } catch (IOException e) {
-                LOG.warn("Unable to fetch system jobs from node {}: {}", entry.getKey(), e);
+                LOG.warn("Unable to fetch system jobs from node {}:", entry.getKey(), e);
             }
         }
 

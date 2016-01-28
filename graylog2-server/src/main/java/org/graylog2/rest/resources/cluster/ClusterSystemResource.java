@@ -92,7 +92,7 @@ public class ClusterSystemResource extends ProxiedResource {
                             LOG.warn("Unable to fetch system overview from node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to fetch system overview from node {}: {}", entry.getKey(), e);
+                        LOG.warn("Unable to fetch system overview from node {}:", entry.getKey(), e);
                     }
                     return Optional.absent();
                 }));
