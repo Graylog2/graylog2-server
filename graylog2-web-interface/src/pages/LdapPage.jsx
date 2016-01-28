@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
-import PermissionsMixin from 'util/PermissionsMixin';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import LdapStore from 'stores/users/LdapStore';
@@ -13,10 +12,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import LdapComponent from 'components/users/LdapComponent';
 
 const LdapPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore)],
   render() {
-    const permissions = this.state.currentUser.permissions;
-    // TODO: fix permission names
     return (
       <span>
         <PageHeader title="LDAP Settings" titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
