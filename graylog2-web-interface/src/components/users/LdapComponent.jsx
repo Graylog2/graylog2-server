@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 
 import { Row, Col, Input, Button} from 'react-bootstrap';
 
@@ -6,23 +6,20 @@ import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
 
 import RolesStore from 'stores/users/RolesStore';
-import LdapStore from 'stores/users/LdapStore';
 import LdapGroupsStore from 'stores/users/LdapGroupsStore';
-import URI from 'urijs';
 
 const LdapComponent = React.createClass({
+  propTypes: {
+    ldapSettings: PropTypes.object.isRequired,
+  },
   getInitialState() {
     return {
-      ldapSettings: null,
+      ldapSettings: this.props.ldapSettings,
       roles: null,
     };
   },
 
   componentDidMount() {
-    LdapStore.loadSettings().done(settings => {
-      settings.ldap_uri = new URI(settings.ldap_uri);
-      this.setState({ldapSettings: settings});
-    });
     RolesStore.loadRoles().then((response) => {
       this.setState({
         roles: response.roles
@@ -36,7 +33,7 @@ const LdapComponent = React.createClass({
   },
 
   _isLoading() {
-    return !this.state.ldapSettings || !this.state.roles;
+    return !this.state.roles;
   },
 
   _bindChecked(ev, value) {

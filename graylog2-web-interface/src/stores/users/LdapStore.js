@@ -6,11 +6,9 @@ import fetch from 'logic/rest/FetchProvider';
 
 const LdapStore = Reflux.createStore({
   ldapSettings: undefined,
+
   init() {
-    this.loadSettings().then((response) => {
-      this.trigger({ldapSettings: response});
-      this.system = response;
-    });
+    this.loadSettings();
   },
 
   getInitialState() {
@@ -20,7 +18,13 @@ const LdapStore = Reflux.createStore({
   loadSettings() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.LdapController.info().url);
 
-    return fetch('GET', url);
+    const promise = fetch('GET', url);
+    promise.then(response => {
+      this.ldapSettings = response;
+      this.trigger({ldapSettings: response});
+    });
+
+    return promise;
   },
 });
 

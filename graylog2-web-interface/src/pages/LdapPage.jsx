@@ -1,19 +1,47 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
+import URI from 'urijs';
 
 import DocsHelper from 'util/DocsHelper';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import LdapStore from 'stores/users/LdapStore';
 
-import PageHeader from 'components/common/PageHeader';
+import { PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import LdapComponent from 'components/users/LdapComponent';
 
 const LdapPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore)],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(LdapStore, '_onLdapSettingsChange')],
+  getInitialState() {
+    return {
+      ldapSettings: undefined,
+    };
+  },
+  _onLdapSettingsChange(state) {
+    if (!state.ldapSettings) {
+      return;
+    }
+
+    // Clone settings object, so we don't the store reference
+    const settings = JSON.parse(JSON.stringify(state.ldapSettings));
+    settings.ldap_uri = new URI(settings.ldap_uri);
+
+    this.setState({ldapSettings: settings});
+  },
+  _isLoading() {
+    return !this.state.ldapSettings;
+  },
   render() {
+    let content;
+
+    if (this._isLoading()) {
+      content = <Spinner/>;
+    } else {
+      content = <LdapComponent ldapSettings={this.state.ldapSettings} />;
+    }
+
     return (
       <span>
         <PageHeader title="LDAP Settings" titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
@@ -24,7 +52,7 @@ const LdapPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <LdapComponent />
+            {content}
           </Col>
         </Row>
       </span>
