@@ -39,10 +39,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
 @Api(value = "Cluster/LoadBalancers", description = "Cluster-wide status propagation for LB")
@@ -80,7 +83,8 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
                 RemoteLoadBalancerStatusResource.class);
         final Response response = remoteLoadBalancerStatusResource.override(status).execute();
         if (!response.isSuccess()) {
-            LOG.warn("Unable to override load balancer status on node " + nodeId + ": " + response.message());
+            LOG.warn("Unable to override load balancer status on node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
 }

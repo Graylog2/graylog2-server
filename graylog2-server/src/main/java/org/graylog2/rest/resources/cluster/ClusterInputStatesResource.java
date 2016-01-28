@@ -93,10 +93,10 @@ public class ClusterInputStatesResource extends ProxiedResource {
                         if (response.isSuccess()) {
                             return response.body().states();
                         } else {
-                            LOG.warn("Unable to fetch input states from node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to fetch input states from node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to fetch input states from node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to fetch input states from node {}: {}", entry.getKey(), e);
                     }
                     return Collections.emptySet();
                 }));
@@ -123,10 +123,10 @@ public class ClusterInputStatesResource extends ProxiedResource {
                         if (response.isSuccess()) {
                             return Optional.of(response.body());
                         } else {
-                            LOG.warn("Unable to start input on node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to start input on node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to start input on node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to start input on node {}: {}",entry.getKey(), e);
                     }
                     return Optional.absent();
                 }));
@@ -153,10 +153,10 @@ public class ClusterInputStatesResource extends ProxiedResource {
                         if (response.isSuccess()) {
                             return Optional.of(response.body());
                         } else {
-                            LOG.warn("Unable to stop input on node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to stop input on node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to stop input on node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to stop input on node {}: {}", entry.getKey(), e);
                     }
                     return Optional.absent();
                 }));

@@ -37,11 +37,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 
 @RequiresAuthentication
@@ -77,7 +79,8 @@ public class ClusterSystemShutdownResource extends ProxiedResource {
                 RemoteSystemShutdownResource.class);
         final Response response = remoteSystemShutdownResource.shutdown().execute();
         if (response.code() != ACCEPTED.getCode()) {
-            LOG.warn("Unable send shut down signal to node " + nodeId + ": " + response.message());
+            LOG.warn("Unable send shut down signal to node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
 }
