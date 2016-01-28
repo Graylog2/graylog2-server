@@ -168,7 +168,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     summaries = Collections.emptyList();
                 }
 
-                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
+                return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);
             }

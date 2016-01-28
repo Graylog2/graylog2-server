@@ -157,7 +157,7 @@ public class StreamAlertReceiverResource extends RestResource {
 
         final Stream stream = streamService.load(streamid);
 
-        final DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.iso8601(), getSubject().getPrincipal().toString(), Collections.<String, Object>emptyMap());
+        final DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.nowUTC(), getSubject().getPrincipal().toString(), Collections.<String, Object>emptyMap());
         try {
             AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
             List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);

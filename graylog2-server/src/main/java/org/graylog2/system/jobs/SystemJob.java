@@ -63,7 +63,7 @@ public abstract class SystemJob {
     }
 
     public void markStarted() {
-        startedAt = Tools.iso8601();
+        startedAt = Tools.nowUTC();
     }
 
     public DateTime getStartedAt() {

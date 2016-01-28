@@ -33,7 +33,7 @@ public class DroolsEngineTest {
     public void runWithoutRules() {
         final DroolsEngine engine = new DroolsEngine(Collections.<URI>emptySet());
 
-        final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", Tools.iso8601()));
+        final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", Tools.nowUTC()));
 
         assertEquals("No rules should have fired", rulesFired, 0);
 
@@ -74,7 +74,7 @@ public class DroolsEngineTest {
         final boolean valid2 = engine.addRule(rule2);
         assertTrue("Rule should compile without errors", valid2);
 
-        final Message msg = new Message("test message", "test source", Tools.iso8601());
+        final Message msg = new Message("test message", "test source", Tools.nowUTC());
         final int fired = engine.evaluateInSharedSession(msg);
 
         assertTrue("msg is filtered out", msg.getFilterOut());
@@ -105,7 +105,7 @@ public class DroolsEngineTest {
         deployed = engine.addRule(validRule);
         assertTrue("Subsequent deployment of valid rule works", deployed);
 
-        engine.evaluateInSharedSession(new Message("foo", "source", Tools.iso8601()));
+        engine.evaluateInSharedSession(new Message("foo", "source", Tools.nowUTC()));
 
         engine.stop();
     }

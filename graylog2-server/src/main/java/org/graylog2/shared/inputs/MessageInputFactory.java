@@ -46,7 +46,7 @@ public class MessageInputFactory {
         input.setTitle(lr.title());
         input.setGlobal(lr.global());
         input.setCreatorUserId(user);
-        input.setCreatedAt(Tools.iso8601());
+        input.setCreatedAt(Tools.nowUTC());
         if (!lr.global())
             input.setNodeId(nodeId);
 

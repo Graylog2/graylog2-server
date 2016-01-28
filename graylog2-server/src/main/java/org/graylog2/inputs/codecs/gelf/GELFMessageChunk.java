@@ -113,7 +113,7 @@ public final class GELFMessageChunk {
         extractSequenceCount();
         extractSequenceNumber();
         extractData();
-        this.arrival = Tools.iso8601().getMillis();
+        this.arrival = Tools.nowUTC().getMillis();
     }
 
     private String extractId() {

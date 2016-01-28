@@ -69,7 +69,7 @@ public class DashboardServiceImplTest {
         final String title = "Dashboard Title";
         final String description = "This is the dashboard description";
         final String creatorUserId = "foobar";
-        final DateTime createdAt = Tools.iso8601();
+        final DateTime createdAt = Tools.nowUTC();
 
         final Dashboard dashboard = dashboardService.create(title, description, creatorUserId, createdAt);
 

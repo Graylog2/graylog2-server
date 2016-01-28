@@ -47,7 +47,7 @@ public class SystemMessageActivityWriter implements ActivityWriter {
     public void write(Activity activity) {
         try {
             Map<String, Object> entry = Maps.newHashMap();
-            entry.put("timestamp", Tools.iso8601());
+            entry.put("timestamp", Tools.nowUTC());
             entry.put("content", activity.getMessage());
             entry.put("caller", activity.getCaller().getCanonicalName());
             entry.put("node_id", serverStatus.getNodeId().toString());

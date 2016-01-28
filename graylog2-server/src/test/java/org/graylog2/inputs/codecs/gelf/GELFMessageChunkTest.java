@@ -41,7 +41,7 @@ public class GELFMessageChunkTest {
     @Test
     public void testGetArrival() throws Exception {
         final GELFMessageChunk chunk = buildChunk();
-        final long l = Tools.iso8601().getMillis();
+        final long l = Tools.nowUTC().getMillis();
         final long arrival = chunk.getArrival();
         assertTrue(l - arrival < 5000L); // delta shmelta
     }

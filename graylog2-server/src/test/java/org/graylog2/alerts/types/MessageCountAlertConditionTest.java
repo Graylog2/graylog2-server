@@ -162,7 +162,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
                 searches,
                 stream,
                 CONDITION_ID,
-                Tools.iso8601(),
+                Tools.nowUTC(),
                 STREAM_CREATOR,
                 parameters);
     }

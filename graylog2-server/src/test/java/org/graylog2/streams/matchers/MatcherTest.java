@@ -39,7 +39,7 @@ public class MatcherTest {
     }
 
     protected Message getSampleMessage() {
-        return new Message("foo", "bar", Tools.iso8601());
+        return new Message("foo", "bar", Tools.nowUTC());
     }
 
     protected StreamRuleMatcher getMatcher(StreamRule rule) {

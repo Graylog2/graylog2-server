@@ -110,7 +110,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
             if (count > 0) {
                 LOG.debug("Alert check <{}> found [{}] messages.", id, count);
-                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
+                return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 LOG.debug("Alert check <{}> returned no results.", id);
                 return new NegativeCheckResult(this);

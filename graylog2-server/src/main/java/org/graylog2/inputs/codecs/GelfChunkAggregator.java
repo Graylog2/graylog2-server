@@ -192,7 +192,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     }
 
     private boolean isOutdated(ChunkEntry entry) {
-        return (Tools.iso8601().getMillis() - entry.firstTimestamp) > VALIDITY_PERIOD;
+        return (Tools.nowUTC().getMillis() - entry.firstTimestamp) > VALIDITY_PERIOD;
     }
 
     private ChunkEntry getAndCleanupEntry(String id) {

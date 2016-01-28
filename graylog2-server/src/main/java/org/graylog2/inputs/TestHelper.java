@@ -87,7 +87,7 @@ public class TestHelper {
     }
 
     public static Message simpleLogMessage() {
-        return new Message("bar", "foo", Tools.iso8601());
+        return new Message("bar", "foo", Tools.nowUTC());
     }
 
 }

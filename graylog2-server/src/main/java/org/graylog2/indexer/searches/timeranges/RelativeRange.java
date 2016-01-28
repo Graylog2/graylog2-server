@@ -50,7 +50,7 @@ public abstract class RelativeRange extends TimeRange {
     public DateTime getFrom() {
         // TODO this should be computed once
         if (range() > 0) {
-            return Tools.iso8601().minus(Seconds.seconds(range()));
+            return Tools.nowUTC().minus(Seconds.seconds(range()));
         }
         return new DateTime(0, DateTimeZone.UTC);
     }
@@ -59,7 +59,7 @@ public abstract class RelativeRange extends TimeRange {
     @JsonIgnore
     public DateTime getTo() {
         // TODO this should be fixed
-        return Tools.iso8601();
+        return Tools.nowUTC();
     }
 
     @JsonCreator

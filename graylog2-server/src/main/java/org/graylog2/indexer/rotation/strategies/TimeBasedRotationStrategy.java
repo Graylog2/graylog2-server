@@ -108,7 +108,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             throw new IllegalArgumentException("Could not determine rotation stride length.");
         }
 
-        final DateTime anchorTime = MoreObjects.firstNonNull(lastAnchor, Tools.iso8601());
+        final DateTime anchorTime = MoreObjects.firstNonNull(lastAnchor, Tools.nowUTC());
 
         final DateTimeField field = largestStrideType.getField(anchorTime.getChronology());
         // use normalized here to make sure we actually have the largestStride type available! see https://github.com/Graylog2/graylog2-server/issues/836
@@ -137,7 +137,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         }
 
         final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
-        final DateTime now = Tools.iso8601();
+        final DateTime now = Tools.nowUTC();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (lastRotation == null) {
             lastRotation = indices.indexCreationDate(index);

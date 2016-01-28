@@ -46,7 +46,7 @@ public class DroolsRulesSessionTest {
 
     @Before
     public void setUp() throws Exception {
-        message = new Message("hello", "localhost", Tools.iso8601());
+        message = new Message("hello", "localhost", Tools.nowUTC());
 
         when(kieSession.insert(message)).thenReturn(factHandle);
         when(kieSession.fireAllRules()).thenReturn(rulesFired);

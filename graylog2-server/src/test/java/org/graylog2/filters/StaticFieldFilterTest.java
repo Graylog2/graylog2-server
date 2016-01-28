@@ -40,7 +40,7 @@ public class StaticFieldFilterTest {
 
     @Test
     public void testFilter() throws Exception {
-        Message msg = new Message("hello", "junit", Tools.iso8601());
+        Message msg = new Message("hello", "junit", Tools.nowUTC());
         msg.setSourceInputId("someid");
 
         when(inputService.find(eq("someid"))).thenReturn(input);
@@ -57,7 +57,7 @@ public class StaticFieldFilterTest {
 
     @Test
     public void testFilterIsNotOverwritingExistingKeys() throws Exception {
-        Message msg = new Message("hello", "junit", Tools.iso8601());
+        Message msg = new Message("hello", "junit", Tools.nowUTC());
         msg.addField("foo", "IWILLSURVIVE");
 
         when(inputService.find(eq("someid"))).thenReturn(input);

@@ -110,7 +110,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 final String resultDescription = "Stream had " + count + " messages in the last " + time
                         + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
                         + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
-                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
+                return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);
             }

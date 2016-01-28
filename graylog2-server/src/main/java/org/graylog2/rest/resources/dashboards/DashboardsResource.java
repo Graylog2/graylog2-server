@@ -102,7 +102,7 @@ public class DashboardsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(name = "JSON body", required = true) CreateDashboardRequest cr) throws ValidationException {
         // Create dashboard.
-        final Dashboard dashboard = dashboardService.create(cr.title(), cr.description(), getCurrentUser().getName(), Tools.iso8601());
+        final Dashboard dashboard = dashboardService.create(cr.title(), cr.description(), getCurrentUser().getName(), Tools.nowUTC());
         final String id = dashboardService.save(dashboard);
 
         final Map<String, String> result = ImmutableMap.of("dashboard_id", id);

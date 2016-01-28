@@ -113,9 +113,9 @@ public class MessageFilterChainProcessorTest {
                                                                                        Sets.newHashSet(filterOnlyFirst),
                                                                                        Mockito.mock(Journal.class),
                                                                                        serverStatus);
-        Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
+        Message filteredoutMessage = new Message("filtered out", "source", Tools.nowUTC());
         filteredoutMessage.setJournalOffset(1);
-        Message unfilteredMessage = new Message("filtered out", "source", Tools.iso8601());
+        Message unfilteredMessage = new Message("filtered out", "source", Tools.nowUTC());
 
         final Messages messages1 = filterTest.process(filteredoutMessage);
         final Messages messages2 = filterTest.process(unfilteredMessage);

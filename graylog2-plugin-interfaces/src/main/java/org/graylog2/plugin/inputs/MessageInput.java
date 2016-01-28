@@ -280,7 +280,7 @@ public abstract class MessageInput implements Stoppable {
             if (messageInput.getCreatedAt() != null)
                 put(FIELD_CREATED_AT, messageInput.getCreatedAt());
             else
-                put(FIELD_CREATED_AT, Tools.iso8601());
+                put(FIELD_CREATED_AT, Tools.nowUTC());
 
 
             if (messageInput.getStaticFields() != null && !messageInput.getStaticFields().isEmpty())

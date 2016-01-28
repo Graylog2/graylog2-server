@@ -71,7 +71,7 @@ public class ServerStatus {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
         this.clusterId = "";
-        this.startedAt = Tools.iso8601();
+        this.startedAt = Tools.nowUTC();
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
         this.messageDetailRecordingStrategy = configuration.isMessageRecordingsEnabled()
                 ? MessageDetailRecordingStrategy.ALWAYS

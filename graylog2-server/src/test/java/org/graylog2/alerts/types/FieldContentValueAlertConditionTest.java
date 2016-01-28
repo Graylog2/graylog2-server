@@ -166,7 +166,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
                 mock(Configuration.class),
                 stream,
                 CONDITION_ID,
-                Tools.iso8601(),
+                Tools.nowUTC(),
                 STREAM_CREATOR,
                 parameters);
     }

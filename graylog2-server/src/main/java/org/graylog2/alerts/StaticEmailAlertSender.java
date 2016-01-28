@@ -143,7 +143,7 @@ public class StaticEmailAlertSender implements AlertSender {
 
         sb.append("\n\n");
         sb.append("##########\n");
-        sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
+        sb.append("Date: ").append(Tools.nowUTC().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
         sb.append("Stream URL: ").append(buildStreamDetailsURL(configuration.getWebInterfaceUri(), checkResult, stream)).append("\n");

@@ -259,7 +259,7 @@ public class BundleImporter {
             NotFoundException, org.graylog2.ConfigurationException, ExtractorFactory.NoSuchExtractorException,
             org.graylog2.plugin.inputs.Extractor.ReservedFieldException {
         final Configuration inputConfig = new Configuration(inputDescription.getConfiguration());
-        final DateTime createdAt = Tools.iso8601();
+        final DateTime createdAt = Tools.nowUTC();
 
         final MessageInput messageInput = messageInputFactory.create(inputDescription.getType(), inputConfig);
         messageInput.setTitle(inputDescription.getTitle());
@@ -418,7 +418,7 @@ public class BundleImporter {
                 outputDescription.getType(),
                 userName,
                 outputDescription.getConfiguration(),
-                Tools.iso8601().toDate(),
+                Tools.nowUTC().toDate(),
                 bundleId));
 
         if (!isNullOrEmpty(referenceId)) {
@@ -449,7 +449,7 @@ public class BundleImporter {
         streamData.put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, streamDescription.getMatchingType().name());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
+        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);
 
         final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData.build());
@@ -496,7 +496,7 @@ public class BundleImporter {
         dashboardData.put(DashboardImpl.FIELD_DESCRIPTION, dashboardDescription.getDescription());
         dashboardData.put(DashboardImpl.FIELD_CONTENT_PACK, bundleId);
         dashboardData.put(DashboardImpl.FIELD_CREATOR_USER_ID, userName);
-        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, Tools.iso8601());
+        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, Tools.nowUTC());
 
         final org.graylog2.dashboards.Dashboard dashboard = new DashboardImpl(dashboardData);
         final String dashboardId = dashboardService.save(dashboard);

@@ -160,7 +160,7 @@ public class FakeHttpRawMessageGenerator {
     }
 
     private static Message createMessage(GeneratorState state, int httpCode, Resource resource, int tookMs, DateTime ingestTime) {
-        final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.iso8601());
+        final Message msg = new Message(shortMessage(ingestTime, state.method, state.resource, httpCode, tookMs), state.source, Tools.nowUTC());
         msg.addFields(ingestTimeFields(ingestTime));
         msg.addFields(resourceFields(resource));
         msg.addField("ticks", System.nanoTime());
@@ -186,7 +186,7 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.iso8601();
+        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
@@ -208,7 +208,7 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.iso8601();
+        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
@@ -229,7 +229,7 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.iso8601();
+        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 
@@ -250,7 +250,7 @@ public class FakeHttpRawMessageGenerator {
             msBase = 400;
         }
 
-        final DateTime ingestTime = Tools.iso8601();
+        final DateTime ingestTime = Tools.nowUTC();
         final Resource resource = RESOURCE_MAP.get(state.resource);
         final int tookMs = rateDeviation(msBase, deviation, rand);
 

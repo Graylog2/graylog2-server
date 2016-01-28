@@ -321,7 +321,7 @@ public abstract class CmdLineTool implements CliCommand {
     private String dumpConfiguration(final Map<String, String> configMap) {
         final StringBuilder sb = new StringBuilder();
         sb.append("# Configuration of graylog2-").append(commandName).append(" ").append(version).append(System.lineSeparator());
-        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.nowUTC()).append(System.lineSeparator());
 
         for (Map.Entry<String, String> entry : configMap.entrySet()) {
             sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());

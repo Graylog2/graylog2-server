@@ -231,7 +231,7 @@ public class GelfOutput implements MessageOutput {
         if (fieldTimeStamp instanceof DateTime) {
             timestamp = (DateTime) fieldTimeStamp;
         } else {
-            timestamp = Tools.iso8601();
+            timestamp = Tools.nowUTC();
         }
 
         final GelfMessageLevel messageLevel = extractLevel(message.getField(Message.FIELD_LEVEL));
