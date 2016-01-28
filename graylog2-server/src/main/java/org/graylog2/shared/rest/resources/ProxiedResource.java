@@ -21,7 +21,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import java.util.List;
 
-public abstract class ProxiedResource {
+public abstract class ProxiedResource extends RestResource {
     protected final String authenticationToken;
 
     public ProxiedResource(@Context HttpHeaders httpHeaders) {
