@@ -1,9 +1,10 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col, Input, Button} from 'react-bootstrap';
+import { Row, Col, Input, Button } from 'react-bootstrap';
 import URI from 'urijs';
 
 import { MultiSelect, Spinner } from 'components/common';
+import ObjectUtils from 'util/ObjectUtils';
 
 import RolesStore from 'stores/users/RolesStore';
 import LdapStore from 'stores/users/LdapStore';
@@ -143,7 +144,7 @@ const LdapComponent = React.createClass({
     }
 
     // Clone settings object, so we don't the store reference
-    const settings = JSON.parse(JSON.stringify(state.ldapSettings));
+    const settings = ObjectUtils.clone(state.ldapSettings);
     settings.ldap_uri = new URI(settings.ldap_uri);
 
     this.setState({ldapSettings: settings});
