@@ -122,6 +122,7 @@ const LdapComponent = React.createClass({
   getInitialState() {
     return {
       ldapSettings: undefined,
+      ldapUri: undefined,
       roles: undefined,
     };
   },
@@ -146,9 +147,8 @@ const LdapComponent = React.createClass({
 
     // Clone settings object, so we don't the store reference
     const settings = ObjectUtils.clone(state.ldapSettings);
-    settings.ldap_uri = new URI(settings.ldap_uri);
-
-    this.setState({ldapSettings: settings});
+    const ldapUri = new URI(settings.ldap_uri);
+    this.setState({ldapSettings: settings, ldapUri: ldapUri});
   },
 
   _isLoading() {
@@ -168,39 +168,50 @@ const LdapComponent = React.createClass({
   },
 
   _setSetting(attribute, value) {
-    const settings = this.state.ldapSettings;
-    settings[attribute] = value;
-    this.setState({ldapSettings: settings});
+    const newState = {};
+
+    let formattedValue = value;
+    // Convert URI object into string to store it in the state
+    if (attribute === 'ldap_uri' && typeof value === 'object') {
+      newState.ldapUri = value;
+      formattedValue = value.toString();
+    }
+
+    // Clone state to not modify it directly
+    const settings = ObjectUtils.clone(this.state.ldapSettings);
+    settings[attribute] = formattedValue;
+    newState.ldapSettings = settings;
+    this.setState(newState);
   },
 
   _setUriScheme(scheme) {
-    const ldapUri = this.state.ldapSettings.ldap_uri;
+    const ldapUri = this.state.ldapUri.clone();
     ldapUri.scheme(scheme);
-    this._setSetting({ldap_uri: ldapUri});
+    this._setSetting('ldap_uri', ldapUri);
   },
 
   _uriScheme() {
-    return this.state.ldapSettings.ldap_uri.scheme() + '://';
+    return this.state.ldapUri.scheme() + '://';
   },
 
   _setUriHost(host) {
-    const ldapUri = this.state.ldapSettings.ldap_uri;
-    ldapUri.host(host);
-    this._setSetting({ldap_uri: ldapUri});
+    const ldapUri = this.state.ldapUri.clone();
+    ldapUri.hostname(host);
+    this._setSetting('ldap_uri', ldapUri);
   },
 
   _uriHost() {
-    return this.state.ldapSettings.ldap_uri.hostname();
+    return this.state.ldapUri.hostname();
   },
 
   _setUriPort(port) {
-    const ldapUri = this.state.ldapSettings.ldap_uri;
+    const ldapUri = this.state.ldapUri.clone();
     ldapUri.port(port);
-    this._setSetting({ldap_uri: ldapUri});
+    this._setSetting('ldap_uri', ldapUri);
   },
 
   _uriPort() {
-    return this.state.ldapSettings.ldap_uri.port();
+    return this.state.ldapUri.port();
   },
 
   _setAdditionalDefaultGroups(rolesString) {
@@ -293,7 +304,7 @@ const LdapComponent = React.createClass({
               <div className="form-group">
                 <Col sm={9} smOffset={3}>
                   <Button id="ldap-test-connection" bsStyle="warning"
-                          disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
+                          disabled={disabled || this._uriHost() === ''}>
                     Test Server Connection
                   </Button>
                   <span className="help-block">Performs a background connection check with the address and credentials above.</span>
