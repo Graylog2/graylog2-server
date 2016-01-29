@@ -5,6 +5,7 @@ import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const LdapStore = Reflux.createStore({
+  sourceUrl: '/system/ldap/',
   ldapSettings: undefined,
 
   init() {
@@ -16,7 +17,7 @@ const LdapStore = Reflux.createStore({
   },
 
   loadSettings() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.LdapController.info().url);
+    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings`);
 
     const promise = fetch('GET', url);
     promise.then(response => {

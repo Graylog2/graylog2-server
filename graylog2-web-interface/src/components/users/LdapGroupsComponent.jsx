@@ -56,7 +56,7 @@ const LdapGroupsComponent = React.createClass({
     if (content.size === 0) {
       return (<Row>
         <Col md={12} mdPush={1}>
-          <Panel bsStyle="info">No LDAP/Active Directory groups found. Please verify that your <a href={jsRoutes.controllers.LdapController.index().url}>LDAP group mapping</a> settings are correct.</Panel>
+          <Panel bsStyle="info">No LDAP/Active Directory groups found. Please verify that your <a href="">LDAP group mapping</a> settings are correct.</Panel>
         </Col>
       </Row>);
     } else {
