@@ -1,21 +1,20 @@
-import React, {PropTypes} from 'react';
-
+import React from 'react';
+import Reflux from 'reflux';
 import { Row, Col, Input, Button} from 'react-bootstrap';
+import URI from 'urijs';
 
-import Spinner from 'components/common/Spinner';
-import MultiSelect from 'components/common/MultiSelect';
+import { MultiSelect, Spinner } from 'components/common';
 
 import RolesStore from 'stores/users/RolesStore';
+import LdapStore from 'stores/users/LdapStore';
 import LdapGroupsStore from 'stores/users/LdapGroupsStore';
 
 const LdapComponent = React.createClass({
-  propTypes: {
-    ldapSettings: PropTypes.object.isRequired,
-  },
+  mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange')],
   getInitialState() {
     return {
-      ldapSettings: this.props.ldapSettings,
-      roles: null,
+      ldapSettings: undefined,
+      roles: undefined,
     };
   },
 
@@ -32,8 +31,20 @@ const LdapComponent = React.createClass({
     });
   },
 
+  _onLdapSettingsChange(state) {
+    if (!state.ldapSettings) {
+      return;
+    }
+
+    // Clone settings object, so we don't the store reference
+    const settings = JSON.parse(JSON.stringify(state.ldapSettings));
+    settings.ldap_uri = new URI(settings.ldap_uri);
+
+    this.setState({ldapSettings: settings});
+  },
+
   _isLoading() {
-    return !this.state.roles;
+    return !this.state.ldapSettings || !this.state.roles;
   },
 
   _bindChecked(ev, value) {
