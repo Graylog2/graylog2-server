@@ -252,6 +252,11 @@ const LdapComponent = React.createClass({
     return 'info';
   },
 
+  _saveSettings(event) {
+    event.preventDefault();
+    LdapStore.update(this.state.ldapSettings);
+  },
+
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -276,11 +281,12 @@ const LdapComponent = React.createClass({
     return (
       <Row>
         <Col lg={8}>
-          <form id="ldap-settings-form" className="form-horizontal">
+          <form id="ldap-settings-form" className="form-horizontal" onSubmit={this._saveSettings}>
             <Input type="checkbox" label="Enable LDAP"
                    help="User accounts will be taken from LDAP/Active Directory, the administrator account will still be available."
                    wrapperClassName="col-sm-offset-3 col-sm-9"
                    name="enabled"
+                   checked={this.state.ldapSettings.enabled}
                    onChange={this._bindChecked}/>
 
             <fieldset>
@@ -315,7 +321,7 @@ const LdapComponent = React.createClass({
                          disabled={disabled}/>
                 </div>
                 <label className="checkbox-inline">
-                  <input type="checkbox" name="ssl" checked={this.state.ldapSettings.ssl} onChange={this._updateSsl}
+                  <input type="checkbox" name="ssl" checked={this.state.ldapUri.scheme() === 'ldaps'} onChange={this._updateSsl}
                          disabled={disabled}/> SSL
                 </label>
                 <label className="checkbox-inline">
@@ -399,7 +405,7 @@ const LdapComponent = React.createClass({
                 <Row>
                   <Col sm={4}>
                     <select id="default_group" name="default_group" className="form-control" required
-                            value={this.state.ldapSettings.default_group} disabled={disabled}
+                            value={this.state.ldapSettings.default_group.toLowerCase()} disabled={disabled}
                             onChange={(ev) => this._setSetting('default_group', ev.target.value)}>
 
                       <option value="reader">Reader - basic access</option>
@@ -448,7 +454,7 @@ const LdapComponent = React.createClass({
 
             <div className="form-group">
               <Col sm={9} smOffset={3}>
-                <Button bsStyle="success">Save LDAP settings</Button>
+                <Button type="submit" bsStyle="success">Save LDAP settings</Button>
               </Col>
             </div>
           </form>

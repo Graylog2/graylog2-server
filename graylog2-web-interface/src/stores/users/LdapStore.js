@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
@@ -24,6 +25,18 @@ const LdapStore = Reflux.createStore({
       this.ldapSettings = response;
       this.trigger({ldapSettings: response});
     });
+
+    return promise;
+  },
+
+  update(newLdapSettings) {
+    const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings`);
+
+    const promise = fetch('PUT', url, newLdapSettings);
+    promise.then(
+      () => UserNotification.success('LDAP settings saved successfully'),
+      error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings')
+    );
 
     return promise;
   },
