@@ -220,183 +220,188 @@ const LdapComponent = React.createClass({
 
     const rolesOptions = this.state.roles;
 
-    return (<Row>
-      <Col lg={8}>
-        <form id="ldap-settings-form" className="form-horizontal">
-          <Input type="checkbox" label="Enable LDAP"
-                 help="User accounts will be taken from LDAP/Active Directory, the administrator account will still be available."
-                 wrapperClassName="col-sm-offset-3 col-sm-9"
-                 name="enabled"
-                 onChange={this._bindChecked}/>
+    return (
+      <Row>
+        <Col lg={8}>
+          <form id="ldap-settings-form" className="form-horizontal">
+            <Input type="checkbox" label="Enable LDAP"
+                   help="User accounts will be taken from LDAP/Active Directory, the administrator account will still be available."
+                   wrapperClassName="col-sm-offset-3 col-sm-9"
+                   name="enabled"
+                   onChange={this._bindChecked}/>
 
-          <fieldset>
-            <legend className="col-sm-12">1. Server configuration</legend>
-            <Input id="active_directory" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" label="Server Type">
-              <label className="radio-inline">
-                <input type="radio" name="active_directory"
-                       checked={!isAD} disabled={disabled}
-                       onChange={(ev) => this._bindChecked(ev, false)}/>
-                LDAP
-              </label>
-              <label className="radio-inline">
-                <input type="radio" name="active_directory"
-                       checked={isAD} disabled={disabled}
-                       onChange={(ev) => this._bindChecked(ev, true)}/>
-                Active Directory
-              </label>
-            </Input>
+            <fieldset>
+              <legend className="col-sm-12">1. Server configuration</legend>
+              <Input id="active_directory" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" label="Server Type">
+                <label className="radio-inline">
+                  <input type="radio" name="active_directory"
+                         checked={!isAD} disabled={disabled}
+                         onChange={(ev) => this._bindChecked(ev, false)}/>
+                  LDAP
+                </label>
+                <label className="radio-inline">
+                  <input type="radio" name="active_directory"
+                         checked={isAD} disabled={disabled}
+                         onChange={(ev) => this._bindChecked(ev, true)}/>
+                  Active Directory
+                </label>
+              </Input>
 
-            <Input id="ldap-uri-host" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" label="Server Address">
-              <div className="input-group">
-                <span className="input-group-addon">{this._uriScheme()}</span>
-                <input type="text" className="form-control" id="ldap-uri-host" value={this._uriHost()}
-                       placeholder="Hostname" required onChange={(ev) => this._setUriHost(ev.target.value)}
-                       disabled={disabled}/>
-                <span className="input-group-addon input-group-separator">:</span>
-                <input type="number" className="form-control" id="ldap-uri-port" value={this._uriPort()} min="1"
-                       max="65535" placeholder="Port"
-                       required style={{width: 120}} onChange={(ev) => this._setUriPort(ev.target.value)}
-                       disabled={disabled}/>
+              <Input id="ldap-uri-host" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" label="Server Address">
+                <div className="input-group">
+                  <span className="input-group-addon">{this._uriScheme()}</span>
+                  <input type="text" className="form-control" id="ldap-uri-host" value={this._uriHost()}
+                         placeholder="Hostname" required onChange={(ev) => this._setUriHost(ev.target.value)}
+                         disabled={disabled}/>
+                  <span className="input-group-addon input-group-separator">:</span>
+                  <input type="number" className="form-control" id="ldap-uri-port" value={this._uriPort()} min="1"
+                         max="65535" placeholder="Port"
+                         required style={{width: 120}} onChange={(ev) => this._setUriPort(ev.target.value)}
+                         disabled={disabled}/>
+                </div>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="ssl" checked={this.state.ldapSettings.ssl} onChange={this._updateSsl}
+                         disabled={disabled}/> SSL
+                </label>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="use_start_tls" value="true" id="ldap-uri-starttls"
+                         checked={this.state.ldapSettings.use_start_tls} onChange={this._bindChecked}
+                         disabled={disabled}/> StartTLS
+                </label>
+                <label className="checkbox-inline">
+                  <input type="checkbox" name="trust_all_certificates" value="true" id="trust-all-certificates"
+                         checked={this.state.ldapSettings.trust_all_certificates} onChange={this._bindChecked}
+                         disabled={disabled}/> Allow self-signed certificates
+                </label>
+              </Input>
+
+              <Input type="text" id="system_username" name="system_username" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="System User DN" label="System Username"
+                     value={this.state.ldapSettings.system_username} help={help.SYSTEM_USERNAME}
+                     onChange={this._bindValue} disabled={disabled}/>
+
+              <Input type="password" id="system_password" name="system_password" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="System Password" label="System Password"
+                     value={this.state.ldapSettings.system_password} help={help.SYSTEM_PASSWORD}
+                     onChange={this._bindValue} disabled={disabled}/>
+            </fieldset>
+
+            <fieldset>
+              <legend className="col-sm-12">2. Connection Test</legend>
+              <div className="form-group">
+                <Col sm={9} smOffset={3}>
+                  <Button id="ldap-test-connection" bsStyle="warning"
+                          disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
+                    Test Server Connection
+                  </Button>
+                  <span className="help-block">Performs a background connection check with the address and credentials above.</span>
+                  <div className="alert alert-danger" id="ldap-connectionfailure-reason"
+                       style={{display: 'none'}}></div>
+                </Col>
               </div>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="ssl" checked={this.state.ldapSettings.ssl} onChange={this._updateSsl}
-                       disabled={disabled}/> SSL
-              </label>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="use_start_tls" value="true" id="ldap-uri-starttls"
-                       checked={this.state.ldapSettings.use_start_tls} onChange={this._bindChecked}
-                       disabled={disabled}/> StartTLS
-              </label>
-              <label className="checkbox-inline">
-                <input type="checkbox" name="trust_all_certificates" value="true" id="trust-all-certificates"
-                       checked={this.state.ldapSettings.trust_all_certificates} onChange={this._bindChecked}
-                       disabled={disabled}/> Allow self-signed certificates
-              </label>
-            </Input>
+            </fieldset>
 
-            <Input type="text" id="system_username" name="system_username" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="System User DN" label="System Username"
-                   value={this.state.ldapSettings.system_username} help={help.SYSTEM_USERNAME}
-                   onChange={this._bindValue} disabled={disabled}/>
+            <fieldset>
+              <legend className="col-sm-12">3. User mapping</legend>
+              <Input type="text" id="search_base" name="search_base" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Search Base" label="Search Base DN"
+                     value={this.state.ldapSettings.search_base} help={help.SEARCH_BASE}
+                     onChange={this._bindValue} disabled={disabled} required/>
 
-            <Input type="password" id="system_password" name="system_password" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="System Password" label="System Password"
-                   value={this.state.ldapSettings.system_password} help={help.SYSTEM_PASSWORD}
-                   onChange={this._bindValue} disabled={disabled}/>
-          </fieldset>
+              <Input type="text" id="search_pattern" name="search_pattern" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Search Pattern" label="User Search Pattern"
+                     value={this.state.ldapSettings.search_pattern} help={help.SEARCH_PATTERN}
+                     onChange={this._bindValue} disabled={disabled} required/>
 
-          <fieldset>
-            <legend className="col-sm-12">2. Connection Test</legend>
-            <div className="form-group">
-              <Col sm={9} smOffset={3}>
-                <Button id="ldap-test-connection" bsStyle="warning"
-                        disabled={disabled || this.state.ldapSettings.ldap_uri.hostname() === ''}>
-                  Test Server Connection
-                </Button>
-                <span className="help-block">Performs a background connection check with the address and credentials above.</span>
-                <div className="alert alert-danger" id="ldap-connectionfailure-reason" style={{display: 'none'}}></div>
-              </Col>
-            </div>
-          </fieldset>
+              <Input type="text" id="display_name_attribute" name="display_name_attribute" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Display Name Attribute" label="Display Name attribute"
+                     value={this.state.ldapSettings.display_name_attribute} help={help.DISPLAY_NAME}
+                     onChange={this._bindValue} disabled={disabled} required/>
+            </fieldset>
 
-          <fieldset>
-            <legend className="col-sm-12">3. User mapping</legend>
-            <Input type="text" id="search_base" name="search_base" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Search Base" label="Search Base DN"
-                   value={this.state.ldapSettings.search_base} help={help.SEARCH_BASE}
-                   onChange={this._bindValue} disabled={disabled} required/>
+            <fieldset>
+              <legend className="col-sm-12">4. Group Mapping
+                <small>(optional)</small>
+              </legend>
+              <Input type="text" id="group_search_base" name="group_search_base" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Group Search Base" label="Group Search Base DN"
+                     value={this.state.ldapSettings.group_search_base} help={help.GROUP_SEARCH_BASE}
+                     onChange={this._bindValue} disabled={disabled}/>
 
-            <Input type="text" id="search_pattern" name="search_pattern" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Search Pattern" label="User Search Pattern"
-                   value={this.state.ldapSettings.search_pattern} help={help.SEARCH_PATTERN}
-                   onChange={this._bindValue} disabled={disabled} required/>
+              <Input type="text" id="group_search_pattern" name="group_search_pattern" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Group Search Pattern" label="Group Search Pattern"
+                     value={this.state.ldapSettings.group_search_pattern} help={help.GROUP_PATTERN}
+                     onChange={this._bindValue} disabled={disabled}/>
 
-            <Input type="text" id="display_name_attribute" name="display_name_attribute" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Display Name Attribute" label="Display Name attribute"
-                   value={this.state.ldapSettings.display_name_attribute} help={help.DISPLAY_NAME}
-                   onChange={this._bindValue} disabled={disabled} required/>
-          </fieldset>
+              <Input type="text" id="group_id_attribute" name="group_id_attribute" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" placeholder="Group Id Attribute" label="Group Name Attribute"
+                     value={this.state.ldapSettings.group_id_attribute} help={help.GROUP_ID}
+                     onChange={this._bindValue} disabled={disabled}/>
 
-          <fieldset>
-            <legend className="col-sm-12">4. Group Mapping <small>(optional)</small></legend>
-            <Input type="text" id="group_search_base" name="group_search_base" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Group Search Base" label="Group Search Base DN"
-                   value={this.state.ldapSettings.group_search_base} help={help.GROUP_SEARCH_BASE}
-                   onChange={this._bindValue} disabled={disabled}/>
+              <Input id="default_group" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" label="Default User Role"
+                     help={help.DEFAULT_GROUP}>
+                <Row>
+                  <Col sm={4}>
+                    <select id="default_group" name="default_group" className="form-control" required
+                            value={this.state.ldapSettings.default_group} disabled={disabled}
+                            onChange={(ev) => this._setSetting('default_group', ev.target.value)}>
 
-            <Input type="text" id="group_search_pattern" name="group_search_pattern" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Group Search Pattern" label="Group Search Pattern"
-                   value={this.state.ldapSettings.group_search_pattern} help={help.GROUP_PATTERN}
-                   onChange={this._bindValue} disabled={disabled}/>
+                      <option value="reader">Reader - basic access</option>
+                      <option value="admin">Administrator - complete access</option>
+                    </select>
+                  </Col>
+                </Row>
+              </Input>
 
-            <Input type="text" id="group_id_attribute" name="group_id_attribute" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" placeholder="Group Id Attribute" label="Group Name Attribute"
-                   value={this.state.ldapSettings.group_id_attribute} help={help.GROUP_ID}
-                   onChange={this._bindValue} disabled={disabled}/>
-
-            <Input id="default_group" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" label="Default User Role"
-                   help={help.DEFAULT_GROUP}>
               <Row>
-                <Col sm={4}>
-                  <select id="default_group" name="default_group" className="form-control" required
-                          value={this.state.ldapSettings.default_group} disabled={disabled}
-                          onChange={(ev) => this._setSetting('default_group', ev.target.value)}>
-
-                    <option value="reader">Reader - basic access</option>
-                    <option value="admin">Administrator - complete access</option>
-                  </select>
+                <Col sm={9} smOffset={3}>
+                  <Panel bsStyle="info">
+                    Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
+                    Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                  </Panel>
                 </Col>
               </Row>
-            </Input>
 
-            <Row>
+              <Input id="additional_default_groups" labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9" label="Additional Default Roles"
+                     help={help.ADDITIONAL_GROUPS}>
+                <MultiSelect
+                  ref="select"
+                  options={rolesOptions}
+                  disabled={disabled}
+                  value={this.state.ldapSettings.additional_default_groups}
+                  onChange={(roles) => this._setAdditionalDefaultGroups(roles)}
+                  placeholder="Choose additional roles..."
+                />
+              </Input>
+
+              <Row>
+                <Col sm={9} smOffset={3}>
+                  <Panel bsStyle="info">
+                    Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
+                    Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                  </Panel>
+                </Col>
+              </Row>
+            </fieldset>
+
+            <fieldset>
+              <legend className="col-sm-12">5. Login test</legend>
+
+            </fieldset>
+
+            <div className="form-group">
               <Col sm={9} smOffset={3}>
-                <Panel bsStyle="info">
-                  Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
-                  Existing user accounts will be updated on their next login, or if you edit their roles manually.
-                </Panel>
+                <Button bsStyle="success">Save LDAP settings</Button>
               </Col>
-            </Row>
-
-            <Input id="additional_default_groups" labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" label="Additional Default Roles"
-                   help={help.ADDITIONAL_GROUPS}>
-              <MultiSelect
-                ref="select"
-                options={rolesOptions}
-                disabled={disabled}
-                value={this.state.ldapSettings.additional_default_groups}
-                onChange={(roles) => this._setAdditionalDefaultGroups(roles)}
-                placeholder="Choose additional roles..."
-              />
-            </Input>
-
-            <Row>
-              <Col sm={9} smOffset={3}>
-                <Panel bsStyle="info">
-                  Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br/>
-                  Existing user accounts will be updated on their next login, or if you edit their roles manually.
-                </Panel>
-              </Col>
-            </Row>
-          </fieldset>
-
-          <fieldset>
-            <legend className="col-sm-12">5. Login test</legend>
-
-          </fieldset>
-
-          <div className="form-group">
-            <Col sm={9} smOffset={3}>
-              <Button bsStyle="success">Save LDAP settings</Button>
-            </Col>
-          </div>
-        </form>
-      </Col>
-    </Row>);
+            </div>
+          </form>
+        </Col>
+      </Row>
+    );
   },
 });
 
