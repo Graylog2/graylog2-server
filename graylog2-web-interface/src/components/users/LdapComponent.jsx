@@ -9,6 +9,112 @@ import RolesStore from 'stores/users/RolesStore';
 import LdapStore from 'stores/users/LdapStore';
 import LdapGroupsStore from 'stores/users/LdapGroupsStore';
 
+const HelperText = {
+  activeDirectory: {
+    SYSTEM_USERNAME: (
+      <span>
+        The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.<br/>
+        This needs to match the <code>userPrincipalName</code> of that user.
+      </span>
+    ),
+    SYSTEM_PASSWORD: ('The password for the initial connection to the Active Directory server.'),
+    SEARCH_BASE: (
+      <span>
+        The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
+      </span>
+    ),
+    SEARCH_PATTERN: (
+      <span>
+        For example <code className="text-nowrap">{'(&(objectclassName=user)(sAMAccountName={0}))'}</code>.{' '}
+        The string <code>{'{0}'}</code> will be replaced by the entered username.
+      </span>
+    ),
+    DISPLAY_NAME: (
+      <span>
+        Try to load a test user using the form below, if you are unsure which attribute to use.<br/>
+        Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.
+      </span>
+    ),
+    GROUP_SEARCH_BASE: (
+      <span>
+        The base tree to limit the Active Directory group search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
+      </span>
+    ),
+    GROUP_PATTERN: (
+      <span>
+        The search pattern used to find groups in Active Directory for mapping to Graylog roles, e.g.{' '}
+        <code className="text-nowrap">(objectclassName=group)</code> or{' '}
+        <code className="text-nowrap">(&amp;(objectclassName=group)(cn=graylog*))</code>.
+      </span>
+    ),
+    GROUP_ID: (
+      <span>Which Active Directory attribute to use for the full name of the group, usually <code>cn</code>.</span>
+    ),
+    DEFAULT_GROUP: (
+      <span>
+        The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
+        You can assign additional permissions by <a href="">mapping Active Directory groups to{' '}
+        Graylog roles</a>, or you can assign additional Graylog roles to Active Directory users below.
+      </span>
+    ),
+    ADDITIONAL_GROUPS: (
+      'Choose the additional roles each Active Directory user will have by default, leave it empty if you want to map Active Directory groups to Graylog roles.'
+    ),
+  },
+
+  ldap: {
+    SYSTEM_USERNAME: (
+      <span>
+        The username for the initial connection to the LDAP server, e.g.{' '}
+        <code className="text-nowrap">uid=admin,ou=system</code>, this might be optional depending on your LDAP server.
+      </span>
+    ),
+    SYSTEM_PASSWORD: ('The password for the initial connection to the LDAP server.'),
+    SEARCH_BASE: (
+      <span>
+        The base tree to limit the LDAP search query to, e.g. <code className="text-nowrap">cn=users,dc=example,dc=com</code>.
+      </span>
+    ),
+    SEARCH_PATTERN: (
+      <span>
+        For example <code className="text-nowrap">{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.{' '}
+        The string <code>{'{0}'}</code> will be replaced by the entered username.
+      </span>
+    ),
+    DISPLAY_NAME: (
+      <span>
+        Try to load a test user using the form below, if you are unsure which attribute to use.<br/>
+        Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.
+      </span>
+    ),
+    GROUP_SEARCH_BASE: (
+      <span>
+        The base tree to limit the LDAP group search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
+      </span>
+    ),
+    GROUP_PATTERN: (
+      <span>
+        The search pattern used to find groups in LDAP for mapping to Graylog roles, e.g.{' '}
+        <code>(objectclassName=groupOfNames)</code> or{' '}
+        <code className="text-nowrap">(&amp;(objectclassName=groupOfNames)(cn=graylog*))</code>.
+      </span>
+    ),
+    GROUP_ID: (
+      <span>Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.</span>
+    ),
+    DEFAULT_GROUP: (
+      <span>
+        The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
+        You can assign additional permissions by <a href="">mapping LDAP groups to Graylog roles</a>,{' '}
+        or you can assign additional Graylog roles to LDAP users below.
+      </span>
+    ),
+    ADDITIONAL_GROUPS: (
+      'Choose the additional roles each LDAP user will have by default, leave it empty if you want to map LDAP groups to Graylog roles.'
+    ),
+  },
+};
+
 const LdapComponent = React.createClass({
   mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange')],
   getInitialState() {
@@ -101,51 +207,6 @@ const LdapComponent = React.createClass({
     this._setSetting('additional_default_groups', roles);
   },
 
-  helpTextsAD: {
-    SYSTEM_USERNAME: (
-      <span>The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@@some.domain</code>.<br/>
-      This needs to match the <code>userPrincipalName</code> of that user.</span>),
-    SYSTEM_PASSWORD: ('The password for the initial connection to the Active Directory server.'),
-    SEARCH_BASE: (
-      <span>The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>),
-    SEARCH_PATTERN: (<span>For example <code className="text-nowrap">{'(&(objectclassName=user)(sAMAccountName={0}))'}</code>. The string <code>{'{0}'}</code>
-                            will be replaced by the entered username.</span>),
-    DISPLAY_NAME: (
-      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which Active Directory attribute to use for the full name of the user in Graylog, e.g.
-        <code>displayName</code>.</span>),
-    GROUP_SEARCH_BASE: (<span>The base tree to limit the Active Directory group search query to, e.g. <code>
-      cn=users,dc=example,dc=com</code></span>),
-    GROUP_PATTERN: (
-      <span>The search pattern used to find groups in Active Directory for mapping to Graylog roles, e.g. <code className="text-nowrap">(objectclassName=group)</code> or
-        <code className="text-nowrap">(&amp;(objectclassName=group)(cn=graylog*))</code></span>),
-    GROUP_ID: (
-      <span>Which Active Directory attribute to use for the full name of the group, usually <code>cn</code>.</span>),
-    DEFAULT_GROUP: (<span>The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
-                            You can assign additional permissions by <a href="">mapping Active Directory groups to
-        Graylog roles</a>, or you can assign additional Graylog roles to Active Directory users below.</span>),
-    ADDITIONAL_GROUPS: ('Choose the additional roles each Active Directory user will have by default, leave it empty if you want to map Active Directory groups to Graylog roles.'),
-  },
-  helpTextsLDAP: {
-    SYSTEM_USERNAME: (
-      <span>The username for the initial connection to the LDAP server, e.g. <code className="text-nowrap">uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>),
-    SYSTEM_PASSWORD: ('The password for the initial connection to the LDAP server.'),
-    SEARCH_BASE: (
-      <span>The base tree to limit the LDAP search query to, e.g. <code className="text-nowrap">cn=users,dc=example,dc=com</code></span>
-    ),
-    SEARCH_PATTERN: (
-      <span>For example <code className="text-nowrap">{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.The string <code>{'{0}'}</code> will be replaced by the entered username.</span>
-    ),
-    DISPLAY_NAME: (
-      <span>Try to load a test user using the form below, if you are unsure which attribute to use.<br/>Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.</span>),
-    GROUP_SEARCH_BASE: (<span>The base tree to limit the LDAP group search query to, e.g. <code>
-      cn=users,dc=example,dc=com</code></span>),
-    GROUP_PATTERN: (<span>The search pattern used to find groups in LDAP for mapping to Graylog roles, e.g. <code>(objectclassName=groupOfNames)</code> or
-      <code className="text-nowrap">(&amp;(objectclassName=groupOfNames)(cn=graylog*))</code></span>),
-    GROUP_ID: (<span>Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.</span>),
-    DEFAULT_GROUP: (<span>The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
-                            You can assign additional permissions by <a href="">mapping LDAP groups to Graylog roles</a>, or you can assign additional Graylog roles to LDAP users below.</span>),
-    ADDITIONAL_GROUPS: ('Choose the additional roles each LDAP user will have by default, leave it empty if you want to map LDAP groups to Graylog roles.'),
-  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -153,7 +214,7 @@ const LdapComponent = React.createClass({
 
     const isAD = this.state.ldapSettings.active_directory;
     const disabled = !this.state.ldapSettings.enabled;
-    const help = isAD ? this.helpTextsAD : this.helpTextsLDAP;
+    const help = isAD ? HelperText.activeDirectory : HelperText.ldap;
 
     const rolesOptions = this.state.roles;
 
@@ -330,7 +391,8 @@ const LdapComponent = React.createClass({
                 <span className="help-block">{help.DEFAULT_GROUP}</span>
                 <div className="panel panel-info">
                   <div className="panel-body">
-                    <p>Changing the static role assignment will only affect to new users created via LDAP/Active
+                    <p>
+                      Changing the static role assignment will only affect to new users created via LDAP/Active
                       Directory!<br/>
                       Existing user accounts will be updated on their next login, or if you edit their roles manually.
                     </p>
@@ -355,7 +417,8 @@ const LdapComponent = React.createClass({
                 <span className="help-block ">{help.ADDITIONAL_GROUPS}</span>
                 <div className="panel panel-info">
                   <div className="panel-body">
-                    <p>Changing the static role assignment will only affect to new users created via LDAP/Active
+                    <p>
+                      Changing the static role assignment will only affect to new users created via LDAP/Active
                       Directory!<br/>
                       Existing user accounts will be updated on their next login, or if you edit their roles manually.
                     </p>
