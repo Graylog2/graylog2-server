@@ -357,6 +357,9 @@ public class Message implements Messages {
 
     @SuppressWarnings("unchecked")
     public List<String> getStreamIds() {
+        if (!hasField(FIELD_STREAMS)) {
+            return Collections.emptyList();
+        }
         try {
             return Lists.<String>newArrayList(getFieldAs(List.class, FIELD_STREAMS));
         } catch (ClassCastException e) {
