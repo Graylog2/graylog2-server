@@ -26,7 +26,7 @@ const HelperText = {
     ),
     SEARCH_PATTERN: (
       <span>
-        For example <code className="text-nowrap">{'(&(objectclassName=user)(sAMAccountName={0}))'}</code>.{' '}
+        For example <code className="text-nowrap">{'(&(objectClass=user)(sAMAccountName={0}))'}</code>.{' '}
         The string <code>{'{0}'}</code> will be replaced by the entered username.
       </span>
     ),
@@ -44,8 +44,8 @@ const HelperText = {
     GROUP_PATTERN: (
       <span>
         The search pattern used to find groups in Active Directory for mapping to Graylog roles, e.g.{' '}
-        <code className="text-nowrap">(objectclassName=group)</code> or{' '}
-        <code className="text-nowrap">(&amp;(objectclassName=group)(cn=graylog*))</code>.
+        <code className="text-nowrap">(objectClass=group)</code> or{' '}
+        <code className="text-nowrap">(&amp;(objectClass=group)(cn=graylog*))</code>.
       </span>
     ),
     GROUP_ID: (
@@ -79,7 +79,7 @@ const HelperText = {
     ),
     SEARCH_PATTERN: (
       <span>
-        For example <code className="text-nowrap">{'(&(objectclassName=inetOrgPerson)(uid={0}))'}</code>.{' '}
+        For example <code className="text-nowrap">{'(&(objectClass=inetOrgPerson)(uid={0}))'}</code>.{' '}
         The string <code>{'{0}'}</code> will be replaced by the entered username.
       </span>
     ),
@@ -97,8 +97,8 @@ const HelperText = {
     GROUP_PATTERN: (
       <span>
         The search pattern used to find groups in LDAP for mapping to Graylog roles, e.g.{' '}
-        <code>(objectclassName=groupOfNames)</code> or{' '}
-        <code className="text-nowrap">(&amp;(objectclassName=groupOfNames)(cn=graylog*))</code>.
+        <code>(objectClass=groupOfNames)</code> or{' '}
+        <code className="text-nowrap">(&amp;(objectClass=groupOfNames)(cn=graylog*))</code>.
       </span>
     ),
     GROUP_ID: (
