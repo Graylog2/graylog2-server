@@ -6,6 +6,7 @@ import URI from 'urijs';
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
+import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 
 import RolesStore from 'stores/users/RolesStore';
@@ -126,7 +127,6 @@ const LdapComponent = React.createClass({
       ldapSettings: undefined,
       ldapUri: undefined,
       roles: undefined,
-      serverConnectionStatus: {},
     };
   },
 
@@ -224,41 +224,6 @@ const LdapComponent = React.createClass({
     this._setSetting('additional_default_groups', roles);
   },
 
-  _testServerConnection() {
-    LdapStore.testServerConnection(this.state.ldapSettings)
-      .then(
-        result => {
-          if (result.connected) {
-            this.setState({serverConnectionStatus: {loading: false, success: true}});
-          } else {
-            this.setState({serverConnectionStatus: {loading: false, error: result.exception}});
-          }
-        },
-        () => {
-          this.setState({
-            serverConnectionStatus: {
-              loading: false,
-              error: 'Unable to check connection, please try again.',
-            },
-          });
-        }
-      );
-
-    this.setState({serverConnectionStatus: {loading: true}});
-  },
-
-  _getServerConnectionStyle() {
-    const serverConnectionStatus = this.state.serverConnectionStatus;
-    if (serverConnectionStatus.success) {
-      return 'success';
-    }
-    if (serverConnectionStatus.error) {
-      return 'danger';
-    }
-
-    return 'info';
-  },
-
   _saveSettings(event) {
     event.preventDefault();
     LdapStore.update(this.state.ldapSettings);
@@ -274,16 +239,6 @@ const LdapComponent = React.createClass({
     const help = isAD ? HelperText.activeDirectory : HelperText.ldap;
 
     const rolesOptions = this.state.roles;
-
-    const serverConnectionStatus = this.state.serverConnectionStatus;
-    let serverConnectionResult;
-
-    if (serverConnectionStatus.error) {
-      serverConnectionResult = <Alert bsStyle="danger">{serverConnectionStatus.error}</Alert>;
-    }
-    if (serverConnectionStatus.success) {
-      serverConnectionResult = <Alert bsStyle="success">Connection to server was successful</Alert>;
-    }
 
     return (
       <Row>
@@ -357,17 +312,7 @@ const LdapComponent = React.createClass({
 
             <fieldset>
               <legend className="col-sm-12">2. Connection Test</legend>
-              <div className="form-group">
-                <Col sm={9} smOffset={3}>
-                  <Button id="ldap-test-connection" bsStyle={this._getServerConnectionStyle()}
-                          disabled={disabled || this._uriHost() === '' || serverConnectionStatus.loading}
-                          onClick={this._testServerConnection}>
-                    {serverConnectionStatus.loading ? 'Testing...' : 'Test Server Connection'}
-                  </Button>
-                  <span className="help-block">Performs a background connection check with the address and credentials above.</span>
-                  {serverConnectionResult}
-                </Col>
-              </div>
+              <TestLdapConnection ldapSettings={this.state.ldapSettings} ldapUri={this.state.ldapUri} disabled={disabled}/>
             </fieldset>
 
             <fieldset>
