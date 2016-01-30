@@ -120,7 +120,7 @@ const HelperText = {
 };
 
 const LdapComponent = React.createClass({
-  mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange')],
+  mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange', '_onLdapSettingsChange')],
   getInitialState() {
     return {
       ldapSettings: undefined,
