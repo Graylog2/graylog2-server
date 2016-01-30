@@ -6,6 +6,8 @@ import URI from 'urijs';
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
+import TestLdapLogin from './TestLdapLogin';
+
 import RolesStore from 'stores/users/RolesStore';
 import LdapStore from 'stores/users/LdapStore';
 import LdapGroupsStore from 'stores/users/LdapGroupsStore';
@@ -233,7 +235,12 @@ const LdapComponent = React.createClass({
           }
         },
         () => {
-          this.setState({serverConnectionStatus: {loading: false, error: 'Unable to check connection, please try again.'}});
+          this.setState({
+            serverConnectionStatus: {
+              loading: false,
+              error: 'Unable to check connection, please try again.',
+            },
+          });
         }
       );
 
@@ -321,7 +328,8 @@ const LdapComponent = React.createClass({
                          disabled={disabled}/>
                 </div>
                 <label className="checkbox-inline">
-                  <input type="checkbox" name="ssl" checked={this.state.ldapUri.scheme() === 'ldaps'} onChange={this._updateSsl}
+                  <input type="checkbox" name="ssl" checked={this.state.ldapUri.scheme() === 'ldaps'}
+                         onChange={this._updateSsl}
                          disabled={disabled}/> SSL
                 </label>
                 <label className="checkbox-inline">
@@ -449,14 +457,17 @@ const LdapComponent = React.createClass({
 
             <fieldset>
               <legend className="col-sm-12">5. Login test</legend>
-
+              <TestLdapLogin ldapSettings={this.state.ldapSettings} disabled={disabled}/>
             </fieldset>
 
-            <div className="form-group">
-              <Col sm={9} smOffset={3}>
-                <Button type="submit" bsStyle="success">Save LDAP settings</Button>
-              </Col>
-            </div>
+            <fieldset>
+              <legend className="col-sm-12">6. Store settings</legend>
+              <div className="form-group">
+                <Col sm={9} smOffset={3}>
+                  <Button type="submit" bsStyle="success">Save LDAP settings</Button>
+                </Col>
+              </div>
+            </fieldset>
           </form>
         </Col>
       </Row>

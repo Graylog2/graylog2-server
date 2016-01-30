@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const LdapStore = Reflux.createStore({
@@ -41,9 +40,13 @@ const LdapStore = Reflux.createStore({
     return promise;
   },
 
-  testServerConnection(newLdapSettings) {
+  _ldapTest(payload) {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/test`);
-    const testPayload = {
+    return fetch('POST', url, payload);
+  },
+
+  testServerConnection(newLdapSettings) {
+    const payload = {
       test_connect_only: true,
       ldap_uri: newLdapSettings.ldap_uri,
       system_username: newLdapSettings.system_username,
@@ -53,7 +56,28 @@ const LdapStore = Reflux.createStore({
       active_directory: newLdapSettings.active_directory,
     };
 
-    return fetch('POST', url, testPayload);
+    return this._ldapTest(payload);
+  },
+
+  testLogin(newLdapSettings, principal, password) {
+    const payload = {
+      test_connect_only: false,
+      principal: principal,
+      password: password,
+      ldap_uri: newLdapSettings.ldap_uri,
+      system_username: newLdapSettings.system_username,
+      system_password: newLdapSettings.system_password,
+      use_start_tls: newLdapSettings.use_start_tls,
+      trust_all_certificates: newLdapSettings.trust_all_certificates,
+      active_directory: newLdapSettings.active_directory,
+      search_base: newLdapSettings.search_base,
+      search_pattern: newLdapSettings.search_pattern,
+      group_search_base: newLdapSettings.group_search_base,
+      group_id_attribute: newLdapSettings.group_id_attribute,
+      group_search_pattern: newLdapSettings.group_search_pattern,
+    };
+
+    return this._ldapTest(payload);
   },
 });
 
