@@ -86,6 +86,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .modifiedAt(DateTime.now())
                 .build();
         final RuleSource save = ruleSourceService.save(newRuleSource);
+        // TODO determine which pipelines could change because of this new rule (there could be pipelines referring to a previously unresolved rule)
         clusterBus.post(RulesChangedEvent.updatedRuleId(save.id()));
         log.info("Created new rule {}", save);
         return save;
@@ -139,6 +140,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .modifiedAt(DateTime.now())
                 .build();
         final RuleSource savedRule = ruleSourceService.save(toSave);
+
+        // TODO determine which pipelines could change because of this updated rule
         clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
 
         return savedRule;
@@ -150,6 +153,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         ruleSourceService.load(id);
         ruleSourceService.delete(id);
+
+        // TODO determine which pipelines could change because of this deleted rule, causing them to recompile
         clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 

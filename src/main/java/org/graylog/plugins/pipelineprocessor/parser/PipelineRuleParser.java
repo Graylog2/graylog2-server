@@ -76,10 +76,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import static java.util.stream.Collectors.toList;
 
@@ -727,7 +729,8 @@ public class PipelineRuleParser {
             final Pipeline.Builder builder = Pipeline.builder();
 
             builder.name(unquote(ctx.name.getText(), '"'));
-            List<Stage> stages = Lists.newArrayList();
+            SortedSet<Stage> stages = Sets.newTreeSet(Comparator.comparingInt(Stage::stage));
+
             for (RuleLangParser.StageDeclarationContext stage : ctx.stageDeclaration()) {
                 final Stage.Builder stageBuilder = Stage.builder();
 

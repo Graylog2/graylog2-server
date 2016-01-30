@@ -23,12 +23,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DropMessage;
-import org.graylog.plugins.pipelineprocessor.functions.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
+import org.graylog.plugins.pipelineprocessor.functions.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
-import org.graylog.plugins.pipelineprocessor.processors.NaiveRuleProcessor;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog2.plugin.PluginConfigBean;
@@ -46,7 +46,8 @@ public class PipelineProcessorModule extends PluginModule {
 
     @Override
     protected void configure() {
-        addMessageProcessor(NaiveRuleProcessor.class);
+        //addMessageProcessor(NaiveRuleProcessor.class);
+        addMessageProcessor(PipelineInterpreter.class);
         addRestResource(RuleResource.class);
         addRestResource(PipelineResource.class);
 

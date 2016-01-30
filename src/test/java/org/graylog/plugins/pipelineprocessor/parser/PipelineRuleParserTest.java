@@ -433,8 +433,8 @@ public class PipelineRuleParserTest {
         final Pipeline pipeline = Iterables.getOnlyElement(pipelines);
         assertEquals("cisco", pipeline.name());
         assertEquals(2, pipeline.stages().size());
-        final Stage stage1 = pipeline.stages().get(0);
-        final Stage stage2 = pipeline.stages().get(1);
+        final Stage stage1 = pipeline.stages().first();
+        final Stage stage2 = pipeline.stages().last();
 
         assertEquals(true, stage1.matchAll());
         assertEquals(1, stage1.stage());
