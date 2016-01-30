@@ -33,7 +33,10 @@ const LdapStore = Reflux.createStore({
 
     const promise = fetch('PUT', url, newLdapSettings);
     promise.then(
-      () => UserNotification.success('LDAP settings saved successfully'),
+      () => {
+        this.loadSettings();
+        UserNotification.success('LDAP settings saved successfully');
+      },
       error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings')
     );
 
