@@ -11,7 +11,6 @@ import TestLdapLogin from './TestLdapLogin';
 
 import RolesStore from 'stores/users/RolesStore';
 import LdapStore from 'stores/users/LdapStore';
-import LdapGroupsStore from 'stores/users/LdapGroupsStore';
 
 const HelperText = {
   activeDirectory: {
