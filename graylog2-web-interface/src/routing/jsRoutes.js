@@ -211,6 +211,10 @@ const jsRoutes = {
       order: (inputId) => { return {url: `/system/inputs/${inputId}/extractors/order`}; },
       update: (inputId, extractorId) => { return {url: `/system/inputs/${inputId}/extractors/${extractorId}`}; },
     },
+    LdapController: {
+      apiGroups: () => { return {url: '/system/ldap/groups'}; },
+      apiGroupsMapping: () => { return {url: '/system/ldap/settings/groups'}; },
+    },
     MessagesController: {
       single: (index, messageId) => { return {url: `/messages/${index}/${messageId}`}; },
       analyze: (index, string) => { return {url: `/messages/${index}/analyze?string=${string}`}; },
