@@ -13,8 +13,8 @@ import NewUserForm from 'components/users/NewUserForm';
 
 const CreateUsersPage = React.createClass({
   componentDidMount() {
-    RolesStore.loadRoles().then((response) => {
-      this.setState({roles: response.roles});
+    RolesStore.loadRoles().then(roles => {
+      this.setState({roles: roles});
     });
   },
   getInitialState() {

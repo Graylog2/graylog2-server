@@ -28,8 +28,8 @@ const RolesComponent = React.createClass({
 
   loadRoles() {
     const promise = RolesStore.loadRoles();
-    promise.then((resp) => {
-      this.setState({roles: Immutable.Set(resp.roles), rolesLoaded: true});
+    promise.then(roles => {
+      this.setState({roles: Immutable.Set(roles), rolesLoaded: true});
     });
   },
 
