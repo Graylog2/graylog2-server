@@ -167,7 +167,10 @@ public class GelfCodec extends AbstractCodec {
             final Map.Entry<String, JsonNode> entry = fields.next();
 
             String key = entry.getKey();
-            final JsonNode value = entry.getValue();
+            // Do not index useless GELF "version" field.
+            if ("version".equals(key)) {
+                continue;
+            }
 
             // Don't include GELF syntax underscore in message field key.
             if (key.startsWith("_") && key.length() > 1) {
@@ -185,6 +188,8 @@ public class GelfCodec extends AbstractCodec {
             }
 
             // Convert JSON containers to Strings, and pick a suitable number representation.
+            final JsonNode value = entry.getValue();
+
             final Object fieldValue;
             if (value.isContainerNode()) {
                 fieldValue = value.toString();
