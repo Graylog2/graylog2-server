@@ -29,7 +29,7 @@ public abstract class SystemOverviewResponse {
     @JsonProperty
     public abstract String codename();
     @JsonProperty
-    public abstract String serverId();
+    public abstract String nodeId();
     @JsonProperty
     public abstract String clusterId();
     @JsonProperty
@@ -52,7 +52,7 @@ public abstract class SystemOverviewResponse {
     @JsonCreator
     public static SystemOverviewResponse create(@JsonProperty("facility") String facility,
                                                 @JsonProperty("codename") String codename,
-                                                @JsonProperty("server_id") String serverId,
+                                                @JsonProperty("node_id") String nodeId,
                                                 @JsonProperty("cluster_id") String clusterId,
                                                 @JsonProperty("version") String version,
                                                 @JsonProperty("started_at") String startedAt,
@@ -62,6 +62,6 @@ public abstract class SystemOverviewResponse {
                                                 @JsonProperty("lb_status") String lbStatis,
                                                 @JsonProperty("timezone") String timezone,
                                                 @JsonProperty("operating_system") String operatingSystem) {
-        return new AutoValue_SystemOverviewResponse(facility, codename, serverId, clusterId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone, operatingSystem);
+        return new AutoValue_SystemOverviewResponse(facility, codename, nodeId, clusterId, version, startedAt, isProcessing, hostname, lifecycle, lbStatis, timezone, operatingSystem);
     }
 }
