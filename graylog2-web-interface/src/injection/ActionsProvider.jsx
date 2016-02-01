@@ -1,5 +1,6 @@
 class ActionsProvider {
   constructor() {
+    /* eslint-disable import/no-require */
     this.actions = {
       AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
       AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
@@ -24,6 +25,7 @@ class ActionsProvider {
       SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
       Widgets: () => require('actions/widgets/WidgetsActions'),
     };
+    /* eslint-enable import/no-require */
   }
 
   getActions(actionsName) {

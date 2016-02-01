@@ -1,5 +1,6 @@
 class StoreProvider {
   constructor() {
+    /* eslint-disable import/no-require */
     this.stores = {
       AlarmCallbacks: () => require('stores/alarmcallbacks/AlarmCallbacksStore'),
       AlertConditions: () => require('stores/alertconditions/AlertConditionsStore'),
@@ -38,6 +39,7 @@ class StoreProvider {
       CurrentUser: () => require('stores/users/CurrentUserStore'),
       Startpage: () => require('stores/users/StartpageStore'),
     };
+    /* eslint-enable import/no-require */
   }
 
   getStore(storeName) {

@@ -14,14 +14,19 @@ import 'stylesheets/rickshaw.min.css';
 import 'stylesheets/graylog2.less';
 
 const AppFacade = React.createClass({
-  mixins: [Reflux.connect(SessionStore)],
+  propTypes: {
+    storeProvider: React.PropTypes.object.isRequired,
+    actionsProvider: React.PropTypes.object.isRequired,
+  },
 
   childContextTypes: {
     storeProvider: React.PropTypes.object,
     actionsProvider: React.PropTypes.object,
   },
 
-  getChildContext: function() {
+  mixins: [Reflux.connect(SessionStore)],
+
+  getChildContext() {
     return {
       storeProvider: this.props.storeProvider,
       actionsProvider: this.props.actionsProvider,
@@ -31,9 +36,8 @@ const AppFacade = React.createClass({
   render() {
     if (!this.state.sessionId) {
       return <LoginPage />;
-    } else {
-      return <LoggedInPage />;
     }
+    return <LoggedInPage />;
   },
 });
 

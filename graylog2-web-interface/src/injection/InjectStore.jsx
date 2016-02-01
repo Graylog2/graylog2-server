@@ -11,11 +11,10 @@ const InjectStore = (storeName, key) => {
       const store = this.context.storeProvider.getStore(storeName);
       return Reflux.connect(store, key).getInitialState();
     },
-
     componentDidMount: function() {
       const store = this.context.storeProvider.getStore(storeName);
       return Reflux.connect(store, key).componentDidMount.bind(this).apply();
-    }
+    },
   };
 };
 
