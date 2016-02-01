@@ -76,6 +76,7 @@ if (TARGET === 'start') {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.DefinePlugin({DEVELOPMENT: true}),
     ],
   });
 }
