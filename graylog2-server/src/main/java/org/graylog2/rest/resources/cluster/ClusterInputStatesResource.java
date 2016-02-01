@@ -34,6 +34,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,26 +60,19 @@ import java.util.stream.Collectors;
 @Api(value = "Cluster/InputState", description = "Cluster-wide input states")
 @Path("/cluster/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
-public class ClusterInputStatesResource {
+public class ClusterInputStatesResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterInputStatesResource.class);
 
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
-    private final String authenticationToken;
 
     @Inject
     public ClusterInputStatesResource(NodeService nodeService,
                                       RemoteInterfaceProvider remoteInterfaceProvider,
                                       @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
+        super(httpHeaders);
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
-
-        final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
-        if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.authenticationToken = authenticationTokens.get(0);
-        } else {
-            this.authenticationToken = null;
-        }
     }
 
     @GET
@@ -100,10 +93,10 @@ public class ClusterInputStatesResource {
                         if (response.isSuccess()) {
                             return response.body().states();
                         } else {
-                            LOG.warn("Unable to fetch input states from node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to fetch input states from node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to fetch input states from node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to fetch input states from node {}:", entry.getKey(), e);
                     }
                     return Collections.emptySet();
                 }));
@@ -130,10 +123,10 @@ public class ClusterInputStatesResource {
                         if (response.isSuccess()) {
                             return Optional.of(response.body());
                         } else {
-                            LOG.warn("Unable to start input on node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to start input on node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to start input on node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to start input on node {}:",entry.getKey(), e);
                     }
                     return Optional.absent();
                 }));
@@ -160,10 +153,10 @@ public class ClusterInputStatesResource {
                         if (response.isSuccess()) {
                             return Optional.of(response.body());
                         } else {
-                            LOG.warn("Unable to stop input on node " + entry.getKey() + ": " + response.message());
+                            LOG.warn("Unable to stop input on node {}: {}", entry.getKey(), response.message());
                         }
                     } catch (IOException e) {
-                        LOG.warn("Unable to stop input on node " + entry.getKey() + ": ", e);
+                        LOG.warn("Unable to stop input on node {}:", entry.getKey(), e);
                     }
                     return Optional.absent();
                 }));

@@ -37,10 +37,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Processing", description = "Cluster-wide processing status control.")
@@ -79,7 +82,8 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
         if (!response.isSuccess()) {
-            LOG.warn("Unable to pause message processing on node " + nodeId + ": " + response.message());
+            LOG.warn("Unable to pause message processing on node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
 
@@ -91,7 +95,8 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();
         if (!response.isSuccess()) {
-            LOG.warn("Unable to resume message processing on node " + nodeId + ": " + response.message());
+            LOG.warn("Unable to resume message processing on node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
 }
