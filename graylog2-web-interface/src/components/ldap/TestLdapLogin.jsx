@@ -19,12 +19,22 @@ const TestLdapLogin = React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.style.use();
+  },
+
   componentWillReceiveProps(nextProps) {
     // Reset login status if ldapSettings changed
     if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({loginStatus: {}});
     }
   },
+
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!./TestLdapLogin.css'),
 
   _changeLoginForm(event) {
     const newState = {};
