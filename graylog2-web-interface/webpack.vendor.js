@@ -13,8 +13,6 @@ console.log('Building vendor bundle.');
 
 const webpackConfig = {
   entry: {
-    //app: APP_PATH,
-    //config: 'config.js',
     vendor: vendorModules,
   },
   output: {
