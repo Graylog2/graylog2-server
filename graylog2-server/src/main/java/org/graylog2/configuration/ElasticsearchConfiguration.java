@@ -127,6 +127,12 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_request_timeout", validator = PositiveDurationValidator.class)
     private Duration requestTimeout = Duration.minutes(1L);
 
+    @Parameter(value = "elasticsearch_sanitize_field_names")
+    private boolean sanitizeFieldNames = true;
+
+    @Parameter(value = "elasticsearch_invalid_character_replacement")
+    private String invalidCharacterReplacement = "_";
+
     public String getClusterName() {
         return clusterName;
     }
@@ -261,5 +267,13 @@ public class ElasticsearchConfiguration {
 
     public Duration getRequestTimeout() {
         return requestTimeout;
+    }
+
+    public boolean isSanitizeFieldNames() {
+        return sanitizeFieldNames;
+    }
+
+    public String getInvalidCharacterReplacement() {
+        return invalidCharacterReplacement;
     }
 }

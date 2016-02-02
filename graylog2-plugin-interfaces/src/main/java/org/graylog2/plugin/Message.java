@@ -38,6 +38,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -249,24 +250,27 @@ public class Message implements Messages {
         fields.put(FIELD_SOURCE, source);
     }
 
-    public void addField(final String key, final Object value) {
+    @Nullable
+    public Object addField(final String key, final Object value) {
         // Don't accept protected keys. (some are allowed though lol)
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key) || !validKey(key)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", key, getId());
             }
-            return;
+            return null;
         }
 
-        if(value instanceof String) {
+        if (value instanceof String) {
             final String str = ((String) value).trim();
 
-            if(!str.isEmpty()) {
-                fields.put(key.trim(), str);
+            if (!str.isEmpty()) {
+                return fields.put(key.trim(), str);
             }
-        } else if(value != null) {
-            fields.put(key.trim(), value);
+        } else if (value != null) {
+            return fields.put(key.trim(), value);
         }
+
+        return null;
     }
 
     public static boolean validKey(final String key) {
@@ -313,10 +317,13 @@ public class Message implements Messages {
         }
     }
 
-    public void removeField(final String key) {
+    @Nullable
+    public Object removeField(final String key) {
         if (!RESERVED_FIELDS.contains(key)) {
-            fields.remove(key);
+            return fields.remove(key);
         }
+
+        return null;
     }
 
     public <T> T getFieldAs(final Class<T> T, final String key) throws ClassCastException {
@@ -452,6 +459,7 @@ public class Message implements Messages {
         public static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
+
         public static Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
