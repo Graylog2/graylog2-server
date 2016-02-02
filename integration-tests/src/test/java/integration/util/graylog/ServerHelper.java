@@ -49,7 +49,7 @@ public class ServerHelper {
 
             InputStream inputStream = connection.getInputStream();
             JsonNode json = mapper.readTree(inputStream);
-            return json.get("server_id").toString();
+            return json.get("node_id").toString();
         } catch (IOException e) {
             e.printStackTrace();
         }

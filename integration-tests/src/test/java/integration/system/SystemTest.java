@@ -39,8 +39,8 @@ public class SystemTest extends BaseRestTest {
                             "is_processing",
                             "lb_status",
                             "lifecycle",
+                            "node_id",
                             "operating_system",
-                            "server_id",
                             "started_at",
                             "timezone",
                             "version"
