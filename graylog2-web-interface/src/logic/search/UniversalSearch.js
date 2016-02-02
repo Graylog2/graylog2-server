@@ -100,4 +100,4 @@ var UniversalSearch = {
 
 };
 
-export = UniversalSearch;
+export default UniversalSearch;
