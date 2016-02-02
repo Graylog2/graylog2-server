@@ -259,13 +259,14 @@ public class MessageTest {
         assertTrue(Message.validKey("foo123"));
         assertTrue(Message.validKey("foo-bar123"));
         assertTrue(Message.validKey("foo_bar123"));
-        assertTrue(Message.validKey("foo.bar123"));
+        assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
         assertTrue(Message.validKey(""));
 
         assertFalse(Message.validKey("foo bar"));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
+        assertFalse(Message.validKey("foo.bar123"));
         assertFalse(Message.validKey(" "));
     }
 

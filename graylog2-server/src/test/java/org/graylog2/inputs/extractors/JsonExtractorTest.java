@@ -94,10 +94,10 @@ public class JsonExtractorTest {
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("foobar", "object.text", -1, -1),
-                new Extractor.Result(1234.5678, "object.number", -1, -1),
-                new Extractor.Result(true, "object.bool", -1, -1),
-                new Extractor.Result("foobar", "object.nested.text", -1, -1)
+                new Extractor.Result("foobar", "object_text", -1, -1),
+                new Extractor.Result(1234.5678, "object_number", -1, -1),
+                new Extractor.Result(true, "object_bool", -1, -1),
+                new Extractor.Result("foobar", "object_nested_text", -1, -1)
         );
     }
 
