@@ -36,7 +36,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
 
-@Api(value = "System/Plugin", description = "Plugin information")
+@Api(value = "System/Plugins", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
 public class SystemPluginResource extends RestResource {
