@@ -9,9 +9,6 @@
     "airbnb",
     "import/warnings"
   ],
-  "plugins": [
-    "import",
-  ],
   "rules": {
     "no-else-return": 1,
     "no-nested-ternary": 1,
@@ -22,7 +19,7 @@
   "settings": {
     "import/resolve": {
       "extensions": [".js", ".jsx", ".ts"],
-      "moduleDirectory": ["src", "node_modules"]
+      "moduleDirectory": ["src", "node_modules", "public"]
     }
   }
 }
