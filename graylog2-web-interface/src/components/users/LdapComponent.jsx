@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import URI from 'urijs';
+import naturalSort from 'javascript-natural-sort';
 
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
@@ -142,7 +143,7 @@ const LdapComponent = React.createClass({
   _formatAdditionalRoles(roles) {
     return roles
       .filter((r) => !(r.name.toLowerCase() === 'reader' || r.name.toLowerCase() === 'admin'))
-      .sort((r1, r2) => r1.name.localeCompare(r2.name))
+      .sort((r1, r2) => naturalSort(r1.name.toLowerCase(), r2.name.toLowerCase()))
       .map((r) => {
         return {label: r.name, value: r.name};
       });
