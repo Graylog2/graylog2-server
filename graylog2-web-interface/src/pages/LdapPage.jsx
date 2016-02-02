@@ -1,17 +1,13 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
-
-import CurrentUserStore from 'stores/users/CurrentUserStore';
 
 import { PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import LdapComponent from 'components/users/LdapComponent';
 
 const LdapPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <span>
