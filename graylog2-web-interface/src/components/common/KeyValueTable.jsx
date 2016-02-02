@@ -4,10 +4,10 @@ import { Button, Input } from 'react-bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 /**
- * KVTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
+ * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
  * provides inputs to create, edit and delete key-value pairs.
  */
-const KVTable = React.createClass({
+const KeyValueTable = React.createClass({
   propTypes: {
     pairs: PropTypes.object.isRequired, // Object containing key-values to represent in the table
     headers: PropTypes.array, // Table headers. Must be an array with three elements [ key header, value header, actions header]
@@ -150,4 +150,4 @@ const KVTable = React.createClass({
   },
 });
 
-export default KVTable;
+export default KeyValueTable;
