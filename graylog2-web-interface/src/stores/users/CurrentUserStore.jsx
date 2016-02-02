@@ -8,7 +8,7 @@ import SessionStore from 'stores/sessions/SessionStore';
 import StartpageStore from 'stores/users/StartpageStore';
 
 const CurrentUserStore = Reflux.createStore({
-  listenable: [SessionActions],
+  listenables: [SessionActions],
   sourceUrl: '/users',
   currentUser: undefined,
 
