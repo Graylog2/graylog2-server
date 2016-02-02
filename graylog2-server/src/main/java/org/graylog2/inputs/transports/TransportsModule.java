@@ -36,7 +36,6 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "kafka", KafkaTransport.class);
         installTransport(mapBinder, "amqp", AmqpTransport.class);
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
-        installTransport(mapBinder, "localmetrics", LocalMetricsTransport.class);
         installTransport(mapBinder, "syslog-tcp", SyslogTcpTransport.class);
 
         // TODO Add instrumentation to ExecutorService and ThreadFactory
@@ -46,5 +45,4 @@ public class TransportsModule extends Graylog2Module {
                                                                   .setNameFormat("transport-boss-%d")
                                                                   .build()));
     }
-
 }
