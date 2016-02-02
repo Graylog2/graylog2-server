@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 
-import LdapStore from 'stores/users/LdapStore';
+import LdapActions from 'actions/ldap/LdapActions';
 
 const TestLdapConnection = React.createClass({
   propTypes: {
@@ -24,7 +24,7 @@ const TestLdapConnection = React.createClass({
   },
 
   _testServerConnection() {
-    LdapStore.testServerConnection(this.props.ldapSettings)
+    LdapActions.testServerConnection.triggerPromise(this.props.ldapSettings)
       .then(
         result => {
           if (result.connected) {

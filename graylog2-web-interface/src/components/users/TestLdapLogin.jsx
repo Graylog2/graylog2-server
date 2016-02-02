@@ -3,7 +3,7 @@ import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
 
 import ObjectUtils from 'util/ObjectUtils';
 
-import LdapStore from 'stores/users/LdapStore';
+import LdapActions from 'actions/ldap/LdapActions';
 
 const TestLdapLogin = React.createClass({
   propTypes: {
@@ -41,7 +41,7 @@ const TestLdapLogin = React.createClass({
   },
 
   _testLogin() {
-    LdapStore.testLogin(this.props.ldapSettings, this.state.loginUser, this.state.loginPassword)
+    LdapActions.testLogin.triggerPromise(this.props.ldapSettings, this.state.loginUser, this.state.loginPassword)
       .then(
         result => {
           if (result.connected && (result.login_authenticated || !ObjectUtils.isEmpty(result.entry))) {

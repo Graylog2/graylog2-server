@@ -13,6 +13,7 @@ import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 
 import RolesStore from 'stores/users/RolesStore';
+import LdapActions from 'actions/ldap/LdapActions';
 import LdapStore from 'stores/users/LdapStore';
 
 const HelperText = {
@@ -232,7 +233,7 @@ const LdapComponent = React.createClass({
 
   _saveSettings(event) {
     event.preventDefault();
-    LdapStore.update(this.state.ldapSettings);
+    LdapActions.update(this.state.ldapSettings);
   },
 
   render() {

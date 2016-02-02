@@ -4,7 +4,10 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
+import LdapActions from 'actions/ldap/LdapActions';
+
 const LdapStore = Reflux.createStore({
+  listenables: [LdapActions],
   sourceUrl: '/system/ldap/',
   ldapSettings: undefined,
 
@@ -25,7 +28,7 @@ const LdapStore = Reflux.createStore({
       this.trigger({ldapSettings: response});
     });
 
-    return promise;
+    LdapActions.loadSettings.promise(promise);
   },
 
   update(newLdapSettings) {
@@ -40,7 +43,7 @@ const LdapStore = Reflux.createStore({
       error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings')
     );
 
-    return promise;
+    LdapActions.update.promise(promise);
   },
 
   _ldapTest(payload) {
@@ -59,7 +62,9 @@ const LdapStore = Reflux.createStore({
       active_directory: newLdapSettings.active_directory,
     };
 
-    return this._ldapTest(payload);
+    const promise = this._ldapTest(payload);
+
+    LdapActions.testServerConnection.promise(promise);
   },
 
   testLogin(newLdapSettings, principal, password) {
@@ -80,7 +85,9 @@ const LdapStore = Reflux.createStore({
       group_search_pattern: newLdapSettings.group_search_pattern,
     };
 
-    return this._ldapTest(payload);
+    const promise = this._ldapTest(payload);
+
+    LdapActions.testLogin.promise(promise);
   },
 });
 
