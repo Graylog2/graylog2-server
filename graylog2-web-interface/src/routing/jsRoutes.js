@@ -24,6 +24,9 @@ const jsRoutes = {
       CountsApiController: {
         total: () => { return {url: '/count/total'}; },
       },
+      ClusterApiResource: {
+        node: () => { return {url: '/system/cluster/node'}; },
+      },
       DashboardsApiController: {
         create: () => { return {url: '/dashboards' }; },
         index: () => { return {url: '/dashboards' }; },

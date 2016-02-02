@@ -2,7 +2,9 @@ import React from 'react';
 import Reflux from 'reflux';
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
+import ServerUnavailablePage from 'react-proxy?name=ServerUnavailablePage!pages/ServerUnavailablePage';
 import SessionStore from 'stores/sessions/SessionStore';
+import ServerAvailabilityStore from 'stores/sessions/ServerAvailabilityStore';
 
 import 'javascripts/shims/styles/shim.css';
 import 'stylesheets/bootstrap.min.css';
@@ -24,7 +26,7 @@ const AppFacade = React.createClass({
     actionsProvider: React.PropTypes.object,
   },
 
-  mixins: [Reflux.connect(SessionStore)],
+  mixins: [Reflux.connect(SessionStore), Reflux.connect(ServerAvailabilityStore)],
 
   getChildContext() {
     return {
@@ -33,7 +35,20 @@ const AppFacade = React.createClass({
     };
   },
 
+  componentDidMount() {
+    this.interval = setInterval(ServerAvailabilityStore.ping, 20000);
+  },
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  },
+
   render() {
+    if (!this.state.server.up) {
+      return <ServerUnavailablePage />;
+    }
     if (!this.state.sessionId) {
       return <LoginPage />;
     }
