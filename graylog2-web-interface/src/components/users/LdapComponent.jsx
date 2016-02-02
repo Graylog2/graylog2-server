@@ -135,15 +135,17 @@ const LdapComponent = React.createClass({
 
   componentDidMount() {
     RolesStore.loadRoles().then(roles => {
-      this.setState({
-        roles: roles
-          .sort((r1, r2) => r1.name.localeCompare(r2.name))
-          .filter((r) => !(r.name.toLowerCase() === 'reader' || r.name.toLowerCase() === 'admin'))
-          .map((r) => {
-            return {label: r.name, value: r.name};
-          }),
-      });
+      this.setState({roles: this._formatAdditionalRoles(roles)});
     });
+  },
+
+  _formatAdditionalRoles(roles) {
+    return roles
+      .filter((r) => !(r.name.toLowerCase() === 'reader' || r.name.toLowerCase() === 'admin'))
+      .sort((r1, r2) => r1.name.localeCompare(r2.name))
+      .map((r) => {
+        return {label: r.name, value: r.name};
+      });
   },
 
   _onLdapSettingsChange(state) {
