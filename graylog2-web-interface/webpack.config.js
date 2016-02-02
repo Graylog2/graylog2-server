@@ -11,8 +11,6 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
-const SHARED_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'shared-manifest.json');
-const SHARED_MANIFEST = require(SHARED_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
@@ -50,7 +48,6 @@ const webpackConfig = {
   devtool: 'eval',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
-    new webpack.DllReferencePlugin({ manifest: SHARED_MANIFEST, context: ROOT_PATH }),
     new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png', template: 'templates/index.html.template'}),
     new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template', excludeChunks: ['config']}),
   ],

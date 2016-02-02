@@ -28,7 +28,6 @@ module.exports = function(config) {
     files: [
       'config.js',
       'build/vendor.js',
-      'build/shared.js',
       'test/shim/es5-shim.js',
       'test/shim/server-side-global-vars.js',
       'test/src/*.js',

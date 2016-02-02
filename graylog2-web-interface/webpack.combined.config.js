@@ -10,4 +10,3 @@ module.exports = ['./webpack.config.js']
   .reduce(function(config1, config2) {
     return merge.smart(config2, config1);
   });
-
