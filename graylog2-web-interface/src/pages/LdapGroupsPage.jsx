@@ -11,7 +11,7 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
-import LdapStore from 'stores/users/LdapStore';
+import LdapStore from 'stores/ldap/LdapStore';
 
 const LdapGroupsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore)],

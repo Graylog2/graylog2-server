@@ -9,7 +9,7 @@ import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
 import RolesStore from 'stores/users/RolesStore';
-import LdapGroupsStore from 'stores/users/LdapGroupsStore';
+import LdapGroupsStore from 'stores/ldap/LdapGroupsStore';
 
 const LdapGroupsComponent = React.createClass({
   getInitialState() {
