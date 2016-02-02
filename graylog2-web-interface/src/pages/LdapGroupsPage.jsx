@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import { PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import LdapGroupsComponent from 'components/users/LdapGroupsComponent';
+import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';

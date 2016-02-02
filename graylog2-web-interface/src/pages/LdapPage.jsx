@@ -5,7 +5,7 @@ import DocsHelper from 'util/DocsHelper';
 
 import { PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import LdapComponent from 'components/users/LdapComponent';
+import LdapComponent from 'components/ldap/LdapComponent';
 
 const LdapPage = React.createClass({
   render() {
