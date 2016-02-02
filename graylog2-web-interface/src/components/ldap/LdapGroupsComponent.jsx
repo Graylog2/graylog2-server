@@ -9,6 +9,7 @@ import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
 import RolesStore from 'stores/users/RolesStore';
+import LdapGroupsActions from 'actions/ldap/LdapGroupsActions';
 import LdapGroupsStore from 'stores/ldap/LdapGroupsStore';
 
 const LdapGroupsComponent = React.createClass({
@@ -22,8 +23,8 @@ const LdapGroupsComponent = React.createClass({
   },
 
   componentDidMount() {
-    LdapGroupsStore.loadMapping().then(mapping => this.setState({mapping: Immutable.Map(mapping)}));
-    LdapGroupsStore.loadGroups()
+    LdapGroupsActions.loadMapping.triggerPromise().then(mapping => this.setState({mapping: Immutable.Map(mapping)}));
+    LdapGroupsActions.loadGroups.triggerPromise()
       .then(
         groups => this.setState({groups: Immutable.Set(groups)}),
         error => this.setState({groupsErrorMessage: error})
@@ -42,7 +43,7 @@ const LdapGroupsComponent = React.createClass({
   },
 
   _saveMapping() {
-    LdapGroupsStore.saveMapping(this.state.mapping.toJS());
+    LdapGroupsActions.saveMapping(this.state.mapping.toJS());
   },
 
   _isLoading() {
