@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -354,20 +353,38 @@ public class Message implements Messages {
         this.streams = Sets.newHashSet(streams);
     }
 
-    public List<Stream> getStreams() {
-        return Lists.newArrayList(this.streams);
+    /**
+     * Get the streams this message is currently routed to.
+     * @return an immutable copy of the current set of assigned streams, empty if no streams have been assigned
+     */
+    public Set<Stream> getStreams() {
+        return ImmutableSet.copyOf(this.streams);
     }
 
+    /**
+     * Assign the given stream to this message.
+     *
+     * @param stream the stream to route this message into
+     */
     public void addStream(Stream stream) {
         streams.add(stream);
     }
 
-    public void addStreams(Collection<Stream> newStreams) {
-        streams.addAll(newStreams);
+    /**
+     * Assign all of the streams to this message.
+     * @param newStreams an iterable of Stream objects
+     */
+    public void addStreams(Iterable<Stream> newStreams) {
+        Iterables.addAll(streams, newStreams);
     }
 
-    public void removeStream(Stream stream) {
-        streams.remove(stream);
+    /**
+     * Remove the stream assignment from this message.
+     * @param stream the stream assignment to remove this message from
+     * @return <tt>true</tt> if this message was assigned to the stream
+     */
+    public boolean removeStream(Stream stream) {
+        return streams.remove(stream);
     }
 
     @SuppressWarnings("unchecked")
