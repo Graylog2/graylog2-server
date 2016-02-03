@@ -47,7 +47,7 @@ const AppFacade = React.createClass({
 
   render() {
     if (!this.state.server.up) {
-      return <ServerUnavailablePage />;
+      return <ServerUnavailablePage server={this.state.server} />;
     }
     if (!this.state.sessionId) {
       return <LoginPage />;
