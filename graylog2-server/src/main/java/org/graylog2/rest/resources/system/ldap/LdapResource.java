@@ -92,7 +92,7 @@ public class LdapResource extends RestResource {
     public LdapSettingsResponse getLdapSettings() {
         final LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null) {
-            throw new javax.ws.rs.NotFoundException();
+            return LdapSettingsResponse.emptyDisabled();
         }
 
         return LdapSettingsResponse.create(

@@ -117,4 +117,23 @@ public abstract class LdapSettingsResponse {
                                                   additionalDefaultGroups,
                                                   groupSearchPattern);
     }
+
+    public static LdapSettingsResponse emptyDisabled() {
+        return new AutoValue_LdapSettingsResponse(false,
+                                                  "",
+                                                  "",
+                                                  URI.create("ldap://localhost:389"),
+                                                  false,
+                                                  false,
+                                                  false,
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  null,
+                                                  null);
+    }
 }
