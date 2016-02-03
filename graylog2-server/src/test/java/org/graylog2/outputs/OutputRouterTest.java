@@ -16,6 +16,7 @@
  */
 package org.graylog2.outputs;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
@@ -26,10 +27,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -117,11 +116,8 @@ public class OutputRouterTest {
     @Test
     public void testGetOutputFromSingleStreams() throws Exception {
         final Stream stream = mock(Stream.class);
-        List<Stream> streamList = new ArrayList<Stream>() {{
-            add(stream);
-        }};
         final Message message = mock(Message.class);
-        when(message.getStreams()).thenReturn(streamList);
+        when(message.getStreams()).thenReturn(ImmutableSet.of(stream));
 
         final MessageOutput messageOutput = mock(MessageOutput.class);
         final Set<MessageOutput> messageOutputList = new HashSet<MessageOutput>() {{
@@ -153,11 +149,7 @@ public class OutputRouterTest {
             add(messageOutput2);
         }};
         final Message message = mock(Message.class);
-        final List<Stream> streamList = new ArrayList<Stream>() {{
-            add(stream1);
-            add(stream2);
-        }};
-        when(message.getStreams()).thenReturn(streamList);
+        when(message.getStreams()).thenReturn(ImmutableSet.of(stream1, stream2));
 
         OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));
         doReturn(messageOutputSet1).when(outputRouter).getMessageOutputsForStream(eq(stream1));
@@ -180,11 +172,7 @@ public class OutputRouterTest {
             add(messageOutput);
         }};
         final Message message = mock(Message.class);
-        final List<Stream> streamList = new ArrayList<Stream>() {{
-            add(stream1);
-            add(stream2);
-        }};
-        when(message.getStreams()).thenReturn(streamList);
+        when(message.getStreams()).thenReturn(ImmutableSet.of(stream1, stream2));
 
         OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));
         doReturn(messageOutputSet).when(outputRouter).getMessageOutputsForStream(eq(stream1));

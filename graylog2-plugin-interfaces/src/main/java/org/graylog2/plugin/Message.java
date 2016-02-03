@@ -32,6 +32,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -114,7 +115,7 @@ public class Message implements Messages {
     public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
 
     private final Map<String, Object> fields = Maps.newHashMap();
-    private List<Stream> streams = Lists.newArrayList();
+    private Set<Stream> streams = Sets.newHashSet();
     private String sourceInputId;
 
     // Used for drools to filter out messages.
@@ -350,16 +351,50 @@ public class Message implements Messages {
         return Collections.unmodifiableSet(fields.keySet());
     }
 
+    @Deprecated
     public void setStreams(final List<Stream> streams) {
-        this.streams = Lists.newArrayList(streams);
+        this.streams = Sets.newHashSet(streams);
     }
 
-    public List<Stream> getStreams() {
-        return this.streams;
+    /**
+     * Get the streams this message is currently routed to.
+     * @return an immutable copy of the current set of assigned streams, empty if no streams have been assigned
+     */
+    public Set<Stream> getStreams() {
+        return ImmutableSet.copyOf(this.streams);
+    }
+
+    /**
+     * Assign the given stream to this message.
+     *
+     * @param stream the stream to route this message into
+     */
+    public void addStream(Stream stream) {
+        streams.add(stream);
+    }
+
+    /**
+     * Assign all of the streams to this message.
+     * @param newStreams an iterable of Stream objects
+     */
+    public void addStreams(Iterable<Stream> newStreams) {
+        Iterables.addAll(streams, newStreams);
+    }
+
+    /**
+     * Remove the stream assignment from this message.
+     * @param stream the stream assignment to remove this message from
+     * @return <tt>true</tt> if this message was assigned to the stream
+     */
+    public boolean removeStream(Stream stream) {
+        return streams.remove(stream);
     }
 
     @SuppressWarnings("unchecked")
     public List<String> getStreamIds() {
+        if (!hasField(FIELD_STREAMS)) {
+            return Collections.emptyList();
+        }
         try {
             return Lists.<String>newArrayList(getFieldAs(List.class, FIELD_STREAMS));
         } catch (ClassCastException e) {

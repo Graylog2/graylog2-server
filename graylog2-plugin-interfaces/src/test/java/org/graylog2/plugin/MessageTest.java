@@ -25,6 +25,7 @@ package org.graylog2.plugin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Sets.symmetricDifference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -187,9 +189,37 @@ public class MessageTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
 
-        message.setStreams(Lists.newArrayList(stream1, stream2));
+        message.addStreams(Lists.newArrayList(stream2, stream1));
 
-        assertEquals(Lists.newArrayList(stream1, stream2), message.getStreams());
+        // make sure all streams we've added are being returned. Internally it's a set, so don't check the order, it doesn't matter anyway.
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2);
+    }
+
+    @Test
+    public void testStreamMutators() {
+        final Stream stream1 = mock(Stream.class);
+        final Stream stream2 = mock(Stream.class);
+        final Stream stream3 = mock(Stream.class);
+
+        Assertions.assertThat(message.getStreams()).isNotNull();
+        Assertions.assertThat(message.getStreams()).isEmpty();
+
+        message.addStream(stream1);
+
+        final Set<Stream> onlyWithStream1 = message.getStreams();
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        message.addStreams(Sets.newHashSet(stream3, stream2));
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2, stream3);
+
+        // getStreams is a copy and doesn't change after mutations
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        // stream2 was assigned
+        Assertions.assertThat(message.removeStream(stream2)).isTrue();
+        // streams2 is no longer assigned
+        Assertions.assertThat(message.removeStream(stream2)).isFalse();
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream3);
     }
 
     @Test
@@ -358,11 +388,11 @@ public class MessageTest {
 
     @Test
     public void testGetFieldNames() throws Exception {
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
 
         message.addField("testfield", "testvalue");
 
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)
