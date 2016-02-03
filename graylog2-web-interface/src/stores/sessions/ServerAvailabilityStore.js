@@ -33,7 +33,7 @@ const ServerAvailabilityStore = Reflux.createStore({
     this.server = { up: false, error: error };
     this.trigger({ server: this.server });
   },
-  reportSucess() {
+  reportSuccess() {
     this.server = { up: true };
     this.trigger({ server: this.server });
   },
