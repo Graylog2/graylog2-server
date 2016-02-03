@@ -18,9 +18,6 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -31,10 +28,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListeningScheduledExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -58,41 +51,31 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.journal.Journal;
-import org.jooq.lambda.Seq;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.cache.CacheLoader.asyncReloading;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
 
+    private final RuleSourceService ruleSourceService;
     private final PipelineSourceService pipelineSourceService;
+    private final PipelineStreamAssignmentService pipelineStreamAssignmentService;
     private final PipelineRuleParser pipelineRuleParser;
     private final Journal journal;
     private final Meter filteredOutMessages;
-    private final LoadingCache<String, Rule> ruleCache;
-    private final ListeningScheduledExecutorService scheduledExecutorService;
 
     private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>(ImmutableMap.of());
     private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineAssignments = new AtomicReference<>(ImmutableSetMultimap.of());
@@ -104,29 +87,76 @@ public class PipelineInterpreter implements MessageProcessor {
                                PipelineRuleParser pipelineRuleParser,
                                Journal journal,
                                MetricRegistry metricRegistry,
-                               @Named("daemonScheduler") ScheduledExecutorService scheduledExecutorService,
                                @ClusterEventBus EventBus clusterBus) {
+        this.ruleSourceService = ruleSourceService;
         this.pipelineSourceService = pipelineSourceService;
+        this.pipelineStreamAssignmentService = pipelineStreamAssignmentService;
         this.pipelineRuleParser = pipelineRuleParser;
-        this.journal = journal;
-        this.scheduledExecutorService = MoreExecutors.listeningDecorator(scheduledExecutorService);
-        this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
-        clusterBus.register(this);
-        ruleCache = CacheBuilder.newBuilder()
-                .build(asyncReloading(new RuleLoader(ruleSourceService, pipelineRuleParser), scheduledExecutorService));
 
-        // prime the cache with all presently stored rules
-        try {
-            final List<String> ruleIds = ruleSourceService.loadAll().stream().map(RuleSource::id).collect(Collectors.toList());
-            log.info("Compiling {} processing rules", ruleIds.size());
-            // TODO this sucks, because it is completely async and we can't use listenable futures to trigger the pipeline updates
-            ruleCache.getAll(ruleIds);
-            triggerPipelineUpdate();
-        } catch (ExecutionException ignored) {
+        this.journal = journal;
+        this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+
+        // listens to cluster wide Rule, Pipeline and pipeline stream assignment changes
+        clusterBus.register(this);
+
+        reload();
+    }
+
+    private void reload() {
+        // read all rules and compile them
+        Map<String, Rule> ruleNameMap = Maps.newHashMap();
+        for (RuleSource ruleSource : ruleSourceService.loadAll()) {
+            Rule rule;
+            try {
+                rule = pipelineRuleParser.parseRule(ruleSource.source());
+            } catch (ParseException e) {
+                rule = Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id());
+            }
+            ruleNameMap.put(rule.name(), rule);
         }
 
-        // initialize all assignments
-        pipelineStreamAssignmentService.loadAll().forEach(this::handlePipelineAssignmentChanges);
+        Map<String, Pipeline> pipelineIdMap = Maps.newHashMap();
+        // read all pipelines and compile them
+        for (PipelineSource pipelineSource : pipelineSourceService.loadAll()) {
+            Pipeline pipeline;
+            try {
+                pipeline =  pipelineRuleParser.parsePipeline(pipelineSource);
+            } catch (ParseException e) {
+                pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineSource.id());
+            }
+            pipelineIdMap.put(pipelineSource.id(), pipeline);
+        }
+
+        // resolve all rules in the stages
+        pipelineIdMap.values().stream()
+                .flatMap(pipeline -> {
+                    log.info("Resolving pipeline {}", pipeline.name());
+                    return pipeline.stages().stream();
+                })
+                .forEach(stage -> {
+                    final List<Rule> resolvedRules = stage.ruleReferences().stream().
+                            map(ref -> {
+                                Rule rule = ruleNameMap.get(ref);
+                                if (rule == null) {
+                                    rule = Rule.alwaysFalse("Unresolved rule " + ref);
+                                }
+                                log.info("Resolved rule `{}` to {}", ref, rule);
+                                return rule;
+                            })
+                            .collect(Collectors.toList());
+                    stage.setRules(resolvedRules);
+                });
+        currentPipelines.set(ImmutableMap.copyOf(pipelineIdMap));
+
+        // read all stream assignments of those pipelines to allow processing messages through them
+        final HashMultimap<String, Pipeline> assignments = HashMultimap.create();
+        for (PipelineStreamAssignment streamAssignment : pipelineStreamAssignmentService.loadAll()) {
+            streamAssignment.pipelineIds().stream()
+                    .map(pipelineIdMap::get)
+                    .filter(Objects::nonNull)
+                    .forEach(pipeline -> assignments.put(streamAssignment.streamId(), pipeline));
+        }
+        streamPipelineAssignments.set(ImmutableSetMultimap.copyOf(assignments));
 
     }
 
@@ -280,15 +310,11 @@ public class PipelineInterpreter implements MessageProcessor {
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
         event.deletedRuleIds().forEach(id -> {
-            ruleCache.invalidate(id);
             log.info("Invalidated rule {}", id);
         });
         event.updatedRuleIds().forEach(id -> {
-            ruleCache.refresh(id);
             log.info("Refreshing rule {}", id);
         });
-
-        triggerPipelineUpdate();
     }
 
     @Subscribe
@@ -299,144 +325,11 @@ public class PipelineInterpreter implements MessageProcessor {
         event.updatedPipelineIds().forEach(id -> {
             log.info("Refreshing pipeline {}", id);
         });
-
-        triggerPipelineUpdate();
     }
 
     @Subscribe
     public void handlePipelineAssignmentChanges(PipelineStreamAssignment assignment) {
-        // rebuild the stream -> pipelines multimap
-        // default stream is represented as "default" in the map
-        final String streamId = assignment.streamId();
-        final Set<String> pipelineIds = assignment.pipelineIds();
-
-        final ImmutableSetMultimap<String, Pipeline> multimap = streamPipelineAssignments.get();
-        final ImmutableMap<String, Pipeline> pipelines = currentPipelines.get();
-
-        // set the new per-stream mapping
-        final HashMultimap<String, Pipeline> newMap = HashMultimap.create(multimap);
-        newMap.removeAll(streamId);
-        pipelineIds.stream()
-                .map(pipelines::get)
-                .filter(Objects::nonNull)
-                .forEach(pipeline -> newMap.put(streamId, pipeline));
-
-        streamPipelineAssignments.set(ImmutableSetMultimap.copyOf(newMap));
-    }
-
-    private void triggerPipelineUpdate() {
-        Futures.addCallback(
-                scheduledExecutorService.schedule(new PipelineResolver(), 500, TimeUnit.MILLISECONDS),
-                new FutureCallback<ImmutableSet<Pipeline>>() {
-                    @Override
-                    public void onSuccess(@Nullable ImmutableSet<Pipeline> result) {
-                        // TODO how do we deal with concurrent updates? canceling earlier attempts?
-                        if (result == null) {
-                            currentPipelines.set(ImmutableMap.of());
-                        } else {
-                            currentPipelines.set(Maps.uniqueIndex(result, Pipeline::id));
-                        }
-                    }
-                    @Override
-                    public void onFailure(Throwable t) {
-                        // do not touch the existing pipeline configuration
-                        log.error("Unable to update pipeline processor", t);
-                    }
-                });
-    }
-
-    private static class RuleLoader extends CacheLoader<String, Rule> {
-        private final RuleSourceService ruleSourceService;
-        private final PipelineRuleParser pipelineRuleParser;
-
-        public RuleLoader(RuleSourceService ruleSourceService, PipelineRuleParser pipelineRuleParser) {
-            this.ruleSourceService = ruleSourceService;
-            this.pipelineRuleParser = pipelineRuleParser;
-        }
-
-        @Override
-        public Map<String, Rule> loadAll(Iterable<? extends String> keys) throws Exception {
-            final Map<String, Rule> all = Maps.newHashMap();
-            final HashSet<String> keysToLoad = Sets.newHashSet(keys);
-            for (RuleSource ruleSource : ruleSourceService.loadAll()) {
-                if (!keysToLoad.isEmpty()) {
-                    if (!keysToLoad.contains(ruleSource.id())) {
-                        continue;
-                    }
-                }
-                try {
-                    all.put(ruleSource.id(), pipelineRuleParser.parseRule(ruleSource.source()));
-                } catch (ParseException e) {
-                    log.error("Unable to parse rule: " + e.getMessage());
-                    all.put(ruleSource.id(), Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id()));
-                }
-            }
-            return all;
-        }
-
-        @Override
-        public Rule load(@Nullable String ruleId) throws Exception {
-            final RuleSource ruleSource = ruleSourceService.load(ruleId);
-            try {
-                return pipelineRuleParser.parseRule(ruleSource.source());
-            } catch (ParseException e) {
-                log.error("Unable to parse rule: " + e.getMessage());
-                // return dummy rule
-                return Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id());
-            }
-        }
-    }
-
-    private class PipelineResolver implements Callable<ImmutableSet<Pipeline>> {
-        private final Logger log = LoggerFactory.getLogger(PipelineResolver.class);
-
-
-        @Override
-        public ImmutableSet<Pipeline> call() throws Exception {
-            log.info("Updating pipeline processor after rule/pipeline update");
-
-            final Collection<PipelineSource> allPipelineSources = pipelineSourceService.loadAll();
-            log.info("Found {} pipelines to resolve", allPipelineSources.size());
-
-            // compile all pipelines
-            Set<Pipeline> pipelines = Sets.newHashSetWithExpectedSize(allPipelineSources.size());
-            for (PipelineSource source : allPipelineSources) {
-                try {
-                    final Pipeline pipeline = pipelineRuleParser.parsePipeline(source);
-                    pipelines.add(pipeline);
-                    log.info("Parsed pipeline {} with {} stages", pipeline.name(), pipeline.stages().size());
-                } catch (ParseException e) {
-                    log.warn("Unable to compile pipeline {}: {}", source.title(), e);
-                }
-            }
-
-            // change the rule cache to be able to quickly look up rules by name
-            final Map<String, Rule> nameRuleMap =
-                    Seq.toMap(Seq.seq(ruleCache.asMap())
-                                      .map(entry -> tuple(entry.v2().name(), entry.v2())));
-
-            // resolve all rules
-            pipelines.stream()
-                    .flatMap(pipeline -> {
-                        log.info("Resolving pipeline {}", pipeline.name());
-                        return pipeline.stages().stream();
-                    })
-                    .forEach(stage -> {
-                        final List<Rule> resolvedRules = stage.ruleReferences().stream().
-                                map(ref -> {
-                                    Rule rule = nameRuleMap.get(ref);
-                                    if (rule == null) {
-                                        rule = Rule.alwaysFalse("Unresolved rule " + ref);
-                                    }
-                                    log.info("Resolved rule `{}` to {}", ref, rule);
-                                    return rule;
-                                })
-                                .collect(Collectors.toList());
-                        stage.setRules(resolvedRules);
-                    });
-
-            return ImmutableSet.copyOf(pipelines);
-        }
+        log.info("Pipeline stream assignment changed: {}", assignment);
     }
 
 }

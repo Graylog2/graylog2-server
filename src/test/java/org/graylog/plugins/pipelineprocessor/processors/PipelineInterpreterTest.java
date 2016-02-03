@@ -39,7 +39,6 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
@@ -96,7 +95,6 @@ public class PipelineInterpreterTest {
                 parser,
                 mock(Journal.class),
                 mock(MetricRegistry.class),
-                Executors.newSingleThreadScheduledExecutor(),
                 mock(EventBus.class)
         );
 
