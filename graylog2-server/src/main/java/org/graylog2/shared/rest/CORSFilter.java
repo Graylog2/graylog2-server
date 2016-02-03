@@ -29,7 +29,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         // we have already added the necessary headers for OPTIONS requests below
         if (requestContext.getRequest().getMethod().equalsIgnoreCase("options")) {
-            if(Response.Status.Family.familyOf(responseContext.getStatus()) == Response.Status.Family.INFORMATIONAL) {
+            if(Response.Status.Family.familyOf(responseContext.getStatus()) == Response.Status.Family.SUCCESSFUL) {
                 return;
             }
             responseContext.setStatus(Response.Status.NO_CONTENT.getStatusCode());
