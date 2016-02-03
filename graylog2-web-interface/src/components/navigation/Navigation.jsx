@@ -167,7 +167,7 @@ const Navigation = React.createClass({
                   <MenuItem>Indices</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
+              {false && this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.LOGGING}>
                   <MenuItem>Logging</MenuItem>
                 </LinkContainer>
