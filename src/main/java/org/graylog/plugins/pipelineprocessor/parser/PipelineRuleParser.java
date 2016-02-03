@@ -72,6 +72,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,11 +153,11 @@ public class PipelineRuleParser {
         throw new ParseException(parseContext.getErrors());
     }
 
-    public Pipeline parsePipeline(String pipeline) {
+    public Pipeline parsePipeline(PipelineSource pipelineSource) {
         final ParseContext parseContext = new ParseContext();
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
-        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipeline));
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipelineSource.source()));
         lexer.removeErrorListeners();
         lexer.addErrorListener(errorListener);
 
@@ -170,7 +171,8 @@ public class PipelineRuleParser {
         WALKER.walk(new PipelineAstBuilder(parseContext), pipelineContext);
 
         if (parseContext.getErrors().isEmpty()) {
-            return parseContext.pipelines.get(0);
+            final Pipeline pipeline = parseContext.pipelines.get(0);
+            return pipeline.withId(pipelineSource.id());
         }
         throw new ParseException(parseContext.getErrors());
     }

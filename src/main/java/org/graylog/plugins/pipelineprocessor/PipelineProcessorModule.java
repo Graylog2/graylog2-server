@@ -22,14 +22,17 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
-import org.graylog.plugins.pipelineprocessor.functions.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -50,6 +53,7 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessor(PipelineInterpreter.class);
         addRestResource(RuleResource.class);
         addRestResource(PipelineResource.class);
+        addRestResource(PipelineStreamResource.class);
 
         // built-in functions
         addMessageProcessorFunction(BooleanCoercion.NAME, BooleanCoercion.class);
@@ -57,9 +61,14 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessorFunction(LongCoercion.NAME, LongCoercion.class);
         addMessageProcessorFunction(StringCoercion.NAME, StringCoercion.class);
 
+        // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
+        addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
+        addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
+
+        // input related functions
         addMessageProcessorFunction(FromInput.NAME, FromInput.class);
     }
 

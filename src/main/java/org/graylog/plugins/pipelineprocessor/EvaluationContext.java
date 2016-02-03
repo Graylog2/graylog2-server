@@ -16,15 +16,20 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageCollection;
+import org.graylog2.plugin.Messages;
 
+import java.util.List;
 import java.util.Map;
 
 public class EvaluationContext {
 
     private final Message message;
     private Map<String, TypedValue> ruleVars;
+    private List<Message> createdMessages = Lists.newArrayList();
 
     public EvaluationContext(Message message) {
         this.message = message;
@@ -41,6 +46,18 @@ public class EvaluationContext {
 
     public TypedValue get(String identifier) {
         return ruleVars.get(identifier);
+    }
+
+    public Messages createdMessages() {
+        return new MessageCollection(createdMessages);
+    }
+
+    public void addCreatedMessage(Message newMessage) {
+        createdMessages.add(newMessage);
+    }
+
+    public void clearCreatedMessages() {
+        createdMessages.clear();
     }
 
     public class TypedValue {

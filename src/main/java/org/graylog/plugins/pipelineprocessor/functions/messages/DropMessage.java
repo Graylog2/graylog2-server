@@ -14,33 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
-import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog2.plugin.Message;
 
 import java.util.Optional;
 
-public class HasField implements Function<Boolean> {
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-    public static final String NAME = "has_field";
+public class DropMessage implements Function<Void> {
+
+    public static final String NAME = "drop_message";
+    public static final String MESSAGE_ARG = "message";
 
     @Override
-    public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<String> field = args.evaluated("field", context, String.class);
-        return context.currentMessage().hasField(field.orElse(null));
+    public Void evaluate(FunctionArgs args, EvaluationContext context) {
+        final Optional<Message> message;
+        if (args.isPresent("message")) {
+            message = args.evaluated("message", context, Message.class);
+        } else {
+            message = Optional.of(context.currentMessage());
+        }
+        message.get().setFilterOut(true);
+        return null;
     }
 
     @Override
-    public FunctionDescriptor<Boolean> descriptor() {
-        return FunctionDescriptor.<Boolean>builder()
+    public FunctionDescriptor<Void> descriptor() {
+        return FunctionDescriptor.<Void>builder()
                 .name(NAME)
-                .returnType(Boolean.class)
-                .params(ImmutableList.of(ParameterDescriptor.string("field")))
+                .pure(true)
+                .returnType(Void.class)
+                .params(ImmutableList.of(
+                        param().type(Message.class).optional().name(MESSAGE_ARG).build()
+                ))
                 .build();
     }
 }

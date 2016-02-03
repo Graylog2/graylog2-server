@@ -19,11 +19,14 @@ package org.graylog.plugins.pipelineprocessor.ast;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nullable;
 import java.util.SortedSet;
 
 @AutoValue
 public abstract class Pipeline {
 
+    @Nullable
+    public abstract String id();
     public abstract String name();
     public abstract SortedSet<Stage> stages();
 
@@ -37,9 +40,15 @@ public abstract class Pipeline {
 
     public abstract Builder toBuilder();
 
+    public Pipeline withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Pipeline build();
+
+        public abstract Builder id(String id);
 
         public abstract Builder name(String name);
 

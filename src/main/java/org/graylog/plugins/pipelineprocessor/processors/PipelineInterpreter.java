@@ -22,7 +22,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -38,12 +41,14 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
 import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
 import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
@@ -63,7 +68,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,12 +93,13 @@ public class PipelineInterpreter implements MessageProcessor {
     private final LoadingCache<String, Rule> ruleCache;
     private final ListeningScheduledExecutorService scheduledExecutorService;
 
-    private final AtomicReference<ImmutableSet<Pipeline>> currentPipelines = new AtomicReference<>();
-    private HashMultimap<String, Pipeline> streamPipelineAssignments = HashMultimap.create();
+    private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>();
+    private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineAssignments = new AtomicReference<>(ImmutableSetMultimap.of());
 
     @Inject
     public PipelineInterpreter(RuleSourceService ruleSourceService,
                                PipelineSourceService pipelineSourceService,
+                               PipelineStreamAssignmentService pipelineStreamAssignmentService,
                                PipelineRuleParser pipelineRuleParser,
                                Journal journal,
                                MetricRegistry metricRegistry,
@@ -113,7 +118,9 @@ public class PipelineInterpreter implements MessageProcessor {
         try {
             final List<String> ruleIds = ruleSourceService.loadAll().stream().map(RuleSource::id).collect(Collectors.toList());
             log.info("Compiling {} processing rules", ruleIds.size());
+            // TODO this sucks, because it is completely async and we can't use listenable futures to trigger the pipeline updates
             ruleCache.getAll(ruleIds);
+            triggerPipelineUpdate();
         } catch (ExecutionException ignored) {
         }
     }
@@ -140,30 +147,35 @@ public class PipelineInterpreter implements MessageProcessor {
 
                 // 1. for each message, determine which pipelines are supposed to be executed, based on their streams
                 //    null is the default stream, the other streams are identified by their id
-                final Set<Pipeline> pipelinesToRun;
+                final ImmutableSet<Pipeline> pipelinesToRun;
 
                 // this makes a copy of the list!
-                final Set<String> initialStreamIds = Sets.newHashSet(message.getStreamIds());
+                final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
+
+                final ImmutableSetMultimap<String, Pipeline> streamAssignment = streamPipelineAssignments.get();
 
                 if (initialStreamIds.isEmpty()) {
-                    if (processingBlacklist.contains(tuple(msgId, (String) null))) {
+                    if (processingBlacklist.contains(tuple(msgId, "default"))) {
                         // already processed default pipeline for this message
-                        pipelinesToRun = Collections.emptySet();
+                        pipelinesToRun = ImmutableSet.of();
                         log.info("[{}] already processed default stream, skipping", msgId);
                     } else {
                         // get the default stream pipeline assignments for this message
-                        pipelinesToRun = streamPipelineAssignments.get(null);
+                        pipelinesToRun = streamAssignment.get("default");
                         log.info("[{}] running default stream pipelines: [{}]",
                                  msgId,
                                  pipelinesToRun.stream().map(Pipeline::name).toArray());
                     }
                 } else {
-                    pipelinesToRun = initialStreamIds.stream()
-                            // 2. if a message-stream combination has already been processed (is in the set), skip that execution
+                    // 2. if a message-stream combination has already been processed (is in the set), skip that execution
+                    final Set<String> streamsIds = initialStreamIds.stream()
                             .filter(streamId -> !processingBlacklist.contains(tuple(msgId, streamId)))
-                            .flatMap(streamId -> streamPipelineAssignments.get(streamId).stream())
+                            .filter(streamAssignment::containsKey)
                             .collect(Collectors.toSet());
-                    log.info("[{}] running pipelines {}", msgId, pipelinesToRun);
+                    pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
+                            .flatMap(streamId -> streamAssignment.get(streamId).stream())
+                            .collect(Collectors.toSet()));
+                    log.info("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
                 }
 
                 final StageIterator stages = new StageIterator(pipelinesToRun);
@@ -222,15 +234,21 @@ public class PipelineInterpreter implements MessageProcessor {
                         // 4. after each complete stage run, merge the processing changes, stages are isolated from each other
                         // TODO message changes become visible immediately for now
 
+                        // 4a. also add all new messages from the context to the toProcess work list
+                        Iterables.addAll(toProcess, context.createdMessages());
+                        context.clearCreatedMessages();
                     }
 
                 }
                 boolean addedStreams = false;
                 // 5. add each message-stream combination to the blacklist set
                 for (Stream stream : message.getStreams()) {
-                    processingBlacklist.add(tuple(msgId, stream.getId()));
                     if (!initialStreamIds.remove(stream.getId())) {
                         addedStreams = true;
+                    } else {
+                        // only add pre-existing streams to blacklist, this has the effect of only adding already processed streams,
+                        // not newly added ones.
+                        processingBlacklist.add(tuple(msgId, stream.getId()));
                     }
                 }
                 if (message.getFilterOut()) {
@@ -240,8 +258,8 @@ public class PipelineInterpreter implements MessageProcessor {
                     journal.markJournalOffsetCommitted(message.getJournalOffset());
                 }
                 // 6. go to 1 and iterate over all messages again until no more streams are being assigned
-                if (!addedStreams) {
-                    log.info("[{}] no new streams matches, not running again", msgId);
+                if (!addedStreams || message.getFilterOut()) {
+                    log.info("[{}] no new streams matches or dropped message, not running again", msgId);
                     fullyProcessed.add(message);
                 } else {
                     // process again, we've added a stream
@@ -266,7 +284,6 @@ public class PipelineInterpreter implements MessageProcessor {
         });
 
         triggerPipelineUpdate();
-
     }
 
     @Subscribe
@@ -281,19 +298,37 @@ public class PipelineInterpreter implements MessageProcessor {
         triggerPipelineUpdate();
     }
 
+    @Subscribe
+    public void handlePipelineAssignmentChanges(PipelineStreamAssignment assignment) {
+        // rebuild the stream -> pipelines multimap
+        // default stream is represented as "default" in the map
+        final String streamId = assignment.streamId();
+        final Set<String> pipelineIds = assignment.pipelineIds();
+
+        final ImmutableSetMultimap<String, Pipeline> multimap = streamPipelineAssignments.get();
+        final ImmutableMap<String, Pipeline> pipelines = currentPipelines.get();
+
+        // set the new per-stream mapping
+        final HashMultimap<String, Pipeline> newMap = HashMultimap.create(multimap);
+        newMap.removeAll(streamId);
+        pipelineIds.stream().map(pipelines::get).forEach(pipeline -> newMap.put(streamId, pipeline));
+
+        streamPipelineAssignments.set(ImmutableSetMultimap.copyOf(newMap));
+    }
+
     private void triggerPipelineUpdate() {
         Futures.addCallback(
-                scheduledExecutorService.schedule(new PipelineResolver(), 250, TimeUnit.MILLISECONDS),
+                scheduledExecutorService.schedule(new PipelineResolver(), 500, TimeUnit.MILLISECONDS),
                 new FutureCallback<ImmutableSet<Pipeline>>() {
                     @Override
                     public void onSuccess(@Nullable ImmutableSet<Pipeline> result) {
                         // TODO how do we deal with concurrent updates? canceling earlier attempts?
-                        currentPipelines.set(result);
-                        if (result != null) {
-                            streamPipelineAssignments.putAll(null, result);
+                        if (result == null) {
+                            currentPipelines.set(ImmutableMap.of());
+                        } else {
+                            currentPipelines.set(Maps.uniqueIndex(result, Pipeline::id));
                         }
                     }
-
                     @Override
                     public void onFailure(Throwable t) {
                         // do not touch the existing pipeline configuration
@@ -359,7 +394,7 @@ public class PipelineInterpreter implements MessageProcessor {
             Set<Pipeline> pipelines = Sets.newHashSetWithExpectedSize(allPipelineSources.size());
             for (PipelineSource source : allPipelineSources) {
                 try {
-                    final Pipeline pipeline = pipelineRuleParser.parsePipeline(source.source());
+                    final Pipeline pipeline = pipelineRuleParser.parsePipeline(source);
                     pipelines.add(pipeline);
                     log.info("Parsed pipeline {} with {} stages", pipeline.name(), pipeline.stages().size());
                 } catch (ParseException e) {
