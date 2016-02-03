@@ -25,6 +25,7 @@ package org.graylog2.plugin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -191,9 +192,7 @@ public class MessageTest {
         message.addStreams(Lists.newArrayList(stream2, stream1));
 
         // make sure all streams we've added are being returned. Internally it's a set, so don't check the order, it doesn't matter anyway.
-        assertEquals(0,
-                     symmetricDifference(Sets.newHashSet(stream1, stream2),
-                                         Sets.newHashSet(message.getStreams())).size());
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2);
     }
 
     @Test
