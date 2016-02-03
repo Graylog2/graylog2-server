@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Sets.symmetricDifference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -187,9 +188,12 @@ public class MessageTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
 
-        message.setStreams(Lists.newArrayList(stream1, stream2));
+        message.addStreams(Lists.newArrayList(stream2, stream1));
 
-        assertEquals(Lists.newArrayList(stream1, stream2), message.getStreams());
+        // make sure all streams we've added are being returned. Internally it's a set, so don't check the order, it doesn't matter anyway.
+        assertEquals(0,
+                     symmetricDifference(Sets.newHashSet(stream1, stream2),
+                                         Sets.newHashSet(message.getStreams())).size());
     }
 
     @Test
@@ -357,11 +361,11 @@ public class MessageTest {
 
     @Test
     public void testGetFieldNames() throws Exception {
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
 
         message.addField("testfield", "testvalue");
 
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)
