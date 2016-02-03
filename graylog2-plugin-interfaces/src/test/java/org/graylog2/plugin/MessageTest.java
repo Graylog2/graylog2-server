@@ -196,6 +196,33 @@ public class MessageTest {
     }
 
     @Test
+    public void testStreamMutators() {
+        final Stream stream1 = mock(Stream.class);
+        final Stream stream2 = mock(Stream.class);
+        final Stream stream3 = mock(Stream.class);
+
+        Assertions.assertThat(message.getStreams()).isNotNull();
+        Assertions.assertThat(message.getStreams()).isEmpty();
+
+        message.addStream(stream1);
+
+        final Set<Stream> onlyWithStream1 = message.getStreams();
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        message.addStreams(Sets.newHashSet(stream3, stream2));
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2, stream3);
+
+        // getStreams is a copy and doesn't change after mutations
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        // stream2 was assigned
+        Assertions.assertThat(message.removeStream(stream2)).isTrue();
+        // streams2 is no longer assigned
+        Assertions.assertThat(message.removeStream(stream2)).isFalse();
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream3);
+    }
+
+    @Test
     public void testGetStreamIds() throws Exception {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
