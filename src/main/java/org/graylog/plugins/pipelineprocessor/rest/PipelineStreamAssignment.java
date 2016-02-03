@@ -34,7 +34,7 @@ public abstract class PipelineStreamAssignment {
     @Nullable
     @Id
     @ObjectId
-    public abstract String id();
+    public abstract String _id();
 
     @JsonProperty
     public abstract String streamId();
@@ -43,11 +43,11 @@ public abstract class PipelineStreamAssignment {
     public abstract Set<String> pipelineIds();
 
     @JsonCreator
-    public static PipelineStreamAssignment create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static PipelineStreamAssignment create(@Id @ObjectId @JsonProperty("id") @Nullable String _id,
                                                   @JsonProperty("stream_id") String streamId,
                                                   @JsonProperty("pipeline_ids") Set<String> pipelineIds) {
         return builder()
-                .id(id)
+                ._id(_id)
                 .streamId(streamId)
                 .pipelineIds(pipelineIds)
                 .build();
@@ -63,7 +63,7 @@ public abstract class PipelineStreamAssignment {
     public abstract static class Builder {
         public abstract PipelineStreamAssignment build();
 
-        public abstract Builder id(String id);
+        public abstract Builder _id(String _id);
 
         public abstract Builder streamId(String streamId);
 
