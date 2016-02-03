@@ -18,9 +18,6 @@ const HelpMenu = React.createClass({
         <MenuItem href="http://info.graylog.org/ask-a-question" target="_blank">
           <i className="fa fa-external-link"></i> Ask a Question
         </MenuItem>
-        <MenuItem href="http://info.graylog.org/product-feedback" target="_blank">
-          <i className="fa fa-external-link"></i> Feedback to Product Team
-        </MenuItem>
 
         <MenuItem divider />
         <LinkContainer to={Routes.getting_started(true)}>
