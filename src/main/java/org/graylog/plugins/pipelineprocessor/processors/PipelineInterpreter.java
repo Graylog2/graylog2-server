@@ -123,6 +123,10 @@ public class PipelineInterpreter implements MessageProcessor {
             triggerPipelineUpdate();
         } catch (ExecutionException ignored) {
         }
+
+        // initialize all assignments
+        pipelineStreamAssignmentService.loadAll().forEach(this::handlePipelineAssignmentChanges);
+
     }
 
     /**
