@@ -20,12 +20,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
 import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
-import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
@@ -42,7 +40,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
@@ -78,34 +75,41 @@ public class PipelineInterpreterTest {
                                       null)
         ));
 
-        final Map<String, Function<?>> functions = Maps.newHashMap();
-        functions.put(CreateMessage.NAME, new CreateMessage());
-        functions.put(StringCoercion.NAME, new StringCoercion());
-
-        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
-
         final PipelineStreamAssignmentService pipelineStreamAssignmentService = mock(PipelineStreamAssignmentService.class);
         final PipelineStreamAssignment pipelineStreamAssignment = PipelineStreamAssignment.create(null,
                                                                                                   "default",
                                                                                                   newHashSet("cde"));
         when(pipelineStreamAssignmentService.loadAll()).thenReturn(
-                newHashSet(pipelineStreamAssignment))
-        ;
+                newHashSet(pipelineStreamAssignment)
+        );
+
+        final Map<String, Function<?>> functions = Maps.newHashMap();
+        functions.put(CreateMessage.NAME, new CreateMessage());
+        functions.put(StringCoercion.NAME, new StringCoercion());
+
+        final PipelineRuleParser parser = setupParser(functions);
 
         final PipelineInterpreter interpreter = new PipelineInterpreter(
-                ruleSourceService, pipelineSourceService, pipelineStreamAssignmentService, parser, mock(Journal.class), mock(MetricRegistry.class),
-                Executors.newSingleThreadScheduledExecutor(), mock(EventBus.class)
+                ruleSourceService,
+                pipelineSourceService,
+                pipelineStreamAssignmentService,
+                parser,
+                mock(Journal.class),
+                mock(MetricRegistry.class),
+                Executors.newSingleThreadScheduledExecutor(),
+                mock(EventBus.class)
         );
-        interpreter.handlePipelineChanges(PipelinesChangedEvent.create(Collections.emptySet(),Collections.emptySet()));
-        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
-        interpreter.handlePipelineAssignmentChanges(pipelineStreamAssignment);
 
         Message msg = new Message("original message", "test", Tools.nowUTC());
         final Messages processed = interpreter.process(msg);
 
         final Message[] messages = Iterables.toArray(processed, Message.class);
         assertEquals(2, messages.length);
+    }
+
+    private PipelineRuleParser setupParser(Map<String, Function<?>> functions) {
+        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
+        return new PipelineRuleParser(functionRegistry);
     }
 
 }

@@ -71,6 +71,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -93,7 +94,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final LoadingCache<String, Rule> ruleCache;
     private final ListeningScheduledExecutorService scheduledExecutorService;
 
-    private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>();
+    private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>(ImmutableMap.of());
     private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineAssignments = new AtomicReference<>(ImmutableSetMultimap.of());
 
     @Inject
@@ -315,7 +316,10 @@ public class PipelineInterpreter implements MessageProcessor {
         // set the new per-stream mapping
         final HashMultimap<String, Pipeline> newMap = HashMultimap.create(multimap);
         newMap.removeAll(streamId);
-        pipelineIds.stream().map(pipelines::get).forEach(pipeline -> newMap.put(streamId, pipeline));
+        pipelineIds.stream()
+                .map(pipelines::get)
+                .filter(Objects::nonNull)
+                .forEach(pipeline -> newMap.put(streamId, pipeline));
 
         streamPipelineAssignments.set(ImmutableSetMultimap.copyOf(newMap));
     }
