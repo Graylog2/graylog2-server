@@ -24,7 +24,7 @@ const ServerAvailabilityStore = Reflux.createStore({
       (error) => {
         this.server = { up: false, error: error };
         this.trigger({ server: this.server });
-      },
+      }
     );
 
     return promise;
