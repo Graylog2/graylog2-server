@@ -8,9 +8,4 @@ module.exports = [
   'react-router-bootstrap',
   'reflux',
   'moment',
-  'c3',
-  'd3',
-  'dc',
-  'rickshaw',
-  'jquery-ui',
 ];
