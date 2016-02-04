@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import $ from 'jquery';
+import {} from 'jquery-ui';
 import dc from 'dc';
 import d3 from 'd3';
 
