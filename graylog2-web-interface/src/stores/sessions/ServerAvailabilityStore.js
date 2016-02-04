@@ -16,26 +16,22 @@ const ServerAvailabilityStore = Reflux.createStore({
     return { server: this.server };
   },
   ping() {
-    const promise = new Builder('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterApiResource.node().url)).build().then(
-      () => {
-        this.server = {up: true};
-        this.trigger({ server: this.server });
-      },
-      (error) => {
-        this.server = { up: false, error: error };
-        this.trigger({ server: this.server });
-      }
+    return new Builder('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterApiResource.node().url)).build().then(
+      () => ServerAvailabilityActions.reportSuccess(),
+      (error) => ServerAvailabilityActions.reportError(error)
     );
-
-    return promise;
   },
   reportError(error) {
-    this.server = { up: false, error: error };
-    this.trigger({ server: this.server });
+    if (this.server.up) {
+      this.server = {up: false, error: error};
+      this.trigger({server: this.server});
+    }
   },
   reportSuccess() {
-    this.server = { up: true };
-    this.trigger({ server: this.server });
+    if (!this.server.up) {
+      this.server = {up: true};
+      this.trigger({server: this.server});
+    }
   },
 });
 
