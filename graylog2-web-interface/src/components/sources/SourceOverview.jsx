@@ -15,6 +15,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import UniversalSearch from 'logic/search/UniversalSearch';
 
 import SourcesStore from 'stores/sources/SourcesStore';
+import HistogramDataActions from 'actions/sources/HistogramDataActions';
 import HistogramDataStore from 'stores/sources/HistogramDataStore';
 import SearchStore from 'stores/search/SearchStore';
 
@@ -147,19 +148,21 @@ const SourceOverview = React.createClass({
 
   loadHistogramData() {
     let filters;
-    const onLoaded = (histogramData) => {
-      this.setState({
-        resolution: histogramData.interval,
-        reloadingHistogram: false,
-        histogramDataAvailable: histogramData.values.length >= 2,
-      });
-      this._resetHistogram(histogramData.values);
-    };
 
     if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
       filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
     }
-    HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION, onLoaded);
+
+    HistogramDataActions.load(this.state.range, filters, SCREEN_RESOLUTION)
+      .then(histogramData => {
+        this.setState({
+          resolution: histogramData.interval,
+          reloadingHistogram: false,
+          histogramDataAvailable: histogramData.values.length >= 2,
+        });
+        this._resetHistogram(histogramData.values);
+      });
+
     this.setState({reloadingHistogram: true});
   },
 
