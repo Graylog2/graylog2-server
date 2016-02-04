@@ -51,15 +51,20 @@ const ServerUnavailablePage = React.createClass({
       errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
     }
     if (error.originalError) {
+      const originalError = error.originalError;
+      errorDetails.push(
+        <dt key="status-original-request-title">Original Request</dt>,
+        <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>
+      );
       errorDetails.push(
         <dt key="status-code-title">Status code</dt>,
-        <dd key="status-code-desc">{String(error.originalError.status)}</dd>
+        <dd key="status-code-desc">{String(originalError.status)}</dd>
       );
 
-      if (typeof error.originalError.toString === 'function') {
+      if (typeof originalError.toString === 'function') {
         errorDetails.push(
           <dt key="full-error-title">Full error message</dt>,
-          <dd key="full-error-desc">{error.originalError.toString()}</dd>
+          <dd key="full-error-desc">{originalError.toString()}</dd>
         );
       }
     }
