@@ -91,10 +91,11 @@ const ServerUnavailablePage = React.createClass({
           <div>
             <p>
               We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
+              Please verify that the server is healthy and working correctly.
             </p>
             <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
             <p>
-              Please verify that the server is healthy and it is working correctly. Do you need a hand?{' '}
+              Do you need a hand?{' '}
               <a href="https://www.graylog.org/community-support" target="_blank">We can help you</a>.
             </p>
             <div>
