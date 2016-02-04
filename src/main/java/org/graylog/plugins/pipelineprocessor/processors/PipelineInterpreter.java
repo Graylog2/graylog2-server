@@ -56,11 +56,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -75,6 +78,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final PipelineStreamAssignmentService pipelineStreamAssignmentService;
     private final PipelineRuleParser pipelineRuleParser;
     private final Journal journal;
+    private final ScheduledExecutorService scheduler;
     private final Meter filteredOutMessages;
 
     private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>(ImmutableMap.of());
@@ -87,6 +91,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                PipelineRuleParser pipelineRuleParser,
                                Journal journal,
                                MetricRegistry metricRegistry,
+                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                @ClusterEventBus EventBus clusterBus) {
         this.ruleSourceService = ruleSourceService;
         this.pipelineSourceService = pipelineSourceService;
@@ -94,6 +99,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.pipelineRuleParser = pipelineRuleParser;
 
         this.journal = journal;
+        this.scheduler = scheduler;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
 
         // listens to cluster wide Rule, Pipeline and pipeline stream assignment changes
@@ -102,7 +108,8 @@ public class PipelineInterpreter implements MessageProcessor {
         reload();
     }
 
-    private void reload() {
+    // this should not run in parallel
+    private synchronized void reload() {
         // read all rules and compile them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();
         for (RuleSource ruleSource : ruleSourceService.loadAll()) {
@@ -315,6 +322,7 @@ public class PipelineInterpreter implements MessageProcessor {
         event.updatedRuleIds().forEach(id -> {
             log.info("Refreshing rule {}", id);
         });
+        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
@@ -325,11 +333,13 @@ public class PipelineInterpreter implements MessageProcessor {
         event.updatedPipelineIds().forEach(id -> {
             log.info("Refreshing pipeline {}", id);
         });
+        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handlePipelineAssignmentChanges(PipelineStreamAssignment assignment) {
         log.info("Pipeline stream assignment changed: {}", assignment);
+        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
 
 }
