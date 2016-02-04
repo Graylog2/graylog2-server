@@ -37,43 +37,48 @@ const Navigation = React.createClass({
   },
 
   _systemTitle() {
-    let suffix = '';
+    const prefix = 'System';
 
-    if (this._isActive('/system') || this._isActive('/system?page=')) {
-      suffix = ' / Overview';
+    if (this._isActive('/system/overview')) {
+      return prefix + ' / Overview';
     }
-    if (this._isActive('/system/nodes') || this._isActive('/system/radios')) {
-      suffix = ' / Nodes';
+    if (this._isActive('/system/nodes')) {
+      return prefix + ' / Nodes';
     }
     if (this._isActive('/system/inputs')) {
-      suffix = ' / Inputs';
+      return prefix + ' / Inputs';
     }
     if (this._isActive('/system/outputs')) {
-      suffix = ' / Outputs';
+      return prefix + ' / Outputs';
     }
     if (this._isActive('/system/indices')) {
-      suffix = ' / Indices';
+      return prefix + ' / Indices';
     }
     if (this._isActive('/system/logging')) {
-      suffix = ' / Logging';
+      return prefix + ' / Logging';
     }
     if (this._isActive('/system/users')) {
-      suffix = ' / Users';
+      return prefix + ' / Users';
     }
     if (this._isActive('/system/roles')) {
-      suffix = ' / Roles';
+      return prefix + ' / Roles';
     }
     if (this._isActive('/system/contentpacks')) {
-      suffix = ' / Content Packs';
+      return prefix + ' / Content Packs';
     }
     if (this._isActive('/system/grokpatterns')) {
-      suffix = ' / Grok Patterns';
+      return prefix + ' / Grok Patterns';
     }
     if (this._isActive('/system/collectors')) {
-      suffix = ' / Collectors';
+      return prefix + ' / Collectors';
     }
 
-    return 'System' + suffix;
+    const pluginRoute = PluginStore.exports('systemnavigation').find((pluginRoute) => this._isActive(pluginRoute.path));
+    if (pluginRoute) {
+      return prefix + ' / ' + pluginRoute.description;
+    }
+
+    return prefix;
   },
 
   render() {
