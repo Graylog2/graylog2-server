@@ -137,7 +137,7 @@ public class PipelineInterpreter implements MessageProcessor {
         // resolve all rules in the stages
         pipelineIdMap.values().stream()
                 .flatMap(pipeline -> {
-                    log.info("Resolving pipeline {}", pipeline.name());
+                    log.debug("Resolving pipeline {}", pipeline.name());
                     return pipeline.stages().stream();
                 })
                 .forEach(stage -> {
@@ -147,7 +147,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                 if (rule == null) {
                                     rule = Rule.alwaysFalse("Unresolved rule " + ref);
                                 }
-                                log.info("Resolved rule `{}` to {}", ref, rule);
+                                log.debug("Resolved rule `{}` to {}", ref, rule);
                                 return rule;
                             })
                             .collect(Collectors.toList());
@@ -200,11 +200,11 @@ public class PipelineInterpreter implements MessageProcessor {
                     if (processingBlacklist.contains(tuple(msgId, "default"))) {
                         // already processed default pipeline for this message
                         pipelinesToRun = ImmutableSet.of();
-                        log.info("[{}] already processed default stream, skipping", msgId);
+                        log.debug("[{}] already processed default stream, skipping", msgId);
                     } else {
                         // get the default stream pipeline assignments for this message
                         pipelinesToRun = streamAssignment.get("default");
-                        log.info("[{}] running default stream pipelines: [{}]",
+                        log.debug("[{}] running default stream pipelines: [{}]",
                                  msgId,
                                  pipelinesToRun.stream().map(Pipeline::name).toArray());
                     }
@@ -217,7 +217,7 @@ public class PipelineInterpreter implements MessageProcessor {
                     pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
                             .flatMap(streamId -> streamAssignment.get(streamId).stream())
                             .collect(Collectors.toSet()));
-                    log.info("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
+                    log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
                 }
 
                 final StageIterator stages = new StageIterator(pipelinesToRun);
@@ -232,12 +232,12 @@ public class PipelineInterpreter implements MessageProcessor {
                         final Pipeline pipeline = pair.v2();
                         if (!pipelinesToProceedWith.isEmpty() &&
                                 !pipelinesToProceedWith.contains(pipeline)) {
-                            log.info("[{}] previous stage result prevents further processing of pipeline `{}`",
+                            log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
                                      msgId,
                                      pipeline.name());
                             continue;
                         }
-                        log.info("[{}] evaluating rule conditions in stage {}: match {}",
+                        log.debug("[{}] evaluating rule conditions in stage {}: match {}",
                                  msgId,
                                  stage.stage(),
                                  stage.matchAll() ? "all" : "either");
@@ -249,14 +249,14 @@ public class PipelineInterpreter implements MessageProcessor {
                         final ArrayList<Rule> rulesToRun = Lists.newArrayListWithCapacity(stage.getRules().size());
                         for (Rule rule : stage.getRules()) {
                             if (rule.when().evaluateBool(context)) {
-                                log.info("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
+                                log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
                                 rulesToRun.add(rule);
                             } else {
-                                log.info("[{}] rule `{}` does not match", msgId, rule.name());
+                                log.debug("[{}] rule `{}` does not match", msgId, rule.name());
                             }
                         }
                         for (Rule rule : rulesToRun) {
-                            log.info("[{}] rule `{}` matched running actions", msgId, rule.name());
+                            log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
                             for (Statement statement : rule.then()) {
                                 statement.evaluate(context);
                             }
@@ -268,7 +268,7 @@ public class PipelineInterpreter implements MessageProcessor {
                         // record that it is ok to proceed with the pipeline
                         if ((stage.matchAll() && (rulesToRun.size() == stage.getRules().size()))
                                 || (rulesToRun.size() > 0)) {
-                            log.info("[{}] stage for pipeline `{}` required match: {}, ok to proceed with next stage",
+                            log.debug("[{}] stage for pipeline `{}` required match: {}, ok to proceed with next stage",
                                      msgId, pipeline.name(), stage.matchAll() ? "all" : "either");
                             pipelinesToProceedWith.add(pipeline);
                         }
@@ -301,11 +301,11 @@ public class PipelineInterpreter implements MessageProcessor {
                 }
                 // 6. go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {
-                    log.info("[{}] no new streams matches or dropped message, not running again", msgId);
+                    log.debug("[{}] no new streams matches or dropped message, not running again", msgId);
                     fullyProcessed.add(message);
                 } else {
                     // process again, we've added a stream
-                    log.info("[{}] new streams assigned, running again for those streams", msgId);
+                    log.debug("[{}] new streams assigned, running again for those streams", msgId);
                     toProcess.add(message);
                 }
             }
@@ -317,10 +317,10 @@ public class PipelineInterpreter implements MessageProcessor {
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
         event.deletedRuleIds().forEach(id -> {
-            log.info("Invalidated rule {}", id);
+            log.debug("Invalidated rule {}", id);
         });
         event.updatedRuleIds().forEach(id -> {
-            log.info("Refreshing rule {}", id);
+            log.debug("Refreshing rule {}", id);
         });
         scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
@@ -328,17 +328,17 @@ public class PipelineInterpreter implements MessageProcessor {
     @Subscribe
     public void handlePipelineChanges(PipelinesChangedEvent event) {
         event.deletedPipelineIds().forEach(id -> {
-            log.info("Invalidated pipeline {}", id);
+            log.debug("Invalidated pipeline {}", id);
         });
         event.updatedPipelineIds().forEach(id -> {
-            log.info("Refreshing pipeline {}", id);
+            log.debug("Refreshing pipeline {}", id);
         });
         scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handlePipelineAssignmentChanges(PipelineStreamAssignment assignment) {
-        log.info("Pipeline stream assignment changed: {}", assignment);
+        log.debug("Pipeline stream assignment changed: {}", assignment);
         scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }
 
