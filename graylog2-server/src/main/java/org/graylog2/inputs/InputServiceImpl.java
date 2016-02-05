@@ -17,7 +17,6 @@
 package org.graylog2.inputs;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -54,6 +53,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
@@ -132,6 +133,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input create(String id, Map<String, Object> fields) {
+        checkArgument(ObjectId.isValid(id), "Invalid id <%s>", id);
         return new InputImpl(new ObjectId(id), fields);
     }
 
@@ -142,6 +144,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input find(String id) throws NotFoundException {
+        checkArgument(ObjectId.isValid(id), "Invalid id <%s>", id);
+
         final DBObject o = get(org.graylog2.inputs.InputImpl.class, id);
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
@@ -151,6 +155,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException {
+        checkArgument(ObjectId.isValid(id), "Invalid id <%s>", id);
         final List<BasicDBObject> forThisNodeOrGlobal = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
@@ -165,6 +170,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input findForThisNode(String nodeId, String id) throws NotFoundException, IllegalArgumentException {
+        checkArgument(ObjectId.isValid(id), "Invalid id <%s>", id);
         final List<BasicDBObject> forThisNode = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
@@ -188,14 +194,9 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public void addStaticField(Input input, final String key, final String value) throws ValidationException {
-        final EmbeddedPersistable obj = new EmbeddedPersistable() {
-            @Override
-            public Map<String, Object> getPersistedFields() {
-                return ImmutableMap.<String, Object>of(
-                        InputImpl.FIELD_STATIC_FIELD_KEY, key,
-                        InputImpl.FIELD_STATIC_FIELD_VALUE, value);
-            }
-        };
+        final EmbeddedPersistable obj = () -> ImmutableMap.<String, Object>of(
+                InputImpl.FIELD_STATIC_FIELD_KEY, key,
+                InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
         embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
     }
@@ -268,12 +269,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Extractor getExtractor(final Input input, final String extractorId) throws NotFoundException {
-        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), new Predicate<Extractor>() {
-            @Override
-            public boolean apply(Extractor extractor) {
-                return extractor.getId().equals(extractorId);
-            }
-        });
+        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), e -> e.getId().equals(extractorId));
 
         if (!extractor.isPresent()) {
             LOG.error("Extractor <{}> not found.", extractorId);
