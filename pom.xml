@@ -106,7 +106,7 @@
         <sigar.version>1.6.4</sigar.version>
         <restassured.version>2.8.0</restassured.version>
         <elasticsearch.version>2.1.1</elasticsearch.version>
-        <retrofit.version>2.0.0-beta3</retrofit.version>
+        <retrofit.version>2.0.0-beta4</retrofit.version>
     </properties>
 
     <repositories>

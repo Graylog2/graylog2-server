@@ -22,8 +22,8 @@ import com.google.common.net.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.graylog2.cluster.Node;
-import retrofit2.JacksonConverterFactory;
 import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
 
