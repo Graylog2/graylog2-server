@@ -158,9 +158,9 @@ const SourceOverview = React.createClass({
         this.setState({
           resolution: histogramData.interval,
           reloadingHistogram: false,
-          histogramDataAvailable: histogramData.values.length >= 2,
+          histogramDataAvailable: histogramData.histogram.length >= 2,
         });
-        this._resetHistogram(histogramData.values);
+        this._resetHistogram(histogramData.histogram);
       });
 
     this.setState({reloadingHistogram: true});
