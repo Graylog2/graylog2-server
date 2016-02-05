@@ -1,6 +1,8 @@
 import moment from 'moment';
 import MomentUtils from 'util/MomentUtils';
 
+const DEFAULT_MAX_DATA_POINTS = 4000;
+
 const HistogramFormatter = {
   _firstDataPointTimestamp(dataPoints, queryFrom, isSearchAll) {
     if (isSearchAll) {
@@ -12,6 +14,7 @@ const HistogramFormatter = {
 
   format(dataPoints, queryTimeRange, resolution, maxDataPoints, isSearchAll) {
     const formattedPoints = [];
+    const maxDataPoints = (screenSize && screenSize > 0 ? screenSize : DEFAULT_MAX_DATA_POINTS);
 
     if (typeof dataPoints === 'object' && !Array.isArray(dataPoints)) {
       const from = this._firstDataPointTimestamp(dataPoints, queryTimeRange.from, isSearchAll);

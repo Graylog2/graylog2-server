@@ -11,7 +11,6 @@ const HistogramDataStore = Reflux.createStore({
   listenables: [HistogramDataActions],
   sourceUrl: '/search/universal/relative/histogram',
   histogram: undefined,
-  DEFAULT_MAX_DATA_POINTS: 4000,
 
   getInitialState() {
     return {histogram: this.histogram};
@@ -45,9 +44,8 @@ const HistogramDataStore = Reflux.createStore({
     const promise = fetch('GET', url.toString())
       .then(
         response => {
-          const results = response.results;
-          response.values = HistogramFormatter.format(results, response.queried_timerange, interval,
-            maxDataPoints || this.DEFAULT_MAX_DATA_POINTS, rangeAsNumber === 0);
+          response.values = HistogramFormatter.format(response.results, response.queried_timerange, interval,
+            maxDataPoints, rangeAsNumber === 0);
           return response;
         },
         error => {
