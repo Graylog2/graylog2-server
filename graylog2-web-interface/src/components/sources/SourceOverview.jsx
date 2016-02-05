@@ -39,7 +39,7 @@ const SourceOverview = React.createClass({
     this.messageCountDimension = this.sourcesData.dimension((d) => d.message_count);
 
     this.histogramData = crossfilter();
-    this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
+    this.valueDimension = this.histogramData.dimension((d) => new Date(d.x));
     this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
 
     return {
