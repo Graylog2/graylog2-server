@@ -1,5 +1,6 @@
 import moment from 'moment';
 import MomentUtils from 'util/MomentUtils';
+import NumberUtils from 'util/NumberUtils';
 
 const DEFAULT_MAX_DATA_POINTS = 4000;
 
@@ -36,7 +37,7 @@ const HistogramFormatter = {
           const result = ((value === null || value === undefined) ? 0 : value);
           formattedPoints.push({
             x: tempTime.valueOf(),
-            y: result,
+            y: NumberUtils.normalizeGraphNumber(result),
           });
         }
         index += 1;
