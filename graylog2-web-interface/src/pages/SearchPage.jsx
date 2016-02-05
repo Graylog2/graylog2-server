@@ -60,9 +60,7 @@ const SearchPage = React.createClass({
   _determineHistogramResolution(response) {
     let queryRangeInMinutes;
     if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
-      const oldestIndex = Object.keys(response.used_indices)
-        .map((key) => response.used_indices[key])
-        .sort((i1, i2) => moment(i1.end).isAfter(i2.end))[0];
+      const oldestIndex = response.used_indices.sort((i1, i2) => moment(i2.end) - moment(i1.end))[0];
       queryRangeInMinutes = moment(response.to).diff(oldestIndex.begin, 'minutes');
     } else {
       queryRangeInMinutes = moment(response.to).diff(response.from, 'minutes');
@@ -70,27 +68,27 @@ const SearchPage = React.createClass({
 
     const duration = moment.duration(queryRangeInMinutes, 'minutes');
 
-    if (duration.hours() < 12) {
+    if (duration.asHours() < 12) {
       return 'minute';
     }
 
-    if (duration.days() < 2) {
+    if (duration.asDays() < 3) {
       return 'hour';
     }
 
-    if (duration.days() < 30) {
+    if (duration.asDays() < 30) {
       return 'day';
     }
 
-    if (duration.days() < 6 * 30) {
+    if (duration.asMonths() < 2) {
       return 'week';
     }
 
-    if (duration.days() < 2 * 365) {
+    if (duration.asMonths() < 18) {
       return 'month';
     }
 
-    if (duration.days() < 10 * 365) {
+    if (duration.asYears() < 3) {
       return 'quarter';
     }
 
