@@ -2,9 +2,11 @@ import Reflux from 'reflux';
 import jQuery from 'jquery';
 import moment from 'moment';
 import md5 from 'md5';
-
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import Qs from 'qs';
+
+import HistogramFormatter from 'logic/graphs/HistogramFormatter';
+import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+
 import URLUtils from 'util/URLUtils';
 import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -47,12 +49,14 @@ const UniversalSearchStore = Reflux.createStore({
       return result;
     });
   },
-  histogram(type, query, timerange, interval, streamId) {
+  histogram(type, query, timerange, interval, streamId, maxDataPoints) {
     const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;
+      response.histogram = HistogramFormatter.format(response.results, response.histogram_boundaries, interval,
+        maxDataPoints, type === 'relative' && timerange.relative === 0, true);
       return response;
     });
   },

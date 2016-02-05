@@ -82,15 +82,15 @@ const SearchPage = React.createClass({
       return 'day';
     }
 
-    if (duration.days() < 6*30) {
+    if (duration.days() < 6 * 30) {
       return 'week';
     }
 
-    if (duration.days() < 2*365) {
+    if (duration.days() < 2 * 365) {
       return 'month';
     }
 
-    if (duration.days() < 10*365) {
+    if (duration.days() < 10 * 365) {
       return 'quarter';
     }
 
@@ -115,11 +115,6 @@ const SearchPage = React.createClass({
       this.setState({selectedFields: this.state.selectedFields.concat(fieldName)});
     }
   },
-  _formatHistogram(results) {
-    return Object.keys(results).map((key) => {
-      return {x: Number(key), y: results[key]};
-    });
-  },
 
   render() {
     if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram) {
@@ -131,7 +126,7 @@ const SearchPage = React.createClass({
     return (
       <SearchResult query={SearchStore.query} builtQuery={searchResult.built_query}
                     result={searchResult} histogram={this.state.histogram}
-                    formattedHistogram={this._formatHistogram(this.state.histogram.results)}
+                    formattedHistogram={this.state.histogram.histogram}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
                     searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions} />
     );

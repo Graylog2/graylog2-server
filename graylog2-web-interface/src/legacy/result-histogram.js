@@ -12,13 +12,6 @@ const resultHistogram = {
     _graphTimeline: $("#result-graph-timeline"),
     _resultHistogramGraph: undefined,
 
-    _correctDataBoundaries: function(data) {
-        var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
-
-        rickshawHelper.processHistogramData(data, this._histogramContainer.data("from"), this._histogramContainer.data("to"), selectedResolution);
-        return data;
-    },
-
     _getHistogramContainerWidth: function() {
         return this._histogramContainer.width();
     },
@@ -31,7 +24,7 @@ const resultHistogram = {
     },
 
     setData: function(data) {
-        this._histogram = this._correctDataBoundaries(data);
+        this._histogram = data;
     },
 
     drawResultGraph: function() {

@@ -13,7 +13,21 @@ const HistogramFormatter = {
     return moment.utc(queryFrom);
   },
 
-  format(dataPoints, queryTimeRange, resolution, maxDataPoints, isSearchAll) {
+  /**
+   * Formats the histogram to add empty data where there were no results, normalizes its values to
+   * avoid errors in the underlying graphing library, and samples the data, so we don't draw more
+   * points that we can display.
+   *
+   * @param {object} dataPoints: Histogram data as returned from the server {unix_time: value, ...}
+   * @param {object} queryTimeRange: Time ranges of the query that generated the histogram
+   * @param {string} resolution: Histogram resolution
+   * @param {number} screenSize: Screen width to calculate the maximum number of data points returned
+   * @param {boolean} isSearchAll: Indicates if the histogram was made for a search in all messages or not
+   * @param {boolean} legacy: Flag to indicate if the x-axis should contain timestamps in ms or seconds.
+   *                          This was added as Rickshaw only supports the latter format
+   *
+   */
+  format(dataPoints, queryTimeRange, resolution, screenSize, isSearchAll, legacy = false) {
     const formattedPoints = [];
     const maxDataPoints = (screenSize && screenSize > 0 ? screenSize : DEFAULT_MAX_DATA_POINTS);
 
@@ -36,7 +50,7 @@ const HistogramFormatter = {
           const value = dataPoints[timestamp];
           const result = ((value === null || value === undefined) ? 0 : value);
           formattedPoints.push({
-            x: tempTime.valueOf(),
+            x: (legacy ? tempTime.unix() : tempTime.valueOf()),
             y: NumberUtils.normalizeGraphNumber(result),
           });
         }
