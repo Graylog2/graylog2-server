@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -28,8 +27,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.indexer.responses.FailureCount;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
@@ -44,6 +43,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,8 +53,12 @@ import java.util.Map;
 public class FailuresResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(FailuresResource.class);
 
-    @Inject
     private IndexFailureService indexFailureService;
+
+    @Inject
+    public FailuresResource(IndexFailureService indexFailureService) {
+        this.indexFailureService = indexFailureService;
+    }
 
     @GET
     @Timed
@@ -88,8 +92,9 @@ public class FailuresResource extends RestResource {
                                       @QueryParam("limit") @Min(0) int limit,
                                       @ApiParam(name = "offset", value = "Offset", required = true)
                                       @QueryParam("offset") @Min(0) int offset) {
-        final List<Map<String, Object>> failures = Lists.newArrayList();
-        for (IndexFailure failure : indexFailureService.all(limit, offset)) {
+        final List<IndexFailure> indexFailures = indexFailureService.all(limit, offset);
+        final List<Map<String, Object>> failures = new ArrayList<>(indexFailures.size());
+        for (IndexFailure failure : indexFailures) {
             failures.add(failure.asMap());
         }
 

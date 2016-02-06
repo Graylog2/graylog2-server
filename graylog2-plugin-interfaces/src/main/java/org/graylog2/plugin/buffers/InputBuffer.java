@@ -25,7 +25,7 @@ package org.graylog2.plugin.buffers;
 import org.graylog2.plugin.journal.RawMessage;
 
 public interface InputBuffer {
-    public abstract void insert(RawMessage message);
+    void insert(RawMessage message);
 
-    public long getUsage();
+    long getUsage();
 }

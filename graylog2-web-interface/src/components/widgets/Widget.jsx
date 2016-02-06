@@ -1,12 +1,9 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import Reflux from 'reflux';
 import $ from 'jquery';
 import Qs from 'qs';
 
 import URLUtils from 'util/URLUtils';
-
-import UserNotification from 'util/UserNotification';
 
 import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader } from 'components/widgets';
 
@@ -22,11 +19,21 @@ import WidgetsActions from 'actions/widgets/WidgetsActions';
 
 const Widget = React.createClass({
   propTypes: {
-    widget: React.PropTypes.object.isRequired,
-    dashboardGrid: React.PropTypes.object,
-    dashboardId: React.PropTypes.string.isRequired,
-    shouldUpdate: React.PropTypes.bool.isRequired,
-    locked: React.PropTypes.bool.isRequired,
+    widget: PropTypes.object.isRequired,
+    dashboardId: PropTypes.string.isRequired,
+    shouldUpdate: PropTypes.bool.isRequired,
+    locked: PropTypes.bool.isRequired,
+  },
+  statics: {
+    Type: {
+      SEARCH_RESULT_COUNT: 'SEARCH_RESULT_COUNT',
+      STREAM_SEARCH_RESULT_COUNT: 'STREAM_SEARCH_RESULT_COUNT',
+      STATS_COUNT: 'STATS_COUNT',
+      SEARCH_RESULT_CHART: 'SEARCH_RESULT_CHART',
+      QUICKVALUES: 'QUICKVALUES',
+      FIELD_CHART: 'FIELD_CHART',
+      STACKED_CHART: 'STACKED_CHART',
+    },
   },
   getInitialState() {
     return {
@@ -41,11 +48,6 @@ const Widget = React.createClass({
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
-
-    if (this.props.dashboardGrid) {
-      this.props.dashboardGrid.add_widget()
-    }
-
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentDidUpdate() {
@@ -55,22 +57,10 @@ const Widget = React.createClass({
     clearInterval(this.loadValueInterval);
     $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
-  WIDGET_DATA_REFRESH: 30 * 1000,
+
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
   WIDGET_HEADER_HEIGHT: 25,
   WIDGET_FOOTER_HEIGHT: 20,
-  statics: {
-    Type: {
-      SEARCH_RESULT_COUNT: 'SEARCH_RESULT_COUNT',
-      STREAM_SEARCH_RESULT_COUNT: 'STREAM_SEARCH_RESULT_COUNT',
-      STATS_COUNT: 'STATS_COUNT',
-      SEARCH_RESULT_CHART: 'SEARCH_RESULT_CHART',
-      QUICKVALUES: 'QUICKVALUES',
-      FIELD_CHART: 'FIELD_CHART',
-      STACKED_CHART: 'STACKED_CHART',
-    },
-  },
-
   _isBoundToStream() {
     return ('stream_id' in this.props.widget.config) && (this.props.widget.config.stream_id !== null);
   },
@@ -113,7 +103,7 @@ const Widget = React.createClass({
   },
   _getVisualization() {
     if (this.props.widget.type === '') {
-      return;
+      return null;
     }
 
     if (this.state.result === undefined) {
@@ -128,7 +118,7 @@ const Widget = React.createClass({
       return <div className="not-available">{this.state.result}</div>;
     }
 
-    var visualization;
+    let visualization;
 
     switch (this.props.widget.type.toUpperCase()) {
       case this.constructor.Type.SEARCH_RESULT_COUNT:
@@ -137,35 +127,35 @@ const Widget = React.createClass({
         visualization = <NumericVisualization data={this.state.result} config={this.props.widget.config}/>;
         break;
       case this.constructor.Type.SEARCH_RESULT_CHART:
-        visualization = <HistogramVisualization id={this.props.widget.id}
+        visualization = (<HistogramVisualization id={this.props.widget.id}
                                                 data={this.state.result}
                                                 interval={this.props.widget.config.interval}
                                                 height={this.state.height}
-                                                width={this.state.width}/>;
+                                                width={this.state.width}/>);
         break;
       case this.constructor.Type.QUICKVALUES:
-        visualization = <QuickValuesVisualization id={this.props.widget.id}
+        visualization = (<QuickValuesVisualization id={this.props.widget.id}
                                                   config={this.props.widget.config}
                                                   data={this.state.result}
                                                   height={this.state.height}
-                                                  width={this.state.width}/>;
+                                                  width={this.state.width}/>);
         break;
       case this.constructor.Type.FIELD_CHART:
-        visualization = <GraphVisualization id={this.props.widget.id}
+        visualization = (<GraphVisualization id={this.props.widget.id}
                                             data={this.state.result}
                                             config={this.props.widget.config}
                                             height={this.state.height}
-                                            width={this.state.width}/>;
+                                            width={this.state.width}/>);
         break;
       case this.constructor.Type.STACKED_CHART:
-        visualization = <StackedGraphVisualization id={this.props.widget.id}
+        visualization = (<StackedGraphVisualization id={this.props.widget.id}
                                                    data={this.state.result}
                                                    config={this.props.widget.config}
                                                    height={this.state.height}
-                                                   width={this.state.width}/>;
+                                                   width={this.state.width}/>);
         break;
       default:
-        throw('Error: Widget type "' + this.props.widget.type + '" not supported');
+        throw new Error(`Error: Widget type '${this.props.widget.type}' not supported`);
     }
 
     return visualization;
@@ -173,9 +163,9 @@ const Widget = React.createClass({
   _getUrlPath() {
     if (this._isBoundToStream()) {
       return '/streams/' + this.props.widget.config.stream_id + '/messages';
-    } else {
-      return '/search';
     }
+
+    return '/search';
   },
   _getUrlQueryString() {
     const config = this.props.widget.config;
@@ -186,13 +176,13 @@ const Widget = React.createClass({
       rangetype: rangeType,
       interval: config.interval,
     };
-    switch(rangeType) {
+    switch (rangeType) {
       case 'relative':
         query[rangeType] = config.timerange.range;
         break;
       case 'absolute':
-        query['from'] = config.timerange.from;
-        query['to'] = config.timerange.to;
+        query.from = config.timerange.from;
+        query.to = config.timerange.to;
         break;
       case 'keyword':
         query[rangeType] = config.timerange.keyword;
@@ -208,47 +198,19 @@ const Widget = React.createClass({
 
     return URLUtils.appPrefixed(path + '?' + queryString);
   },
-  metricsUrl() {
-    // TODO: replace with react router link
-    const url = '/system/metrics/master';
-    const query = {
-      // TODO: replace hardcoded metric name
-      prefilter: 'org.graylog2.dashboards.widgets.*.' + this.props.widget.id
-    };
-
-    return URLUtils.appPrefixed(url + '?' + Qs.stringify(query));
-  },
   _replaySearch(e) {
     URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
-  },
-  _goToWidgetMetrics() {
-    URLUtils.openLink(this.metricsUrl(), false);
   },
   _showConfig() {
     this.refs.configModal.open();
   },
   _showEditConfig() {
     this.refs.editModal.open();
-
-    // Ugly workaround to avoid being able to move a widget when the modal is shown :(
-    this._disableGridster();
-  },
-  _disableGridster() {
-    this.props.dashboardGrid.disable();
-  },
-  _enableGridster() {
-    this.props.dashboardGrid.enable();
   },
   updateWidget(newWidgetData) {
     newWidgetData.id = this.props.widget.id;
 
-    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData).then(() => {
-      this.setState({
-        title: newWidgetData.title,
-        cacheTime: newWidgetData.cacheTime,
-        config: newWidgetData.config,
-      });
-    });
+    WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData);
   },
   deleteWidget() {
     if (window.confirm('Do you really want to delete "' + this.props.widget.description + '"?')) {
@@ -262,17 +224,16 @@ const Widget = React.createClass({
     }
     const showConfigModal = (
       <WidgetConfigModal ref="configModal"
+                         dashboardId={this.props.dashboardId}
                          widget={this.props.widget}
-                         boundToStream={this._isBoundToStream()}
-                         metricsAction={this._goToWidgetMetrics}/>
+                         boundToStream={this._isBoundToStream()}/>
     );
 
     const editConfigModal = (
       <WidgetEditConfigModal ref="editModal"
                              widgetTypes={this.constructor.Type}
                              widget={this.props.widget}
-                             onUpdate={this.updateWidget}
-                             onModalHidden={this._enableGridster}/>
+                             onUpdate={this.updateWidget}/>
     );
 
     return (

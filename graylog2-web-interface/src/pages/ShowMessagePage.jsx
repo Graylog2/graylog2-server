@@ -37,7 +37,7 @@ const ShowMessagePage = React.createClass({
   },
   _formatInput(state) {
     const input = {};
-    input[state.input.input_id] = state.input;
+    input[state.input.id] = state.input;
     this.setState({inputs: Immutable.Map(input)});
   },
   _isLoaded() {

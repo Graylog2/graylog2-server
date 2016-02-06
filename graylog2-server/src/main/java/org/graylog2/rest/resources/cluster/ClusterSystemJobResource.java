@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.cluster;
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -26,13 +27,16 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.Response;
+import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -45,26 +49,19 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Cluster/Jobs", description = "Cluster-wide System Jobs")
 @Path("/cluster/jobs")
-public class ClusterSystemJobResource {
+public class ClusterSystemJobResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemJobResource.class);
 
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
-    private final String authenticationToken;
 
     @Inject
     public ClusterSystemJobResource(NodeService nodeService,
                                     RemoteInterfaceProvider remoteInterfaceProvider,
                                     @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
+        super(httpHeaders);
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
-
-        final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
-        if (authenticationTokens != null && authenticationTokens.size() >= 1) {
-            this.authenticationToken = authenticationTokens.get(0);
-        } else {
-            this.authenticationToken = null;
-        }
     }
 
     @GET
@@ -81,13 +78,37 @@ public class ClusterSystemJobResource {
                 if (response.isSuccess()) {
                     result.put(entry.getKey(), response.body());
                 } else {
-                    LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": " + response);
+                    LOG.warn("Unable to fetch system jobs from node {}: {}", entry.getKey(), response);
                 }
             } catch (IOException e) {
-                LOG.warn("Unable to fetch system jobs from node " + entry.getKey() + ": ", e);
+                LOG.warn("Unable to fetch system jobs from node {}:", entry.getKey(), e);
             }
         });
 
         return result;
+    }
+
+    @GET
+    @Path("{jobId}")
+    @Timed
+    @ApiOperation(value = "Get job with the given ID")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SystemJobSummary getJob(@ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) throws IOException {
+        for (Map.Entry<String, Node> entry : nodeService.allActive().entrySet()) {
+            final RemoteSystemJobResource remoteSystemJobResource = remoteInterfaceProvider.get(entry.getValue(), this.authenticationToken, RemoteSystemJobResource.class);
+            try {
+                final Response<SystemJobSummary> response = remoteSystemJobResource.get(jobId).execute();
+                if (response.isSuccess()) {
+                    // Return early because there can be only one job with the same ID in the cluster.
+                    return response.body();
+                } else {
+                    LOG.warn("Unable to fetch system job {} from node {}: {}", jobId, entry.getKey(), response);
+                }
+            } catch (IOException e) {
+                LOG.warn("Unable to fetch system jobs from node {}:", entry.getKey(), e);
+            }
+        }
+
+        throw new NotFoundException("System job with id " + jobId + " not found!");
     }
 }

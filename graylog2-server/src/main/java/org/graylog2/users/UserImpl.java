@@ -185,8 +185,13 @@ public class UserImpl extends PersistedImpl implements User {
         if (fields.containsKey(STARTPAGE)) {
             @SuppressWarnings("unchecked")
             final Map<String, String> obj = (Map<String, String>) fields.get(STARTPAGE);
-            startpage.put("type", obj.get("type"));
-            startpage.put("id", obj.get("id"));
+            final String type = obj.get("type");
+            final String id = obj.get("id");
+
+            if (type != null && id != null) {
+                startpage.put("type", type);
+                startpage.put("id", id);
+            }
         }
 
         return startpage;

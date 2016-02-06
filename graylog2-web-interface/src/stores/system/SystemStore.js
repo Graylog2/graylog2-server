@@ -20,6 +20,11 @@ const SystemStore = Reflux.createStore({
 
     return fetch('GET', url);
   },
+  jvm() {
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.jvm().url);
+
+    return fetch('GET', url);
+  },
 });
 
 export default SystemStore;

@@ -79,11 +79,11 @@ public class RawMessage implements Serializable {
     }
 
     public RawMessage(byte[] payload, InetSocketAddress remoteAddress) {
-        this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), ResolvableInetSocketAddress.wrap(remoteAddress), payload);
+        this(Long.MIN_VALUE, new UUID(), Tools.nowUTC(), ResolvableInetSocketAddress.wrap(remoteAddress), payload);
     }
 
     public RawMessage(byte[] payload, ResolvableInetSocketAddress remoteAddress) {
-        this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), remoteAddress, payload);
+        this(Long.MIN_VALUE, new UUID(), Tools.nowUTC(), remoteAddress, payload);
     }
 
     public RawMessage(long journalOffset,

@@ -3,10 +3,10 @@ import {Row, Col} from 'react-bootstrap';
 
 const EntityListItem = React.createClass({
   propTypes: {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     titleSuffix: PropTypes.any,
     description: PropTypes.any,
-    actions: PropTypes.array,
+    actions: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
     createdFromContentPack: PropTypes.bool,
     contentRow: PropTypes.node,
   },

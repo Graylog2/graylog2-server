@@ -19,7 +19,7 @@ package org.graylog2.indexer.ranges;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-import org.graylog2.bindings.providers.ServerObjectMapperProvider;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class MongoIndexRangeTest {
         int calculationDuration = 42;
         MongoIndexRange indexRange = MongoIndexRange.create(indexName, begin, end, calculatedAt, calculationDuration);
 
-        ObjectMapper objectMapper = new ServerObjectMapperProvider().get();
+        ObjectMapper objectMapper = new ObjectMapperProvider().get();
         String json = objectMapper.writeValueAsString(indexRange);
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
 

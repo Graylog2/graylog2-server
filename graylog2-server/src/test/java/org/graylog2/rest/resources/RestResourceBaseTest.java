@@ -91,7 +91,7 @@ public class RestResourceBaseTest {
         }
     }
 
-    static class MyVarargMatcher extends ArgumentMatcher<String[]> implements VarargMatcher {
+    static class MyVarargMatcher implements VarargMatcher, ArgumentMatcher<String[]> {
         @Override public boolean matches(Object varargArgument) {
             return /* does it match? */ true;
         }

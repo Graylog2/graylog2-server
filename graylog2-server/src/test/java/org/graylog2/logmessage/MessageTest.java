@@ -33,48 +33,48 @@ public class MessageTest {
 
     @Test
     public void testIdGetsSet() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         assertNotNull(lm.getId());
         assertFalse(lm.getId().isEmpty());
     }
 
     @Test
     public void testIsCompleteSucceeds() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         assertTrue(lm.isComplete());
     }
 
     @Test
     public void testIsCompleteFails() {
-        Message lm = new Message("foo", null, Tools.iso8601());
+        Message lm = new Message("foo", null, Tools.nowUTC());
         assertTrue(lm.isComplete());
 
-        lm = new Message("foo", "", Tools.iso8601());
+        lm = new Message("foo", "", Tools.nowUTC());
         assertTrue(lm.isComplete());
 
-        lm = new Message(null, "bar", Tools.iso8601());
+        lm = new Message(null, "bar", Tools.nowUTC());
         assertFalse(lm.isComplete());
 
-        lm = new Message("", "bar", Tools.iso8601());
+        lm = new Message("", "bar", Tools.nowUTC());
         assertFalse(lm.isComplete());
 
-        lm = new Message("", "", Tools.iso8601());
+        lm = new Message("", "", Tools.nowUTC());
         assertFalse(lm.isComplete());
 
-        lm = new Message(null, null, Tools.iso8601());
+        lm = new Message(null, null, Tools.nowUTC());
         assertFalse(lm.isComplete());
     }
 
     @Test
     public void testAddField() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         lm.addField("ohai", "thar");
         assertEquals("thar", lm.getField("ohai"));
     }
 
     @Test
     public void testAddFieldsWithMap() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         lm.addField("ohai", "hai");
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -90,7 +90,7 @@ public class MessageTest {
 
     @Test
     public void testRemoveField() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         lm.addField("something", "foo");
         lm.addField("something_else", "bar");
 
@@ -102,7 +102,7 @@ public class MessageTest {
 
     @Test
     public void testRemoveFieldWithNonExistentKey() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         lm.addField("something", "foo");
         lm.addField("something_else", "bar");
 
@@ -113,7 +113,7 @@ public class MessageTest {
 
     @Test
     public void testRemoveFieldDoesNotDeleteReservedFields() {
-        DateTime time = Tools.iso8601();
+        DateTime time = Tools.nowUTC();
         Message lm = new Message("foo", "bar", time);
         lm.removeField("source");
         lm.removeField("timestamp");
@@ -128,7 +128,7 @@ public class MessageTest {
 
     @Test
     public void testToString() {
-        Message lm = new Message("foo", "bar", Tools.iso8601());
+        Message lm = new Message("foo", "bar", Tools.nowUTC());
         lm.toString();
         // Fine if it does not crash.
     }

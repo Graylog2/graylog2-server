@@ -75,7 +75,7 @@ public class MessageResource extends RestResource {
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
             final ResultMessage resultMessage = messages.get(messageId, index);
-            final Message message = new Message(resultMessage.getMessage());
+            final Message message = resultMessage.getMessage();
             checkMessageReadPermission(message);
 
             return resultMessage;

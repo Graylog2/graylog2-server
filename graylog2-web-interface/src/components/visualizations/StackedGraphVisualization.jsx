@@ -20,7 +20,6 @@ const StackedGraphVisualization = React.createClass({
     config: PropTypes.object.isRequired,
   },
   getInitialState() {
-    this.normalizedData = false;
     this.series = Immutable.List();
     this.seriesNames = Immutable.Map();
     this.barWidthScale = d3.scale.linear().domain(d3.range(0, 10000)).range(d3.range(0.6, 0, -0.01));
@@ -34,7 +33,6 @@ const StackedGraphVisualization = React.createClass({
     this.drawData();
   },
   componentWillReceiveProps(nextProps) {
-    this.normalizedData = false;
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
@@ -43,28 +41,33 @@ const StackedGraphVisualization = React.createClass({
     this.drawData();
   },
   _normalizeData(data) {
-    if (this.normalizedData || data === null || data === undefined || !Array.isArray(data)) {
+    if (data === null || data === undefined || !Array.isArray(data)) {
       return [];
     }
-    this.normalizedData = true;
-
-    return data.map((dataPoint) => {
-      dataPoint.y = NumberUtils.normalizeGraphNumber(dataPoint.y);
-      return dataPoint;
-    });
+    return data;
+  },
+  _extractDataValue(results, seriesNo) {
+    const statisticalValue = results[this.props.config.series[seriesNo - 1].statistical_function];
+    return NumberUtils.normalizeGraphNumber(statisticalValue);
   },
   _formatData(data) {
     const normalizedData = this._normalizeData(data);
     let series = Immutable.Map();
+    let seriesNo = 1;
 
-    normalizedData.forEach((dataPoint) => {
-      const timestamp = dataPoint.x * 1000;
-      const formattedDataPoint = Immutable.Map({timestamp: timestamp}).set('series' + dataPoint.series, dataPoint.y);
-      if (series.has(timestamp)) {
-        series = series.set(timestamp, series.get(timestamp).merge(formattedDataPoint));
-      } else {
-        series = series.set(timestamp, formattedDataPoint);
-      }
+    normalizedData.forEach(aSeries => {
+      const timestamps = Object.keys(aSeries);
+      timestamps.forEach(timestamp => {
+        const formattedTimestamp = Number(timestamp) * 1000;
+        const value = this._extractDataValue(aSeries[timestamp], seriesNo);
+        const formattedDataPoint = Immutable.Map({timestamp: formattedTimestamp}).set(`series${seriesNo}`, value);
+        if (series.has(formattedTimestamp)) {
+          series = series.set(formattedTimestamp, series.get(formattedTimestamp).merge(formattedDataPoint));
+        } else {
+          series = series.set(formattedTimestamp, formattedDataPoint);
+        }
+      }, this);
+      seriesNo += 1;
     }, this);
 
     return series.toOrderedSet().sortBy((dataPoint) => dataPoint.get('timestamp'));
@@ -108,7 +111,7 @@ const StackedGraphVisualization = React.createClass({
     }
   },
   _formatTooltipTitle(x) {
-    return new DateTime(x).format(DateTime.Formats.COMPLETE);
+    return new DateTime(x).toString(DateTime.Formats.COMPLETE);
   },
   _formatTooltipValue(value) {
     let formattedValue;

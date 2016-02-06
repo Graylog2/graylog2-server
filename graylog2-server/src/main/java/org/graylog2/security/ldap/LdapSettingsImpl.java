@@ -378,6 +378,8 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     @Override
     public void setAdditionalDefaultGroups(Set<String> groupNames) {
         try {
+            if (groupNames == null) return;
+
             final Map<String, Role> nameToRole = Maps.uniqueIndex(roleService.loadAll(), Roles.roleToNameFunction());
             final List<String> groupIds = Lists.newArrayList(Collections2.transform(groupNames, new Function<String, String>() {
                 @Nullable

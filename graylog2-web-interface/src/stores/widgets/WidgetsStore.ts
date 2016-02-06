@@ -2,14 +2,14 @@
 
 const Reflux = require('reflux');
 
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require('util/URLUtils');
+const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const WidgetsActions = require('actions/widgets/WidgetsActions');
 
-interface SerializedWidget {
+interface Widget {
     id: string;
     description: string;
     type: string;
@@ -18,43 +18,14 @@ interface SerializedWidget {
     config: {};
 }
 
-interface Widget {
-    id: string;
-    title: string;
-    type: string;
-    cacheTime: number;
-    creatorUserId?: string;
-    config: {};
-}
-
 const WidgetsStore = Reflux.createStore({
     listenables: [WidgetsActions],
-    _deserializeWidget(widget: SerializedWidget): Widget {
-        return {
-            id: widget.id,
-            title: widget.description,
-            type: widget.type,
-            cacheTime: widget.cache_time,
-            creatorUserId: widget.creator_user_id,
-            config: widget.config
-        };
-    },
-    _serializeWidget(widget: Widget): SerializedWidget {
-        return {
-            id: widget.id,
-            description: widget.title,
-            type: widget.type,
-            cache_time: widget.cacheTime,
-            creator_user_id: widget.creatorUserId,
-            config: widget.config
-        };
-    },
     _serializeWidgetForUpdate(widget: Widget): any {
         return {
-            description: widget.title,
+            description: widget.description,
             type: widget.type,
-            cache_time: widget.cacheTime,
-            creator_user_id: widget.creatorUserId,
+            cache_time: widget.cache_time,
+            creator_user_id: widget.creator_user_id,
             config: widget.config,
         };
     },
@@ -79,7 +50,7 @@ const WidgetsStore = Reflux.createStore({
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
         const promise = new Builder('GET', url)
             .authenticated()
-            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .setHeader('X-Graylog-No-Session-Extension', 'true')
             .json()
             .build();
 
@@ -89,18 +60,20 @@ const WidgetsStore = Reflux.createStore({
                     "Could not load widget information");
             }
         });
-        return promise.then((widget) => this._deserializeWidget(widget));
+        return promise;
     },
 
     updateWidget(dashboardId: string, widget: Widget): Promise<string[]> {
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
         var promise = fetch('PUT', url, this._serializeWidgetForUpdate(widget));
 
-        promise.then(() => UserNotification.success("Widget updated successfully"),
-        (error) => {
-            UserNotification.error("Updating widget \"" + widget.title + "\" failed with status: " + error.message,
+        promise.then(
+          () => UserNotification.success("Widget updated successfully"),
+          (error) => {
+              UserNotification.error("Updating widget \"" + widget.description + "\" failed with status: " + error.message,
                 "Could not update widget");
-        });
+          }
+        );
 
         return promise;
     },
@@ -110,7 +83,7 @@ const WidgetsStore = Reflux.createStore({
 
         return new Builder('GET', url)
             .authenticated()
-            .setHeader('X-Graylog2-No-Session-Extension', 'true')
+            .setHeader('X-Graylog-No-Session-Extension', 'true')
             .json()
             .build();
     },

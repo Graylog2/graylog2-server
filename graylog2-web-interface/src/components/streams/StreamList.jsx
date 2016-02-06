@@ -7,15 +7,16 @@ var PermissionsMixin = require('../../util/PermissionsMixin');
 var CreateStreamButton = require('./CreateStreamButton');
 
 var StreamList = React.createClass({
+    propTypes: {
+      onStreamSave: React.PropTypes.func.isRequired,
+    },
     mixins: [PermissionsMixin],
     getInitialState() {
         return {};
     },
     _formatStream(stream) {
         return <Stream key={"stream-" + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
-                       permissions={this.props.permissions} user={this.props.user}
-                       onDelete={this.props.onDelete} onResume={this.props.onResume} onPause={this.props.onPause}
-                       onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>;
+                       permissions={this.props.permissions} user={this.props.user}/>;
     },
     _sortByTitle(stream1, stream2) {
         return stream1.title.localeCompare(stream2.title);
@@ -36,8 +37,7 @@ var StreamList = React.createClass({
                     <span>
                         <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
                                         buttonText="Create one now" ref='createStreamButton'
-                                        onSave={this.props.onStreamCreated} />
-                        .
+                                        onSave={this.props.onStreamSave} />
                     </span>
                 );
             }

@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
@@ -32,17 +31,13 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
-import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
-import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
-import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
@@ -149,7 +144,6 @@ public class Searches {
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final Client c;
-    private final MetricRegistry metricRegistry;
     private final Timer esRequestTimer;
     private final Histogram esTimeRangeHistogram;
 
@@ -163,7 +157,6 @@ public class Searches {
         this.deflector = checkNotNull(deflector);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.c = checkNotNull(client);
-        this.metricRegistry = checkNotNull(metricRegistry);
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
@@ -176,22 +169,21 @@ public class Searches {
     public CountResult count(String query, TimeRange range, String filter) {
         Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
 
-        SearchRequest request;
+        final SearchRequestBuilder srb;
         if (filter == null) {
-            request = standardSearchRequest(query, indices, range).request();
+            srb = standardSearchRequest(query, indices, range);
         } else {
-            request = filteredSearchRequest(query, filter, indices, range).request();
+            srb = filteredSearchRequest(query, filter, indices, range);
         }
-        request.searchType(SearchType.COUNT);
+        srb.setSize(0);
 
-        SearchResponse r = c.search(request).actionGet();
+        final SearchResponse r = c.search(srb.request()).actionGet();
         recordEsMetrics(r, range);
-        return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
+        return CountResult.create(r.getHits().getTotalHits(), r.getTookInMillis());
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
-        final SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, filter, null, false);
 
         // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
         // until we've scrolled through the entire set.
@@ -200,12 +192,14 @@ public class Searches {
         // "For backwards compatibility, if the fields parameter specifies fields which are not stored , it will
         // load the _source and extract it from it. This functionality has been replaced by the source filtering
         // parameter." -- So we should look at the source filtering parameter once we switched to ES 1.x.
-        srb.addFields(fields.toArray(new String[fields.size()]));
-        srb.addField("_source"); // always request the _source field because otherwise we can't access non-stored values
-
-        final SearchRequest request = srb.setSearchType(SearchType.SCAN)
+        final SearchRequest request = standardSearchRequest(query, indices, limit, offset, range, filter, null, false)
                 .setScroll(new TimeValue(1, TimeUnit.MINUTES))
-                .setSize(500).request(); // TODO magic numbers
+                .setSize(500) // TODO magic numbers
+                .addSort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
+                .addFields(fields.toArray(new String[fields.size()]))
+                .addField("_source") // always request the _source field because otherwise we can't access non-stored values
+                .request();
+
         if (LOG.isDebugEnabled()) {
             try {
                 LOG.debug("ElasticSearch scroll query: {}", XContentHelper.convertToJson(request.source(), false));
@@ -223,13 +217,13 @@ public class Searches {
     }
 
     public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) {
-        final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
-                .setQuery(query)
-                .setFilter(filter)
-                .setRange(range)
-                .setLimit(limit)
-                .setOffset(offset)
-                .setSorting(sorting)
+        final SearchesConfig searchesConfig = SearchesConfig.builder()
+                .query(query)
+                .filter(filter)
+                .range(range)
+                .limit(limit)
+                .offset(offset)
+                .sorting(sorting)
                 .build();
 
         return search(searchesConfig);
@@ -283,8 +277,8 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsResult(
-                (Terms) f.getAggregations().get(AGG_TERMS),
-                (Missing) f.getAggregations().get("missing"),
+                f.getAggregations().get(AGG_TERMS),
+                f.getAggregations().get("missing"),
                 f.getDocCount(),
                 query,
                 request.source(),
@@ -368,7 +362,7 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsStatsResult(
-                (Terms) f.getAggregations().get(AGG_TERMS_STATS),
+                f.getAggregations().get(AGG_TERMS_STATS),
                 query,
                 request.source(),
                 r.getTook()
@@ -430,9 +424,9 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
-                (ValueCount) f.getAggregations().get(AGG_VALUE_COUNT),
-                (ExtendedStats) f.getAggregations().get(AGG_EXTENDED_STATS),
-                (Cardinality) f.getAggregations().get(AGG_CARDINALITY),
+                f.getAggregations().get(AGG_VALUE_COUNT),
+                f.getAggregations().get(AGG_EXTENDED_STATS),
+                f.getAggregations().get(AGG_CARDINALITY),
                 r.getHits(),
                 query,
                 request.source(),
@@ -467,7 +461,7 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new DateHistogramResult(
-                (org.elasticsearch.search.aggregations.bucket.histogram.Histogram) f.getAggregations().get(AGG_HISTOGRAM),
+                f.getAggregations().get(AGG_HISTOGRAM),
                 query,
                 request.source(),
                 interval,
@@ -513,7 +507,7 @@ public class Searches {
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldHistogramResult(
-                (org.elasticsearch.search.aggregations.bucket.histogram.Histogram) f.getAggregations().get(AGG_HISTOGRAM),
+                f.getAggregations().get(AGG_HISTOGRAM),
                 query,
                 request.source(),
                 interval,
@@ -539,10 +533,6 @@ public class Searches {
         }
 
         return request;
-    }
-
-    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices) {
-        return standardSearchRequest(query, indices, 0, 0, null, null);
     }
 
     private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, TimeRange range) {
@@ -582,21 +572,17 @@ public class Searches {
             query = "*";
         }
 
-        final SearchRequestBuilder srb = c.prepareSearch(indices.toArray(new String[indices.size()]))
-                .setIndicesOptions(IndicesOptions.lenientExpandOpen());
-
         final QueryBuilder queryBuilder;
-
         if (query.trim().equals("*")) {
             queryBuilder = matchAllQuery();
         } else {
-            QueryStringQueryBuilder qs = queryStringQuery(query);
-            qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
-            queryBuilder = qs;
+            queryBuilder = queryStringQuery(query).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
         }
 
-        srb.setQuery(QueryBuilders.filteredQuery(queryBuilder, standardFilters(range, filter)));
-        srb.setFrom(offset);
+        final SearchRequestBuilder srb = c.prepareSearch(indices.toArray(new String[indices.size()]))
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
+                .setQuery(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)))
+                .setFrom(offset);
 
         if (limit > 0) {
             srb.setSize(limit);
@@ -620,23 +606,6 @@ public class Searches {
 
     private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) {
         return standardSearchRequest(query, indices, limit, offset, range, filter, sort, true);
-    }
-
-    private SearchHit oneOfIndex(String index, QueryBuilder q, SortOrder sort) {
-        SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(index);
-        srb.setQuery(q);
-        srb.setSize(1);
-        srb.addSort("timestamp", sort);
-
-        SearchResponse r = c.search(srb.request()).actionGet();
-        recordEsMetrics(r, null);
-
-        if (r.getHits() != null && r.getHits().totalHits() > 0) {
-            return r.getHits().getAt(0);
-        } else {
-            return null;
-        }
     }
 
     private void recordEsMetrics(SearchResponse r, @Nullable TimeRange range) {

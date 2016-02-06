@@ -35,4 +35,6 @@ public interface Node extends Persisted {
     String getShortNodeId();
 
     Node.Type getType();
+
+    String getHostname();
 }

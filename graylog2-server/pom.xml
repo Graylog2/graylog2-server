@@ -38,7 +38,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.0-alpha.2-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -53,22 +53,9 @@
             <artifactId>graylog2-plugin</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-bootstrap</artifactId>
+            <groupId>io.airlift</groupId>
+            <artifactId>airline</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-inputs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-rest-models</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -125,7 +112,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
+            <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
 
@@ -157,6 +144,10 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jsonSchema</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -170,6 +161,14 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-log4j2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-json</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -181,16 +180,28 @@
             <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>jersey-netty</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-bean-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>guice-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>hk2-locator</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -278,11 +289,6 @@
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog.plugins</groupId>
-            <artifactId>usage-statistics</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.wordnik</groupId>
             <artifactId>swagger-annotations</artifactId>
         </dependency>
@@ -306,15 +312,15 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jul</artifactId>
         </dependency>
 
         <dependency>
@@ -346,12 +352,57 @@
             <artifactId>ldap-client-test</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.squareup.retrofit</groupId>
+            <groupId>com.squareup.retrofit2</groupId>
             <artifactId>retrofit</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.squareup.retrofit</groupId>
+            <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-jackson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graylog.repackaged</groupId>
+            <artifactId>os-platform-finder</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hdrhistogram</groupId>
+            <artifactId>HdrHistogram</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>syslog4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
         </dependency>
     </dependencies>
 
@@ -363,6 +414,16 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
             </resource>
         </resources>
         <plugins>
@@ -370,10 +431,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <attach>false</attach>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <attach>true</attach>
+                    <appendAssemblyId>true</appendAssemblyId>
                     <descriptors>
-                        <descriptor>src/main/assembly/graylog2.xml</descriptor>
+                        <descriptor>src/main/assembly/graylog.xml</descriptor>
                     </descriptors>
                     <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
                     <outputDirectory>${project.parent.build.directory}/assembly</outputDirectory>
@@ -422,6 +483,33 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <finalName>graylog</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>${mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useLastCommittedRevision>true</useLastCommittedRevision>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

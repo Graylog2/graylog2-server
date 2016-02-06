@@ -26,11 +26,15 @@ const UsersPage = React.createClass({
           <span>Read more about user management in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.</span>
           <span>
             {this.isPermitted(permissions, 'LDAP_EDIT') &&
-              <Button bsStyle="info">Configure LDAP</Button>
+              <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}>
+                <Button bsStyle="info">Configure LDAP</Button>
+              </LinkContainer>
             }
             {' '}
             {this.isPermitted(permissions, 'LDAPGROUPS_EDIT') &&
-              <Button bsStyle="info">LDAP Group Mapping</Button>
+              <LinkContainer to={Routes.SYSTEM.LDAP.GROUPS}>
+                <Button bsStyle="info">LDAP Group Mapping</Button>
+              </LinkContainer>
             }
             {' '}
             {this.isPermitted(permissions, 'USERS_CREATE') &&

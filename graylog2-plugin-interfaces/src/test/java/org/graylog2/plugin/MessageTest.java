@@ -25,6 +25,7 @@ package org.graylog2.plugin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Sets.symmetricDifference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -55,32 +57,32 @@ public class MessageTest {
 
     @Before
     public void setUp() {
-        originalTimestamp = Tools.iso8601();
+        originalTimestamp = Tools.nowUTC();
         message = new Message("foo", "bar", originalTimestamp);
     }
 
     @Test
     public void testAddFieldDoesOnlyAcceptAlphanumericKeys() throws Exception {
-        Message m = new Message("foo", "bar", Tools.iso8601());
+        Message m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("some_thing", "bar");
         assertEquals("bar", m.getField("some_thing"));
 
-        m = new Message("foo", "bar", Tools.iso8601());
+        m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("some-thing", "bar");
         assertEquals("bar", m.getField("some-thing"));
 
-        m = new Message("foo", "bar", Tools.iso8601());
+        m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("somethin$g", "bar");
         assertNull(m.getField("somethin$g"));
 
-        m = new Message("foo", "bar", Tools.iso8601());
+        m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("someäthing", "bar");
         assertNull(m.getField("someäthing"));
     }
 
     @Test
     public void testAddFieldTrimsValue() throws Exception {
-        Message m = new Message("foo", "bar", Tools.iso8601());
+        Message m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("something", " bar ");
         assertEquals("bar", m.getField("something"));
 
@@ -93,7 +95,7 @@ public class MessageTest {
 
     @Test
     public void testAddFieldWorksWithIntegers() throws Exception {
-        Message m = new Message("foo", "bar", Tools.iso8601());
+        Message m = new Message("foo", "bar", Tools.nowUTC());
         m.addField("something", 3);
         assertEquals(3, m.getField("something"));
     }
@@ -187,9 +189,37 @@ public class MessageTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
 
-        message.setStreams(Lists.newArrayList(stream1, stream2));
+        message.addStreams(Lists.newArrayList(stream2, stream1));
 
-        assertEquals(Lists.newArrayList(stream1, stream2), message.getStreams());
+        // make sure all streams we've added are being returned. Internally it's a set, so don't check the order, it doesn't matter anyway.
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2);
+    }
+
+    @Test
+    public void testStreamMutators() {
+        final Stream stream1 = mock(Stream.class);
+        final Stream stream2 = mock(Stream.class);
+        final Stream stream3 = mock(Stream.class);
+
+        Assertions.assertThat(message.getStreams()).isNotNull();
+        Assertions.assertThat(message.getStreams()).isEmpty();
+
+        message.addStream(stream1);
+
+        final Set<Stream> onlyWithStream1 = message.getStreams();
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        message.addStreams(Sets.newHashSet(stream3, stream2));
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream2, stream3);
+
+        // getStreams is a copy and doesn't change after mutations
+        Assertions.assertThat(onlyWithStream1).containsOnly(stream1);
+
+        // stream2 was assigned
+        Assertions.assertThat(message.removeStream(stream2)).isTrue();
+        // streams2 is no longer assigned
+        Assertions.assertThat(message.removeStream(stream2)).isFalse();
+        Assertions.assertThat(message.getStreams()).containsOnly(stream1, stream3);
     }
 
     @Test
@@ -259,13 +289,14 @@ public class MessageTest {
         assertTrue(Message.validKey("foo123"));
         assertTrue(Message.validKey("foo-bar123"));
         assertTrue(Message.validKey("foo_bar123"));
-        assertTrue(Message.validKey("foo.bar123"));
+        assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
         assertTrue(Message.validKey(""));
 
         assertFalse(Message.validKey("foo bar"));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
+        assertFalse(Message.validKey("foo.bar123"));
         assertFalse(Message.validKey(" "));
     }
 
@@ -308,32 +339,32 @@ public class MessageTest {
 
     @Test
     public void testIsComplete() throws Exception {
-        Message message = new Message("message", "source", Tools.iso8601());
+        Message message = new Message("message", "source", Tools.nowUTC());
         assertTrue(message.isComplete());
 
-        message = new Message("message", "", Tools.iso8601());
+        message = new Message("message", "", Tools.nowUTC());
         assertTrue(message.isComplete());
 
-        message = new Message("message", null, Tools.iso8601());
+        message = new Message("message", null, Tools.nowUTC());
         assertTrue(message.isComplete());
 
-        message = new Message("", "source", Tools.iso8601());
+        message = new Message("", "source", Tools.nowUTC());
         assertFalse(message.isComplete());
 
-        message = new Message(null, "source", Tools.iso8601());
+        message = new Message(null, "source", Tools.nowUTC());
         assertFalse(message.isComplete());
     }
 
     @Test
     public void testGetValidationErrorsWithEmptyMessage() throws Exception {
-        final Message message = new Message("", "source", Tools.iso8601());
+        final Message message = new Message("", "source", Tools.nowUTC());
 
         assertEquals("message is empty, ", message.getValidationErrors());
     }
 
     @Test
     public void testGetValidationErrorsWithNullMessage() throws Exception {
-        final Message message = new Message(null, "source", Tools.iso8601());
+        final Message message = new Message(null, "source", Tools.nowUTC());
 
         assertEquals("message is missing, ", message.getValidationErrors());
     }
@@ -357,11 +388,11 @@ public class MessageTest {
 
     @Test
     public void testGetFieldNames() throws Exception {
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
 
         message.addField("testfield", "testvalue");
 
-        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -16,25 +16,23 @@
  */
 package org.graylog2.commands.journal;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import io.airlift.airline.Arguments;
 import io.airlift.airline.Command;
-import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,10 +48,11 @@ public class JournalDecode extends AbstractJournalCommand {
 
     @Override
     protected List<Module> getCommandBindings() {
-        final ArrayList<Module> modules = Lists.newArrayList(super.getCommandBindings());
-        modules.add(new CodecsModule());
-        modules.add(new ServerObjectMapperModule());
-        return modules;
+        return ImmutableList.<Module>builder()
+                .addAll(super.getCommandBindings())
+                .add(new CodecsModule())
+                .add(new ObjectMapperModule(getClass().getClassLoader()))
+                .build();
     }
 
     @Override
@@ -89,12 +88,12 @@ public class JournalDecode extends AbstractJournalCommand {
         final Long readOffset = range.lowerEndpoint();
         final long count = range.upperEndpoint() - range.lowerEndpoint() + 1;
         final List<Journal.JournalReadEntry> entries = journal.read(readOffset,
-                                                                    count);
+                count);
         for (final Journal.JournalReadEntry entry : entries) {
             final RawMessage raw = RawMessage.decode(entry.getPayload(), entry.getOffset());
             if (raw == null) {
                 System.err.println(MessageFormatter.format("Journal entry at offset {} failed to decode",
-                                                           entry.getOffset()));
+                        entry.getOffset()));
                 continue;
             }
 

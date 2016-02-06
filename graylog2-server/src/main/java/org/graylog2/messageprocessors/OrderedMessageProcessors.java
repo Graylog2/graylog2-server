@@ -1,0 +1,118 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog2.messageprocessors;
+
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * Represents the current MessageProcessor ordering in the system.
+ *
+ * The order is configurable by writing a new MessageProcessorOrder into the ClusterConfig
+ */
+public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
+
+    private final Set<MessageProcessor> processors;
+    private final AtomicReference<List<MessageProcessor>> sortedProcessors =
+            new AtomicReference<>(Collections.emptyList());
+    private Ordering<String> classNameOrdering;
+
+    @Inject
+    public OrderedMessageProcessors(Set<MessageProcessor> processors,
+                                    ClusterConfigService clusterConfigService,
+                                    @ClusterEventBus EventBus clusterEventBus) {
+        this.processors = processors;
+        clusterEventBus.register(this);
+        // TODO by default sort on class name this is probably not the best idea, but for now works.
+        this.classNameOrdering = Ordering.from(String.CASE_INSENSITIVE_ORDER);
+
+        // load existing order from cluster state
+        final MessageProcessorOrder order = clusterConfigService.get(MessageProcessorOrder.class);
+        sortProcessorChain(order);
+    }
+
+    private void sortProcessorChain(MessageProcessorOrder order) {
+        if (order != null) {
+            // if we have an explicit ordering use that (unknown last, partial ordering over the given list)
+            classNameOrdering = new ExplicitOrdering(order.classOrder());
+        }
+        final ImmutableList<MessageProcessor> sortedCopy =
+                classNameOrdering.onResultOf(mp -> mp.getClass().getCanonicalName()).immutableSortedCopy(processors);
+
+        final Collection<MessageProcessor> enabledMessageProcessors =
+                Collections2.filter(sortedCopy,
+                                    mp -> order == null || !order.disabledMessageProcessors().contains(mp.getClass().getCanonicalName()));
+        sortedProcessors.set(ImmutableList.copyOf(enabledMessageProcessors));
+    }
+
+    @Subscribe
+    public void handleOrderingUpdate(MessageProcessorOrder order) {
+        sortProcessorChain(order);
+    }
+
+    @Override
+    public Iterator<MessageProcessor> iterator() {
+        return sortedProcessors.get().iterator();
+    }
+
+    private static class ExplicitOrdering extends Ordering<String> {
+        private final Map<String, Integer> idxMap;
+
+        public ExplicitOrdering(List<String> order) {
+            this.idxMap = Maps.newHashMapWithExpectedSize(order.size());
+            int idx = 0;
+            for (String s : order) {
+                idxMap.put(s, idx);
+                idx++;
+            }
+        }
+
+        @Override
+        public int compare(String left, String right) {
+            final Integer leftIdx = idxMap.get(left);
+            final Integer rightIdx = idxMap.get(right);
+
+            if (leftIdx != null && rightIdx != null) {
+                //noinspection SuspiciousNameCombination
+                return Integer.compare(leftIdx, rightIdx);
+            }
+            if (leftIdx == null && rightIdx == null) {
+                return left.compareTo(right);
+            }
+            if (leftIdx == null) {
+                return -1;
+            }
+            return  1;
+        }
+    }
+}

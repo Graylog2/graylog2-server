@@ -1,8 +1,10 @@
 import Reflux from 'reflux';
-import SessionActions from 'actions/sessions/SessionActions';
+
 import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
 import { Builder } from 'logic/rest/FetchProvider';
+
+import SessionActions from 'actions/sessions/SessionActions';
 
 const SessionStore = Reflux.createStore({
   listenables: [SessionActions],

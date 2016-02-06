@@ -46,7 +46,6 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;

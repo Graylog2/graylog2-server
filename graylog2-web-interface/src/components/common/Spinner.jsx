@@ -11,7 +11,7 @@ const Spinner = React.createClass({
     return {};
   },
   render() {
-    return (<div><i className="fa fa-spin fa-spinner"/> {this.props.text}</div>);
+    return (<span><i className="fa fa-spin fa-spinner"/> {this.props.text}</span>);
   },
 });
 

@@ -20,7 +20,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,13 +30,8 @@ public class TimeRangesTest {
     public void toSecondsHandlesIncompleteTimeRange() throws Exception {
         assertThat(TimeRanges.toSeconds(new TimeRange() {
             @Override
-            public Type getType() {
-                return Type.ABSOLUTE;
-            }
-
-            @Override
-            public Map<String, Object> getPersistedConfig() {
-                return Collections.emptyMap();
+            public String type() {
+                return AbsoluteRange.ABSOLUTE;
             }
 
             @Override
@@ -47,18 +41,18 @@ public class TimeRangesTest {
 
             @Override
             public DateTime getTo() {
+                return null;
+            }
+
+            @Override
+            public Map<String, Object> getPersistedConfig() {
                 return null;
             }
         })).isEqualTo(0);
         assertThat(TimeRanges.toSeconds(new TimeRange() {
             @Override
-            public Type getType() {
-                return Type.ABSOLUTE;
-            }
-
-            @Override
-            public Map<String, Object> getPersistedConfig() {
-                return Collections.emptyMap();
+            public String type() {
+                return AbsoluteRange.ABSOLUTE;
             }
 
             @Override
@@ -69,6 +63,11 @@ public class TimeRangesTest {
             @Override
             public DateTime getTo() {
                 return DateTime.now(DateTimeZone.UTC);
+            }
+
+            @Override
+            public Map<String, Object> getPersistedConfig() {
+                return null;
             }
         })).isEqualTo(0);
     }
@@ -78,8 +77,8 @@ public class TimeRangesTest {
         DateTime from = DateTime.now(DateTimeZone.UTC);
         DateTime to = from.plusMinutes(5);
 
-        assertThat(TimeRanges.toSeconds(new AbsoluteRange(from, to))).isEqualTo(300);
-        assertThat(TimeRanges.toSeconds(new RelativeRange(300))).isEqualTo(300);
-        assertThat(TimeRanges.toSeconds(new KeywordRange("last 5 minutes"))).isEqualTo(300);
+        assertThat(TimeRanges.toSeconds(AbsoluteRange.create(from, to))).isEqualTo(300);
+        assertThat(TimeRanges.toSeconds(RelativeRange.create(300))).isEqualTo(300);
+        assertThat(TimeRanges.toSeconds(KeywordRange.create("last 5 minutes"))).isEqualTo(300);
     }
 }

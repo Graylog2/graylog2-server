@@ -17,7 +17,7 @@ const CreateAlertConditionInput = React.createClass({
       type: this.PLACEHOLDER,
     };
   },
-  PLACEHOLDER: "placeholder",
+  PLACEHOLDER: 'placeholder',
   alertConditionsFactory: new AlertConditionsFactory(),
   _onChange(evt) {
     this.setState({type: evt.target.value});
@@ -27,7 +27,7 @@ const CreateAlertConditionInput = React.createClass({
     const request = {
       type: this.state.type,
       parameters: this.refs.conditionForm.getValue(),
-    }
+    };
     AlertConditionsActions.save(this.props.streamId, request);
   },
   _formatConditionForm(type) {
@@ -44,19 +44,20 @@ const CreateAlertConditionInput = React.createClass({
           <h2 style={{marginBotton: '10px'}}>
             Add new alert condition
           </h2>
+          <p className="description">
+            Configure conditions that will trigger stream alerts when they are fulfilled.
+          </p>
 
-          <form className="form-inline" onSubmit={this.props.onSubmit}>
+          <form className="form-inline" onSubmit={this._onSubmit}>
             <div className="form-group" style={{display: 'block'}}>
               <Input type="select" className="add-alert-type form-control" value={this.state.type} onChange={this._onChange}>
                 <option value={this.PLACEHOLDER} disabled>Select Alert Condition Type</option>
                 {availableTypes}
               </Input>
-              {' '}
-              <Button type="submit" bsStyle="success" className="form-control add-alert" disabled={this.state.type === this.PLACEHOLDER}>
-                Create new alert condition
-              </Button>
-
               {conditionForm}
+              {conditionForm !== null && <Button type="submit" bsStyle="success" className="form-control add-alert">
+                Create new alert condition
+              </Button>}
             </div>
           </form>
         </Col>

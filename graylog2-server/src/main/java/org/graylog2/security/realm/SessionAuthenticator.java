@@ -22,7 +22,7 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.graylog2.security.SessionIdToken;
+import org.graylog2.shared.security.SessionIdToken;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -74,7 +74,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final MultivaluedMap<String, String> requestHeaders = (MultivaluedMap<String, String>) ThreadContext.get(
                 "REQUEST_HEADERS");
         // extend session unless the relevant header was passed.
-        if (requestHeaders == null || !"true".equalsIgnoreCase(requestHeaders.getFirst("X-Graylog2-No-Session-Extension"))) {
+        if (requestHeaders == null || !"true".equalsIgnoreCase(requestHeaders.getFirst("X-Graylog-No-Session-Extension"))) {
             session.touch();
         } else {
             LOG.debug("Not extending session because the request indicated not to.");

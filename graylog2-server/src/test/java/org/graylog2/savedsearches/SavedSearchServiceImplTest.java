@@ -110,7 +110,7 @@ public class SavedSearchServiceImplTest {
         final String title = "Example Title";
         final Map<String, Object> query =Collections.emptyMap();
         final String creatorUserId = "someuser";
-        final DateTime createdAt = Tools.iso8601();
+        final DateTime createdAt = Tools.nowUTC();
 
         final SavedSearch savedSearch = savedSearchService.create(title, query, creatorUserId, createdAt);
 

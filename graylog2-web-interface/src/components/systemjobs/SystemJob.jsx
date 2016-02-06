@@ -11,8 +11,8 @@ const SystemJob = React.createClass({
     return (
       <div>
         <i className="fa fa-cog" />{' '}
-        Started <span data-toggle="tooltip" title={job.info}>{job.name}</span>{' '}
-        on <LinkToNode nodeId={job.node_id}/>{' '}
+        <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
+        - Started on <LinkToNode nodeId={job.node_id}/>{' '}
         <Timestamp dateTime={job.started_at} relative/>{' '}
 
         {progress}

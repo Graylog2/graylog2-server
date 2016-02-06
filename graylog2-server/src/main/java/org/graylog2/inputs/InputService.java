@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface InputService extends PersistedService {
+    List<Input> all();
+
     List<Input> allOfThisNode(String nodeId);
 
     Input create(String id, Map<String, Object> fields);

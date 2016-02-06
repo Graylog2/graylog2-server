@@ -42,16 +42,26 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isMaster, URI restTransportUri) {
+    public String registerServer(String nodeId, boolean isMaster, URI restTransportUri, String hostname) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
         fields.put("type", Node.Type.SERVER.toString());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restTransportUri.toString());
+        fields.put("hostname", hostname);
 
         try {
-            return save(new NodeImpl(fields));
+            Node node;
+            try {
+                // Update existing node object.
+                final String objectId = byNodeId(nodeId).getId();
+                node = new NodeImpl(new ObjectId(objectId), fields);
+            } catch (NodeNotFoundException e) {
+                // Create new node object.
+                node = new NodeImpl(fields);
+            }
+            return save(node);
         } catch (ValidationException e) {
             throw new RuntimeException("Validation failed.", e);
         }

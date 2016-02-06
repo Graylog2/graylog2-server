@@ -36,7 +36,7 @@ const AlertsComponent = React.createClass({
     const triggeredAlertsText = this.state.alerts.total > 0 ? <span>&nbsp; <small>{this.state.alerts.total} alerts total</small></span> : null;
 
     return (
-      <Row className="content">
+      <Row className="content triggered-alerts">
         <Col md={12}>
           <h2>
             Triggered alerts

@@ -1,8 +1,8 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require('util/URLUtils');
-import UserNotification = require("util/UserNotification");
+const URLUtils = require('util/URLUtils');
+const UserNotification = require('util/UserNotification');
 const fetch = require('logic/rest/FetchProvider').default;
 
 const ToolsStore = {

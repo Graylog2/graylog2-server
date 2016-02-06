@@ -945,7 +945,7 @@
       this.type = this.type.toUpperCase();
 
       if(this.type != "GET") {
-        if(!confirm("Really execute this non-GET operation? It will be executed on the graylog2-server node.")){
+        if(!confirm("Really execute this non-GET operation? It will be executed on the Graylog server node.")){
           $(".response_throbber").hide();
           return;
         }
@@ -1004,13 +1004,16 @@
       }
       responseContentType = null;
       if (this.type === "POST" || this.type === "GET" || this.type === "PATCH") {
+        responseContentType = "application/json";
+
         if (this.opts.responseContentType) {
           responseContentType = this.opts.responseContentType;
-        } else {
-          responseContentType = "application/json";
+        } else if (this.operation.produces && this.operation.produces.length > 0) {
+          // Use the first non-json content-type if json is not offered by that endpoint
+          if (this.operation.produces.indexOf(responseContentType) === -1) {
+            responseContentType =  this.operation.produces[0];
+          }
         }
-      } else {
-        responseContentType = null;
       }
       if (responseContentType && this.operation.produces) {
         if (this.operation.produces.indexOf(responseContentType) === -1) {

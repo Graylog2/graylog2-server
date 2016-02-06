@@ -1,6 +1,7 @@
 import React from 'react';
 import jQuery from 'jquery';
 
+import {TypeAheadFieldInput} from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
 
 const FieldContentConditionForm = React.createClass({
@@ -15,21 +16,34 @@ const FieldContentConditionForm = React.createClass({
       },
     };
   },
+  getInitialState() {
+    return {
+      field: this.props.alertCondition.field,
+    };
+  },
   getValue() {
     return jQuery.extend({
-      field: this.refs.field.value,
+      field: this.state.field,
       value: this.refs.value.value,
     }, this.refs.gracePeriod.getValue());
+  },
+  _onFieldChange(event) {
+    this.setState({field: event.target.value});
   },
   render() {
     const alertCondition = this.props.alertCondition;
     return (
       <span>
         Trigger alert when a message arrives that has the field{' '}
-        <input ref="field" type="text" className="form-control typeahead-fields" autoComplete="off" required defaultValue={alertCondition.field}/>
+        <TypeAheadFieldInput ref="fieldInput"
+                             type="text"
+                             autoComplete="off"
+                             defaultValue={alertCondition.field}
+                             onChange={this._onFieldChange}
+                             required />
         <br />
         set to{' '}
-        <input ref="value" type="text" className="form-control typeahead-fields" autoComplete="off" required defaultValue={alertCondition.value}/>
+        <input ref="value" type="text" className="form-control" autoComplete="off" required defaultValue={alertCondition.value}/>
         {' '}
         <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
       </span>

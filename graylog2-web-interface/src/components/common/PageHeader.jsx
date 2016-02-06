@@ -19,7 +19,7 @@ const PageHeader = React.createClass({
     };
   },
   render() {
-    const children = (this.props.children.length !== undefined ? this.props.children : [this.props.children]);
+    const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
     return (
       <span>
         <Row className="content content-head">

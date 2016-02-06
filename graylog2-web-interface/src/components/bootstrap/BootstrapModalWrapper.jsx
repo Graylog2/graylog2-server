@@ -5,16 +5,6 @@ import {Modal} from 'react-bootstrap';
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
  */
 class BootstrapModalWrapper extends Component {
-  static propTypes = {
-    showModal: PropTypes.bool,
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-    onOpen: PropTypes.func,
-    onClose: PropTypes.func,
-  };
-
   constructor(props) {
     super(props);
 
@@ -54,5 +44,15 @@ class BootstrapModalWrapper extends Component {
     );
   }
 }
+
+BootstrapModalWrapper.propTypes = {
+  showModal: PropTypes.bool,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]).isRequired,
+  onOpen: PropTypes.func,
+  onClose: PropTypes.func,
+};
 
 export default BootstrapModalWrapper;

@@ -28,7 +28,6 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.SearchesConfigBuilder;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -90,14 +89,14 @@ public class AbsoluteSearchResource extends SearchResource {
         final List<String> fieldList = parseOptionalFields(fields);
 
         TimeRange timeRange = buildAbsoluteTimeRange(from, to);
-        final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
-                .setQuery(query)
-                .setFilter(filter)
-                .setFields(fieldList)
-                .setRange(timeRange)
-                .setLimit(limit)
-                .setOffset(offset)
-                .setSorting(sorting)
+        final SearchesConfig searchesConfig = SearchesConfig.builder()
+                .query(query)
+                .filter(filter)
+                .fields(fieldList)
+                .range(timeRange)
+                .limit(limit)
+                .offset(offset)
+                .sorting(sorting)
                 .build();
 
         try {
@@ -311,7 +310,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {
         try {
-            return new AbsoluteRange(from, to);
+            return AbsoluteRange.create(from, to);
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);

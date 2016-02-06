@@ -21,8 +21,10 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.system.activities.Activity;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 public class IndexRotationThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
@@ -41,7 +44,8 @@ public class IndexRotationThread extends Periodical {
     private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final Indices indices;
-    private final Provider<RotationStrategy> rotationStrategyProvider;
+    private final ClusterConfigService clusterConfigService;
+    private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -49,13 +53,15 @@ public class IndexRotationThread extends Periodical {
                                Deflector deflector,
                                Cluster cluster,
                                ActivityWriter activityWriter,
-                               Provider<RotationStrategy> rotationStrategyProvider) {
+                               ClusterConfigService clusterConfigService,
+                               Map<String, Provider<RotationStrategy>> rotationStrategyMap) {
         this.notificationService = notificationService;
         this.deflector = deflector;
         this.cluster = cluster;
         this.activityWriter = activityWriter;
         this.indices = indices;
-        this.rotationStrategyProvider = rotationStrategyProvider;
+        this.clusterConfigService = clusterConfigService;
+        this.rotationStrategyMap = rotationStrategyMap;
     }
 
     @Override
@@ -79,27 +85,28 @@ public class IndexRotationThread extends Periodical {
     }
 
     protected void checkForRotation() {
+        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
+
+        if (config == null) {
+            LOG.warn("No index management configuration found, not running index rotation!");
+            return;
+        }
+
+        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategy());
+
+        if (rotationStrategyProvider == null) {
+            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategy());
+            return;
+        }
+
         final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
 
-        String currentTarget;
-        try {
-            currentTarget = deflector.getNewestTargetName();
-        } catch (NoTargetIndexException e) {
-            LOG.error("Could not find current deflector target. Aborting.", e);
+        if (rotationStrategy == null) {
+            LOG.warn("No rotation strategy found, not running index rotation!");
             return;
         }
-        final RotationStrategy.Result rotate = rotationStrategy.shouldRotate(currentTarget);
-        if (rotate == null) {
-            LOG.error("Cannot perform rotation at this moment.");
-            return;
-        }
-        LOG.debug("Rotation strategy result: {}", rotate.getDescription());
-        if (rotate.shouldRotate()) {
-            LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", currentTarget);
-            deflector.cycle();
-        } else {
-            LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", currentTarget);
-        }
+
+        rotationStrategy.rotate();
     }
 
     protected void checkAndRepair() {

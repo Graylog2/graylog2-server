@@ -74,7 +74,7 @@ public class FilterServiceImpl implements FilterService {
     @Override
     public FilterDescription save(FilterDescription filter) throws ValidationException {
         if (filter.createdAt == null) {
-            filter.createdAt = Tools.iso8601();
+            filter.createdAt = Tools.nowUTC();
         }
         if (!validate(filter)) {
             throw new ValidationException("Validation failed.");

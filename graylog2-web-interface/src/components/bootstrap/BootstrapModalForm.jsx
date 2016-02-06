@@ -12,31 +12,6 @@ import { validate } from 'legacy/validations.js';
  * has, and providing form validation using HTML5 and our custom validation.
  */
 class BootstrapModalForm extends Component {
-  static propTypes = {
-    /* Modal title */
-    title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /* Form contents, included in the modal body */
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-    onModalOpen: PropTypes.func,
-    onModalClose: PropTypes.func,
-    onSubmitForm: PropTypes.func,
-    /* Object with additional props to pass to the form */
-    formProps: PropTypes.object,
-    /* Text to use in the cancel button. "Cancel" is the default */
-    cancelButtonText: PropTypes.string,
-    /* Text to use in the submit button. "Submit" is the default */
-    submitButtonText: PropTypes.string,
-  };
-
-  static defaultProps = {
-    formProps: {},
-    cancelButtonText: 'Cancel',
-    submitButtonText: 'Submit',
-  };
-
   constructor(props) {
     super(props);
 
@@ -109,5 +84,30 @@ class BootstrapModalForm extends Component {
     );
   }
 }
+
+BootstrapModalForm.propTypes = {
+  /* Modal title */
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  /* Form contents, included in the modal body */
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]).isRequired,
+  onModalOpen: PropTypes.func,
+  onModalClose: PropTypes.func,
+  onSubmitForm: PropTypes.func,
+  /* Object with additional props to pass to the form */
+  formProps: PropTypes.object,
+  /* Text to use in the cancel button. "Cancel" is the default */
+  cancelButtonText: PropTypes.string,
+  /* Text to use in the submit button. "Submit" is the default */
+  submitButtonText: PropTypes.string,
+};
+
+BootstrapModalForm.defaultProps = {
+  formProps: {},
+  cancelButtonText: 'Cancel',
+  submitButtonText: 'Submit',
+};
 
 export default BootstrapModalForm;

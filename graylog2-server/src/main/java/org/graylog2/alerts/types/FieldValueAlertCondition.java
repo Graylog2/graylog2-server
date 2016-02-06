@@ -67,7 +67,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private final String field;
     private final DecimalFormat decimalFormat;
     private final Searches searches;
-    private List<Message> searchHits = Lists.newArrayList();
 
     @AssistedInject
     public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
@@ -76,9 +75,9 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
-        this.time = (Integer) parameters.get("time");
+        this.time = Integer.parseInt(String.valueOf(parameters.get("time")));
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = (Number) parameters.get("threshold");
+        this.threshold = Double.parseDouble(String.valueOf(parameters.get("threshold")));
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase(Locale.ENGLISH));
         this.field = (String) parameters.get("field");
 
@@ -101,7 +100,8 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         try {
             final String filter = "streams:" + stream.getId();
             // TODO we don't support cardinality yet
-            final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60), false, true, false);
+            final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter,
+                                                                          RelativeRange.create(time * 60), false, true, false);
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
@@ -161,15 +161,14 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     final List<ResultMessage> searchResult = fieldStatsResult.getSearchHits();
                     summaries = Lists.newArrayListWithCapacity(searchResult.size());
                     for (ResultMessage resultMessage : searchResult) {
-                        final Message msg = new Message(resultMessage.getMessage());
-                        this.searchHits.add(msg);
+                        final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }
                 } else {
                     summaries = Collections.emptyList();
                 }
 
-                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
+                return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);
             }
@@ -185,10 +184,5 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
             return new NegativeCheckResult(this);
         }
-    }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return Lists.newArrayList(searchHits);
     }
 }

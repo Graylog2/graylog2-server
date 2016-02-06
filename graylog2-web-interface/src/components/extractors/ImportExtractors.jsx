@@ -13,7 +13,7 @@ const ImportExtractors = React.createClass({
     try {
       const parsedExtractors = JSON.parse(this.refs.extractorsInput.getValue());
       const extractors = parsedExtractors.extractors;
-      ExtractorsActions.import(this.props.input.input_id, extractors);
+      ExtractorsActions.import(this.props.input.id, extractors);
     } catch (error) {
       UserNotification.error('There was an error while parsing extractors. Are they in JSON format? ' + error,
         'Could not import extractors');

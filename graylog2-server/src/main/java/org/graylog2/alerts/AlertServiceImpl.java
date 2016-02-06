@@ -118,7 +118,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
         DateTime triggeredAt = new DateTime(alert.get("triggered_at"), DateTimeZone.UTC);
 
-        return Seconds.secondsBetween(triggeredAt, Tools.iso8601()).getSeconds();
+        return Seconds.secondsBetween(triggeredAt, Tools.nowUTC()).getSeconds();
     }
 
     @Override
@@ -176,7 +176,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
         }
 
-        return createAlertCondition(alertConditionType, stream, null, Tools.iso8601(), userId, ccr.parameters());
+        return createAlertCondition(alertConditionType, stream, null, Tools.nowUTC(), userId, ccr.parameters());
     }
 
     @Override

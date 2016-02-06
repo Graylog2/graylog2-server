@@ -1,15 +1,19 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import { Input } from 'react-bootstrap';
 import { substringMatcher } from 'logic/search/UniversalSearch';
-
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/typeahead.jquery.min.js');
+import $ from 'jquery';
+import Typeahead from 'typeahead.js';
 
 const TypeAheadInput = React.createClass({
   propTypes: {
-    label: React.PropTypes.string.isRequired,
-    onKeyPress: React.PropTypes.func,
+    label: PropTypes.string.isRequired,
+    onKeyPress: PropTypes.func,
+    displayKey: PropTypes.string,
+    suggestions: PropTypes.array, // [ "some string", "otherstring" ]
+    suggestionText: PropTypes.string,
+    onTypeaheadLoaded: PropTypes.func,
+    onSuggestionSelected: PropTypes.func,
   },
 
   componentDidMount() {
@@ -39,8 +43,6 @@ const TypeAheadInput = React.createClass({
 
     const $fieldInput = $(this.fieldInput);
 
-    // props.suggestions:
-    // [ "some string", "otherstring" ]
     $fieldInput.typeahead({
       hint: true,
       highlight: true,
@@ -51,7 +53,12 @@ const TypeAheadInput = React.createClass({
         displayKey: props.displayKey,
         source: substringMatcher(props.suggestions, props.displayKey, 6),
         templates: {
-          suggestion: (value) => `<div><strong>${ props.suggestionText }</strong> ${ value.value }</div>`,
+          suggestion: (value) => {
+            if (props.suggestionText) {
+              return `<div><strong>${props.suggestionText}</strong> ${value[props.displayKey]}</div>`;
+            }
+            return `<div>${value.value}</div>`;
+          },
         },
       });
 
@@ -61,7 +68,9 @@ const TypeAheadInput = React.createClass({
     }
 
     $(this.fieldFormGroup).on('typeahead:select typeahead:autocomplete', (event, suggestion) => {
-      props.onSuggestionSelected(event, suggestion);
+      if (props.onSuggestionSelected) {
+        props.onSuggestionSelected(event, suggestion);
+      }
     });
   },
   render() {

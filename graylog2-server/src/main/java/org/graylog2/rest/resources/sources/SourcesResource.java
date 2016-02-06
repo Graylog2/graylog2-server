@@ -90,7 +90,7 @@ public class SourcesResource extends RestResource {
                 @Override
                 public TermsResult call() throws Exception {
                     try {
-                        return searches.terms("source", size, "*", new RelativeRange(range));
+                        return searches.terms("source", size, "*", RelativeRange.create(range));
                     } catch (InvalidRangeParametersException | InvalidRangeFormatException e) {
                         throw new ExecutionException(e);
                     }

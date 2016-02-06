@@ -9,11 +9,9 @@ import NotificationsActions from 'actions/notifications/NotificationsActions';
 const NotificationsStore = Reflux.createStore({
   listenables: [NotificationsActions],
   notifications: undefined,
-  POLL_INTERVAL: 3000,
 
   init() {
     this.list();
-    setInterval(this.list, this.POLL_INTERVAL);
   },
   getInitialState() {
     if (this.notifications) {
@@ -26,7 +24,7 @@ const NotificationsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.NotificationsApiController.list().url);
     const promise = new Builder('GET', url)
       .authenticated()
-      .setHeader('X-Graylog2-No-Session-Extension', 'true')
+      .setHeader('X-Graylog-No-Session-Extension', 'true')
       .json()
       .build();
 

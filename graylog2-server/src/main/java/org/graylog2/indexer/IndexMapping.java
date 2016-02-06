@@ -33,6 +33,15 @@ import java.util.Map;
 public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
 
+    public Map<String, Object> messageTemplate(final String template, final String analyzer) {
+        final ImmutableMap<String, Object> map = ImmutableMap.<String, Object>of(TYPE_MESSAGE, messageMapping(analyzer));
+
+        return ImmutableMap.<String, Object>of(
+                "template", template,
+                "mappings", map
+        );
+    }
+
     public Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(
                 "properties", partFieldProperties(analyzer),

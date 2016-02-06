@@ -6,6 +6,9 @@ var BootstrapModalForm = require('../bootstrap/BootstrapModalForm');
 var Input = require('react-bootstrap').Input;
 
 var StreamForm = React.createClass({
+    propTypes: {
+      onSubmit: React.PropTypes.func.isRequired,
+    },
     mixins: [LinkedStateMixin],
     getInitialState() {
         return this._getValuesFromProps(this.props);

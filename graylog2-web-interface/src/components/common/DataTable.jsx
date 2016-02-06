@@ -15,12 +15,13 @@ const DataTable = React.createClass({
   propTypes: {
     children: React.PropTypes.node,
     className: React.PropTypes.string,
+    rowClassName: React.PropTypes.string,
     displayKey: React.PropTypes.string,
     dataRowFormatter: React.PropTypes.func.isRequired,
     filterBy: React.PropTypes.string,
     filterLabel: React.PropTypes.string.isRequired,
     filterKeys: React.PropTypes.array.isRequired,
-    filterSuggestions: React.PropTypes.string,
+    filterSuggestions: React.PropTypes.array,
     headerCellFormatter: React.PropTypes.func.isRequired,
     headers: React.PropTypes.array.isRequired,
     id: React.PropTypes.string,
@@ -31,6 +32,7 @@ const DataTable = React.createClass({
     return {
       filterSuggestions: [],
       displayKey: 'value',
+      rowClassName: '',
     };
   },
   getInitialState() {
@@ -113,7 +115,7 @@ const DataTable = React.createClass({
     return (
       <div>
         {filter}
-        <div className="row">
+        <div className={`row ${this.props.rowClassName}`}>
           <div className="col-md-12">
             <div id={this.props.id} className="data-table table-responsive">
               {data}

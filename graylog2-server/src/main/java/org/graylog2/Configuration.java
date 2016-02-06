@@ -37,7 +37,7 @@ import static org.graylog2.plugin.Tools.getUriWithPort;
 import static org.graylog2.plugin.Tools.getUriWithScheme;
 
 /**
- * Helper class to hold configuration of Graylog2
+ * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
@@ -48,10 +48,10 @@ public class Configuration extends BaseConfiguration {
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT + "/");
+    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/");
 
     @Parameter(value = "web_listen_uri", required = true)
-    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_WEB_PORT + "/");
+    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/");
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 500;
@@ -204,12 +204,12 @@ public class Configuration extends BaseConfiguration {
 
     @Override
     public URI getRestListenUri() {
-        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(restListenUri, getRestUriScheme()), GRAYLOG2_DEFAULT_PORT), "/");
+        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(restListenUri, getRestUriScheme()), GRAYLOG_DEFAULT_PORT), "/");
     }
 
     @Override
     public URI getWebListenUri() {
-        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(webListenUri, getWebUriScheme()), GRAYLOG2_DEFAULT_WEB_PORT), "/");
+        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(webListenUri, getWebUriScheme()), GRAYLOG_DEFAULT_WEB_PORT), "/");
     }
 
     public String getRootUsername() {

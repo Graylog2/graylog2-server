@@ -24,6 +24,9 @@ const jsRoutes = {
       CountsApiController: {
         total: () => { return {url: '/count/total'}; },
       },
+      ClusterApiResource: {
+        node: () => { return {url: '/system/cluster/node'}; },
+      },
       DashboardsApiController: {
         create: () => { return {url: '/dashboards' }; },
         index: () => { return {url: '/dashboards' }; },
@@ -53,6 +56,7 @@ const jsRoutes = {
       IndexRangesApiController: {
         list: () => { return {url: '/system/indices/ranges'}; },
         rebuild: () => { return {url: '/system/indices/ranges/rebuild'}; },
+        rebuildSingle: (index) => { return {url: `/system/indices/ranges/${index}/rebuild`}; },
       },
       IndicesApiController: {
         close: (indexName) => { return {url: '/system/indexer/indices/' + indexName + '/close'}; },
@@ -65,6 +69,15 @@ const jsRoutes = {
         list: () => { return {url: '/system/inputs'}; },
         get: (id) => { return {url: `/system/inputs/${id}`}; },
         globalRecentMessage: (inputId) => { return {url: '/' + inputId}; },
+      },
+      InputStatesController: {
+        start: (inputId) => { return {url: `/system/inputstates/${inputId}`}; },
+        stop: (inputId) => { return {url: `/system/inputstates/${inputId}`}; },
+      },
+      ClusterInputStatesController: {
+        list: () => { return {url: '/cluster/inputstates'}; },
+        start: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
+        stop: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
       },
       MessageFieldsApiController: {
         list: () => { return {url: '/system/fields'}; },
@@ -132,10 +145,12 @@ const jsRoutes = {
       },
       SystemApiController: {
         info: () => { return {url: '/system'}; },
+        jvm: () => { return {url: '/system/jvm'}; },
         fields: () => { return {url: '/system/fields'}; },
       },
       SystemJobsApiController: {
         list: () => { return {url: '/cluster/jobs'}; },
+        getJob: (jobId) => { return {url: '/cluster/jobs/' + jobId}; },
       },
       SystemMessagesApiController: {
         all: (page) => { return {url: '/system/messages?page=' + page}; },
@@ -185,7 +200,6 @@ const jsRoutes = {
         load: (username) => { return {url: '/users/' + username}; },
         delete: (username) => { return {url: '/users/' + username}; },
         update: (username) => { return {url: '/users/' + username}; },
-        updateRoles: (username) => { return {url: '/users/' + username + '/roles'}; },
       },
     },
     DashboardsController: {
@@ -209,9 +223,6 @@ const jsRoutes = {
     },
     RadiosController: {
       show: (nodeId) => { return {url: `/system/radios/${nodeId}`}; },
-    },
-    StreamRulesController: {
-      index: (streamId) => { return {url: `/streams/${streamId}/rules`}; },
     },
     SearchController: {
       index: (query, rangetype, timerange) => {

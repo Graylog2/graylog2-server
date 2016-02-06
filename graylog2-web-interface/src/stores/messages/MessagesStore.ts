@@ -4,8 +4,8 @@ const moment = require('moment');
 
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
-import UserNotification = require("util/UserNotification");
-import URLUtils = require("util/URLUtils");
+const UserNotification = require('util/UserNotification');
+const URLUtils = require('util/URLUtils');
 const MessageFieldsFilter = require('logic/message/MessageFieldsFilter');
 
 interface Field {
@@ -25,16 +25,17 @@ var MessagesStore = {
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
             .then(response => {
                 const message = response.message;
-                const filteredFields = MessageFieldsFilter.filterFields(message);
+                const fields = message.fields;
+                const filteredFields = MessageFieldsFilter.filterFields(fields);
                 const newMessage = {
-                    id: message._id,
+                    id: message.id,
                     timestamp: moment(message.timestamp).unix(),
                     filtered_fields: filteredFields,
                     formatted_fields: filteredFields,
-                    fields: message,
+                    fields: fields,
                     index: response.index,
-                    source_node_id: message.gl2_source_node,
-                    source_input_id: message.gl2_source_input,
+                    source_node_id: fields.gl2_source_node,
+                    source_input_id: fields.gl2_source_input,
                     stream_ids: message.streams,
                 };
 

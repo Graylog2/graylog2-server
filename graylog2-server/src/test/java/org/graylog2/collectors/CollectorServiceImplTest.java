@@ -23,9 +23,9 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
-import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(JukitoRunner.class)
-@UseModules({ServerObjectMapperModule.class, ValidatorModule.class})
+@UseModules({ObjectMapperModule.class, ValidatorModule.class})
 @CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
 public class CollectorServiceImplTest {
     @ClassRule

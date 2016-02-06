@@ -1,4 +1,5 @@
-import $ from 'jquery';
+require('!script!../../public/javascripts/jquery-2.1.1.min.js');
+require('!script!../../public/javascripts/bootstrap.min.js');
 
 $(document).ready(function () {
     "use strict";
@@ -111,7 +112,7 @@ function dispatchRuleValidation($ref, validatorType) {
             break;
         case "alphanum_underscore":
             if (!validateAlphanumericUnderscores($ref)) {
-                validationFailure($ref, "Must only contain alphanumeric chars or underscores");
+                validationFailure($ref, "Must only contain alphanumeric characters or underscores");
                 errors = true;
             }
             break;

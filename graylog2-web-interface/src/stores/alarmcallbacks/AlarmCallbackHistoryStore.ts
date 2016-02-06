@@ -1,5 +1,5 @@
-import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
+const UserNotification = require('util/UserNotification');
+const URLUtils = require('util/URLUtils');
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
@@ -11,7 +11,11 @@ class AlarmCallbackHistoryStore {
         };
         var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
 
-        return fetch('GET', url).catch(failCallback);
+        return fetch('GET', url)
+          .then(
+            response => response.histories,
+            failCallback
+          );
     }
 }
 const alarmCallbackHistoryStore = new AlarmCallbackHistoryStore();

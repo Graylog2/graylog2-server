@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
@@ -7,17 +7,29 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 const IfPermitted = React.createClass({
   propTypes: {
-    children: React.PropTypes.node.isRequired,
-    permissions: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.arrayOf(React.PropTypes.string),
+    children: PropTypes.node.isRequired,
+    permissions: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string),
     ]).isRequired,
+    anyPermissions: PropTypes.bool,
   },
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  getDefaultProps() {
+    return {
+      anyPermissions: false,
+    };
+  },
+  _checkPermissions() {
+    if (this.props.anyPermissions) {
+      return this.isAnyPermitted(this.state.currentUser.permissions, this.props.permissions);
+    }
+
+    return this.isPermitted(this.state.currentUser.permissions, this.props.permissions);
+  },
   render() {
-    const permissions = this.state.currentUser.permissions;
-    if (this.isPermitted(permissions, this.props.permissions)) {
-      return this.props.children;
+    if (this._checkPermissions()) {
+      return React.Children.count(this.props.children) > 1 ? <span>{this.props.children}</span> : this.props.children;
     }
 
     return null;

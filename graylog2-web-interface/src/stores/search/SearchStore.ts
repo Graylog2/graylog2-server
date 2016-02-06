@@ -9,7 +9,7 @@ import Immutable = require('immutable');
 import jsRoutes = require('routing/jsRoutes');
 const Routes = require('routing/Routes');
 var Qs = require('qs');
-var URLUtils = require('../../util/URLUtils');
+const URLUtils = require('util/URLUtils');
 
 class SearchStore {
     static NOT_OPERATOR = "NOT";

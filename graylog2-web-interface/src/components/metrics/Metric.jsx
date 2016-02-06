@@ -16,7 +16,7 @@ const Metric = React.createClass({
   iconMapping: {
     timer: 'clock-o',
     histogram: 'signal',
-    meter: 'circle',
+    meter: 'play-circle',
     gauge: 'dashboard',
     counter: 'circle',
   },

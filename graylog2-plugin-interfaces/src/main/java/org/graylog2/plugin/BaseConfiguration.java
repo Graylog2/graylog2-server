@@ -35,15 +35,15 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
+import java.nio.file.Path;
 
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
-    protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
-    protected static final int GRAYLOG2_DEFAULT_WEB_PORT = 9000;
+    protected static final int GRAYLOG_DEFAULT_PORT = 12900;
+    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -67,7 +67,7 @@ public abstract class BaseConfiguration {
     private String inputBufferWaitStrategy = "blocking";
 
     @Parameter(value = "rest_enable_cors")
-    private boolean restEnableCors = false;
+    private boolean restEnableCors = true;
 
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
@@ -78,26 +78,20 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_max_header_size", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxHeaderSize = 8192;
 
-    @Parameter(value = "rest_max_chunk_size", required = true, validator = PositiveIntegerValidator.class)
-    private int restMaxChunkSize = 8192;
+    @Parameter(value = "rest_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int restThreadPoolSize = 16;
 
     @Parameter(value = "rest_enable_tls")
     private boolean restEnableTls = false;
 
-    @Parameter(value = "rest_thread_pool_size")
-    private int restThreadPoolSize = 16;
-
     @Parameter(value = "rest_tls_cert_file")
-    private File restTlsCertFile;
+    private Path restTlsCertFile;
 
     @Parameter(value = "rest_tls_key_file")
-    private File restTlsKeyFile;
+    private Path restTlsKeyFile;
 
     @Parameter(value = "rest_tls_key_password")
     private String restTlsKeyPassword;
-
-    @Parameter(value = "rest_worker_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int restWorkerThreadsMaxPoolSize = 16;
 
     @Parameter(value = "plugin_dir")
     private String pluginDir = "plugin";
@@ -147,26 +141,20 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_max_header_size", required = true, validator = PositiveIntegerValidator.class)
     private int webMaxHeaderSize = 8192;
 
-    @Parameter(value = "web_max_chunk_size", required = true, validator = PositiveIntegerValidator.class)
-    private int webMaxChunkSize = 8192;
-
     @Parameter(value = "web_enable_tls")
     private boolean webEnableTls = false;
 
-    @Parameter(value = "web_thread_pool_size")
+    @Parameter(value = "web_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int webThreadPoolSize = 16;
 
     @Parameter(value = "web_tls_cert_file")
-    private File webTlsCertFile;
+    private Path webTlsCertFile;
 
     @Parameter(value = "web_tls_key_file")
-    private File webTlsKeyFile;
+    private Path webTlsKeyFile;
 
     @Parameter(value = "web_tls_key_password")
     private String webTlsKeyPassword;
-
-    @Parameter(value = "web_worker_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int webWorkerThreadsMaxPoolSize = 16;
 
     public String getRestUriScheme() {
         return getUriScheme(isRestEnableTls());
@@ -181,7 +169,7 @@ public abstract class BaseConfiguration {
     }
 
     public URI getRestTransportUri() {
-        return Tools.getUriWithPort(restTransportUri, GRAYLOG2_DEFAULT_PORT);
+        return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
     }
 
     public void setRestTransportUri(final URI restTransportUri) {
@@ -206,7 +194,7 @@ public abstract class BaseConfiguration {
             }
 
             transportUri = Tools.getUriWithPort(
-                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG2_DEFAULT_PORT);
+                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG_DEFAULT_PORT);
         } else {
             transportUri = listenUri;
         }
@@ -267,32 +255,24 @@ public abstract class BaseConfiguration {
         return restMaxHeaderSize;
     }
 
-    public int getRestMaxChunkSize() {
-        return restMaxChunkSize;
+    public int getRestThreadPoolSize() {
+        return restThreadPoolSize;
     }
 
     public boolean isRestEnableTls() {
         return restEnableTls;
     }
 
-    public int getRestThreadPoolSize() {
-        return restThreadPoolSize;
-    }
-
-    public File getRestTlsCertFile() {
+    public Path getRestTlsCertFile() {
         return restTlsCertFile;
     }
 
-    public File getRestTlsKeyFile() {
+    public Path getRestTlsKeyFile() {
         return restTlsKeyFile;
     }
 
     public String getRestTlsKeyPassword() {
         return restTlsKeyPassword;
-    }
-
-    public int getRestWorkerThreadsMaxPoolSize() {
-        return restWorkerThreadsMaxPoolSize;
     }
 
     public String getPluginDir() {
@@ -373,10 +353,6 @@ public abstract class BaseConfiguration {
         return webMaxHeaderSize;
     }
 
-    public int getWebMaxChunkSize() {
-        return webMaxChunkSize;
-    }
-
     public boolean isWebEnableTls() {
         return webEnableTls;
     }
@@ -385,19 +361,15 @@ public abstract class BaseConfiguration {
         return webThreadPoolSize;
     }
 
-    public File getWebTlsCertFile() {
+    public Path getWebTlsCertFile() {
         return webTlsCertFile;
     }
 
-    public File getWebTlsKeyFile() {
+    public Path getWebTlsKeyFile() {
         return webTlsKeyFile;
     }
 
     public String getWebTlsKeyPassword() {
         return webTlsKeyPassword;
-    }
-
-    public int getWebWorkerThreadsMaxPoolSize() {
-        return webWorkerThreadsMaxPoolSize;
     }
 }

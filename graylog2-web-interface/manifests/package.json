@@ -1,0 +1,25 @@
+{
+  "name": "graylog-web-manifests",
+  "version": "2.0.0-SNAPSHOT-2",
+  "description": "Manifests needed to reuse vendor & shared bundles in graylog web interface plugins",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Graylog2/graylog-web-manifests.git"
+  },
+  "keywords": [
+    "graylog",
+    "web",
+    "plugin",
+    "manifests",
+    "webpack"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Graylog2/graylog-web-manifests/issues"
+  },
+  "homepage": "https://github.com/Graylog2/graylog-web-manifests#readme"
+}

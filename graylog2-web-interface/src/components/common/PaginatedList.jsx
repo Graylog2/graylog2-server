@@ -33,7 +33,7 @@ const PaginatedList = React.createClass({
   },
   _pageSizeSelect() {
     return (
-      <div className="form-inline" style={{float: 'right'}}>
+      <div className="form-inline page-size" style={{float: 'right'}}>
         <Input type="select" bsSize="small" label="Show:" value={this.state.pageSize} onChange={this._onChangePageSize}>
           {this.props.pageSizes.map((size) => <option key={'option-' + size} value={size}>{size}</option>)}
         </Input>
@@ -42,6 +42,10 @@ const PaginatedList = React.createClass({
   },
   render() {
     const numberPages = Math.ceil(this.props.totalItems / this.state.pageSize);
+    if (numberPages === 0) {
+      return <span>{this.props.children}</span>;
+    }
+
     return (
       <span>
         {this._pageSizeSelect()}

@@ -64,13 +64,6 @@ const LoginPage = React.createClass({
 
               <ButtonInput type="submit" bsStyle="info">Sign in</ButtonInput>
 
-              <div className="login-advanced">
-                <div className="footer pull-right">
-                  <span id="total-count-zero" className="hidden">No configured node was ever reached.</span>
-                  <span id="total-count-nonzero"><span id="connected-count"/> of <span id="total-count"/> nodes connected.</span>
-                </div>
-                <br style={{clear: 'both'}} />
-              </div>
             </form>
           </Row>
         </div>

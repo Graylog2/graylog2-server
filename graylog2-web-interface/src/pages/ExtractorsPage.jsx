@@ -71,10 +71,10 @@ const ExtractorsPage = React.createClass({
           </span>
 
           <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
-            <LinkContainer to={Routes.import_extractors(this.state.node.node_id, this.state.input.input_id)}>
+            <LinkContainer to={Routes.import_extractors(this.state.node.node_id, this.state.input.id)}>
               <MenuItem>Import extractors</MenuItem>
             </LinkContainer>
-            <LinkContainer to={Routes.export_extractors(this.state.node.node_id, this.state.input.input_id)}>
+            <LinkContainer to={Routes.export_extractors(this.state.node.node_id, this.state.input.id)}>
               <MenuItem>Export extractors</MenuItem>
             </LinkContainer>
           </DropdownButton>

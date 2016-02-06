@@ -31,11 +31,13 @@ import java.util.Set;
 
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
     private final DatabaseOperation<Client> databaseOperation;
+    private final ElasticsearchConfiguration config;
     private final Client client;
     private final Set<String> indexes;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, ElasticsearchConfiguration config, Set<String> indexes) {
         this.databaseOperation = databaseOperation;
+        this.config = config;
         this.client = databaseOperation.connectionManager();
         this.indexes = ImmutableSet.copyOf(indexes);
     }
@@ -52,9 +54,8 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
-            final Messages messages = new Messages(client, configuration);
-            final Indices indices = new Indices(client, configuration, new IndexMapping(), messages);
+            final Messages messages = new Messages(client, config);
+            final Indices indices = new Indices(client, config, new IndexMapping(), messages);
 
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);

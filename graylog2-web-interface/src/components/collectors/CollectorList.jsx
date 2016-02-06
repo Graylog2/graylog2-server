@@ -17,6 +17,11 @@ const CollectorList = React.createClass({
   componentDidMount() {
     this.loadData();
   },
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  },
   COLLECTOR_DATA_REFRESH: 5 * 1000,
 
   loadData() {
@@ -28,7 +33,7 @@ const CollectorList = React.createClass({
       }
     });
 
-    setTimeout(this.loadData, this.COLLECTOR_DATA_REFRESH);
+    this.interval = setTimeout(this.loadData, this.COLLECTOR_DATA_REFRESH);
   },
   _getFilteredCollectors() {
     const filter = this.state.filter.toLowerCase().trim();

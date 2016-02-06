@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Button, Input } from 'react-bootstrap';
-import Immutable from 'immutable';
 
 import Spinner from 'components/common/Spinner';
 
@@ -20,7 +19,7 @@ const InputDropdown = React.createClass({
   },
   PLACEHOLDER: 'placeholder',
   _formatInput(input) {
-    return <option key={input.input_id} value={input.input_id}>{input.title} ({input.type})</option>;
+    return <option key={input.id} value={input.id}>{input.title} ({input.type})</option>;
   },
   _sortByTitle(input1, input2) {
     return input1.title.localeCompare(input2.title);

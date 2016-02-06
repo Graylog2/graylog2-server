@@ -132,7 +132,7 @@ public class GarbageCollectionWarningThread extends Periodical {
 
                             final Notification systemNotification = notificationService.buildNow()
                                     .addNode(nodeId.toString())
-                                    .addTimestamp(Tools.iso8601())
+                                    .addTimestamp(Tools.nowUTC())
                                     .addSeverity(Notification.Severity.URGENT)
                                     .addType(Notification.Type.GC_TOO_LONG)
                                     .addDetail("gc_name", gc.getName())

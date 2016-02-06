@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
+import Footer from 'components/layout/Footer';
 
 import 'stylesheets/chosen.bootstrap.min.css';
 import 'stylesheets/chosen-bootstrap.less';
@@ -35,6 +36,7 @@ const App = React.createClass({
           <i className="fa fa-arrow-up"/>
         </div>
         {this.props.children}
+        <Footer/>
       </div>
     );
   },

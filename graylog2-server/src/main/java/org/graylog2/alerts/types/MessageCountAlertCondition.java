@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +55,6 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
-    private List<Message> searchHits = Collections.emptyList();
     private final Searches searches;
 
     @AssistedInject
@@ -64,9 +62,9 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
 
         this.searches = searches;
-        this.time = (Integer) parameters.get("time");
+        this.time = Integer.parseInt(String.valueOf(parameters.get("time")));
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = (Integer) parameters.get("threshold");
+        this.threshold = Integer.parseInt(String.valueOf(parameters.get("threshold")));
     }
 
     @Override
@@ -81,8 +79,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     protected CheckResult runCheck() {
         try {
             final String filter = "streams:" + stream.getId();
-            final CountResult result = searches.count("*", new RelativeRange(time * 60), filter);
-            final long count = result.getCount();
+            final CountResult result = searches.count("*", RelativeRange.create(time * 60), filter);
+            final long count = result.count();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 
@@ -101,9 +99,10 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             if (triggered) {
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 if (getBacklog() > 0) {
-                    final SearchResult backlogResult = searches.search("*", filter, new RelativeRange(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
+                    final SearchResult backlogResult = searches.search("*", filter,
+                                                                       RelativeRange.create(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
-                        final Message msg = new Message(resultMessage.getMessage());
+                        final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                     }
                 }
@@ -111,7 +110,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 final String resultDescription = "Stream had " + count + " messages in the last " + time
                         + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
                         + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
-                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
+                return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);
             }
@@ -125,10 +124,4 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             return null;
         }
     }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return Lists.newArrayList(searchHits);
-    }
-
 }

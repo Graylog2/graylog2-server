@@ -3,9 +3,9 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import Immutable = require('immutable');
-import UserNotification = require("util/UserNotification");
+const UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require("../../util/URLUtils");
+const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const PermissionsMixin = require('util/PermissionsMixin');
@@ -106,7 +106,7 @@ class DashboardsStore {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
     const promise = new Builder('GET', url)
         .authenticated()
-        .setHeader('X-Graylog2-No-Session-Extension', 'true')
+        .setHeader('X-Graylog-No-Session-Extension', 'true')
         .json()
         .build();
 

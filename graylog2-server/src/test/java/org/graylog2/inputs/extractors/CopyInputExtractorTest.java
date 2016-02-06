@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class CopyInputExtractorTest extends AbstractExtractorTest {
     @Test
     public void testCopy() throws Extractor.ReservedFieldException, ConfigurationException {
-        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
+        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "foo");
 

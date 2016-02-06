@@ -82,7 +82,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testReplacementWithNoMatchAndDefaultReplacement() throws Exception {
-        final Message message = new Message("Test", "source", Tools.iso8601());
+        final Message message = new Message("Test", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",
@@ -103,7 +103,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testReplacementWithOnePlaceholder() throws Exception {
-        final Message message = new Message("Test Foobar", "source", Tools.iso8601());
+        final Message message = new Message("Test Foobar", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",
@@ -124,7 +124,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test(expected = RuntimeException.class)
     public void testReplacementWithTooManyPlaceholders() throws Exception {
-        final Message message = new Message("Foobar 123", "source", Tools.iso8601());
+        final Message message = new Message("Foobar 123", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",
@@ -143,7 +143,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testReplacementWithCustomReplacement() throws Exception {
-        final Message message = new Message("Foobar 123", "source", Tools.iso8601());
+        final Message message = new Message("Foobar 123", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",
@@ -164,7 +164,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testReplacementWithReplaceAll() throws Exception {
-        final Message message = new Message("Foobar 123 Foobaz 456", "source", Tools.iso8601());
+        final Message message = new Message("Foobar 123 Foobaz 456", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",
@@ -185,7 +185,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testReplacementWithoutReplaceAll() throws Exception {
-        final Message message = new Message("Foobar 123 Foobaz 456", "source", Tools.iso8601());
+        final Message message = new Message("Foobar 123 Foobaz 456", "source", Tools.nowUTC());
         final RegexReplaceExtractor extractor = new RegexReplaceExtractor(
                 metricRegistry,
                 "id",

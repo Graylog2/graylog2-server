@@ -66,12 +66,44 @@ const ShowDashboardPage = React.createClass({
       </Row>
     );
   },
+  _defaultWidgetDimensions(widget) {
+    const dimensions = {col: 0, row: 0};
+
+    switch (widget.type.toUpperCase()) {
+      case Widget.Type.SEARCH_RESULT_CHART:
+      case Widget.Type.STACKED_CHART:
+      case Widget.Type.FIELD_CHART:
+        dimensions.width = 2;
+        dimensions.height = 1;
+        break;
+      case Widget.Type.QUICKVALUES:
+        dimensions.width = 1;
+        dimensions.height = (widget.config.show_pie_chart && widget.config.show_data_table ? 3 : 2);
+        break;
+      case Widget.Type.SEARCH_RESULT_COUNT:
+      case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
+      case Widget.Type.STATS_COUNT:
+      default:
+        dimensions.width = 1;
+        dimensions.height = 1;
+    }
+
+    return dimensions;
+  },
+  _dashboardIsEmpty(dashboard) {
+    return dashboard.widgets.length === 0;
+  },
   formatDashboard(dashboard) {
-    if (dashboard.widgets.length === 0) {
+    if (this._dashboardIsEmpty(dashboard)) {
       return this.emptyDashboard();
     }
 
-    const widgets = this.state.dashboard.widgets.sort((d1, d2) => {
+    const positions = {};
+    dashboard.widgets.forEach(widget => {
+      positions[widget.id] = dashboard.positions[widget.id] || this._defaultWidgetDimensions(widget);
+    });
+
+    const widgets = dashboard.widgets.sort((d1, d2) => {
       if (d1.col === d2.col) {
         return d1.row < d2.row;
       }
@@ -83,15 +115,20 @@ const ShowDashboardPage = React.createClass({
                 locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
       );
     });
+
     return (
       <Row>
         <div className="dashboard">
-          <GridsterContainer ref="gridsterContainer" positions={this.state.dashboard.positions}>
+          <GridsterContainer ref="gridsterContainer" positions={positions} onPositionsChange={this._onPositionsChange}>
             {widgets}
           </GridsterContainer>
         </div>
       </Row>
     );
+  },
+  _unlockDashboard(event) {
+    event.preventDefault();
+    this.setState({locked: false});
   },
   _onUnlock() {
     const locked = !this.state.locked;
@@ -103,13 +140,8 @@ const ShowDashboardPage = React.createClass({
       this.refs.gridsterContainer.unlockGrid();
     }
   },
-  _onPositionsChanged() {
-    const positions = this.state.dashboardGrid.serialize().map((position) => {
-      return {id: position.id, col: position.col, row: position.row, width: position.size_x, height: position.size_y};
-    });
-    const dashboard = this.state.dashboard;
-
-    DashboardsStore.updatePositions(dashboard, positions);
+  _onPositionsChange(newPositions) {
+    DashboardsStore.updatePositions(this.state.dashboard, newPositions);
   },
   _toggleFullscreen() {
     const element = document.documentElement;
@@ -124,8 +156,8 @@ const ShowDashboardPage = React.createClass({
     }
   },
   _toggleUpdateInBackground() {
-    const forceUpdate = this.state.forceUpdateInBackground;
-    this.setState({forceUpdateInBackground: !forceUpdate});
+    const forceUpdate = !this.state.forceUpdateInBackground;
+    this.setState({forceUpdateInBackground: forceUpdate});
     UserNotification.success('Graphs will be updated ' + (forceUpdate ? 'even' : 'only')
       + ' when the browser is in the ' + (forceUpdate ? 'background' : 'foreground'), '');
   },
@@ -155,7 +187,7 @@ const ShowDashboardPage = React.createClass({
     const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id)
       && dashboard.widgets.length > 0 ?
       (<div id="drag-widgets-description">
-          Drag widgets to any position you like in <a role="button" onClick={() => this.setState({locked: false})}>
+          Drag widgets to any position you like in <a href="#" role="button" onClick={this._unlockDashboard}>
           unlock / edit</a>{' '}
           mode.
       </div>) : null;
@@ -163,7 +195,8 @@ const ShowDashboardPage = React.createClass({
     const dashboardTitle = (
       <span>
         <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
-        {!this.state.locked &&
+        &nbsp;
+        {!this.state.locked && !this._dashboardIsEmpty(dashboard) &&
         <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
                                    description={dashboard.description} buttonClass="btn-info btn-xs">
           <i className="fa fa-pencil"/>

@@ -1,5 +1,7 @@
-import UserNotification = require('util/UserNotification');
-import URLUtils = require('util/URLUtils');
+/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
+
+const UserNotification = require('util/UserNotification');
+const URLUtils = require('util/URLUtils');
 import UsersStore = require('stores/users/UsersStore');
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
@@ -16,17 +18,22 @@ export interface RoleMembership {
 }
 
 export const RolesStore = {
-  loadRoles(): JQueryPromise<string[]> {
-    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.listRoles().url));
-    promise.catch((error) => {
-      if (error.additional.status !== 404) {
-        UserNotification.error("Loading role list failed with status: " + error,
-          "Could not load role list");
-      }
-    });
+  loadRoles(): Promise<string[]> {
+    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.listRoles().url))
+      .then(
+        response => response.roles,
+        error => {
+          if (error.additional.status !== 404) {
+            UserNotification.error("Loading role list failed with status: " + error,
+              "Could not load role list");
+          }
+        }
+      );
+
     return promise;
   },
-  createRole(role: Role): JQueryPromise<Role> {
+
+  createRole(role: Role): Promise<Role> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.createRole().url);
     const promise = fetch('POST', url, role);
 
@@ -40,7 +47,7 @@ export const RolesStore = {
     return promise;
   },
 
-  updateRole(rolename: string, role: Role): JQueryPromise<Role> {
+  updateRole(rolename: string, role: Role): Promise<Role> {
     const promise = fetch('PUT', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.updateRole(rolename).url), role);
 
     promise.then((newRole) => {
@@ -55,7 +62,7 @@ export const RolesStore = {
     return promise;
   },
 
-  deleteRole(rolename: string): JQueryPromise<string[]> {
+  deleteRole(rolename: string): Promise<string[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.deleteRole(rolename).url);
     const promise = fetch('DELETE', url);
 
@@ -69,7 +76,7 @@ export const RolesStore = {
     });
     return promise;
   },
-  getMembers(rolename: string): JQueryPromise<RoleMembership[]> {
+  getMembers(rolename: string): Promise<RoleMembership[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.loadMembers(rolename).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {

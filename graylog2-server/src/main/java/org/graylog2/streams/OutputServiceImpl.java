@@ -93,7 +93,7 @@ public class OutputServiceImpl implements OutputService {
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
         return create(OutputImpl.create(new ObjectId().toHexString(), request.title(), request.type(), userId, request.configuration(),
-                Tools.iso8601().toDate(), request.contentPack()));
+                Tools.nowUTC().toDate(), request.contentPack()));
     }
 
     @Override

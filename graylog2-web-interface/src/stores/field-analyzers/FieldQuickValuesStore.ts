@@ -2,9 +2,9 @@
 
 const fetch = require('logic/rest/FetchProvider').default;
 import SearchStore = require('stores/search/SearchStore');
-import UserNotification = require('util/UserNotification');
+const UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
-import URLUtils = require('util/URLUtils');
+const URLUtils = require('util/URLUtils');
 const Qs = require('qs');
 
 const FieldQuickValuesStore = {

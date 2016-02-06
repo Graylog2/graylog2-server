@@ -17,13 +17,10 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class DummyAlertCondition extends AbstractAlertCondition {
@@ -40,12 +37,6 @@ public class DummyAlertCondition extends AbstractAlertCondition {
 
     @Override
     public CheckResult runCheck() {
-        return new CheckResult(true, this, this.description, Tools.iso8601(), null);
+        return new CheckResult(true, this, this.description, Tools.nowUTC(), null);
     }
-
-    @Override
-    public List<Message> getSearchHits() {
-        return Collections.emptyList();
-    }
-
 }

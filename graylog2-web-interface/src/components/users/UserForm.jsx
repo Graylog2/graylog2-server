@@ -38,8 +38,8 @@ const UserForm = React.createClass({
     DashboardsStore.listDashboards().then((dashboards) => {
       this.setState({dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title))});
     });
-    RolesStore.loadRoles().then((response) => {
-      this.setState({roles: response.roles.sort((r1, r2) => r1.name.localeCompare(r2.name))});
+    RolesStore.loadRoles().then(roles => {
+      this.setState({roles: roles.sort((r1, r2) => r1.name.localeCompare(r2.name))});
     });
   },
   formatMultiselectOptions(collection) {

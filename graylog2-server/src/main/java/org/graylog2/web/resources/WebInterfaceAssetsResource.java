@@ -65,6 +65,7 @@ public class WebInterfaceAssetsResource {
         return Response
                 .ok(this.indexHtmlGenerator.get())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
+                .header("X-UA-Compatible", "IE=edge")
                 .build();
     }
 }

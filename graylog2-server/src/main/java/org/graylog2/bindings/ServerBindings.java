@@ -36,7 +36,6 @@ import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.bindings.providers.RotationStrategyProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
@@ -54,18 +53,16 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
-import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
-import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
@@ -116,7 +113,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
-        bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
         bind(EventBus.class).annotatedWith(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 
@@ -169,7 +165,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindInterfaces() {
-        bind(SecurityContextFactory.class).to(ShiroSecurityContextFactory.class);
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
         install(new FactoryModuleBuilder().implement(StreamRouterEngine.class, StreamRouterEngine.class).build(
@@ -200,6 +195,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindEventBusListeners() {
         bind(InputStateListener.class).asEagerSingleton();
+        bind(InputEventListener.class).asEagerSingleton();
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
     }

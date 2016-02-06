@@ -1,15 +1,19 @@
-'use strict';
+import React, {PropTypes} from 'react';
 
-var React = require('react');
-
-var BootstrapAccordion = React.createClass({
-    render() {
-        return (
-            <div id="bundles" className="panel-group">
-                {this.props.children}
-            </div>
-        );
-    }
+const BootstrapAccordion = React.createClass({
+  propTypes: {
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
+    ]).isRequired,
+  },
+  render() {
+    return (
+      <div id="bundles" className="panel-group">
+        {this.props.children}
+      </div>
+    );
+  },
 });
 
-module.exports = BootstrapAccordion;
+export default BootstrapAccordion;

@@ -1,14 +1,17 @@
 {
+  "parser": "babel-eslint",
+  "ecmaFeatures": {
+    "classes": true,
+    "jsx": true,
+  },
   "extends": [
     "eslint:recommended",
     "airbnb",
     "import/warnings"
   ],
-  "plugins": [
-    "import",
-  ],
   "rules": {
     "no-else-return": 1,
+    "no-nested-ternary": 1,
     "new-cap": 0,
     "indent": [2, 2, { "SwitchCase" : 1}],
     "import/no-unresolved": 1,
@@ -16,7 +19,7 @@
   "settings": {
     "import/resolve": {
       "extensions": [".js", ".jsx", ".ts"],
-      "moduleDirectory": ["src", "node_modules"]
+      "moduleDirectory": ["src", "node_modules", "public"]
     }
   }
 }

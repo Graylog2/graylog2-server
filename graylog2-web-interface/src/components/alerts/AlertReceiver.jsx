@@ -13,15 +13,16 @@ const AlertReceiver = React.createClass({
     type: React.PropTypes.string.isRequired,
   },
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
-  _onDelete() {
-    if (window.confirm('Really remove receiver?')) {
+  _onDelete(event) {
+    event.preventDefault();
+    if (window.confirm(`Do you really want to remove receiver '${this.props.receiver}'?`)) {
       StreamsStore.deleteReceiver(this.props.streamId, this.props.type, this.props.receiver);
     }
   },
   _formatGlyph() {
-    switch(this.props.type) {
+    switch (this.props.type) {
       case 'users': return <i className="fa fa-user"/>;
-      case 'emails': return <i className="fa fa-envelope"/>
+      case 'emails': return <i className="fa fa-envelope"/>;
     }
   },
   render() {
@@ -29,9 +30,9 @@ const AlertReceiver = React.createClass({
     return (
       <li>
         {this._formatGlyph()}{' '}&nbsp;{this.props.receiver}
-
+        &nbsp;
         {this.isPermitted(permissions, 'streams:edit:' + this.props.streamId) &&
-          <a onClick={this._onDelete}>
+          <a href="" onClick={this._onDelete}>
             <i className="fa fa-remove"/>
           </a>
         }

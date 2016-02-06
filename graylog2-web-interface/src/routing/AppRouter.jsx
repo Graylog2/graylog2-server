@@ -3,14 +3,16 @@ import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import { IndexRoute, Router, Route } from 'react-router';
-import {createHistory} from 'history';
+import { createHistory } from 'history';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 
+import StartPage from 'pages/StartPage';
 import SearchPage from 'pages/SearchPage';
 import ShowMessagePage from 'pages/ShowMessagePage';
 import StreamsPage from 'pages/StreamsPage';
-import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
+import StreamEditPage from 'pages/StreamEditPage';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
 import StreamAlertsPage from 'pages/StreamAlertsPage';
 import StreamSearchPage from 'pages/StreamSearchPage';
@@ -18,6 +20,7 @@ import DashboardsPage from 'pages/DashboardsPage';
 import ShowDashboardPage from 'pages/ShowDashboardPage';
 import SourcesPage from 'pages/SourcesPage';
 import InputsPage from 'pages/InputsPage';
+import NodeInputsPage from 'pages/NodeInputsPage';
 import ExtractorsPage from 'pages/ExtractorsPage';
 import CreateExtractorsPage from 'pages/CreateExtractorsPage';
 import EditExtractorsPage from 'pages/EditExtractorsPage';
@@ -39,14 +42,21 @@ import LoggersPage from 'pages/LoggersPage';
 import GettingStartedPage from 'pages/GettingStartedPage';
 import ShowMetricsPage from 'pages/ShowMetricsPage';
 import ShowNodePage from 'pages/ShowNodePage';
+import NodesPage from 'pages/NodesPage';
+import ThreadDumpPage from 'pages/ThreadDumpPage';
+import LdapPage from 'pages/LdapPage';
+import LdapGroupsPage from 'pages/LdapGroupsPage';
 
 const AppRouter = React.createClass({
   render() {
+    const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
+      return <Route key={pluginRoute.component.displayName} path={pluginRoute.path} component={pluginRoute.component} />;
+    });
     return (
       <Router history={createHistory()}>
         <Route path="/" component={App}>
+          <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
-            <IndexRoute component={SearchPage}/>
             <Route path={Routes.SEARCH} component={SearchPage}/>
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
@@ -55,12 +65,13 @@ const AppRouter = React.createClass({
           <Route component={AppWithoutSearchBar}>
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage}/>
             <Route path={Routes.STREAMS} component={StreamsPage}/>
-            <Route path={Routes.stream_edit(':streamId')} component={StreamRulesEditor}/>
+            <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage}/>
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage}/>
+            <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage}/>
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.local_input_extractors(':nodeId', ':inputId')} component={ExtractorsPage}/>
             <Route path={Routes.new_extractor(':nodeId', ':inputId')} component={CreateExtractorsPage}/>
@@ -75,6 +86,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage}/>
             <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage}/>
             <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage}/>
+            <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage}/>
             <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
@@ -82,6 +94,10 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
+            <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
+            <Route path={Routes.SYSTEM.LDAP.SETTINGS} component={LdapPage}/>
+            <Route path={Routes.SYSTEM.LDAP.GROUPS} component={LdapGroupsPage}/>
+            {pluginRoutes}
           </Route>
         </Route>
       </Router>

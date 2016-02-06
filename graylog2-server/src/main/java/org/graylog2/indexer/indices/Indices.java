@@ -18,7 +18,6 @@ package org.graylog2.indexer.indices;
 
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
@@ -41,13 +40,13 @@ import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
+import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -57,11 +56,11 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -69,12 +68,13 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
-import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -84,6 +84,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -91,9 +92,9 @@ import java.util.concurrent.TimeUnit;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 @Singleton
-public class Indices implements IndexManagement {
-
+public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
+    private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
     private final Client c;
     private final ElasticsearchConfiguration configuration;
@@ -109,13 +110,13 @@ public class Indices implements IndexManagement {
     }
 
     public void move(String source, String target) {
-        QueryBuilder qb = matchAllQuery();
-
         SearchResponse scrollResp = c.prepareSearch(source)
-                .setSearchType(SearchType.SCAN)
-                .setScroll(new TimeValue(10000))
-                .setQuery(qb)
-                .setSize(350).execute().actionGet();
+                .setScroll(TimeValue.timeValueSeconds(10L))
+                .setQuery(matchAllQuery())
+                .addSort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
+                .setSize(350)
+                .execute()
+                .actionGet();
 
         while (true) {
             scrollResp = c.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
@@ -209,19 +210,60 @@ public class Indices implements IndexManagement {
         return response.getAliases().isEmpty() ? null : response.getAliases().keysIt().next();
     }
 
+    private void ensureIndexTemplate() {
+        final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(), configuration.getAnalyzer());
+
+        // First check if we have to install the index template. If the template exists, we do not install it again.
+        // We do not compare the installed template in Elasticsearch with our template to avoid overwriting changes
+        // done by users.
+        try {
+            final GetIndexTemplatesResponse getIndexTemplatesResponse = c.admin().indices()
+                    .prepareGetTemplates(configuration.getTemplateName())
+                    .get();
+
+            final List<IndexTemplateMetaData> existingTemplate = getIndexTemplatesResponse.getIndexTemplates();
+
+            if (existingTemplate.size() > 0) {
+                LOG.debug("Index template \"{}\" exists, not installing it again.", configuration.getTemplateName());
+                return;
+            }
+        } catch (Exception e) {
+            LOG.error("Unable to get index template \"" + configuration.getTemplateName() + "\" from Elasticsearch.", e);
+        }
+
+        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(configuration.getTemplateName())
+                .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
+                .setSource(template)
+                .request();
+
+        try {
+            final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
+            if (acknowledged) {
+                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", configuration.getTemplateName());
+            }
+        } catch (Exception e) {
+            LOG.error("Unable to create the Graylog index template: " + configuration.getTemplateName(), e);
+        }
+    }
+
     public boolean create(String indexName) {
-        final Map<String, String> keywordLowercase = ImmutableMap.of(
-                "tokenizer", "keyword",
-                "filter", "lowercase");
-        final Map<String, Object> settings = ImmutableMap.of(
-                "number_of_shards", configuration.getShards(),
-                "number_of_replicas", configuration.getReplicas(),
-                "index.analysis.analyzer.analyzer_keyword", keywordLowercase);
-        final Map<String, Object> messageMapping = indexMapping.messageMapping(configuration.getAnalyzer());
+        return create(indexName, configuration.getShards(), configuration.getReplicas(), Settings.EMPTY);
+    }
+
+    public boolean create(String indexName, int numShards, int numReplicas, Settings customSettings) {
+        final Settings settings = Settings.builder()
+                .put("number_of_shards", numShards)
+                .put("number_of_replicas", numReplicas)
+                .put("analysis.analyzer.analyzer_keyword.tokenizer", "keyword")
+                .put("analysis.analyzer.analyzer_keyword.filter", "lowercase")
+                .put(customSettings)
+                .build();
+
+        // Make sure our index template exists before creating an index!
+        ensureIndexTemplate();
 
         final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
                 .setSettings(settings)
-                .addMapping(IndexMapping.TYPE_MESSAGE, messageMapping)
                 .request();
 
         return c.admin().indices().create(cir).actionGet().isAcknowledged();
@@ -265,26 +307,6 @@ public class Indices implements IndexManagement {
         c.admin().indices().updateSettings(request).actionGet();
     }
 
-    public boolean isReadOnly(String index) {
-        final GetSettingsRequest request = c.admin().indices().prepareGetSettings(index).request();
-        final GetSettingsResponse response = c.admin().indices().getSettings(request).actionGet();
-
-        return response.getIndexToSettings().get(index).getAsBoolean("index.blocks.write", false);
-    }
-
-    public void setReadWrite(String index) {
-        Settings settings = Settings.builder()
-                .put("index.blocks.write", false)
-                .put("index.blocks.read", false)
-                .put("index.blocks.metadata", false)
-                .build();
-
-        final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
-                .setSettings(settings)
-                .request();
-        c.admin().indices().updateSettings(request).actionGet();
-    }
-
     public void flush(String index) {
         FlushRequest flush = new FlushRequest(index);
         flush.force(true); // Just flushes. Even if it is not necessary.
@@ -292,10 +314,14 @@ public class Indices implements IndexManagement {
         c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
     }
 
+    public Settings reopenIndexSettings() {
+        return Settings.builder().put(REOPENED_INDEX_SETTING, true).build();
+    }
+
     public void reopenIndex(String index) {
         // Mark this index as re-opened. It will never be touched by retention.
         UpdateSettingsRequest settings = new UpdateSettingsRequest(index);
-        settings.settings(Collections.<String, Object>singletonMap("graylog2_reopened", true));
+        settings.settings(reopenIndexSettings());
         c.admin().indices().updateSettings(settings).actionGet();
 
         // Open index.
@@ -314,7 +340,7 @@ public class Indices implements IndexManagement {
     }
 
     protected Boolean checkForReopened(IndexMetaData metaData) {
-        return metaData.getSettings().getAsBoolean("index.graylog2_reopened", false);
+        return metaData.getSettings().getAsBoolean("index." + REOPENED_INDEX_SETTING, false);
     }
 
     public Set<String> getClosedIndices() {
@@ -474,7 +500,7 @@ public class Indices implements IndexManagement {
             if (settings == null) {
                 return null;
             }
-            return new DateTime(settings.getAsLong("creation_date", 0L), DateTimeZone.UTC);
+            return new DateTime(settings.getAsLong("index.creation_date", 0L), DateTimeZone.UTC);
         } catch (ElasticsearchException e) {
             LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
             return null;

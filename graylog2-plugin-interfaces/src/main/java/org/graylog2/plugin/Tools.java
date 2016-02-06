@@ -328,8 +328,17 @@ public final class Tools {
                 .toFormatter();
     }
 
-    public static DateTime iso8601() {
+    public static DateTime nowUTC() {
         return new DateTime(DateTimeZone.UTC);
+    }
+
+    /**
+     * @return The current date with timezone UTC.
+     * @deprecated Use {@link #nowUTC()} instead.
+     */
+    @Deprecated
+    public static DateTime iso8601() {
+        return nowUTC();
     }
 
     public static String getISO8601String(DateTime time) {
@@ -502,10 +511,11 @@ public final class Tools {
 
     public static String bytesToHex(byte[] a) {
         StringBuilder sb = new StringBuilder(a.length * 2);
-        for(byte b: a)
+        for (byte b : a)
             sb.append(String.format(Locale.ENGLISH, "%02x", b & 0xff)).append(' ');
         return sb.toString().trim();
     }
+
     /**
      * The default uncaught exception handler will print to STDERR, which we don't always want for threads.
      * Using this utility method you can avoid writing to STDERR on a per-thread basis

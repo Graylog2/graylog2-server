@@ -12,40 +12,19 @@ const HelpMenu = React.createClass({
   render() {
     return (
       <NavDropdown navItem title="Help" id="user-menu-dropdown" active={this.props.active}>
-        <LinkContainer to={Routes.GETTING_STARTED}>
+        <MenuItem href="http://info.graylog.org/report-a-problem" target="_blank">
+          <i className="fa fa-external-link"></i> Report a Problem
+        </MenuItem>
+        <MenuItem href="http://info.graylog.org/ask-a-question" target="_blank">
+          <i className="fa fa-external-link"></i> Ask a Question
+        </MenuItem>
+
+        <MenuItem divider />
+        <LinkContainer to={Routes.getting_started(true)}>
           <MenuItem>Getting Started</MenuItem>
         </LinkContainer>
         <MenuItem href={DocsHelper.versionedDocsHomePage()} target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Documentation
-        </MenuItem>
-        <MenuItem divider/>
-        <MenuItem href="https://www.graylog.org/support/" target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Get Support
-        </MenuItem>
-        <MenuItem href="https://graylog.wufoo.com/forms/qup3ebj0kp9cfo/" target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Feedback
-        </MenuItem>
-        <MenuItem divider/>
-        <MenuItem href="https://graylog.wufoo.com/forms/mzwusin1f7kudv/" target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Ask a Question
-        </MenuItem>
-        <MenuItem href="https://graylog.wufoo.com/forms/zaw0hgh07cndha/" target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Report a Problem
-        </MenuItem>
-        <MenuItem href="https://graylog.ideas.aha.io/?sort=popular" target="blank">
-          <i className="fa fa-external-link"></i>
-          &nbsp;
-          Product Ideas
+          <i className="fa fa-external-link"></i> Documentation
         </MenuItem>
       </NavDropdown>
     );

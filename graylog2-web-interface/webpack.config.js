@@ -8,17 +8,18 @@ const merge = require('webpack-merge');
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
+const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
+const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
 const webpackConfig = {
   entry: {
     app: APP_PATH,
-    config: 'config.js',
   },
   output: {
     path: BUILD_PATH,
-    vendor: ['react', 'react-router', 'react-bootstrap'],
     filename: '[name].[hash].js',
     publicPath: '/',
   },
@@ -39,16 +40,16 @@ const webpackConfig = {
   resolve: {
     // you can now require('file') instead of require('file.coffee')
     extensions: ['', '.js', '.json', '.jsx', '.ts'],
-    modulesDirectories: ['src', 'node_modules', 'public'],
+    modulesDirectories: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
   },
   eslint: {
     configFile: '.eslintrc',
   },
   devtool: 'eval',
   plugins: [
-    new Clean([BUILD_PATH]),
-    new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png'}),
-    new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template'}),
+    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
+    new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png', template: 'templates/index.html.template'}),
+    new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template', excludeChunks: ['config']}),
   ],
 };
 
@@ -58,10 +59,6 @@ const commonConfigs = {
       { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
     ],
   },
-  plugins: [
-    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.bundle.js'),
-    new webpack.optimize.CommonsChunkPlugin('config', 'config.js', ['config']),
-  ],
 };
 
 if (TARGET === 'start') {
@@ -76,6 +73,7 @@ if (TARGET === 'start') {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.DefinePlugin({DEVELOPMENT: true}),
     ],
   });
 }
@@ -109,7 +107,7 @@ if (TARGET === 'test') {
 }
 
 if (TARGET === 'start' || TARGET === 'build') {
-  module.exports = merge(commonConfigs, module.exports);
+  module.exports = merge(module.exports, commonConfigs);
 }
 
 if (Object.keys(module.exports).length === 0) {

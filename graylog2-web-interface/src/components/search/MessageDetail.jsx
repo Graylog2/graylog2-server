@@ -100,9 +100,11 @@ const MessageDetail = React.createClass({
       if (!streamList) {
         streamList = [];
       }
-      const url = jsRoutes.controllers.StreamRulesController.index(stream.id).url + '#' + this.props.message.id + '.' + this.props.message.index;
-
-      streamList.push(<MenuItem key={stream.id} href={url}>{stream.title}</MenuItem>);
+      streamList.push(
+        <LinkContainer key={stream.id} to={Routes.stream_edit_example(stream.id, this.props.message.index, this.props.message.id)}>
+          <MenuItem>{stream.title}</MenuItem>
+        </LinkContainer>
+      );
     });
 
     const streamIds = Immutable.Set(this.props.message.stream_ids);

@@ -23,17 +23,14 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse;
+import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.indexer.rotation.strategies.RotationStrategyConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
+import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
-import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
-import org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse;
-import org.graylog2.rest.models.system.responses.SizeBasedRotationStrategyResponse;
 import org.graylog2.shared.security.RestrictToMaster;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -48,6 +45,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "System/Deflector", description = "Index deflector management")
@@ -58,17 +56,20 @@ public class DeflectorResource extends RestResource {
 
     private final Deflector deflector;
     private final ActivityWriter activityWriter;
-    private final Provider<RotationStrategy> rotationStrategyProvider;
+    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
+    private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration configuration;
 
     @Inject
     public DeflectorResource(Deflector deflector,
                              ActivityWriter activityWriter,
-                             Provider<RotationStrategy> rotationStrategyProvider,
+                             Map<String, Provider<RotationStrategy>> rotationStrategies,
+                             ClusterConfigService clusterConfigService,
                              ElasticsearchConfiguration configuration) {
         this.deflector = deflector;
         this.activityWriter = activityWriter;
-        this.rotationStrategyProvider = rotationStrategyProvider;
+        this.rotationStrategies = rotationStrategies;
+        this.clusterConfigService = clusterConfigService;
         this.configuration = configuration;
     }
 
@@ -77,7 +78,7 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public DeflectorSummary deflector() {
+    public DeflectorSummary deflector() throws ClassNotFoundException {
         return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex(), this.config());
     }
 
@@ -88,23 +89,20 @@ public class DeflectorResource extends RestResource {
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
     @RestrictToMaster
-    public DeflectorConfigResponse config() {
-        final RotationStrategy strategy = rotationStrategyProvider.get();
-        DeflectorConfigResponse response = null;
-
-        if (strategy instanceof MessageCountRotationStrategy) {
-            response = new MessageCountRotationStrategyResponse(configuration.getMaxDocsPerIndex());
-        } else if (strategy instanceof SizeBasedRotationStrategy) {
-            response = new SizeBasedRotationStrategyResponse(configuration.getMaxSizePerIndex());
-        } else if (strategy instanceof TimeBasedRotationStrategy) {
-            response = new TimeBasedRotationStrategyResponse(configuration.getMaxTimePerIndex());
+    public DeflectorConfigResponse config() throws ClassNotFoundException {
+        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
+        if (indexManagementConfig == null) {
+            throw new InternalServerErrorException("Invalid index management configuration");
         } else {
-            throw new InternalServerErrorException("Unknown rotation strategy!");
+            final Provider<RotationStrategy> provider = rotationStrategies.get(indexManagementConfig.rotationStrategy());
+            if (provider == null) {
+                throw new InternalServerErrorException("Unknown index rotation strategy: " + indexManagementConfig.rotationStrategy());
+            }
+            final Class<RotationStrategyConfig> strategy = (Class<RotationStrategyConfig>) provider.get().configurationClass();
+            final RotationStrategyConfig config = clusterConfigService.get(strategy);
+
+            return config.toDeflectorConfigResponse(configuration.getMaxNumberOfIndices());
         }
-
-        response.maxNumberOfIndices = configuration.getMaxNumberOfIndices();
-
-        return response;
     }
 
     @POST

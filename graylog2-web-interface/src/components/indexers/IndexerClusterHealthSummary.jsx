@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-import { DocumentationLink } from 'components/support'
+import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
 const IndexerClusterHealthSummary = React.createClass({

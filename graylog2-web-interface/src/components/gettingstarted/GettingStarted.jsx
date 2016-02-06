@@ -1,6 +1,9 @@
 import React, { PropTypes } from 'react';
-import Spinner from '../common/Spinner';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
 import Qs from 'qs';
+
+import {Spinner} from 'components/common';
+import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';
 
 const GettingStarted = React.createClass({
   propTypes() {
@@ -9,14 +12,16 @@ const GettingStarted = React.createClass({
       masterOs: PropTypes.string.isRequired,
       masterVersion: PropTypes.string.isRequired,
       gettingStartedUrl: PropTypes.string.isRequired,
+      noDismissButton: PropTypes.bool,
+      onDismiss: PropTypes.func,
     };
   },
   getInitialState() {
     return {
       guideLoaded: false,
+      guideUrl: '',
       showStaticContent: false,
       frameHeight: '500px',
-      minHeight: 200,
     };
   },
   componentDidMount() {
@@ -34,15 +39,62 @@ const GettingStarted = React.createClass({
       this.timeoutId = null;
     }
   },
+
+  timeoutId: null,
+  _onMessage(messageEvent) {
+    // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
+    if (this.props.gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
+      if (this.timeoutId !== null) {
+        window.clearTimeout(Number(this.timeoutId));
+        this.timeoutId = null;
+      }
+      this.setState({
+        guideLoaded: messageEvent.data.guideLoaded,
+        guideUrl: messageEvent.data.guideUrl,
+        minHeight: messageEvent.data.height === 0 ? this.state.minHeight : messageEvent.data.height,
+      });
+    }
+  },
+  _displayFallbackContent() {
+    this.setState({showStaticContent: true});
+  },
+  _dismissGuide() {
+    GettingStartedActions.dismiss.triggerPromise().then(() => {
+      if (this.props.onDismiss) {
+        this.props.onDismiss();
+      }
+    });
+  },
   render() {
+    let dismissButton = null;
+    if (!this.props.noDismissButton) {
+      dismissButton = (
+        <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
+          <i className="fa fa-times"></i> Dismiss guide
+        </Button>
+      );
+    }
     let gettingStartedContent = null;
     if (this.state.showStaticContent) {
-      gettingStartedContent = <div>Could not load dynamic content in time, living with static content for now.</div>;
+      gettingStartedContent = (
+        <Grid>
+          <Row>
+            <Col mdPush={3} md={6} className="content content-head text-center" style={{paddingBottom: '15px'}}>
+              <span>
+                We could not load the
+                <a target="_blank" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
+                Please open it directly with a browser that can access the public internet.
+              </span>
+            </Col>
+          </Row>
+        </Grid>
+      );
     } else {
       const query = Qs.stringify({
         c: this.props.clusterId,
         o: this.props.masterOs,
         v: this.props.masterVersion,
+        m: this.props.noDismissButton,
       });
 
       const iframeStyles = {
@@ -55,13 +107,18 @@ const GettingStarted = React.createClass({
         iframeStyles.display = 'none';
       }
 
-      const url = this.props.gettingStartedUrl + '?' + query;
+      const url = this.state.guideUrl === '' ? (this.props.gettingStartedUrl + '?' + query) : this.state.guideUrl;
       let spinner = null;
       if (!this.state.guideLoaded) {
-        spinner = (<div>
-          <h1>Welcome to Graylog</h1>
-          <Spinner text="Loading Graylog Getting started guide ..."/>
-        </div>);
+        spinner = (
+          <Grid>
+            <Row>
+              <Col mdPush={3} md={6} className="content content-head text-center" style={{paddingBottom: '15px'}}>
+                <Spinner text="Loading Graylog Getting started guide ..."/>
+              </Col>
+            </Row>
+          </Grid>
+        );
       }
 
       gettingStartedContent = (<div>
@@ -70,33 +127,18 @@ const GettingStarted = React.createClass({
                 style={iframeStyles}
                 id="getting-started-frame"
                 frameBorder="0"
-                scrolling="no">
+                scrolling="yes">
           <p>Sorry, no iframes</p>
         </iframe>
       </div>);
     }
-    return (<div>
-      {gettingStartedContent}
-    </div>);
-  },
-
-  timeoutId: null,
-  _onMessage(messageEvent) {
-    // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
-    if (this.props.gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
-      if (this.timeoutId !== null) {
-        window.clearTimeout(Number(this.timeoutId));
-        this.timeoutId = null;
-      }
-      this.setState({
-        guideLoaded: messageEvent.data.guideLoaded,
-        minHeight: messageEvent.data.height === 0 ? this.state.minHeight : messageEvent.data.height,
-      });
-    }
-  },
-  _displayFallbackContent() {
-    this.setState({showStaticContent: true});
+    return (
+      <div id="react-gettingstarted">
+        <div className="pull-right">{dismissButton}</div>
+        {gettingStartedContent}
+      </div>
+    );
   },
 });
 
-module.exports = GettingStarted;
+export default GettingStarted;

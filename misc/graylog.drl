@@ -1,0 +1,21 @@
+// The following header lines are automatically added by Graylog server.
+//package org.graylog2.rules
+//import org.graylog2.plugin.Message
+
+//global org.slf4j.Logger log
+
+rule "Rewrite localhost host"
+    when
+        m : Message( source == "localhost" )
+    then
+        m.addField("source", "localhost.example.com" );
+        log.info( "[Overwrite localhost rule fired] : " + m.toString() );
+end
+
+rule "Drop UDP and ICMP Traffic from firewall"
+    when
+        m : Message( getField("full_message") matches "(?i).*(ICMP|UDP) Packet(.|\n|\r)*" && source == "firewall" )
+    then
+        m.setFilterOut(true);
+        log.info("[Drop all syslog ICMP and UDP traffic] : " + m.toString() );
+end

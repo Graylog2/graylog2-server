@@ -101,7 +101,7 @@ public abstract class AlertConditionTest {
         assertTrue("AlertCondition should be triggered, but it's not!", result.isTriggered());
         assertNotNull("Timestamp of returned check result should not be null!", result.getTriggeredAt());
         assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
-        long difference = Tools.iso8601().getMillis() - result.getTriggeredAt().getMillis();
+        long difference = Tools.nowUTC().getMillis() - result.getTriggeredAt().getMillis();
         assertTrue("AlertCondition should be triggered about now", difference < 1000);
         assertFalse("Alert was triggered, so we should not be in grace period!", alertService.inGracePeriod(alertCondition));
     }
@@ -139,7 +139,7 @@ public abstract class AlertConditionTest {
     protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
         try {
             return klazz.getConstructor(Searches.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
-                    .newInstance(searches, stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
+                    .newInstance(searches, stream, CONDITION_ID, Tools.nowUTC(), STREAM_CREATOR, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -330,7 +330,7 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_TITLE, cr.title());
         streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
-        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
+        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
 
         final Stream stream = streamService.create(streamData);

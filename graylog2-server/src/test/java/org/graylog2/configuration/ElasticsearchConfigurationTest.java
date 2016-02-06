@@ -35,7 +35,7 @@ public class ElasticsearchConfigurationTest {
         ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
         new JadConfig(new InMemoryRepository(), configuration).process();
 
-        assertEquals(configuration.getIndexPrefix(), "graylog2");
+        assertEquals(configuration.getIndexPrefix(), "graylog");
     }
 
     @Test

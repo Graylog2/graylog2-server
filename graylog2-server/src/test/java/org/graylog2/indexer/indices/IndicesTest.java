@@ -26,8 +26,13 @@ import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateResponse;
+import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
+import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
@@ -57,7 +62,7 @@ public class IndicesTest {
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
 
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
-    private static final String INDEX_NAME = "graylog";
+    private static final String INDEX_NAME = "graylog_0";
     private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
         @Override
         public String getIndexPrefix() {
@@ -74,7 +79,7 @@ public class IndicesTest {
 
     public IndicesTest() {
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(CONFIG, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
@@ -144,7 +149,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
@@ -153,7 +158,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex("graylog");
+        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
@@ -162,5 +167,48 @@ public class IndicesTest {
     @Test(expected = IndexNotFoundException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
         indices.timestampStatsOfIndex("does-not-exist");
+    }
+
+    @Test
+    public void testCreateEnsuresIndexTemplateExists() throws Exception {
+        final String templateName = CONFIG.getTemplateName();
+        final IndicesAdminClient client = this.client.admin().indices();
+        final GetIndexTemplatesRequest request = client.prepareGetTemplates(templateName).request();
+        final GetIndexTemplatesResponse responseBefore = client.getTemplates(request).actionGet();
+
+        assertThat(responseBefore.getIndexTemplates()).isEmpty();
+
+        indices.create("index_template_test");
+
+        final GetIndexTemplatesResponse responseAfter = client.getTemplates(request).actionGet();
+        assertThat(responseAfter.getIndexTemplates()).hasSize(1);
+        final IndexTemplateMetaData templateMetaData = responseAfter.getIndexTemplates().get(0);
+        assertThat(templateMetaData.getName()).isEqualTo(templateName);
+        assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
+
+        final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
+        final DeleteIndexTemplateResponse deleteResponse = client.deleteTemplate(deleteRequest).actionGet();
+        assertThat(deleteResponse.isAcknowledged()).isTrue();
+
+        indices.delete("index_template_test");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        indices.create("index_creation_date_test");
+
+        final DateTime indexCreationDate = indices.indexCreationDate("index_creation_date_test");
+        org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now);
+
+        indices.delete("index_creation_date_test");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void indexCreationDateReturnsNullForNonExistingIndex() {
+        final DateTime indexCreationDate = indices.indexCreationDate("index_missing");
+        assertThat(indexCreationDate).isNull();
     }
 }

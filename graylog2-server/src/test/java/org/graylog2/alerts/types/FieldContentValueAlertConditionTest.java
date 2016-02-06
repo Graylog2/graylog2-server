@@ -74,6 +74,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final HashMap<String, Object> source = Maps.newHashMap();
         source.put("message", "something is in here");
 
+        when(searchHit.getId()).thenReturn("some id");
         when(searchHit.getSource()).thenReturn(source);
         when(searchHit.getIndex()).thenReturn("graylog_test");
         when(searchHits.iterator()).thenReturn(Iterators.singletonIterator(searchHit));
@@ -142,7 +143,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final Configuration configuration = mock(Configuration.class);
         final SearchResult searchResult = mock(SearchResult.class);
         final int alertCheckInterval = 42;
-        final RelativeRange relativeRange = new RelativeRange(alertCheckInterval);
+        final RelativeRange relativeRange = RelativeRange.create(alertCheckInterval);
 
         when(configuration.getAlertCheckInterval()).thenReturn(alertCheckInterval);
 
@@ -165,7 +166,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
                 mock(Configuration.class),
                 stream,
                 CONDITION_ID,
-                Tools.iso8601(),
+                Tools.nowUTC(),
                 STREAM_CREATOR,
                 parameters);
     }

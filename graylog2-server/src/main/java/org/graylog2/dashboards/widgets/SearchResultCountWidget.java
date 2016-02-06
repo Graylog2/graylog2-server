@@ -74,17 +74,17 @@ public class SearchResultCountWidget extends DashboardWidget {
         if (trend && timeRange instanceof RelativeRange) {
             DateTime toPrevious = timeRange.getFrom();
             DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
-            TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
+            TimeRange previousTimeRange = AbsoluteRange.create(fromPrevious, toPrevious);
             CountResult previousCr = searches.count(query, previousTimeRange);
 
             Map<String, Object> results = Maps.newHashMap();
-            results.put("now", cr.getCount());
-            results.put("previous", previousCr.getCount());
-            long tookMs = cr.getTookMs() + previousCr.getTookMs();
+            results.put("now", cr.count());
+            results.put("previous", previousCr.count());
+            long tookMs = cr.tookMs() + previousCr.tookMs();
 
             return new ComputationResult(results, tookMs);
         } else {
-            return new ComputationResult(cr.getCount(), cr.getTookMs());
+            return new ComputationResult(cr.count(), cr.tookMs());
         }
     }
 }

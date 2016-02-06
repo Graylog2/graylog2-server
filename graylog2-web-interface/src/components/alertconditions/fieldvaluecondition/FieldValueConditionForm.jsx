@@ -1,6 +1,7 @@
 import React from 'react';
 import jQuery from 'jquery';
 
+import {Pluralize, TypeAheadFieldInput} from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
 
 const FieldValueConditionForm = React.createClass({
@@ -11,7 +12,7 @@ const FieldValueConditionForm = React.createClass({
     return {
       alertCondition: {
         field: '',
-        time: 0,
+        time: 1,
         threshold: 0,
         threshold_type: 'LOWER',
         type: 'MEAN',
@@ -20,15 +21,17 @@ const FieldValueConditionForm = React.createClass({
   },
   getInitialState() {
     return {
-      threshold_type: this.props.alertCondition.threshold_type,
+      thresholdType: this.props.alertCondition.threshold_type,
+      field: this.props.alertCondition.field,
+      time: this.props.alertCondition.time,
     };
   },
   getValue() {
     return jQuery.extend({
-      field: this.refs.field.value,
+      field: this.state.field,
       time: Number(this.refs.time.value),
       threshold: parseFloat(this.refs.threshold.value),
-      threshold_type: this.refs.threshold_type.value,
+      threshold_type: this.state.thresholdType,
       type: this.refs.check_type.value,
     }, this.refs.gracePeriod.getValue());
   },
@@ -52,34 +55,46 @@ const FieldValueConditionForm = React.createClass({
       <span className="threshold-type">
         {this.thresholdTypes.map((type) =>
           <label key={'threshold-label-' + type} className="radio-inline">
-            <input key={'threshold-type-' + type} ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChanged}
-                   value={type} checked={this.state.threshold_type === type}/>
+            <input key={'threshold-type-' + type} ref="threshold_type" type="radio" name="threshold_type" onChange={this._onTypeChange}
+                   value={type} checked={this.state.thresholdType === type}/>
             {type.toLowerCase()}
           </label>
         )}
       </span>
     );
   },
-  _onTypeChanged(evt) {
-    this.setState({threshold_type: evt.target.value});
+  _onFieldChange(event) {
+    this.setState({field: event.target.value});
+  },
+  _onTypeChange(event) {
+    this.setState({thresholdType: event.target.value});
+  },
+  _onTimeChange(event) {
+    this.setState({time: event.target.value});
   },
   render() {
     const alertCondition = this.props.alertCondition;
     return (
       <span>
-        Trigger alert when the field{' '}
-        <input ref="field" name="field" type="text" className="form-control typeahead-fields" autoComplete="off" required defaultValue={alertCondition.field}/>
+        Trigger alert when the field
+        {' '}
+        <TypeAheadFieldInput ref="fieldInput"
+                             type="text"
+                             autoComplete="off"
+                             defaultValue={alertCondition.field}
+                             onChange={this._onFieldChange}
+                             required />
         <br />
         has a {this._formatCheckType()}
         <br />
-        that was {this._formatThresholdType()} {' '}
-        <input ref="threshold" name="threshold" type="number" className="form-control pluralsingular validatable"
-               data-validate="number" data-pluralsingular="threshold-descr" defaultValue={alertCondition.threshold} />
-        {' '}<span className="threshold-descr" data-plural="messages" data-singular="message">messages</span>{' '}
-        in the last{' '}
-        <input ref="time" name="time" type="number" className="form-control pluralsingular validatable"
-               data-validate="positive_number" data-pluralsingular="time-descr" defaultValue={alertCondition.time} />{' '}
-        <span className="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+        that was {this._formatThresholdType()} than{' '}
+        <input ref="threshold" name="threshold" step="0.01" type="number" className="form-control"
+               defaultValue={alertCondition.threshold} required/>
+        {' '}in the last{' '}
+        <input ref="time" name="time" type="number" min="1" className="form-control"
+               defaultValue={alertCondition.time} onChange={this._onTimeChange} required/>
+        {' '}
+        <Pluralize singular="minute" plural="minutes" value={this.state.time}/>
         {' '}
         <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
       </span>

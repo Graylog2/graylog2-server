@@ -79,7 +79,7 @@ public class SavedSearchesResource extends SearchResource {
             throw new BadRequestException(msg);
         }
 
-        final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.iso8601());
+        final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.nowUTC());
         final String id = savedSearchService.save(search);
 
         final URI searchUri = getUriBuilderToSelf().path(SavedSearchesResource.class)

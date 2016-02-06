@@ -5,14 +5,16 @@ import fetch from 'logic/rest/FetchProvider';
 
 import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
+import StartpageStore from 'stores/users/StartpageStore';
 
 const CurrentUserStore = Reflux.createStore({
-  listenable: [SessionActions],
+  listenables: [SessionActions],
   sourceUrl: '/users',
   currentUser: undefined,
 
   init() {
-    this.listenTo(SessionStore, this.update, this.update);
+    this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
+    this.listenTo(StartpageStore, this.reload, this.reload);
   },
 
   getInitialState() {
@@ -23,16 +25,25 @@ const CurrentUserStore = Reflux.createStore({
     return this.currentUser;
   },
 
-  update(sessionInfo) {
+  sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
       const username = sessionInfo.username;
-
-      fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
-        .then((resp) => {
-          this.currentUser = resp;
-          this.trigger({currentUser: this.currentUser});
-        });
+      this.update(username);
     }
+  },
+
+  reload() {
+    if (this.currentUser !== undefined) {
+      this.update(this.currentUser.username);
+    }
+  },
+
+  update(username) {
+    fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
+      .then((resp) => {
+        this.currentUser = resp;
+        this.trigger({currentUser: this.currentUser});
+      });
   },
 });
 

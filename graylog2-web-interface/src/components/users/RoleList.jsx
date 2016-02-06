@@ -31,7 +31,7 @@ var RoleList = React.createClass({
 
         return (
             <tr key={role.name}>
-                <td className="centered">{role.name}</td>
+                <td>{role.name}</td>
                 <td className="limited">{role.description}</td>
                 <td style={{width: 150}}>
                     {role.read_only ? null : actions}

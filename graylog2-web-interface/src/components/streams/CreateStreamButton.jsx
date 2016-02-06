@@ -5,7 +5,10 @@ var Button = require('react-bootstrap').Button;
 var StreamForm = require('./StreamForm');
 
 var CreateStreamButton = React.createClass({
-    onClick(evt) {
+    propTypes: {
+      onSave: React.PropTypes.func.isRequired,
+    },
+    onClick() {
         this.refs.streamForm.open();
     },
     render() {

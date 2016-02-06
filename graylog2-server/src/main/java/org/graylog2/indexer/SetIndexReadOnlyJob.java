@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -118,6 +117,6 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
     @Override
     public String getInfo() {
-        return "Setting index " + index + "to read-only.";
+        return "Setting index " + index + " to read-only.";
     }
 }

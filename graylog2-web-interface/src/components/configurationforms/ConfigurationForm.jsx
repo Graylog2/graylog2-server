@@ -1,11 +1,8 @@
 import $ from 'jquery';
-
 import React from 'react';
-import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
-import TextField from 'components/configurationforms/TextField';
-import NumberField from 'components/configurationforms/NumberField';
-import BooleanField from 'components/configurationforms/BooleanField';
-import DropdownField from 'components/configurationforms/DropdownField';
+
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 
 const ConfigurationForm = React.createClass({
   getInitialState() {
@@ -24,17 +21,7 @@ const ConfigurationForm = React.createClass({
       titleValue: '',
     };
   },
-  _copyStateFromProps(props) {
-    return {
-      configFields: $.extend({}, props.configFields),
-      values: $.extend({}, props.values),
-      titleValue: this.props.titleValue,
-    };
-  },
-  _sortByOptionality(x1, x2) {
-    return (this.state.configFields[x1].is_optional - this.state.configFields[x2].is_optional);
-  },
-  _save() {
+  getValue() {
     const data = {};
     const values = this.state.values;
     if (this.props.includeTitleField) {
@@ -46,6 +33,22 @@ const ConfigurationForm = React.createClass({
     $.map(this.state.configFields, function(field, name) {
       data.configuration[name] = (values[name] === undefined  || values === null || String(values[name]).trim() === "" ? field.default_value : values[name]);
     });
+
+    return data;
+  },
+  _copyStateFromProps(props) {
+    const effectiveTitleValue = (this.state && this.state.titleValue !== undefined ? this.state.titleValue : props.titleValue);
+    return {
+      configFields: $.extend({}, props.configFields),
+      values: $.extend({}, props.values),
+      titleValue: effectiveTitleValue,
+    };
+  },
+  _sortByOptionality(x1, x2) {
+    return (this.state.configFields[x1].is_optional - this.state.configFields[x2].is_optional);
+  },
+  _save() {
+    const data = this.getValue();
 
     this.props.submitAction(data);
     this.refs.modal.close();
@@ -62,33 +65,34 @@ const ConfigurationForm = React.createClass({
     this.setState({titleValue: value});
   },
   _handleChange(field, value) {
-    var values = this.state.values;
+    const values = this.state.values;
     values[field] = value;
     this.setState({values: values});
   },
   _renderConfigField(configField, key, autoFocus) {
-    var value = this.state.values[key];
-    var typeName = this.props.typeName;
+    const value = this.state.values[key];
+    const typeName = this.props.typeName;
+
     switch(configField.type) {
-    case "text":
-      return (<TextField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
-                         value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
-    case "number":
-      return (<NumberField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
+      case "text":
+        return (<TextField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
                            value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
-    case "boolean":
-      return (<BooleanField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
-                            value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
-    case "dropdown":
-      return (<DropdownField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
+      case "number":
+        return (<NumberField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
                              value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+      case "boolean":
+        return (<BooleanField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
+                              value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+      case "dropdown":
+        return (<DropdownField key={typeName + "-" + key} typeName={typeName} title={key} field={configField}
+                               value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
     }
   },
   render() {
-    var typeName = this.props.typeName;
-    var title = this.props.title;
-    var helpBlock = this.props.helpBlock;
-    var titleField = {is_optional: false, attributes: [], human_name: 'Title', description: helpBlock};
+    const typeName = this.props.typeName;
+    const title = this.props.title;
+    const helpBlock = this.props.helpBlock;
+    const titleField = {is_optional: false, attributes: [], human_name: 'Title', description: helpBlock};
 
     let shouldAutoFocus = true;
     let titleElement;
@@ -98,8 +102,8 @@ const ConfigurationForm = React.createClass({
       shouldAutoFocus = false;
     }
 
-    var configFieldKeys = $.map(this.state.configFields, (v,k) => {return k;}).sort(this._sortByOptionality);
-    var configFields = configFieldKeys.map((key) => {
+    const configFieldKeys = $.map(this.state.configFields, (v,k) => {return k;}).sort(this._sortByOptionality);
+    const configFields = configFieldKeys.map((key) => {
       const configField = this._renderConfigField(this.state.configFields[key], key, shouldAutoFocus);
       if (shouldAutoFocus) {
         shouldAutoFocus = false;
@@ -116,6 +120,7 @@ const ConfigurationForm = React.createClass({
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {titleElement}
+          {this.props.children}
           {configFields}
         </fieldset>
       </BootstrapModalForm>

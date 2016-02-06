@@ -1,11 +1,20 @@
 import React from 'react';
 import Reflux from 'reflux';
-import PageHeader from 'components/common/PageHeader';
-import InputsList from 'components/inputs/InputsList';
+
 import CurrentUserStore from 'stores/users/CurrentUserStore';
+import InputStatesStore from 'stores/inputs/InputStatesStore';
+
+import { PageHeader } from 'components/common';
+import { InputsList } from 'components/inputs';
 
 const InputsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
+  componentDidMount() {
+    this.interval = setInterval(InputStatesStore.list, 2000);
+  },
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  },
   render() {
     return (
       <div>

@@ -16,77 +16,87 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import com.google.common.base.MoreObjects;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
-import java.util.Locale;
 import java.util.Map;
 
-public class RelativeRange implements TimeRange {
+@AutoValue
+@JsonTypeName(RelativeRange.RELATIVE)
+public abstract class RelativeRange extends TimeRange {
 
-    private final int range;
+    public static final String RELATIVE = "relative";
 
-    public RelativeRange(int range) throws InvalidRangeParametersException {
-        if (range < 0) {
-            throw new InvalidRangeParametersException();
-        }
+    @JsonProperty
+    public abstract String type();
 
-        this.range = range;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.RELATIVE;
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>of(
-                "type", getType().toString().toLowerCase(Locale.ENGLISH),
-                "range", getRange());
-    }
+    @JsonProperty
+    public abstract int range();
 
     public int getRange() {
-        return range;
+        return range();
     }
 
     @Override
+    @JsonIgnore
     public DateTime getFrom() {
-        if (getRange() > 0) {
-            return Tools.iso8601().minus(Seconds.seconds(getRange()));
+        // TODO this should be computed once
+        if (range() > 0) {
+            return Tools.nowUTC().minus(Seconds.seconds(range()));
         }
         return new DateTime(0, DateTimeZone.UTC);
     }
 
     @Override
+    @JsonIgnore
     public DateTime getTo() {
-        return Tools.iso8601();
+        // TODO this should be fixed
+        return Tools.nowUTC();
+    }
+
+    @JsonCreator
+    public static RelativeRange create(@JsonProperty("type") String type, @JsonProperty("range") int range) throws InvalidRangeParametersException {
+        return builder().type(type).checkRange(range).build();
+    }
+
+    public static RelativeRange create(int range) throws InvalidRangeParametersException {
+        return create(RELATIVE, range);
+    }
+
+    public static Builder builder() {
+        return new AutoValue_RelativeRange.Builder();
     }
 
     @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("range", range)
-                .add("from", getFrom())
-                .add("to", getTo())
-                .toString();
+    public Map<String, Object> getPersistedConfig() {
+        return ImmutableMap.<String, Object>of(
+                "type", RELATIVE,
+                "range", getRange());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract RelativeRange build();
 
-        RelativeRange that = (RelativeRange) o;
-        return range == that.range;
+        public abstract Builder type(String type);
+
+        public abstract Builder range(int range);
+
+        // TODO replace with custom build()
+        public Builder checkRange(int range) throws InvalidRangeParametersException {
+            if (range < 0) {
+                throw new InvalidRangeParametersException();
+            }
+            return range(range);
+        }
     }
 
-    @Override
-    public int hashCode() {
-        return range;
-    }
 }

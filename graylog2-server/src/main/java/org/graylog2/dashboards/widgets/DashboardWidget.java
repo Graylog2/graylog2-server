@@ -125,7 +125,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>of("timerange", this.getTimeRange().getPersistedConfig());
+        return ImmutableMap.of("timerange", this.getTimeRange().getPersistedConfig());
     }
 
     protected abstract ComputationResult compute();

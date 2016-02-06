@@ -1,6 +1,7 @@
 import request from 'superagent-bluebird-promise';
 import SessionStore from 'stores/sessions/SessionStore';
 import SessionActions from 'actions/sessions/SessionActions';
+import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
 
 export class FetchError extends Error {
   constructor(message, additional) {
@@ -35,13 +36,18 @@ export class Builder {
       .accept('json')
       .then((resp) => {
         if (resp.ok) {
+          ServerAvailabilityActions.reportSuccess();
           return resp.body;
         }
 
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
-        if (error.status === 401) {
+        if (SessionStore.isLoggedIn() && error.status === 401) {
           SessionActions.logout(SessionStore.getSessionId());
+        }
+
+        if (error.originalError && !error.originalError.status) {
+          ServerAvailabilityActions.reportError(error);
         }
 
         throw new FetchError(error.statusText, error);
@@ -56,9 +62,17 @@ export class Builder {
 }
 
 export default function fetch(method, url, body) {
-  const builder = new Builder(method, url)
+  const promise = () => new Builder(method, url)
     .authenticated()
-    .json(body);
+    .json(body)
+    .build();
 
-  return builder.build();
+  if (!SessionStore.isLoggedIn()) {
+    return new Promise((resolve, reject) => {
+      SessionActions.login.completed.listen(() => {
+        promise().then(resolve, reject);
+      });
+    });
+  }
+  return promise();
 }

@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -23,7 +25,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -88,33 +89,26 @@ public class IndexHelper {
     public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
                                                        Deflector deflector,
                                                        TimeRange range) {
-        Set<String> indices = Sets.newHashSet();
-
-        for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
+        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, deflector, range);
+        final ImmutableSet.Builder<String> indices = ImmutableSet.builder();
+        for (IndexRange indexRange : indexRanges) {
             indices.add(indexRange.indexName());
         }
 
-        // Always include the most recent index in some cases.
-        final String targetIndex = deflector.getCurrentActualTargetIndex();
-        if (targetIndex != null && (indices.isEmpty() || range instanceof RelativeRange)) {
-            indices.add(targetIndex);
-        }
-
-        return indices;
+        return indices.build();
     }
 
     public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
                                                                      Deflector deflector,
                                                                      TimeRange range) {
-        Set<IndexRange> indices = Sets.newTreeSet(IndexRange.COMPARATOR);
-
+        final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
             indices.add(indexRange);
         }
 
-        // Always include the most recent index in some cases.
+        // Always include the deflector target
         final String targetIndex = deflector.getCurrentActualTargetIndex();
-        if (targetIndex != null && (indices.isEmpty() || range instanceof RelativeRange)) {
+        if (targetIndex != null) {
             try {
                 final IndexRange deflectorIndexRange = indexRangeService.get(targetIndex);
                 indices.add(deflectorIndexRange);
@@ -123,7 +117,6 @@ public class IndexHelper {
             }
         }
 
-        return indices;
+        return indices.build();
     }
-
 }

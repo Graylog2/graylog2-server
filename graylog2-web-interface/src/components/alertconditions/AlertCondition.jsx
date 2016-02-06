@@ -25,11 +25,12 @@ const AlertCondition = React.createClass({
       AlertConditionsActions.delete(this.props.alertCondition.stream_id, this.props.alertCondition.id);
     }
   },
-  _onUpdate() {
+  _onUpdate(event) {
+    event.preventDefault();
     const request = {
       type: this.props.alertCondition.type,
       parameters: this.refs.updateForm.getValue(),
-    }
+    };
     AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request)
     .then(() => {
       this.setState({edit: false});
@@ -49,11 +50,11 @@ const AlertCondition = React.createClass({
             <alertConditionType.summary alertCondition={alertCondition} />
             {' '}
             {this.state.edit &&
-            <span>
+            <form onSubmit={this._onUpdate}>
               <AlertConditionForm ref="updateForm" type={alertCondition.type} alertCondition={alertCondition.parameters} />
               {' '}
-              <Button bsStyle="info" onClick={this._onUpdate}>Save</Button>
-            </span>}
+              <Button bsStyle="info" type="submit">Save</Button>
+            </form>}
           </Col>
 
           <Col md={3} style={{textAlign: 'right'}}>
@@ -62,7 +63,6 @@ const AlertCondition = React.createClass({
             <Button bsStyle="danger" onClick={this._onDelete}>Delete condition</Button>
           </Col>
         </Row>
-        <hr />
       </span>
     );
   },

@@ -25,9 +25,9 @@ import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -40,6 +40,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,6 +142,10 @@ public class IndexerSetupService extends AbstractIdleService {
                 LOG.info("This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will write into the local disk journal.");
                 LOG.info("See {} for details.", DocsHelper.PAGE_ES_CONFIGURATION);
             }
+            if (ClusterHealthStatus.GREEN.equals(health.getStatus())) {
+                notificationService.fixed(Notification.Type.ES_CLUSTER_RED);
+            }
+            notificationService.fixed(Notification.Type.ES_UNAVAILABLE);
         } catch (ElasticsearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 

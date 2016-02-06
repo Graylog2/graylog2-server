@@ -1,7 +1,7 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-import UserNotification = require('util/UserNotification');
-import URLUtils = require('util/URLUtils');
+const UserNotification = require('util/UserNotification');
+const URLUtils = require('util/URLUtils');
 import jsRoutes = require('routing/jsRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
@@ -45,13 +45,15 @@ const UsersStore = {
 
   loadUsers(): Promise<User[]> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.list().url);
-    const promise = fetch('GET', url);
-    promise.catch((error) => {
-      if (error.additional.status !== 404) {
-        UserNotification.error("Loading user list failed with status: " + error,
-          "Could not load user list");
-      }
-    });
+    const promise = fetch('GET', url)
+      .then(
+        response => response.users,
+        (error) => {
+          if (error.additional.status !== 404) {
+            UserNotification.error("Loading user list failed with status: " + error,
+              "Could not load user list");
+          }
+        });
     return promise;
   },
 
@@ -83,7 +85,7 @@ const UsersStore = {
   },
 
   updateRoles(username: string, roles: string[]): void {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.updateRoles(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.update(username).url);
     const promise = fetch('PUT', url, {roles: roles});
 
     return promise;
