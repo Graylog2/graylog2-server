@@ -62,6 +62,7 @@ import org.graylog2.messageprocessors.MessageFilterChainProcessor;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -166,9 +167,9 @@ public class PipelineBenchmark {
     }
 
     @Benchmark
-    public void testPipeline(final InterpreterState state) {
+    public Messages testPipeline(final InterpreterState state) {
         Message msg = new Message("original message", "test", Tools.nowUTC());
-        state.interpreter.process(msg);
+        return state.interpreter.process(msg);
     }
 
     @State(Scope.Benchmark)
@@ -245,9 +246,9 @@ public class PipelineBenchmark {
     }
 
     @Benchmark
-    public void testMessageFilterChain(final MessageFilterState state) {
+    public Messages testMessageFilterChain(final MessageFilterState state) {
         Message msg = new Message("original message", "test", Tools.nowUTC());
-        state.filterChain.process(msg);
+        return state.filterChain.process(msg);
     }
 
     public static <T> T mock(Class<T> classToMock) {
