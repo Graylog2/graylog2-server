@@ -7,6 +7,7 @@ import d3 from 'd3';
 import jQuery from 'jquery';
 
 import DateTime from 'logic/datetimes/DateTime';
+import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import D3Utils from 'util/D3Utils';
 import NumberUtils from 'util/NumberUtils';
@@ -61,6 +62,7 @@ const GraphVisualization = React.createClass({
     id: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired,
     config: PropTypes.object.isRequired,
+    computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
   },
@@ -79,7 +81,7 @@ const GraphVisualization = React.createClass({
   getInitialState() {
     this.triggerRender = true;
     this.graphData = crossfilter();
-    this.dimension = this.graphData.dimension((d) => d.x * 1000);
+    this.dimension = this.graphData.dimension((d) => d.x);
     this.group = this.dimension.group().reduceSum((d) => d.y);
 
     return {
@@ -97,9 +99,10 @@ const GraphVisualization = React.createClass({
     this._updateData(nextProps.data, nextProps.config);
   },
   _updateData(data, config) {
-    const dataPoints = jQuery.map(data, (value, timestamp) => {
-      return {x: Number(timestamp), y: value[config.valuetype]};
-    });
+    const isSearchAll = (config.timerange.type === 'relative' && config.timerange.range === 0);
+    const dataPoints = HistogramFormatter.format(data, this.props.computationTimeRange,
+      config.interval, this.props.width, isSearchAll, config.valuetype);
+
     this.setState({dataPoints: this._normalizeData(dataPoints)}, this.drawData);
   },
   _normalizeData(data) {

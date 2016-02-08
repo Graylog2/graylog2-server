@@ -149,10 +149,11 @@ const Widget = React.createClass({
         break;
       case this.constructor.Type.FIELD_CHART:
         visualization = (<GraphVisualization id={this.props.widget.id}
-                                            data={this.state.result}
-                                            config={this.props.widget.config}
-                                            height={this.state.height}
-                                            width={this.state.width}/>);
+                                             data={this.state.result}
+                                             config={this.props.widget.config}
+                                             computationTimeRange={this.state.computationTimeRange}
+                                             height={this.state.height}
+                                             width={this.state.width}/>);
         break;
       case this.constructor.Type.STACKED_CHART:
         visualization = (<StackedGraphVisualization id={this.props.widget.id}
