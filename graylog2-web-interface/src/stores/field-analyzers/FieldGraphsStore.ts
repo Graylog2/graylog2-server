@@ -185,8 +185,12 @@ class FieldGraphsStore {
         this.saveGraph(graphId, defaultOptions.merge(givenOptions).toJS());
     }
 
-    renderFieldGraph(graphOptions: Object, graphContainer: Element) {
+    renderFieldGraph(graphOptions: Object, graphContainer: Element, options: Object = {new: true}) {
+      if (options['new']) {
         FieldChart.renderNewFieldChart(graphOptions, graphContainer);
+      } else {
+        FieldChart.renderFieldChart(graphOptions, graphContainer, {newGraph: false});
+      }
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {

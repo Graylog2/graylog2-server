@@ -33,15 +33,17 @@ const SearchPage = React.createClass({
   componentDidMount() {
     const query = SearchStore.query.length > 0 ? SearchStore.query : '*';
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
-      this.setState({searchResult: response});
+    this.timer = setInterval(() => {
+      UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
+        this.setState({searchResult: response});
 
-      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
+        const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
-        this.setState({histogram: histogram});
+        UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
+          this.setState({histogram: histogram});
+        });
       });
-    });
+    }, 2000);
     InputsActions.list.triggerPromise();
 
     StreamsStore.listStreams().then((streams) => {
@@ -52,6 +54,11 @@ const SearchPage = React.createClass({
 
     NodesActions.list();
     DashboardsStore.updateWritableDashboards();
+  },
+  componentWillUnmount() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
