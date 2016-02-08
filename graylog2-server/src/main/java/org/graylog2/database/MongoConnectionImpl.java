@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.UnknownHostException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -40,7 +39,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class MongoConnectionImpl implements MongoConnection {
     private static final Logger LOG = LoggerFactory.getLogger(MongoConnectionImpl.class);
-        
+
     private final MongoClientURI mongoClientURI;
 
     private MongoClient m = null;
@@ -67,19 +66,15 @@ public class MongoConnectionImpl implements MongoConnection {
                 throw new RuntimeException("MongoDB database name is missing.");
             }
 
-            try {
-                m = new MongoClient(mongoClientURI);
-                db = m.getDB(dbName);
-                db.setWriteConcern(WriteConcern.SAFE);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException("Cannot resolve host name for MongoDB", e);
-            }
+            m = new MongoClient(mongoClientURI);
+            db = m.getDB(dbName);
+            db.setWriteConcern(WriteConcern.SAFE);
         }
 
         try {
             db.command("{ ping: 1 }");
         } catch (MongoCommandException e) {
-            if(e.getCode() == 18) {
+            if (e.getCode() == 18) {
                 throw new MongoException("Couldn't connect to MongoDB. Please check the authentication credentials.", e);
             } else {
                 throw new MongoException("Couldn't connect to MongoDB: " + e.getMessage(), e);
