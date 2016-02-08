@@ -6,6 +6,7 @@ import dc from 'dc';
 import d3 from 'd3';
 
 import DateTime from 'logic/datetimes/DateTime';
+import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import D3Utils from 'util/D3Utils';
 
@@ -18,13 +19,15 @@ const HistogramVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired,
+    computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
   },
   getInitialState() {
     this.triggerRender = true;
     this.histogramData = crossfilter();
-    this.dimension = this.histogramData.dimension((d) => d.x * 1000);
+    this.dimension = this.histogramData.dimension((d) => d.x);
     this.group = this.dimension.group().reduceSum((d) => d.y);
 
     return {
@@ -51,9 +54,10 @@ const HistogramVisualization = React.createClass({
     this.triggerRender = true;
   },
   drawData() {
-    const dataPoints = $.map(this.state.dataPoints, (value, timestamp) => {
-      return {x: Number(timestamp), y: value};
-    });
+    const isSearchAll = (this.props.config.timerange.type === 'relative' && this.props.config.timerange.range === 0);
+    const dataPoints = HistogramFormatter.format(this.state.dataPoints, this.props.computationTimeRange,
+      this.props.config.interval, this.props.width, isSearchAll, null);
+
     this.histogram.xUnits(() => dataPoints.length - 1);
     this.histogramData.remove();
     this.histogramData.add(dataPoints);

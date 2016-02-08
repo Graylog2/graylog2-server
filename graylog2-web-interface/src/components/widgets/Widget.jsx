@@ -75,12 +75,18 @@ const Widget = React.createClass({
     const width = this.refs.widget.clientWidth;
 
     WidgetsStore.loadValue(this.props.dashboardId, this.props.widget.id, width).then((value) => {
-      this.setState({
+      const newState = {
         result: value.result,
         calculatedAt: value.calculated_at,
         error: false,
         errorMessage: undefined,
-      });
+      };
+
+      if (value.computation_time_range) {
+        newState.computationTimeRange = value.computation_time_range;
+      }
+
+      this.setState(newState);
     }, (response) => {
       const error = response.message;
       const newResult = this.state.result === undefined ? 'N/A' : this.state.result;
@@ -128,10 +134,11 @@ const Widget = React.createClass({
         break;
       case this.constructor.Type.SEARCH_RESULT_CHART:
         visualization = (<HistogramVisualization id={this.props.widget.id}
-                                                data={this.state.result}
-                                                interval={this.props.widget.config.interval}
-                                                height={this.state.height}
-                                                width={this.state.width}/>);
+                                                 data={this.state.result}
+                                                 config={this.props.widget.config}
+                                                 computationTimeRange={this.state.computationTimeRange}
+                                                 height={this.state.height}
+                                                 width={this.state.width}/>);
         break;
       case this.constructor.Type.QUICKVALUES:
         visualization = (<QuickValuesVisualization id={this.props.widget.id}
