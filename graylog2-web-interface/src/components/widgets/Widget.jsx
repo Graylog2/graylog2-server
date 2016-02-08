@@ -142,10 +142,10 @@ const Widget = React.createClass({
         break;
       case this.constructor.Type.QUICKVALUES:
         visualization = (<QuickValuesVisualization id={this.props.widget.id}
-                                                  config={this.props.widget.config}
-                                                  data={this.state.result}
-                                                  height={this.state.height}
-                                                  width={this.state.width}/>);
+                                                   config={this.props.widget.config}
+                                                   data={this.state.result}
+                                                   height={this.state.height}
+                                                   width={this.state.width}/>);
         break;
       case this.constructor.Type.FIELD_CHART:
         visualization = (<GraphVisualization id={this.props.widget.id}
