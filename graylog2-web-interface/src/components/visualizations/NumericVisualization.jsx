@@ -10,7 +10,10 @@ const TrendIndicatorType = {
 const NumericVisualization = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
-    data: React.PropTypes.object.isRequired,
+    data: React.PropTypes.oneOfType([
+      React.PropTypes.object,
+      React.PropTypes.number,
+    ]).isRequired,
   },
   getInitialState() {
     return {
