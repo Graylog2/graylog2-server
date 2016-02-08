@@ -62,6 +62,7 @@ import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.indices.IndexClosedException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
@@ -528,6 +529,8 @@ public class Indices {
         final SearchResponse response;
         try {
             response = c.search(srb.request()).actionGet();
+        } catch (IndexClosedException e) {
+            throw e;
         } catch (org.elasticsearch.index.IndexNotFoundException e) {
             LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
             throw e;
