@@ -23,11 +23,13 @@ const HistogramFormatter = {
    * @param {string} resolution: Histogram resolution
    * @param {number} screenSize: Screen width to calculate the maximum number of data points returned
    * @param {boolean} isSearchAll: Indicates if the histogram was made for a search in all messages or not
+   * @param {string} valueKey: Histogram contains objects with different values, this indicates the key
+   *                           to access the value to plot
    * @param {boolean} legacy: Flag to indicate if the x-axis should contain timestamps in ms or seconds.
    *                          This was added as Rickshaw only supports the latter format
    *
    */
-  format(dataPoints, queryTimeRange, resolution, screenSize, isSearchAll, legacy = false) {
+  format(dataPoints, queryTimeRange, resolution, screenSize, isSearchAll, valueKey, legacy = false) {
     const formattedPoints = [];
     const maxDataPoints = (screenSize && screenSize > 0 ? screenSize : DEFAULT_MAX_DATA_POINTS);
 
@@ -48,7 +50,19 @@ const HistogramFormatter = {
         if (index % factor === 0) {
           const timestamp = String(tempTime.unix());
           const value = dataPoints[timestamp];
-          const result = ((value === null || value === undefined) ? 0 : value);
+
+          let result = 0;
+          // Get the actual value if the result for that time is an object. If there is no result, we'll use 0
+          if (value !== null && value !== undefined) {
+            if (typeof value === 'object') {
+              if (value.hasOwnProperty(valueKey)) {
+                result = value[valueKey];
+              }
+            } else {
+              result = value;
+            }
+          }
+
           formattedPoints.push({
             x: (legacy ? tempTime.unix() : tempTime.valueOf()),
             y: NumberUtils.normalizeGraphNumber(result),

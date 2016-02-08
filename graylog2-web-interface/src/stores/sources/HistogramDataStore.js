@@ -45,7 +45,7 @@ const HistogramDataStore = Reflux.createStore({
       .then(
         response => {
           response.histogram = HistogramFormatter.format(response.results, response.queried_timerange, interval,
-            maxDataPoints, rangeAsNumber === 0);
+            maxDataPoints, rangeAsNumber === 0, null);
           return response;
         },
         error => {

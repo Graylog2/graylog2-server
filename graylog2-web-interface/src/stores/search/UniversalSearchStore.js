@@ -56,7 +56,7 @@ const UniversalSearchStore = Reflux.createStore({
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;
       response.histogram = HistogramFormatter.format(response.results, response.histogram_boundaries, interval,
-        maxDataPoints, type === 'relative' && timerange.relative === 0, true);
+        maxDataPoints, type === 'relative' && timerange.relative === 0, null, true);
       return response;
     });
   },

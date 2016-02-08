@@ -4,7 +4,6 @@ import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
 import Qs from 'qs';
-import naturalSort from 'javascript-natural-sort';
 
 import DateTime from 'logic/datetimes/DateTime';
 import rickshawHelper from 'legacy/rickshaw-helper';
@@ -14,6 +13,7 @@ import fetch from 'logic/rest/FetchProvider';
 import jsRoutes from 'routing/jsRoutes';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
+import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 function generateShortId() {
     return Math.random().toString(36).substr(2, 9);
@@ -144,8 +144,6 @@ export const FieldChart = {
 
         // Do not add from time when we search in all messages
         var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
-
-        rickshawHelper.processHistogramData(data.values, from, data.to, data.interval);
 
         var graph = new Rickshaw.Graph({
             element: $graphElement[0],
@@ -315,22 +313,18 @@ export const FieldChart = {
         ).url;
 
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
-          .then(request => {
-              const formattedRequest = {
-                  time: request.time,
-                  interval: request.interval,
-                  from: request.queried_timerange.from,
-                  to: request.queried_timerange.to,
-                  values: [],
+          .then(response => {
+              const formattedResponse = {
+                  time: response.time,
+                  interval: response.interval,
+                  from: response.queried_timerange.from,
+                  to: response.queried_timerange.to,
               };
 
-              Object.keys(request.results)
-                  .sort(naturalSort)
-                  .map(timestamp => {
-                      formattedRequest.values.push({x: Number(timestamp), y: request.results[timestamp][opts.valuetype]});
-                  });
+              formattedResponse.values = HistogramFormatter.format(response.results, response.queried_timerange, opts.interval,
+                jQuery(window).width(), opts.rangetype === 'relative' && opts.range.relative === 0, opts.valuetype, true);
 
-              return formattedRequest;
+              return formattedResponse;
           });
 
         promise
