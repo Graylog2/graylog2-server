@@ -1,5 +1,4 @@
 import Rickshaw from 'rickshaw';
-import rickshawHelper from 'legacy/rickshaw-helper';
 import DateTime from 'logic/datetimes/DateTime';
 import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
 import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
@@ -46,7 +45,7 @@ const resultHistogram = {
             element: this._histogramContainer[0],
             width: this._getHistogramContainerWidth(),
             height: 120,
-            renderer: rickshawHelper.getRenderer("bar"),
+            renderer: "bar",
             resolution: selectedResolution,
             series: [ {
                 name: "Messages",

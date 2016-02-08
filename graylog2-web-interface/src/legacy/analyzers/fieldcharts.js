@@ -6,7 +6,6 @@ import Rickshaw from 'rickshaw';
 import Qs from 'qs';
 
 import DateTime from 'logic/datetimes/DateTime';
-import rickshawHelper from 'legacy/rickshaw-helper';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -150,7 +149,7 @@ export const FieldChart = {
             width: $graphElement.width(),
             height: this.GRAPH_HEIGHT,
             interpolation: opts.interpolation,
-            renderer: rickshawHelper.getRenderer(opts.renderer),
+            renderer: opts.renderer,
             resolution: data.interval,
             series: [{
                 name: "value",
