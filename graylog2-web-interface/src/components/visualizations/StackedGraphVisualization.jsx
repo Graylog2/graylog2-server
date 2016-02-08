@@ -6,8 +6,8 @@ import c3 from 'c3';
 import d3 from 'd3';
 
 import D3Utils from 'util/D3Utils';
-import NumberUtils from 'util/NumberUtils';
 import DateTime from 'logic/datetimes/DateTime';
+import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import graphHelper from 'legacy/graphHelper';
 
@@ -18,6 +18,7 @@ const StackedGraphVisualization = React.createClass({
     height: PropTypes.number,
     width: PropTypes.number,
     config: PropTypes.object.isRequired,
+    computationTimeRange: PropTypes.object,
   },
   getInitialState() {
     this.series = Immutable.List();
@@ -46,31 +47,34 @@ const StackedGraphVisualization = React.createClass({
     }
     return data;
   },
-  _extractDataValue(results, seriesNo) {
-    const statisticalValue = results[this.props.config.series[seriesNo - 1].statistical_function];
-    return NumberUtils.normalizeGraphNumber(statisticalValue);
-  },
   _formatData(data) {
     const normalizedData = this._normalizeData(data);
-    let series = Immutable.Map();
-    let seriesNo = 1;
+    const isSearchAll = (this.props.config.timerange.type === 'relative' && this.props.config.timerange.range === 0);
+    const formattedSeries = [];
 
-    normalizedData.forEach(aSeries => {
-      const timestamps = Object.keys(aSeries);
-      timestamps.forEach(timestamp => {
-        const formattedTimestamp = Number(timestamp) * 1000;
-        const value = this._extractDataValue(aSeries[timestamp], seriesNo);
-        const formattedDataPoint = Immutable.Map({timestamp: formattedTimestamp}).set(`series${seriesNo}`, value);
-        if (series.has(formattedTimestamp)) {
-          series = series.set(formattedTimestamp, series.get(formattedTimestamp).merge(formattedDataPoint));
-        } else {
-          series = series.set(formattedTimestamp, formattedDataPoint);
-        }
-      }, this);
-      seriesNo += 1;
+    normalizedData.forEach((aSeries, idx) => {
+      formattedSeries.push(HistogramFormatter.format(aSeries, this.props.computationTimeRange,
+        this.props.config.interval, this.props.width, isSearchAll, this.props.config.series[idx].statistical_function));
     }, this);
 
-    return series.toOrderedSet().sortBy((dataPoint) => dataPoint.get('timestamp'));
+    return this._mergeSeries(formattedSeries);
+  },
+  _mergeSeries(series) {
+    let mergedSeries = Immutable.Map();
+
+    series.forEach((aSeries, idx) => {
+      aSeries.forEach(seriesPoint => {
+        const timestamp = seriesPoint.x;
+        const mergedDataPoint = Immutable.Map({timestamp: timestamp}).set(`series${idx + 1}`, seriesPoint.y);
+        if (mergedSeries.has(timestamp)) {
+          mergedSeries = mergedSeries.set(timestamp, mergedSeries.get(timestamp).merge(mergedDataPoint));
+        } else {
+          mergedSeries = mergedSeries.set(timestamp, mergedDataPoint);
+        }
+      }, this);
+    }, this);
+
+    return mergedSeries.toOrderedSet().sortBy(dataPoint => dataPoint.get('timestamp'));
   },
   _getGraphType() {
     let graphType;
