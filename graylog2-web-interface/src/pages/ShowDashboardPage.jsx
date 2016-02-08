@@ -48,7 +48,7 @@ const ShowDashboardPage = React.createClass({
     return this.state.currentUser.preferences.updateUnfocussed;
   },
   shouldUpdate() {
-    return this.updateUnFocussed() || this.state.forceUpdateInBackground || this.state.focus;
+    return Boolean(this.updateUnFocussed() || this.state.forceUpdateInBackground || this.state.focus);
   },
   removeWidget(props) {
     if (props.delete) {
