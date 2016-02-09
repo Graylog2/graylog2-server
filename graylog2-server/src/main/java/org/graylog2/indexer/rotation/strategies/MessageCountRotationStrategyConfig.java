@@ -24,6 +24,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 import org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse;
 
+import javax.validation.constraints.Min;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class MessageCountRotationStrategyConfig implements RotationStrategyConfig {
@@ -32,12 +34,12 @@ public abstract class MessageCountRotationStrategyConfig implements RotationStra
 
     @JsonCreator
     public static MessageCountRotationStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                            @JsonProperty("max_docs_per_index") int maxDocsPerIndex) {
+                                                            @JsonProperty("max_docs_per_index") @Min(1) int maxDocsPerIndex) {
         return new AutoValue_MessageCountRotationStrategyConfig(type, maxDocsPerIndex);
     }
 
     @JsonCreator
-    public static MessageCountRotationStrategyConfig create(@JsonProperty("max_docs_per_index") int maxDocsPerIndex) {
+    public static MessageCountRotationStrategyConfig create(@JsonProperty("max_docs_per_index") @Min(1) int maxDocsPerIndex) {
         return create(MessageCountRotationStrategyConfig.class.getCanonicalName(), maxDocsPerIndex);
     }
 

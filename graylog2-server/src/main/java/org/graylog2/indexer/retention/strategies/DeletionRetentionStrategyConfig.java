@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+
+import javax.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue
@@ -31,12 +32,12 @@ public abstract class DeletionRetentionStrategyConfig implements RetentionStrate
 
     @JsonCreator
     public static DeletionRetentionStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                         @JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+                                                         @JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
         return new AutoValue_DeletionRetentionStrategyConfig(type, maxNumberOfIndices);
     }
 
     @JsonCreator
-    public static DeletionRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+    public static DeletionRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
         return new AutoValue_DeletionRetentionStrategyConfig(DeletionRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
     }
 }
