@@ -11,7 +11,7 @@ import resultHistogram from 'legacy/result-histogram';
 // Hue-manatee. We tried to be sorry, but aren't.
 const LegacyHistogram = React.createClass({
   propTypes: {
-    formattedHistogram: React.PropTypes.object.isRequired,
+    formattedHistogram: React.PropTypes.array.isRequired,
     histogram: React.PropTypes.object.isRequired,
     isStreamSearch: React.PropTypes.bool.isRequired,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
