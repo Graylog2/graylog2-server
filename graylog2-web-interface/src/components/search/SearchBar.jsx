@@ -43,6 +43,11 @@ const SearchBar = React.createClass({
     SearchStore.onAddQueryTerm = this._animateQueryChange;
     this._initializeSearchQueryInput();
   },
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.query !== prevState.query) {
+      this._updateSearchQueryInput(this.state.query);
+    }
+  },
   componentWillUnmount() {
     this._removeSearchQueryInput();
   },
@@ -51,13 +56,18 @@ const SearchBar = React.createClass({
   },
   _initializeSearchQueryInput() {
     if (this.props.userPreferences.enableSmartSearch) {
-      const queryInput = new QueryInput(this.refs.query.getInputDOMNode());
-      queryInput.display();
+      this.queryInput = new QueryInput(this.refs.query.getInputDOMNode());
+      this.queryInput.display();
       // We need to update on changes made on typeahead
       const queryDOMElement = ReactDOM.findDOMNode(this.refs.query);
       $(queryDOMElement).on('typeahead:change', (event) => {
         SearchStore.query = event.target.value;
       });
+    }
+  },
+  _updateSearchQueryInput(value) {
+    if (this.props.userPreferences.enableSmartSearch) {
+      this.queryInput.update(value);
     }
   },
   _removeSearchQueryInput() {

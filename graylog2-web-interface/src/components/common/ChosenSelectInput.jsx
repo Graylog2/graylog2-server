@@ -11,6 +11,7 @@ const ChosenSelectInput = React.createClass({
     children: PropTypes.any,
     onChange: PropTypes.func,
     dataPlaceholder: PropTypes.string,
+    value: PropTypes.string,
   },
   componentDidMount() {
     const $selectDOMNode = $(this.refs.select.getInputDOMNode());
@@ -42,9 +43,11 @@ const ChosenSelectInput = React.createClass({
     return this.selectedOption;
   },
   render() {
+    const value = this.props.value || 'placeholder';
+
     // Chosen needs the empty option to render the placeholder
     return (
-      <Input ref="select" type="select" placeholder="placeholder" {...this.props}>
+      <Input ref="select" type="select" placeholder="placeholder" {...this.props} value={value}>
         <option value="placeholder"></option>
         {this.props.children}
       </Input>

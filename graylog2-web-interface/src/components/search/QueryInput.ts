@@ -63,6 +63,10 @@ class QueryInput {
         });
     }
 
+    update(newValue) {
+        $(this.queryInputContainer).typeahead('val', newValue);
+    }
+
     private codeCompletionProvider(query: string, callback: (matches: Array<any>) => void) {
         var prefix = "";
         var matches: Array<any> = [];
