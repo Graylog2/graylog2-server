@@ -28,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
@@ -64,6 +65,8 @@ public class PipelineProcessorModule extends PluginModule {
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
+        addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
+
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
