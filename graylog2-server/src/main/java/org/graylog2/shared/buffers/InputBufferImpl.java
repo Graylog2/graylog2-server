@@ -82,7 +82,12 @@ public class InputBufferImpl implements InputBuffer {
         ringBuffer = disruptor.start();
 
         incomingMessages = metricRegistry.meter(name(InputBufferImpl.class, "incomingMessages"));
-        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_USAGE, (Gauge<Long>) this::getUsage);
+        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return InputBufferImpl.this.getUsage();
+            }
+        });
         safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_SIZE, constantGauge(ringBuffer.getBufferSize()));
 
         LOG.info("Initialized {} with ring size <{}> and wait strategy <{}>, running {} parallel message handlers.",

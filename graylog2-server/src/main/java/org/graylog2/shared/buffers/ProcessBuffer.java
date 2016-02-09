@@ -64,7 +64,12 @@ public class ProcessBuffer extends Buffer {
 
         final Timer parseTime = metricRegistry.timer(name(ProcessBuffer.class, "parseTime"));
         final Timer decodeTime = metricRegistry.timer(name(ProcessBuffer.class, "decodeTime"));
-        MetricUtils.safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_USAGE, (Gauge<Long>) this::getUsage);
+        MetricUtils.safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return ProcessBuffer.this.getUsage();
+            }
+        });
         safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_SIZE, constantGauge(ringBufferSize));
 
         final WaitStrategy waitStrategy = getWaitStrategy(waitStrategyName, "processor_wait_strategy");

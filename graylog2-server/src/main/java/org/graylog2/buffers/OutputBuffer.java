@@ -58,7 +58,12 @@ public class OutputBuffer extends Buffer {
         this.ringBufferSize = ringSize;
         this.incomingMessages = metricRegistry.meter(name(OutputBuffer.class, "incomingMessages"));
 
-        safelyRegister(metricRegistry, GlobalMetricNames.OUTPUT_BUFFER_USAGE, (Gauge<Long>) this::getUsage);
+        safelyRegister(metricRegistry, GlobalMetricNames.OUTPUT_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return OutputBuffer.this.getUsage();
+            }
+        });
         safelyRegister(metricRegistry, GlobalMetricNames.OUTPUT_BUFFER_SIZE, constantGauge(ringBufferSize));
 
         final ThreadFactory threadFactory = threadFactory(metricRegistry);
