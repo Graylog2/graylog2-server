@@ -76,7 +76,13 @@ const SavedSearchesStore = Reflux.createStore({
       }
     }
 
-    const url = `${Routes.SEARCH}?${Qs.stringify(searchQuery)}`;
+    let url;
+    if (streamId) {
+      url = Routes.stream_search(streamId);
+    } else {
+      url = Routes.SEARCH;
+    }
+    url = `${url}?${Qs.stringify(searchQuery)}`;
     URLUtils.openLink(url, false);
   },
 
