@@ -59,7 +59,7 @@ const LegacyHistogram = React.createClass({
 
     var resolutionSelector = (
       <ul className="graph-resolution-selector list-inline">
-        <li><i className="fa fa-clock-o"></i></li>
+        <li><i className="fa fa-clock-o"/></li>
         {resolutionLinks}
       </ul>
     );

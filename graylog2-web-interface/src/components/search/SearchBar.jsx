@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
 
 import {ChosenSelectInput, DatePicker} from 'components/common';
-import QueryInput from './QueryInput';
+import { RefreshControls, QueryInput } from 'components/search';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
@@ -194,108 +194,108 @@ const SearchBar = React.createClass({
     let selector;
 
     switch (this.state.rangeType) {
-    case 'relative':
-      selector = (
-        <div className="timerange-selector relative"
-             style={{width: 270, marginLeft: 50}}>
-          <Input id="relative-timerange-selector"
-                 ref="relative"
-                 type="select"
-                 value={this.state.rangeParams.get('relative')}
-                 name="relative"
-                 onChange={this._rangeParamsChanged('relative')}
-                 className="input-sm">
-            <option value="300">Search in the last 5 minutes</option>
-            <option value="900">Search in the last 15 minutes</option>
-            <option value="1800">Search in the last 30 minutes</option>
-            <option value="3600">Search in the last 1 hour</option>
-            <option value="7200">Search in the last 2 hours</option>
-            <option value="28800">Search in the last 8 hours</option>
-            <option value="86400">Search in the last 1 day</option>
-            <option value="172800">Search in the last 2 days</option>
-            <option value="432000">Search in the last 5 days</option>
-            <option value="604800">Search in the last 7 days</option>
-            <option value="1209600">Search in the last 14 days</option>
-            <option value="2592000">Search in the last 30 days</option>
-            <option value="0">Search in all messages</option>
-          </Input>
-        </div>
-      );
-      break;
-    case 'absolute':
-      selector = (
-        <div className="timerange-selector absolute" style={{width: 600}}>
-          <div className="row no-bm" style={{marginLeft: 50}}>
-            <div className="col-md-5" style={{padding: 0}}>
-              <Input type="hidden" name="from" ref="from"/>
-              <DatePicker id="searchFromDatePicker"
-                          title="Search start date"
-                          date={this.state.rangeParams.get('from')}
-                          onChange={this._onDateSelected('from')} >
-                <Input type="text"
-                       ref="fromFormatted"
-                       value={this._formattedDateStringInUserTZ('from')}
-                       onChange={this._rangeParamsChanged('from')}
-                       placeholder={DateTime.Formats.DATETIME}
-                       buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
-                       bsStyle={this._isValidDateField('from') ? null : 'error'}
-                       bsSize="small"
-                       required/>
-              </DatePicker>
-
-            </div>
-            <div className="col-md-1">
-              <p className="text-center" style={{margin: 0, lineHeight: '30px'}}>to</p>
-            </div>
-            <div className="col-md-5" style={{padding: 0}}>
-              <Input type="hidden" name="to" ref="to"/>
-              <DatePicker id="searchToDatePicker"
-                          title="Search end date"
-                          date={this.state.rangeParams.get('to')}
-                          onChange={this._onDateSelected('to')} >
-                <Input type="text"
-                       ref="toFormatted"
-                       value={this._formattedDateStringInUserTZ('to')}
-                       onChange={this._rangeParamsChanged('to')}
-                       placeholder={DateTime.Formats.DATETIME}
-                       buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
-                       bsStyle={this._isValidDateField('to') ? null : 'error'}
-                       bsSize="small"
-                       required/>
+      case 'relative':
+        selector = (
+          <div className="timerange-selector relative"
+               style={{width: 270, marginLeft: 50}}>
+            <Input id="relative-timerange-selector"
+                   ref="relative"
+                   type="select"
+                   value={this.state.rangeParams.get('relative')}
+                   name="relative"
+                   onChange={this._rangeParamsChanged('relative')}
+                   className="input-sm">
+              <option value="300">Search in the last 5 minutes</option>
+              <option value="900">Search in the last 15 minutes</option>
+              <option value="1800">Search in the last 30 minutes</option>
+              <option value="3600">Search in the last 1 hour</option>
+              <option value="7200">Search in the last 2 hours</option>
+              <option value="28800">Search in the last 8 hours</option>
+              <option value="86400">Search in the last 1 day</option>
+              <option value="172800">Search in the last 2 days</option>
+              <option value="432000">Search in the last 5 days</option>
+              <option value="604800">Search in the last 7 days</option>
+              <option value="1209600">Search in the last 14 days</option>
+              <option value="2592000">Search in the last 30 days</option>
+              <option value="0">Search in all messages</option>
+            </Input>
+          </div>
+        );
+        break;
+      case 'absolute':
+        selector = (
+          <div className="timerange-selector absolute" style={{width: 600}}>
+            <div className="row no-bm" style={{marginLeft: 50}}>
+              <div className="col-md-5" style={{padding: 0}}>
+                <Input type="hidden" name="from" ref="from"/>
+                <DatePicker id="searchFromDatePicker"
+                            title="Search start date"
+                            date={this.state.rangeParams.get('from')}
+                            onChange={this._onDateSelected('from')} >
+                  <Input type="text"
+                         ref="fromFormatted"
+                         value={this._formattedDateStringInUserTZ('from')}
+                         onChange={this._rangeParamsChanged('from')}
+                         placeholder={DateTime.Formats.DATETIME}
+                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
+                         bsStyle={this._isValidDateField('from') ? null : 'error'}
+                         bsSize="small"
+                         required/>
                 </DatePicker>
+
+              </div>
+              <div className="col-md-1">
+                <p className="text-center" style={{margin: 0, lineHeight: '30px'}}>to</p>
+              </div>
+              <div className="col-md-5" style={{padding: 0}}>
+                <Input type="hidden" name="to" ref="to"/>
+                <DatePicker id="searchToDatePicker"
+                            title="Search end date"
+                            date={this.state.rangeParams.get('to')}
+                            onChange={this._onDateSelected('to')} >
+                  <Input type="text"
+                         ref="toFormatted"
+                         value={this._formattedDateStringInUserTZ('to')}
+                         onChange={this._rangeParamsChanged('to')}
+                         placeholder={DateTime.Formats.DATETIME}
+                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
+                         bsStyle={this._isValidDateField('to') ? null : 'error'}
+                         bsSize="small"
+                         required/>
+                </DatePicker>
+              </div>
             </div>
           </div>
-        </div>
-      );
-      break;
-    case 'keyword':
-      selector = (
-        <div className="timerange-selector keyword" style={{width: 650}}>
-          <div className="row no-bm" style={{marginLeft: 50}}>
-            <div className="col-md-5" style={{padding: 0}}>
-              <Input type="text"
-                     ref="keyword"
-                     name="keyword"
-                     value={this.state.rangeParams.get('keyword')}
-                     onChange={this._keywordSearchChanged}
-                     placeholder="Last week"
-                     className="input-sm"
-                     required/>
-            </div>
-            <div className="col-md-7" style={{paddingRight: 0}}>
-              {this.state.keywordPreview.size > 0 &&
-              <Alert bsStyle="info" style={{height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0}}>
-                <strong style={{marginRight: 8}}>Preview:</strong>
-                {this.state.keywordPreview.get('from')} to {this.state.keywordPreview.get('to')}
-              </Alert>
+        );
+        break;
+      case 'keyword':
+        selector = (
+          <div className="timerange-selector keyword" style={{width: 650}}>
+            <div className="row no-bm" style={{marginLeft: 50}}>
+              <div className="col-md-5" style={{padding: 0}}>
+                <Input type="text"
+                       ref="keyword"
+                       name="keyword"
+                       value={this.state.rangeParams.get('keyword')}
+                       onChange={this._keywordSearchChanged}
+                       placeholder="Last week"
+                       className="input-sm"
+                       required/>
+              </div>
+              <div className="col-md-7" style={{paddingRight: 0}}>
+                {this.state.keywordPreview.size > 0 &&
+                <Alert bsStyle="info" style={{height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0}}>
+                  <strong style={{marginRight: 8}}>Preview:</strong>
+                  {this.state.keywordPreview.get('from')} to {this.state.keywordPreview.get('to')}
+                </Alert>
                 }
+              </div>
             </div>
           </div>
-        </div>
-      );
-      break;
-    default:
-      throw new Error(`Unsupported range type ${this.state.rangeType}`);
+        );
+        break;
+      default:
+        throw new Error(`Unsupported range type ${this.state.rangeType}`);
     }
 
     return selector;
@@ -336,10 +336,10 @@ const SearchBar = React.createClass({
 
                 <div className="timerange-selector-container">
                   <div className="row no-bm">
-                    <div className="col-md-9">
+                    <div className="col-md-6">
                       <ButtonToolbar className="timerange-chooser pull-left">
                         <DropdownButton bsStyle="info"
-                                        title={<i className="fa fa-clock-o"></i>}
+                                        title={<i className="fa fa-clock-o"/>}
                                         onSelect={this._rangeTypeChanged}
                                         id="dropdown-timerange-selector">
                           <MenuItem eventKey="relative"
@@ -359,10 +359,14 @@ const SearchBar = React.createClass({
 
                       {this._getRangeTypeSelector()}
                     </div>
-                    <div className="col-md-3">
-                      <div className="saved-searches-selector-container"
-                           style={{float: 'right', marginRight: 5, width: 270}}>
-                        {this._getSavedSearchesSelector()}
+                    <div className="col-md-6">
+                      <div className="saved-searches-selector-container pull-right" style={{display: 'inline-flex', marginRight: '5px'}}>
+                        <div style={{marginRight: '5px'}}>
+                          <RefreshControls />
+                        </div>
+                        <div style={{width: '270px'}}>
+                          {this._getSavedSearchesSelector()}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -372,11 +376,11 @@ const SearchBar = React.createClass({
                   <div className="pull-right search-help">
                     <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                        title="Search query syntax documentation"
-                                       text={<i className="fa fa-lightbulb-o"></i>}/>
+                                       text={<i className="fa fa-lightbulb-o"/>}/>
                   </div>
 
                   <Button type="submit" bsStyle="success" className="pull-left">
-                    <i className="fa fa-search"></i>
+                    <i className="fa fa-search"/>
                   </Button>
 
                   <div className="query">

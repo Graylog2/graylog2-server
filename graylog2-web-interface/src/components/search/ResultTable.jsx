@@ -5,6 +5,8 @@ import Immutable from 'immutable';
 import StreamsStore from 'stores/streams/StreamsStore';
 import SearchStore from 'stores/search/SearchStore';
 
+import RefreshActions from 'actions/tools/RefreshActions';
+
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
@@ -42,6 +44,7 @@ const ResultTable = React.createClass({
       newSet = this.state.expandedMessages.delete(id);
     } else {
       newSet = this.state.expandedMessages.add(id);
+      RefreshActions.disable();
     }
     this.setState({expandedMessages: newSet});
   },

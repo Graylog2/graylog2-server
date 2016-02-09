@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import LegacyFieldGraph from './LegacyFieldGraph';
 import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
@@ -13,6 +14,7 @@ const FieldGraphs = React.createClass({
     searchInStream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
+  mixins: [PureRenderMixin],
   getInitialState() {
     this.notifyOnNewGraphs = false;
 
