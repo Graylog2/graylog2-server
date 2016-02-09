@@ -1,20 +1,21 @@
-/* global resultHistogram */
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-'use strict';
+import Widget from 'components/widgets/Widget';
+import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-
-var Widget = require('../widgets/Widget');
-var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
-
-var SearchStore = require('../../stores/search/SearchStore');
+import SearchStore from 'stores/search/SearchStore';
 
 import resultHistogram from 'legacy/result-histogram';
 
 // Hue-manatee. We tried to be sorry, but aren't.
 const LegacyHistogram = React.createClass({
-  RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
+  propTypes: {
+    formattedHistogram: React.PropTypes.object.isRequired,
+    histogram: React.PropTypes.object.isRequired,
+    isStreamSearch: React.PropTypes.bool.isRequired,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+  },
   getInitialState() {
     return {};
   },
@@ -23,6 +24,7 @@ const LegacyHistogram = React.createClass({
     resultHistogram.setData(this.props.formattedHistogram);
     resultHistogram.drawResultGraph();
   },
+  RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
   _resolutionChanged(newResolution) {
     return (event) => {
       event.preventDefault();
@@ -34,18 +36,18 @@ const LegacyHistogram = React.createClass({
       return null;
     }
 
-    return this.props.histogram['histogram_boundaries'].from;
+    return this.props.histogram.histogram_boundaries.from;
   },
   render() {
     if (SearchStore.resolution === undefined) {
       SearchStore.resolution = this.props.histogram.interval;
     }
-    var resolutionLinks = this.RESOLUTIONS.map((resolution) => {
-      var className = "date-histogram-res-selector";
+    const resolutionLinks = this.RESOLUTIONS.map((resolution) => {
+      let className = 'date-histogram-res-selector';
       if (this.props.histogram.interval === resolution) {
-        className += " selected-resolution";
+        className += ' selected-resolution';
       }
-      var suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? "" : ",";
+      const suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? '' : ',';
       return (
         <li key={resolution}>
           <a href="#" className={className} data-resolution={resolution}
@@ -57,7 +59,7 @@ const LegacyHistogram = React.createClass({
       );
     });
 
-    var resolutionSelector = (
+    const resolutionSelector = (
       <ul className="graph-resolution-selector list-inline">
         <li><i className="fa fa-clock-o"/></li>
         {resolutionLinks}
@@ -69,7 +71,7 @@ const LegacyHistogram = React.createClass({
         <AddToDashboardMenu title="Add to dashboard"
                             widgetType={Widget.Type.SEARCH_RESULT_CHART}
                             configuration={{interval: this.props.histogram.interval}}
-                            pullRight={true}
+                            pullRight
                             permissions={this.props.permissions}
                             isStreamSearch={this.props.isStreamSearch}/>
       </div>
@@ -80,12 +82,12 @@ const LegacyHistogram = React.createClass({
       <div id="result-graph-container">
         <div id="y_axis"></div>
         <div id="result-graph" data-from={this._getFirstHistogramValue()}
-             data-to={this.props.histogram['histogram_boundaries'].to}></div>
+             data-to={this.props.histogram.histogram_boundaries.to}></div>
         <div id="result-graph-timeline"></div>
       </div>
 
     </div>);
-  }
+  },
 });
 
-module.exports = LegacyHistogram;
+export default LegacyHistogram;

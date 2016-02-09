@@ -25,12 +25,6 @@ const SearchPage = React.createClass({
     location: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
   },
-  getInitialState() {
-    return {
-      selectedFields: ['message', 'source'],
-      query: SearchStore.query.length > 0 ? SearchStore.query : '*',
-    };
-  },
   mixins: [
     Reflux.connect(NodesStore),
     Reflux.connect(MessageFieldsStore),
@@ -38,6 +32,12 @@ const SearchPage = React.createClass({
     Reflux.listenTo(InputsStore, '_formatInputs'),
     Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
   ],
+  getInitialState() {
+    return {
+      selectedFields: ['message', 'source'],
+      query: SearchStore.query.length > 0 ? SearchStore.query : '*',
+    };
+  },
   componentDidMount() {
     this._refreshData();
     InputsActions.list.triggerPromise();

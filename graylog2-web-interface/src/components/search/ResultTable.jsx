@@ -10,7 +10,18 @@ import RefreshActions from 'actions/tools/RefreshActions';
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
-  EXPAND_ALL_RENDER_ASYNC_DELAY: 10,
+  propTypes: {
+    highlight: React.PropTypes.bool.isRequired,
+    inputs: React.PropTypes.array.isRequired,
+    messages: React.PropTypes.array.isRequired,
+    nodes: React.PropTypes.array.isRequired,
+    page: React.PropTypes.number.isRequired,
+    resultCount: React.PropTypes.number.isRequired,
+    selectedFields: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+    sortField: React.PropTypes.string.isRequired,
+    sortOrder: React.PropTypes.string.isRequired,
+    streams: React.PropTypes.array.isRequired,
+  },
   getInitialState() {
     return {
       expandedMessages: Immutable.Set(),
@@ -24,16 +35,17 @@ const ResultTable = React.createClass({
     if (this.state.allStreamsLoaded) {
       return;
     }
-    var promise = StreamsStore.listStreams();
+    const promise = StreamsStore.listStreams();
     promise.done((streams) => this._onStreamsLoaded(streams));
   },
-  componentDidUpdate(oldProps, oldState) {
+  componentDidUpdate() {
     if (this.state.expandAllRenderAsync) {
       // This may take some time, so we ensure we display a loading indicator in the page
       // while all messages are being expanded
       setTimeout(() => this.setState({expandAllRenderAsync: false}), this.EXPAND_ALL_RENDER_ASYNC_DELAY);
     }
   },
+  EXPAND_ALL_RENDER_ASYNC_DELAY: 10,
   _onStreamsLoaded(streams) {
     this.setState({allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title)});
   },
@@ -83,19 +95,18 @@ const ResultTable = React.createClass({
     const classesDesc = 'fa fa-sort-amount-asc fa-flip-vertical sort-order-desc sort-order-item';
     // if the given field name is the one we sorted on
     if (this.props.sortField.toLowerCase().localeCompare(fieldName.toLowerCase()) === 0) {
-
-      if (this.props.sortOrder.toLowerCase().localeCompare("desc") === 0) {
+      if (this.props.sortOrder.toLowerCase().localeCompare('desc') === 0) {
         sortLinks = (
           <span>
-            <i className={classesDesc + ' sort-order-active'}></i>
-            <a href="#" onClick={(e) => this._handleSort(e, fieldName, "asc")}><i className={classesAsc}></i></a>
+            <i className={classesDesc + ' sort-order-active'}/>
+            <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc}/></a>
           </span>
         );
       } else {
         sortLinks = (
           <span>
-            <i className={classesAsc + ' sort-order-active'}></i>
-            <a href="#" onClick={(e) => this._handleSort(e, fieldName, "desc")}><i className={classesDesc}></i></a>
+            <i className={classesAsc + ' sort-order-active'}/>
+            <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc}/></a>
           </span>
         );
       }
@@ -103,8 +114,8 @@ const ResultTable = React.createClass({
       // the given fieldname is not being sorted on
       sortLinks = (
         <span className="sort-order">
-          <a href="#" onClick={(e) => this._handleSort(e, fieldName, "asc")}><i className={classesAsc}></i></a>
-          <a href="#" onClick={(e) => this._handleSort(e, fieldName, "desc")}><i className={classesDesc}></i></a>
+          <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc}/></a>
+          <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc}/></a>
         </span>
       );
     }
@@ -112,16 +123,16 @@ const ResultTable = React.createClass({
   },
 
   render() {
-    var selectedColumns = this._fieldColumns();
+    const selectedColumns = this._fieldColumns();
     return (
       <div className="content-col">
         <h1 className="pull-left">Messages</h1>
 
-        <ButtonGroup bsSize='small' className="pull-right">
-          <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"></i></Button>
+        <ButtonGroup bsSize="small" className="pull-right">
+          <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"/></Button>
           <Button title="Collapse all messages"
                   onClick={this.collapseAll}
-                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"></i></Button>
+                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"/></Button>
         </ButtonGroup>
 
         <MessageTablePaginator position="top" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}/>
@@ -130,7 +141,7 @@ const ResultTable = React.createClass({
           <table className="table table-condensed messages">
             <thead>
             <tr>
-              <th style={{width: 180}}>Timestamp {this._sortIcons("timestamp")}</th>
+              <th style={{width: 180}}>Timestamp {this._sortIcons('timestamp')}</th>
               { selectedColumns.toSeq().map(selectedFieldName => <th key={selectedFieldName}
                                                                      style={this._columnStyle(selectedFieldName)}>{selectedFieldName} {this._sortIcons(selectedFieldName) }</th>) }
             </tr>
@@ -153,11 +164,11 @@ const ResultTable = React.createClass({
         </div>
 
         <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}>
-          <ButtonGroup bsSize='small' className="pull-right" style={{position: 'absolute', marginTop: 20, right: 10}}>
-            <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"></i></Button>
+          <ButtonGroup bsSize="small" className="pull-right" style={{position: 'absolute', marginTop: 20, right: 10}}>
+            <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand"/></Button>
             <Button title="Collapse all messages"
                     onClick={this.collapseAll}
-                    disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"></i></Button>
+                    disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress"/></Button>
           </ButtonGroup>
         </MessageTablePaginator>
       </div>

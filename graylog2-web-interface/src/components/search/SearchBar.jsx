@@ -162,7 +162,7 @@ const SearchBar = React.createClass({
       return false;
     }
   },
-  _prepareSearch(event) {
+  _prepareSearch() {
     // Convert from and to values to UTC
     if (this.state.rangeType === 'absolute') {
       const fromInput = this.refs.fromFormatted.getValue();

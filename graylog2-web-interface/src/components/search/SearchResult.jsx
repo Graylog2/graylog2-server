@@ -29,6 +29,18 @@ const SearchResult = React.createClass({
     permissions: PropTypes.array.isRequired,
   },
 
+  getDefaultProps() {
+    return {
+      query: '*',
+      builtQuery: '',
+      formattedHistogram: [],
+      searchInStream: null,
+      streams: Immutable.Map({}),
+      inputs: Immutable.Map({}),
+      nodes: Immutable.Map({}),
+    };
+  },
+
   getInitialState() {
     const initialFields = SearchStore.fields;
     return {
@@ -41,17 +53,6 @@ const SearchResult = React.createClass({
     };
   },
 
-  getDefaultProps() {
-    return {
-      query: '*',
-      builtQuery: '',
-      formattedHistogram: [],
-      searchInStream: null,
-      streams: Immutable.Map({}),
-      inputs: Immutable.Map({}),
-      nodes: Immutable.Map({}),
-    };
-  },
   componentDidMount() {
     DashboardsStore.updateWritableDashboards();
   },

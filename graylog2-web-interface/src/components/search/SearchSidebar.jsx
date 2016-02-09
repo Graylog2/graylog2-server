@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Reflux from 'reflux';
-import { Button, ButtonGroup, DropdownButton, Glyphicon, Input, MenuItem, Modal } from 'react-bootstrap';
+import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
 import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
 
