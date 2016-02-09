@@ -19,9 +19,15 @@ const Metric = React.createClass({
     meter: 'play-circle',
     gauge: 'dashboard',
     counter: 'circle',
+    unknown: 'question-circle',
   },
   _formatIcon(type) {
-    return this.iconMapping[type];
+    const icon = this.iconMapping[type];
+    if (icon) {
+        return icon;
+    }
+    
+    return this.iconMapping.unknown;
   },
   _formatName(metricName) {
     return (
