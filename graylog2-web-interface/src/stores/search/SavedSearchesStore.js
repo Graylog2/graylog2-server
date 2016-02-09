@@ -72,7 +72,8 @@ const SavedSearchesStore = Reflux.createStore({
     };
     for (const paramName in savedSearch.query) {
       if (Object.hasOwnProperty.call(savedSearch.query, paramName)) {
-        searchQuery[paramName.toLowerCase()] = savedSearch.query[paramName];
+        const effectiveParamName = (paramName.toLowerCase() === 'query' ? 'q' : paramName.toLowerCase());
+        searchQuery[effectiveParamName] = savedSearch.query[paramName];
       }
     }
 
