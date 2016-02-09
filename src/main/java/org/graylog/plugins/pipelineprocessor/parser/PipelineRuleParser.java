@@ -36,7 +36,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
@@ -49,7 +49,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.MapExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
@@ -471,7 +471,7 @@ public class PipelineRuleParser {
         @Override
         public void exitArrayLiteralExpr(RuleLangParser.ArrayLiteralExprContext ctx) {
             final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(toList());
-            exprs.put(ctx, new ArrayExpression(elements));
+            exprs.put(ctx, new ArrayLiteralExpression(elements));
         }
 
         @Override
@@ -482,7 +482,7 @@ public class PipelineRuleParser {
                 final Expression value = exprs.get(propAssignmentContext.expression());
                 map.put(key, value);
             }
-            exprs.put(ctx, new MapExpression(map));
+            exprs.put(ctx, new MapLiteralExpression(map));
         }
 
         @Override
