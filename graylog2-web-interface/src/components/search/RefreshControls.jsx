@@ -21,8 +21,8 @@ const RefreshControls = React.createClass({
             <input id="mySlider"
                    type="range"
                    value={this.state.refresh.interval}
-                   min={1}
-                   max={300}
+                   min={1000}
+                   max={60 * 1000}
                    onChange={(evt) => RefreshActions.changeInterval(evt.target.value)}
                    step={1000} />
             {' '}60s
