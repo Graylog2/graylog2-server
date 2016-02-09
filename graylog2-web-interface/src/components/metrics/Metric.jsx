@@ -24,9 +24,9 @@ const Metric = React.createClass({
   _formatIcon(type) {
     const icon = this.iconMapping[type];
     if (icon) {
-        return icon;
+      return icon;
     }
-    
+
     return this.iconMapping.unknown;
   },
   _formatName(metricName) {
