@@ -70,6 +70,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.3.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
                 <version>0.9.9</version>
@@ -174,6 +180,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

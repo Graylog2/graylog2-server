@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.IndexedAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
@@ -63,9 +64,11 @@ import org.graylog.plugins.pipelineprocessor.ast.statements.FunctionStatement;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
+import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
 import org.graylog.plugins.pipelineprocessor.parser.errors.MissingRequiredParam;
+import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
@@ -531,6 +534,16 @@ public class PipelineRuleParser {
             exprs.put(ctx, exprs.get(ctx.functionCall()));
             parseContext.addInnerNode(ctx);
         }
+
+        @Override
+        public void exitIndexedAccess(RuleLangParser.IndexedAccessContext ctx) {
+            final Expression array = exprs.get(ctx.array);
+            final Expression index = exprs.get(ctx.index);
+
+            final IndexedAccessExpression expr = new IndexedAccessExpression(array, index);
+            exprs.put(ctx, expr);
+            log.info("IDXACCESS: ctx {} => {}", ctx, expr);
+        }
     }
 
     private class RuleTypeAnnotator extends RuleLangBaseListener {
@@ -641,6 +654,36 @@ public class PipelineRuleParser {
             }
         }
 
+        @Override
+        public void exitIndexedAccess(RuleLangParser.IndexedAccessContext ctx) {
+            final IndexedAccessExpression idxExpr = (IndexedAccessExpression) parseContext.expressions().get(
+                    ctx);
+
+            final Class<?> indexableType = idxExpr.getIndexableObject().getType();
+            final Class<?> indexType = idxExpr.getIndex().getType();
+
+            final boolean isMap = Map.class.isAssignableFrom(indexableType);
+            if (indexableType.isArray()
+                    || List.class.isAssignableFrom(indexableType)
+                    || Iterable.class.isAssignableFrom(indexableType)
+                    || isMap) {
+                // then check if the index type is compatible, must be long for array-like and string for map-like types
+                if (isMap) {
+                    if (!String.class.equals(indexType)) {
+                        // add type error
+                        parseContext.addError(new IncompatibleIndexType(ctx, String.class, indexType));
+                    }
+                } else {
+                    if (!Long.class.equals(indexType)) {
+                        parseContext.addError(new IncompatibleIndexType(ctx, Long.class, indexType));
+                    }
+                }
+            } else {
+                // not an indexable type
+                parseContext.addError(new NonIndexableType(ctx, indexableType));
+            }
+
+        }
     }
 
     /**

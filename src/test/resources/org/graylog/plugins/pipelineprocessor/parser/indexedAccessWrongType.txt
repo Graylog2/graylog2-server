@@ -1,0 +1,6 @@
+rule "indexed array and map access"
+when
+    one_arg("not an array")[0] == "first"
+then
+    trigger_test();
+end

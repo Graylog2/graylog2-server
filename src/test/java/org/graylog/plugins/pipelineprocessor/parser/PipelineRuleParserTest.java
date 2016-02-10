@@ -30,11 +30,13 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
+import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
+import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
@@ -444,6 +446,34 @@ public class PipelineRuleParserTest {
         assertEquals(2, stage2.stage());
         assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"},
                           stage2.ruleReferences().toArray());
+    }
+
+    @Test
+    public void indexedAccess() {
+        final Rule rule = parser.parseRule(ruleForTest());
+
+        evaluateRule(rule, new Message("hallo", "test", DateTime.now()));
+        assertTrue("condition should be true", actionsTriggered.get());
+    }
+
+    @Test
+    public void indexedAccessWrongType() {
+        try {
+            parser.parseRule(ruleForTest());
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(NonIndexableType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
+
+    @Test
+    public void indexedAccessWrongIndexType() {
+        try {
+            parser.parseRule(ruleForTest());
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
     }
 
     private Message evaluateRule(Rule rule, Message message) {

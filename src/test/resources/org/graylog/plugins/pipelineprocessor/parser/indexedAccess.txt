@@ -1,0 +1,6 @@
+rule "indexed array and map access"
+when
+    ["first","second"][0] == "first" and {third: "a value"}["third"] == "a value"
+then
+    trigger_test();
+end

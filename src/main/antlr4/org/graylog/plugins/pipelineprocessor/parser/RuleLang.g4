@@ -77,7 +77,7 @@ ruleDeclaration
 expression
     :   MessageRef '.' field=expression                                 # MessageRef
     |   fieldSet=expression '.' field=expression                        # Nested
-    |   fieldSet=expression '[' expression ']'                          # Array
+    |   array=expression '[' index=expression ']'                       # IndexedAccess
     |   functionCall                                                    # Func
     |   left=expression comparison=('<=' | '>=' | '>' | '<') right=expression # Comparison
     |   left=expression equality=('==' | '!=') right=expression         # Equality
