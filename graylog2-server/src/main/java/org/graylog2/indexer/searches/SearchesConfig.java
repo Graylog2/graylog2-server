@@ -96,7 +96,7 @@ public abstract class SearchesConfig {
         abstract SearchesConfig autoBuild();
 
         public SearchesConfig build() {
-            if (limit() == 0) {
+            if (limit() <= 0) {
                 limit(DEFAULT_LIMIT);
             }
             return autoBuild();
