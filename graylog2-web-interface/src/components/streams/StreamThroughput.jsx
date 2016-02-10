@@ -14,8 +14,11 @@ const StreamThroughput = React.createClass({
   componentWillMount() {
     MetricsActions.addGlobal(this._metricName());
   },
+  componentWillUnmount() {
+    MetricsActions.removeGlobal(this._metricName());
+  },
   _metricName() {
-    return "org.graylog2.plugin.streams.Stream." + this.props.streamId + ".incomingMessages.1-sec-rate";
+    return `org.graylog2.plugin.streams.Stream.${this.props.streamId}.incomingMessages.1-sec-rate`;
   },
   _calculateThroughput() {
     return Object.keys(this.state.metrics)
