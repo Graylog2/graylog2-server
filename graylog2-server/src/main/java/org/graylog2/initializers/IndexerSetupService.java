@@ -32,15 +32,14 @@ import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.node.Node;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -84,7 +84,15 @@ public class GlobalTimeoutClient extends FilterClient {
         @Override
         public TransportRequestOptions transportOptions(Settings settings) {
             final TransportRequestOptions result = super.transportOptions(settings);
-            return result.timeout() == null ? result.withTimeout(timeout) : result;
+            if (result.timeout() == null) {
+                return TransportRequestOptions.builder()
+                        .withCompress(result.compress())
+                        .withType(result.type())
+                        .withTimeout(timeout)
+                        .build();
+            } else {
+                return result;
+            }
         }
 
         @Override
