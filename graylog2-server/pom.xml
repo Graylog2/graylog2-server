@@ -454,18 +454,6 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <filter>
-                            <artifact>log4j:apache-log4j-extras</artifact>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                        </filter>
-                        <filter>
-                            <artifact>log4j:log4j</artifact>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                        </filter>
                         <!-- http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ -->
                         <filter>
                             <artifact>commons-collections:commons-collections</artifact>
