@@ -5,7 +5,7 @@ import RefreshActions from 'actions/tools/RefreshActions';
 const RefreshStore = Reflux.createStore({
   listenables: [RefreshActions],
   interval: 5 * 1000,
-  enabled: true,
+  enabled: false,
 
   getInitialState() {
     return {
