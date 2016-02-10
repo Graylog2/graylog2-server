@@ -29,6 +29,9 @@ class ActionsProvider {
   }
 
   getActions(actionsName) {
+    if (!this.actions[actionsName]) {
+      throw new Error('Requested actions "' + actionsName + '" is not registered.');
+    }
     return this.actions[actionsName];
   }
 }
