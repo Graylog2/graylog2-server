@@ -22,14 +22,19 @@ const LegacyHistogram = React.createClass({
   componentDidMount() {
     this._renderHistogram(this.props.formattedHistogram);
   },
-  componentDidUpdate() {
-    this._renderHistogram(this.props.formattedHistogram);
+  componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.formattedHistogram) !== prevProps.formattedHistogram) {
+      this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
+    }
   },
   RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
   _renderHistogram(histogram) {
     resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
     resultHistogram.setData(histogram);
     resultHistogram.drawResultGraph();
+  },
+  _updateHistogram(histogram) {
+    resultHistogram.updateData(histogram);
   },
   _resolutionChanged(newResolution) {
     return (event) => {

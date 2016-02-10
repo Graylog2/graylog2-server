@@ -101,6 +101,15 @@ const resultHistogram = {
         this._resultHistogramGraph = resultGraph;
     },
 
+    updateData: function(newData) {
+        if (this._histogram.length > 0) {
+            if (typeof this._resultHistogramGraph !== 'undefined') {
+                this._resultHistogramGraph.series[0].data = newData;
+                this._resultHistogramGraph.update();
+            }
+        }
+    },
+
     redrawResultGraph: function() {
         if(this._histogram.length > 0) {
             if (typeof this._resultHistogramGraph !== 'undefined') {
