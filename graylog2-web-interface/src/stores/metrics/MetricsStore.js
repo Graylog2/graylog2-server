@@ -24,7 +24,6 @@ const MetricsStore = Reflux.createStore({
   },
   updateNodes(update) {
     this.nodes = update.nodes;
-    MetricsActions.names();
   },
   logout() {
     this.registrations = {};

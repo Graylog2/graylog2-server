@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 import MetricsStore from 'stores/metrics/MetricsStore';
 import NodesStore from 'stores/nodes/NodesStore';
 
+import MetricsActions from 'actions/metrics/MetricsActions';
 
 import { PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
@@ -14,6 +15,9 @@ const ShowMetricsPage = React.createClass({
     params: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore), Reflux.connect(NodesStore)],
+  componentDidMount() {
+    MetricsActions.names();
+  },
   render() {
     if (!this.state.nodes || !this.state.metricsNames) {
       return <Spinner />;
