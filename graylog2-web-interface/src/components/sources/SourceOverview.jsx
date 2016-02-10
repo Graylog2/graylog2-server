@@ -13,6 +13,7 @@ import { Spinner } from 'components/common';
 
 import DateTime from 'logic/datetimes/DateTime';
 import UniversalSearch from 'logic/search/UniversalSearch';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import SourcesStore from 'stores/sources/SourcesStore';
 import HistogramDataActions from 'actions/sources/HistogramDataActions';
@@ -26,8 +27,6 @@ const DEFAULT_RANGE_IN_SECS = hoursToSeconds(1);
 const SUPPORTED_RANGES_IN_SECS = [hoursToSeconds(1), daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
 
 let SCREEN_RESOLUTION = $(window).width();
-
-let resizeMutex;
 
 const SourceOverview = React.createClass({
   getInitialState() {
@@ -82,7 +81,7 @@ const SourceOverview = React.createClass({
     this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
     this.applyRangeParameter();
     dc.renderAll();
-    $(window).on('resize', this._resizeCallback);
+    window.addEventListener('resize', this._resizeCallback);
     $(window).on('hashchange', this._applyRangeFromHash);
     // register them live as we do not know if those buttons are currently in the DOM
     $(document).on('click', '.sidebar-hide', this._updateWidth);
@@ -91,7 +90,7 @@ const SourceOverview = React.createClass({
   },
 
   componentWillUnmount() {
-    $(window).off('resize', this._resizeCallback);
+    window.removeEventListener('resize', this._resizeCallback);
     $(window).off('hashchange', this._applyRangeFromHash);
     $(document).off('click', '.sidebar-hide', this._updateWidth);
     $(document).off('click', '.sidebar-show', this._updateWidth);
@@ -106,6 +105,7 @@ const SourceOverview = React.createClass({
   },
 
   NUMBER_OF_TOP_VALUES: 10,
+  eventThrottler: new EventHandlersThrottler(),
 
   loadData() {
     this.loadSources();
@@ -179,9 +179,7 @@ const SourceOverview = React.createClass({
   },
 
   _resizeCallback() {
-    // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
-    clearTimeout(resizeMutex);
-    resizeMutex = setTimeout(() => this._updateWidth(), 200);
+    this.eventThrottler.throttle(() => this._updateWidth());
   },
 
   // redirect old range format (as query parameter) to new format (deep link)

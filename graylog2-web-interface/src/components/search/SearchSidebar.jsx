@@ -11,7 +11,7 @@ import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';
 
-let resizeMutex;
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 const SearchSidebar = React.createClass({
   propTypes: {
@@ -55,11 +55,13 @@ const SearchSidebar = React.createClass({
     window.removeEventListener('resize', this._resizeCallback);
     window.removeEventListener('scroll', this._updateHeight);
   },
+
+  eventsThrottler: new EventHandlersThrottler(),
+
   _resizeCallback() {
-    // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
-    clearTimeout(resizeMutex);
-    resizeMutex = setTimeout(() => this._updateHeight(), 100);
+    this.eventsThrottler.throttle(() => this._updateHeight());
   },
+
   _updateHeight() {
     const header = ReactDOM.findDOMNode(this.refs.header);
 

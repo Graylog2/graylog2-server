@@ -2,6 +2,8 @@ import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import { Page } from 'components/common';
 
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
+
 import SearchStore from 'stores/search/SearchStore';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
@@ -14,7 +16,7 @@ const MessageTablePaginator = React.createClass({
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
-    ]).isRequired,
+    ]),
     position: PropTypes.string,
   },
   getInitialState() {
@@ -26,14 +28,15 @@ const MessageTablePaginator = React.createClass({
   componentDidMount() {
     this._setPaginationWidth();
     this._initializeAffix();
-    $(window).on('resize', this._setPaginationWidth);
+    window.addEventListener('resize', this._setPaginationWidth);
   },
 
   componentWillUnmount() {
-    $(window).off('resize', this._setPaginationWidth);
+    window.removeEventListener('resize', this._setPaginationWidth);
   },
 
   RESULTS_PER_PAGE: 100,
+  eventsThrottler: new EventHandlersThrottler(),
 
   _initializeAffix() {
     if (this.props.position === 'bottom') {
@@ -47,7 +50,9 @@ const MessageTablePaginator = React.createClass({
   },
   _setPaginationWidth() {
     if (this.props.position === 'bottom') {
-      this.setState({paginationWidth: ReactDOM.findDOMNode(this.refs.paginatorContainer).clientWidth});
+      this.eventsThrottler.throttle(() => {
+        this.setState({paginationWidth: ReactDOM.findDOMNode(this.refs.paginatorContainer).clientWidth});
+      });
     }
   },
   _numberOfPages() {
