@@ -64,7 +64,7 @@ const FieldGraphs = React.createClass({
 
     return (
       <div id="field-graphs">
-        {fieldGraphs}
+        {fieldGraphs.valueSeq()}
       </div>
     );
   },
