@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.validation.constraints.Min;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class ClosingRetentionStrategyConfig implements RetentionStrategyConfig {
@@ -30,12 +32,12 @@ public abstract class ClosingRetentionStrategyConfig implements RetentionStrateg
 
     @JsonCreator
     public static ClosingRetentionStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                        @JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+                                                        @JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
         return new AutoValue_ClosingRetentionStrategyConfig(type, maxNumberOfIndices);
     }
 
     @JsonCreator
-    public static ClosingRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") int maxNumberOfIndices) {
+    public static ClosingRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
         return new AutoValue_ClosingRetentionStrategyConfig(ClosingRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
     }
 }

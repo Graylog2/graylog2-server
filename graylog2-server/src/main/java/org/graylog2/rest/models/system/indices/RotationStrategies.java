@@ -14,30 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.graylog2.indexer.retention.strategies;
+package org.graylog2.rest.models.system.indices;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import javax.validation.constraints.Min;
+import java.util.Set;
 
-@JsonAutoDetect
 @AutoValue
-public abstract class DeletionRetentionStrategyConfig implements RetentionStrategyConfig {
-    @JsonProperty("max_number_of_indices")
-    public abstract int maxNumberOfIndices();
+@JsonAutoDetect
+public abstract class RotationStrategies {
+    @JsonProperty
+    public abstract int total();
+
+    @JsonProperty
+    public abstract Set<String> strategies();
 
     @JsonCreator
-    public static DeletionRetentionStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                         @JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
-        return new AutoValue_DeletionRetentionStrategyConfig(type, maxNumberOfIndices);
-    }
-
-    @JsonCreator
-    public static DeletionRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
-        return new AutoValue_DeletionRetentionStrategyConfig(DeletionRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
+    public static RotationStrategies create(@JsonProperty("total") int total,
+                                            @JsonProperty("strategies") Set<String> strategies) {
+        return new AutoValue_RotationStrategies(total, strategies);
     }
 }

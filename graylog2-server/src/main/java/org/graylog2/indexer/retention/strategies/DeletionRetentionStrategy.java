@@ -67,6 +67,6 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
 
     @Override
     public Class<?> configurationClass() {
-        return DeletionRetentionStrategy.class;
+        return DeletionRetentionStrategyConfig.class;
     }
 }

@@ -14,30 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.graylog2.indexer.retention.strategies;
+package org.graylog2.rest.models.system.indices;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.retention.strategies.RetentionStrategyConfig;
+import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class DeletionRetentionStrategyConfig implements RetentionStrategyConfig {
-    @JsonProperty("max_number_of_indices")
-    public abstract int maxNumberOfIndices();
+public abstract class RetentionStrategySummary {
+    @JsonProperty
+    public abstract String strategy();
+
+    @JsonProperty
+    public abstract RetentionStrategyConfig config();
 
     @JsonCreator
-    public static DeletionRetentionStrategyConfig create(@JsonProperty(TYPE_FIELD) String type,
-                                                         @JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
-        return new AutoValue_DeletionRetentionStrategyConfig(type, maxNumberOfIndices);
-    }
-
-    @JsonCreator
-    public static DeletionRetentionStrategyConfig create(@JsonProperty("max_number_of_indices") @Min(1) int maxNumberOfIndices) {
-        return new AutoValue_DeletionRetentionStrategyConfig(DeletionRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
+    public static RetentionStrategySummary create(@JsonProperty("strategy") @NotEmpty String strategy,
+                                                  @JsonProperty("config") @Valid @NotNull RetentionStrategyConfig config) {
+        return new AutoValue_RetentionStrategySummary(strategy, config);
     }
 }

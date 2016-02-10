@@ -57,46 +57,42 @@ public class ConfigurationManagementPeriodical extends Periodical {
         final SizeBasedRotationStrategyConfig sizeBasedRotationStrategyConfig = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
         final TimeBasedRotationStrategyConfig timeBasedRotationStrategyConfig = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
 
-        // TODO: Disabled the conditions until we have a REST API and UI for the rotation/retention settings.
-        //if (messageCountRotationStrategyConfig == null) {
+        if (messageCountRotationStrategyConfig == null) {
             final MessageCountRotationStrategyConfig countConfig = MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex());
             clusterConfigService.write(countConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_docs_per_index", countConfig);
-        //}
-        //if (sizeBasedRotationStrategyConfig == null) {
+        }
+        if (sizeBasedRotationStrategyConfig == null) {
             final SizeBasedRotationStrategyConfig sizeConfig = SizeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxSizePerIndex());
             clusterConfigService.write(sizeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_size_per_index", sizeConfig);
-        //}
-        //if (timeBasedRotationStrategyConfig == null) {
+        }
+        if (timeBasedRotationStrategyConfig == null) {
             final TimeBasedRotationStrategyConfig timeConfig = TimeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxTimePerIndex());
             clusterConfigService.write(timeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
-        //}
+        }
 
         // All default retention strategy settings
         final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
         final DeletionRetentionStrategy deletionRetentionStrategy = clusterConfigService.get(DeletionRetentionStrategy.class);
 
-        //if (closingRetentionStrategyConfig == null) {
+        if (closingRetentionStrategyConfig == null) {
             final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(closingConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", closingConfig);
-        //}
+        }
 
-        //if (deletionRetentionStrategy == null) {
+        if (deletionRetentionStrategy == null) {
             final DeletionRetentionStrategyConfig deletionConfig = DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(deletionConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", deletionConfig);
-        //}
+        }
 
         // Selected rotation and retention strategies.
         final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
-
-        //if (indexManagementConfig == null) {
+        if (indexManagementConfig == null) {
             final Class<? extends RotationStrategy> rotationStrategyClass;
-            final Class<? extends RetentionStrategy> retentionStrategyClass;
-
             switch (elasticsearchConfiguration.getRotationStrategy()) {
                 case "size":
                     rotationStrategyClass = SizeBasedRotationStrategy.class;
@@ -105,24 +101,32 @@ public class ConfigurationManagementPeriodical extends Periodical {
                     rotationStrategyClass = TimeBasedRotationStrategy.class;
                     break;
                 case "count":
+                    rotationStrategyClass = MessageCountRotationStrategy.class;
+                    break;
                 default:
+                    LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRotationStrategy());
                     rotationStrategyClass = MessageCountRotationStrategy.class;
             }
 
+            final Class<? extends RetentionStrategy> retentionStrategyClass;
             switch (elasticsearchConfiguration.getRetentionStrategy()) {
                 case "close":
                     retentionStrategyClass = ClosingRetentionStrategy.class;
                     break;
                 case "delete":
+                    retentionStrategyClass = DeletionRetentionStrategy.class;
+                    break;
                 default:
+                    LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRetentionStrategy());
                     retentionStrategyClass = DeletionRetentionStrategy.class;
             }
 
-            final IndexManagementConfig config = IndexManagementConfig.create(rotationStrategyClass.getCanonicalName(),
+            final IndexManagementConfig config = IndexManagementConfig.create(
+                    rotationStrategyClass.getCanonicalName(),
                     retentionStrategyClass.getCanonicalName());
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
-        //}
+        }
     }
 
     @Override
