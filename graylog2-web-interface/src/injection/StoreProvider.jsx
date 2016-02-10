@@ -65,6 +65,9 @@ class StoreProvider {
   }
 
   getStore(storeName) {
+    if (!this.stores[storeName]) {
+      throw new Error('Requested store "' + storeName + '" is not registered.');
+    }
     return this.stores[storeName]();
   }
 }
