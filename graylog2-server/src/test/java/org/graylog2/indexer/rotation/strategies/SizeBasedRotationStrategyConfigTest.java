@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 

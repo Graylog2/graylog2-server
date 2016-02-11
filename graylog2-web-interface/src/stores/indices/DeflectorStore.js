@@ -10,7 +10,6 @@ import DeflectorActions from 'actions/indices/DeflectorActions';
 const DeflectorStore = Reflux.createStore({
   listenables: [DeflectorActions],
   deflector: {
-    config: undefined,
     info: undefined,
   },
   init() {
@@ -26,14 +25,12 @@ const DeflectorStore = Reflux.createStore({
     DeflectorActions.cycle.promise(promise);
   },
   cycleCompleted() {
-    DeflectorActions.config();
     DeflectorActions.list();
   },
   list() {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DeflectorApiController.list().url);
     const promise = fetch('GET', url).then((info) => {
       this.deflector.info = info;
-      this.deflector.config = info.config;
       this.trigger({deflector: this.deflector});
     });
 

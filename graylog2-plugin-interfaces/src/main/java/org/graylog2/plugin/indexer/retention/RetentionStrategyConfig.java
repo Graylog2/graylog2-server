@@ -22,10 +22,13 @@
  */
 package org.graylog2.plugin.indexer.retention;
 
-public interface RetentionStrategy {
-    void retain();
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-    Class<? extends RetentionStrategyConfig> configurationClass();
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
+public interface RetentionStrategyConfig {
+    String TYPE_FIELD = "type";
 
-    RetentionStrategyConfig defaultConfiguration();
+    @JsonProperty(TYPE_FIELD)
+    String type();
 }
