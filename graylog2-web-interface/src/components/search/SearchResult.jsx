@@ -159,12 +159,13 @@ const SearchResult = React.createClass({
 
                 <ul>
                   <li><i className="fa fa-group" /> <a href="https://www.graylog.org/community-support/"
-                                                         target="_blank">Forum / Mailing list</a></li>
+                                                         target="_blank">Community support</a></li>
                   <li><i className="fa fa-github-alt" /> <a
                     href="https://github.com/Graylog2/graylog2-web-interface/issues" target="_blank">Issue tracker</a>
                   </li>
-                  <li><i className="fa fa-heart" /> <a href="https://www.graylog.com/support/" target="_blank">Commercial
-                    support</a></li>
+                  <li><i className="fa fa-heart" /> <a href="https://www.graylog.org/professional-support" target="_blank">
+                    Professional support
+                  </a></li>
                 </ul>
               </div>
 
