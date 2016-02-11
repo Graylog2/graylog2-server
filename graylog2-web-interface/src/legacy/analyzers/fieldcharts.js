@@ -27,6 +27,22 @@ export function generateId() {
   return r;
 }
 
+function sendFailureEvent(graphId, errorMessage) {
+  jQuery(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
+}
+
+function sendCreatedGraphEvent(opts) {
+  jQuery(document).trigger('created.graylog.fieldgraph', {graphOptions: opts});
+}
+
+function sendUpdatedGraphEvent(opts) {
+  jQuery(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
+}
+
+function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
+  jQuery(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
+}
+
 export const FieldChart = {
   fieldGraphs: {},
   GRAPH_HEIGHT: 120,
@@ -37,11 +53,11 @@ export const FieldChart = {
   },
 
   _getDefaultOptions(opts) {
-    var searchParams = {};
+    let searchParams = {};
     jQuery(document).trigger('get-original-search.graylog.search', {
       callback(params) {
         searchParams = params.toJS();
-      }
+      },
     });
 
     // Options.
@@ -50,7 +66,7 @@ export const FieldChart = {
     }
 
     if (opts.interval === undefined) {
-      opts.interval = searchParams['interval'] || 'minute';
+      opts.interval = searchParams.interval || 'minute';
     }
 
     if (opts.interpolation === undefined) {
@@ -70,11 +86,11 @@ export const FieldChart = {
     }
 
     if (opts.query === undefined) {
-      opts.query = searchParams['query'];
+      opts.query = searchParams.query;
     }
 
     if (opts.rangetype === undefined) {
-      opts.rangetype = searchParams['range_type'];
+      opts.rangetype = searchParams.range_type;
     }
 
     if (opts.range === undefined) {
@@ -87,42 +103,44 @@ export const FieldChart = {
 
     switch (opts.rangetype) {
       case 'relative':
-        if (opts.range.relative == undefined) {
-          opts.range.relative = searchParams['relative'];
+        if (opts.range.relative === undefined) {
+          opts.range.relative = searchParams.relative;
         }
         break;
       case 'absolute':
-        if (opts.range.from == undefined) {
-          opts.range.from = searchParams['from'];
+        if (opts.range.from === undefined) {
+          opts.range.from = searchParams.from;
         }
 
-        if (opts.range.to == undefined) {
-          opts.range.to = searchParams['to'];
+        if (opts.range.to === undefined) {
+          opts.range.to = searchParams.to;
         }
         break;
       case 'keyword':
-        if (opts.range.keyword == undefined) {
-          opts.range.keyword = searchParams['keyword'];
+        if (opts.range.keyword === undefined) {
+          opts.range.keyword = searchParams.keyword;
         }
         break;
+      default:
     }
 
     return opts;
   },
 
   _getTimeRangeParams(opts) {
-    var timerange = {};
+    const timerange = {};
     switch (opts.rangetype) {
       case 'relative':
-        timerange['range'] = opts.range.relative;
+        timerange.range = opts.range.relative;
         break;
       case 'absolute':
-        timerange['from'] = opts.range.from;
-        timerange['to'] = opts.range.to;
+        timerange.from = opts.range.from;
+        timerange.to = opts.range.to;
         break;
       case 'keyword':
-        timerange['keyword'] = opts.range.keyword;
+        timerange.keyword = opts.range.keyword;
         break;
+      default:
     }
 
     return timerange;
@@ -135,16 +153,16 @@ export const FieldChart = {
       jQuery('.field-graph-query', $graphContainer).text('*');
     }
 
-    var lines = [];
+    const lines = [];
     lines.push(JSON.stringify(opts));
     $graphContainer.attr('data-lines', lines);
 
     jQuery('.type-description', $graphContainer).text('[' + GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype) + '] ' + opts.field + ', ');
 
     // Do not add from time when we search in all messages
-    var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
+    const from = $graphContainer.data('from') !== undefined ? data.from : undefined;
 
-    var graph = new Rickshaw.Graph({
+    const graph = new Rickshaw.Graph({
       element: $graphElement[0],
       width: $graphElement.width(),
       height: this.GRAPH_HEIGHT,
@@ -157,8 +175,8 @@ export const FieldChart = {
         color: '#26ADE4',
         gl2_query: opts.query,
         valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype),
-        field: opts.field
-      }]
+        field: opts.field,
+      }],
     });
 
     new Rickshaw.Graph.Axis.Y({
@@ -177,23 +195,23 @@ export const FieldChart = {
 
     new Rickshaw.Graph.HoverDetail({
       graph: graph,
-      formatter: function (series, x, y) {
+      formatter: function(series, x, y) {
         const date = `<span class="date">${new DateTime(x * 1000).toString(DateTime.Formats.COMPLETE)}</span>`;
         const swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
         const content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
         return content;
-      }
+      },
     });
 
     new Rickshaw.Graph.Graylog2Selector({
       graph: graph,
     });
 
-    if (opts.renderer == "scatterplot") {
+    if (opts.renderer === 'scatterplot') {
       graph.renderer.dotSize = 2;
     }
 
-    if (opts.renderer == "area") {
+    if (opts.renderer === 'area') {
       graph.renderer.stroke = true;
     }
 
@@ -253,7 +271,7 @@ export const FieldChart = {
     if (error.additional && error.additional.status === 400) {
       sendFailureEvent(opts.chartid, 'Field graphs are only available for numeric fields.');
     } else {
-      var alert = jQuery('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
+      const alert = jQuery('<div>').addClass('alert').addClass('alert-warning').text('Field graph could not be loaded, please try again after reloading the page.');
       $graphElement.html(alert);
       const errorMessage = (error.additional ? ` with status ${error.additional.status}` : ` with error: ${error.message}`);
       UserNotification.error(`Loading field graph for '${opts.field}' failed ${errorMessage}`);
@@ -263,7 +281,7 @@ export const FieldChart = {
 
   _chartOptionsFromContainer(cc) {
     try {
-      return JSON.parse(cc.attr("data-lines"));
+      return JSON.parse(cc.attr('data-lines'));
     } catch (e) {
       return this._getDefaultOptions();
     }
@@ -278,7 +296,7 @@ export const FieldChart = {
   },
 
   _insertSpinner($graphContainer) {
-    var spinnerElement = jQuery(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
+    const spinnerElement = jQuery(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
     $graphContainer.append(spinnerElement);
   },
 
@@ -330,8 +348,8 @@ export const FieldChart = {
     promise
       .then(data => {
         // Delete a possibly already existing graph to manage updates.
-        $graphElement.html("");
-        $graphYAxis.html("");
+        $graphElement.html('');
+        $graphYAxis.html('');
         $graphYAxis.hide();
 
         this._onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, data);
@@ -377,7 +395,7 @@ export const FieldChart = {
 
   changeInterpolation(graphContainer, interpolation) {
     const graphOptions = this._chartOptionsFromContainer(graphContainer);
-    this._changeGraphConfig(graphContainer, "interpolation", interpolation);
+    this._changeGraphConfig(graphContainer, 'interpolation', interpolation);
 
     const graph = this.fieldGraphs[graphOptions.chartid];
     graph.interpolation = interpolation;
@@ -391,11 +409,11 @@ export const FieldChart = {
     const graph = this.fieldGraphs[graphOptions.chartid];
     graph.setRenderer(renderer);
 
-    if (renderer == 'scatterplot') {
+    if (renderer === 'scatterplot') {
       graph.renderer.dotSize = 2;
     }
 
-    if (renderer == 'area') {
+    if (renderer === 'area') {
       graph.renderer.stroke = true;
     }
 
@@ -428,14 +446,14 @@ export const FieldChart = {
       const series = draggedChart.series[i];
       let query = series.gl2_query;
 
-      if (query == undefined || query == '') {
+      if (query === undefined || query === '') {
         query = '*';
       }
 
       // Add query to query list of chart.
-      const queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
-        + "<span class=\"type-description\">[" + StringUtils.escapeHTML(series.valuetype) + "] " + series.field + ", </span> "
-        + "Query: <span class='field-graph-query'>" + StringUtils.escapeHTML(query) + "</span>";
+      const queryDescription = '<div class="field-graph-query-color" style="background-color: "' + lineColor + ';"></div> '
+        + '<span class="type-description">[' + StringUtils.escapeHTML(series.valuetype) + '] ' + series.field + ', </span> '
+        + 'Query: <span class="field-graph-query">' + StringUtils.escapeHTML(query) + '</span>';
 
       jQuery('ul.field-graph-query-container', targetElem).append('<li>' + queryDescription + '</li>');
 
@@ -444,10 +462,10 @@ export const FieldChart = {
         color: lineColor,
         gl2_query: query,
         valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(series.valuetype),
-        field: series.field
+        field: series.field,
       };
 
-      addSeries['data'] = series.data;
+      addSeries.data = series.data;
 
       targetChart.series.push(addSeries);
     }
@@ -468,55 +486,38 @@ export const FieldChart = {
   },
 };
 
-
-function sendCreatedGraphEvent(opts) {
-  jQuery(document).trigger('created.graylog.fieldgraph', {graphOptions: opts});
-}
-
-function sendUpdatedGraphEvent(opts) {
-  jQuery(document).trigger('updated.graylog.fieldgraph', {graphOptions: opts});
-}
-
-function sendFailureEvent(graphId, errorMessage) {
-  jQuery(document).trigger('failed.graylog.fieldgraph', {graphId: graphId, errorMessage: errorMessage});
-}
-
-function sendMergedGraphsEvent(targetGraphId, draggedGraphId) {
-  jQuery(document).trigger('merged.graylog.fieldgraph', {targetGraphId: targetGraphId, draggedGraphId: draggedGraphId});
-}
-
 // Changing type of value graphs.
-jQuery(document).on('click', '.field-graph-container ul.renderer-selector li a', function (e) {
+jQuery(document).on('click', '.field-graph-container ul.renderer-selector li a', function(e) {
   e.preventDefault();
 
-  var graphContainer = jQuery(this).closest('.field-graph-container');
-  var type = jQuery(this).attr('data-type');
+  const graphContainer = jQuery(this).closest('.field-graph-container');
+  const type = jQuery(this).attr('data-type');
   FieldChart.changeRenderer(graphContainer, type);
 });
 
 // Changing interpolation of value graphs.
-jQuery(document).on('click', '.field-graph-container ul.interpolation-selector li a', function (e) {
+jQuery(document).on('click', '.field-graph-container ul.interpolation-selector li a', function(e) {
   e.preventDefault();
 
-  var graphContainer = jQuery(this).closest('.field-graph-container');
-  var interpolation = jQuery(this).attr('data-type');
+  const graphContainer = jQuery(this).closest('.field-graph-container');
+  const interpolation = jQuery(this).attr('data-type');
   FieldChart.changeInterpolation(graphContainer, interpolation);
 });
 
 // Changing interval of value graphs.
-jQuery(document).on('click', '.field-graph-container ul.interval-selector li a', function (e) {
+jQuery(document).on('click', '.field-graph-container ul.interval-selector li a', function(e) {
   e.preventDefault();
 
-  var graphContainer = jQuery(this).closest('.field-graph-container');
-  var interval = jQuery(this).attr('data-type');
+  const graphContainer = jQuery(this).closest('.field-graph-container');
+  const interval = jQuery(this).attr('data-type');
   FieldChart.changeResolution(graphContainer, interval);
 });
 
 // Changing value type of value graphs.
-jQuery(document).on('click', '.field-graph-container ul.valuetype-selector li a', function (e) {
+jQuery(document).on('click', '.field-graph-container ul.valuetype-selector li a', function(e) {
   e.preventDefault();
 
-  var graphContainer = jQuery(this).closest('.field-graph-container');
-  var valuetype = jQuery(this).attr('data-type');
+  const graphContainer = jQuery(this).closest('.field-graph-container');
+  const valuetype = jQuery(this).attr('data-type');
   FieldChart.changeStatisticalFunction(graphContainer, valuetype);
 });
