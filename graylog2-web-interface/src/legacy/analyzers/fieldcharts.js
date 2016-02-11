@@ -407,14 +407,14 @@ export const FieldChart = {
     const graphOptions = this._chartOptionsFromContainer(graphContainer);
     graphOptions.interval = resolution;
     this._changeGraphConfig(graphContainer, 'interval', resolution);
-    this.renderFieldChart(graphOptions, graphContainer);
+    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
   },
 
   changeStatisticalFunction(graphContainer, statisticalFunction) {
     const graphOptions = this._chartOptionsFromContainer(graphContainer);
     graphOptions.valuetype = statisticalFunction;
     this._changeGraphConfig(graphContainer, 'valuetype', statisticalFunction);
-    this.renderFieldChart(graphOptions, graphContainer);
+    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
   },
 
   _mergeCharts(targetId, draggedId) {
