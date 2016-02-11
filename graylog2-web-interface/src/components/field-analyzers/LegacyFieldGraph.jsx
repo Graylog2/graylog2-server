@@ -29,9 +29,10 @@ const LegacyFieldGraph = React.createClass({
     const graphContainer = ReactDOM.findDOMNode(this.refs.fieldGraphContainer);
     FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
   },
-  componentDidUpdate() {
-    const graphContainer = ReactDOM.findDOMNode(this.refs.fieldGraphContainer);
-    FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer, {new: false});
+  componentDidUpdate(prevProps) {
+    if (this.props.from !== prevProps.from || this.props.to !== prevProps.to) {
+      FieldGraphsStore.updateFieldGraphData(this.props.graphId);
+    }
   },
   statisticalFunctions: ['mean', 'max', 'min', 'total', 'count', 'cardinality'],
   interpolations: ['linear', 'step-after', 'basis', 'bundle', 'cardinal', 'monotone'],

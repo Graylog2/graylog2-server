@@ -286,7 +286,34 @@ export const FieldChart = {
     jQuery('.spinner', $graphContainer).remove();
   },
 
-  renderFieldChart(opts, graphContainer, renderingOptions) {
+  _fetchData(opts, timeRangeParams) {
+    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
+      opts.rangetype,
+      opts.query || '*',
+      opts.field,
+      opts.interval,
+      Qs.stringify(timeRangeParams),
+      opts.streamid
+    ).url;
+
+    return fetch('GET', URLUtils.qualifyUrl(url))
+      .then(response => {
+        const formattedResponse = {
+          time: response.time,
+          interval: response.interval,
+          from: response.queried_timerange.from,
+          to: response.queried_timerange.to,
+        };
+
+        formattedResponse.values = HistogramFormatter.format(response.results, response.queried_timerange, opts.interval,
+          jQuery(window).width(), opts.rangetype === 'relative' && opts.range.relative === 0, opts.valuetype, true);
+
+        return formattedResponse;
+      });
+  },
+
+  renderFieldChart(opts, graphContainer, options) {
+    const renderingOptions = options || {};
     const field = opts.field;
     const $graphContainer = jQuery(graphContainer);
     const $graphElement = jQuery('.field-graph', $graphContainer);
@@ -299,30 +326,7 @@ export const FieldChart = {
     opts = this._getDefaultOptions(opts);
     const timeRangeParams = this._getTimeRangeParams(opts);
 
-    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
-      opts.rangetype,
-      opts.query || '*',
-      opts.field,
-      opts.interval,
-      Qs.stringify(timeRangeParams),
-      opts.streamid
-    ).url;
-
-        const promise = fetch('GET', URLUtils.qualifyUrl(url))
-          .then(response => {
-              const formattedResponse = {
-                  time: response.time,
-                  interval: response.interval,
-                  from: response.queried_timerange.from,
-                  to: response.queried_timerange.to,
-              };
-
-              formattedResponse.values = HistogramFormatter.format(response.results, response.queried_timerange, opts.interval,
-                jQuery(window).width(), opts.rangetype === 'relative' && opts.range.relative === 0, opts.valuetype, true);
-
-              return formattedResponse;
-          });
-
+    const promise = this._fetchData(opts, timeRangeParams);
     promise
       .then(data => {
         // Delete a possibly already existing graph to manage updates.
@@ -332,7 +336,7 @@ export const FieldChart = {
 
         this._onFieldHistogramLoad($graphContainer, $graphElement, $graphYAxis, opts, data);
 
-        if (renderingOptions && renderingOptions.newGraph) {
+        if (renderingOptions.newGraph) {
           sendCreatedGraphEvent(opts);
         }
       })
@@ -343,6 +347,28 @@ export const FieldChart = {
           this._deleteSpinner($graphContainer);
         }
       });
+  },
+
+  updateFieldChartData(graphId, options, seriesName) {
+    options = this._getDefaultOptions(options);
+    const timeRangeParams = this._getTimeRangeParams(options);
+
+    const promise = this._fetchData(options, timeRangeParams);
+    promise.then(
+      data => {
+        const fieldGraph = this.fieldGraphs[graphId];
+        if (fieldGraph) {
+          const series = fieldGraph.series.filter(aSeries => aSeries.name === seriesName)[0];
+          if (series) {
+            series.data = data.values;
+            fieldGraph.update();
+          }
+        }
+      },
+      error => {
+        UserNotification.error(`Updating field graph data failed: ${error}`, 'Could not update field graph data');
+      }
+    );
   },
 
   renderNewFieldChart(options, graphContainer) {
