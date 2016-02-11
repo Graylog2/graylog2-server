@@ -5,6 +5,7 @@ import Widget from 'components/widgets/Widget';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import SearchStore from 'stores/search/SearchStore';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import resultHistogram from 'legacy/result-histogram';
 
@@ -21,13 +22,24 @@ const LegacyHistogram = React.createClass({
   },
   componentDidMount() {
     this._renderHistogram(this.props.formattedHistogram);
+    window.addEventListener('resize', this._onResize);
   },
   componentDidUpdate(prevProps) {
     if (JSON.stringify(this.props.formattedHistogram) !== prevProps.formattedHistogram) {
       this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
     }
   },
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+  },
+
   RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
+  eventThrottler: new EventHandlersThrottler(),
+
+  _onResize() {
+    this.eventThrottler.throttle(() => resultHistogram.redrawResultGraph());
+  },
+
   _renderHistogram(histogram) {
     resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
     resultHistogram.setData(histogram);
