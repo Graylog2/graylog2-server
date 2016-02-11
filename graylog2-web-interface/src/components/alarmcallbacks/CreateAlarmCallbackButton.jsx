@@ -1,5 +1,5 @@
 import React from 'react';
-import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
+import { ConfigurationForm } from 'components/configurationforms';
 import jQuery from 'jquery';
 
 const CreateAlarmCallbackButton = React.createClass({
