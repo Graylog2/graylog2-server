@@ -1,13 +1,11 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
+import { Col, Row } from 'react-bootstrap';
 
-import SearchSidebar from './SearchSidebar';
-import ResultTable from './ResultTable';
-import { LegacyHistogram } from 'components/search';
+import { LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
 import FieldGraphs from 'components/field-analyzers/FieldGraphs';
 import FieldQuickValues from 'components/field-analyzers/FieldQuickValues';
 import FieldStatistics from 'components/field-analyzers/FieldStatistics';
-import ShowQueryModal from './ShowQueryModal';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Widget from 'components/widgets/Widget';
@@ -31,18 +29,6 @@ const SearchResult = React.createClass({
     permissions: PropTypes.array.isRequired,
   },
 
-  getInitialState() {
-    const initialFields = SearchStore.fields;
-    return {
-      selectedFields: this.sortFields(initialFields),
-      sortField: SearchStore.sortField,
-      sortOrder: SearchStore.sortOrder,
-      showAllFields: false,
-      shouldHighlight: true,
-      currentPage: SearchStore.page,
-    };
-  },
-
   getDefaultProps() {
     return {
       query: '*',
@@ -52,6 +38,18 @@ const SearchResult = React.createClass({
       streams: Immutable.Map({}),
       inputs: Immutable.Map({}),
       nodes: Immutable.Map({}),
+    };
+  },
+
+  getInitialState() {
+    const initialFields = SearchStore.fields;
+    return {
+      selectedFields: this.sortFields(initialFields),
+      sortField: SearchStore.sortField,
+      sortOrder: SearchStore.sortOrder,
+      showAllFields: false,
+      shouldHighlight: true,
+      currentPage: SearchStore.page,
     };
   },
 
@@ -130,8 +128,8 @@ const SearchResult = React.createClass({
       }
       return (
         <div>
-          <div className="row content content-head">
-            <div className="col-md-12">
+          <Row className="content content-head">
+            <Col md={12}>
               <h1>
                 <span className="pull-right">
                   <AddToDashboardMenu title="Add count to dashboard"
@@ -150,33 +148,33 @@ const SearchResult = React.createClass({
                                                                          text="documentation"/>
                   &nbsp;if you need help with the search syntax.</strong>
               </p>
-            </div>
-          </div>
-          <div className="row content">
-            <div className="col-md-12">
+            </Col>
+          </Row>
+          <Row className="content">
+            <Col md={12}>
               <div className="support-sources">
                 <h2>Need help?</h2>
                 Do not hesitate to consult the Graylog community if your questions are not answered in the&nbsp;
                 <DocumentationLink page={DocsHelper.PAGES.WELCOME} text="documentation"/>.
 
                 <ul>
-                  <li><i className="fa fa-group"></i> <a href="https://www.graylog.org/community-support/"
+                  <li><i className="fa fa-group" /> <a href="https://www.graylog.org/community-support/"
                                                          target="_blank">Forum / Mailing list</a></li>
-                  <li><i className="fa fa-github-alt"></i> <a
+                  <li><i className="fa fa-github-alt" /> <a
                     href="https://github.com/Graylog2/graylog2-web-interface/issues" target="_blank">Issue tracker</a>
                   </li>
-                  <li><i className="fa fa-heart"></i> <a href="https://www.graylog.com/support/" target="_blank">Commercial
+                  <li><i className="fa fa-heart" /> <a href="https://www.graylog.com/support/" target="_blank">Commercial
                     support</a></li>
                 </ul>
               </div>
 
-            </div>
-          </div>
+            </Col>
+          </Row>
         </div>);
     }
     return (
-      <div id="main-content-search" className="row">
-        <div ref="opa" className="col-md-3 col-sm-12" id="sidebar">
+      <Row id="main-content-search">
+        <Col ref="opa" md={3} sm={12} id="sidebar">
           <SearchSidebar result={this.props.result}
                          builtQuery={this.props.builtQuery}
                          selectedFields={this.state.selectedFields}
@@ -195,8 +193,8 @@ const SearchResult = React.createClass({
                          searchInStream={this.props.searchInStream}
                          permissions={this.props.permissions}
           />
-        </div>
-        <div className="col-md-9 col-sm-12" id="main-content-sidebar">
+        </Col>
+        <Col md={9} sm={12} id="main-content-sidebar">
           <FieldStatistics ref="fieldStatisticsComponent"
                            permissions={this.props.permissions}/>
 
@@ -227,8 +225,8 @@ const SearchResult = React.createClass({
                        highlight={this.state.shouldHighlight}
           />
 
-        </div>
-      </div>);
+        </Col>
+      </Row>);
   },
 });
 

@@ -9,6 +9,7 @@ import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
 import NodesStore from 'stores/nodes/NodesStore';
+import RefreshStore from 'stores/tools/RefreshStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import UniversalSearchStore from 'stores/search/UniversalSearchStore';
 
@@ -24,24 +25,21 @@ const SearchPage = React.createClass({
     location: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
   },
+  mixins: [
+    Reflux.connect(NodesStore),
+    Reflux.connect(MessageFieldsStore),
+    Reflux.connect(CurrentUserStore),
+    Reflux.listenTo(InputsStore, '_formatInputs'),
+    Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
+  ],
   getInitialState() {
     return {
       selectedFields: ['message', 'source'],
+      query: SearchStore.query.length > 0 ? SearchStore.query : '*',
     };
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(MessageFieldsStore), Reflux.connect(CurrentUserStore), Reflux.listenTo(InputsStore, '_formatInputs')],
   componentDidMount() {
-    const query = SearchStore.query.length > 0 ? SearchStore.query : '*';
-    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
-      this.setState({searchResult: response});
-
-      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
-
-      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
-        this.setState({histogram: histogram});
-      });
-    });
+    this._refreshData();
     InputsActions.list.triggerPromise();
 
     StreamsStore.listStreams().then((streams) => {
@@ -52,6 +50,33 @@ const SearchPage = React.createClass({
 
     NodesActions.list();
     DashboardsStore.updateWritableDashboards();
+  },
+  componentWillUnmount() {
+    this._stopTimer();
+  },
+  _setupTimer(refresh) {
+    this._stopTimer();
+    if (refresh.enabled) {
+      this.timer = setInterval(this._refreshData, refresh.interval);
+    }
+  },
+  _stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  },
+  _refreshData() {
+    const query = this.state.query;
+    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
+      this.setState({searchResult: response});
+
+      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
+
+      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
+        this.setState({histogram: histogram});
+      });
+    });
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);

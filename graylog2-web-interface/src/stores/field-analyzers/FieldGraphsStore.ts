@@ -185,8 +185,33 @@ class FieldGraphsStore {
         this.saveGraph(graphId, defaultOptions.merge(givenOptions).toJS());
     }
 
-    renderFieldGraph(graphOptions: Object, graphContainer: Element) {
+    renderFieldGraph(graphOptions: Object, graphContainer: Element, options: Object = {new: true}) {
+      if (options['new']) {
         FieldChart.renderNewFieldChart(graphOptions, graphContainer);
+      } else {
+        FieldChart.renderFieldChart(graphOptions, graphContainer, {newGraph: false});
+      }
+    }
+
+    updateFieldGraphData(graphId: string) {
+        const seriesName = graphId;
+        const graphOptions = this.fieldGraphs.get(graphId);
+        let effectiveGraphId;
+
+        // First we figure out if the graphId is part of a stacked graph
+        this.stackedGraphs.some((stackedGraphsIds, containerGraphId) => {
+            if (stackedGraphsIds.has(graphId)) {
+                effectiveGraphId = containerGraphId;
+                return true;
+            }
+        });
+
+        // If it is not part of a stacked graph, use the graphId given as argument
+        if (!effectiveGraphId) {
+            effectiveGraphId = graphId;
+        }
+
+        FieldChart.updateFieldChartData(effectiveGraphId, graphOptions, seriesName);
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {
