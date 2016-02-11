@@ -21,8 +21,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
-import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Period;
 
 import javax.validation.constraints.NotNull;
@@ -30,6 +29,8 @@ import javax.validation.constraints.NotNull;
 @JsonAutoDetect
 @AutoValue
 public abstract class TimeBasedRotationStrategyConfig implements RotationStrategyConfig {
+    private static final Period DEFAULT_DAYS = Period.days(1);
+
     @JsonProperty("rotation_period")
     public abstract Period rotationPeriod();
 
@@ -44,8 +45,7 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
         return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex);
     }
 
-    @Override
-    public DeflectorConfigResponse toDeflectorConfigResponse(int maxNumberOfIndices) {
-        return TimeBasedRotationStrategyResponse.create(maxNumberOfIndices, rotationPeriod());
+    public static TimeBasedRotationStrategyConfig createDefault() {
+        return create(DEFAULT_DAYS);
     }
 }

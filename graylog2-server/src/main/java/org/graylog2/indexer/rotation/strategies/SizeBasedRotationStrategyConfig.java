@@ -20,15 +20,17 @@ package org.graylog2.indexer.rotation.strategies;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
-import org.graylog2.rest.models.system.responses.SizeBasedRotationStrategyResponse;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import javax.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class SizeBasedRotationStrategyConfig implements RotationStrategyConfig {
+    private static final long DEFAULT_MAX_SIZE = Size.gigabytes(1L).toBytes();
+
     @JsonProperty("max_size")
     public abstract long maxSize();
 
@@ -43,8 +45,7 @@ public abstract class SizeBasedRotationStrategyConfig implements RotationStrateg
         return create(SizeBasedRotationStrategyConfig.class.getCanonicalName(), maxSize);
     }
 
-    @Override
-    public DeflectorConfigResponse toDeflectorConfigResponse(int maxNumberOfIndices) {
-        return SizeBasedRotationStrategyResponse.create(maxNumberOfIndices, maxSize());
+    public static SizeBasedRotationStrategyConfig createDefault() {
+        return create(DEFAULT_MAX_SIZE);
     }
 }

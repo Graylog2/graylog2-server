@@ -41,7 +41,6 @@ const jsRoutes = {
         updatePositions: (dashboardId) => { return {url: '/dashboards/' + dashboardId + '/positions'}; },
       },
       DeflectorApiController: {
-        config: () => { return {url: '/system/deflector/config'}; },
         cycle: () => { return {url: '/system/deflector/cycle'}; },
         list: () => { return {url: '/system/deflector'}; },
       },

@@ -23,12 +23,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.management.IndexManagementConfig;
-import org.graylog2.indexer.rotation.strategies.RotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
-import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.RestrictToMaster;
@@ -40,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -79,30 +75,7 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public DeflectorSummary deflector() throws ClassNotFoundException {
-        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex(), this.config());
-    }
-
-    @GET
-    @Timed
-    @ApiOperation(value = "Get deflector configuration. Only available on master nodes.")
-    @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
-    @Path("/config")
-    @Produces(MediaType.APPLICATION_JSON)
-    @RestrictToMaster
-    public DeflectorConfigResponse config() throws ClassNotFoundException {
-        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (indexManagementConfig == null) {
-            throw new InternalServerErrorException("Invalid index management configuration");
-        } else {
-            final Provider<RotationStrategy> provider = rotationStrategies.get(indexManagementConfig.rotationStrategy());
-            if (provider == null) {
-                throw new InternalServerErrorException("Unknown index rotation strategy: " + indexManagementConfig.rotationStrategy());
-            }
-            final Class<RotationStrategyConfig> strategy = (Class<RotationStrategyConfig>) provider.get().configurationClass();
-            final RotationStrategyConfig config = clusterConfigService.get(strategy);
-
-            return config.toDeflectorConfigResponse(configuration.getMaxNumberOfIndices());
-        }
+        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex());
     }
 
     @POST

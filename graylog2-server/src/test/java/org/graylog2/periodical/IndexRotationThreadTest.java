@@ -25,6 +25,7 @@ import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +64,12 @@ public class IndexRotationThreadTest {
                     }
 
                     @Override
-                    public Class<?> configurationClass() {
+                    public RotationStrategyConfig defaultConfiguration() {
+                        return null;
+                    }
+
+                    @Override
+                    public Class<? extends RotationStrategyConfig> configurationClass() {
                         return null;
                     }
                 };
@@ -99,7 +105,12 @@ public class IndexRotationThreadTest {
                     }
 
                     @Override
-                    public Class<?> configurationClass() {
+                    public RotationStrategyConfig defaultConfiguration() {
+                        return null;
+                    }
+
+                    @Override
+                    public Class<? extends RotationStrategyConfig> configurationClass() {
                         return null;
                     }
                 };
@@ -136,7 +147,12 @@ public class IndexRotationThreadTest {
                     }
 
                     @Override
-                    public Class<?> configurationClass() {
+                    public RotationStrategyConfig defaultConfiguration() {
+                        return null;
+                    }
+
+                    @Override
+                    public Class<? extends RotationStrategyConfig> configurationClass() {
                         return null;
                     }
                 };
