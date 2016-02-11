@@ -19,10 +19,14 @@ const RefreshControls = React.createClass({
     '1 Minute': 60,
     '5 Minutes': 300,
   },
+  _changeInterval(interval) {
+    RefreshActions.changeInterval(interval);
+    RefreshActions.enable();
+  },
   render() {
     const intervalOptions = Object.keys(this.INTERVAL_OPTIONS).map((key) => {
       const interval = this.INTERVAL_OPTIONS[key] * 1000;
-      return <MenuItem key={'RefreshControls-' + key} onClick={() => RefreshActions.changeInterval(interval)}>{key}</MenuItem>;
+      return <MenuItem key={'RefreshControls-' + key} onClick={() => this._changeInterval(interval)}>{key}</MenuItem>;
     });
     const intervalDuration = moment.duration(this.state.refresh.interval);
     const naturalInterval = intervalDuration.asSeconds() < 60 ?
