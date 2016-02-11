@@ -144,22 +144,22 @@ export const FieldChart = {
     // Do not add from time when we search in all messages
     var from = $graphContainer.data('from') !== undefined ? data.from : undefined;
 
-        var graph = new Rickshaw.Graph({
-            element: $graphElement[0],
-            width: $graphElement.width(),
-            height: this.GRAPH_HEIGHT,
-            interpolation: opts.interpolation,
-            renderer: opts.renderer,
-            resolution: data.interval,
-            series: [{
-                name: "value",
-                data: data.values,
-                color: '#26ADE4',
-                gl2_query: opts.query,
-                valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype),
-                field: opts.field
-            }]
-        });
+    var graph = new Rickshaw.Graph({
+      element: $graphElement[0],
+      width: $graphElement.width(),
+      height: this.GRAPH_HEIGHT,
+      interpolation: opts.interpolation,
+      renderer: opts.renderer,
+      resolution: data.interval,
+      series: [{
+        name: opts.chartid,
+        data: data.values,
+        color: '#26ADE4',
+        gl2_query: opts.query,
+        valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype),
+        field: opts.field
+      }]
+    });
 
     new Rickshaw.Graph.Axis.Y({
       graph: graph,
@@ -414,7 +414,7 @@ export const FieldChart = {
       jQuery('ul.field-graph-query-container', targetElem).append('<li>' + queryDescription + '</li>');
 
       const addSeries = {
-        name: 'value' + i,
+        name: series.name,
         color: lineColor,
         gl2_query: query,
         valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(series.valuetype),
