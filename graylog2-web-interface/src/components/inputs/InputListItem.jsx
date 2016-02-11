@@ -104,7 +104,9 @@ const InputListItem = React.createClass({
                       id={`more-actions-dropdown-${this.props.input.id}`}
                       pullRight>
         <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
-          <MenuItem key={`edit-input-${this.props.input.id}`} onSelect={this._editInput}>
+          <MenuItem key={`edit-input-${this.props.input.id}`}
+                    onSelect={this._editInput}
+                    disabled={definition === undefined}>
             Edit input
           </MenuItem>
         </IfPermitted>
@@ -134,6 +136,15 @@ const InputListItem = React.createClass({
       );
     }
 
+    const inputForm = definition ?
+        <InputForm ref="configurationForm" key={'edit-form-input-' + input.id}
+                   globalValue={input.global} nodeValue={input.node}
+                   configFields={definition.requested_configuration}
+                   title={'Editing Input ' + input.title}
+                   titleValue={input.title}
+                   typeName={input.type} includeTitleField
+                   submitAction={this._updateInput} values={input.attributes} /> : null;
+
     const additionalContent = (
       <div>
         <Col md={8}>
@@ -148,13 +159,7 @@ const InputListItem = React.createClass({
         <Col md={4}>
           <InputThroughput input={input} />
         </Col>
-        <InputForm ref="configurationForm" key={'edit-form-input-' + input.id}
-                   globalValue={input.global} nodeValue={input.node}
-                   configFields={definition.requested_configuration}
-                   title={'Editing Input ' + input.title}
-                   titleValue={input.title}
-                   typeName={input.type} includeTitleField
-                   submitAction={this._updateInput} values={input.attributes} />
+        {inputForm}
       </div>
     );
 
