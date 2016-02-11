@@ -484,6 +484,16 @@ export const FieldChart = {
     const sourceGraphElement = jQuery('.field-graph-container[data-chart-id="' + sourceGraphId + '"]');
     sourceGraphElement.hide();
   },
+
+  redraw(graphId) {
+    const graph = this.fieldGraphs[graphId];
+    if (graph) {
+      const $graphContainer = jQuery('.field-graph-container[data-chart-id="' + graphId + '"]');
+      const $graphElement = jQuery('.field-graph', $graphContainer);
+      graph.configure({width: $graphElement.width()});
+      graph.render();
+    }
+  },
 };
 
 // Changing type of value graphs.

@@ -8,6 +8,7 @@ const fieldCharts = require('legacy/analyzers/fieldcharts');
 const generateId = fieldCharts.generateId;
 const FieldChart = fieldCharts.FieldChart;
 
+const EventHandlersThrottler = require('util/EventHandlersThrottler');
 const UserNotification = require('util/UserNotification');
 
 interface CreateFieldChartWidgetRequestParams {
@@ -57,12 +58,14 @@ class FieldGraphsStore {
     private renderedGraphs: Immutable.Set<string>;
     private _fieldGraphs: Immutable.Map<string, Object>;
     private _stackedGraphs: Immutable.Map<string, Immutable.Set<string>>;
+    private _eventsThrottle;
     onFieldGraphCreated: (graphId: string)=>void;
     onFieldGraphsUpdated: (query: Object)=>void;
     onFieldGraphsMerged: (targetGraphId: Object)=>void;
 
     constructor() {
         this.resetStore();
+        this._eventsThrottle = new EventHandlersThrottler();
 
         $(document).on('created.graylog.fieldgraph', (event, data) => {
             this.saveGraph(data.graphOptions['chartid'], data.graphOptions);
@@ -84,6 +87,10 @@ class FieldGraphsStore {
 
         $(document).on('merged.graylog.fieldgraph', (event, data) => {
             this.updateStackedGraphs(data.targetGraphId, data.draggedGraphId);
+        });
+
+        window.addEventListener('resize', () => {
+            this._eventsThrottle.throttle(() => this.redrawGraphs());
         });
     }
 
@@ -300,6 +307,10 @@ class FieldGraphsStore {
         }
 
         return <CreateStackedChartWidgetRequestParams> requestParams;
+    }
+
+    redrawGraphs() {
+        this.fieldGraphs.forEach((fieldGraph, id) => FieldChart.redraw(id));
     }
 }
 
