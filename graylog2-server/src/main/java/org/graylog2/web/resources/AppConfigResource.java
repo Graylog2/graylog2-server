@@ -17,8 +17,8 @@
 package org.graylog2.web.resources;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.base.Strings;
 import com.google.common.io.Resources;
-import org.apache.directory.api.util.Strings;
 import org.graylog2.Configuration;
 
 import javax.inject.Inject;
@@ -73,7 +73,7 @@ public class AppConfigResource {
         if (overrideServerUriHeaders != null && !overrideServerUriHeaders.isEmpty()) {
             Optional<String> firstHeader = overrideServerUriHeaders.stream().filter(s -> {
                 try {
-                    return s != null && Strings.isNotEmpty(s) && new URL(s) != null;
+                    return !Strings.isNullOrEmpty(s) && new URL(s) != null;
                 } catch (MalformedURLException e) {
                     return false;
                 }
