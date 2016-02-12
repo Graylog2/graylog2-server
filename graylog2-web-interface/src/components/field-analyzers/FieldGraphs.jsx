@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
+import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import LegacyFieldGraph from './LegacyFieldGraph';
@@ -19,16 +20,16 @@ const FieldGraphs = React.createClass({
     this.notifyOnNewGraphs = false;
 
     return {
-      fieldGraphs: FieldGraphsStore.fieldGraphs,
-      stackedGraphs: FieldGraphsStore.stackedGraphs,
+      fieldGraphs: Immutable.fromJS(FieldGraphsStore.fieldGraphs.toJS()),
+      stackedGraphs: Immutable.fromJS(FieldGraphsStore.stackedGraphs.toJS()),
     };
   },
   componentDidMount() {
     this.initialFieldGraphs = this.state.fieldGraphs;
     this.notifyOnNewGraphs = true;
 
-    FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: newFieldGraphs});
-    FieldGraphsStore.onFieldGraphsMerged = (newStackedGraphs) => this.setState({stackedGraphs: newStackedGraphs});
+    FieldGraphsStore.onFieldGraphsUpdated = (newFieldGraphs) => this.setState({fieldGraphs: Immutable.fromJS(newFieldGraphs.toJS())});
+    FieldGraphsStore.onFieldGraphsMerged = (newStackedGraphs) => this.setState({stackedGraphs: Immutable.fromJS(newStackedGraphs.toJS())});
     FieldGraphsStore.onFieldGraphCreated = (graphId) => {
       if (this.notifyOnNewGraphs && !this.initialFieldGraphs.has(graphId)) {
         const element = ReactDOM.findDOMNode(this.refs[graphId]);
@@ -53,7 +54,7 @@ const FieldGraphs = React.createClass({
           <LegacyFieldGraph key={graphId}
                             ref={graphId}
                             graphId={graphId}
-                            graphOptions={graphOptions}
+                            graphOptions={graphOptions.toJS()}
                             onDelete={() => this.deleteFieldGraph(graphId)}
                             from={this.props.from}
                             to={this.props.to}
