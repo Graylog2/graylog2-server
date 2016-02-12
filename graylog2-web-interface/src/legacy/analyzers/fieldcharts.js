@@ -3,7 +3,6 @@ import jQueryUI from 'jquery-ui';
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
-import Qs from 'qs';
 
 import DateTime from 'logic/datetimes/DateTime';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
@@ -310,7 +309,7 @@ export const FieldChart = {
       opts.query || '*',
       opts.field,
       opts.interval,
-      Qs.stringify(timeRangeParams),
+      timeRangeParams,
       opts.streamid
     ).url;
 

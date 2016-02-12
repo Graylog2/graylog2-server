@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 import jQuery from 'jquery';
 import moment from 'moment';
 import md5 from 'md5';
-import Qs from 'qs';
 
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -15,8 +14,10 @@ const UniversalSearchStore = Reflux.createStore({
   listenables: [],
 
   search(type, query, timerange, streamId, limit) {
-    const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query, timerangeParams, streamId, limit).url);
+    const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
+
+    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query,
+      timerangeParams, streamId, limit).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
@@ -50,7 +51,7 @@ const UniversalSearchStore = Reflux.createStore({
     });
   },
   histogram(type, query, timerange, interval, streamId, maxDataPoints) {
-    const timerangeParams = UniversalSearchStore.serializeTimeRange(type, timerange);
+    const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {
@@ -62,13 +63,13 @@ const UniversalSearchStore = Reflux.createStore({
   },
 });
 
-UniversalSearchStore.serializeTimeRange = (type, timerange) => {
+UniversalSearchStore.extractTimeRange = (type, timerange) => {
   // The server API uses the `range` parameter instead of `relative` for indicating a relative time range.
   if (type === 'relative') {
-    return Qs.stringify({range: timerange.relative});
+    return {range: timerange.relative};
   }
 
-  return Qs.stringify(timerange);
+  return timerange;
 };
 
 export default UniversalSearchStore;

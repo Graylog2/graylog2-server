@@ -5,7 +5,6 @@ import SearchStore = require('stores/search/SearchStore');
 const UserNotification = require('util/UserNotification');
 import jsRoutes = require('routing/jsRoutes');
 const URLUtils = require('util/URLUtils');
-const Qs = require('qs');
 
 const FieldQuickValuesStore = {
     getQuickValues(field: string): Promise<string[]> {
@@ -31,7 +30,7 @@ const FieldQuickValuesStore = {
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,
-            Qs.stringify(timerange),
+            timerange,
             streamId
         ).url;
 
