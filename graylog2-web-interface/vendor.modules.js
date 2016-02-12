@@ -8,4 +8,5 @@ module.exports = [
   'react-router-bootstrap',
   'reflux',
   'moment',
+  'moment-timezone',
 ];
