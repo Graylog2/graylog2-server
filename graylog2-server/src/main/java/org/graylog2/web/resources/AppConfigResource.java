@@ -18,26 +18,39 @@ package org.graylog2.web.resources;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.io.Resources;
+import org.apache.directory.api.util.Strings;
 import org.graylog2.Configuration;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Path("/config.js")
 public class AppConfigResource {
+    private static final String CK_OVERRIDE_SERVER_URI = "X-Graylog-Server-URL";
     private static final Engine engine = new Engine();
-    private final String content;
+    private final Configuration configuration;
 
     @Inject
     public AppConfigResource(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public String get(@Context HttpHeaders headers) {
         final URL templateUrl = this.getClass().getResource("/web-interface/config.js.template");
         final String template;
         try {
@@ -45,17 +58,30 @@ public class AppConfigResource {
         } catch (IOException e) {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
+
+        final String serverTransportUri = serverUriFromHeadersOrDefault(headers);
         final Map<String, Object> model = new HashMap<String, Object>() {{
             put("rootTimeZone", configuration.getRootTimeZone());
-            put("serverUri", configuration.getRestTransportUri());
+            put("serverUri", serverTransportUri);
             put("appPathPrefix", "");
         }};
-        this.content = engine.transform(template, model);
+        return engine.transform(template, model);
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public String get() {
-        return this.content;
+    private String serverUriFromHeadersOrDefault(HttpHeaders httpHeaders) {
+        final List<String> overrideServerUriHeaders = httpHeaders.getRequestHeader(CK_OVERRIDE_SERVER_URI);
+        if (overrideServerUriHeaders != null && !overrideServerUriHeaders.isEmpty()) {
+            Optional<String> firstHeader = overrideServerUriHeaders.stream().filter(s -> {
+                try {
+                    return s != null && Strings.isNotEmpty(s) && new URL(s) != null;
+                } catch (MalformedURLException e) {
+                    return false;
+                }
+            }).findFirst();
+
+            return firstHeader.orElse(configuration.getRestTransportUri().toString());
+        }
+
+        return configuration.getRestTransportUri().toString();
     }
 }
