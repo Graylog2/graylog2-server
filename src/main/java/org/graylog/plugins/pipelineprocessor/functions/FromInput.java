@@ -44,11 +44,11 @@ public class FromInput extends AbstractFunction<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = args.evaluated(ID_ARG, context, String.class).orElse("");
+        String id = args.param(ID_ARG).eval(args, context, String.class).orElse("");
 
         MessageInput input = null;
         if ("".equals(id)) {
-            final String name = args.evaluated(NAME_ARG, context, String.class).orElse("");
+            final String name = args.param(NAME_ARG).eval(args, context, String.class).orElse("");
             for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {

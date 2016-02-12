@@ -36,8 +36,8 @@ public class DoubleCoercion extends AbstractFunction<Double> {
 
     @Override
     public Double evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.required(VALUE, context, Object.class);
-        final Double defaultValue = args.evaluated(DEFAULT, context, Double.class).orElse(0d);
+        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
+        final Double defaultValue = args.param(DEFAULT).eval(args, context, Double.class).orElse(0d);
         if (evaluated == null) {
             return defaultValue;
         }

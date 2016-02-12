@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.Maps;
-import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
 import javax.annotation.Nonnull;
@@ -25,7 +24,6 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -55,30 +53,6 @@ public class FunctionArgs {
         return args.entrySet().stream()
                 .filter(e -> e.getValue().isConstant())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @Nonnull
-    @Deprecated
-    public <T> Optional<T> evaluated(String name, EvaluationContext context, Class<T> argumentType) {
-        return Optional.ofNullable(required(name, context, argumentType));
-    }
-
-    @Nullable
-    @Deprecated
-    public <T> T required(String name, EvaluationContext context, Class<T> argumentType) {
-        final ParameterDescriptor param = descriptor.param(name);
-
-        final Object precomputedValue = constantValues.get(name);
-        if (precomputedValue != null) {
-            return (T)param.transformedType().cast(precomputedValue);
-        }
-        final Expression valueExpr = expression(name);
-        if (valueExpr == null) {
-            return null;
-        }
-        final Object value = valueExpr.evaluate(context);
-        final Object transformed = param.transform().apply(value);
-        return (T)param.transformedType().cast(transformed);
     }
 
     public boolean isPresent(String key) {

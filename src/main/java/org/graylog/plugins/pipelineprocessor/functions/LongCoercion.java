@@ -36,8 +36,8 @@ public class LongCoercion extends AbstractFunction<Long> {
 
     @Override
     public Long evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse(new Object());
-        final Long defaultValue = args.evaluated(DEFAULT, context, Long.class).orElse(0L);
+        final Object evaluated = args.param(VALUE).eval(args, context, Object.class).orElse(new Object());
+        final Long defaultValue = args.param(DEFAULT).eval(args, context, Long.class).orElse(0L);
 
         return firstNonNull(tryParse(evaluated.toString()), defaultValue);
     }

@@ -36,7 +36,7 @@ public class DropMessage extends AbstractFunction<Void> {
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         final Optional<Message> message;
         if (args.isPresent("message")) {
-            message = args.evaluated("message", context, Message.class);
+            message = args.param("message").eval(args, context, Message.class);
         } else {
             message = Optional.of(context.currentMessage());
         }

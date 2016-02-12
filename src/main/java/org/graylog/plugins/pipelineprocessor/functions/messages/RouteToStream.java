@@ -45,11 +45,11 @@ public class RouteToStream extends AbstractFunction<Void> {
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = args.evaluated(ID_ARG, context, String.class).orElse("");
+        String id = args.param(ID_ARG).eval(args, context, String.class).orElse("");
 
         final Stream stream;
         if ("".equals(id)) {
-            final String name = args.evaluated(NAME_ARG, context, String.class).orElse("");
+            final String name = args.param(NAME_ARG).eval(args, context, String.class).orElse("");
             if ("".equals(name)) {
                 return null;
             }

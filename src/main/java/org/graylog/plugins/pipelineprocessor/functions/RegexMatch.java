@@ -38,14 +38,14 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
 
     @Override
     public RegexMatchResult evaluate(FunctionArgs args, EvaluationContext context) {
-        final Pattern regex = args.required(PATTERN_ARG, context, Pattern.class);
-        final String value = args.required(VALUE_ARG, context, String.class);
+        final Pattern regex = args.param(PATTERN_ARG).evalRequired(args, context, Pattern.class);
+        final String value = args.param(VALUE_ARG).evalRequired(args, context, String.class);
         if (regex == null || value == null) {
             throw new IllegalArgumentException();
         }
         //noinspection unchecked
         final List<String> groupNames =
-                (List<String>) args.evaluated(GROUP_NAMES_ARG, context, List.class)
+                (List<String>) args.param(GROUP_NAMES_ARG).eval(args, context, List.class)
                         .orElse(Collections.emptyList());
 
         final Matcher matcher = regex.matcher(value);

@@ -133,7 +133,7 @@ public class PipelineRuleParserTest {
         functions.put("one_arg", new AbstractFunction<String>() {
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
-                return args.evaluated("one", context, String.class).orElse("");
+                return args.param("one").eval(args, context, String.class).orElse("");
             }
 
             @Override
@@ -148,9 +148,9 @@ public class PipelineRuleParserTest {
         functions.put("concat", new AbstractFunction<String>() {
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
-                final Object one = args.evaluated("one", context, Object.class).orElse("");
-                final Object two = args.evaluated("two", context, Object.class).orElse("");
-                final Object three = args.evaluated("three", context, Object.class).orElse("");
+                final Object one = args.param("one").eval(args, context, Object.class).orElse("");
+                final Object two = args.param("two").eval(args, context, Object.class).orElse("");
+                final Object three = args.param("three").eval(args, context, Object.class).orElse("");
                 return one.toString() + two.toString() + three.toString();
             }
 
@@ -206,7 +206,7 @@ public class PipelineRuleParserTest {
         functions.put("customObject", new AbstractFunction<CustomObject>() {
             @Override
             public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
-                return new CustomObject(args.evaluated("default", context, String.class).orElse(""));
+                return new CustomObject(args.param("default").eval(args, context, String.class).orElse(""));
             }
 
             @Override
@@ -221,7 +221,7 @@ public class PipelineRuleParserTest {
         functions.put("keys", new AbstractFunction<List>() {
             @Override
             public List evaluate(FunctionArgs args, EvaluationContext context) {
-                final Optional<Map> map = args.evaluated("map", context, Map.class);
+                final Optional<Map> map = args.param("map").eval(args, context, Map.class);
                 return Lists.newArrayList(map.orElse(Collections.emptyMap()).keySet());
             }
 
@@ -237,7 +237,7 @@ public class PipelineRuleParserTest {
         functions.put("sort", new AbstractFunction<Collection>() {
             @Override
             public Collection evaluate(FunctionArgs args, EvaluationContext context) {
-                final Collection collection = args.evaluated("collection",
+                final Collection collection = args.param("collection").eval(args,
                                                              context,
                                                              Collection.class).orElse(Collections.emptyList());
                 return Ordering.natural().sortedCopy(collection);

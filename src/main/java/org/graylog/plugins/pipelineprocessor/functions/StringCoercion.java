@@ -34,11 +34,11 @@ public class StringCoercion extends AbstractFunction<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.required(VALUE, context, Object.class);
+        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
         if (evaluated instanceof String) {
             return (String) evaluated;
         } else {
-            return args.evaluated(DEFAULT, context, String.class).orElse("");
+            return args.param(DEFAULT).eval(args, context, String.class).orElse("");
         }
     }
 

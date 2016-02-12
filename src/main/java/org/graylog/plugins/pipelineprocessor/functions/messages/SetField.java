@@ -34,8 +34,8 @@ public class SetField extends AbstractFunction<Void> {
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = args.required(FIELD, context, String.class);
-        final Object value = args.required(VALUE, context, Object.class);
+        final String field = args.param(FIELD).evalRequired(args, context, String.class);
+        final Object value = args.param(VALUE).evalRequired(args, context, Object.class);
 
         if (!Strings.isNullOrEmpty(field)) {
             context.currentMessage().addField(field, value);

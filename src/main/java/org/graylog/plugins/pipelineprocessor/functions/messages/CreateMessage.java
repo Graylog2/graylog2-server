@@ -40,13 +40,13 @@ public class CreateMessage extends AbstractFunction<Message> {
 
     @Override
     public Message evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<String> optMessage = args.evaluated(MESSAGE_ARG, context, String.class);
+        final Optional<String> optMessage = args.param(MESSAGE_ARG).eval(args, context, String.class);
         final String message = optMessage.isPresent() ? optMessage.get() : context.currentMessage().getMessage();
 
-        final Optional<String> optSource = args.evaluated(SOURCE_ARG, context, String.class);
+        final Optional<String> optSource = args.param(SOURCE_ARG).eval(args, context, String.class);
         final String source = optSource.isPresent() ? optSource.get() : context.currentMessage().getSource();
 
-        final Optional<DateTime> optTimestamp = args.evaluated(TIMESTAMP_ARG, context, DateTime.class);
+        final Optional<DateTime> optTimestamp = args.param(TIMESTAMP_ARG).eval(args, context, DateTime.class);
         final DateTime timestamp = optTimestamp.isPresent() ? optTimestamp.get() : Tools.nowUTC();
 
         final Message newMessage = new Message(message, source, timestamp);
