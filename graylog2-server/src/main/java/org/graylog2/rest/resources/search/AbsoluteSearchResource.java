@@ -40,10 +40,13 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.AdditionalMediaType;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -60,8 +63,8 @@ public class AbsoluteSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
 
     @Inject
-    public AbsoluteSearchResource(Searches searches) {
-        super(searches);
+    public AbsoluteSearchResource(Searches searches, @Named("query_time_range_limit") @Nullable Duration timeRangeLimit) {
+        super(searches, timeRangeLimit);
     }
 
     @GET
@@ -310,7 +313,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {
         try {
-            return AbsoluteRange.create(from, to);
+            return restrictTimeRange(AbsoluteRange.create(from, to));
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);

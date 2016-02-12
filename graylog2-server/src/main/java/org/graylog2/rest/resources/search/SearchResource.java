@@ -45,10 +45,14 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
@@ -64,10 +68,12 @@ public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     protected final Searches searches;
+    protected final Duration timeRangeLimit;
 
     @Inject
-    public SearchResource(Searches searches) {
+    public SearchResource(Searches searches, @Named("query_time_range_limit") @Nullable Duration timeRangeLimit) {
         this.searches = searches;
+        this.timeRangeLimit = timeRangeLimit;
     }
 
     protected void validateInterval(String interval) {
@@ -223,7 +229,7 @@ public abstract class SearchResource extends RestResource {
         QueryParseError errorMessage = QueryParseError.create(query, "Unable to execute search", e.getClass().getCanonicalName());
 
         // We're so going to hell for this…
-        if(e.getMessage().contains("nested: ParseException")) {
+        if (e.getMessage().contains("nested: ParseException")) {
             final QueryParser queryParser = new QueryParser("", new StandardAnalyzer());
             try {
                 queryParser.parse(query);
@@ -331,5 +337,19 @@ public abstract class SearchResource extends RestResource {
                 }
             }
         };
+    }
+
+    protected org.graylog2.indexer.searches.timeranges.TimeRange restrictTimeRange(final org.graylog2.indexer.searches.timeranges.TimeRange timeRange) {
+        final DateTime originalFrom = timeRange.getFrom();
+        final DateTime to = timeRange.getTo();
+        final DateTime from;
+        if (timeRangeLimit == null) {
+            from = originalFrom;
+        } else {
+            final DateTime limitedFrom = to.minus(timeRangeLimit);
+            from = limitedFrom.isAfter(originalFrom) ? limitedFrom : originalFrom;
+        }
+
+        return AbsoluteRange.create(from, to);
     }
 }
