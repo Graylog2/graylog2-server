@@ -33,7 +33,7 @@ public class MapLiteralExpression implements Expression {
 
     @Override
     public boolean isConstant() {
-        return false;
+        return map.values().stream().allMatch(Expression::isConstant);
     }
 
     @Override

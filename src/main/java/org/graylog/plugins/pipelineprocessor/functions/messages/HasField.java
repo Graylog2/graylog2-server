@@ -18,21 +18,19 @@ package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import java.util.Optional;
-
-public class HasField implements Function<Boolean> {
+public class HasField extends AbstractFunction<Boolean> {
 
     public static final String NAME = "has_field";
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<String> field = args.evaluated("field", context, String.class);
-        return context.currentMessage().hasField(field.orElse(null));
+        final String field = args.required("field", context, String.class);
+        return context.currentMessage().hasField(field);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class HasField implements Function<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(ImmutableList.of(ParameterDescriptor.string("field")))
+                .params(ImmutableList.of(ParameterDescriptor.string("field").build()))
                 .build();
     }
 }

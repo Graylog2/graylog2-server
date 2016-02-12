@@ -18,7 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.Message;
@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-public class DropMessage implements Function<Void> {
+public class DropMessage extends AbstractFunction<Void> {
 
     public static final String NAME = "drop_message";
     public static final String MESSAGE_ARG = "message";

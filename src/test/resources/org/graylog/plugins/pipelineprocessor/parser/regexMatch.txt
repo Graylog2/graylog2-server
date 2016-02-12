@@ -1,0 +1,8 @@
+rule "regexMatch"
+when
+    regex(".*(cde).*", "abcdefg").matches == true
+then
+    let result = regex(".*(cde).*", "abcdefg");
+    set_field("group_1", result["0"]);
+    set_field("matched_regex", result.matches);
+end

@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.database.NotFoundException;
@@ -28,9 +28,9 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class RouteToStream implements Function<Void> {
+public class RouteToStream extends AbstractFunction<Void> {
 
     public static final String NAME = "route_to_stream";
     private static final String ID_ARG = "id";
@@ -81,8 +81,8 @@ public class RouteToStream implements Function<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(
-                        param().optional().string(NAME_ARG).build(),
-                        param().optional().string(ID_ARG).build()))
+                        string(NAME_ARG).optional().build(),
+                        string(ID_ARG).optional().build()))
                 .build();
     }
 }

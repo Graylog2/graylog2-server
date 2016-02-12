@@ -38,7 +38,13 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     @Override
     public boolean evaluateBool(EvaluationContext context) {
-        final boolean equals = left.evaluate(context).equals(right.evaluate(context));
+        final Object left = this.left.evaluate(context);
+        final Object right = this.right.evaluate(context);
+        if (left == null) {
+            // TODO log error
+            return false;
+        }
+        final boolean equals = left.equals(right);
         if (checkEquality) {
             return equals;
         }

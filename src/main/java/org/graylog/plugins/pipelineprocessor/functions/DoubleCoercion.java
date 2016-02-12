@@ -18,7 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.google.common.primitives.Doubles;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
@@ -27,7 +27,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-public class DoubleCoercion implements Function<Double> {
+public class DoubleCoercion extends AbstractFunction<Double> {
 
     public static final String NAME = "double";
 
@@ -36,8 +36,13 @@ public class DoubleCoercion implements Function<Double> {
 
     @Override
     public Double evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse(new Object());
-        return (Double) firstNonNull(Doubles.tryParse(evaluated.toString()), args.evaluated(DEFAULT, context, Double.class).orElse(0d));
+        final Object evaluated = args.required(VALUE, context, Object.class);
+        final Double defaultValue = args.evaluated(DEFAULT, context, Double.class).orElse(0d);
+        if (evaluated == null) {
+            return defaultValue;
+        }
+        return firstNonNull(Doubles.tryParse(evaluated.toString()),
+                            defaultValue);
     }
 
     @Override
@@ -46,7 +51,7 @@ public class DoubleCoercion implements Function<Double> {
                 .name(NAME)
                 .returnType(Double.class)
                 .params(of(
-                        object(VALUE),
+                        object(VALUE).build(),
                         param().optional().name(DEFAULT).type(Double.class).build()
                 ))
                 .build();

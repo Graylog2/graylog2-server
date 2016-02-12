@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.IOState;
@@ -27,11 +27,13 @@ import org.graylog2.shared.inputs.InputRegistry;
 import javax.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class FromInput implements Function<Boolean> {
+public class FromInput extends AbstractFunction<Boolean> {
 
     public static final String NAME = "from_input";
+    public static final String ID_ARG = "id";
+    public static final String NAME_ARG = "name";
 
     private final InputRegistry inputRegistry;
 
@@ -42,11 +44,11 @@ public class FromInput implements Function<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = args.evaluated("id", context, String.class).orElse("");
+        String id = args.evaluated(ID_ARG, context, String.class).orElse("");
 
         MessageInput input = null;
         if ("".equals(id)) {
-            final String name = args.evaluated("name", context, String.class).orElse("");
+            final String name = args.evaluated(NAME_ARG, context, String.class).orElse("");
             for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
@@ -74,8 +76,8 @@ public class FromInput implements Function<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(
-                        param().optional().string("id").build(),
-                        param().optional().string("name").build()))
+                        string(ID_ARG).optional().build(),
+                        string(NAME_ARG).optional().build()))
                 .build();
     }
 }

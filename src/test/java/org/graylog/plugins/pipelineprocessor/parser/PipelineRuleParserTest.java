@@ -25,12 +25,14 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -64,7 +66,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -84,7 +85,7 @@ public class PipelineRuleParserTest {
     @BeforeClass
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = Maps.newHashMap();
-        functions.put("nein", new Function<Boolean>() {
+        functions.put("nein", new AbstractFunction<Boolean>() {
             @Override
             public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return false;
@@ -99,7 +100,7 @@ public class PipelineRuleParserTest {
                         .build();
             }
         });
-        functions.put("doch", new Function<Boolean>() {
+        functions.put("doch", new AbstractFunction<Boolean>() {
             @Override
             public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return true;
@@ -114,7 +115,7 @@ public class PipelineRuleParserTest {
                         .build();
             }
         });
-        functions.put("double_valued_func", new Function<Double>() {
+        functions.put("double_valued_func", new AbstractFunction<Double>() {
             @Override
             public Double evaluate(FunctionArgs args, EvaluationContext context) {
                 return 0d;
@@ -129,7 +130,7 @@ public class PipelineRuleParserTest {
                         .build();
             }
         });
-        functions.put("one_arg", new Function<String>() {
+        functions.put("one_arg", new AbstractFunction<String>() {
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
                 return args.evaluated("one", context, String.class).orElse("");
@@ -140,11 +141,11 @@ public class PipelineRuleParserTest {
                 return FunctionDescriptor.<String>builder()
                         .name("one_arg")
                         .returnType(String.class)
-                        .params(of(ParameterDescriptor.string("one")))
+                        .params(of(ParameterDescriptor.string("one").build()))
                         .build();
             }
         });
-        functions.put("concat", new Function<String>() {
+        functions.put("concat", new AbstractFunction<String>() {
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
                 final Object one = args.evaluated("one", context, Object.class).orElse("");
@@ -159,14 +160,14 @@ public class PipelineRuleParserTest {
                         .name("concat")
                         .returnType(String.class)
                         .params(of(
-                                ParameterDescriptor.string("one"),
-                                ParameterDescriptor.object("two"),
-                                ParameterDescriptor.object("three")
+                                ParameterDescriptor.string("one").build(),
+                                ParameterDescriptor.object("two").build(),
+                                ParameterDescriptor.object("three").build()
                         ))
                         .build();
             }
         });
-        functions.put("trigger_test", new Function<Void>() {
+        functions.put("trigger_test", new AbstractFunction<Void>() {
             @Override
             public Void evaluate(FunctionArgs args, EvaluationContext context) {
                 actionsTriggered.set(true);
@@ -182,7 +183,7 @@ public class PipelineRuleParserTest {
                         .build();
             }
         });
-        functions.put("optional", new Function<Boolean>() {
+        functions.put("optional", new AbstractFunction<Boolean>() {
             @Override
             public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
                 return true;
@@ -194,15 +195,15 @@ public class PipelineRuleParserTest {
                         .name("optional")
                         .returnType(Boolean.class)
                         .params(of(
-                                ParameterDescriptor.bool("a"),
-                                ParameterDescriptor.string("b"),
-                                param().floating("c").optional().build(),
-                                ParameterDescriptor.integer("d")
+                                ParameterDescriptor.bool("a").build(),
+                                ParameterDescriptor.string("b").build(),
+                                ParameterDescriptor.floating("c").optional().build(),
+                                ParameterDescriptor.integer("d").build()
                         ))
                         .build();
             }
         });
-        functions.put("customObject", new Function<CustomObject>() {
+        functions.put("customObject", new AbstractFunction<CustomObject>() {
             @Override
             public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
                 return new CustomObject(args.evaluated("default", context, String.class).orElse(""));
@@ -213,11 +214,11 @@ public class PipelineRuleParserTest {
                 return FunctionDescriptor.<CustomObject>builder()
                         .name("customObject")
                         .returnType(CustomObject.class)
-                        .params(of(ParameterDescriptor.string("default")))
+                        .params(of(ParameterDescriptor.string("default").build()))
                         .build();
             }
         });
-        functions.put("keys", new Function<List>() {
+        functions.put("keys", new AbstractFunction<List>() {
             @Override
             public List evaluate(FunctionArgs args, EvaluationContext context) {
                 final Optional<Map> map = args.evaluated("map", context, Map.class);
@@ -229,11 +230,11 @@ public class PipelineRuleParserTest {
                 return FunctionDescriptor.<List>builder()
                         .name("keys")
                         .returnType(List.class)
-                        .params(of(param().name("map").type(Map.class).build()))
+                        .params(of(ParameterDescriptor.type("map", Map.class).build()))
                         .build();
             }
         });
-        functions.put("sort", new Function<Collection>() {
+        functions.put("sort", new AbstractFunction<Collection>() {
             @Override
             public Collection evaluate(FunctionArgs args, EvaluationContext context) {
                 final Collection collection = args.evaluated("collection",
@@ -247,7 +248,7 @@ public class PipelineRuleParserTest {
                 return FunctionDescriptor.<Collection>builder()
                         .name("sort")
                         .returnType(Collection.class)
-                        .params(of(param().name("collection").type(Collection.class).build()))
+                        .params(of(ParameterDescriptor.type("collection", Collection.class).build()))
                         .build();
             }
         });
@@ -255,6 +256,7 @@ public class PipelineRuleParserTest {
         functions.put(StringCoercion.NAME, new StringCoercion());
         functions.put(SetField.NAME, new SetField());
         functions.put(HasField.NAME, new HasField());
+        functions.put(RegexMatch.NAME, new RegexMatch());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -473,6 +475,19 @@ public class PipelineRuleParserTest {
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
+
+    @Test
+    public void regexMatch() {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+            final Message message = evaluateRule(rule);
+            assertNotNull(message);
+            assertTrue(message.hasField("matched_regex"));
+            assertTrue(message.hasField("group_1"));
+        } catch (ParseException e) {
+            fail("Should parse");
         }
     }
 

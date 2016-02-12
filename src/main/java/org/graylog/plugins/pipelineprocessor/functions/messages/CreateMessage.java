@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.Message;
@@ -28,8 +28,9 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class CreateMessage implements Function<Message> {
+public class CreateMessage extends AbstractFunction<Message> {
 
     public static final String NAME = "create_message";
 
@@ -61,8 +62,8 @@ public class CreateMessage implements Function<Message> {
                 .name(NAME)
                 .returnType(Message.class)
                 .params(of(
-                        param().string(MESSAGE_ARG).optional().build(),
-                        param().string(SOURCE_ARG).optional().build(),
+                        string(MESSAGE_ARG).optional().build(),
+                        string(SOURCE_ARG).optional().build(),
                         param().name(TIMESTAMP_ARG).type(DateTime.class).optional().build()
                 ))
                 .build();

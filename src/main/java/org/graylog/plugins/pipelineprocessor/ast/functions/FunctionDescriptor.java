@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 @AutoValue
 public abstract class FunctionDescriptor<T> {
@@ -26,9 +28,15 @@ public abstract class FunctionDescriptor<T> {
 
     public abstract boolean pure();
 
-    public abstract Class<T> returnType();
+    public abstract Class<? extends T> returnType();
 
     public abstract ImmutableList<ParameterDescriptor> params();
+
+    public abstract ImmutableMap<String, ParameterDescriptor> paramMap();
+
+    public ParameterDescriptor param(String name) {
+        return paramMap().get(name);
+    }
 
     public static <T> Builder<T> builder() {
         //noinspection unchecked
@@ -37,11 +45,18 @@ public abstract class FunctionDescriptor<T> {
 
     @AutoValue.Builder
     public static abstract class Builder<T> {
-        public abstract FunctionDescriptor<T> build();
+        public abstract FunctionDescriptor<T> autoBuild();
+
+        public FunctionDescriptor<T> build() {
+            return paramMap(Maps.uniqueIndex(params(), ParameterDescriptor::name))
+                    .autoBuild();
+        }
 
         public abstract Builder<T> name(String name);
         public abstract Builder<T> pure(boolean pure);
-        public abstract Builder<T> returnType(Class<T> type);
+        public abstract Builder<T> returnType(Class<? extends T> type);
         public abstract Builder<T> params(ImmutableList<ParameterDescriptor> params);
+        public abstract Builder<T> paramMap(ImmutableMap<String, ParameterDescriptor> map);
+        public abstract ImmutableList<ParameterDescriptor> params();
     }
 }

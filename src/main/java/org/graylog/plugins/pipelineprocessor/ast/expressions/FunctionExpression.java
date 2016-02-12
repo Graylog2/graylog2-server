@@ -27,10 +27,13 @@ public class FunctionExpression implements Expression {
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(Function<?> function, FunctionArgs args) {
+    public FunctionExpression(FunctionArgs args) {
         this.args = args;
-        this.function = function;
-        this.descriptor = function.descriptor();
+        this.function = args.getFunction();
+        this.descriptor = this.function.descriptor();
+
+        // precomputes all constant arguments to avoid dynamically recomputing trees on every invocation
+        this.function.preprocessArgs(args);
     }
 
     public Function<?> getFunction() {

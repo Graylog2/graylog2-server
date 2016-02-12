@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -73,6 +74,9 @@ public class PipelineProcessorModule extends PluginModule {
 
         // input related functions
         addMessageProcessorFunction(FromInput.NAME, FromInput.class);
+
+        // generic functions
+        addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

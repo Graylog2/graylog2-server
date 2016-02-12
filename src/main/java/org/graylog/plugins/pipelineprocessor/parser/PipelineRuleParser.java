@@ -341,8 +341,9 @@ public class PipelineRuleParser {
                 }
             }
 
-            final FunctionExpression expr = new FunctionExpression(functionRegistry.resolveOrError(name),
-                                                                   new FunctionArgs(argsMap));
+            final FunctionExpression expr = new FunctionExpression(
+                     new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
+            );
 
             log.info("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -519,12 +520,16 @@ public class PipelineRuleParser {
                 parseContext.addError(new UndeclaredVariable(ctx));
             }
             final Expression expr;
-            if (idIsFieldAccess) {
+            String type;
+            // if the identifier is also a declared variable name prefer the variable
+            if (idIsFieldAccess && !definedVars.contains(identifierName)) {
                 expr = new FieldRefExpression(identifierName);
+                type = "FIELDREF";
             } else {
                 expr = new VarRefExpression(identifierName);
+                type = "VARREF";
             }
-            log.info("VAR: ctx {} => {}", ctx, expr);
+            log.info("{}: ctx {} => {}", type, ctx, expr);
             exprs.put(ctx, expr);
         }
 

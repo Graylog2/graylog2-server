@@ -31,7 +31,7 @@ public class ArrayLiteralExpression implements Expression {
 
     @Override
     public boolean isConstant() {
-        return false;
+        return elements.stream().allMatch(Expression::isConstant);
     }
 
     @Override

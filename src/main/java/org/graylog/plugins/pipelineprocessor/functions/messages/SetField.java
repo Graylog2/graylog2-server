@@ -16,18 +16,17 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
+import com.google.common.base.Strings;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
-
-import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class SetField implements Function<Void> {
+public class SetField extends AbstractFunction<Void> {
 
     public static final String NAME = "set_field";
     public static final String FIELD = "field";
@@ -35,11 +34,11 @@ public class SetField implements Function<Void> {
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<Object> field = args.evaluated(FIELD, context, Object.class);
-        final Optional<Object> value = args.evaluated(VALUE, context, Object.class);
+        final String field = args.required(FIELD, context, String.class);
+        final Object value = args.required(VALUE, context, Object.class);
 
-        if (field.isPresent() && !field.get().toString().isEmpty()) {
-            context.currentMessage().addField(field.get().toString(), value.get());
+        if (!Strings.isNullOrEmpty(field)) {
+            context.currentMessage().addField(field, value);
         }
         return null;
     }
@@ -49,8 +48,8 @@ public class SetField implements Function<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(of(string(FIELD),
-                           object(VALUE)))
+                .params(of(string(FIELD).build(),
+                           object(VALUE).build()))
                 .build();
     }
 }
