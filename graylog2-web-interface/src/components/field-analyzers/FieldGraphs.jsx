@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import LegacyFieldGraph from './LegacyFieldGraph';
 import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
@@ -13,6 +14,7 @@ const FieldGraphs = React.createClass({
     searchInStream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
+  mixins: [PureRenderMixin],
   getInitialState() {
     this.notifyOnNewGraphs = false;
 
@@ -45,12 +47,9 @@ const FieldGraphs = React.createClass({
     FieldGraphsStore.deleteGraph(graphId);
   },
   render() {
-    const fieldGraphs = [];
-
-    this.state.fieldGraphs
+    const fieldGraphs = this.state.fieldGraphs
       .sortBy(graph => graph.createdAt)
-      .forEach((graphOptions, graphId) => {
-        fieldGraphs.push(
+      .map((graphOptions, graphId) =>
           <LegacyFieldGraph key={graphId}
                             ref={graphId}
                             graphId={graphId}
@@ -61,12 +60,11 @@ const FieldGraphs = React.createClass({
                             permissions={this.props.permissions}
                             stacked={this.state.stackedGraphs.has(graphId)}
                             hidden={this.state.stackedGraphs.some((stackedGraphs) => stackedGraphs.has(graphId))}/>
-        );
-      });
+      );
 
     return (
       <div id="field-graphs">
-        {fieldGraphs}
+        {fieldGraphs.valueSeq()}
       </div>
     );
   },

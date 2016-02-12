@@ -1,28 +1,31 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import {Button} from 'react-bootstrap';
+import Reflux from 'reflux';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Widget from 'components/widgets/Widget';
 import Spinner from 'components/common/Spinner';
-import FieldQuickValuesStore from 'stores/field-analyzers/FieldQuickValuesStore';
 import UIUtils from 'util/UIUtils';
+
+import FieldQuickValuesStore from 'stores/field-analyzers/FieldQuickValuesStore';
+import RefreshStore from 'stores/tools/RefreshStore';
 
 const FieldQuickValues = React.createClass({
   propTypes: {
     permissions: PropTypes.arrayOf(React.PropTypes.string),
   },
+  mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {
     return {
       field: undefined,
-      autoReload: false,
       data: [],
     };
   },
 
   componentDidMount() {
-    this.updateIntervalId = window.setInterval(() => this._loadQuickValuesData(true), 3000);
+    this._loadQuickValuesData();
   },
   componentDidUpdate(oldProps, oldState) {
     if (this.state.field !== oldState.field) {
@@ -31,20 +34,23 @@ const FieldQuickValues = React.createClass({
     }
   },
   componentWillUnmount() {
-    window.clearInterval(this.updateIntervalId);
+    this._stopTimer();
   },
-  _toggleAutoReload() {
-    const shouldAutoReload = !this.state.autoReload;
-    this.setState({autoReload: shouldAutoReload});
+  _setupTimer(refresh) {
+    this._stopTimer();
+    if (refresh.enabled) {
+      this.timer = setInterval(this._loadQuickValuesData, refresh.interval);
+    }
+  },
+  _stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   },
   addFieldQuickValues(field) {
     this.setState({field: field}, () => this._loadQuickValuesData(false));
   },
-  _loadQuickValuesData(autoReload) {
-    if (autoReload && !this.state.autoReload) {
-      return;
-    }
-
+  _loadQuickValuesData() {
     if (this.state.field !== undefined) {
       this.setState({loadPending: true});
       const promise = FieldQuickValuesStore.getQuickValues(this.state.field);
@@ -82,8 +88,6 @@ const FieldQuickValues = React.createClass({
                                 pullRight
                                 permissions={this.props.permissions}>
               <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
-              <Button bsSize="small"
-                      onClick={() => this._toggleAutoReload()}>{this.state.autoReload ? 'Stop reloading' : 'Reload automatically'} </Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for {this.state.field} {this.state.loadPending && <i

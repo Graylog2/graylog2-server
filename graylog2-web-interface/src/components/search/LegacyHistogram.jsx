@@ -1,91 +1,116 @@
-/* global resultHistogram */
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-'use strict';
+import Widget from 'components/widgets/Widget';
+import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-
-var Widget = require('../widgets/Widget');
-var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
-
-var SearchStore = require('../../stores/search/SearchStore');
+import SearchStore from 'stores/search/SearchStore';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import resultHistogram from 'legacy/result-histogram';
 
 // Hue-manatee. We tried to be sorry, but aren't.
-var LegacyHistogram = React.createClass({
-    RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
-    getInitialState() {
-        if (SearchStore.resolution === undefined) {
-            SearchStore.resolution = this.props.histogram.interval;
-        }
-        return {};
-    },
-    componentDidMount() {
-        resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
-        resultHistogram.setData(this.props.formattedHistogram);
-        resultHistogram.drawResultGraph();
-    },
-    _resolutionChanged(newResolution) {
-        return (event) => {
-            event.preventDefault();
-            SearchStore.resolution = newResolution;
-        };
-    },
-    _getFirstHistogramValue() {
-        if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
-            return null;
-        }
-
-        return this.props.histogram['histogram_boundaries'].from;
-    },
-    render() {
-        var resolutionLinks = this.RESOLUTIONS.map((resolution) => {
-            var className = "date-histogram-res-selector";
-            if (this.props.histogram.interval === resolution) {
-                className += " selected-resolution";
-            }
-            var suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? "" : ",";
-            return (
-                <li key={resolution}>
-                    <a href="#" className={className} data-resolution={resolution}
-                       onClick={this._resolutionChanged(resolution)}>
-                        {resolution}
-                    </a>
-                    {suffix}
-                </li>
-            );
-        });
-
-        var resolutionSelector = (
-            <ul className="graph-resolution-selector list-inline">
-                <li><i className="fa fa-clock-o"></i></li>
-                {resolutionLinks}
-            </ul>
-        );
-
-        return (<div className="content-col">
-            <div className="pull-right">
-                <AddToDashboardMenu title="Add to dashboard"
-                                    widgetType={Widget.Type.SEARCH_RESULT_CHART}
-                                    configuration={{interval: this.props.histogram.interval}}
-                                    pullRight={true}
-                                    permissions={this.props.permissions}
-                                    isStreamSearch={this.props.isStreamSearch}/>
-            </div>
-            <h1>Histogram</h1>
-
-            {resolutionSelector}
-
-            <div id="result-graph-container">
-                <div id="y_axis"></div>
-                <div id="result-graph" data-from={this._getFirstHistogramValue()}
-                     data-to={this.props.histogram['histogram_boundaries'].to}></div>
-                <div id="result-graph-timeline"></div>
-            </div>
-
-        </div>);
+const LegacyHistogram = React.createClass({
+  propTypes: {
+    formattedHistogram: React.PropTypes.array.isRequired,
+    histogram: React.PropTypes.object.isRequired,
+    isStreamSearch: React.PropTypes.bool.isRequired,
+    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+  },
+  getInitialState() {
+    return {};
+  },
+  componentDidMount() {
+    this._renderHistogram(this.props.formattedHistogram);
+    window.addEventListener('resize', this._onResize);
+  },
+  componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.formattedHistogram) !== prevProps.formattedHistogram) {
+      this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
     }
+  },
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+  },
+
+  RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
+  eventThrottler: new EventHandlersThrottler(),
+
+  _onResize() {
+    this.eventThrottler.throttle(() => resultHistogram.redrawResultGraph());
+  },
+
+  _renderHistogram(histogram) {
+    resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
+    resultHistogram.setData(histogram);
+    resultHistogram.drawResultGraph();
+  },
+  _updateHistogram(histogram) {
+    resultHistogram.updateData(histogram);
+  },
+  _resolutionChanged(newResolution) {
+    return (event) => {
+      event.preventDefault();
+      SearchStore.resolution = newResolution;
+    };
+  },
+  _getFirstHistogramValue() {
+    if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
+      return null;
+    }
+
+    return this.props.histogram.histogram_boundaries.from;
+  },
+  render() {
+    if (SearchStore.resolution === undefined) {
+      SearchStore.resolution = this.props.histogram.interval;
+    }
+    const resolutionLinks = this.RESOLUTIONS.map((resolution) => {
+      let className = 'date-histogram-res-selector';
+      if (this.props.histogram.interval === resolution) {
+        className += ' selected-resolution';
+      }
+      const suffix = resolution === this.RESOLUTIONS[this.RESOLUTIONS.length - 1] ? '' : ',';
+      return (
+        <li key={resolution}>
+          <a href="#" className={className} data-resolution={resolution}
+             onClick={this._resolutionChanged(resolution)}>
+            {resolution}
+          </a>
+          {suffix}
+        </li>
+      );
+    });
+
+    const resolutionSelector = (
+      <ul className="graph-resolution-selector list-inline">
+        <li><i className="fa fa-clock-o"/></li>
+        {resolutionLinks}
+      </ul>
+    );
+
+    return (<div className="content-col">
+      <div className="pull-right">
+        <AddToDashboardMenu title="Add to dashboard"
+                            widgetType={Widget.Type.SEARCH_RESULT_CHART}
+                            configuration={{interval: this.props.histogram.interval}}
+                            pullRight
+                            permissions={this.props.permissions}
+                            isStreamSearch={this.props.isStreamSearch}/>
+      </div>
+      <h1>Histogram</h1>
+
+      {resolutionSelector}
+
+      <div id="result-graph-container">
+        <div id="y_axis"></div>
+        <div id="result-graph" data-from={this._getFirstHistogramValue()}
+             data-to={this.props.histogram.histogram_boundaries.to}></div>
+        <div id="result-graph-timeline"></div>
+      </div>
+
+    </div>);
+  },
 });
 
-module.exports = LegacyHistogram;
+export default LegacyHistogram;

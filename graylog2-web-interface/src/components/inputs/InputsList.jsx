@@ -12,6 +12,7 @@ import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import SingleNodeActions from 'actions/nodes/SingleNodeActions';
 import SingleNodeStore from 'stores/nodes/SingleNodeStore';
+import InputTypesActions from 'actions/inputs/InputTypesActions';
 
 const InputsList = React.createClass({
   propTypes: {
@@ -26,6 +27,7 @@ const InputsList = React.createClass({
     };
   },
   componentDidMount() {
+    InputTypesActions.list();
     InputsActions.list();
     SingleNodeActions.get();
   },

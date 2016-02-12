@@ -21,6 +21,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +44,13 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     }
 
     @Override
-    public Class<?> configurationClass() {
+    public Class<? extends RotationStrategyConfig> configurationClass() {
         return MessageCountRotationStrategyConfig.class;
+    }
+
+    @Override
+    public RotationStrategyConfig defaultConfiguration() {
+        return MessageCountRotationStrategyConfig.createDefault();
     }
 
     @Nullable

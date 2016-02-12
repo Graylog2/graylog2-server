@@ -20,12 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.indexer.retention;
+package org.graylog2.plugin.indexer.rotation;
 
-public interface RetentionStrategy {
-    void retain();
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-    Class<? extends RetentionStrategyConfig> configurationClass();
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = RotationStrategyConfig.TYPE_FIELD, visible = true)
+public interface RotationStrategyConfig {
+    String TYPE_FIELD = "type";
 
-    RetentionStrategyConfig defaultConfiguration();
+    @JsonProperty(TYPE_FIELD)
+    String type();
 }

@@ -15,12 +15,11 @@ import DocsHelper from 'util/DocsHelper';
 import { PageHeader, Spinner } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerClusterHealthSummary } from 'components/indexers';
-import { DeflectorConfigSummary, IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
+import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
 
 const IndicesPage = React.createClass({
   componentDidMount() {
     const timerId = setInterval(() => {
-      DeflectorActions.config();
       DeflectorActions.list();
 
       IndexRangesActions.list();
@@ -51,13 +50,12 @@ const IndicesPage = React.createClass({
         <PageHeader title="Indices">
           <span>
             This is an overview of all indices (message stores) Graylog is currently taking in account
-            for searches and analysis. You can learn more about the index model in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />.
-            Closed indices can be re-opened at any time.
+            for searches and analysis.
           </span>
 
           <span>
-            <DeflectorConfigSummary config={this.state.deflector.config} />
+            You can learn more about the index model in the{' '}
+            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
           </span>
 
           <IndicesMaintenanceDropdown />

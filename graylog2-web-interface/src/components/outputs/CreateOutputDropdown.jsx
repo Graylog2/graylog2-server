@@ -1,7 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
 
-import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
+import { ConfigurationForm } from 'components/configurationforms';
 
 const CreateOutputDropdown = React.createClass({
     PLACEHOLDER: "placeholder",

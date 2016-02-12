@@ -21,6 +21,7 @@ import com.google.common.base.Stopwatch;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,12 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
     }
 
     @Override
-    public Class<?> configurationClass() {
+    public Class<? extends RetentionStrategyConfig> configurationClass() {
         return DeletionRetentionStrategyConfig.class;
+    }
+
+    @Override
+    public RetentionStrategyConfig defaultConfiguration() {
+        return DeletionRetentionStrategyConfig.createDefault();
     }
 }

@@ -24,5 +24,8 @@ package org.graylog2.plugin.indexer.rotation;
 
 public interface RotationStrategy {
     void rotate();
-    Class<?> configurationClass();
+
+    Class<? extends RotationStrategyConfig> configurationClass();
+
+    RotationStrategyConfig defaultConfiguration();
 }

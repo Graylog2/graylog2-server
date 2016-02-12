@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-import ConfigurationForm from 'components/configurationforms/ConfigurationForm';
+import { ConfigurationForm } from 'components/configurationforms';
 
 const EditAlarmCallbackButton = React.createClass({
   propTypes: {
