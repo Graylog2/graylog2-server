@@ -49,7 +49,6 @@ const SearchResult = React.createClass({
       sortOrder: SearchStore.sortOrder,
       showAllFields: false,
       shouldHighlight: true,
-      currentPage: SearchStore.page,
     };
   },
 
@@ -215,7 +214,7 @@ const SearchResult = React.createClass({
                        searchInStream={this.props.searchInStream}/>
 
           <ResultTable messages={this.props.result.messages}
-                       page={this.state.currentPage}
+                       page={SearchStore.page}
                        selectedFields={this.state.selectedFields}
                        sortField={this.state.sortField}
                        sortOrder={this.state.sortOrder}

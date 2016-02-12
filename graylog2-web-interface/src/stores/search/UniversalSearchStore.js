@@ -11,13 +11,16 @@ import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const UniversalSearchStore = Reflux.createStore({
+  DEFAULT_LIMIT: 150,
   listenables: [],
 
-  search(type, query, timerange, streamId, limit) {
+  search(type, query, timerange, streamId, limit, page) {
     const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
+    const effectiveLimit = limit || this.DEFAULT_LIMIT;
+    const offset = (page - 1) * effectiveLimit;
 
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query,
-      timerangeParams, streamId, limit).url);
+      timerangeParams, streamId, effectiveLimit, offset).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);

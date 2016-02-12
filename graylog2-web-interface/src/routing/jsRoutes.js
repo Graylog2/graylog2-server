@@ -183,12 +183,15 @@ const jsRoutes = {
         _buildUrl(url, queryString) {
           return `${url}?${Qs.stringify(queryString)}`;
         },
-        search(type, query, timerange, streamId, limit) {
+        search(type, query, timerange, streamId, limit, offset) {
           const url = `/search/universal/${type}`;
           const queryString = this._buildBaseQueryString(query, timerange, streamId);
 
           if (limit) {
             queryString.limit = limit;
+          }
+          if (offset) {
+            queryString.offset = offset;
           }
 
           return {url: this._buildUrl(url, queryString)};
