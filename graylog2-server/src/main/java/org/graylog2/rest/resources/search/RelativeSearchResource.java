@@ -37,16 +37,19 @@ import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.AdditionalMediaType;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -64,8 +67,8 @@ public class RelativeSearchResource extends SearchResource {
     private final Counter searchQueryException;
 
     @Inject
-    public RelativeSearchResource(Searches searches, MetricRegistry metricRegistry) {
-        super(searches, metricRegistry);
+    public RelativeSearchResource(Searches searches, MetricRegistry metricRegistry, @Named("query_time_range_limit") @Nullable Duration timeRangeLimit) {
+        super(searches, metricRegistry, timeRangeLimit);
         searchQueryException = metricRegistry.counter(MetricRegistry.name(SearchResource.class,
                                                                           "search-query-exceptions"));
     }
@@ -303,7 +306,7 @@ public class RelativeSearchResource extends SearchResource {
 
     private TimeRange buildRelativeTimeRange(int range) {
         try {
-            return new RelativeRange(range);
+            return restrictTimeRange(new RelativeRange(range));
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException(e);
