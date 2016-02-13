@@ -45,7 +45,7 @@ public abstract class FunctionDescriptor<T> {
 
     @AutoValue.Builder
     public static abstract class Builder<T> {
-        public abstract FunctionDescriptor<T> autoBuild();
+        abstract FunctionDescriptor<T> autoBuild();
 
         public FunctionDescriptor<T> build() {
             return paramMap(Maps.uniqueIndex(params(), ParameterDescriptor::name))
