@@ -32,7 +32,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;

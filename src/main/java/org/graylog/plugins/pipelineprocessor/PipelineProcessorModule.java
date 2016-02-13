@@ -24,7 +24,10 @@ import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -32,6 +35,9 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamResource;
@@ -77,6 +83,16 @@ public class PipelineProcessorModule extends PluginModule {
 
         // generic functions
         addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
+
+        // string functions
+        addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);
+        addMessageProcessorFunction(Capitalize.NAME, Capitalize.class);
+        addMessageProcessorFunction(Lowercase.NAME, Lowercase.class);
+        addMessageProcessorFunction(SwapCase.NAME, SwapCase.class);
+        addMessageProcessorFunction(Uncapitalize.NAME, Uncapitalize.class);
+        addMessageProcessorFunction(Uppercase.NAME, Uppercase.class);
+
+
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

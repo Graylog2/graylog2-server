@@ -1,4 +1,4 @@
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.ImmutableMap;
