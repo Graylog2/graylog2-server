@@ -30,11 +30,11 @@ public abstract class RetentionStrategies {
     public abstract int total();
 
     @JsonProperty
-    public abstract Set<String> strategies();
+    public abstract Set<RetentionStrategyDescription> strategies();
 
     @JsonCreator
     public static RetentionStrategies create(@JsonProperty("total") int total,
-                                             @JsonProperty("strategies") Set<String> strategies) {
+                                             @JsonProperty("strategies") Set<RetentionStrategyDescription> strategies) {
         return new AutoValue_RetentionStrategies(total, strategies);
     }
 }
