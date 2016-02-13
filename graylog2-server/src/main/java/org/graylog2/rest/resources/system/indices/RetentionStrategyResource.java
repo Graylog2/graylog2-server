@@ -98,7 +98,7 @@ public class RetentionStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current retention strategy",
             notes = "This resource stores the configuration of the currently used retention strategy.")
-    public void config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
+    public RetentionStrategySummary config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
                        @Valid @NotNull RetentionStrategySummary retentionStrategySummary) {
         if (!retentionStrategies.containsKey(retentionStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find retention strategy for given type " + retentionStrategySummary.strategy());
@@ -116,6 +116,8 @@ public class RetentionStrategyResource extends RestResource {
 
         clusterConfigService.write(retentionStrategySummary.config());
         clusterConfigService.write(indexManagementConfig);
+
+        return retentionStrategySummary;
     }
 
     @GET

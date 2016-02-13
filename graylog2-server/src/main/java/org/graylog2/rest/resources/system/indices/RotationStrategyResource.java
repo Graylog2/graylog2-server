@@ -98,7 +98,7 @@ public class RotationStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current rotation strategy",
             notes = "This resource stores the configuration of the currently used rotation strategy.")
-    public void config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
+    public RotationStrategySummary config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
                        @Valid @NotNull RotationStrategySummary rotationStrategySummary) {
         if (!rotationStrategies.containsKey(rotationStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find rotation strategy for given type " + rotationStrategySummary.strategy());
@@ -116,6 +116,8 @@ public class RotationStrategyResource extends RestResource {
 
         clusterConfigService.write(rotationStrategySummary.config());
         clusterConfigService.write(indexManagementConfig);
+
+        return rotationStrategySummary;
     }
 
     @GET
