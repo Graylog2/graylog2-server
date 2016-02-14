@@ -68,7 +68,7 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this.state.query;
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId).then((response) => {
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page).then((response) => {
       this.setState({searchResult: response});
 
       const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
@@ -147,7 +147,7 @@ const SearchPage = React.createClass({
     searchResult.all_fields = this.state.fields;
     const selectedFields = this.sortFields(Immutable.List(this.state.selectedFields));
     return (
-      <SearchResult query={SearchStore.query} builtQuery={searchResult.built_query}
+      <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
                     result={searchResult} histogram={this.state.histogram}
                     formattedHistogram={this.state.histogram.histogram}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}

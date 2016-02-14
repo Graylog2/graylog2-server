@@ -1,3 +1,5 @@
+import Qs from 'qs';
+
 const jsRoutes = {
   controllers: {
     api: {
@@ -164,28 +166,61 @@ const jsRoutes = {
         substringTest: () => { return {url: '/tools/substring_tester'};},
       },
       UniversalSearchApiController: {
-        _streamFilter: (streamId) => {
-          return (streamId ? `&filter=streams:${streamId}` : '');
+        _streamFilter(streamId) {
+          return (streamId ? {filter: `streams:${streamId}`} : '');
         },
-        search(type, query, timerange, streamId, limit) {
-          let url = `/search/universal/${type}?query=${query}&${timerange}${this._streamFilter(streamId)}`;
+        _buildBaseQueryString(query, timerange, streamId) {
+          const queryString = {};
+
+          const streamFilter = this._streamFilter(streamId);
+
+          queryString.query = query;
+          Object.keys(timerange).forEach(key => queryString[key] = timerange[key]);
+          Object.keys(streamFilter).forEach(key => queryString[key] = streamFilter[key]);
+
+          return queryString;
+        },
+        _buildUrl(url, queryString) {
+          return `${url}?${Qs.stringify(queryString)}`;
+        },
+        search(type, query, timerange, streamId, limit, offset) {
+          const url = `/search/universal/${type}`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+
           if (limit) {
-            url += `&limit=${limit}`;
+            queryString.limit = limit;
+          }
+          if (offset) {
+            queryString.offset = offset;
           }
 
-          return {url: url};
+          return {url: this._buildUrl(url, queryString)};
         },
-        histogram(type, query, interval, timerange, streamId) {
-          return {url: `/search/universal/${type}/histogram?query=${query}&interval=${interval}&${timerange}${this._streamFilter(streamId)}`};
+        histogram(type, query, resolution, timerange, streamId) {
+          const url = `/search/universal/${type}/histogram`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+          queryString.interval = resolution;
+
+          return {url: this._buildUrl(url, queryString)};
         },
         fieldHistogram(type, query, field, resolution, timerange, streamId) {
-          return {url: `/search/universal/${type}/fieldhistogram?query=${query}&interval=${resolution}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+          const url = `/search/universal/${type}/fieldhistogram`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+          queryString.interval = resolution;
+          queryString.field = field;
+          return {url: this._buildUrl(url, queryString)};
         },
         fieldStats(type, query, field, timerange, streamId) {
-          return {url: `/search/universal/${type}/stats?query=${query}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+          const url = `/search/universal/${type}/stats`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+          queryString.field = field;
+          return {url: this._buildUrl(url, queryString)};
         },
         fieldTerms(type, query, field, timerange, streamId) {
-          return {url: `/search/universal/${type}/terms?query=${query}&field=${field}&${timerange}${this._streamFilter(streamId)}`};
+          const url = `/search/universal/${type}/terms`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+          queryString.field = field;
+          return {url: this._buildUrl(url, queryString)};
         },
       },
       UsageStatsApiController: {

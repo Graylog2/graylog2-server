@@ -17,7 +17,7 @@ const RolesPage = React.createClass({
           </span>
 
           <span>
-            Read more about Graylog roles in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLE} text="documentation"/>.
+            Read more about Graylog roles in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.
           </span>
         </PageHeader>
 

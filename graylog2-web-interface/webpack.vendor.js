@@ -1,4 +1,4 @@
-// webpack.config.js
+// webpack.vendor.js
 const webpack = require('webpack');
 const path = require('path');
 const Clean = require('clean-webpack-plugin');
@@ -20,6 +20,11 @@ const webpackConfig = {
     filename: '[name].js',
     publicPath: '/',
     library: '__[name]',
+  },
+  module: {
+    loaders: [
+      { test: /\.json$/, loader: 'json-loader' },
+    ],
   },
   plugins: [
     new Clean([path.resolve(BUILD_PATH, 'vendor.*.js')]),

@@ -8,7 +8,6 @@ import jsRoutes = require('routing/jsRoutes');
 const URLUtils = require('util/URLUtils');
 const UserNotification = require('util/UserNotification');
 import SearchStore = require('stores/search/SearchStore');
-const Qs = require('qs');
 
 const FieldStatisticsStore = {
     FUNCTIONS: Immutable.OrderedMap({
@@ -44,7 +43,7 @@ const FieldStatisticsStore = {
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,
-            Qs.stringify(timerange),
+            timerange,
             streamId
         ).url;
 

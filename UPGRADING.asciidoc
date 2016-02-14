@@ -32,6 +32,11 @@ One of the most important breaking changes in Elasticsearch 2.x is that https://
 
 Using the https://github.com/elastic/elasticsearch-migration[Elasticsearch Migration Plugin] might help to highlight some potential pitfalls if an existing Elasticsearch 1.x cluster should be upgraded to Elasticsearch 2.x.
 
+### Log4j 2 migration
+
+Graylog switched its logging backend from https://logging.apache.org/log4j/1.2/[Log4j 1.2] to https://logging.apache.org/log4j/2.x/[Log4j 2].
+
+Please refer to the https://logging.apache.org/log4j/2.x/manual/migration.html[Log4j Migration Guide] for information on how to update your existing logging configuration.
 
 ### Removed configuration settings
 

@@ -5,6 +5,7 @@ import { Page } from 'components/common';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import SearchStore from 'stores/search/SearchStore';
+import UniversalSearchStore from 'stores/search/UniversalSearchStore';
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap.min.js');
@@ -35,7 +36,6 @@ const MessageTablePaginator = React.createClass({
     window.removeEventListener('resize', this._setPaginationWidth);
   },
 
-  RESULTS_PER_PAGE: 100,
   eventsThrottler: new EventHandlersThrottler(),
 
   _initializeAffix() {
@@ -56,7 +56,7 @@ const MessageTablePaginator = React.createClass({
     }
   },
   _numberOfPages() {
-    return Math.ceil(this.props.resultCount / this.RESULTS_PER_PAGE);
+    return Math.ceil(this.props.resultCount / UniversalSearchStore.DEFAULT_LIMIT);
   },
   _minPage() {
     const currentTenMin = Math.floor(this.props.currentPage / 10) * 10;
