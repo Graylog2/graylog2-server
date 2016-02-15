@@ -104,12 +104,14 @@ const ShowDashboardPage = React.createClass({
       positions[widget.id] = dashboard.positions[widget.id] || this._defaultWidgetDimensions(widget);
     });
 
-    const widgets = dashboard.widgets.sort((d1, d2) => {
-      if (d1.col === d2.col) {
-        return d1.row < d2.row;
+    const widgets = dashboard.widgets.sort((widget1, widget2) => {
+      const position1 = positions[widget1.id];
+      const position2 = positions[widget2.id];
+      if (position1.col === position2.col) {
+        return position1.row - position2.row;
       }
 
-      return d1.col < d2.col;
+      return position1.col - position2.col;
     }).map((widget) => {
       return (
         <Widget id={widget.id} key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id}
