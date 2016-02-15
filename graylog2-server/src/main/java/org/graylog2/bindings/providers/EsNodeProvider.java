@@ -23,6 +23,7 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.plugins.Plugin;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.esplugin.MonitorPlugin;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,32 +35,35 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 @Singleton
 public class EsNodeProvider implements Provider<Node> {
     private static final Logger LOG = LoggerFactory.getLogger(EsNodeProvider.class);
 
     private final ElasticsearchConfiguration configuration;
+    private final NodeId nodeId;
 
     @Inject
-    public EsNodeProvider(ElasticsearchConfiguration configuration) {
-        this.configuration = configuration;
+    public EsNodeProvider(ElasticsearchConfiguration configuration, NodeId nodeId) {
+        this.configuration = requireNonNull(configuration);
+        this.nodeId = requireNonNull(nodeId);
     }
 
     @Override
     public Node get() {
         return new GraylogNode(
-                readNodeSettings(configuration),
+                readNodeSettings(configuration, nodeId),
                 Collections.<Class<? extends Plugin>>singleton(MonitorPlugin.class));
     }
 
-    public static Settings readNodeSettings(ElasticsearchConfiguration conf) {
+    public static Settings readNodeSettings(ElasticsearchConfiguration conf, NodeId nodeId) {
         final Settings.Builder settings = Settings.builder();
 
         // Standard Configuration.
         settings.put("cluster.name", conf.getClusterName());
 
-        settings.put("node.name", conf.getNodeName());
+        settings.put("node.name", conf.getNodeNamePrefix() + nodeId);
         settings.put("node.master", conf.isMasterNode());
         settings.put("node.data", conf.isDataNode());
         settings.put("node.client", true);

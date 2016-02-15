@@ -27,7 +27,11 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import org.elasticsearch.common.settings.Settings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.plugin.system.NodeId;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +44,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class EsNodeProviderTest {
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private NodeId nodeId;
+
+    @Before
+    public void setUp() throws IOException {
+        nodeId = new NodeId(temporaryFolder.newFile().getAbsolutePath());
+    }
+
     private ElasticsearchConfiguration setupConfig(Map<String, String> settings) {
         // required params we don't care about in this test, so we set them to dummy values for all test cases
         settings.put("retention_strategy", "delete");
@@ -62,10 +76,10 @@ public class EsNodeProviderTest {
         Map<String, String> settings = Maps.newHashMap();
         ElasticsearchConfiguration config = setupConfig(settings);
 
-        Settings nodeSettings = EsNodeProvider.readNodeSettings(config);
+        Settings nodeSettings = EsNodeProvider.readNodeSettings(config, nodeId);
 
         assertEquals(defaultConfig.getClusterName(), nodeSettings.get("cluster.name"));
-        assertEquals(defaultConfig.getNodeName(), nodeSettings.get("node.name"));
+        assertEquals(defaultConfig.getNodeNamePrefix() + nodeId, nodeSettings.get("node.name"));
         assertEquals(defaultConfig.isMasterNode(), nodeSettings.getAsBoolean("node.master", false));
         assertEquals(defaultConfig.isDataNode(), nodeSettings.getAsBoolean("node.data", false));
         assertEquals(defaultConfig.isHttpEnabled(), nodeSettings.getAsBoolean("http.enabled", false));
@@ -84,7 +98,7 @@ public class EsNodeProviderTest {
 
         // add all ES settings here that are configurable via graylog.conf
         addEsConfig(esPropNames, settings, "cluster.name", "elasticsearch_cluster_name", "garylog5");
-        addEsConfig(esPropNames, settings, "node.name", "elasticsearch_node_name", "garylord");
+        addEsConfig(esPropNames, settings, "node.name", "elasticsearch_node_name_prefix", "garylord-");
         addEsConfig(esPropNames, settings, "node.master", "elasticsearch_node_master", "true");
         addEsConfig(esPropNames, settings, "node.data", "elasticsearch_node_data", "true");
         addEsConfig(esPropNames, settings, "path.home", "elasticsearch_path_home", "data/elasticsearch");
@@ -111,12 +125,18 @@ public class EsNodeProviderTest {
 
         ElasticsearchConfiguration config = setupConfig(settings);
 
-        Settings nodeSettings = EsNodeProvider.readNodeSettings(config);
+        Settings nodeSettings = EsNodeProvider.readNodeSettings(config, nodeId);
 
         assertThat(Sets.symmetricDifference(esPropNames.keySet(), nodeSettings.getAsMap().keySet())).isEmpty();
 
+        assertThat(nodeSettings.get("node.name")).isEqualTo(settings.get("elasticsearch_node_name_prefix") + nodeId);
         for (Map.Entry<String, String> property : esPropNames.entrySet()) {
-            final String settingValue = nodeSettings.get(property.getKey());
+            final String key = property.getKey();
+            // The node name is being constructed and not used verbatim.
+            if ("node.name".equals(key)) {
+                continue;
+            }
+            final String settingValue = nodeSettings.get(key);
 
             // the node setting value should be whatever we have put in.
             assertThat(settingValue).isEqualTo(property.getValue());
@@ -132,10 +152,12 @@ public class EsNodeProviderTest {
 
         ElasticsearchConfiguration config = setupConfig(settings);
 
-        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config);
+        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config, nodeId);
 
         assertNotEquals("cluster.name", config.getClusterName(), nodeSettings.get("cluster.name"));
-        assertNotEquals("node.name", config.getNodeName(), nodeSettings.get("node.name"));
+        assertEquals("cluster.name", "fromfile", nodeSettings.get("cluster.name"));
+        assertNotEquals("node.name", config.getNodeNamePrefix(), nodeSettings.get("node.name"));
+        assertEquals("node.name", "filenode", nodeSettings.get("node.name"));
         assertNotEquals("node.master", config.isMasterNode(), nodeSettings.get("node.master"));
         assertNotEquals("node.data", config.isDataNode(), nodeSettings.get("node.data"));
         assertNotEquals("http.enabled", config.isHttpEnabled(), nodeSettings.get("http.enabled"));
@@ -158,7 +180,7 @@ public class EsNodeProviderTest {
         final ElasticsearchConfiguration config = new ElasticsearchConfiguration();
         new JadConfig(new InMemoryRepository(settings), config).process();
 
-        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config);
+        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config, nodeId);
 
         assertThat(nodeSettings.getAsArray("discovery.zen.ping.unicast.hosts")).contains("example.com");
     }
@@ -174,7 +196,7 @@ public class EsNodeProviderTest {
         final ElasticsearchConfiguration config = new ElasticsearchConfiguration();
         new JadConfig(new InMemoryRepository(settings), config).process();
 
-        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config);
+        final Settings nodeSettings = EsNodeProvider.readNodeSettings(config, nodeId);
 
         assertThat(nodeSettings.getAsArray("discovery.zen.ping.unicast.hosts")).contains("example.com", "example.net");
     }
