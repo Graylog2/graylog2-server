@@ -22,6 +22,8 @@
  */
 package org.graylog2.plugin.cluster;
 
+import java.util.Set;
+
 /**
  * Service to save and retrieve cluster configuration beans.
  */
@@ -61,4 +63,11 @@ public interface ClusterConfigService {
      * @return The number of removed entries from the cluster configuration.
      */
     <T> int remove(Class<T> type);
+
+    /**
+     * List all classes of configuration beans in the database.
+     *
+     * @return The list of Java classes being used in the database.
+     */
+    Set<Class<?>> list();
 }
