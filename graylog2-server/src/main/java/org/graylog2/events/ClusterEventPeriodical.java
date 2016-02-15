@@ -86,12 +86,6 @@ public class ClusterEventPeriodical extends Periodical {
 
         DBCollection coll = db.getCollection(COLLECTION_NAME);
 
-        /* FIXME: Not supported by Fongo
-        if (coll.isCapped()) {
-            LOG.warn("The \"{}\" collection in MongoDB is capped which will cause problems. Please drop the collection.", COLLECTION_NAME);
-        }
-        */
-
         coll.createIndex(DBSort
                 .asc("timestamp")
                 .asc("producer")

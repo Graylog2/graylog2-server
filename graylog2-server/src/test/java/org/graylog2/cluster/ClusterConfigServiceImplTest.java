@@ -299,7 +299,7 @@ public class ClusterConfigServiceImplTest {
         DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test
