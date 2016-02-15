@@ -18,8 +18,10 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
 
 const IndicesPage = React.createClass({
+  mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore),
+    Reflux.connect(IndexRangesStore), Reflux.connect(MessageCountsStore), Reflux.connect(IndexerClusterStore)],
   componentDidMount() {
-    const timerId = setInterval(() => {
+    this.timerId = setInterval(() => {
       DeflectorActions.list();
 
       IndexRangesActions.list();
@@ -28,15 +30,15 @@ const IndicesPage = React.createClass({
 
       MessageCountsActions.total();
 
-      IndexerClusterActions
+      IndexerClusterActions.health();
+      IndexerClusterActions.name();
     }, this.REFRESH_INTERVAL);
-    this.setState({timerId: timerId});
   },
   componentWillUnmount() {
-    clearInterval(this.state.timerId);
+    if (this.timerId) {
+      clearInterval(this.timerId);
+    }
   },
-  mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore),
-    Reflux.connect(IndexRangesStore), Reflux.connect(MessageCountsStore), Reflux.connect(IndexerClusterStore)],
   REFRESH_INTERVAL: 2000,
   _totalIndexCount() {
     return (Object.keys(this.state.indices).length + this.state.closedIndices.length);
@@ -45,6 +47,7 @@ const IndicesPage = React.createClass({
     if (!this.state.indices || !this.state.indexRanges || !this.state.deflector || !this.state.health) {
       return <Spinner />;
     }
+    const deflectorInfo = this.state.deflector.info;
     return (
       <span>
         <PageHeader title="Indices">
@@ -66,7 +69,7 @@ const IndicesPage = React.createClass({
             <Alert bsStyle="success" style={{marginTop: '10'}}>
               <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
               {numeral(this.state.events).format('0,0')} messages under management,
-              current write-active index is <i>{this.state.deflector.info.current_target}</i>.
+              current write-active index is <i>{deflectorInfo ? deflectorInfo.current_target : <Spinner />}</i>.
             </Alert>
             <IndexerClusterHealthSummary health={this.state.health} />
           </Col>
