@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.parser;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -30,12 +30,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
@@ -46,24 +45,14 @@ import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertArrayEquals;
@@ -72,15 +61,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class PipelineRuleParserTest {
-
-    @org.junit.Rule
-    public TestName name = new TestName();
-
-    private PipelineRuleParser parser;
-    private static FunctionRegistry functionRegistry;
-
-    private static final AtomicBoolean actionsTriggered = new AtomicBoolean(false);
+public class PipelineRuleParserTest extends BaseParserTest {
 
     @BeforeClass
     public static void registerFunctions() {
@@ -258,13 +239,6 @@ public class PipelineRuleParserTest {
         functions.put(HasField.NAME, new HasField());
         functions.put(RegexMatch.NAME, new RegexMatch());
         functionRegistry = new FunctionRegistry(functions);
-    }
-
-    @Before
-    public void setup() {
-        parser = new PipelineRuleParser(functionRegistry);
-        // initialize before every test!
-        actionsTriggered.set(false);
     }
 
     @After
@@ -488,36 +462,6 @@ public class PipelineRuleParserTest {
             assertTrue(message.hasField("group_1"));
         } catch (ParseException e) {
             fail("Should parse");
-        }
-    }
-
-    private Message evaluateRule(Rule rule, Message message) {
-        final EvaluationContext context = new EvaluationContext(message);
-        if (rule.when().evaluateBool(context)) {
-
-            for (Statement statement : rule.then()) {
-                statement.evaluate(context);
-            }
-            return message;
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    private Message evaluateRule(Rule rule) {
-        final Message message = new Message("hello test", "source", DateTime.now());
-        return evaluateRule(rule, message);
-    }
-
-    private String ruleForTest() {
-        try {
-            final URL resource = this.getClass().getResource(name.getMethodName().concat(".txt"));
-            final Path path = Paths.get(resource.toURI());
-            final byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes, Charsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
         }
     }
 

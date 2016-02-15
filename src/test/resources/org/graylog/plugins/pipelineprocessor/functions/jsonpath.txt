@@ -1,0 +1,10 @@
+rule "jsonpath"
+when true
+then
+  let x = parse_json(string(message.`message`));
+  let new_fields = select_jsonpath(x,
+            { author_first: "$['store']['book'][0]['author']",
+              author_last: "$['store']['book'][-1:]['author']"
+            });
+  set_fields(new_fields);
+end

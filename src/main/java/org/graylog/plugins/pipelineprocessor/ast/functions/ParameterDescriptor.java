@@ -104,6 +104,7 @@ public abstract class ParameterDescriptor<T, R> {
         return type.cast(transform().apply(type().cast(value)));
     }
 
+
     @AutoValue.Builder
     public static abstract class Builder<T, R> {
         public abstract Builder<T, R> type(Class<? extends T> type);

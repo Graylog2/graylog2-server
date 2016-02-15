@@ -24,17 +24,20 @@ import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
-import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
-import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
-import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
+import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
@@ -72,6 +75,7 @@ public class PipelineProcessorModule extends PluginModule {
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
+        addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
@@ -92,6 +96,9 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessorFunction(Uncapitalize.NAME, Uncapitalize.class);
         addMessageProcessorFunction(Uppercase.NAME, Uppercase.class);
 
+        // json
+        addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
+        addMessageProcessorFunction(SelectJsonPath.NAME, SelectJsonPath.class);
 
     }
 
