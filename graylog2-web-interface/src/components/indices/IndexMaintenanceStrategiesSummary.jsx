@@ -5,6 +5,7 @@ import Spinner from 'components/common/Spinner';
 const IndexMaintenanceStrategiesSummary = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
+    pluginExports: React.PropTypes.array.isRequired,
   },
 
   render() {
@@ -13,10 +14,10 @@ const IndexMaintenanceStrategiesSummary = React.createClass({
     }
 
     const activeStrategy = this.props.config.strategy;
-    const strategy = this.props.pluginExports.find((strategy) => strategy.type === activeStrategy);
+    const strategy = this.props.pluginExports.find((exportedStrategy) => exportedStrategy.type === activeStrategy);
 
     if (!strategy || !strategy.summaryComponent) {
-      return (<Alert bsStyle='danger'>Summary for strategy {activeStrategy} not found!</Alert>);
+      return (<Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>);
     }
 
     const element = React.createElement(strategy.summaryComponent, {config: this.props.config.config});

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Select } from 'components/common';
 
+import style from '!style!css!./IndicesConfiguration.css';
+
 const IndexMaintenanceStrategiesConfiguration = React.createClass({
   propTypes: {
     title: React.PropTypes.string.isRequired,
@@ -61,26 +63,26 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
 
   _availableSelectOptions() {
     return this.props.pluginExports.map((config) => {
-      return {value: config.type, label: config.displayName}
+      return {value: config.type, label: config.displayName};
     });
   },
 
   _getConfigurationComponent(selectedStrategy) {
     if (!selectedStrategy || selectedStrategy.length < 1) {
-      return;
+      return null;
     }
 
-    const strategy = this.props.pluginExports.find((strategy) => strategy.type === selectedStrategy);
+    const strategy = this.props.pluginExports.find((exportedStrategy) => exportedStrategy.type === selectedStrategy);
 
     if (!strategy) {
-      return undefined;
+      return null;
     }
 
     const strategyConfig = this._getStrategyConfig(selectedStrategy);
     const element = React.createElement(strategy.configComponent, {
       config: strategyConfig,
       jsonSchema: this._getStrategyJsonSchema(selectedStrategy),
-      updateConfig: this._onConfigUpdate
+      updateConfig: this._onConfigUpdate,
     });
 
     return (<span key={strategy.type}>{element}</span>);
@@ -94,22 +96,22 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     return (
       <span>
         <h3>{this.props.title}</h3>
-        <div style={{marginTop: 10}}>
+        <div className={style.topMargin}>
           <p>{this.props.description}</p>
         </div>
-        <div style={{marginTop: 10}}>
+        <div className={style.topMargin}>
           <Select placeholder={this.props.selectPlaceholder}
                   options={this._availableSelectOptions()}
-                  matchProp='value'
+                  matchProp="value"
                   value={this._activeSelection()}
                   onValueChange={this._onSelect}/>
         </div>
-        <div style={{marginTop: 10}}>
+        <div className={style.topMargin}>
           {this._getConfigurationComponent(this._activeSelection())}
         </div>
       </span>
     );
-  }
+  },
 });
 
 export default IndexMaintenanceStrategiesConfiguration;

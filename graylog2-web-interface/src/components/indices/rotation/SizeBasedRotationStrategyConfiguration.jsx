@@ -13,7 +13,7 @@ const SizeBasedRotationStrategyConfiguration = React.createClass({
   getInitialState() {
     return {
       max_size: this.props.config.max_size,
-    }
+    };
   },
 
   _onInputUpdate(field) {
@@ -34,12 +34,12 @@ const SizeBasedRotationStrategyConfiguration = React.createClass({
     return (
       <div>
         <fieldset>
-          <Input type='number'
-                 id='max-size'
-                 label='Max size per index (in bytes)'
+          <Input type="number"
+                 id="max-size"
+                 label="Max size per index (in bytes)"
                  onChange={this._onInputUpdate('max_size')}
                  value={this.state.max_size}
-                 help='Maximum size of an index before it gets rotated'
+                 help="Maximum size of an index before it gets rotated"
                  addonAfter={this._formatSize()}
                  autoFocus
                  required />

@@ -108,12 +108,12 @@ const IndicesConfigurationStore = Reflux.createStore({
     return (error) => {
       let errorMessage;
       try {
-        errorMessage = error.additional.body.message
+        errorMessage = error.additional.body.message;
       } catch (e) {
         errorMessage = error.message;
       }
       UserNotification.error(`${message}: ${errorMessage}`, title);
-    }
+    };
   },
 });
 

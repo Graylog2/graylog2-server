@@ -12,7 +12,7 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
   getInitialState() {
     return {
       rotation_period: this.props.config.rotation_period,
-    }
+    };
   },
 
   _onPeriodUpdate(field) {
@@ -55,12 +55,12 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
   render() {
     return (
       <div>
-        <Input type='text'
-               ref='rotation_period'
-               label='Rotation period (ISO8601 Duration)'
+        <Input type="text"
+               ref="rotation_period"
+               label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
                value={this.state.rotation_period}
-               help='How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'
+               help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                autofocus

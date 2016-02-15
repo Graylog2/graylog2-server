@@ -1,9 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Button, Input, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { Select } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -56,7 +55,7 @@ const IndicesConfiguration = React.createClass({
       newRotationConfig: {
         strategy: strategy,
         config: config,
-      }
+      },
     });
   },
 
@@ -65,7 +64,7 @@ const IndicesConfiguration = React.createClass({
       newRetentionConfig: {
         strategy: strategy,
         config: config,
-      }
+      },
     });
   },
 
@@ -88,9 +87,9 @@ const IndicesConfiguration = React.createClass({
 
     let rotationConfig;
     if (this.state.activeRotationConfig && this.state.rotationStrategies) {
-      rotationConfig = (<IndexMaintenanceStrategiesConfiguration title='Index Rotation Configuration'
-                                                                 description='Please select an index rotation strategy'
-                                                                 selectPlaceholder='Select rotation strategy'
+      rotationConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                                                 description="Please select an index rotation strategy"
+                                                                 selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                  strategies={this.state.rotationStrategies}
                                                                  activeConfig={this.state.activeRotationConfig}
@@ -101,9 +100,9 @@ const IndicesConfiguration = React.createClass({
 
     let retentionConfig;
     if (this.state.activeRetentionConfig && this.state.retentionStrategies) {
-      retentionConfig = (<IndexMaintenanceStrategiesConfiguration title='Index Retention Configuration'
-                                                                  description='Please select an index retention strategy'
-                                                                  selectPlaceholder='Select retention strategy'
+      retentionConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                                                  description="Please select an index retention strategy"
+                                                                  selectPlaceholder="Select retention strategy"
                                                                   pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                   strategies={this.state.retentionStrategies}
                                                                   activeConfig={this.state.activeRetentionConfig}
@@ -116,7 +115,7 @@ const IndicesConfiguration = React.createClass({
       <div>
         <h2>Settings</h2>
 
-        <div style={{marginTop: 10}}>
+        <div className={style.topMargin}>
           <Row>
             <Col md={6}>
               {rotationSummary}
@@ -125,12 +124,12 @@ const IndicesConfiguration = React.createClass({
               {retentionSummary}
             </Col>
           </Row>
-          <hr style={{marginBottom: '5', marginTop: '10'}}/>
-          <Button bsStyle='info' bsSize='xs' onClick={() => this._openModal()}>Update configuration</Button>{' '}
+          <hr className={style.separator}/>
+          <Button bsStyle="info" bsSize="xs" onClick={() => this._openModal()}>Update configuration</Button>{' '}
         </div>
 
-        <BootstrapModalForm ref='indicesConfigurationModal'
-                            title='Update Index Settings'
+        <BootstrapModalForm ref="indicesConfigurationModal"
+                            title="Update Index Settings"
                             onSubmitForm={this._saveConfiguration}
                             submitButtonText="Save">
           {rotationConfig}

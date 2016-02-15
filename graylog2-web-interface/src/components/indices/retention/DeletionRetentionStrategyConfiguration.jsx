@@ -11,7 +11,7 @@ const DeletionRetentionStrategyConfiguration = React.createClass({
   getInitialState() {
     return {
       max_number_of_indices: this.props.config.max_number_of_indices,
-    }
+    };
   },
 
   _onInputUpdate(field) {
@@ -28,9 +28,9 @@ const DeletionRetentionStrategyConfiguration = React.createClass({
     return (
       <div>
         <fieldset>
-          <Input type='number'
-                 id='max-number-of-indices'
-                 label='Max number of indices'
+          <Input type="number"
+                 id="max-number-of-indices"
+                 label="Max number of indices"
                  onChange={this._onInputUpdate('max_number_of_indices')}
                  value={this.state.max_number_of_indices}
                  help={<span>Maximum number of indices to keep before <strong>deleting</strong> the oldest ones</span>}

@@ -14,3 +14,12 @@
 :local(.deflistWide) dd {
     margin-left: 200px;
 }
+
+:local(.topMargin) {
+    margin-top: 10px;
+}
+
+hr:local(.separator) {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}

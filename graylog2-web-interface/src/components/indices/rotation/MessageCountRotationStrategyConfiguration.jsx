@@ -11,7 +11,7 @@ const MessageCountRotationStrategyConfiguration = React.createClass({
   getInitialState() {
     return {
       max_docs_per_index: this.props.config.max_docs_per_index,
-    }
+    };
   },
 
   _onInputUpdate(field) {
@@ -28,12 +28,12 @@ const MessageCountRotationStrategyConfiguration = React.createClass({
     return (
       <div>
         <fieldset>
-          <Input type='number'
-                 id='max-docs-per-index'
-                 label='Max documents per index'
+          <Input type="number"
+                 id="max-docs-per-index"
+                 label="Max documents per index"
                  onChange={this._onInputUpdate('max_docs_per_index')}
                  value={this.state.max_docs_per_index}
-                 help='Maximum number of documents in an index before it gets rotated'
+                 help="Maximum number of documents in an index before it gets rotated"
                  autoFocus
                  required />
         </fieldset>
