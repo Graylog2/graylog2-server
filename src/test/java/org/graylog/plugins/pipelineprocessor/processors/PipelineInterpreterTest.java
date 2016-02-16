@@ -24,7 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
 import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
-import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -85,7 +85,7 @@ public class PipelineInterpreterTest {
 
         final Map<String, Function<?>> functions = Maps.newHashMap();
         functions.put(CreateMessage.NAME, new CreateMessage());
-        functions.put(StringCoercion.NAME, new StringCoercion());
+        functions.put(StringConversion.NAME, new StringConversion());
 
         final PipelineRuleParser parser = setupParser(functions);
 

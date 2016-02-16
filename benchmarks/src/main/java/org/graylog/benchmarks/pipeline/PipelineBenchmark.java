@@ -43,7 +43,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
 import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
-import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -115,7 +115,7 @@ public class PipelineBenchmark {
                                       "title",
                                       "description",
                                       "rule \"add\"\n" +
-                                              "when string(message.`message`) == \"original message\"\n" +
+                                              "when tostring(message.`message`) == \"original message\"\n" +
                                               "then\n" +
                                               "  set_field(\"field\", \"derived message\");\n" +
                                               "end",
@@ -144,7 +144,7 @@ public class PipelineBenchmark {
 
             final Map<String, Function<?>> functions = Maps.newHashMap();
             functions.put(SetField.NAME, new SetField());
-            functions.put(StringCoercion.NAME, new StringCoercion());
+            functions.put(StringConversion.NAME, new StringConversion());
 
             final PipelineRuleParser parser = setupParser(functions);
 

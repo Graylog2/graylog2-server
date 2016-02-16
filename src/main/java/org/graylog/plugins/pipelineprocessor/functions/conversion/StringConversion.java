@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -23,23 +23,34 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class BooleanCoercion extends AbstractFunction<Boolean> {
-    public static final String NAME = "bool";
+public class StringConversion extends AbstractFunction<String> {
+
+    public static final String NAME = "tostring";
 
     private static final String VALUE = "value";
+    private static final String DEFAULT = "default";
 
     @Override
-    public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        return args.param(VALUE).evalRequired(args, context, Boolean.class);
+    public String evaluate(FunctionArgs args, EvaluationContext context) {
+        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
+        if (evaluated instanceof String) {
+            return (String) evaluated;
+        } else {
+            return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+        }
     }
 
     @Override
-    public FunctionDescriptor<Boolean> descriptor() {
-        return FunctionDescriptor.<Boolean>builder()
+    public FunctionDescriptor<String> descriptor() {
+        return FunctionDescriptor.<String>builder()
                 .name(NAME)
-                .returnType(Boolean.class)
-                .params(of(object(VALUE, Boolean.class).transform(o -> Boolean.parseBoolean(String.valueOf(o))).build()))
+                .returnType(String.class)
+                .params(of(
+                        object(VALUE).build(),
+                        string(DEFAULT).optional().build()
+                ))
                 .build();
     }
 }

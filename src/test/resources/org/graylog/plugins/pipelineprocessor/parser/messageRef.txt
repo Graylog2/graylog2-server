@@ -1,5 +1,5 @@
 rule "message field ref"
-when long(value: message.responseCode, default: 200) >= 500
+when tolong(value: message.responseCode, default: 200) >= 500
 then
     set_field(field: "response_category", value: "server_error");
 end

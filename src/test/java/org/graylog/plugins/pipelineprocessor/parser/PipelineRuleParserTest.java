@@ -29,8 +29,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
@@ -232,8 +232,8 @@ public class PipelineRuleParserTest extends BaseParserTest {
                         .build();
             }
         });
-        functions.put(LongCoercion.NAME, new LongCoercion());
-        functions.put(StringCoercion.NAME, new StringCoercion());
+        functions.put(LongConversion.NAME, new LongConversion());
+        functions.put(StringConversion.NAME, new StringConversion());
         functions.put(SetField.NAME, new SetField());
         functions.put(HasField.NAME, new HasField());
         functions.put(RegexMatch.NAME, new RegexMatch());

@@ -4,6 +4,10 @@ import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -27,10 +31,10 @@ public class ProcessorFunctionsModule extends PluginModule {
     @Override
     protected void configure() {
         // built-in functions
-        addMessageProcessorFunction(BooleanCoercion.NAME, BooleanCoercion.class);
-        addMessageProcessorFunction(DoubleCoercion.NAME, DoubleCoercion.class);
-        addMessageProcessorFunction(LongCoercion.NAME, LongCoercion.class);
-        addMessageProcessorFunction(StringCoercion.NAME, StringCoercion.class);
+        addMessageProcessorFunction(BooleanConversion.NAME, BooleanConversion.class);
+        addMessageProcessorFunction(DoubleConversion.NAME, DoubleConversion.class);
+        addMessageProcessorFunction(LongConversion.NAME, LongConversion.class);
+        addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
 
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);

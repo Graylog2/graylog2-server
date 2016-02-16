@@ -20,6 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -53,10 +57,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
 
-        functions.put(BooleanCoercion.NAME, new BooleanCoercion());
-        functions.put(DoubleCoercion.NAME, new DoubleCoercion());
-        functions.put(LongCoercion.NAME, new LongCoercion());
-        functions.put(StringCoercion.NAME, new StringCoercion());
+        functions.put(BooleanConversion.NAME, new BooleanConversion());
+        functions.put(DoubleConversion.NAME, new DoubleConversion());
+        functions.put(LongConversion.NAME, new LongConversion());
+        functions.put(StringConversion.NAME, new StringConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());

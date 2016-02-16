@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
+import com.google.common.primitives.Doubles;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -23,33 +24,35 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
-import static com.google.common.primitives.Longs.tryParse;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-public class LongCoercion extends AbstractFunction<Long> {
+public class DoubleConversion extends AbstractFunction<Double> {
 
-    public static final String NAME = "long";
+    public static final String NAME = "todouble";
 
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";
 
     @Override
-    public Long evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.param(VALUE).eval(args, context, Object.class).orElse(new Object());
-        final Long defaultValue = args.param(DEFAULT).eval(args, context, Long.class).orElse(0L);
-
-        return firstNonNull(tryParse(evaluated.toString()), defaultValue);
+    public Double evaluate(FunctionArgs args, EvaluationContext context) {
+        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
+        final Double defaultValue = args.param(DEFAULT).eval(args, context, Double.class).orElse(0d);
+        if (evaluated == null) {
+            return defaultValue;
+        }
+        return firstNonNull(Doubles.tryParse(evaluated.toString()),
+                            defaultValue);
     }
 
     @Override
-    public FunctionDescriptor<Long> descriptor() {
-        return FunctionDescriptor.<Long>builder()
+    public FunctionDescriptor<Double> descriptor() {
+        return FunctionDescriptor.<Double>builder()
                 .name(NAME)
-                .returnType(Long.class)
+                .returnType(Double.class)
                 .params(of(
                         object(VALUE).build(),
-                        integer(DEFAULT).optional().build()
+                        param().optional().name(DEFAULT).type(Double.class).build()
                 ))
                 .build();
     }
