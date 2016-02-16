@@ -16,6 +16,7 @@ import { PageHeader, Spinner } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
+import IndicesConfiguration from 'components/indices/IndicesConfiguration';
 
 const IndicesPage = React.createClass({
   mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore),
@@ -63,6 +64,12 @@ const IndicesPage = React.createClass({
 
           <IndicesMaintenanceDropdown />
         </PageHeader>
+
+        <Row className="content">
+          <Col md={12}>
+            <IndicesConfiguration />
+          </Col>
+        </Row>
 
         <Row className="content">
           <Col md={12}>
