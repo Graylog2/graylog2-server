@@ -338,6 +338,9 @@ public class PipelineRuleParser {
                             i++;
                         }
                     }
+                } else if(! params.stream().allMatch(ParameterDescriptor::optional)) {
+                    // no parameters given but some of them are required
+                    parseContext.addError(new WrongNumberOfArgs(ctx, function, 0));
                 }
             }
 

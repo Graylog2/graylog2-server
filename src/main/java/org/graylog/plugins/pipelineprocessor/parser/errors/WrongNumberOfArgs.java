@@ -18,7 +18,10 @@ package org.graylog.plugins.pipelineprocessor.parser.errors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.parser.RuleLangParser;
+
+import java.util.function.Predicate;
 
 public class WrongNumberOfArgs extends ParseError {
     private final Function<?> function;
@@ -35,7 +38,8 @@ public class WrongNumberOfArgs extends ParseError {
     @JsonProperty("reason")
     @Override
     public String toString() {
-        return "Expected " + function.descriptor().params().size() +
+        final Predicate<ParameterDescriptor> optional = ParameterDescriptor::optional;
+        return "Expected " + function.descriptor().params().stream().filter(optional.negate()).count() +
                 " arguments but found " + argCount +
                 " in call to function " + function.descriptor().name()
                 + positionString();
