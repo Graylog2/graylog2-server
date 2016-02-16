@@ -24,10 +24,12 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
@@ -65,6 +67,7 @@ public class ClusterConfigResource extends RestResource {
     @GET
     @ApiOperation(value = "List all configuration classes")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public ClusterConfigList list() {
         final Set<Class<?>> classes = clusterConfigService.list();
 
@@ -75,6 +78,7 @@ public class ClusterConfigResource extends RestResource {
     @Path("{configClass}")
     @ApiOperation(value = "Get configuration settings from database")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public Object read(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
@@ -90,6 +94,7 @@ public class ClusterConfigResource extends RestResource {
     @Path("{configClass}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update configuration in database")
+    @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     public Response update(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                            @PathParam("configClass") @NotBlank String configClass,
                            @ApiParam(name = "body", value = "The payload of the cluster configuration", required = true)
@@ -109,6 +114,7 @@ public class ClusterConfigResource extends RestResource {
     @Path("{configClass}")
     @ApiOperation(value = "Delete configuration settings from database")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_DELETE)
     public void delete(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
@@ -124,6 +130,7 @@ public class ClusterConfigResource extends RestResource {
     @Produces(MoreMediaTypes.APPLICATION_SCHEMA_JSON)
     @ApiOperation(value = "Get JSON schema of configuration class")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public JsonSchema schema(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                              @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);
