@@ -16,6 +16,9 @@
  */
 package org.graylog2.database;
 
+import com.github.zafarkhaja.semver.Version;
+import com.mongodb.BasicDBList;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -27,6 +30,7 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -39,6 +43,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class MongoConnectionImpl implements MongoConnection {
     private static final Logger LOG = LoggerFactory.getLogger(MongoConnectionImpl.class);
+    private static final Version MINIMUM_MONGODB_VERSION = Version.forIntegers(2, 4);
 
     private final MongoClientURI mongoClientURI;
 
@@ -81,7 +86,33 @@ public class MongoConnectionImpl implements MongoConnection {
             }
         }
 
+        final Version mongoVersion = getMongoVersion(m.getDB("admin"));
+        if (mongoVersion != null && mongoVersion.lessThan(MINIMUM_MONGODB_VERSION)) {
+            LOG.warn("You're running MongoDB {} but Graylog requires at least MongoDB {}. Please upgrade.",
+                    mongoVersion, MINIMUM_MONGODB_VERSION);
+        }
+
         return m;
+    }
+
+    @Nullable
+    private Version getMongoVersion(DB adminDb) {
+        final CommandResult buildInfoResult = adminDb.command("buildInfo");
+        if (buildInfoResult.ok()) {
+            final BasicDBList versionArray = (BasicDBList) buildInfoResult.get("versionArray");
+            if (versionArray == null || versionArray.size() < 3) {
+                LOG.debug("Couldn't retrieve MongoDB version");
+                return null;
+            }
+
+            final int majorVersion = (int) versionArray.get(0);
+            final int minorVersion = (int) versionArray.get(1);
+            final int patchVersion = (int) versionArray.get(2);
+            return Version.forIntegers(majorVersion, minorVersion, patchVersion);
+        } else {
+            LOG.debug("Couldn't retrieve MongoDB buildInfo: {}", buildInfoResult.getErrorMessage());
+            return null;
+        }
     }
 
     /**
