@@ -339,6 +339,52 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.count()).isEqualTo(0L);
     }
 
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void listReturnsAllClasses() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", AnotherCustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+
+        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(clusterConfigService.list())
+                .hasSize(2)
+                .containsOnly(CustomConfig.class, AnotherCustomConfig.class);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void listIgnoresInvalidClasses() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", "invalid.ClassName")
+                .add("payload", Collections.emptyMap())
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+
+        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(clusterConfigService.list())
+                .hasSize(1)
+                .containsOnly(CustomConfig.class);
+    }
+
     public static class ClusterConfigChangedEventHandler {
         public volatile ClusterConfigChangedEvent event;
 
