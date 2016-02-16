@@ -16,22 +16,15 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-public abstract class DashboardWidget implements EmbeddedPersistable {
+public class DashboardWidget implements EmbeddedPersistable {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_DESCRIPTION = "description";
@@ -49,7 +42,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         STACKED_CHART
     }
 
-    private final MetricRegistry metricRegistry;
     private final Type type;
     private final String id;
     private final TimeRange timeRange;
@@ -57,10 +49,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     private final String creatorUserId;
     private int cacheTime;
     private String description;
-    private Supplier<ComputationResult> cachedResult;
 
-    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
-        this.metricRegistry = metricRegistry;
+    protected DashboardWidget(Type type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
         this.type = type;
         this.id = id;
         this.timeRange = timeRange;
@@ -68,7 +58,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         this.creatorUserId = creatorUserId;
         this.description = description;
         this.cacheTime = cacheTime.getCacheTime();
-        this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
     }
 
     public Type getType() {
@@ -89,7 +78,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     public void setCacheTime(int cacheTime) {
         this.cacheTime = cacheTime;
-        this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
     }
 
     public int getCacheTime() {
@@ -120,23 +108,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
                 .build();
     }
 
-    public ComputationResult getComputationResult() throws ExecutionException {
-        return cachedResult.get();
-    }
-
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.of("timerange", this.getTimeRange().getPersistedConfig());
-    }
-
-    protected abstract ComputationResult compute();
-
-
-    private Timer getCalculationTimer() {
-        return metricRegistry.timer(MetricRegistry.name(this.getClass(), getId(), "calculationTime"));
-    }
-
-    private Meter getCalculationMeter() {
-        return metricRegistry.meter(MetricRegistry.name(this.getClass(), getId(), "calculations"));
     }
 
     public static class NoSuchWidgetTypeException extends Exception {
@@ -146,17 +119,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         public NoSuchWidgetTypeException(String msg) {
             super(msg);
-        }
-    }
-
-    private class ComputationResultSupplier implements Supplier<ComputationResult> {
-        @Override
-        public ComputationResult get() {
-            try (Timer.Context timer = getCalculationTimer().time()) {
-                return compute();
-            } finally {
-                getCalculationMeter().mark();
-            }
         }
     }
 }

@@ -28,7 +28,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.joda.time.DateTime;

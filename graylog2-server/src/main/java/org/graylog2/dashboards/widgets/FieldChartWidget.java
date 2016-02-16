@@ -16,11 +16,11 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +39,14 @@ public class FieldChartWidget extends ChartWidget {
     private final String renderer;
     private final String interpolation;
     private final Searches searches;
+    private final TimeRange timeRange;
+    private final String widgetId;
 
-    public FieldChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(metricRegistry, Type.FIELD_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
+    public FieldChartWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange, String widgetId) throws InvalidWidgetConfigurationException {
+        super(config);
         this.searches = searches;
+        this.timeRange = timeRange;
+        this.widgetId = widgetId;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -74,7 +78,7 @@ public class FieldChartWidget extends ChartWidget {
     }
 
     @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
@@ -86,12 +90,12 @@ public class FieldChartWidget extends ChartWidget {
                     field,
                     Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
                     filter,
-                    this.getTimeRange(),
+                    this.timeRange,
                     "cardinality".equalsIgnoreCase(statisticalFunction));
 
             return new ComputationResult(histogramResult.getResults(), histogramResult.took().millis(), histogramResult.getHistogramBoundaries());
         } catch (Searches.FieldTypeException e) {
-            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Not a numeric field? The field was [" + field + "]";
+            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + this.widgetId + ">. Not a numeric field? The field was [" + field + "]";
             LOG.error(msg, e);
             throw new RuntimeException(msg, e);
         }

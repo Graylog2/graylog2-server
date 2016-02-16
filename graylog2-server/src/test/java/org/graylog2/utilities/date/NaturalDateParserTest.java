@@ -16,6 +16,7 @@
  */
 package org.graylog2.utilities.date;
 
+import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

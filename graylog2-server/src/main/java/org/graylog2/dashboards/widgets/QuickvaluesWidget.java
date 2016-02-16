@@ -16,12 +16,13 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class QuickvaluesWidget extends DashboardWidget {
+public class QuickvaluesWidget implements WidgetStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
 
@@ -40,13 +41,14 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     private final String field;
     private final Searches searches;
+    private final TimeRange timeRange;
 
     private final Boolean showPieChart;
     private final Boolean showDataTable;
 
-    public QuickvaluesWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(metricRegistry, Type.QUICKVALUES, id, timeRange, description, cacheTime, config, creatorUserId);
+    public QuickvaluesWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange) throws InvalidWidgetConfigurationException {
         this.searches = searches;
+        this.timeRange = timeRange;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -65,10 +67,9 @@ public class QuickvaluesWidget extends DashboardWidget {
         return query;
     }
 
-    @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
+                .putAll(ImmutableMap.of("timerange", this.timeRange.getPersistedConfig()))
                 .put("query", query)
                 .put("field", field)
                 .put("show_pie_chart", showPieChart)
@@ -82,13 +83,13 @@ public class QuickvaluesWidget extends DashboardWidget {
     }
 
     @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
-        final TermsResult terms = searches.terms(field, 50, query, filter, this.getTimeRange());
+        final TermsResult terms = searches.terms(field, 50, query, filter, this.timeRange);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("terms", terms.getTerms());

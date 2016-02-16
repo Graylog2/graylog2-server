@@ -17,11 +17,10 @@
 
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Searches.DateHistogramInterval;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -29,15 +28,13 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public abstract class ChartWidget extends DashboardWidget {
+public abstract class ChartWidget implements WidgetStrategy {
 
     @Nullable
     protected final String streamId;
     protected final DateHistogramInterval interval;
 
-    protected ChartWidget(MetricRegistry metricRegistry, Type type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
-        super(metricRegistry, type, id, timeRange, description, cacheTime, config, creatorUserId);
-
+    protected ChartWidget(Map<String, Object> config) {
         this.streamId = (String) config.get("stream_id");
 
         if (config.containsKey("interval")) {
@@ -47,10 +44,8 @@ public abstract class ChartWidget extends DashboardWidget {
         }
     }
 
-    @Override
     public Map<String, Object> getPersistedConfig() {
         final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
                 .put("interval", interval.toString().toLowerCase(Locale.ENGLISH));
 
         if (!isNullOrEmpty(streamId)) {

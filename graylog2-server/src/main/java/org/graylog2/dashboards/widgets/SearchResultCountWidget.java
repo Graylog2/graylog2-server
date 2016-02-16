@@ -16,35 +16,33 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.Map;
 
-public class SearchResultCountWidget extends DashboardWidget {
+public class SearchResultCountWidget implements WidgetStrategy {
 
     protected final Searches searches;
     protected final String query;
+    protected final TimeRange timeRange;
     protected final Boolean trend;
     protected final Boolean lowerIsBetter;
 
-    public SearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        this(metricRegistry, Type.SEARCH_RESULT_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
-    }
-
-    protected SearchResultCountWidget(MetricRegistry metricRegistry, Type type, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, type, id, timeRange, description, cacheTime, config, creatorUserId);
+    protected SearchResultCountWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange) {
         this.searches = searches;
 
         this.query = query;
+        this.timeRange = timeRange;
         this.trend = config.get("trend") != null && Boolean.parseBoolean(String.valueOf(config.get("trend")));
         this.lowerIsBetter = config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(config.get("lower_is_better")));
     }
@@ -53,10 +51,9 @@ public class SearchResultCountWidget extends DashboardWidget {
         return searches;
     }
 
-    @Override
     public Map<String, Object> getPersistedConfig() {
         return ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
+                .putAll(ImmutableMap.of("timerange", this.timeRange.getPersistedConfig()))
                 .put("query", query)
                 .put("trend", trend)
                 .put("lower_is_better", lowerIsBetter)
@@ -64,12 +61,12 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         return computeInternal(null);
     }
 
     protected ComputationResult computeInternal(String filter) {
-        final TimeRange timeRange = this.getTimeRange();
+        final TimeRange timeRange = this.timeRange;
         CountResult cr = searches.count(query, timeRange, filter);
         if (trend && timeRange instanceof RelativeRange) {
             DateTime toPrevious = timeRange.getFrom();

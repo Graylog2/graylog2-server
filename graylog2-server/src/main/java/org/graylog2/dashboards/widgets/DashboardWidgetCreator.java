@@ -20,11 +20,11 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.MetricRegistry;
 import com.mongodb.BasicDBObject;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
@@ -164,72 +164,6 @@ public class DashboardWidgetCreator {
             final String creatorUserId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
 
         final WidgetCacheTime cacheTime = cacheTimeFactory.create(requestedCacheTime);
-
-        switch (type) {
-            case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case FIELD_CHART:
-                return new FieldChartWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case QUICKVALUES:
-                return new QuickvaluesWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case STATS_COUNT:
-                return new StatisticalCountWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        query,
-                        timeRange,
-                        creatorUserId);
-            case STACKED_CHART:
-                return new StackedChartWidget(metricRegistry, searches,
-                        widgetId,
-                        description,
-                        cacheTime,
-                        config,
-                        timeRange,
-                        creatorUserId);
-            default:
-                throw new DashboardWidget.NoSuchWidgetTypeException();
-        }
+        return new DashboardWidget(type, widgetId, timeRange, description, cacheTimeFactory.create(requestedCacheTime), config, creatorUserId);
     }
 }

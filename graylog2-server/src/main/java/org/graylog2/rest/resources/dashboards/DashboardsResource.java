@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.dashboards;
 
-import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -32,10 +31,11 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
+import org.graylog2.dashboards.widgets.WidgetResultCache;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.dashboards.responses.WidgetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -46,7 +46,6 @@ import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.rest.models.dashboards.responses.DashboardList;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.security.RestrictToMaster;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -82,16 +81,19 @@ public class DashboardsResource extends RestResource {
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private ActivityWriter activityWriter;
     private final Searches searches;
+    private final WidgetResultCache widgetResultCache;
 
     @Inject
     public DashboardsResource(DashboardService dashboardService,
                               DashboardWidgetCreator dashboardWidgetCreator,
                               ActivityWriter activityWriter,
-                              Searches searches) {
+                              Searches searches,
+                              WidgetResultCache widgetResultCache) {
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.activityWriter = activityWriter;
         this.searches = searches;
+        this.widgetResultCache = widgetResultCache;
     }
 
     @POST
@@ -322,7 +324,7 @@ public class DashboardsResource extends RestResource {
     public Map<String, Object> widgetValue(@ApiParam(name = "dashboardId", required = true)
                                            @PathParam("dashboardId") String dashboardId,
                                            @ApiParam(name = "widgetId", required = true)
-                                           @PathParam("widgetId") String widgetId) throws NotFoundException {
+                                           @PathParam("widgetId") String widgetId) throws NotFoundException, InvalidWidgetConfigurationException {
         checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);
@@ -333,12 +335,7 @@ public class DashboardsResource extends RestResource {
             throw new javax.ws.rs.NotFoundException();
         }
 
-        try {
-            return widget.getComputationResult().asMap();
-        } catch (ExecutionException e) {
-            LOG.error("Error while computing dashboard.", e);
-            throw new WebApplicationException(e, Response.Status.GATEWAY_TIMEOUT);
-        }
+        return widgetResultCache.getComputationResultForDashboardWidget(widget).asMap();
     }
 
     @PUT

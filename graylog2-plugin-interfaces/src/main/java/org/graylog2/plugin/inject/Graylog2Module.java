@@ -30,6 +30,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -253,6 +254,17 @@ public abstract class Graylog2Module extends AbstractModule {
         }
 
         installOutput(outputMapBinder, target, factoryClass);
+    }
+
+    protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyMapBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>(){});
+    }
+
+    protected <T extends WidgetStrategy.Factory> void installWidgetStrategy(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
+                                                                            Class<? extends WidgetStrategy> target,
+                                                                            Class<? extends WidgetStrategy.Factory<? extends WidgetStrategy>> targetFactory) {
+        install(new FactoryModuleBuilder().implement(WidgetStrategy.class, target).build(targetFactory));
+        widgetStrategyBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 
     @Nonnull

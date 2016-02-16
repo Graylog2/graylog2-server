@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.searches.timeranges;
+package org.graylog2.plugin.indexer.searches.timeranges;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.utilities.date.NaturalDateParser;
+import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
 
 import java.util.Map;

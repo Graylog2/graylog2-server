@@ -27,6 +27,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -143,5 +144,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addMessageProcessor(Class<? extends MessageProcessor> processorClass) {
         processorBinder().addBinding().to(processorClass);
+    }
+
+    protected <T extends WidgetStrategy> void addWidgetStrategy(Class<T> widgetStrategyClass, Class<? extends WidgetStrategy.Factory<T>> factory) {
+        installWidgetStrategy(widgetStrategyMapBinder(), widgetStrategyClass, factory);
     }
 }

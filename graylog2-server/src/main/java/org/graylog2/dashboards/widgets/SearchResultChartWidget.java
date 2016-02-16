@@ -16,11 +16,11 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Map;
 
@@ -30,10 +30,12 @@ public class SearchResultChartWidget extends ChartWidget {
 
     private final String query;
     private final Searches searches;
+    private final TimeRange timeRange;
 
-    public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
+    public SearchResultChartWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange) {
+        super(config);
         this.searches = searches;
+        this.timeRange = timeRange;
         this.query = getNonEmptyQuery(query);
     }
 
@@ -59,13 +61,13 @@ public class SearchResultChartWidget extends ChartWidget {
     }
 
     @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
-        HistogramResult histogram = searches.histogram(query, interval, filter, this.getTimeRange());
+        HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
         return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
     }
 }

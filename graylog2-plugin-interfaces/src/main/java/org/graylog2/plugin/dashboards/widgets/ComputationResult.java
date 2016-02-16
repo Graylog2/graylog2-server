@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.plugin.dashboards.widgets;
 
 import com.google.common.collect.Maps;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
