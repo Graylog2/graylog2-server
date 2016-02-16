@@ -107,6 +107,7 @@
         <restassured.version>2.8.0</restassured.version>
         <elasticsearch.version>2.2.0</elasticsearch.version>
         <retrofit.version>2.0.0-beta4</retrofit.version>
+        <forbiddenapis.version>2.0</forbiddenapis.version>
     </properties>
 
     <repositories>
@@ -976,7 +977,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>2.0</version>
+                    <version>${forbiddenapis.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1248,6 +1249,7 @@
                     <plugin>
                         <groupId>de.thetaphi</groupId>
                         <artifactId>forbiddenapis</artifactId>
+                        <version>${forbiddenapis.version}</version>
                         <configuration>
                             <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                             <internalRuntimeForbidden>true</internalRuntimeForbidden>
@@ -1337,6 +1339,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire.version}</version>
                         <configuration>
                             <forkCount>2</forkCount>
                         </configuration>
