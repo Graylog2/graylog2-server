@@ -24,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConvers
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
+import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -41,17 +43,24 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
+
+    public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
 
     @BeforeClass
     public static void registerFunctions() {
@@ -92,6 +101,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
+
+        functions.put(Now.NAME, new Now());
+        functions.put(ParseDate.NAME, new ParseDate());
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -150,5 +162,31 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void dates() {
+        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        try {
+            final Rule rule;
+            try {
+                rule = parser.parseRule(ruleForTest());
+            } catch (ParseException e) {
+                fail("Should not fail to parse", e);
+                return;
+            }
+            final Message message = evaluateRule(rule);
+
+            assertThat(actionsTriggered.get()).isTrue();
+            assertThat(message).isNotNull();
+            assertThat(message).isNotEmpty();
+            assertThat(message.hasField("year")).isTrue();
+            assertThat(message.getField("year")).isEqualTo(2010);
+            assertThat(message.getField("timezone")).isEqualTo("UTC");
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
     }
 }
