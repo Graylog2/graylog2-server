@@ -1,6 +1,7 @@
 import React from 'react';
 
 import moment from 'moment';
+import {} from 'moment-duration-format';
 import style from '!style!css!../IndicesConfiguration.css';
 
 const TimeBasedRotationStrategySummary = React.createClass({
