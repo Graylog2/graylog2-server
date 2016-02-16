@@ -291,7 +291,7 @@ public class ClusterConfigServiceImplTest {
 
     @Test
     public void prepareCollectionCreatesIndexesOnExistingCollection() throws Exception {
-        DBCollection original = mongoConnection.getDatabase().createCollection(COLLECTION_NAME, null);
+        DBCollection original = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         original.dropIndexes();
         assertThat(original.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
@@ -299,7 +299,7 @@ public class ClusterConfigServiceImplTest {
         DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test

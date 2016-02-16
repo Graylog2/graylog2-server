@@ -79,7 +79,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     static DBCollection prepareCollection(final MongoConnection mongoConnection) {
         DBCollection coll = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         coll.createIndex(DBSort.asc("type"), "unique_type", true);
-        coll.setWriteConcern(WriteConcern.FSYNCED);
+        coll.setWriteConcern(WriteConcern.JOURNALED);
 
         return coll;
     }
@@ -125,7 +125,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         String canonicalClassName = AutoValueUtils.getCanonicalName(payload.getClass());
         ClusterConfig clusterConfig = ClusterConfig.create(canonicalClassName, payload, nodeId.toString());
 
-        dbCollection.update(DBQuery.is("type", canonicalClassName), clusterConfig, true, false, WriteConcern.FSYNCED);
+        dbCollection.update(DBQuery.is("type", canonicalClassName), clusterConfig, true, false, WriteConcern.JOURNALED);
 
         ClusterConfigChangedEvent event = ClusterConfigChangedEvent.create(
                 DateTime.now(DateTimeZone.UTC), nodeId.toString(), canonicalClassName);
