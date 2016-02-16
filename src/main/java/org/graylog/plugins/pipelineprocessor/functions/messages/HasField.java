@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import java.util.Optional;
-
-public class HasField implements Function<Boolean> {
+public class HasField extends AbstractFunction<Boolean> {
 
     public static final String NAME = "has_field";
+    public static final String FIELD = "field";
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<String> field = args.evaluated("field", context, String.class);
-        return context.currentMessage().hasField(field.orElse(null));
+        final String field = args.param(FIELD).evalRequired(args, context, String.class);
+        return context.currentMessage().hasField(field);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class HasField implements Function<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(ImmutableList.of(ParameterDescriptor.string("field")))
+                .params(ImmutableList.of(ParameterDescriptor.string(FIELD).build()))
                 .build();
     }
 }

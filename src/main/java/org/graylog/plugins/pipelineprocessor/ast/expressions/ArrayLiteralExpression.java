@@ -22,16 +22,16 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArrayExpression implements Expression {
+public class ArrayLiteralExpression implements Expression {
     private final List<Expression> elements;
 
-    public ArrayExpression(List<Expression> elements) {
+    public ArrayLiteralExpression(List<Expression> elements) {
         this.elements = elements;
     }
 
     @Override
     public boolean isConstant() {
-        return false;
+        return elements.stream().allMatch(Expression::isConstant);
     }
 
     @Override

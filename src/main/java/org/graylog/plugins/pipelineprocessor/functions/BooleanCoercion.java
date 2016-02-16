@@ -17,22 +17,21 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class BooleanCoercion implements Function<Boolean> {
+public class BooleanCoercion extends AbstractFunction<Boolean> {
     public static final String NAME = "bool";
 
     private static final String VALUE = "value";
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse("false");
-        return Boolean.parseBoolean(evaluated.toString());
+        return args.param(VALUE).evalRequired(args, context, Boolean.class);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class BooleanCoercion implements Function<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(of(object(VALUE)))
+                .params(of(object(VALUE, Boolean.class).transform(o -> Boolean.parseBoolean(String.valueOf(o))).build()))
                 .build();
     }
 }

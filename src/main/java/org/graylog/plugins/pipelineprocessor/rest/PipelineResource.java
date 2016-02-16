@@ -47,7 +47,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
-@Api(value = "Pipeline Pipelines", description = "Pipelines for the pipeline message processor")
+@Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor")
 @Path("/system/pipelines")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -74,7 +74,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/pipeline")
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         try {
-            pipelineRuleParser.parsePipeline(pipelineSource.source());
+            pipelineRuleParser.parsePipeline(pipelineSource);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
@@ -96,7 +96,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/pipeline/parse")
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         try {
-            pipelineRuleParser.parsePipeline(pipelineSource.source());
+            pipelineRuleParser.parsePipeline(pipelineSource);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
@@ -130,7 +130,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                              @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         final PipelineSource pipelineSource = pipelineSourceService.load(id);
         try {
-            pipelineRuleParser.parsePipeline(update.source());
+            pipelineRuleParser.parsePipeline(update);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }

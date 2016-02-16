@@ -16,15 +16,37 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageCollection;
+import org.graylog2.plugin.Messages;
+import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.Map;
 
 public class EvaluationContext {
 
+    private static final EvaluationContext EMPTY_CONTEXT = new EvaluationContext() {
+        @Override
+        public void addCreatedMessage(Message newMessage) {
+            // cannot add messages to empty context
+        }
+
+        @Override
+        public void define(String identifier, Class type, Object value) {
+            // cannot define any variables in empty context
+        }
+    };
+
     private final Message message;
     private Map<String, TypedValue> ruleVars;
+    private List<Message> createdMessages = Lists.newArrayList();
+
+    private EvaluationContext() {
+        this(new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"))); // first Graylog release
+    }
 
     public EvaluationContext(Message message) {
         this.message = message;
@@ -41,6 +63,22 @@ public class EvaluationContext {
 
     public TypedValue get(String identifier) {
         return ruleVars.get(identifier);
+    }
+
+    public Messages createdMessages() {
+        return new MessageCollection(createdMessages);
+    }
+
+    public void addCreatedMessage(Message newMessage) {
+        createdMessages.add(newMessage);
+    }
+
+    public void clearCreatedMessages() {
+        createdMessages.clear();
+    }
+
+    public static EvaluationContext emptyContext() {
+        return EMPTY_CONTEXT;
     }
 
     public class TypedValue {

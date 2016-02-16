@@ -44,7 +44,11 @@ public class FieldAccessExpression implements Expression {
         final Object bean = this.object.evaluate(context);
         final String fieldName = field.evaluate(context).toString();
         try {
-            final Object property = PropertyUtils.getProperty(bean, fieldName);
+            Object property = PropertyUtils.getProperty(bean, fieldName);
+            if (property == null) {
+                // in case the bean is a Map, try again with a simple property, it might be masked by the Map
+                property = PropertyUtils.getSimpleProperty(bean, fieldName);
+            }
             log.debug("[field access] property {} of bean {}: {}", fieldName, bean.getClass().getTypeName(), property);
             return property;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {

@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import PipelineStreamComponent from 'PipelineStreamComponent';
 
 import PipelinesActions from 'PipelinesActions';
 import PipelinesStore from 'PipelinesStore';
@@ -17,30 +17,37 @@ import RulesComponent from 'RulesComponent';
 
 
 const PipelinesPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(PipelinesStore), Reflux.connect(RulesStore)],
-
+  mixins: [
+    Reflux.connect(PipelinesStore),
+    Reflux.connect(RulesStore),
+  ],
+  contextTypes: {
+    storeProvider: React.PropTypes.object,
+  },
   getInitialState() {
     return {
       pipelines: undefined,
       rules: undefined,
+      streams: undefined,
+      assignments: [],
     }
   },
 
   componentDidMount() {
     PipelinesActions.list();
     RulesActions.list();
-  },
 
-  loadData() {
-    PipelinesActions.list();
+    var store = this.context.storeProvider.getStore('Streams');
+    store.listStreams().then((streams) => this.setState({streams: streams}));
   },
 
   render() {
     let content;
-    if (!this.state.pipelines || !this.state.rules) {
+    if (!this.state.pipelines || !this.state.rules || !this.state.streams) {
       content = <Spinner />;
     } else {
       content = [
+        <PipelineStreamComponent key="assignments" pipelines={this.state.pipelines} streams={this.state.streams} assignments={this.state.assignments}/>,
         <PipelinesComponent key="pipelines" pipelines={this.state.pipelines} />,
         <RulesComponent key="rules" rules={this.state.rules} />
       ];

@@ -21,14 +21,30 @@ import com.google.auto.value.AutoValue;
 import java.util.List;
 
 @AutoValue
-public abstract class Stage {
+public abstract class Stage implements Comparable<Stage> {
+    private List<Rule> rules;
 
     public abstract int stage();
     public abstract boolean matchAll();
     public abstract List<String> ruleReferences();
 
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
     public static Builder builder() {
         return new AutoValue_Stage.Builder();
+    }
+
+    public abstract Builder toBuilder();
+
+    @Override
+    public int compareTo(@SuppressWarnings("NullableProblems") Stage other) {
+        return Integer.compare(stage(), other.stage());
     }
 
     @AutoValue.Builder

@@ -14,32 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.functions;
+package org.graylog.plugins.pipelineprocessor.functions.messages;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Strings;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
-import org.graylog2.plugin.Message;
 
-import java.util.Optional;
+import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+public class SetField extends AbstractFunction<Void> {
 
-public class DropMessage implements Function<Void> {
-
-    public static final String NAME = "drop_message";
+    public static final String NAME = "set_field";
+    public static final String FIELD = "field";
+    public static final String VALUE = "value";
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<Message> message;
-        if (args.isPresent("message")) {
-            message = args.evaluated("message", context, Message.class);
-        } else {
-            message = Optional.of(context.currentMessage());
+        final String field = args.param(FIELD).evalRequired(args, context, String.class);
+        final Object value = args.param(VALUE).evalRequired(args, context, Object.class);
+
+        if (!Strings.isNullOrEmpty(field)) {
+            context.currentMessage().addField(field, value);
         }
-        message.get().setFilterOut(true);
         return null;
     }
 
@@ -47,11 +47,9 @@ public class DropMessage implements Function<Void> {
     public FunctionDescriptor<Void> descriptor() {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
-                .pure(true)
                 .returnType(Void.class)
-                .params(ImmutableList.of(
-                        param().type(Message.class).optional().name("message").build()
-                ))
+                .params(of(string(FIELD).build(),
+                           object(VALUE).build()))
                 .build();
     }
 }

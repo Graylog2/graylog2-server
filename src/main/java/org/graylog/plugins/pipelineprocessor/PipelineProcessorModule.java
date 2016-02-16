@@ -22,14 +22,28 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.BooleanCoercion;
 import org.graylog.plugins.pipelineprocessor.functions.DoubleCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.DropMessage;
-import org.graylog.plugins.pipelineprocessor.functions.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.LongCoercion;
-import org.graylog.plugins.pipelineprocessor.functions.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.StringCoercion;
-import org.graylog.plugins.pipelineprocessor.processors.NaiveRuleProcessor;
+import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
+import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
+import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -46,9 +60,11 @@ public class PipelineProcessorModule extends PluginModule {
 
     @Override
     protected void configure() {
-        addMessageProcessor(NaiveRuleProcessor.class);
+        //addMessageProcessor(NaiveRuleProcessor.class);
+        addMessageProcessor(PipelineInterpreter.class);
         addRestResource(RuleResource.class);
         addRestResource(PipelineResource.class);
+        addRestResource(PipelineStreamResource.class);
 
         // built-in functions
         addMessageProcessorFunction(BooleanCoercion.NAME, BooleanCoercion.class);
@@ -56,10 +72,34 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessorFunction(LongCoercion.NAME, LongCoercion.class);
         addMessageProcessorFunction(StringCoercion.NAME, StringCoercion.class);
 
+        // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);
         addMessageProcessorFunction(SetField.NAME, SetField.class);
+        addMessageProcessorFunction(SetFields.NAME, SetFields.class);
+        addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
+
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
+        addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
+        addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
+
+        // input related functions
         addMessageProcessorFunction(FromInput.NAME, FromInput.class);
+
+        // generic functions
+        addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
+
+        // string functions
+        addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);
+        addMessageProcessorFunction(Capitalize.NAME, Capitalize.class);
+        addMessageProcessorFunction(Lowercase.NAME, Lowercase.class);
+        addMessageProcessorFunction(SwapCase.NAME, SwapCase.class);
+        addMessageProcessorFunction(Uncapitalize.NAME, Uncapitalize.class);
+        addMessageProcessorFunction(Uppercase.NAME, Uppercase.class);
+
+        // json
+        addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
+        addMessageProcessorFunction(SelectJsonPath.NAME, SelectJsonPath.class);
+
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

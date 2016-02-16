@@ -17,17 +17,17 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
 import static com.google.common.primitives.Longs.tryParse;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.integer;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
-public class LongCoercion implements Function<Long> {
+public class LongCoercion extends AbstractFunction<Long> {
 
     public static final String NAME = "long";
 
@@ -36,8 +36,8 @@ public class LongCoercion implements Function<Long> {
 
     @Override
     public Long evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse(new Object());
-        final Long defaultValue = args.evaluated(DEFAULT, context, Long.class).orElse(0L);
+        final Object evaluated = args.param(VALUE).eval(args, context, Object.class).orElse(new Object());
+        final Long defaultValue = args.param(DEFAULT).eval(args, context, Long.class).orElse(0L);
 
         return firstNonNull(tryParse(evaluated.toString()), defaultValue);
     }
@@ -48,8 +48,8 @@ public class LongCoercion implements Function<Long> {
                 .name(NAME)
                 .returnType(Long.class)
                 .params(of(
-                        object(VALUE),
-                        param().optional().integer(DEFAULT).build()
+                        object(VALUE).build(),
+                        integer(DEFAULT).optional().build()
                 ))
                 .build();
     }

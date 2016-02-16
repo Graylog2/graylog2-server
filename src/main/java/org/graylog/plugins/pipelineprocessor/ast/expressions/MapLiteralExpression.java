@@ -24,16 +24,16 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapExpression implements Expression {
+public class MapLiteralExpression implements Expression {
     private final HashMap<String, Expression> map;
 
-    public MapExpression(HashMap<String, Expression> map) {
+    public MapLiteralExpression(HashMap<String, Expression> map) {
         this.map = map;
     }
 
     @Override
     public boolean isConstant() {
-        return false;
+        return map.values().stream().allMatch(Expression::isConstant);
     }
 
     @Override

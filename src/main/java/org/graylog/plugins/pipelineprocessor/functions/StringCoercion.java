@@ -17,15 +17,15 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 
-public class StringCoercion implements Function<String> {
+public class StringCoercion extends AbstractFunction<String> {
 
     public static final String NAME = "string";
 
@@ -34,11 +34,11 @@ public class StringCoercion implements Function<String> {
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.evaluated(VALUE, context, Object.class).orElse(new Object());
+        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
         if (evaluated instanceof String) {
             return (String) evaluated;
         } else {
-            return args.evaluated(DEFAULT, context, String.class).orElse("");
+            return args.param(DEFAULT).eval(args, context, String.class).orElse("");
         }
     }
 
@@ -48,8 +48,8 @@ public class StringCoercion implements Function<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(of(
-                        object(VALUE),
-                        param().optional().string(DEFAULT).build()
+                        object(VALUE).build(),
+                        string(DEFAULT).optional().build()
                 ))
                 .build();
     }
