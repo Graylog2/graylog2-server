@@ -79,6 +79,10 @@ expression
     |   fieldSet=expression '.' field=expression                        # Nested
     |   array=expression '[' index=expression ']'                       # IndexedAccess
     |   functionCall                                                    # Func
+//    |   ('+'|'-') expression                                            # SignedExpression
+////    |   ('~'|'!') expression                                            # BitwiseNot
+//    |   expression ('*'|'/'|'%') expression                             # Multiplication
+//    |   expression ('+'|'-') expression                                 # Addition
     |   left=expression comparison=('<=' | '>=' | '>' | '<') right=expression # Comparison
     |   left=expression equality=('==' | '!=') right=expression         # Equality
     |   left=expression and=And right=expression                        # And
@@ -151,22 +155,22 @@ Integer
 
 fragment
 DecimalIntegerLiteral
-    :   DecimalNumeral IntegerTypeSuffix?
+    :   Sign? DecimalNumeral IntegerTypeSuffix?
     ;
 
 fragment
 HexIntegerLiteral
-    :   HexNumeral IntegerTypeSuffix?
+    :   Sign? HexNumeral IntegerTypeSuffix?
     ;
 
 fragment
 OctalIntegerLiteral
-    :   OctalNumeral IntegerTypeSuffix?
+    :   Sign? OctalNumeral IntegerTypeSuffix?
     ;
 
 fragment
 BinaryIntegerLiteral
-    :   BinaryNumeral IntegerTypeSuffix?
+    :   Sign? BinaryNumeral IntegerTypeSuffix?
     ;
 
 fragment
@@ -272,8 +276,8 @@ BinaryDigitOrUnderscore
 
 // Floats
 Float
-    :   DecimalFloatingPointLiteral
-    |   HexadecimalFloatingPointLiteral
+    :   Sign? DecimalFloatingPointLiteral
+    |   Sign? HexadecimalFloatingPointLiteral
     ;
 
 fragment
