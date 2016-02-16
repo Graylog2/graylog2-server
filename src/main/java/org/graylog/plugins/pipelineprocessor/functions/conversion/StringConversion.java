@@ -38,7 +38,16 @@ public class StringConversion extends AbstractFunction<String> {
         if (evaluated instanceof String) {
             return (String) evaluated;
         } else {
-            return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+            try {
+                if ((evaluated.getClass().getMethod("toString").getDeclaringClass() != Object.class)) {
+                    return evaluated.toString();
+                } else {
+                    return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+                }
+            } catch (NoSuchMethodException ignored) {
+                // should never happen because toString is always there
+                return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+            }
         }
     }
 
