@@ -1,5 +1,5 @@
 rule "test"
-when tostring(message.`@specialfieldname`, "empty") == "string"
+when tostring($message.`@specialfieldname`, "empty") == "string"
 then
     trigger_test();
 end

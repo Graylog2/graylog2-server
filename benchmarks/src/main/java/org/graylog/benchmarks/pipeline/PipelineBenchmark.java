@@ -115,7 +115,7 @@ public class PipelineBenchmark {
                                       "title",
                                       "description",
                                       "rule \"add\"\n" +
-                                              "when tostring(message.`message`) == \"original message\"\n" +
+                                              "when tostring($message.message) == \"original message\"\n" +
                                               "then\n" +
                                               "  set_field(\"field\", \"derived message\");\n" +
                                               "end",

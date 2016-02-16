@@ -138,7 +138,7 @@ Then: T H E N;
 End: E N D;
 Let: L E T;
 Match: M A T C H;
-MessageRef: 'message';
+MessageRef: '$message';
 
 Boolean
     :   'true'|'false'
