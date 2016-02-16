@@ -88,7 +88,7 @@ const IndicesConfiguration = React.createClass({
     let rotationConfig;
     if (this.state.activeRotationConfig && this.state.rotationStrategies) {
       rotationConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                 description="Please select an index rotation strategy"
+                                                                 description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                  strategies={this.state.rotationStrategies}
@@ -101,7 +101,7 @@ const IndicesConfiguration = React.createClass({
     let retentionConfig;
     if (this.state.activeRetentionConfig && this.state.retentionStrategies) {
       retentionConfig = (<IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                  description="Please select an index retention strategy"
+                                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                                   selectPlaceholder="Select retention strategy"
                                                                   pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                   strategies={this.state.retentionStrategies}
