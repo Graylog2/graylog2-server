@@ -18,7 +18,7 @@ package org.elasticsearch.node;
 
 import org.elasticsearch.Version;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.env.Environment;
+import org.elasticsearch.node.internal.InternalSettingsPreparer;
 import org.elasticsearch.plugins.Plugin;
 
 import java.util.Collection;
@@ -34,6 +34,6 @@ public final class GraylogNode extends Node {
      * @param classpathPlugins A list of classpath plugins to load on startup
      */
     public GraylogNode(Settings preparedSettings, Collection<Class<? extends Plugin>> classpathPlugins) {
-        super(new Environment(preparedSettings), Version.CURRENT, classpathPlugins);
+        super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, null), Version.CURRENT, classpathPlugins);
     }
 }

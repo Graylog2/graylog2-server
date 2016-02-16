@@ -254,7 +254,7 @@ const ExportContentPackPage = React.createClass({
                   <br /><br />
                   <p>
                     <i className="fa fa-lightbulb-o"/>&nbsp;
-                    Share your content pack with the community on <a href="https://www.graylog.org/resources/data-sources/" target="_blank">graylog.org</a> after you have downloaded it.
+                    Share your content pack with the community on the <a href="https://marketplace.graylog.org/" target="_blank">Graylog Marketplace</a> after you have downloaded it.
                   </p>
                 </Col>
               </div>
