@@ -34,8 +34,8 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_cluster_name")
     private String clusterName = "graylog";
 
-    @Parameter(value = "elasticsearch_node_name")
-    private String nodeName = "graylog-server";
+    @Parameter(value = "elasticsearch_node_name_prefix")
+    private String nodeNamePrefix = "graylog-";
 
     @Parameter(value = "elasticsearch_node_master")
     private boolean masterNode = false;
@@ -131,8 +131,8 @@ public class ElasticsearchConfiguration {
         return clusterName;
     }
 
-    public String getNodeName() {
-        return nodeName;
+    public String getNodeNamePrefix() {
+        return nodeNamePrefix;
     }
 
     public boolean isMasterNode() {

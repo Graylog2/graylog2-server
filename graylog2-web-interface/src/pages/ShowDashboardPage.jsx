@@ -10,7 +10,7 @@ import WidgetsStore from 'stores/widgets/WidgetsStore';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
-import { GridsterContainer, GridsterWidget, PageHeader, Spinner } from 'components/common';
+import { GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
@@ -60,7 +60,8 @@ const ShowDashboardPage = React.createClass({
       <Row className="content">
         <Col md={12}>
           <Alert className="no-widgets">
-            This dashboard has no widgets yet. Learn how to add widgets in the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation"/>.
+            This dashboard has no widgets yet. Learn how to add widgets in the <DocumentationLink
+            page={DocsHelper.PAGES.DASHBOARDS} text="documentation"/>.
           </Alert>
         </Col>
       </Row>
@@ -103,12 +104,14 @@ const ShowDashboardPage = React.createClass({
       positions[widget.id] = dashboard.positions[widget.id] || this._defaultWidgetDimensions(widget);
     });
 
-    const widgets = dashboard.widgets.sort((d1, d2) => {
-      if (d1.col === d2.col) {
-        return d1.row < d2.row;
+    const widgets = dashboard.widgets.sort((widget1, widget2) => {
+      const position1 = positions[widget1.id];
+      const position2 = positions[widget2.id];
+      if (position1.col === position2.col) {
+        return position1.row - position2.row;
       }
 
-      return d1.col < d2.col;
+      return position1.col - position2.col;
     }).map((widget) => {
       return (
         <Widget id={widget.id} key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id}
@@ -167,30 +170,35 @@ const ShowDashboardPage = React.createClass({
     }
 
     const dashboard = this.state.dashboard;
-    const currentUser = this.state.currentUser;
 
-    const actions = dashboard.widgets.length > 0 ? (
-      <span className="pull-right">
-        <Button id="update-unfocussed" bsStyle="info" onClick={this._toggleUpdateInBackground}>
-          Update in {this.state.forceUpdateInBackground ? 'foreground' : 'background'}
-        </Button>
-        {' '}
-        <Button className="toggle-fullscreen" bsStyle="info" onClick={this._toggleFullscreen}>Fullscreen</Button>
-        {this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id) &&
-        <span>
+    let actions;
+    if (!this._dashboardIsEmpty(dashboard)) {
+      actions = (
+        <span className="pull-right">
+          <Button id="update-unfocussed" bsStyle="info" onClick={this._toggleUpdateInBackground}>
+            Update in {this.state.forceUpdateInBackground ? 'foreground' : 'background'}
+          </Button>
+          {' '}
+          <Button className="toggle-fullscreen" bsStyle="info" onClick={this._toggleFullscreen}>Fullscreen</Button>
+          <IfPermitted permissions={`${this.DASHBOARDS_EDIT}:${dashboard.id}`}>
             {' '}
-          <Button bsStyle="success" onClick={this._onUnlock}>{this.state.locked ? <span>Unlock / Edit</span> : <span>Lock</span>}</Button>
-          &nbsp;
-          </span>}
-      </span>) : null;
+            <Button bsStyle="success" onClick={this._onUnlock}>{this.state.locked ? 'Unlock / Edit' : 'Lock'}</Button>
+          </IfPermitted>
+        </span>
+      );
+    }
 
-    const supportText = this.isPermitted(currentUser.permissions, this.DASHBOARDS_EDIT + ':' + dashboard.id)
-      && dashboard.widgets.length > 0 ?
-      (<div id="drag-widgets-description">
-          Drag widgets to any position you like in <a href="#" role="button" onClick={this._unlockDashboard}>
-          unlock / edit</a>{' '}
-          mode.
-      </div>) : null;
+    let supportText;
+    if (!this._dashboardIsEmpty(dashboard)) {
+      supportText = (
+        <IfPermitted permissions={`${this.DASHBOARDS_EDIT}:${dashboard.id}`}>
+          <div id="drag-widgets-description">
+            Drag widgets to any position you like in <a href="#" role="button" onClick={this._unlockDashboard}>
+            unlock / edit</a> mode.
+          </div>
+        </IfPermitted>
+      );
+    }
 
     const dashboardTitle = (
       <span>

@@ -44,14 +44,15 @@ Some settings, which have been deprecated in previous versions, have finally bee
 
 .Removed configuration settings
 |===
-| Setting name       | Replacement
+| Setting name              | Replacement
 
-| `mongodb_host`     | `mongodb_uri`
-| `mongodb_port`     | `mongodb_uri`
-| `mongodb_database` | `mongodb_uri`
-| `mongodb_useauth`  | `mongodb_uri`
-| `mongodb_user`     | `mongodb_uri`
-| `mongodb_password` | `mongodb_uri`
+| `mongodb_host`            | `mongodb_uri`
+| `mongodb_port`            | `mongodb_uri`
+| `mongodb_database`        | `mongodb_uri`
+| `mongodb_useauth`         | `mongodb_uri`
+| `mongodb_user`            | `mongodb_uri`
+| `mongodb_password`        | `mongodb_uri`
+| `elasticsearch_node_name` | `elasticsearch_node_name_prefix`
 |===
 
 
@@ -78,8 +79,8 @@ For better consistency, these prefixes have been changed after the project has b
 
 .Configuration override prefixes
 |===
-| Override                 | Old prefix       | New prefix | Example
+| Override              | Old prefix  | New prefix | Example
 
-| Environment variables | `GRAYLOG2_`        | `GRAYLOG_` | `GRAYLOG_IS_MASTER`
-| System properties | `graylog2.`        | `graylog.` | `graylog.is_master`
+| Environment variables | `GRAYLOG2_` | `GRAYLOG_` | `GRAYLOG_IS_MASTER`
+| System properties     | `graylog2.` | `graylog.` | `graylog.is_master`
 |===
