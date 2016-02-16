@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.parser;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -65,7 +64,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @BeforeClass
     public static void registerFunctions() {
-        final Map<String, Function<?>> functions = Maps.newHashMap();
+        final Map<String, Function<?>> functions = commonFunctions();
         functions.put("nein", new AbstractFunction<Boolean>() {
             @Override
             public Boolean evaluate(FunctionArgs args, EvaluationContext context) {

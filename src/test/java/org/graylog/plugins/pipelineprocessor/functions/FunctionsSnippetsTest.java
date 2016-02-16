@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -33,6 +32,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
@@ -51,7 +51,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @BeforeClass
     public static void registerFunctions() {
-        final Map<String, Function<?>> functions = Maps.newHashMap();
+        final Map<String, Function<?>> functions = commonFunctions();
 
         functions.put(BooleanCoercion.NAME, new BooleanCoercion());
         functions.put(DoubleCoercion.NAME, new DoubleCoercion());
@@ -80,6 +80,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Abbreviate.NAME, new Abbreviate());
         functions.put(Capitalize.NAME, new Capitalize());
         functions.put(Lowercase.NAME, new Lowercase());
+        functions.put(Substring.NAME, new Substring());
         functions.put(SwapCase.NAME, new SwapCase());
         functions.put(Uncapitalize.NAME, new Uncapitalize());
         functions.put(Uppercase.NAME, new Uppercase());
@@ -137,5 +138,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("author_first")).isTrue();
         assertThat(message.hasField("author_last")).isTrue();
 
+    }
+
+    @Test
+    public void substring() {
+        final Rule rule = parser.parseRule(ruleForTest());
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
     }
 }

@@ -17,7 +17,12 @@
 package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -33,7 +38,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.google.common.collect.ImmutableList.of;
 
 public class BaseParserTest {
     protected static final AtomicBoolean actionsTriggered = new AtomicBoolean(false);
@@ -42,6 +50,27 @@ public class BaseParserTest {
     @org.junit.Rule
     public TestName name = new TestName();
     protected PipelineRuleParser parser;
+
+    protected static HashMap<String, Function<?>> commonFunctions() {
+        final HashMap<String, Function<?>> functions = Maps.newHashMap();
+        functions.put("trigger_test", new AbstractFunction<Void>() {
+            @Override
+            public Void evaluate(FunctionArgs args, EvaluationContext context) {
+                actionsTriggered.set(true);
+                return null;
+            }
+
+            @Override
+            public FunctionDescriptor<Void> descriptor() {
+                return FunctionDescriptor.<Void>builder()
+                        .name("trigger_test")
+                        .returnType(Void.class)
+                        .params(of())
+                        .build();
+            }
+        });
+        return functions;
+    }
 
     @Before
     public void setup() {
