@@ -72,6 +72,9 @@ const Navigation = React.createClass({
     if (this._isActive('/system/collectors')) {
       return prefix + ' / Collectors';
     }
+    if (this._isActive('/system/configurations')) {
+      return prefix + ' / Configurations';
+    }
 
     const pluginRoute = PluginStore.exports('systemnavigation').find((pluginRoute) => this._isActive(pluginRoute.path));
     if (pluginRoute) {
@@ -149,6 +152,11 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
+              {this.isPermitted(this.props.permissions, ['CLUSTER_CONFIG_ENTRY_READ']) &&
+              <LinkContainer to={Routes.SYSTEM.CONFIGURATIONS}>
+                <MenuItem>Configurations</MenuItem>
+              </LinkContainer>
+              }
               <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>

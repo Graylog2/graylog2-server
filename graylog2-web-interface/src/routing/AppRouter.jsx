@@ -46,6 +46,7 @@ import NodesPage from 'pages/NodesPage';
 import ThreadDumpPage from 'pages/ThreadDumpPage';
 import LdapPage from 'pages/LdapPage';
 import LdapGroupsPage from 'pages/LdapGroupsPage';
+import ConfigurationsPage from 'pages/ConfigurationsPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -79,6 +80,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage}/>
             <Route path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage}/>
             <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
+            <Route path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>
