@@ -75,7 +75,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
 
         // All default retention strategy settings
         final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
-        final DeletionRetentionStrategy deletionRetentionStrategy = clusterConfigService.get(DeletionRetentionStrategy.class);
+        final DeletionRetentionStrategyConfig deletionRetentionStrategyConfig = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
 
         if (closingRetentionStrategyConfig == null) {
             final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
@@ -83,7 +83,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", closingConfig);
         }
 
-        if (deletionRetentionStrategy == null) {
+        if (deletionRetentionStrategyConfig == null) {
             final DeletionRetentionStrategyConfig deletionConfig = DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(deletionConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", deletionConfig);
