@@ -147,6 +147,6 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected <T extends WidgetStrategy> void addWidgetStrategy(Class<T> widgetStrategyClass, Class<? extends WidgetStrategy.Factory<T>> factory) {
-        installWidgetStrategy(widgetStrategyMapBinder(), widgetStrategyClass, factory);
+        installWidgetStrategy(widgetStrategyBinder(), widgetStrategyClass, factory);
     }
 }

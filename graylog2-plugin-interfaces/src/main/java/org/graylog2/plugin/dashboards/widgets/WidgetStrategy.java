@@ -7,8 +7,8 @@ import java.util.Map;
 public interface WidgetStrategy {
     interface Factory<T> {
         T create(Map<String, Object> config,
-                 String query,
-                 TimeRange timeRange);
+                 TimeRange timeRange,
+                 String widgetId);
     }
 
     ComputationResult compute();

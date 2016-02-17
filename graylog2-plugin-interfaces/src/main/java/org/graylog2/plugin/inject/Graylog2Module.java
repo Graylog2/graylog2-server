@@ -256,7 +256,7 @@ public abstract class Graylog2Module extends AbstractModule {
         installOutput(outputMapBinder, target, factoryClass);
     }
 
-    protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyMapBinder() {
+    protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder() {
         return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>(){});
     }
 
@@ -265,6 +265,14 @@ public abstract class Graylog2Module extends AbstractModule {
                                                                             Class<? extends WidgetStrategy.Factory<? extends WidgetStrategy>> targetFactory) {
         install(new FactoryModuleBuilder().implement(WidgetStrategy.class, target).build(targetFactory));
         widgetStrategyBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
+    }
+
+    protected <T extends WidgetStrategy.Factory> void installWidgetStrategyWithAlias(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
+                                                                            String key,
+                                                                            Class<? extends WidgetStrategy> target,
+                                                                            Class<? extends WidgetStrategy.Factory<? extends WidgetStrategy>> targetFactory) {
+        installWidgetStrategy(widgetStrategyBinder, target, targetFactory);
+        widgetStrategyBinder.addBinding(key).to(Key.get(targetFactory));
     }
 
     @Nonnull

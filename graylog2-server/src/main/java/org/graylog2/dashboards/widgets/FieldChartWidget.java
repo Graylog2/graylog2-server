@@ -17,9 +17,12 @@
 package org.graylog2.dashboards.widgets;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +33,10 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class FieldChartWidget extends ChartWidget {
+    public interface Factory extends WidgetStrategy.Factory<FieldChartWidget> {
+        @Override
+        FieldChartWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldChartWidget.class);
 
@@ -42,7 +49,8 @@ public class FieldChartWidget extends ChartWidget {
     private final TimeRange timeRange;
     private final String widgetId;
 
-    public FieldChartWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange, String widgetId) throws InvalidWidgetConfigurationException {
+    @AssistedInject
+    public FieldChartWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         super(config);
         this.searches = searches;
         this.timeRange = timeRange;
@@ -51,6 +59,8 @@ public class FieldChartWidget extends ChartWidget {
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
+
+        final String query = (String)config.get("query");
 
         if (query == null || query.trim().isEmpty()) {
             this.query = "*";

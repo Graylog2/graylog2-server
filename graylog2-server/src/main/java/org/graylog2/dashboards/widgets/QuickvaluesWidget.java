@@ -18,6 +18,9 @@ package org.graylog2.dashboards.widgets;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import com.sun.xml.internal.bind.v2.model.annotation.Quick;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
@@ -33,6 +36,11 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class QuickvaluesWidget implements WidgetStrategy {
 
+    public interface Factory extends WidgetStrategy.Factory<QuickvaluesWidget> {
+        @Override
+        QuickvaluesWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
 
     private final String query;
@@ -46,7 +54,8 @@ public class QuickvaluesWidget implements WidgetStrategy {
     private final Boolean showPieChart;
     private final Boolean showDataTable;
 
-    public QuickvaluesWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange) throws InvalidWidgetConfigurationException {
+    @AssistedInject
+    public QuickvaluesWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         this.searches = searches;
         this.timeRange = timeRange;
 
@@ -54,7 +63,7 @@ public class QuickvaluesWidget implements WidgetStrategy {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
 
-        this.query = query;
+        this.query = (String)config.get("query");
 
         this.field = (String) config.get("field");
         this.streamId = (String) config.get("stream_id");

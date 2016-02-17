@@ -18,6 +18,8 @@ package org.graylog2.dashboards.widgets;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
@@ -32,16 +34,22 @@ import java.util.Map;
 
 public class SearchResultCountWidget implements WidgetStrategy {
 
+    public interface Factory extends WidgetStrategy.Factory<SearchResultCountWidget> {
+        @Override
+        SearchResultCountWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
+
     protected final Searches searches;
     protected final String query;
     protected final TimeRange timeRange;
     protected final Boolean trend;
     protected final Boolean lowerIsBetter;
 
-    protected SearchResultCountWidget(Searches searches, Map<String, Object> config, String query, TimeRange timeRange) {
+    @AssistedInject
+    public SearchResultCountWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
         this.searches = searches;
 
-        this.query = query;
+        this.query = (String)config.get("query");
         this.timeRange = timeRange;
         this.trend = config.get("trend") != null && Boolean.parseBoolean(String.valueOf(config.get("trend")));
         this.lowerIsBetter = config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(config.get("lower_is_better")));
