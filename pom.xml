@@ -4,6 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-geoipresolver</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -22,17 +26,17 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <graylog2.version>1.0.0</graylog2.version>
-        <graylog2.plugin-dir>/usr/share/graylog-server/plugin</graylog2.plugin-dir>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <graylog.version>2.0.0-alpha.3-SNAPSHOT</graylog.version>
+        <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-            <version>${graylog2.version}</version>
+            <artifactId>graylog2-server</artifactId>
+            <version>${graylog.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -97,7 +101,7 @@
                             <type>file</type>
                             <mapper>
                                 <type>perm</type>
-                                <prefix>${graylog2.plugin-dir}</prefix>
+                                <prefix>${graylog.plugin-dir}</prefix>
                                 <filemode>644</filemode>
                                 <user>root</user>
                                 <group>root</group>
@@ -126,7 +130,7 @@
                     <defaultGroupname>root</defaultGroupname>
                     <mappings>
                         <mapping>
-                            <directory>${graylog2.plugin-dir}</directory>
+                            <directory>${graylog.plugin-dir}</directory>
                             <sources>
                                 <source>
                                     <location>${project.build.directory}/</location>
