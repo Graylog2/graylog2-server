@@ -27,6 +27,10 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -107,6 +111,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(FlexParseDate.NAME, new FlexParseDate());
         functions.put(ParseDate.NAME, new ParseDate());
 
+        functions.put(MD5.NAME, new MD5());
+        functions.put(SHA1.NAME, new SHA1());
+        functions.put(SHA256.NAME, new SHA256());
+        functions.put(SHA512.NAME, new SHA512());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -190,5 +198,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
+    }
+
+    @Test
+    public void digests() {
+        final Rule rule = parser.parseRule(ruleForTest());
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
     }
 }

@@ -27,6 +27,10 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -88,6 +92,12 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Now.NAME, Now.class);
         addMessageProcessorFunction(ParseDate.NAME, ParseDate.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
+
+        // hash digest
+        addMessageProcessorFunction(MD5.NAME, MD5.class);
+        addMessageProcessorFunction(SHA1.NAME, SHA1.class);
+        addMessageProcessorFunction(SHA256.NAME, SHA256.class);
+        addMessageProcessorFunction(SHA512.NAME, SHA512.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
