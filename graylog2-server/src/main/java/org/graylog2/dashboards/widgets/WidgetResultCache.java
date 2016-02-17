@@ -54,6 +54,12 @@ public class WidgetResultCache {
         return this.cache.get(dashboardWidget).get();
     }
 
+    public void invalidate(final DashboardWidget dashboardWidget) {
+        if (this.cache.containsKey(dashboardWidget)) {
+            this.cache.remove(dashboardWidget);
+        }
+    }
+
     private class ComputationResultSupplier implements Supplier<ComputationResult> {
         private final MetricRegistry metricRegistry;
         private final DashboardWidget dashboardWidget;

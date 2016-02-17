@@ -121,4 +121,26 @@ public class DashboardWidget implements EmbeddedPersistable {
             super(msg);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DashboardWidget that = (DashboardWidget) o;
+
+        if (cacheTime != that.cacheTime) return false;
+        if (type != that.type) return false;
+        if (!id.equals(that.id)) return false;
+        if (!timeRange.equals(that.timeRange)) return false;
+        if (!config.equals(that.config)) return false;
+        if (!creatorUserId.equals(that.creatorUserId)) return false;
+        return description.equals(that.description);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

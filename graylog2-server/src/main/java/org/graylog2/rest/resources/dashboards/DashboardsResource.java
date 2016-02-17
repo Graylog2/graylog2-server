@@ -33,18 +33,18 @@ import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.dashboards.widgets.WidgetResultCache;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.models.dashboards.responses.WidgetSummary;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.rest.models.dashboards.responses.DashboardList;
+import org.graylog2.rest.models.dashboards.responses.WidgetSummary;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -63,13 +63,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @RequiresAuthentication
 @Api(value = "Dashboards", description = "Manage dashboards")
@@ -158,6 +156,7 @@ public class DashboardsResource extends RestResource {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);
+        dashboard.getWidgets().values().stream().forEach((this.widgetResultCache::invalidate));
         dashboardService.destroy(dashboard);
 
         final String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
@@ -304,6 +303,7 @@ public class DashboardsResource extends RestResource {
         final Dashboard dashboard = dashboardService.load(dashboardId);
 
         final DashboardWidget widget = dashboard.getWidget(widgetId);
+        this.widgetResultCache.invalidate(widget);
         dashboardService.removeWidget(dashboard, widget);
 
         final String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
@@ -370,6 +370,7 @@ public class DashboardsResource extends RestResource {
 
             dashboardService.removeWidget(dashboard, widget);
             dashboardService.addWidget(dashboard, updatedWidget);
+            this.widgetResultCache.invalidate(widget);
         } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
             LOG.error("No such widget type.", e2);
             throw new BadRequestException(e2);
@@ -442,6 +443,7 @@ public class DashboardsResource extends RestResource {
         }
 
         dashboardService.updateWidgetCacheTime(dashboard, widget, uwr.cacheTime());
+        this.widgetResultCache.invalidate(widget);
 
         LOG.info("Updated cache time of widget <" + widgetId + "> on dashboard <" + dashboardId + "> to " +
                 "[" + uwr.cacheTime() + "]. Reason: REST request.");
