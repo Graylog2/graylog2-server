@@ -20,6 +20,10 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.joda.time.DateTime;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -32,14 +36,45 @@ public class StringConversion extends AbstractFunction<String> {
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";
 
+    // this is per-thread to save an expensive concurrent hashmap access
+    private final ThreadLocal<LinkedHashMap<Class<?>, Class<?>>> declaringClassCache;
+
+    public StringConversion() {
+        declaringClassCache = new ThreadLocal<LinkedHashMap<Class<?>, Class<?>>>() {
+            @Override
+            protected LinkedHashMap<Class<?>, Class<?>> initialValue() {
+                return new LinkedHashMap<Class<?>, Class<?>>() {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<Class<?>, Class<?>> eldest) {
+                        return size() > 1024;
+                    }
+                };
+            }
+        };
+    }
+
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
-        if (evaluated instanceof String) {
-            return (String) evaluated;
+        // fast path for the most common targets
+        //noinspection Duplicates
+        if (evaluated instanceof String
+                || evaluated instanceof Number
+                || evaluated instanceof Boolean
+                || evaluated instanceof DateTime) {
+            return evaluated.toString();
         } else {
             try {
-                if ((evaluated.getClass().getMethod("toString").getDeclaringClass() != Object.class)) {
+                // slow path, we aren't sure that the object's class actually overrides toString() so we'll look it up.
+                final Class<?> klass = evaluated.getClass();
+                final LinkedHashMap<Class<?>, Class<?>> classCache = declaringClassCache.get();
+
+                Class<?> declaringClass = classCache.get(klass);
+                if (declaringClass == null) {
+                    declaringClass = klass.getMethod("toString").getDeclaringClass();
+                    classCache.put(klass, declaringClass);
+                }
+                if ((declaringClass != Object.class)) {
                     return evaluated.toString();
                 } else {
                     return args.param(DEFAULT).eval(args, context, String.class).orElse("");
