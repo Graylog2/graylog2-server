@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system.indices;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -29,6 +28,7 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
+import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
 import org.graylog2.rest.models.system.indices.RetentionStrategySummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -48,6 +48,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -97,7 +98,7 @@ public class RetentionStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current retention strategy",
             notes = "This resource stores the configuration of the currently used retention strategy.")
-    public void config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
+    public RetentionStrategySummary config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
                        @Valid @NotNull RetentionStrategySummary retentionStrategySummary) {
         if (!retentionStrategies.containsKey(retentionStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find retention strategy for given type " + retentionStrategySummary.strategy());
@@ -115,6 +116,8 @@ public class RetentionStrategyResource extends RestResource {
 
         clusterConfigService.write(retentionStrategySummary.config());
         clusterConfigService.write(indexManagementConfig);
+
+        return retentionStrategySummary;
     }
 
     @GET
@@ -123,7 +126,10 @@ public class RetentionStrategyResource extends RestResource {
     @ApiOperation(value = "List available retention strategies",
             notes = "This resource returns a list of all available retention strategies on this Graylog node.")
     public RetentionStrategies list() {
-        final Set<String> strategies = retentionStrategies.keySet();
+        final Set<RetentionStrategyDescription> strategies = retentionStrategies.keySet()
+                .stream()
+                .map(this::getRetentionStrategyDescription)
+                .collect(Collectors.toSet());
 
         return RetentionStrategies.create(strategies.size(), strategies);
     }
@@ -133,14 +139,19 @@ public class RetentionStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Show JSON schema for configuration of given retention strategies",
             notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
-    public JsonSchema configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
+    public RetentionStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
                                    @PathParam("strategy") @NotEmpty String strategyName) {
+        return getRetentionStrategyDescription(strategyName);
+    }
+
+    private RetentionStrategyDescription getRetentionStrategyDescription(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true) @PathParam("strategy") @NotEmpty String strategyName) {
         final Provider<RetentionStrategy> provider = retentionStrategies.get(strategyName);
         if (provider == null) {
             throw new NotFoundException("Couldn't find retention strategy for given type " + strategyName);
         }
 
         final RetentionStrategy retentionStrategy = provider.get();
+        final RetentionStrategyConfig defaultConfig = retentionStrategy.defaultConfiguration();
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         try {
             objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(retentionStrategy.configurationClass()), visitor);
@@ -148,6 +159,6 @@ public class RetentionStrategyResource extends RestResource {
             throw new InternalServerErrorException("Couldn't generate JSON schema for retention strategy " + strategyName, e);
         }
 
-        return visitor.finalSchema();
+        return RetentionStrategyDescription.create(strategyName, defaultConfig, visitor.finalSchema());
     }
 }

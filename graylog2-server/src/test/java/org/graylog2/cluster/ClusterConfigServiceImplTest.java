@@ -291,7 +291,7 @@ public class ClusterConfigServiceImplTest {
 
     @Test
     public void prepareCollectionCreatesIndexesOnExistingCollection() throws Exception {
-        DBCollection original = mongoConnection.getDatabase().createCollection(COLLECTION_NAME, null);
+        DBCollection original = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         original.dropIndexes();
         assertThat(original.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
@@ -299,7 +299,7 @@ public class ClusterConfigServiceImplTest {
         DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
-        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.FSYNCED);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
     @Test
@@ -337,6 +337,52 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.count()).isEqualTo(1L);
         assertThat(clusterConfigService.remove(CustomConfig.class)).isEqualTo(1);
         assertThat(collection.count()).isEqualTo(0L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void listReturnsAllClasses() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", AnotherCustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+
+        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(clusterConfigService.list())
+                .hasSize(2)
+                .containsOnly(CustomConfig.class, AnotherCustomConfig.class);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void listIgnoresInvalidClasses() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", CustomConfig.class.getCanonicalName())
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+        collection.save(new BasicDBObjectBuilder()
+                .add("type", "invalid.ClassName")
+                .add("payload", Collections.emptyMap())
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get());
+
+        assertThat(collection.count()).isEqualTo(2L);
+        assertThat(clusterConfigService.list())
+                .hasSize(1)
+                .containsOnly(CustomConfig.class);
     }
 
     public static class ClusterConfigChangedEventHandler {

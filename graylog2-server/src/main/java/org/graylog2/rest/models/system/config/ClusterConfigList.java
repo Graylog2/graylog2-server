@@ -14,27 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.indices;
+package org.graylog2.rest.models.system.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@AutoValue
 @JsonAutoDetect
-public abstract class RotationStrategies {
+@AutoValue
+public abstract class ClusterConfigList {
     @JsonProperty
     public abstract int total();
 
     @JsonProperty
-    public abstract Set<RotationStrategyDescription> strategies();
+    public abstract Set<String> classes();
 
-    @JsonCreator
-    public static RotationStrategies create(@JsonProperty("total") int total,
-                                            @JsonProperty("strategies") Set<RotationStrategyDescription> strategies) {
-        return new AutoValue_RotationStrategies(total, strategies);
+    public static ClusterConfigList create(Collection<String> classes) {
+        return new AutoValue_ClusterConfigList(classes.size(), ImmutableSet.copyOf(classes));
+    }
+
+    public static ClusterConfigList createFromClass(Collection<Class<?>> classes) {
+        return create(classes.stream().map(Class::getCanonicalName).collect(Collectors.toSet()));
     }
 }

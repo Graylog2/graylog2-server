@@ -55,7 +55,6 @@ public class StreamListFingerprintTest {
     @Mock
     Output output2;
 
-    private final String expectedFingerprint = "2d0436f6d02566c5ab9657f4cee95ab2287a5868";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @Before
@@ -99,7 +98,9 @@ public class StreamListFingerprintTest {
     public void testGetFingerprint() throws Exception {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
-        assertEquals(expectedFingerprint, fingerprint.getFingerprint());
+        // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
+        // implementation changed.
+        assertEquals("d669c1037a49c956ef8f25033abc065c2fb259d4", fingerprint.getFingerprint());
     }
 
     @Test

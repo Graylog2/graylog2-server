@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system.indices;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -29,6 +28,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.models.system.indices.RotationStrategies;
+import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
 import org.graylog2.rest.models.system.indices.RotationStrategySummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -48,6 +48,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -97,7 +98,7 @@ public class RotationStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current rotation strategy",
             notes = "This resource stores the configuration of the currently used rotation strategy.")
-    public void config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
+    public RotationStrategySummary config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
                        @Valid @NotNull RotationStrategySummary rotationStrategySummary) {
         if (!rotationStrategies.containsKey(rotationStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find rotation strategy for given type " + rotationStrategySummary.strategy());
@@ -115,6 +116,8 @@ public class RotationStrategyResource extends RestResource {
 
         clusterConfigService.write(rotationStrategySummary.config());
         clusterConfigService.write(indexManagementConfig);
+
+        return rotationStrategySummary;
     }
 
     @GET
@@ -123,25 +126,32 @@ public class RotationStrategyResource extends RestResource {
     @ApiOperation(value = "List available rotation strategies",
             notes = "This resource returns a list of all available rotation strategies on this Graylog node.")
     public RotationStrategies list() {
-        final Set<String> strategies = rotationStrategies.keySet();
+        final Set<RotationStrategyDescription> strategies = rotationStrategies.keySet()
+                .stream()
+                .map(this::getRotationStrategyDescription)
+                .collect(Collectors.toSet());
 
         return RotationStrategies.create(strategies.size(), strategies);
     }
-
 
     @GET
     @Path("strategies/{strategy}")
     @Timed
     @ApiOperation(value = "Show JSON schema for configuration of given rotation strategies",
             notes = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
-    public JsonSchema configSchema(@ApiParam(name = "strategy", value = "The name of the rotation strategy", required = true)
+    public RotationStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the rotation strategy", required = true)
                                    @PathParam("strategy") @NotEmpty String strategyName) {
+        return getRotationStrategyDescription(strategyName);
+    }
+
+    private RotationStrategyDescription getRotationStrategyDescription(String strategyName) {
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
         if (provider == null) {
             throw new NotFoundException("Couldn't find rotation strategy for given type " + strategyName);
         }
 
         final RotationStrategy rotationStrategy = provider.get();
+        final RotationStrategyConfig defaultConfig = rotationStrategy.defaultConfiguration();
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         try {
             objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(rotationStrategy.configurationClass()), visitor);
@@ -149,6 +159,6 @@ public class RotationStrategyResource extends RestResource {
             throw new InternalServerErrorException("Couldn't generate JSON schema for rotation strategy " + strategyName, e);
         }
 
-        return visitor.finalSchema();
+        return RotationStrategyDescription.create(strategyName, defaultConfig, visitor.finalSchema());
     }
 }
