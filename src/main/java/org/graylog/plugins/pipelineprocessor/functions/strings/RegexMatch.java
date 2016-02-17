@@ -78,7 +78,7 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
                 .pure(true)
                 .returnType(RegexMatchResult.class)
                 .params(of(
-                        ParameterDescriptor.string(PATTERN_ARG, Pattern.class).transform(Pattern::compile).build(),
+                        ParameterDescriptor.string(PATTERN_ARG, Pattern.class).build(),
                         ParameterDescriptor.string(VALUE_ARG).build(),
                         ParameterDescriptor.type(GROUP_NAMES_ARG, List.class).optional().build()
                 ))
