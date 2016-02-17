@@ -45,7 +45,7 @@ public class GeoIpResolverFilter implements MessageFilter {
             this.databaseReader = new DatabaseReader.Builder(database).build();
             this.enabled = enabled;
         } catch (IOException e) {
-            LOG.error("Could not open GeoIP database " + geoIpDatabase, e);
+            LOG.error("Could not open GeoIP database {}", geoIpDatabase, e);
             this.enabled = false;
         }
 
@@ -105,7 +105,7 @@ public class GeoIpResolverFilter implements MessageFilter {
                 coordinates.add(location.getLatitude());
             }
         } catch (Exception e) {
-            LOG.debug("Could not get location from IP " + ip, e);
+            LOG.debug("Could not get location from IP {}", ip, e);
         }
 
         return coordinates;
