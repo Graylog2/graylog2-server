@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -27,9 +26,8 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -42,18 +40,12 @@ import java.util.stream.Collectors;
 
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
-    private final MetricRegistry metricRegistry;
-    private final Searches searches;
     private final DashboardWidgetCreator dashboardWidgetCreator;
 
     @Inject
     public DashboardServiceImpl(MongoConnection mongoConnection,
-                                MetricRegistry metricRegistry,
-                                Searches searches,
                                 DashboardWidgetCreator dashboardWidgetCreator) {
         super(mongoConnection);
-        this.metricRegistry = metricRegistry;
-        this.searches = searches;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
     }
 
@@ -75,7 +67,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
             if (fields.get(DashboardImpl.EMBEDDED_WIDGETS) instanceof List) {
                 for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
                     try {
-                        final DashboardWidget widget = dashboardWidgetCreator.fromPersisted(searches, widgetFields);
+                        final DashboardWidget widget = dashboardWidgetCreator.fromPersisted(widgetFields);
                         dashboard.addPersistedWidget(widget);
                     } catch (DashboardWidget.NoSuchWidgetTypeException e) {
                         LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);

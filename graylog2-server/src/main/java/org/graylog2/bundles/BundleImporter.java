@@ -53,6 +53,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.timeranges.TimeRangeFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -83,6 +84,7 @@ public class BundleImporter {
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
+    private final TimeRangeFactory timeRangeFactory;
 
     private final Map<String, org.graylog2.grok.GrokPattern> createdGrokPatterns = new HashMap<>();
     private final Map<String, MessageInput> createdInputs = new HashMap<>();
@@ -105,7 +107,8 @@ public class BundleImporter {
                           final Searches searches,
                           final MessageInputFactory messageInputFactory,
                           final InputLauncher inputLauncher,
-                          final GrokPatternService grokPatternService) {
+                          final GrokPatternService grokPatternService,
+                          final TimeRangeFactory timeRangeFactory) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -119,6 +122,7 @@ public class BundleImporter {
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
+        this.timeRangeFactory = timeRangeFactory;
     }
 
     public void runImport(final ConfigurationBundle bundle, final String userName) {
@@ -528,7 +532,7 @@ public class BundleImporter {
     private org.graylog2.dashboards.widgets.DashboardWidget createDashboardWidget(
             final DashboardWidget dashboardWidget, final String userName)
             throws InvalidRangeParametersException, org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
-        final org.graylog2.dashboards.widgets.DashboardWidget.Type type = dashboardWidget.getType();
+        final String type = dashboardWidget.getType();
         final Map<String, Object> config = dashboardWidget.getConfiguration();
 
         // Replace "stream_id" in config if it's set
@@ -544,33 +548,11 @@ public class BundleImporter {
 
         // Build timerange.
         final Map<String, Object> timerangeConfig = (Map<String, Object>) config.get("timerange");
-        final TimeRange timeRange;
-
-        if (!timerangeConfig.containsKey("type")) {
-            throw new InvalidRangeParametersException("range type not set");
-        }
-
-        final String rangeType = (String) timerangeConfig.get("type");
-        switch (rangeType) {
-            case "relative":
-                timeRange = RelativeRange.create((Integer) timerangeConfig.get("range"));
-                break;
-            case "keyword":
-                timeRange = KeywordRange.create((String) timerangeConfig.get("keyword"));
-                break;
-            case "absolute":
-                final String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-                final String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-
-                timeRange = AbsoluteRange.create(from, to);
-                break;
-            default:
-                throw new InvalidRangeParametersException("range_type not recognized");
-        }
+        final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
         final String widgetId = UUID.randomUUID().toString();
-        return dashboardWidgetCreator.buildDashboardWidget(type, searches,
+        return dashboardWidgetCreator.buildDashboardWidget(type,
                 widgetId, dashboardWidget.getDescription(), dashboardWidget.getCacheTime(),
-                config, (String) config.get("query"), timeRange, userName);
+                config, timeRange, userName);
     }
 }

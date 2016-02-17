@@ -42,7 +42,7 @@ public class DashboardWidget implements EmbeddedPersistable {
         STACKED_CHART
     }
 
-    private final Type type;
+    private final String type;
     private final String id;
     private final TimeRange timeRange;
     private final Map<String, Object> config;
@@ -50,7 +50,7 @@ public class DashboardWidget implements EmbeddedPersistable {
     private int cacheTime;
     private String description;
 
-    protected DashboardWidget(Type type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(String type, String id, TimeRange timeRange, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String creatorUserId) {
         this.type = type;
         this.id = id;
         this.timeRange = timeRange;
@@ -60,7 +60,7 @@ public class DashboardWidget implements EmbeddedPersistable {
         this.cacheTime = cacheTime.getCacheTime();
     }
 
-    public Type getType() {
+    public String getType() {
         return type;
     }
 

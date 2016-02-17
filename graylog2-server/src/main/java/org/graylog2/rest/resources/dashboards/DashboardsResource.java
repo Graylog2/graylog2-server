@@ -75,9 +75,9 @@ import java.util.Map;
 public class DashboardsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
 
-    private DashboardService dashboardService;
+    private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
-    private ActivityWriter activityWriter;
+    private final ActivityWriter activityWriter;
     private final Searches searches;
     private final WidgetResultCache widgetResultCache;
 
@@ -237,7 +237,7 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = dashboardWidgetCreator.fromRequest(searches, awr, getCurrentUser().getName());
+            widget = dashboardWidgetCreator.fromRequest(awr, getCurrentUser().getName());
 
             final Dashboard dashboard = dashboardService.load(dashboardId);
 
@@ -280,7 +280,7 @@ public class DashboardsResource extends RestResource {
         final Dashboard dashboard = dashboardService.load(dashboardId);
         final DashboardWidget widget = dashboard.getWidget(widgetId);
 
-        return WidgetSummary.create(widget.getId(), widget.getDescription(), widget.getType().name(), widget.getCacheTime(),
+        return WidgetSummary.create(widget.getId(), widget.getDescription(), widget.getType(), widget.getCacheTime(),
                 widget.getCreatorUserId(), widget.getConfig());
     }
 
@@ -364,8 +364,7 @@ public class DashboardsResource extends RestResource {
         }
 
         try {
-            final DashboardWidget updatedWidget = dashboardWidgetCreator.fromRequest(searches,
-                    widgetId, awr, widget.getCreatorUserId());
+            final DashboardWidget updatedWidget = dashboardWidgetCreator.fromRequest(widgetId, awr, widget.getCreatorUserId());
             updatedWidget.setCacheTime(awr.cacheTime());
 
             dashboardService.removeWidget(dashboard, widget);

@@ -17,23 +17,13 @@
 
 package org.graylog2.dashboards.widgets;
 
-import com.codahale.metrics.MetricRegistry;
 import com.mongodb.BasicDBObject;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.timeranges.TimeRangeFactory;
 
 import javax.inject.Inject;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,129 +31,64 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DashboardWidgetCreator {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DashboardWidgetCreator.class);
-
-    private final MetricRegistry metricRegistry;
     private final WidgetCacheTime.Factory cacheTimeFactory;
+    private final TimeRangeFactory timeRangeFactory;
 
     @Inject
-    public DashboardWidgetCreator(MetricRegistry metricRegistry, WidgetCacheTime.Factory cacheTimeFactory) {
-        this.metricRegistry = metricRegistry;
+    public DashboardWidgetCreator(WidgetCacheTime.Factory cacheTimeFactory, TimeRangeFactory timeRangeFactory) {
         this.cacheTimeFactory = cacheTimeFactory;
+        this.timeRangeFactory = timeRangeFactory;
     }
 
-    public DashboardWidget fromRequest(Searches searches, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        return fromRequest(searches, null, awr, userId);
+    public DashboardWidget fromRequest(AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+        return fromRequest(null, awr, userId);
     }
 
-    public DashboardWidget fromRequest(Searches searches, String widgetId, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        DashboardWidget.Type type;
-        try {
-            type = DashboardWidget.Type.valueOf(awr.type().toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
-            throw new DashboardWidget.NoSuchWidgetTypeException("No such widget type <" + awr.type() + ">");
-        }
-
-        String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
+    public DashboardWidget fromRequest(String widgetId, AddWidgetRequest awr, String userId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+        final String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
 
         // Build timerange.
         final Map<String, Object> timerangeConfig;
-        final String rangeType;
-
-        if (awr.config().get("timerange") != null) {
+        if (awr.config().get("timerange") != null && awr.config().get("timerange") instanceof Map) {
             timerangeConfig = (Map<String, Object>)awr.config().get("timerange");
-            rangeType = (String) timerangeConfig.get("type");
         } else {
             timerangeConfig = awr.config();
-            rangeType = (String)timerangeConfig.get("range_type");
         }
 
-        if (rangeType == null) {
-            throw new InvalidRangeParametersException("timerange type not set");
-        }
+        final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
-        final TimeRange timeRange;
-        switch (rangeType) {
-            case "relative":
-                timeRange = RelativeRange.create(Integer.parseInt(String.valueOf(timerangeConfig.get("range"))));
-                break;
-            case "keyword":
-                timeRange = KeywordRange.create((String) timerangeConfig.get("keyword"));
-                break;
-            case "absolute":
-                timeRange = AbsoluteRange.create((String) timerangeConfig.get("from"), (String) timerangeConfig.get("to"));
-                break;
-            default:
-                throw new InvalidRangeParametersException("range_type not recognized");
-        }
-
-        return buildDashboardWidget(type, searches, id, awr.description(), 0, awr.config(),
-                (String) awr.config().get("query"), timeRange, userId);
+        return buildDashboardWidget(awr.type(), id, awr.description(), 0, awr.config(),
+                timeRange, userId);
     }
 
-    public DashboardWidget fromPersisted(Searches searches, BasicDBObject fields) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
-        DashboardWidget.Type type;
-        try {
-            type = DashboardWidget.Type.valueOf(((String) fields.get(DashboardWidget.FIELD_TYPE)).toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
-            throw new DashboardWidget.NoSuchWidgetTypeException();
-        }
-
-        BasicDBObject config = (BasicDBObject) fields.get(DashboardWidget.FIELD_CONFIG);
+    public DashboardWidget fromPersisted(BasicDBObject fields) throws DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+        final String type = (String)fields.get(DashboardWidget.FIELD_TYPE);
+        final BasicDBObject config = (BasicDBObject) fields.get(DashboardWidget.FIELD_CONFIG);
 
         // Build timerange.
-        BasicDBObject timerangeConfig = (BasicDBObject) config.get("timerange");
-
-        final String rangeType = (String) timerangeConfig.get(DashboardWidget.FIELD_TYPE);
-        if (rangeType == null) {
-            throw new InvalidRangeParametersException("range type not set");
-        }
+        final BasicDBObject timerangeConfig = (BasicDBObject) config.get("timerange");
 
         final String widgetId = (String) fields.get(DashboardWidget.FIELD_ID);
 
-        TimeRange timeRange;
-        try {
-            switch (rangeType) {
-                case "relative":
-                    timeRange = RelativeRange.create((Integer) timerangeConfig.get("range"));
-                    break;
-                case "keyword":
-                    timeRange = KeywordRange.create((String) timerangeConfig.get("keyword"));
-                    break;
-                case "absolute":
-                    String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-                    String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-
-                    timeRange = AbsoluteRange.create(from, to);
-                    break;
-                default:
-                    throw new InvalidRangeParametersException("range_type not recognized");
-            }
-        } catch (InvalidRangeParametersException e) {
-            LOG.error("Invalid time range provided on widget " + widgetId, e);
-            timeRange = null;
-        }
+        final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
         final String description = (String) fields.get(DashboardWidget.FIELD_DESCRIPTION);
         final int cacheTime = (int) firstNonNull(fields.get(DashboardWidget.FIELD_CACHE_TIME), 0);
 
-        return buildDashboardWidget(type, searches, widgetId, description, cacheTime,
-                config, (String) config.get("query"), timeRange, (String) fields.get(DashboardWidget.FIELD_CREATOR_USER_ID));
+        return buildDashboardWidget(type, widgetId, description, cacheTime,
+                config, timeRange, (String) fields.get(DashboardWidget.FIELD_CREATOR_USER_ID));
     }
 
     public DashboardWidget buildDashboardWidget(
-            final DashboardWidget.Type type,
-            final Searches searches,
+            final String type,
             final String widgetId,
             final String description,
             final int requestedCacheTime,
             final Map<String, Object> config,
-            final String query,
             final TimeRange timeRange,
             final String creatorUserId) throws DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
 
         final WidgetCacheTime cacheTime = cacheTimeFactory.create(requestedCacheTime);
-        return new DashboardWidget(type, widgetId, timeRange, description, cacheTimeFactory.create(requestedCacheTime), config, creatorUserId);
+        return new DashboardWidget(type, widgetId, timeRange, description, cacheTime, config, creatorUserId);
     }
 }
