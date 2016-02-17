@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConvers
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
@@ -103,6 +104,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
 
         functions.put(Now.NAME, new Now());
+        functions.put(FlexParseDate.NAME, new FlexParseDate());
         functions.put(ParseDate.NAME, new ParseDate());
 
         functionRegistry = new FunctionRegistry(functions);
