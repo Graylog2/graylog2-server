@@ -6,7 +6,7 @@
 
 ### Environment
 
-* **Graylog Version:**
-* **Elasticsearch Version:**
-* **MongoDB Version:**
-* **Operating System:**
+* Graylog Version:
+* Elasticsearch Version:
+* MongoDB Version:
+* Operating System:
