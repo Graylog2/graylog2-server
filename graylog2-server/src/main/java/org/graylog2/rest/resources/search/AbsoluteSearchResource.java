@@ -32,6 +32,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
@@ -60,8 +61,8 @@ public class AbsoluteSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
 
     @Inject
-    public AbsoluteSearchResource(Searches searches) {
-        super(searches);
+    public AbsoluteSearchResource(Searches searches, ClusterConfigService clusterConfigService) {
+        super(searches, clusterConfigService);
     }
 
     @GET
@@ -310,7 +311,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {
         try {
-            return AbsoluteRange.create(from, to);
+            return restrictTimeRange(AbsoluteRange.create(from, to));
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new BadRequestException("Invalid timerange parameters provided", e);

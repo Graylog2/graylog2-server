@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
@@ -25,9 +26,11 @@ import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -201,5 +204,23 @@ public class IndexHelperTest {
                 .containsOnly(indexRange0.indexName(), indexRange1.indexName());
         assertThat(IndexHelper.determineAffectedIndices(indexRangeService, deflector, relativeRange))
                 .containsOnly(indexRange0.indexName(), indexRange1.indexName());
+    }
+
+    @Test
+    public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
+        assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
+    }
+
+    @Test
+    public void getTimestampRangeFilterReturnsRangeQueryWithGivenTimeRange() {
+        final DateTime from = new DateTime(2016, 1, 15, 12, 0, DateTimeZone.UTC);
+        final DateTime to = from.plusHours(1);
+        final TimeRange timeRange = AbsoluteRange.create(from, to);
+        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) IndexHelper.getTimestampRangeFilter(timeRange);
+        assertThat(queryBuilder)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("name", "timestamp")
+                .hasFieldOrPropertyWithValue("from", Tools.buildElasticSearchTimeFormat(from))
+                .hasFieldOrPropertyWithValue("to", Tools.buildElasticSearchTimeFormat(to));
     }
 }

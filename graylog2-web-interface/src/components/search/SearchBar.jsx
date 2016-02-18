@@ -17,11 +17,13 @@ import SavedSearchesActions from 'actions/search/SavedSearchesActions';
 import UIUtils from 'util/UIUtils';
 
 import DateTime from 'logic/datetimes/DateTime';
+import moment from 'moment';
 
 const SearchBar = React.createClass({
   propTypes: {
     userPreferences: PropTypes.object,
     savedSearches: PropTypes.arrayOf(PropTypes.object).isRequired,
+    config: PropTypes.object,
   },
 
   getInitialState() {
@@ -195,6 +197,37 @@ const SearchBar = React.createClass({
 
     switch (this.state.rangeType) {
       case 'relative':
+        const availableOptions = this.props.config ? this.props.config.relative_timerange_options : null;
+        const timeRangeLimit = this.props.config ? moment.duration(this.props.config.query_time_range_limit) : null;
+        let options;
+
+        if (availableOptions) {
+          let all = null;
+          options = Object.keys(availableOptions).map((key) => {
+            const seconds = moment.duration(key).asSeconds();
+
+            if (timeRangeLimit > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
+              return null;
+            }
+
+            const option = (<option key={'relative-option-' + key} value={seconds}>{availableOptions[key]}</option>);
+
+            // The "search in all messages" option should be the last one.
+            if (key === 'PT0S') {
+              all = option;
+              return null;
+            } else {
+              return option;
+            }
+          });
+
+          if (all) {
+            options.push(all);
+          }
+        } else {
+          options = (<option value="300">Loading...</option>);
+        }
+
         selector = (
           <div className="timerange-selector relative"
                style={{width: 270, marginLeft: 50}}>
@@ -205,19 +238,7 @@ const SearchBar = React.createClass({
                    name="relative"
                    onChange={this._rangeParamsChanged('relative')}
                    className="input-sm">
-              <option value="300">Search in the last 5 minutes</option>
-              <option value="900">Search in the last 15 minutes</option>
-              <option value="1800">Search in the last 30 minutes</option>
-              <option value="3600">Search in the last 1 hour</option>
-              <option value="7200">Search in the last 2 hours</option>
-              <option value="28800">Search in the last 8 hours</option>
-              <option value="86400">Search in the last 1 day</option>
-              <option value="172800">Search in the last 2 days</option>
-              <option value="432000">Search in the last 5 days</option>
-              <option value="604800">Search in the last 7 days</option>
-              <option value="1209600">Search in the last 14 days</option>
-              <option value="2592000">Search in the last 30 days</option>
-              <option value="0">Search in all messages</option>
+              {options}
             </Input>
           </div>
         );

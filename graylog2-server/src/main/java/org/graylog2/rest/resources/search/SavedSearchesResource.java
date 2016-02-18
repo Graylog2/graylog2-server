@@ -29,6 +29,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
@@ -60,8 +61,9 @@ public class SavedSearchesResource extends SearchResource {
 
     @Inject
     public SavedSearchesResource(Searches searches,
-                                 SavedSearchService savedSearchService) {
-        super(searches);
+                                 SavedSearchService savedSearchService,
+                                 ClusterConfigService clusterConfigService) {
+        super(searches, clusterConfigService);
         this.savedSearchService = savedSearchService;
     }
 

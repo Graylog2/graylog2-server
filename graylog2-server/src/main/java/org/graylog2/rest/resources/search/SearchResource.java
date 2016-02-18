@@ -31,8 +31,10 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
@@ -45,6 +47,8 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +68,12 @@ public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     protected final Searches searches;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SearchResource(Searches searches) {
+    public SearchResource(Searches searches, ClusterConfigService clusterConfigService) {
         this.searches = searches;
+        this.clusterConfigService = clusterConfigService;
     }
 
     protected void validateInterval(String interval) {
@@ -223,7 +229,7 @@ public abstract class SearchResource extends RestResource {
         QueryParseError errorMessage = QueryParseError.create(query, "Unable to execute search", e.getClass().getCanonicalName());
 
         // We're so going to hell for this…
-        if(e.getMessage().contains("nested: ParseException")) {
+        if (e.getMessage().contains("nested: ParseException")) {
             final QueryParser queryParser = new QueryParser("", new StandardAnalyzer());
             try {
                 queryParser.parse(query);
@@ -331,5 +337,22 @@ public abstract class SearchResource extends RestResource {
                 }
             }
         };
+    }
+
+    protected org.graylog2.indexer.searches.timeranges.TimeRange restrictTimeRange(final org.graylog2.indexer.searches.timeranges.TimeRange timeRange) {
+        final DateTime originalFrom = timeRange.getFrom();
+        final DateTime to = timeRange.getTo();
+        final DateTime from;
+
+        final SearchesClusterConfig config = clusterConfigService.get(SearchesClusterConfig.class);
+
+        if (config == null || Period.ZERO.equals(config.queryTimeRangeLimit())) {
+            from = originalFrom;
+        } else {
+            final DateTime limitedFrom = to.minus(config.queryTimeRangeLimit());
+            from = limitedFrom.isAfter(originalFrom) ? limitedFrom : originalFrom;
+        }
+
+        return AbsoluteRange.create(from, to);
     }
 }
