@@ -31,6 +31,8 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
+import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -100,6 +102,10 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SHA1.NAME, SHA1.class);
         addMessageProcessorFunction(SHA256.NAME, SHA256.class);
         addMessageProcessorFunction(SHA512.NAME, SHA512.class);
+
+        // ip handling
+        addMessageProcessorFunction(CidrMatch.NAME, CidrMatch.class);
+        addMessageProcessorFunction(IpAddressConversion.NAME, IpAddressConversion.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

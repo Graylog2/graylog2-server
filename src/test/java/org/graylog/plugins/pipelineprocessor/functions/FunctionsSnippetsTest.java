@@ -31,6 +31,8 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
+import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
@@ -120,6 +122,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SHA1.NAME, new SHA1());
         functions.put(SHA256.NAME, new SHA256());
         functions.put(SHA512.NAME, new SHA512());
+
+        functions.put(IpAddressConversion.NAME, new IpAddressConversion());
+        functions.put(CidrMatch.NAME, new CidrMatch());
+
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -236,4 +242,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("has_xyz")).isInstanceOf(Boolean.class);
         assertThat((boolean)message.getField("has_xyz")).isFalse();
     }
+
+    @Test
+    public void ipMatching() {
+        final Rule rule = parser.parseRule(ruleForTest());
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+    }
+
 }
