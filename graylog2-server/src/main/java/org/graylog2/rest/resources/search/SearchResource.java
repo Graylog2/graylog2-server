@@ -31,8 +31,10 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
@@ -46,13 +48,11 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.Response;
@@ -68,12 +68,12 @@ public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     protected final Searches searches;
-    protected final Duration timeRangeLimit;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SearchResource(Searches searches, @Named("query_time_range_limit") @Nullable Duration timeRangeLimit) {
+    public SearchResource(Searches searches, ClusterConfigService clusterConfigService) {
         this.searches = searches;
-        this.timeRangeLimit = timeRangeLimit;
+        this.clusterConfigService = clusterConfigService;
     }
 
     protected void validateInterval(String interval) {
@@ -343,10 +343,13 @@ public abstract class SearchResource extends RestResource {
         final DateTime originalFrom = timeRange.getFrom();
         final DateTime to = timeRange.getTo();
         final DateTime from;
-        if (timeRangeLimit == null) {
+
+        final SearchesClusterConfig config = clusterConfigService.get(SearchesClusterConfig.class);
+
+        if (config == null || Period.ZERO.equals(config.queryTimeRangeLimit())) {
             from = originalFrom;
         } else {
-            final DateTime limitedFrom = to.minus(timeRangeLimit);
+            final DateTime limitedFrom = to.minus(config.queryTimeRangeLimit());
             from = limitedFrom.isAfter(originalFrom) ? limitedFrom : originalFrom;
         }
 

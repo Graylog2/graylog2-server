@@ -17,11 +17,13 @@
 package org.graylog2.rest.resources.search;
 
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 public class SearchResourceTest {
     @Rule
@@ -38,18 +41,31 @@ public class SearchResourceTest {
     @Mock
     private Searches searches;
 
+    @Mock
+    private ClusterConfigService clusterConfigService;
+
     private SearchResource searchResource;
-    private Duration timeRangeLimit;
+    private Period queryLimitPeriod;
 
     @Before
     public void setUp() {
-        timeRangeLimit = Duration.standardDays(1L);
-        searchResource = new SearchResource(searches, timeRangeLimit) {
+        queryLimitPeriod = Period.parse("P1D");
+        searchResource = new SearchResource(searches, clusterConfigService) {
         };
+
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+                .toBuilder()
+                .queryTimeRangeLimit(queryLimitPeriod)
+                .build());
     }
 
     @Test
     public void restrictTimeRangeReturnsGivenTimeRangeWithinLimit() {
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+                .toBuilder()
+                .queryTimeRangeLimit(queryLimitPeriod)
+                .build());
+
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);
         final DateTime to = from.plusHours(1);
         final TimeRange timeRange = AbsoluteRange.create(from, to);
@@ -62,7 +78,12 @@ public class SearchResourceTest {
 
     @Test
     public void restrictTimeRangeReturnsGivenTimeRangeIfNoLimitHasBeenSet() {
-        final SearchResource resource = new SearchResource(searches, null) {
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+                .toBuilder()
+                .queryTimeRangeLimit(Period.ZERO)
+                .build());
+
+        final SearchResource resource = new SearchResource(searches, clusterConfigService) {
         };
 
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);
@@ -77,13 +98,18 @@ public class SearchResourceTest {
 
     @Test
     public void restrictTimeRangeReturnsLimitedTimeRange() {
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+                .toBuilder()
+                .queryTimeRangeLimit(queryLimitPeriod)
+                .build());
+
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);
-        final DateTime to = from.plus(timeRangeLimit.multipliedBy(2L));
+        final DateTime to = from.plus(queryLimitPeriod.multipliedBy(2));
         final TimeRange timeRange = AbsoluteRange.create(from, to);
         final TimeRange restrictedTimeRange = searchResource.restrictTimeRange(timeRange);
 
         assertThat(restrictedTimeRange).isNotNull();
-        assertThat(restrictedTimeRange.getFrom()).isEqualTo(to.minus(timeRangeLimit));
+        assertThat(restrictedTimeRange.getFrom()).isEqualTo(to.minus(queryLimitPeriod));
         assertThat(restrictedTimeRange.getTo()).isEqualTo(to);
     }
 }

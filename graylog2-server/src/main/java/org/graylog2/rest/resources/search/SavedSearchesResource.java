@@ -29,16 +29,14 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.Duration;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -64,8 +62,8 @@ public class SavedSearchesResource extends SearchResource {
     @Inject
     public SavedSearchesResource(Searches searches,
                                  SavedSearchService savedSearchService,
-                                 @Named("query_time_range_limit") @Nullable Duration timeRangeLimit) {
-        super(searches, timeRangeLimit);
+                                 ClusterConfigService clusterConfigService) {
+        super(searches, clusterConfigService);
         this.savedSearchService = savedSearchService;
     }
 
