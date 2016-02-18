@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.shared.jackson.SizeSerializer;
@@ -51,8 +52,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
                 .setTypeFactory(typeFactory)
-                .registerModule(new JodaModule())
                 .registerModule(new GuavaModule())
+                .registerModule(new JodaModule())
+                .registerModule(new Jdk8Module())
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
                 .registerModule(new SimpleModule("Graylog")
                         .addSerializer(new RangeJsonSerializer())
