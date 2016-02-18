@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
-import { Spinner } from 'components/common';
+import { PageHeader, Spinner } from 'components/common';
 
 import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 import ConfigurationActions from 'actions/configurations/ConfigurationActions';
@@ -50,11 +50,19 @@ const ConfigurationsPage = React.createClass({
     }
 
     return (
-      <Row className="content">
-        <Col md={12}>
-          {searchesConfigComponent}
-        </Col>
-      </Row>
+      <span>
+        <PageHeader title="Configurations">
+          <span>
+            You can configure system settings for different sub systems on this page.
+          </span>
+        </PageHeader>
+
+        <Row className="content">
+          <Col md={12}>
+            {searchesConfigComponent}
+          </Col>
+        </Row>
+      </span>
     );
   },
 });

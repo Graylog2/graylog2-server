@@ -1,6 +1,7 @@
 import React from 'react';
-import { Row, Col, Input, Button } from 'react-bootstrap';
+import { Input, Button } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { IfPermitted } from 'components/common';
 
 import moment from 'moment';
 import {} from 'moment-duration-format';
@@ -74,36 +75,38 @@ const SearchesConfig = React.createClass({
     const duration = moment.duration(config.query_time_range_limit);
 
     return (
-      <Row>
-        <Col md={12}>
-          <h2>Search Configuration</h2>
+      <div>
+        <h2>Search Configuration</h2>
 
-          <dl className={style.deflist}>
-            <dt>Query time range limit</dt>
-            <dd>{config.query_time_range_limit} ({duration.format()})</dd>
-          </dl>
+        <dl className={style.deflist}>
+          <dt>Query time range limit</dt>
+          <dd>{config.query_time_range_limit} ({duration.format()})</dd>
+          <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which
+            span a lot of data and would need a long time and many resources to complete (if at all).</dd>
+        </dl>
 
-          <Button onClick={this._openModal}>Update config</Button>
+        <IfPermitted permissions="clusterconfigentry:edit">
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+        </IfPermitted>
 
-          <BootstrapModalForm ref="searchesConfigModal"
-                              title="Update Search Configuration"
-                              onSubmitForm={this._saveConfig}
-                              submitButtonText="Save">
-            <fieldset>
-              <Input type="text"
-                     ref="query_time_range_limit"
-                     label="Query time range limit (ISO8601 Duration)"
-                     onChange={this._onPeriodUpdate('query_time_range_limit')}
-                     value={this.state.query_time_range_limit}
-                     help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
-                     addonAfter={this._formatDuration()}
-                     bsStyle={this._validationState()}
-                     autofocus
-                     required />
-            </fieldset>
-          </BootstrapModalForm>
-        </Col>
-      </Row>
+        <BootstrapModalForm ref="searchesConfigModal"
+                            title="Update Search Configuration"
+                            onSubmitForm={this._saveConfig}
+                            submitButtonText="Save">
+          <fieldset>
+            <Input type="text"
+                   ref="query_time_range_limit"
+                   label="Query time range limit (ISO8601 Duration)"
+                   onChange={this._onPeriodUpdate('query_time_range_limit')}
+                   value={this.state.query_time_range_limit}
+                   help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
+                   addonAfter={this._formatDuration()}
+                   bsStyle={this._validationState()}
+                   autofocus
+                   required />
+          </fieldset>
+        </BootstrapModalForm>
+      </div>
     );
   },
 });
