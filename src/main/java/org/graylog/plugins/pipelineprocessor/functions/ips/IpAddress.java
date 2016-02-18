@@ -16,7 +16,10 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.ips;
 
+import com.google.common.net.InetAddresses;
+
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Graylog's rule language wrapper for InetAddress.
@@ -34,8 +37,23 @@ public class IpAddress {
         this.address = address;
     }
 
-
     public InetAddress inetAddress() {
         return address;
+    }
+
+    @Override
+    public String toString() {
+        return InetAddresses.toAddrString(address);
+    }
+
+    public IpAddress getAnonymized() {
+        final byte[] address = this.address.getAddress();
+        address[address.length-1] = 0x00;
+        try {
+            return new IpAddress(InetAddress.getByAddress(address));
+        } catch (UnknownHostException e) {
+            // cannot happen, it's created from a valid InetAddress to begin with
+            throw new IllegalStateException(e);
+        }
     }
 }

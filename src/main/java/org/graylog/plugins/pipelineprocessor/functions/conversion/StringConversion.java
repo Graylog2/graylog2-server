@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.joda.time.DateTime;
 
 import java.util.LinkedHashMap;
@@ -57,13 +58,14 @@ public class StringConversion extends AbstractFunction<String> {
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
         // fast path for the most common targets
-        //noinspection Duplicates
         if (evaluated instanceof String
                 || evaluated instanceof Number
                 || evaluated instanceof Boolean
-                || evaluated instanceof DateTime) {
+                || evaluated instanceof DateTime
+                || evaluated instanceof IpAddress) {
             return evaluated.toString();
         } else {
+            //noinspection Duplicates
             try {
                 // slow path, we aren't sure that the object's class actually overrides toString() so we'll look it up.
                 final Class<?> klass = evaluated.getClass();

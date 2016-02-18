@@ -246,9 +246,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void ipMatching() {
         final Rule rule = parser.parseRule(ruleForTest());
-        evaluateRule(rule);
+        final Message message = evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("ip_anon")).isEqualTo("192.168.1.0");
+        assertThat(message.getField("ipv6_anon")).isEqualTo("2001:db8::");
     }
 
 }
