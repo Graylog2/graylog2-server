@@ -37,8 +37,42 @@ const AddToDashboardMenu = React.createClass({
     let widgetConfig = Immutable.Map(this.props.configuration);
     let searchParams = Immutable.Map(this.searchParams);
     // Changes the "relative" key used to store relative time-range to "range"
-    if (searchParams.has('relative')) {
-      searchParams = searchParams.set('range', searchParams.get('relative')).delete('relative');
+    if (searchParams.has('range_type')) {
+      switch (searchParams.get('range_type')) {
+        case 'relative':
+          const relativeTimeRange = Immutable.Map({
+            'relative': searchParams.get('relative'),
+            'type': 'relative',
+          });
+          searchParams = searchParams
+            .set('timerange', relativeTimeRange)
+            .delete('relative')
+            .delete('range_type');
+          break;
+        case 'absolute':
+          const from = searchParams.get('from');
+          const to = searchParams.get('to');
+          const absoluteTimeRange = Immutable.Map({
+            'type': 'absolute',
+            'from': from,
+            'to': to,
+          });
+          searchParams = searchParams
+            .set('timerange', absoluteTimeRange)
+            .delete('from')
+            .delete('to')
+            .delete('range_type');
+          break;
+        case 'keyword':
+          const keywordTimeRange = Immutable.Map({
+            'type': 'keyword',
+            'keyword': searchParams.get('keyword'),
+          });
+          searchParams = searchParams
+            .set('timerange', keywordTimeRange)
+            .delete('keyword')
+            .delete('range_type');
+      }
     }
     // Stores stream ID with the right key name for the add widget request
     if (searchParams.has('streamId')) {

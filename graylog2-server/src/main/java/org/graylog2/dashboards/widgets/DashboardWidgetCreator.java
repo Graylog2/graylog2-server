@@ -48,13 +48,7 @@ public class DashboardWidgetCreator {
         final String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
 
         // Build timerange.
-        final Map<String, Object> timerangeConfig;
-        if (awr.config().get("timerange") != null && awr.config().get("timerange") instanceof Map) {
-            timerangeConfig = (Map<String, Object>)awr.config().get("timerange");
-        } else {
-            timerangeConfig = awr.config();
-        }
-
+        final Map<String, Object> timerangeConfig = (Map<String, Object>)awr.config().get("timerange");
         final TimeRange timeRange = timeRangeFactory.create(timerangeConfig);
 
         return buildDashboardWidget(awr.type(), id, awr.description(), 0, awr.config(),
