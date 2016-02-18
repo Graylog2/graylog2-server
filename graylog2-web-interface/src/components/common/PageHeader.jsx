@@ -27,9 +27,11 @@ const PageHeader = React.createClass({
             <h1>
               {this.props.title}
             </h1>
+            {children[0] &&
             <p className="description">
               {children[0]}
             </p>
+            }
 
             {children[1] &&
             <SupportLink>
