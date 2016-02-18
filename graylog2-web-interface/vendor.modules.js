@@ -7,6 +7,7 @@ module.exports = [
   'react-router',
   'react-router-bootstrap',
   'reflux',
+  'reflux-core',
   'moment',
   'moment-timezone',
 ];
