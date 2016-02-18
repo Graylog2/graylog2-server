@@ -25,9 +25,11 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.joda.time.Period;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -55,6 +57,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .registerModule(new GuavaModule())
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
                 .registerModule(new SimpleModule("Graylog")
+                        .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer()));
