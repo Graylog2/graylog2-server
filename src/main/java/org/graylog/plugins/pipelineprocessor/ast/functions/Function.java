@@ -53,6 +53,7 @@ public interface Function<T> {
                 }
             } catch (Exception exception) {
                 log.warn("Unable to precompute argument value for " + e.getKey(), exception);
+                throw exception;
             }
         }
 
