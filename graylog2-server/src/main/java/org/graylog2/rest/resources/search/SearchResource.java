@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -354,12 +355,12 @@ public abstract class SearchResource extends RestResource {
         final DateTime to = timeRange.getTo();
         final DateTime from;
 
-        final SearchesClusterConfig config = clusterConfigService.get(SearchesClusterConfig.class);
+        final Optional<SearchesClusterConfig> config = clusterConfigService.get(SearchesClusterConfig.class);
 
-        if (config == null || Period.ZERO.equals(config.queryTimeRangeLimit())) {
+        if (!config.isPresent() || Period.ZERO.equals(config.get().queryTimeRangeLimit())) {
             from = originalFrom;
         } else {
-            final DateTime limitedFrom = to.minus(config.queryTimeRangeLimit());
+            final DateTime limitedFrom = to.minus(config.get().queryTimeRangeLimit());
             from = limitedFrom.isAfter(originalFrom) ? limitedFrom : originalFrom;
         }
 

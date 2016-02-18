@@ -33,6 +33,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,10 +62,9 @@ public class MessageProcessorsResource extends RestResource {
     @ApiOperation(value = "Get message processor configuration")
     @Path("config")
     public MessageProcessorsConfigWithDescriptors config() {
-        final MessageProcessorsConfig config = clusterConfigService.getOrDefault(MessageProcessorsConfig.class,
-                MessageProcessorsConfig.defaultConfig());
+        final Optional<MessageProcessorsConfig> config = clusterConfigService.getOrDefault(MessageProcessorsConfig.class);
 
-        return MessageProcessorsConfigWithDescriptors.fromConfig(config.withProcessors(processorClassNames), processorDescriptors);
+        return MessageProcessorsConfigWithDescriptors.fromConfig(config.get().withProcessors(processorClassNames), processorDescriptors);
     }
 
     @PUT

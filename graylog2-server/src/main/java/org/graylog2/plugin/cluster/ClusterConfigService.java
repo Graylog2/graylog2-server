@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.cluster;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -27,20 +28,30 @@ public interface ClusterConfigService {
      *
      * @param type The {@link Class} of the Java configuration bean to retrieve.
      * @param <T>  The type of the Java configuration bean.
-     * @return An instance of the requested type or {@code null} if it couldn't be retrieved.
+     * @return An instance of the requested type wrapped in {@link Optional}.
      */
-    <T> T get(Class<T> type);
+    <T> Optional<T> get(Class<T> type);
 
     /**
-     * Retrieve Java class of a certain type from the cluster configuration or return a default value
-     * in case that failed.
+     * Retrieve Java class of a certain type from the cluster configuration or return the default value
+     * of the configuration class using a static method with signature {@code public static <T> T defaultConfig()}
+     * in case it wasn't found.
      *
-     * @param type         The {@link Class} of the Java configuration bean to retrieve.
-     * @param defaultValue An instance of {@code T} which is returned as default value.
-     * @param <T>          The type of the Java configuration bean.
-     * @return An instance of the requested type.
+     * @param type The {@link Class} of the Java configuration bean to retrieve.
+     * @param <T>  The type of the Java configuration bean.
+     * @return An instance of the requested type wrapped in {@link Optional}.
      */
-    <T> T getOrDefault(Class<T> type, T defaultValue);
+    <T> Optional<T> getOrDefault(Class<T> type);
+
+    /**
+     * Return the default config instance of a cluster config class using a static method with signature
+     * {@code public static <T> T defaultConfig()}.
+     *
+     * @param type The {@link Class} of the Java configuration bean to retrieve.
+     * @param <T>  The type of the Java configuration bean.
+     * @return An instance of the requested type wrapped in {@link Optional}.
+     */
+    <T> Optional<T> getDefault(Class<T> type);
 
     /**
      * Write a configuration bean to the cluster configuration.

@@ -31,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -53,18 +55,18 @@ public class SearchResourceTest {
         searchResource = new SearchResource(searches, clusterConfigService) {
         };
 
-        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(Optional.of(SearchesClusterConfig.defaultConfig()
                 .toBuilder()
                 .queryTimeRangeLimit(queryLimitPeriod)
-                .build());
+                .build()));
     }
 
     @Test
     public void restrictTimeRangeReturnsGivenTimeRangeWithinLimit() {
-        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(Optional.of(SearchesClusterConfig.defaultConfig()
                 .toBuilder()
                 .queryTimeRangeLimit(queryLimitPeriod)
-                .build());
+                .build()));
 
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);
         final DateTime to = from.plusHours(1);
@@ -78,10 +80,10 @@ public class SearchResourceTest {
 
     @Test
     public void restrictTimeRangeReturnsGivenTimeRangeIfNoLimitHasBeenSet() {
-        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(Optional.of(SearchesClusterConfig.defaultConfig()
                 .toBuilder()
                 .queryTimeRangeLimit(Period.ZERO)
-                .build());
+                .build()));
 
         final SearchResource resource = new SearchResource(searches, clusterConfigService) {
         };
@@ -98,10 +100,10 @@ public class SearchResourceTest {
 
     @Test
     public void restrictTimeRangeReturnsLimitedTimeRange() {
-        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(SearchesClusterConfig.createDefault()
+        when(clusterConfigService.get(SearchesClusterConfig.class)).thenReturn(Optional.of(SearchesClusterConfig.defaultConfig()
                 .toBuilder()
                 .queryTimeRangeLimit(queryLimitPeriod)
-                .build());
+                .build()));
 
         final DateTime from = new DateTime(2015, 1, 15, 12, 0, DateTimeZone.UTC);
         final DateTime to = from.plus(queryLimitPeriod.multipliedBy(2));

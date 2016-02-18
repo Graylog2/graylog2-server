@@ -28,9 +28,6 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class ContentPackLoaderConfig {
-    public static final ContentPackLoaderConfig EMPTY =
-            create(Collections.<String>emptySet(), Collections.<String>emptySet(), Collections.<String, String>emptyMap());
-
     @JsonProperty("loaded_content_packs")
     public abstract Set<String> loadedContentPacks();
 
@@ -45,5 +42,9 @@ public abstract class ContentPackLoaderConfig {
                                                  @JsonProperty("applied_content_packs") Set<String> appliedContentPacks,
                                                  @JsonProperty("checksums") Map<String, String> checksums) {
         return new AutoValue_ContentPackLoaderConfig(loadedContentPacks, appliedContentPacks, checksums);
+    }
+
+    public static ContentPackLoaderConfig defaultConfig() {
+        return create(Collections.emptySet(), Collections.emptySet(), Collections.emptyMap());
     }
 }

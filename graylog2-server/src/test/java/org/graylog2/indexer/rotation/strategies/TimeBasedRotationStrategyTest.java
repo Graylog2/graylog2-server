@@ -31,6 +31,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Optional;
+
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
@@ -119,7 +121,7 @@ public class TimeBasedRotationStrategyTest {
 
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
         when(deflector.getNewestTargetName()).thenReturn("ignored");
-        when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(Optional.of(TimeBasedRotationStrategyConfig.create(period)));
 
         final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
@@ -153,7 +155,7 @@ public class TimeBasedRotationStrategyTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
         when(deflector.getNewestTargetName()).thenReturn("ignored");
-        when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(Optional.of(TimeBasedRotationStrategyConfig.create(period)));
 
         final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
 

@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 public class ConfigurationManagementPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationManagementPeriodical.class);
@@ -54,45 +55,45 @@ public class ConfigurationManagementPeriodical extends Periodical {
     // Migrate old Elasticsearch config settings to new ClusterConfig based ones.
     public void migrateElasticsearchConfig() {
         // All default rotation strategy settings.
-        final MessageCountRotationStrategyConfig messageCountRotationStrategyConfig = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
-        final SizeBasedRotationStrategyConfig sizeBasedRotationStrategyConfig = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
-        final TimeBasedRotationStrategyConfig timeBasedRotationStrategyConfig = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
+        final Optional<MessageCountRotationStrategyConfig> messageCountRotationStrategyConfig = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
+        final Optional<SizeBasedRotationStrategyConfig> sizeBasedRotationStrategyConfig = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
+        final Optional<TimeBasedRotationStrategyConfig> timeBasedRotationStrategyConfig = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
 
-        if (messageCountRotationStrategyConfig == null) {
+        if (!messageCountRotationStrategyConfig.isPresent()) {
             final MessageCountRotationStrategyConfig countConfig = MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex());
             clusterConfigService.write(countConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_docs_per_index", countConfig);
         }
-        if (sizeBasedRotationStrategyConfig == null) {
+        if (!sizeBasedRotationStrategyConfig.isPresent()) {
             final SizeBasedRotationStrategyConfig sizeConfig = SizeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxSizePerIndex());
             clusterConfigService.write(sizeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_size_per_index", sizeConfig);
         }
-        if (timeBasedRotationStrategyConfig == null) {
+        if (!timeBasedRotationStrategyConfig.isPresent()) {
             final TimeBasedRotationStrategyConfig timeConfig = TimeBasedRotationStrategyConfig.create(elasticsearchConfiguration.getMaxTimePerIndex());
             clusterConfigService.write(timeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
         }
 
         // All default retention strategy settings
-        final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
-        final DeletionRetentionStrategyConfig deletionRetentionStrategyConfig = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
+        final Optional<ClosingRetentionStrategyConfig> closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
+        final Optional<DeletionRetentionStrategyConfig> deletionRetentionStrategyConfig = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
 
-        if (closingRetentionStrategyConfig == null) {
+        if (!closingRetentionStrategyConfig.isPresent()) {
             final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(closingConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", closingConfig);
         }
 
-        if (deletionRetentionStrategyConfig == null) {
+        if (!deletionRetentionStrategyConfig.isPresent()) {
             final DeletionRetentionStrategyConfig deletionConfig = DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(deletionConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", deletionConfig);
         }
 
         // Selected rotation and retention strategies.
-        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (indexManagementConfig == null) {
+        final Optional<IndexManagementConfig> indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
+        if (!indexManagementConfig.isPresent()) {
             final Class<? extends RotationStrategy> rotationStrategyClass;
             switch (elasticsearchConfiguration.getRotationStrategy()) {
                 case "size":
@@ -129,9 +130,9 @@ public class ConfigurationManagementPeriodical extends Periodical {
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
         }
 
-        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
-        if (searchesClusterConfig == null) {
-            final SearchesClusterConfig config = SearchesClusterConfig.createDefault();
+        final Optional<SearchesClusterConfig> searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        if (!searchesClusterConfig.isPresent()) {
+            final SearchesClusterConfig config = SearchesClusterConfig.defaultConfig();
             LOG.info("Creating searches cluster config: {}", config);
             clusterConfigService.write(config);
         }

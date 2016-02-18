@@ -44,7 +44,7 @@ public abstract class MessageCountRotationStrategyConfig implements RotationStra
         return create(MessageCountRotationStrategyConfig.class.getCanonicalName(), maxDocsPerIndex);
     }
 
-    public static MessageCountRotationStrategyConfig createDefault() {
+    public static MessageCountRotationStrategyConfig defaultConfig() {
         return create(DEFAULT_MAX_DOCS_PER_INDEX);
     }
 }

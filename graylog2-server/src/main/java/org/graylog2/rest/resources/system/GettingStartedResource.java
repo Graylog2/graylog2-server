@@ -32,6 +32,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/GettingStartedGuides", description = "Getting Started guide")
@@ -49,11 +50,11 @@ public class GettingStartedResource extends RestResource {
     @GET
     @ApiOperation("Check whether to display the Getting started guide for this version")
     public DisplayGettingStarted displayGettingStarted() {
-        final GettingStartedState gettingStartedState = clusterConfigService.get(GettingStartedState.class);
-        if (gettingStartedState == null) {
-            return  DisplayGettingStarted.create(true);
+        final Optional<GettingStartedState> gettingStartedState = clusterConfigService.get(GettingStartedState.class);
+        if (!gettingStartedState.isPresent()) {
+            return DisplayGettingStarted.create(true);
         }
-        final boolean isDismissed = gettingStartedState.dismissedInVersions().contains(currentMinorVersionString());
+        final boolean isDismissed = gettingStartedState.get().dismissedInVersions().contains(currentMinorVersionString());
         return DisplayGettingStarted.create(!isDismissed);
     }
 
@@ -61,10 +62,10 @@ public class GettingStartedResource extends RestResource {
     @Path("dismiss")
     @ApiOperation("Dismiss auto-showing getting started guide for this version")
     public void dismissGettingStarted() {
-        final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,
-                                                                                GettingStartedState.create(Sets.<String>newHashSet()));
-        gettingStartedState.dismissedInVersions().add(currentMinorVersionString());
-        clusterConfigService.write(gettingStartedState);
+        final Optional<GettingStartedState> gettingStartedState = clusterConfigService.get(GettingStartedState.class);
+        final GettingStartedState state = gettingStartedState.orElse(GettingStartedState.create(Sets.<String>newHashSet()));
+        state.dismissedInVersions().add(currentMinorVersionString());
+        clusterConfigService.write(state);
 
     }
 

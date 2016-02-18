@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -101,22 +102,22 @@ public class UserPermissionMigrationPeriodical extends Periodical {
             // filter out the individual permissions to dashboards and streams
             final List<String> dashboardStreamPermissions = Lists.newArrayList(
                     Sets.filter(permissionSet,
-                                new Predicate<String>() {
-                                    @Override
-                                    public boolean apply(String permission) {
-                                        return !basePermissions.contains(permission) && !permission.equals("*");
-                                    }
-                                }));
+                            new Predicate<String>() {
+                                @Override
+                                public boolean apply(String permission) {
+                                    return !basePermissions.contains(permission) && !permission.equals("*");
+                                }
+                            }));
             // add the minimal permission set back to the user
             fixedPermissions.addAll(permissions.userSelfEditPermissions(user.getName()));
             fixedPermissions.addAll(dashboardStreamPermissions);
 
             log.info("Migrating permissions to roles for user {} from permissions {} and roles {} to new permissions {} and roles {}",
-                     user.getName(),
-                     permissionSet,
-                     user.getRoleIds(),
-                     fixedPermissions,
-                     fixedRoleIds);
+                    user.getName(),
+                    permissionSet,
+                    user.getRoleIds(),
+                    fixedPermissions,
+                    fixedRoleIds);
 
             user.setRoleIds(fixedRoleIds);
             user.setPermissions(Lists.newArrayList(fixedPermissions));
@@ -149,11 +150,10 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        final UserPermissionMigrationState migrationState =
-                clusterConfigService.getOrDefault(UserPermissionMigrationState.class,
-                                                  UserPermissionMigrationState.create(false));
         // don't run again if the cluster config says we've already migrated the users
-        return !migrationState.migrationDone();
+        return !clusterConfigService.getOrDefault(UserPermissionMigrationState.class)
+                .flatMap(userPermissionMigrationState -> Optional.of(userPermissionMigrationState.migrationDone()))
+                .orElse(false);
     }
 
     @Override

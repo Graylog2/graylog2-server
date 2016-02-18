@@ -31,11 +31,11 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import static org.joda.time.DateTimeFieldType.dayOfMonth;
 import static org.joda.time.DateTimeFieldType.hourOfDay;
@@ -70,7 +70,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.createDefault();
+        return TimeBasedRotationStrategyConfig.defaultConfig();
     }
 
     /**
@@ -132,17 +132,16 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         return new DateTime(newValue, DateTimeZone.UTC);
     }
 
-    @Nonnull
     @Override
     protected Result shouldRotate(String index) {
-        final TimeBasedRotationStrategyConfig config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
+        final Optional<TimeBasedRotationStrategyConfig> config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
 
-        if (config == null) {
+        if (!config.isPresent()) {
             log.warn("No rotation strategy configuration found, not running index rotation!");
             return null;
         }
 
-        final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
+        final Period rotationPeriod = config.get().rotationPeriod().normalizedStandard();
         final DateTime now = Tools.nowUTC();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (lastRotation == null) {

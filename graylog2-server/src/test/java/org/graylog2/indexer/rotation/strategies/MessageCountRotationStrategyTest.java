@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -48,7 +50,7 @@ public class MessageCountRotationStrategyTest {
     public void testRotate() throws Exception {
         when(indices.numberOfMessages("name")).thenReturn(10L);
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(Optional.of(MessageCountRotationStrategyConfig.create(5)));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
@@ -61,7 +63,7 @@ public class MessageCountRotationStrategyTest {
     public void testDontRotate() throws Exception {
         when(indices.numberOfMessages("name")).thenReturn(1L);
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(Optional.of(MessageCountRotationStrategyConfig.create(5)));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 
@@ -75,7 +77,7 @@ public class MessageCountRotationStrategyTest {
     public void testIndexUnavailable() throws Exception {
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
+        when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(Optional.of(MessageCountRotationStrategyConfig.create(5)));
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService);
 

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -68,18 +69,18 @@ public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
     }
 
     private void sortProcessorChain() {
-        final MessageProcessorsConfig config = clusterConfigService.get(MessageProcessorsConfig.class);
+        final Optional<MessageProcessorsConfig> config = clusterConfigService.get(MessageProcessorsConfig.class);
 
-        if (config != null) {
+        if (config.isPresent()) {
             // if we have an explicit ordering use that (unknown last, partial ordering over the given list)
-            classNameOrdering = new ExplicitOrdering(config.processorOrder());
+            classNameOrdering = new ExplicitOrdering(config.get().processorOrder());
         }
         final ImmutableList<MessageProcessor> sortedCopy =
                 classNameOrdering.onResultOf(mp -> mp.getClass().getCanonicalName()).immutableSortedCopy(processors);
 
         final Collection<MessageProcessor> enabledMessageProcessors =
                 Collections2.filter(sortedCopy,
-                                    mp -> config == null || !config.disabledProcessors().contains(mp.getClass().getCanonicalName()));
+                                    mp -> !config.isPresent() || !config.get().disabledProcessors().contains(mp.getClass().getCanonicalName()));
         LOG.debug("New active message processors: {}", enabledMessageProcessors);
         sortedProcessors.set(ImmutableList.copyOf(enabledMessageProcessors));
     }

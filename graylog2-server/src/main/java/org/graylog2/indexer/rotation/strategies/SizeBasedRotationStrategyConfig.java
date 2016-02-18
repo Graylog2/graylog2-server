@@ -45,7 +45,7 @@ public abstract class SizeBasedRotationStrategyConfig implements RotationStrateg
         return create(SizeBasedRotationStrategyConfig.class.getCanonicalName(), maxSize);
     }
 
-    public static SizeBasedRotationStrategyConfig createDefault() {
+    public static SizeBasedRotationStrategyConfig defaultConfig() {
         return create(DEFAULT_MAX_SIZE);
     }
 }

@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -56,7 +57,7 @@ public class SizeBasedRotationStrategyTest {
 
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
+        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(Optional.of(SizeBasedRotationStrategyConfig.create(100L)));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
@@ -74,7 +75,7 @@ public class SizeBasedRotationStrategyTest {
 
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
+        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(Optional.of(SizeBasedRotationStrategyConfig.create(100000L)));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 
@@ -88,7 +89,7 @@ public class SizeBasedRotationStrategyTest {
     public void testRotateFailed() throws Exception {
         when(indices.getIndexStats("name")).thenReturn(null);
         when(deflector.getNewestTargetName()).thenReturn("name");
-        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100));
+        when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(Optional.of(SizeBasedRotationStrategyConfig.create(100)));
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService);
 

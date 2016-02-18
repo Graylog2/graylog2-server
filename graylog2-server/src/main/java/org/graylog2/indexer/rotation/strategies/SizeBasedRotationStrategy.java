@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Optional;
 
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(SizeBasedRotationStrategy.class);
@@ -52,15 +53,15 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return SizeBasedRotationStrategyConfig.createDefault();
+        return SizeBasedRotationStrategyConfig.defaultConfig();
     }
 
     @Nullable
     @Override
     protected Result shouldRotate(final String index) {
-        final SizeBasedRotationStrategyConfig config = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
+        final Optional<SizeBasedRotationStrategyConfig> config = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
 
-        if (config == null) {
+        if (!config.isPresent()) {
             LOG.warn("No rotation strategy configuration found, not running index rotation!");
             return null;
         }
@@ -72,7 +73,8 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
 
         final long sizeInBytes = indexStats.primaries().getStore().getSizeInBytes();
 
-        final boolean shouldRotate = sizeInBytes > config.maxSize();
+        final long maxSize = config.get().maxSize();
+        final boolean shouldRotate = sizeInBytes > maxSize;
 
         return new Result() {
             public final MessageFormat ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH);
@@ -81,10 +83,10 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
             @Override
             public String getDescription() {
                 MessageFormat format = shouldRotate() ? ROTATE : NOT_ROTATE;
-                return format.format(new Object[] {
+                return format.format(new Object[]{
                         index,
                         sizeInBytes,
-                        config.maxSize()
+                        maxSize
                 });
             }
 
