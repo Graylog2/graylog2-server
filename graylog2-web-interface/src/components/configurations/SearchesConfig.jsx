@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, Button, Row, Col } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted } from 'components/common';
+import ObjectUtils from 'util/ObjectUtils';
 
 import moment from 'moment';
 import {} from 'moment-duration-format';
@@ -46,7 +47,7 @@ const SearchesConfig = React.createClass({
   },
 
   _updateTimerangeOptionsState(options) {
-    const config = this.state.config;
+    const config = ObjectUtils.clone(this.state.config);
     const newTimerangeOptions = {};
 
     options.forEach((option) => {
@@ -77,7 +78,7 @@ const SearchesConfig = React.createClass({
 
   _onPeriodUpdate(field) {
     return () => {
-      const update = this.state.config;
+      const update = ObjectUtils.clone(this.state.config);
       let period = this.refs[field].getValue().toUpperCase();
 
       if (!period.startsWith('P')) {
@@ -91,7 +92,7 @@ const SearchesConfig = React.createClass({
   },
 
   _onChecked() {
-    const config = this.state.config;
+    const config = ObjectUtils.clone(this.state.config);
 
     if (this.state.limitEnabled) {
       // If currently enabled, disable by setting the limit to 0 seconds.
@@ -106,7 +107,7 @@ const SearchesConfig = React.createClass({
 
   _onTimerangeOptionRemove(removedIdx) {
     return () => {
-      const options = this.state.timerangeOptionsList;
+      const options = ObjectUtils.clone(this.state.timerangeOptionsList);
 
       // Remove element at index
       options.splice(removedIdx, 1);
@@ -116,7 +117,7 @@ const SearchesConfig = React.createClass({
   },
 
   _onTimerangeOptionAdd() {
-    const options = this.state.timerangeOptionsList;
+    const options = ObjectUtils.clone(this.state.timerangeOptionsList);
 
     if (options) {
       options.push({period: 'PT1S', description: ''});
@@ -126,7 +127,7 @@ const SearchesConfig = React.createClass({
 
   _onTimerangeOptionChange(changedIdx, field) {
     return (e) => {
-      const options = this.state.timerangeOptionsList;
+      const options = ObjectUtils.clone(this.state.timerangeOptionsList);
 
       options.forEach((o, idx) => {
         if (idx === changedIdx) {
