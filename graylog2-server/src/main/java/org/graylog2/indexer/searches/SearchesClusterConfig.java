@@ -22,29 +22,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.Period;
-import org.joda.time.format.ISOPeriodFormat;
 
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class SearchesClusterConfig {
-    private static final org.joda.time.format.PeriodFormatter ISO_PERIOD_FORMAT = ISOPeriodFormat.standard();
-
     private static final Period DEFAULT_QUERY_TIME_RANGE_LIMIT = Period.ZERO;
     private static final Map<Period, String> DEFAULT_RELATIVE_TIMERANGE_OPTIONS = ImmutableMap.<Period, String>builder()
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT5M"), "Search in the last 5 minutes")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT15M"), "Search in the last 15 minutes")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT30M"), "Search in the last 30 minutes")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT1H"), "Search in the last 1 hour")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT2H"), "Search in the last 2 hours")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("PT8H"), "Search in the last 8 hours")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P1D"), "Search in the last 1 day")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P2D"), "Search in the last 2 days")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P5D"), "Search in the last 5 days")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P7D"), "Search in the last 7 days")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P14D"), "Search in the last 14 days")
-            .put(ISO_PERIOD_FORMAT.parsePeriod("P30D"), "Search in the last 30 days")
+            .put(Period.minutes(5), "Search in the last 5 minutes")
+            .put(Period.minutes(15), "Search in the last 15 minutes")
+            .put(Period.minutes(30), "Search in the last 30 minutes")
+            .put(Period.hours(1), "Search in the last 1 hour")
+            .put(Period.hours(2), "Search in the last 2 hours")
+            .put(Period.hours(8), "Search in the last 8 hours")
+            .put(Period.days(1), "Search in the last 1 day")
+            .put(Period.days(2), "Search in the last 2 days")
+            .put(Period.days(5), "Search in the last 5 days")
+            .put(Period.days(7), "Search in the last 7 days")
+            .put(Period.days(14), "Search in the last 14 days")
+            .put(Period.days(30), "Search in the last 30 days")
             .put(Period.ZERO, "Search in all messages")
             .build();
 
