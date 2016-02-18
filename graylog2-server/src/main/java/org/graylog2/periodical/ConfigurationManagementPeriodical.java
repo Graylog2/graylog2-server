@@ -29,6 +29,7 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -126,6 +127,13 @@ public class ConfigurationManagementPeriodical extends Periodical {
                     retentionStrategyClass.getCanonicalName());
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
+        }
+
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        if (searchesClusterConfig == null) {
+            final SearchesClusterConfig config = SearchesClusterConfig.createDefault();
+            LOG.info("Creating searches cluster config: {}", config);
+            clusterConfigService.write(config);
         }
     }
 
