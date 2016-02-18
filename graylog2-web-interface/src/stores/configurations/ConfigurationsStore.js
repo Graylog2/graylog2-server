@@ -24,6 +24,14 @@ const ConfigurationsStore = Reflux.createStore({
     ConfigurationActions.list.promise(promise);
   },
 
+  listSearchesClusterConfig() {
+    const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
+      this.trigger({searchesClusterConfig: response});
+    });
+
+    ConfigurationActions.listSearchesClusterConfig.promise(promise);
+  },
+
   update(configType, config) {
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
@@ -31,6 +39,7 @@ const ConfigurationsStore = Reflux.createStore({
       const configuration = {};
       configuration[configType] = response;
       this.trigger({configuration: configuration});
+      UserNotification.success('Configuration updated successfully');
     }, this._errorHandler('Search config update failed', `Could not update search config: ${configType}`));
 
     ConfigurationActions.update.promise(promise);
