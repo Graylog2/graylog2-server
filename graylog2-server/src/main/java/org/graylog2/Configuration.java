@@ -26,7 +26,6 @@ import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.joda.time.DateTimeZone;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -158,9 +157,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
-
-    @Parameter(value = "query_time_range_limit")
-    private org.joda.time.Duration queryTimeRangeLimit = null;
 
     public boolean isMaster() {
         return isMaster;
@@ -322,10 +318,5 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getIndexRangesCleanupInterval() {
         return indexRangesCleanupInterval;
-    }
-
-    @Nullable
-    public org.joda.time.Duration getQueryTimeRangeLimit() {
-        return queryTimeRangeLimit;
     }
 }
