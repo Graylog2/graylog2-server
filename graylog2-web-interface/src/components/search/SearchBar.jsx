@@ -198,12 +198,19 @@ const SearchBar = React.createClass({
     switch (this.state.rangeType) {
       case 'relative':
         const availableOptions = this.props.config ? this.props.config.relative_timerange_options : null;
+        const timeRangeLimit = this.props.config ? moment.duration(this.props.config.query_time_range_limit) : null;
         let options;
 
         if (availableOptions) {
           let all = null;
           options = Object.keys(availableOptions).map((key) => {
-            const option = (<option key={'relative-option-' + key} value={moment.duration(key).asSeconds()}>{availableOptions[key]}</option>);
+            const seconds = moment.duration(key).asSeconds();
+
+            if (timeRangeLimit > 0 && (seconds > timeRangeLimit.asSeconds() || seconds === 0)) {
+              return null;
+            }
+
+            const option = (<option key={'relative-option-' + key} value={seconds}>{availableOptions[key]}</option>);
 
             // The "search in all messages" option should be the last one.
             if (key === 'PT0S') {
