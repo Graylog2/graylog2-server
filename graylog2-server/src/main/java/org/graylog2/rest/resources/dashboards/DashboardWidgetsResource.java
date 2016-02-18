@@ -104,7 +104,7 @@ public class DashboardWidgetsResource extends RestResource {
             checkPermission(RestPermissions.SEARCHES_KEYWORD);
         }
 
-        DashboardWidget widget;
+        final DashboardWidget widget;
         try {
             widget = dashboardWidgetCreator.fromRequest(awr, getCurrentUser().getName());
 
@@ -123,8 +123,7 @@ public class DashboardWidgetsResource extends RestResource {
         }
 
         final Map<String, String> result = ImmutableMap.of("widget_id", widget.getId());
-        final URI widgetUri = getUriBuilderToSelf().path(DashboardsResource.class)
-                .path("{dashboardId}/widgets/{widgetId}")
+        final URI widgetUri = getUriBuilderToSelf().path(DashboardWidgetsResource.class, "getWidget")
                 .build(dashboardId, widget.getId());
 
         return Response.created(widgetUri).entity(result).build();

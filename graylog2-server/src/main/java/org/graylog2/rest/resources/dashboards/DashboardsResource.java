@@ -90,8 +90,7 @@ public class DashboardsResource extends RestResource {
         final String id = dashboardService.save(dashboard);
 
         final Map<String, String> result = ImmutableMap.of("dashboard_id", id);
-        final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class)
-                .path("{dashboardId}")
+        final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class, "get")
                 .build(id);
 
         return Response.created(dashboardUri).entity(result).build();
