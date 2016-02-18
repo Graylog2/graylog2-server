@@ -111,9 +111,12 @@ public class PipelineRuleParserTest extends BaseParserTest {
             }
         });
         functions.put("one_arg", new AbstractFunction<String>() {
+
+            private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
+
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
-                return args.param("one").eval(args, context, String.class).orElse("");
+                return one.optional(args, context).orElse("");
             }
 
             @Override
@@ -121,16 +124,21 @@ public class PipelineRuleParserTest extends BaseParserTest {
                 return FunctionDescriptor.<String>builder()
                         .name("one_arg")
                         .returnType(String.class)
-                        .params(of(ParameterDescriptor.string("one").build()))
+                        .params(of(one))
                         .build();
             }
         });
         functions.put("concat", new AbstractFunction<String>() {
+
+            private final ParameterDescriptor<Object, Object> three = ParameterDescriptor.object("three").build();
+            private final ParameterDescriptor<Object, Object> two = ParameterDescriptor.object("two").build();
+            private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
+
             @Override
             public String evaluate(FunctionArgs args, EvaluationContext context) {
-                final Object one = args.param("one").eval(args, context, Object.class).orElse("");
-                final Object two = args.param("two").eval(args, context, Object.class).orElse("");
-                final Object three = args.param("three").eval(args, context, Object.class).orElse("");
+                final Object one = this.one.optional(args, context).orElse("");
+                final Object two = this.two.optional(args, context).orElse("");
+                final Object three = this.three.optional(args, context).orElse("");
                 return one.toString() + two.toString() + three.toString();
             }
 
@@ -140,9 +148,9 @@ public class PipelineRuleParserTest extends BaseParserTest {
                         .name("concat")
                         .returnType(String.class)
                         .params(of(
-                                ParameterDescriptor.string("one").build(),
-                                ParameterDescriptor.object("two").build(),
-                                ParameterDescriptor.object("three").build()
+                                one,
+                                two,
+                                three
                         ))
                         .build();
             }
@@ -184,9 +192,12 @@ public class PipelineRuleParserTest extends BaseParserTest {
             }
         });
         functions.put("customObject", new AbstractFunction<CustomObject>() {
+
+            private final ParameterDescriptor<String, String> aDefault = ParameterDescriptor.string("default").build();
+
             @Override
             public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
-                return new CustomObject(args.param("default").eval(args, context, String.class).orElse(""));
+                return new CustomObject(aDefault.optional(args, context).orElse(""));
             }
 
             @Override
@@ -194,14 +205,17 @@ public class PipelineRuleParserTest extends BaseParserTest {
                 return FunctionDescriptor.<CustomObject>builder()
                         .name("customObject")
                         .returnType(CustomObject.class)
-                        .params(of(ParameterDescriptor.string("default").build()))
+                        .params(of(aDefault))
                         .build();
             }
         });
         functions.put("keys", new AbstractFunction<List>() {
+
+            private final ParameterDescriptor<Map, Map> map = ParameterDescriptor.type("map", Map.class).build();
+
             @Override
             public List evaluate(FunctionArgs args, EvaluationContext context) {
-                final Optional<Map> map = args.param("map").eval(args, context, Map.class);
+                final Optional<Map> map = this.map.optional(args, context);
                 return Lists.newArrayList(map.orElse(Collections.emptyMap()).keySet());
             }
 
@@ -210,16 +224,18 @@ public class PipelineRuleParserTest extends BaseParserTest {
                 return FunctionDescriptor.<List>builder()
                         .name("keys")
                         .returnType(List.class)
-                        .params(of(ParameterDescriptor.type("map", Map.class).build()))
+                        .params(of(map))
                         .build();
             }
         });
         functions.put("sort", new AbstractFunction<Collection>() {
+
+            private final ParameterDescriptor<Collection, Collection> collection = ParameterDescriptor.type("collection",
+                                                                                                            Collection.class).build();
+
             @Override
             public Collection evaluate(FunctionArgs args, EvaluationContext context) {
-                final Collection collection = args.param("collection").eval(args,
-                                                             context,
-                                                             Collection.class).orElse(Collections.emptyList());
+                final Collection collection = this.collection.optional(args, context).orElse(Collections.emptyList());
                 return Ordering.natural().sortedCopy(collection);
             }
 
@@ -228,7 +244,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
                 return FunctionDescriptor.<Collection>builder()
                         .name("sort")
                         .returnType(Collection.class)
-                        .params(of(ParameterDescriptor.type("collection", Collection.class).build()))
+                        .params(of(collection))
                         .build();
             }
         });

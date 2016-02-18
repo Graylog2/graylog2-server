@@ -30,11 +30,16 @@ public class SetFields extends AbstractFunction<Void> {
 
     public static final String NAME = "set_fields";
     public static final String FIELDS = "fields";
+    private final ParameterDescriptor<Map, Map> fieldsParam;
+
+    public SetFields() {
+        fieldsParam = ParameterDescriptor.type(FIELDS, Map.class).build();
+    }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         //noinspection unchecked
-        final Map<String, Object> fields = args.param(FIELDS).evalRequired(args, context, Map.class);
+        final Map<String, Object> fields = fieldsParam.required(args, context);
         context.currentMessage().addFields(fields);
         return null;
     }
@@ -45,7 +50,7 @@ public class SetFields extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(
-                        ParameterDescriptor.type(FIELDS, Map.class).build()
+                        fieldsParam
                 ))
                 .build();
     }

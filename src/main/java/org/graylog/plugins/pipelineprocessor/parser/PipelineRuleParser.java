@@ -86,6 +86,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 
 import static java.util.stream.Collectors.toList;
 
@@ -216,13 +217,14 @@ public class PipelineRuleParser {
         private final Set<String> definedVars = Sets.newHashSet();
 
         // this is true for nested field accesses
-        private boolean idIsFieldAccess = false;
+        private Stack<Boolean> isIdIsFieldAccess = new Stack<>();
 
         public RuleAstBuilder(ParseContext parseContext) {
             this.parseContext = parseContext;
             args = parseContext.arguments();
             argsList = parseContext.argumentLists();
             exprs = parseContext.expressions();
+            isIdIsFieldAccess.push(false); // top of stack
         }
 
         @Override
@@ -373,12 +375,12 @@ public class PipelineRuleParser {
         @Override
         public void enterNested(RuleLangParser.NestedContext ctx) {
             // nested field access is ok, these are not rule variables
-            idIsFieldAccess = true;
+            isIdIsFieldAccess.push(true);
         }
 
         @Override
         public void exitNested(RuleLangParser.NestedContext ctx) {
-            idIsFieldAccess = false; // reset for error checks
+            isIdIsFieldAccess.pop(); // reset for error checks
             final Expression object = exprs.get(ctx.fieldSet);
             final Expression field = exprs.get(ctx.field);
             final FieldAccessExpression expr = new FieldAccessExpression(object, field);
@@ -513,12 +515,12 @@ public class PipelineRuleParser {
         @Override
         public void enterMessageRef(RuleLangParser.MessageRefContext ctx) {
             // nested field access is ok, these are not rule variables
-            idIsFieldAccess = true;
+            isIdIsFieldAccess.push(true);
         }
 
         @Override
         public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
-            idIsFieldAccess = false; // reset for error checks
+            isIdIsFieldAccess.pop(); // reset for error checks
             final Expression fieldExpr = exprs.get(ctx.field);
             final MessageRefExpression expr = new MessageRefExpression(fieldExpr);
             log.info("$MSG: ctx {} => {}", ctx, expr);
@@ -530,13 +532,13 @@ public class PipelineRuleParser {
             // unquote identifier if necessary
             final String identifierName = unquote(ctx.Identifier().getText(), '`');
 
-            if (!idIsFieldAccess && !definedVars.contains(identifierName)) {
+            if (!isIdIsFieldAccess.peek() && !definedVars.contains(identifierName)) {
                 parseContext.addError(new UndeclaredVariable(ctx));
             }
             final Expression expr;
             String type;
             // if the identifier is also a declared variable name prefer the variable
-            if (idIsFieldAccess && !definedVars.contains(identifierName)) {
+            if (isIdIsFieldAccess.peek() && !definedVars.contains(identifierName)) {
                 expr = new FieldRefExpression(identifierName);
                 type = "FIELDREF";
             } else {
@@ -661,7 +663,8 @@ public class PipelineRuleParser {
                 sb.append(" ( ");
                 sb.append(expression.getClass().getSimpleName());
                 sb.append(":").append(ctx.getClass().getSimpleName()).append(" ");
-                sb.append(" <").append(expression.getType().getSimpleName()).append(">");
+                sb.append(" <").append(expression.getType().getSimpleName()).append("> ");
+                sb.append(ctx.getText());
             }
         }
 

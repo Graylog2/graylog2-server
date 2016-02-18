@@ -246,7 +246,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void ipMatching() {
         final Rule rule = parser.parseRule(ruleForTest());
-        final Message message = evaluateRule(rule);
+        final Message in = new Message("test", "test", Tools.nowUTC());
+        in.addField("ip", "192.168.1.20");
+        final Message message = evaluateRule(rule, in);
 
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();

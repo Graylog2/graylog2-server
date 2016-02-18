@@ -33,22 +33,28 @@ public class FlexParseDate extends TimezoneAwareFunction {
     public static final String VALUE = "value";
     public static final String NAME = "flex_parse_date";
     public static final String DEFAULT = "default";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<DateTime, DateTime> defaultParam;
+
+    public FlexParseDate() {
+        valueParam = ParameterDescriptor.string(VALUE).build();
+        defaultParam = ParameterDescriptor.type(DEFAULT, DateTime.class).optional().build();
+    }
 
     @Override
     protected DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
-        final String time = args.param(VALUE).evalRequired(args, context, String.class);
-        final DateTimeZone timeZone = args.param(TIMEZONE).evalRequired(args, context, DateTimeZone.class);
+        final String time = valueParam.required(args, context);
 
-        final List<DateGroup> dates = new Parser(timeZone.toTimeZone()).parse(time);
+        final List<DateGroup> dates = new Parser(timezone.toTimeZone()).parse(time);
         if (dates.size() == 0) {
-            final Optional<DateTime> defaultTime = args.param(DEFAULT).eval(args, context, DateTime.class);
+            final Optional<DateTime> defaultTime = defaultParam.optional(args, context);
             if (defaultTime.isPresent()) {
                 return defaultTime.get();
             }
             // TODO really? this should probably throw an exception of some sort to be handled in the interpreter
             return null;
         }
-        return new DateTime(dates.get(0).getDates().get(0), timeZone);
+        return new DateTime(dates.get(0).getDates().get(0), timezone);
     }
 
     @Override
@@ -59,8 +65,8 @@ public class FlexParseDate extends TimezoneAwareFunction {
     @Override
     protected ImmutableList<ParameterDescriptor> params() {
         return ImmutableList.of(
-                ParameterDescriptor.string(VALUE).build(),
-                ParameterDescriptor.type(DEFAULT, DateTime.class).optional().build()
+                valueParam,
+                defaultParam
         );
     }
 }

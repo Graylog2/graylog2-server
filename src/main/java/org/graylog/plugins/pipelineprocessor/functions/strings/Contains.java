@@ -28,12 +28,21 @@ import static com.google.common.collect.ImmutableList.of;
 public class Contains extends AbstractFunction<Boolean> {
 
     public static final String NAME = "contains";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<String, String> searchParam;
+    private final ParameterDescriptor<Boolean, Boolean> ignoreCaseParam;
+
+    public Contains() {
+        valueParam = ParameterDescriptor.string("value").build();
+        searchParam = ParameterDescriptor.string("search").build();
+        ignoreCaseParam = ParameterDescriptor.bool("ignore_case").optional().build();
+    }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param("value").evalRequired(args, context, String.class);
-        final String search = args.param("search").evalRequired(args, context, String.class);
-        final boolean ignoreCase = args.param("ignore_case").eval(args, context, Boolean.class).orElse(false);
+        final String value = valueParam.required(args, context);
+        final String search = searchParam.required(args, context);
+        final boolean ignoreCase = ignoreCaseParam.optional(args, context).orElse(false);
         if (ignoreCase) {
             return StringUtils.containsIgnoreCase(value, search);
         } else {
@@ -47,9 +56,9 @@ public class Contains extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(
-                        ParameterDescriptor.string("value").build(),
-                        ParameterDescriptor.string("search").build(),
-                        ParameterDescriptor.bool("ignore_case").optional().build()
+                        valueParam,
+                        searchParam,
+                        ignoreCaseParam
                 ))
                 .build();
     }

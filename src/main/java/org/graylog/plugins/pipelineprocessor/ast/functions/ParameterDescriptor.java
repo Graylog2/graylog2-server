@@ -87,23 +87,22 @@ public abstract class ParameterDescriptor<T, R> {
         return ParameterDescriptor.<T, R>param().type(typeClass).transformedType(transformedClass).name(name);
     }
 
-    public <X> Optional<X> eval(FunctionArgs args, EvaluationContext context, Class<? extends X> type) {
-        return Optional.ofNullable(evalRequired(args, context, type));
-    }
-
-    public <X> X evalRequired(FunctionArgs args, EvaluationContext context, Class<? extends X> type) {
+    public R required(FunctionArgs args, EvaluationContext context) {
         final Object precomputedValue = args.getPreComputedValue(name());
         if (precomputedValue != null) {
-            return type.cast(transformedType().cast(precomputedValue));
+            return transformedType().cast(precomputedValue);
         }
         final Expression valueExpr = args.expression(name());
         if (valueExpr == null) {
             return null;
         }
         final Object value = valueExpr.evaluate(context);
-        return type.cast(transform().apply(type().cast(value)));
+        return transformedType().cast(transform().apply(type().cast(value)));
     }
 
+    public Optional<R> optional(FunctionArgs args, EvaluationContext context) {
+        return Optional.ofNullable(required(args, context));
+    }
 
     @AutoValue.Builder
     public static abstract class Builder<T, R> {

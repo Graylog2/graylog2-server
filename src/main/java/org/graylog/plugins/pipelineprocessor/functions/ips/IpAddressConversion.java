@@ -29,12 +29,16 @@ import static com.google.common.collect.ImmutableList.of;
 
 public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
-    public static final String IP = "ip";
     public static final String NAME = "toip";
+    private final ParameterDescriptor<Object, Object> ipParam;
+
+    public IpAddressConversion() {
+        ipParam = ParameterDescriptor.object("ip").build();
+    }
 
     @Override
     public IpAddress evaluate(FunctionArgs args, EvaluationContext context) {
-        final String ipString = args.param(IP).evalRequired(args, context, String.class);
+        final String ipString = String.valueOf(ipParam.required(args, context));
 
         final InetAddress inetAddress = InetAddresses.forString(ipString);
         return new IpAddress(inetAddress);
@@ -46,7 +50,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                 .name(NAME)
                 .returnType(IpAddress.class)
                 .params(of(
-                        ParameterDescriptor.string(IP).build()
+                        ipParam
                 ))
                 .build();
     }

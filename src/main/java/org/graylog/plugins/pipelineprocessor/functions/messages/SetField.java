@@ -21,6 +21,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -32,10 +33,18 @@ public class SetField extends AbstractFunction<Void> {
     public static final String FIELD = "field";
     public static final String VALUE = "value";
 
+    private final ParameterDescriptor<String, String> fieldParam;
+    private final ParameterDescriptor<Object, Object> valueParam;
+
+    public SetField() {
+        fieldParam = string(FIELD).build();
+        valueParam = object(VALUE).build();
+    }
+
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = args.param(FIELD).evalRequired(args, context, String.class);
-        final Object value = args.param(VALUE).evalRequired(args, context, Object.class);
+        final String field = fieldParam.required(args, context);
+        final Object value = valueParam.required(args, context);
 
         if (!Strings.isNullOrEmpty(field)) {
             context.currentMessage().addField(field, value);
@@ -48,8 +57,8 @@ public class SetField extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(of(string(FIELD).build(),
-                           object(VALUE).build()))
+                .params(of(fieldParam,
+                           valueParam))
                 .build();
     }
 }

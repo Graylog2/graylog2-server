@@ -29,12 +29,21 @@ import static com.google.common.collect.ImmutableList.of;
 public class Substring extends AbstractFunction<String> {
 
     public static final String NAME = "substring";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<Long, Long> startParam;
+    private final ParameterDescriptor<Long, Long> endParam;
+
+    public Substring() {
+        valueParam = ParameterDescriptor.string("value").build();
+        startParam = ParameterDescriptor.integer("start").build();
+        endParam = ParameterDescriptor.integer("end").optional().build();
+    }
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param("value").evalRequired(args, context, String.class);
-        final int start = Ints.saturatedCast(args.param("start").evalRequired(args, context, Long.class));
-        final int end = Ints.saturatedCast(args.param("end").eval(args, context, Long.class).orElse((long) value.length()));
+        final String value = valueParam.required(args, context);
+        final int start = Ints.saturatedCast(startParam.required(args, context));
+        final int end = Ints.saturatedCast(endParam.optional(args, context).orElse((long) value.length()));
 
         return StringUtils.substring(value, start, end);
     }
@@ -45,9 +54,9 @@ public class Substring extends AbstractFunction<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(of(
-                        ParameterDescriptor.string("value").build(),
-                        ParameterDescriptor.integer("start").build(),
-                        ParameterDescriptor.integer("end").optional().build()
+                        valueParam,
+                        startParam,
+                        endParam
                 ))
                 .build();
     }

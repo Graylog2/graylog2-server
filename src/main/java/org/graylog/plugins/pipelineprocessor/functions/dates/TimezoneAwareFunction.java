@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.functions.dates;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
@@ -29,22 +28,19 @@ import org.joda.time.DateTimeZone;
 public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
 
     public static final String TIMEZONE = "timezone";
+    private final ParameterDescriptor<String, DateTimeZone> timeZoneParam;
 
-    @Override
-    public Object preComputeConstantArgument(FunctionArgs args, String name, Expression arg) {
-        if (name.equals(TIMEZONE)) {
-            final String tz = (String) super.preComputeConstantArgument(args, name, arg);
-            return DateTimeZone.forID(tz);
-        }
-        return super.preComputeConstantArgument(args, name, arg);
+    public TimezoneAwareFunction() {
+        timeZoneParam = ParameterDescriptor
+                .string(TIMEZONE, DateTimeZone.class)
+                .transform(DateTimeZone::forID)
+                .optional()
+                .build();
     }
 
     @Override
     public DateTime evaluate(FunctionArgs args, EvaluationContext context) {
-        final DateTimeZone timezone =
-                args.param(TIMEZONE)
-                        .eval(args, context, DateTimeZone.class)
-                        .orElse(DateTimeZone.UTC);
+        final DateTimeZone timezone = timeZoneParam.optional(args, context).orElse(DateTimeZone.UTC);
 
         return evaluate(args, context, timezone);
     }
@@ -58,10 +54,7 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
                 .returnType(DateTime.class)
                 .params(ImmutableList.<ParameterDescriptor>builder()
                                 .addAll(params())
-                                .add(ParameterDescriptor
-                                             .string(TIMEZONE, DateTimeZone.class)
-                                             .optional()
-                                             .build())
+                                .add(timeZoneParam)
                                 .build())
                 .build();
     }

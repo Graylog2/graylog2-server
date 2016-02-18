@@ -21,26 +21,25 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
 
-import java.util.Optional;
-
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class DropMessage extends AbstractFunction<Void> {
 
     public static final String NAME = "drop_message";
     public static final String MESSAGE_ARG = "message";
+    private final ParameterDescriptor<Message, Message> messageParam;
+
+    public DropMessage() {
+        messageParam = type(MESSAGE_ARG, Message.class).optional().build();
+    }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<Message> message;
-        if (args.isPresent("message")) {
-            message = args.param("message").eval(args, context, Message.class);
-        } else {
-            message = Optional.of(context.currentMessage());
-        }
-        message.get().setFilterOut(true);
+        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+        message.setFilterOut(true);
         return null;
     }
 
@@ -51,7 +50,7 @@ public class DropMessage extends AbstractFunction<Void> {
                 .pure(true)
                 .returnType(Void.class)
                 .params(ImmutableList.of(
-                        param().type(Message.class).optional().name(MESSAGE_ARG).build()
+                        messageParam
                 ))
                 .build();
     }

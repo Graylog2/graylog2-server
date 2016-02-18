@@ -24,23 +24,24 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableList.of;
+import static java.util.stream.Collectors.toMap;
 
 public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
 
     public static final String NAME = "select_jsonpath";
+
     private final Configuration configuration;
+    private final ParameterDescriptor<JsonNode, JsonNode> jsonParam;
+    private final ParameterDescriptor<Map<String, String>, Map<String, JsonPath>> pathsParam;
 
     @Inject
     public SelectJsonPath(ObjectMapper objectMapper) {
@@ -48,30 +49,27 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
                 .options(Option.SUPPRESS_EXCEPTIONS)
                 .jsonProvider(new JacksonJsonNodeJsonProvider(objectMapper))
                 .build();
-    }
 
-    @Override
-    public Object preComputeConstantArgument(FunctionArgs args, String name, Expression arg) {
-        if ("paths".equals(name)) {
-            final Object o = super.preComputeConstantArgument(args, name, arg);
-            //noinspection unchecked
-            final HashMap<String, String> map = (HashMap<String, String>) o;
-            return map.entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    stringStringEntry -> JsonPath.compile(stringStringEntry.getValue())
-            ));
-        }
-        return super.preComputeConstantArgument(args, name, arg);
+        jsonParam = ParameterDescriptor.type("json", JsonNode.class).build();
+        // sigh generics and type erasure
+        //noinspection unchecked
+        pathsParam = ParameterDescriptor.type("paths",
+                                              (Class<? extends Map<String, String>>) new TypeLiteral<Map<String, String>>() {}.getRawType(),
+                                              (Class<? extends Map<String, JsonPath>>) new TypeLiteral<Map<String, JsonPath>>() {}.getRawType())
+                .transform(inputMap -> inputMap
+                        .entrySet().stream()
+                        .collect(toMap(Map.Entry::getKey, e -> JsonPath.compile(e.getValue()))))
+                .build();
     }
 
     @Override
     public Map<String, Object> evaluate(FunctionArgs args, EvaluationContext context) {
-        final JsonNode json = args.param("json").evalRequired(args, context, JsonNode.class);
-        //noinspection unchecked
-        final Map<String, JsonPath> paths = args.param("paths").evalRequired(args, context, Map.class);
+        final JsonNode json = jsonParam.required(args, context);
+        final Map<String, JsonPath> paths = pathsParam.required(args, context);
 
-        return paths.entrySet().stream()
-                .collect(Collectors.toMap(
+        return paths
+                .entrySet().stream()
+                .collect(toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().read(json, configuration)
                 ));
@@ -82,12 +80,10 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
         //noinspection unchecked
         return FunctionDescriptor.<Map<String, Object>>builder()
                 .name(NAME)
-                .returnType((Class<? extends Map<String, Object>>) new TypeLiteral<Map<String,Object>>() {}.getRawType())
+                .returnType((Class<? extends Map<String, Object>>) new TypeLiteral<Map<String, Object>>() {}.getRawType())
                 .params(of(
-                        ParameterDescriptor.type("json", JsonNode.class).build(),
-                        ParameterDescriptor
-                                .type("paths", Map.class, Map.class)
-                                .build()
+                        jsonParam,
+                        pathsParam
                 ))
                 .build();
     }

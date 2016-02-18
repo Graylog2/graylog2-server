@@ -3,7 +3,7 @@ when
     cidr_match("192.0.0.0/8", toip("192.168.1.50")) &&
     ! cidr_match("191.0.0.0/8", toip("192.168.1.50"))
 then
-    set_field("ip_anon", tostring(toip("192.168.1.20").anonymized));
+    set_field("ip_anon", tostring(toip($message.ip).anonymized));
     set_field("ipv6_anon", tostring(toip("2001:db8::1").anonymized));
     trigger_test();
 end

@@ -46,6 +46,7 @@ public class IpAddress {
         return InetAddresses.toAddrString(address);
     }
 
+    @SuppressWarnings("unused")
     public IpAddress getAnonymized() {
         final byte[] address = this.address.getAddress();
         address[address.length-1] = 0x00;

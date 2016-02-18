@@ -21,11 +21,12 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.floating;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 
 public class DoubleConversion extends AbstractFunction<Double> {
 
@@ -33,11 +34,18 @@ public class DoubleConversion extends AbstractFunction<Double> {
 
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";
+    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Double, Double> defaultParam;
+
+    public DoubleConversion() {
+        valueParam = object(VALUE).build();
+        defaultParam = floating(DEFAULT).optional().build();
+    }
 
     @Override
     public Double evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
-        final Double defaultValue = args.param(DEFAULT).eval(args, context, Double.class).orElse(0d);
+        final Object evaluated = valueParam.required(args, context);
+        final Double defaultValue = defaultParam.optional(args, context).orElse(0d);
         if (evaluated == null) {
             return defaultValue;
         }
@@ -51,8 +59,8 @@ public class DoubleConversion extends AbstractFunction<Double> {
                 .name(NAME)
                 .returnType(Double.class)
                 .params(of(
-                        object(VALUE).build(),
-                        param().optional().name(DEFAULT).type(Double.class).build()
+                        valueParam,
+                        defaultParam
                 ))
                 .build();
     }

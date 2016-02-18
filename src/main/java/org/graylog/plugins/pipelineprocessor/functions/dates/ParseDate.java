@@ -30,6 +30,13 @@ public class ParseDate extends TimezoneAwareFunction {
     public static final String NAME = "parse_date";
     public static final String VALUE = "value";
     public static final String PATTERN = "pattern";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<String, String> patternParam;
+
+    public ParseDate() {
+        valueParam = ParameterDescriptor.string(VALUE).build();
+        patternParam = ParameterDescriptor.string(PATTERN).build();
+    }
 
     @Override
     protected String getName() {
@@ -39,15 +46,15 @@ public class ParseDate extends TimezoneAwareFunction {
     @Override
     protected ImmutableList<ParameterDescriptor> params() {
         return ImmutableList.of(
-                ParameterDescriptor.string(VALUE).build(),
-                ParameterDescriptor.string(PATTERN).build()
+                valueParam,
+                patternParam
         );
     }
 
     @Override
     public DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
-        final String dateString = args.param(VALUE).evalRequired(args, context, String.class);
-        final String pattern = args.param(PATTERN).evalRequired(args, context, String.class);
+        final String dateString = valueParam.required(args, context);
+        final String pattern = patternParam.required(args, context);
         final DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern).withZone(timezone);
 
         return formatter.parseDateTime(dateString);

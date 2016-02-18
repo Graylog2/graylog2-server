@@ -27,10 +27,15 @@ public class HasField extends AbstractFunction<Boolean> {
 
     public static final String NAME = "has_field";
     public static final String FIELD = "field";
+    private final ParameterDescriptor<String, String> fieldParam;
+
+    public HasField() {
+        fieldParam = ParameterDescriptor.string(FIELD).build();
+    }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = args.param(FIELD).evalRequired(args, context, String.class);
+        final String field = fieldParam.required(args, context);
         return context.currentMessage().hasField(field);
     }
 
@@ -39,7 +44,7 @@ public class HasField extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(ImmutableList.of(ParameterDescriptor.string(FIELD).build()))
+                .params(ImmutableList.of(fieldParam))
                 .build();
     }
 }

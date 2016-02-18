@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -27,8 +28,8 @@ import org.joda.time.DateTime;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.param;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class CreateMessage extends AbstractFunction<Message> {
 
@@ -37,16 +38,25 @@ public class CreateMessage extends AbstractFunction<Message> {
     private static final String MESSAGE_ARG = "message";
     private static final String SOURCE_ARG = "source";
     private static final String TIMESTAMP_ARG = "timestamp";
+    private final ParameterDescriptor<String, String> messageParam;
+    private final ParameterDescriptor<String, String> sourceParam;
+    private final ParameterDescriptor<DateTime, DateTime> timestampParam;
+
+    public CreateMessage() {
+        messageParam = string(MESSAGE_ARG).optional().build();
+        sourceParam = string(SOURCE_ARG).optional().build();
+        timestampParam = type(TIMESTAMP_ARG, DateTime.class).optional().build();
+    }
 
     @Override
     public Message evaluate(FunctionArgs args, EvaluationContext context) {
-        final Optional<String> optMessage = args.param(MESSAGE_ARG).eval(args, context, String.class);
+        final Optional<String> optMessage = messageParam.optional(args, context);
         final String message = optMessage.isPresent() ? optMessage.get() : context.currentMessage().getMessage();
 
-        final Optional<String> optSource = args.param(SOURCE_ARG).eval(args, context, String.class);
+        final Optional<String> optSource = sourceParam.optional(args, context);
         final String source = optSource.isPresent() ? optSource.get() : context.currentMessage().getSource();
 
-        final Optional<DateTime> optTimestamp = args.param(TIMESTAMP_ARG).eval(args, context, DateTime.class);
+        final Optional<DateTime> optTimestamp = timestampParam.optional(args, context);
         final DateTime timestamp = optTimestamp.isPresent() ? optTimestamp.get() : Tools.nowUTC();
 
         final Message newMessage = new Message(message, source, timestamp);
@@ -62,9 +72,9 @@ public class CreateMessage extends AbstractFunction<Message> {
                 .name(NAME)
                 .returnType(Message.class)
                 .params(of(
-                        string(MESSAGE_ARG).optional().build(),
-                        string(SOURCE_ARG).optional().build(),
-                        param().name(TIMESTAMP_ARG).type(DateTime.class).optional().build()
+                        messageParam,
+                        sourceParam,
+                        timestampParam
                 ))
                 .build();
     }

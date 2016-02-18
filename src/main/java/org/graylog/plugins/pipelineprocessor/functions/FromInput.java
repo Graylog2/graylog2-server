@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -36,19 +37,23 @@ public class FromInput extends AbstractFunction<Boolean> {
     public static final String NAME_ARG = "name";
 
     private final InputRegistry inputRegistry;
+    private final ParameterDescriptor<String, String> idParam;
+    private final ParameterDescriptor<String, String> nameParam;
 
     @Inject
     public FromInput(InputRegistry inputRegistry) {
         this.inputRegistry = inputRegistry;
+        idParam = string(ID_ARG).optional().build();
+        nameParam = string(NAME_ARG).optional().build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = args.param(ID_ARG).eval(args, context, String.class).orElse("");
+        String id = idParam.optional(args, context).orElse("");
 
         MessageInput input = null;
         if ("".equals(id)) {
-            final String name = args.param(NAME_ARG).eval(args, context, String.class).orElse("");
+            final String name = nameParam.optional(args, context).orElse("");
             for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
                 final MessageInput messageInput = messageInputIOState.getStoppable();
                 if (messageInput.getTitle().equalsIgnoreCase(name)) {
@@ -76,8 +81,8 @@ public class FromInput extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(
-                        string(ID_ARG).optional().build(),
-                        string(NAME_ARG).optional().build()))
+                        idParam,
+                        nameParam))
                 .build();
     }
 }

@@ -25,9 +25,16 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import static com.google.common.collect.ImmutableList.of;
 
 public abstract class SingleArgStringFunction extends AbstractFunction<String> {
+
+    private final ParameterDescriptor<String, String> valueParam;
+
+    public SingleArgStringFunction() {
+        valueParam = ParameterDescriptor.string("value").build();
+    }
+
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param("value").evalRequired(args, context, String.class);
+        final String value = valueParam.required(args, context);
         return getDigest(value);
     }
 
@@ -41,7 +48,7 @@ public abstract class SingleArgStringFunction extends AbstractFunction<String> {
                 .name(getName())
                 .returnType(String.class)
                 .params(of(
-                        ParameterDescriptor.string("value").build())
+                        valueParam)
                 )
                 .build();
     }

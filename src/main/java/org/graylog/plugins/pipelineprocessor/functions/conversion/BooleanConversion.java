@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
@@ -27,11 +28,15 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class BooleanConversion extends AbstractFunction<Boolean> {
     public static final String NAME = "tobool";
 
-    private static final String VALUE = "value";
+    private final ParameterDescriptor<Object, Boolean> valueParam;
+
+    public BooleanConversion() {
+        valueParam = object("value", Boolean.class).transform(o -> Boolean.parseBoolean(String.valueOf(o))).build();
+    }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        return args.param(VALUE).evalRequired(args, context, Boolean.class);
+        return valueParam.required(args, context);
     }
 
     @Override
@@ -39,7 +44,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(of(object(VALUE, Boolean.class).transform(o -> Boolean.parseBoolean(String.valueOf(o))).build()))
+                .params(of(valueParam))
                 .build();
     }
 }

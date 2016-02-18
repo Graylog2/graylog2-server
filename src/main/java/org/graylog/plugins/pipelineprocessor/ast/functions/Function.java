@@ -46,13 +46,16 @@ public interface Function<T> {
 
     default void preprocessArgs(FunctionArgs args) {
         for (Map.Entry<String, Expression> e : args.getConstantArgs().entrySet()) {
+            final String name = e.getKey();
             try {
-                final Object value = preComputeConstantArgument(args, e.getKey(), e.getValue());
+                final Object value = preComputeConstantArgument(args, name, e.getValue());
                 if (value != null) {
-                    args.setPreComputedValue(e.getKey(), value);
+                    //noinspection unchecked
+                    final ParameterDescriptor<Object, Object> param = (ParameterDescriptor<Object, Object>) args.param(name);
+                    args.setPreComputedValue(name, param.transform().apply(value));
                 }
             } catch (Exception exception) {
-                log.warn("Unable to precompute argument value for " + e.getKey(), exception);
+                log.warn("Unable to precompute argument value for " + name, exception);
                 throw exception;
             }
         }

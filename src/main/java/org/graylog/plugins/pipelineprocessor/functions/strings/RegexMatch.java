@@ -20,7 +20,6 @@ import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
@@ -37,32 +36,27 @@ import static com.google.common.collect.ImmutableList.of;
 
 public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
 
-    public static final String PATTERN_ARG = "pattern";
-    public static final String VALUE_ARG = "value";
-    public static final String GROUP_NAMES_ARG = "group_names";
     public static final String NAME = "regex";
+    private final ParameterDescriptor<String, Pattern> pattern;
+    private final ParameterDescriptor<String, String> value;
+    private final ParameterDescriptor<List, List> optionalGroupNames;
 
-    @Override
-    public Object preComputeConstantArgument(FunctionArgs args, String name, Expression arg) {
-        final String stringValue = (String) super.preComputeConstantArgument(args, name, arg);
-        switch (name) {
-            case PATTERN_ARG:
-                return Pattern.compile(stringValue);
-        }
-        return stringValue;
+    public RegexMatch() {
+        pattern = ParameterDescriptor.string("pattern", Pattern.class).transform(Pattern::compile).build();
+        value = ParameterDescriptor.string("value").build();
+        optionalGroupNames = ParameterDescriptor.type("group_names", List.class).optional().build();
     }
 
     @Override
     public RegexMatchResult evaluate(FunctionArgs args, EvaluationContext context) {
-        final Pattern regex = args.param(PATTERN_ARG).evalRequired(args, context, Pattern.class);
-        final String value = args.param(VALUE_ARG).evalRequired(args, context, String.class);
+        final Pattern regex = pattern.required(args, context);
+        final String value = this.value.required(args, context);
         if (regex == null || value == null) {
             throw new IllegalArgumentException();
         }
         //noinspection unchecked
         final List<String> groupNames =
-                (List<String>) args.param(GROUP_NAMES_ARG).eval(args, context, List.class)
-                        .orElse(Collections.emptyList());
+                (List<String>) optionalGroupNames.optional(args, context).orElse(Collections.emptyList());
 
         final Matcher matcher = regex.matcher(value);
         final boolean matches = matcher.matches();
@@ -78,9 +72,9 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
                 .pure(true)
                 .returnType(RegexMatchResult.class)
                 .params(of(
-                        ParameterDescriptor.string(PATTERN_ARG, Pattern.class).build(),
-                        ParameterDescriptor.string(VALUE_ARG).build(),
-                        ParameterDescriptor.type(GROUP_NAMES_ARG, List.class).optional().build()
+                        pattern,
+                        value,
+                        optionalGroupNames
                 ))
                 .build();
     }

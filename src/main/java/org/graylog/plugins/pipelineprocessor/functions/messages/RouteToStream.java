@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -36,20 +37,25 @@ public class RouteToStream extends AbstractFunction<Void> {
     private static final String ID_ARG = "id";
     private static final String NAME_ARG = "name";
     private final StreamService streamService;
+    private final ParameterDescriptor<String, String> nameParam;
+    private final ParameterDescriptor<String, String> idParam;
 
     @Inject
     public RouteToStream(StreamService streamService) {
         this.streamService = streamService;
         streamService.loadAllEnabled();
+
+        nameParam = string(NAME_ARG).optional().build();
+        idParam = string(ID_ARG).optional().build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = args.param(ID_ARG).eval(args, context, String.class).orElse("");
+        String id = idParam.optional(args, context).orElse("");
 
         final Stream stream;
         if ("".equals(id)) {
-            final String name = args.param(NAME_ARG).eval(args, context, String.class).orElse("");
+            final String name = nameParam.optional(args, context).orElse("");
             if ("".equals(name)) {
                 return null;
             }
@@ -81,8 +87,8 @@ public class RouteToStream extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(
-                        string(NAME_ARG).optional().build(),
-                        string(ID_ARG).optional().build()))
+                        nameParam,
+                        idParam))
                 .build();
     }
 }

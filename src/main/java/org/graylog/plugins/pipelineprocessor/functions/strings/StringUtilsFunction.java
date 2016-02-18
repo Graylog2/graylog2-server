@@ -29,13 +29,21 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
 
     private static final String VALUE = "value";
     private static final String LOCALE = "locale";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<String, Locale> localeParam;
+
+    public StringUtilsFunction() {
+        valueParam = ParameterDescriptor.string(VALUE).build();
+        localeParam = ParameterDescriptor.string(LOCALE,
+                                                 Locale.class).optional().transform(Locale::forLanguageTag).build();
+    }
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param(VALUE).evalRequired(args, context, String.class);
+        final String value = valueParam.required(args, context);
         Locale locale = Locale.ENGLISH;
         if (isLocaleAware()) {
-            locale = args.param(LOCALE).eval(args, context, Locale.class).orElse(Locale.ENGLISH);
+            locale = localeParam.optional(args, context).orElse(Locale.ENGLISH);
         }
         return apply(value, locale);
     }
@@ -43,10 +51,9 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     @Override
     public FunctionDescriptor<String> descriptor() {
         ImmutableList.Builder<ParameterDescriptor> params = ImmutableList.builder();
-        params.add(ParameterDescriptor.string(VALUE).build());
+        params.add(valueParam);
         if (isLocaleAware()) {
-            params.add(ParameterDescriptor.string(LOCALE,
-                                                  Locale.class).optional().transform(Locale::forLanguageTag).build());
+            params.add(localeParam);
         }
         return FunctionDescriptor.<String>builder()
                 .name(getName())

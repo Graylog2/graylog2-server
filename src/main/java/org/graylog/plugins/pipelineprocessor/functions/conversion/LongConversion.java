@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableList.of;
@@ -34,12 +35,20 @@ public class LongConversion extends AbstractFunction<Long> {
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";
 
+    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Long, Long> defaultParam;
+
+    public LongConversion() {
+        valueParam = object(VALUE).build();
+        defaultParam = integer(DEFAULT).optional().build();
+    }
+
     @Override
     public Long evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.param(VALUE).eval(args, context, Object.class).orElse(new Object());
-        final Long defaultValue = args.param(DEFAULT).eval(args, context, Long.class).orElse(0L);
+        final Object evaluated = valueParam.required(args, context);
+        final Long defaultValue = defaultParam.optional(args, context).orElse(0L);
 
-        return firstNonNull(tryParse(evaluated.toString()), defaultValue);
+        return firstNonNull(tryParse(String.valueOf(evaluated)), defaultValue);
     }
 
     @Override
@@ -48,8 +57,8 @@ public class LongConversion extends AbstractFunction<Long> {
                 .name(NAME)
                 .returnType(Long.class)
                 .params(of(
-                        object(VALUE).build(),
-                        integer(DEFAULT).optional().build()
+                        valueParam,
+                        defaultParam
                 ))
                 .build();
     }

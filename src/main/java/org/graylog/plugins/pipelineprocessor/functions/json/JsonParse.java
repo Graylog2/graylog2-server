@@ -37,15 +37,17 @@ public class JsonParse extends AbstractFunction<JsonNode> {
     public static final String NAME = "parse_json";
 
     private final ObjectMapper objectMapper;
+    private final ParameterDescriptor<String, String> valueParam;
 
     @Inject
     public JsonParse(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        valueParam = ParameterDescriptor.string("value").build();
     }
 
     @Override
     public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param("value").evalRequired(args, context, String.class);
+        final String value = valueParam.required(args, context);
         try {
             return objectMapper.readTree(value);
         } catch (IOException e) {
@@ -60,7 +62,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
                 .name(NAME)
                 .returnType(JsonNode.class)
                 .params(of(
-                        ParameterDescriptor.string("value").build()
+                        valueParam
                 ))
                 .build();
     }

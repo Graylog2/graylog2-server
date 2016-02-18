@@ -27,10 +27,15 @@ public class RemoveField extends AbstractFunction<Void> {
 
     public static final String NAME = "remove_field";
     public static final String FIELD = "field";
+    private final ParameterDescriptor<String, String> fieldParam;
+
+    public RemoveField() {
+        fieldParam = ParameterDescriptor.string(FIELD).build();
+    }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final String field = args.param(FIELD).evalRequired(args, context, String.class);
+        final String field = fieldParam.required(args, context);
         context.currentMessage().removeField(field);
         return null;
     }
@@ -40,7 +45,7 @@ public class RemoveField extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(ImmutableList.of(ParameterDescriptor.string(FIELD).build()))
+                .params(ImmutableList.of(fieldParam))
                 .build();
     }
 }

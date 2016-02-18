@@ -20,6 +20,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.joda.time.DateTime;
 
@@ -34,11 +35,10 @@ public class StringConversion extends AbstractFunction<String> {
 
     public static final String NAME = "tostring";
 
-    private static final String VALUE = "value";
-    private static final String DEFAULT = "default";
-
     // this is per-thread to save an expensive concurrent hashmap access
     private final ThreadLocal<LinkedHashMap<Class<?>, Class<?>>> declaringClassCache;
+    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<String, String> defaultParam;
 
     public StringConversion() {
         declaringClassCache = new ThreadLocal<LinkedHashMap<Class<?>, Class<?>>>() {
@@ -52,11 +52,13 @@ public class StringConversion extends AbstractFunction<String> {
                 };
             }
         };
+        valueParam = object("value").build();
+        defaultParam = string("default").optional().build();
     }
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final Object evaluated = args.param(VALUE).evalRequired(args, context, Object.class);
+        final Object evaluated = valueParam.required(args, context);
         // fast path for the most common targets
         if (evaluated instanceof String
                 || evaluated instanceof Number
@@ -79,11 +81,11 @@ public class StringConversion extends AbstractFunction<String> {
                 if ((declaringClass != Object.class)) {
                     return evaluated.toString();
                 } else {
-                    return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+                    return defaultParam.optional(args, context).orElse("");
                 }
             } catch (NoSuchMethodException ignored) {
                 // should never happen because toString is always there
-                return args.param(DEFAULT).eval(args, context, String.class).orElse("");
+                return defaultParam.optional(args, context).orElse("");
             }
         }
     }
@@ -94,8 +96,8 @@ public class StringConversion extends AbstractFunction<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(of(
-                        object(VALUE).build(),
-                        string(DEFAULT).optional().build()
+                        valueParam,
+                        defaultParam
                 ))
                 .build();
     }

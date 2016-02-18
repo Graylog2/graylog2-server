@@ -31,11 +31,18 @@ public class Abbreviate extends AbstractFunction<String> {
     public static final String NAME = "abbreviate";
     private static final String VALUE = "value";
     private static final String WIDTH = "width";
+    private final ParameterDescriptor<String, String> valueParam;
+    private final ParameterDescriptor<Long, Long> widthParam;
+
+    public Abbreviate() {
+        valueParam = ParameterDescriptor.string(VALUE).build();
+        widthParam = ParameterDescriptor.integer(WIDTH).build();
+    }
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
-        final String value = args.param(VALUE).evalRequired(args, context, String.class);
-        final Long maxWidth = args.param(WIDTH).evalRequired(args, context, Long.class);
+        final String value = valueParam.required(args, context);
+        final Long maxWidth = Math.max(widthParam.required(args, context), 4L);
 
         return StringUtils.abbreviate(value, saturatedCast(maxWidth));
     }
@@ -49,8 +56,8 @@ public class Abbreviate extends AbstractFunction<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(ImmutableList.of(
-                        ParameterDescriptor.string(VALUE).build(),
-                        ParameterDescriptor.integer(WIDTH).build()
+                        valueParam,
+                        widthParam
                 ))
                 .build();
     }
