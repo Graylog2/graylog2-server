@@ -388,7 +388,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitNot(RuleLangParser.NotContext ctx) {
-            final LogicalExpression expression = (LogicalExpression) exprs.get(ctx.expression());
+            final LogicalExpression expression = upgradeBoolFunctionExpression(ctx.expression());
             final NotExpression expr = new NotExpression(expression);
             log.info("NOT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -396,17 +396,28 @@ public class PipelineRuleParser {
 
         @Override
         public void exitAnd(RuleLangParser.AndContext ctx) {
-            final LogicalExpression left = (LogicalExpression) exprs.get(ctx.left);
-            final LogicalExpression right = (LogicalExpression) exprs.get(ctx.right);
+            // if the expressions are function calls but boolean valued, upgrade them,
+            // we allow testing boolean valued functions without explicit comparison operator
+            final LogicalExpression left = upgradeBoolFunctionExpression(ctx.left);
+            final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
+
             final AndExpression expr = new AndExpression(left, right);
             log.info("AND: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
+        private LogicalExpression upgradeBoolFunctionExpression(RuleLangParser.ExpressionContext leftExprContext) {
+            Expression leftExpr = exprs.get(leftExprContext);
+            if (leftExpr instanceof FunctionExpression && leftExpr.getType().equals(Boolean.class)) {
+                leftExpr = new BooleanValuedFunctionWrapper(leftExpr);
+            }
+            return (LogicalExpression) leftExpr;
+        }
+
         @Override
         public void exitOr(RuleLangParser.OrContext ctx) {
-            final LogicalExpression left = (LogicalExpression) exprs.get(ctx.left);
-            final LogicalExpression right = (LogicalExpression) exprs.get(ctx.right);
+            final LogicalExpression left = upgradeBoolFunctionExpression(ctx.left);
+            final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
             final OrExpression expr = new OrExpression(left, right);
             log.info("OR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);

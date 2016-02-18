@@ -451,19 +451,6 @@ public class PipelineRuleParserTest extends BaseParserTest {
         }
     }
 
-    @Test
-    public void regexMatch() {
-        try {
-            final Rule rule = parser.parseRule(ruleForTest());
-            final Message message = evaluateRule(rule);
-            assertNotNull(message);
-            assertTrue(message.hasField("matched_regex"));
-            assertTrue(message.hasField("group_1"));
-        } catch (ParseException e) {
-            fail("Should parse");
-        }
-    }
-
     public static class CustomObject {
         private final String id;
 

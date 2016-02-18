@@ -41,10 +41,11 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
-import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
@@ -55,6 +56,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,6 +64,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
 
@@ -97,9 +101,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         // string functions
         functions.put(Abbreviate.NAME, new Abbreviate());
         functions.put(Capitalize.NAME, new Capitalize());
+        functions.put(Contains.NAME, new Contains());
         functions.put(Lowercase.NAME, new Lowercase());
         functions.put(Substring.NAME, new Substring());
-        functions.put(SwapCase.NAME, new SwapCase());
+        functions.put(Swapcase.NAME, new Swapcase());
         functions.put(Uncapitalize.NAME, new Uncapitalize());
         functions.put(Uppercase.NAME, new Uppercase());
 
@@ -206,5 +211,29 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void regexMatch() {
+        try {
+            final Rule rule = parser.parseRule(ruleForTest());
+            final Message message = evaluateRule(rule);
+            assertNotNull(message);
+            assertTrue(message.hasField("matched_regex"));
+            assertTrue(message.hasField("group_1"));
+        } catch (ParseException e) {
+            Assert.fail("Should parse");
+        }
+    }
+
+    @Test
+    public void strings() {
+        final Rule rule = parser.parseRule(ruleForTest());
+        final Message message = evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("has_xyz")).isInstanceOf(Boolean.class);
+        assertThat((boolean)message.getField("has_xyz")).isFalse();
     }
 }

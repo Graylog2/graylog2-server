@@ -1,0 +1,20 @@
+// various string functions
+rule "string tests"
+when
+    contains("abcdef", "bc") &&
+    lowercase("a MIXED bag of chArs") == "a mixed bag of chars" &&
+    uppercase("a MIXED bag of chArs") == "A MIXED BAG OF CHARS" &&
+    swapcase("Capitalized") == "cAPITALIZED" &&
+    capitalize("hello") == "Hello" &&
+    capitalize("hEllo") == "HEllo" &&
+    uncapitalize("Hello") == "hello" &&
+    uncapitalize("HEllo") == "hEllo" &&
+    abbreviate("", 4)        == "" &&
+    abbreviate("abcdefg", 6) == "abc..." &&
+    abbreviate("abcdefg", 7) == "abcdefg" &&
+    abbreviate("abcdefg", 8) == "abcdefg" &&
+    abbreviate("abcdefg", 4) == "a..."
+then
+    set_field("has_xyz", contains("abcdef", "xyz"));
+    trigger_test();
+end

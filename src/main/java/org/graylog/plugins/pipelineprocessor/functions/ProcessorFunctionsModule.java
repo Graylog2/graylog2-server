@@ -42,10 +42,11 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
-import org.graylog.plugins.pipelineprocessor.functions.strings.SwapCase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog2.plugin.PluginModule;
@@ -78,9 +79,10 @@ public class ProcessorFunctionsModule extends PluginModule {
         // string functions
         addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);
         addMessageProcessorFunction(Capitalize.NAME, Capitalize.class);
+        addMessageProcessorFunction(Contains.NAME, Contains.class);
         addMessageProcessorFunction(Lowercase.NAME, Lowercase.class);
         addMessageProcessorFunction(Substring.NAME, Substring.class);
-        addMessageProcessorFunction(SwapCase.NAME, SwapCase.class);
+        addMessageProcessorFunction(Swapcase.NAME, Swapcase.class);
         addMessageProcessorFunction(Uncapitalize.NAME, Uncapitalize.class);
         addMessageProcessorFunction(Uppercase.NAME, Uppercase.class);
 

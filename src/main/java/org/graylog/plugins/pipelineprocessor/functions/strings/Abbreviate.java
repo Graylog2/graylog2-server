@@ -50,7 +50,7 @@ public class Abbreviate extends AbstractFunction<String> {
                 .returnType(String.class)
                 .params(ImmutableList.of(
                         ParameterDescriptor.string(VALUE).build(),
-                        ParameterDescriptor.string(WIDTH).build()
+                        ParameterDescriptor.integer(WIDTH).build()
                 ))
                 .build();
     }

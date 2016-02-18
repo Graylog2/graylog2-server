@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import java.util.Locale;
 
-public class SwapCase extends StringUtilsFunction {
+public class Swapcase extends StringUtilsFunction {
 
     public static final String NAME = "swapcase";
 
