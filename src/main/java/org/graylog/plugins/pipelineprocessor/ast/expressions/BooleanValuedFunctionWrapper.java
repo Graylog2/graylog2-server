@@ -48,4 +48,9 @@ public class BooleanValuedFunctionWrapper implements LogicalExpression {
     public Class getType() {
         return expr.getType();
     }
+
+    @Override
+    public String toString() {
+        return expr.toString();
+    }
 }
