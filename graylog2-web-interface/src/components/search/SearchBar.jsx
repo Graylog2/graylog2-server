@@ -17,6 +17,7 @@ import SavedSearchesActions from 'actions/search/SavedSearchesActions';
 import UIUtils from 'util/UIUtils';
 
 import DateTime from 'logic/datetimes/DateTime';
+import moment from 'moment';
 
 const SearchBar = React.createClass({
   propTypes: {
@@ -202,10 +203,10 @@ const SearchBar = React.createClass({
         if (availableOptions) {
           let all = null;
           options = Object.keys(availableOptions).map((key) => {
-            const option = (<option key={'relative-option-' + key} value={key}>{availableOptions[key]}</option>);
+            const option = (<option key={'relative-option-' + key} value={moment.duration(key).asSeconds()}>{availableOptions[key]}</option>);
 
             // The "search in all messages" option should be the last one.
-            if (key === '0') {
+            if (key === 'PT0S') {
               all = option;
               return null;
             } else {
