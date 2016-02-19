@@ -36,12 +36,12 @@ const AddToDashboardMenu = React.createClass({
   _saveWidget(title, configuration) {
     let widgetConfig = Immutable.Map(this.props.configuration);
     let searchParams = Immutable.Map(this.searchParams);
-    // Changes the "relative" key used to store relative time-range to "range"
     if (searchParams.has('range_type')) {
       switch (searchParams.get('range_type')) {
         case 'relative':
           const relativeTimeRange = Immutable.Map({
-            'relative': searchParams.get('relative'),
+            // Changes the "relative" key used to store relative time-range to "range"
+            'range': searchParams.get('relative'),
             'type': 'relative',
           });
           searchParams = searchParams
