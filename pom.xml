@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <prerequisites>
-        <maven>3.0</maven>
+        <maven>3.1</maven>
     </prerequisites>
 
     <groupId>org.graylog.plugins</groupId>
@@ -16,6 +16,13 @@
     <name>${project.artifactId}</name>
     <description>Graylog ${project.artifactId} plugin.</description>
     <url>https://www.graylog.org</url>
+
+    <developers>
+        <developer>
+            <name>Edmundo Alvarez</name>
+            <email>edmundo@graylog.com</email>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-geoipresolver.git</connection>
@@ -53,6 +60,15 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource><directory>build</directory></resource>
+            <resource>
+              <directory>src/main/resources</directory>
+              <excludes>
+                <exclude>**/*.properties</exclude>
+              </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -145,4 +161,57 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>web-interface-build</id>
+            <activation>
+                <property>
+                    <name>!skip.web.build</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>0.0.26</version>
+
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>v0.12.5</nodeVersion>
+                                    <npmVersion>2.11.2</npmVersion>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <!-- Optional configuration which provides for running any npm command -->
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>npm run build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
