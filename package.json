@@ -1,10 +1,10 @@
 {
-  "name": "GeoIpResolver",
+  "name": "MapWidget",
   "version": "1.0.0-SNAPSHOT",
   "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/graylog-plugin-geoipresolver"
+    "url": "https://github.com/graylog-plugin-map-widget"
   },
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server",
