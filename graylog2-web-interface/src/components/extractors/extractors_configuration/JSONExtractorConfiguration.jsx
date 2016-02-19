@@ -24,7 +24,7 @@ const JSONExtractorConfiguration = React.createClass({
   componentWillReceiveProps(nextProps) {
     this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
   },
-  DEFAULT_CONFIGURATION: {list_separator: ', ', key_separator: '.', kv_separator: '='},
+  DEFAULT_CONFIGURATION: {list_separator: ', ', key_separator: '_', kv_separator: '='},
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
