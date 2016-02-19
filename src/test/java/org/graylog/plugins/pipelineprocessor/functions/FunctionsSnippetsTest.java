@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversi
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -117,6 +118,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Now.NAME, new Now());
         functions.put(FlexParseDate.NAME, new FlexParseDate());
         functions.put(ParseDate.NAME, new ParseDate());
+        functions.put(FormatDate.NAME, new FormatDate());
 
         functions.put(MD5.NAME, new MD5());
         functions.put(SHA1.NAME, new SHA1());

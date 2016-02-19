@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversi
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -96,6 +97,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Now.NAME, Now.class);
         addMessageProcessorFunction(ParseDate.NAME, ParseDate.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
+        addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
 
         // hash digest
         addMessageProcessorFunction(MD5.NAME, MD5.class);
