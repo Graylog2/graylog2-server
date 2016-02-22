@@ -16,6 +16,7 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -29,16 +30,20 @@ import javax.inject.Inject;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class WidgetResultCache {
     private final ConcurrentMap<String, Supplier<ComputationResult>> cache;
     private final MetricRegistry metricRegistry;
     private final WidgetStrategyFactory widgetStrategyFactory;
+    private final Counter counter;
 
     @Inject
     public WidgetResultCache(MetricRegistry metricRegistry, WidgetStrategyFactory widgetStrategyFactory) {
         this.metricRegistry = metricRegistry;
         this.widgetStrategyFactory = widgetStrategyFactory;
         this.cache = Maps.newConcurrentMap();
+        this.counter = metricRegistry.counter(name(getClass(), "cacheEntries"));
     }
 
     public ComputationResult getComputationResultForDashboardWidget(final DashboardWidget dashboardWidget) throws InvalidWidgetConfigurationException {
@@ -46,17 +51,23 @@ public class WidgetResultCache {
         if (!this.cache.containsKey(widgetId)) {
             final WidgetStrategy widgetStrategy = this.widgetStrategyFactory.getWidgetForType(dashboardWidget.getType().toString(),
                     dashboardWidget.getConfig(), dashboardWidget.getTimeRange(), widgetId);
-            this.cache.putIfAbsent(widgetId, Suppliers.memoizeWithExpiration(
+            final Supplier<ComputationResult> supplier = this.cache.putIfAbsent(widgetId, Suppliers.memoizeWithExpiration(
                     new ComputationResultSupplier(metricRegistry, dashboardWidget, widgetStrategy),
                     dashboardWidget.getCacheTime(),
                     TimeUnit.SECONDS
             ));
+
+            if (supplier == null) {
+                // Only increment the counter if there has been no value for the widget ID before.
+                counter.inc();
+            }
         }
         return this.cache.get(widgetId).get();
     }
 
     public void invalidate(final DashboardWidget dashboardWidget) {
         this.cache.remove(dashboardWidget.getId());
+        counter.dec();
     }
 
     private class ComputationResultSupplier implements Supplier<ComputationResult> {
@@ -82,11 +93,11 @@ public class WidgetResultCache {
         }
 
         private Timer getCalculationTimer() {
-            return metricRegistry.timer(MetricRegistry.name(this.getClass(), this.dashboardWidget.getId(), "calculationTime"));
+            return metricRegistry.timer(name(this.getClass(), this.dashboardWidget.getId(), "calculationTime"));
         }
 
         private Meter getCalculationMeter() {
-            return metricRegistry.meter(MetricRegistry.name(this.getClass(), this.dashboardWidget.getId(), "calculations"));
+            return metricRegistry.meter(name(this.getClass(), this.dashboardWidget.getId(), "calculations"));
         }
     }
 }
