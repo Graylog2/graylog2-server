@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import { Spinner } from 'components/common';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -19,7 +20,14 @@ const MapVisualization = React.createClass({
   getInitialState() {
     return {
       zoomLevel: 1,
+      isComponentMounted: false, // Leaflet operates directly with the DOM, so we need to wait until it is ready :grumpy:
     };
+  },
+  componentDidMount() {
+    this._onComponentMount();
+  },
+  _onComponentMount() {
+    this.setState({isComponentMounted: true});
   },
   position: [0, 0],
   // Coordinates are given as "lat,long"
@@ -42,6 +50,10 @@ const MapVisualization = React.createClass({
     this.setState({zoomLevel: event.target.getZoom()});
   },
   render() {
+    if (!this.state.isComponentMounted) {
+      return <Spinner/>;
+    }
+
     const data = this.props.data.terms;
     const coordinates = Object.keys(data);
     const markers = coordinates.map(aCoordinates => this._formatMarker(aCoordinates, data[aCoordinates]));
