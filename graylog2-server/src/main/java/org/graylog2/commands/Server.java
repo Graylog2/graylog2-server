@@ -40,6 +40,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
+import org.graylog2.dashboards.DashboardBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.messageprocessors.MessageProcessorModule;
@@ -119,7 +120,8 @@ public class Server extends ServerBootstrap {
                 new ObjectMapperModule(classLoader),
                 new RestApiBindings(),
                 new PasswordAlgorithmBindings(),
-                new WidgetStrategyBindings()
+                new WidgetStrategyBindings(),
+                new DashboardBindings()
         );
     }
 
