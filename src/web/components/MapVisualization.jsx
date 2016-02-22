@@ -16,12 +16,17 @@ const MapVisualization = React.createClass({
       data: {},
     };
   },
+  getInitialState() {
+    return {
+      zoomLevel: 2,
+    }
+  },
   position: [0, 0],
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, occurrences) {
     const formattedCoordinates = coordinates.split(',').map(component => Number(component));
     return (
-      <CircleMarker key={coordinates} center={formattedCoordinates} radius={occurrences} color="#AF2228" fillColor="#D3242B" opacity={0.8}>
+      <CircleMarker key={coordinates} center={formattedCoordinates} radius={occurrences * 5 / this.state.zoomLevel} color="#AF2228" fillColor="#D3242B" opacity={0.8}>
         <Popup>
             <dl>
               <dt>Coordinates:</dt>
@@ -33,12 +38,15 @@ const MapVisualization = React.createClass({
       </CircleMarker>
     );
   },
+  _onZoomChange(event) {
+    this.setState({zoomLevel: event.target.getZoom()});
+  },
   render() {
     const coordinates = Object.keys(this.props.data);
     const markers = coordinates.map(aCoordinates => this._formatMarker(aCoordinates, this.props.data[aCoordinates]));
 
     return (
-      <Map center={this.position} zoom={2} style={{height: 700, width: 1200}} scrollWheelZoom={false}>
+      <Map center={this.position} zoom={this.state.zoomLevel} style={{height: 700, width: 1200}} scrollWheelZoom={false} onLeafletZoomend={this._onZoomChange}>
         <TileLayer url={`https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${window.mapConfig.mapboxAccessToken}`}
                    maxZoom={19}
                    attribution={`<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>`}/>
