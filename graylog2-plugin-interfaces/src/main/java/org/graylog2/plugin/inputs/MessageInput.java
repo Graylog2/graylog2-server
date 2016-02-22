@@ -330,7 +330,7 @@ public abstract class MessageInput implements Stoppable {
         // add the common message metadata for this input/codec
         rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
-        rawMessage.addSourceNode(getId(), serverStatus.getNodeId(), serverStatus.hasCapability(ServerStatus.Capability.SERVER));
+        rawMessage.addSourceNode(getId(), serverStatus.getNodeId());
 
         inputBuffer.insert(rawMessage);
 

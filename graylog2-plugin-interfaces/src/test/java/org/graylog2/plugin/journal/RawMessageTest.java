@@ -35,13 +35,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class RawMessageTest {
-
     @Test
     public void minimalEncodeDecode() throws IOException {
-
         final RawMessage rawMessage = new RawMessage("testmessage".getBytes(Charsets.UTF_8));
         final File tempFile = File.createTempFile("node", "test");
-        rawMessage.addSourceNode("inputid", new NodeId(tempFile.getAbsolutePath()), true);
+        rawMessage.addSourceNode("inputid", new NodeId(tempFile.getAbsolutePath()));
         rawMessage.setCodecName("raw");
         rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
 
@@ -51,7 +49,5 @@ public class RawMessageTest {
         assertNotNull(decodedMsg);
         assertArrayEquals("testmessage".getBytes(Charsets.UTF_8), decodedMsg.getPayload());
         assertEquals("raw", decodedMsg.getCodecName());
-
     }
-
 }

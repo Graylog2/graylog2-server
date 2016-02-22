@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.system.stats.fs;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog2.shared.system.stats.SigarService;
 import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.FileSystemMap;
@@ -38,14 +39,9 @@ public class SigarFsProbe implements FsProbe {
     private final Map<File, FileSystem> sigarFileSystems = new HashMap<>();
 
     @Inject
-    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") @Nullable File journalDirectory) {
+    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") File journalDirectory) {
         this.sigarService = sigarService;
-        this.locations = new HashSet<>();
-        
-        // nullable for radio bindings where we don't have journalling.
-        if (journalDirectory != null) {
-            locations.add(journalDirectory);
-        }
+        this.locations = ImmutableSet.of(journalDirectory);
     }
 
     @Override
