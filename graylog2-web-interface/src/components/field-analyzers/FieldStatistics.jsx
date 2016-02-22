@@ -30,7 +30,7 @@ const FieldStatistics = React.createClass({
       window.clearInterval(this.updateIntervalId);
     }
   },
-  addFieldStatistics(field) {
+  addField(field) {
     this._reloadFieldStatistics(field);
   },
   _reloadAllStatistics() {

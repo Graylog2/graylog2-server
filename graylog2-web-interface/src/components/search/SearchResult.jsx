@@ -15,6 +15,9 @@ import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import SearchStore from 'stores/search/SearchStore';
 import DocsHelper from 'util/DocsHelper';
 
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import {} from 'components/field-analyzers'; // Make sure to load all field analyzer plugins!
+
 const SearchResult = React.createClass({
   propTypes: {
     query: PropTypes.string,
@@ -102,18 +105,33 @@ const SearchResult = React.createClass({
     return sortedFields.concat(remainingFieldsSorted);
   },
 
-  addFieldGraph(field) {
-    this.refs.fieldGraphsComponent.addFieldGraph(field);
-  },
-  addFieldQuickValues(field) {
-    this.refs.fieldQuickValuesComponent.addFieldQuickValues(field);
-  },
-  addFieldStatistics(field) {
-    this.refs.fieldStatisticsComponent.addFieldStatistics(field);
+  addFieldAnalyzer(ref, field) {
+    this.refs[ref].addField(field);
   },
   _showQueryModal(event) {
     event.preventDefault();
     this.refs.showQueryModal.open();
+  },
+
+  _fieldAnalyzers(filter) {
+    return PluginStore.exports('fieldAnalyzers')
+      .filter(analyzer => filter !== undefined ? filter(analyzer) : true);
+  },
+
+  _fieldAnalyzerComponents(filter) {
+    return this._fieldAnalyzers(filter)
+      .map((analyzer, idx) => {
+        return React.createElement(analyzer.component, {
+          key: idx,
+          ref: analyzer.refId,
+          widgetType: analyzer.widgetType,
+          permissions: this.props.permissions,
+          searchInStream: this.props.searchInStream,
+          resolution: this.props.histogram.interval,
+          from: this.props.histogram.histogram_boundaries.from,
+          to: this.props.histogram.histogram_boundaries.to,
+        });
+      });
   },
 
   render() {
@@ -179,12 +197,11 @@ const SearchResult = React.createClass({
                          builtQuery={this.props.builtQuery}
                          selectedFields={this.state.selectedFields}
                          fields={this._fields()}
+                         fieldAnalyzers={this._fieldAnalyzers()}
                          showAllFields={this.state.showAllFields}
                          togglePageFields={this.togglePageFields}
                          onFieldToggled={this.onFieldToggled}
-                         onFieldSelectedForGraph={this.addFieldGraph}
-                         onFieldSelectedForQuickValues={this.addFieldQuickValues}
-                         onFieldSelectedForStats={this.addFieldStatistics}
+                         onFieldAnalyzer={this.addFieldAnalyzer}
                          predefinedFieldSelection={this.predefinedFieldSelection}
                          showHighlightToggle={anyHighlightRanges}
                          shouldHighlight={this.state.shouldHighlight}
@@ -195,23 +212,14 @@ const SearchResult = React.createClass({
           />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">
-          <FieldStatistics ref="fieldStatisticsComponent"
-                           permissions={this.props.permissions}/>
-
-          <FieldQuickValues ref="fieldQuickValuesComponent"
-                            permissions={this.props.permissions}/>
+          {this._fieldAnalyzerComponents((analyzer) => analyzer.displayPriority >= 100)}
 
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
                            isStreamSearch={this.props.searchInStream !== null}/>
 
-          <FieldGraphs ref="fieldGraphsComponent"
-                       resolution={this.props.histogram.interval}
-                       from={this.props.histogram.histogram_boundaries.from}
-                       to={this.props.histogram.histogram_boundaries.to}
-                       permissions={this.props.permissions}
-                       searchInStream={this.props.searchInStream}/>
+          {this._fieldAnalyzerComponents((analyzer) => analyzer.displayPriority < 100)}
 
           <ResultTable messages={this.props.result.messages}
                        page={SearchStore.page}

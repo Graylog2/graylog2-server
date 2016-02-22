@@ -47,7 +47,7 @@ const FieldQuickValues = React.createClass({
       clearInterval(this.timer);
     }
   },
-  addFieldQuickValues(field) {
+  addField(field) {
     this.setState({field: field}, () => this._loadQuickValuesData(false));
   },
   _loadQuickValuesData() {

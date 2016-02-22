@@ -4,9 +4,8 @@ import {Input, Button, ButtonGroup} from 'react-bootstrap';
 const SidebarMessageField = React.createClass({
   propTypes: {
     field: PropTypes.object,
-    onFieldSelectedForGraph: PropTypes.func.isRequired,
-    onFieldSelectedForQuickValues: PropTypes.func.isRequired,
-    onFieldSelectedForStats: PropTypes.func.isRequired,
+    fieldAnalyzers: React.PropTypes.array,
+    onFieldAnalyzer: React.PropTypes.func,
     onToggled: PropTypes.func,
     selected: PropTypes.bool,
   },
@@ -18,6 +17,17 @@ const SidebarMessageField = React.createClass({
   _toggleShowActions() {
     this.setState({showActions: !this.state.showActions});
   },
+
+  _fieldAnalyzerButtons() {
+    return this.props.fieldAnalyzers.map((analyzer, idx) => {
+      return (
+        <Button key={'field-analyzer-button-' + idx} onClick={() => this.props.onFieldAnalyzer(analyzer.refId, this.props.field.name)}>
+          {analyzer.displayName}
+        </Button>
+      );
+    });
+  },
+
   render() {
     let toggleClassName = 'fa fa-fw open-analyze-field ';
     toggleClassName += this.state.showActions ? 'open-analyze-field-active fa-caret-down' : 'fa-caret-right';
@@ -37,15 +47,7 @@ const SidebarMessageField = React.createClass({
           {this.state.showActions &&
           <div className="analyze-field">
             <ButtonGroup bsSize="xsmall">
-              <Button onClick={() => this.props.onFieldSelectedForStats(this.props.field.name)}>
-                Statistics
-              </Button>
-              <Button onClick={() => this.props.onFieldSelectedForQuickValues(this.props.field.name)}>
-                Quick values
-              </Button>
-              <Button onClick={() => this.props.onFieldSelectedForGraph(this.props.field.name)}>
-                Generate chart
-              </Button>
+              {this._fieldAnalyzerButtons()}
             </ButtonGroup>
           </div>}
         </div>
