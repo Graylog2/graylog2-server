@@ -28,7 +28,7 @@ export const MapsStore = Reflux.createStore({
     const promise = fetch('GET', URLUtils.qualifyUrl(url));
     promise.then(
       response => {
-        this.mapCoordinates = response.terms;
+        this.mapCoordinates = response;
         this.trigger({mapCoordinates: this.mapCoordinates});
       },
       error => {
