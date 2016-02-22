@@ -339,7 +339,7 @@ public abstract class SearchResource extends RestResource {
         };
     }
 
-    protected org.graylog2.indexer.searches.timeranges.TimeRange restrictTimeRange(final org.graylog2.indexer.searches.timeranges.TimeRange timeRange) {
+    protected org.graylog2.plugin.indexer.searches.timeranges.TimeRange restrictTimeRange(final org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
         final DateTime originalFrom = timeRange.getFrom();
         final DateTime to = timeRange.getTo();
         final DateTime from;
