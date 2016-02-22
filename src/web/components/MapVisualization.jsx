@@ -38,7 +38,7 @@ const MapVisualization = React.createClass({
     const markers = coordinates.map(aCoordinates => this._formatMarker(aCoordinates, this.props.data[aCoordinates]));
 
     return (
-      <Map center={this.position} zoom={2} style={{height: 700, width: 1200}}>
+      <Map center={this.position} zoom={2} style={{height: 700, width: 1200}} scrollWheelZoom={false}>
         <TileLayer url={`https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${window.mapConfig.mapboxAccessToken}`}
                    maxZoom={19}
                    attribution={`<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>`}/>
