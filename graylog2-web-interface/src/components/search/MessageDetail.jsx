@@ -59,7 +59,7 @@ const MessageDetail = React.createClass({
     let nodeInformation;
 
     if (node) {
-      const nodeURL = node.radio ? jsRoutes.controllers.RadiosController.show(nodeId).url : jsRoutes.controllers.NodesController.node(nodeId).url;
+      const nodeURL = jsRoutes.controllers.NodesController.node(nodeId).url;
       nodeInformation = (
         <a href={nodeURL}>
           <i className="fa fa-code-fork"/>
@@ -115,6 +115,7 @@ const MessageDetail = React.createClass({
       }
     });
 
+    // Legacy
     let viaRadio = this.props.message.source_radio_id;
     if (viaRadio) {
       viaRadio = (
