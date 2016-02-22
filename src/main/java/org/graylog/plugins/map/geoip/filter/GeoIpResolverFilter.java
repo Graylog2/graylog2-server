@@ -1,4 +1,4 @@
-package org.graylog.plugin.filter.geoipresolver;
+package org.graylog.plugins.map.geoip.filter;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;

@@ -1,9 +1,9 @@
-package org.graylog.plugin.filter.geoipresolver;
+package org.graylog.plugins.map.config;
 
 import com.github.joschi.jadconfig.Parameter;
 import org.graylog2.plugin.PluginConfigBean;
 
-public class GeoIpResolverConfiguration implements PluginConfigBean {
+public class MapWidgetConfiguration implements PluginConfigBean {
     @Parameter(value = "geoip_resolver_database")
     private String geoIpDatabase = "/usr/local/share/GeoIp/GeoIP2-City.mmdb";
 

@@ -1,4 +1,4 @@
-package org.graylog.plugin.filter.geoipresolver;
+package org.graylog.plugins.map.geoip.filter;
 
 import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.MetricFilter;

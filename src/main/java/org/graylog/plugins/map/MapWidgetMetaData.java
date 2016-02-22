@@ -1,4 +1,4 @@
-package org.graylog.plugin.filter.geoipresolver;
+package org.graylog.plugins.map;
 
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -8,15 +8,15 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
-public class GeoIpResolverFilterMetaData implements PluginMetaData {
+public class MapWidgetMetaData implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return "org.graylog.plugin.filter.geoipresolver.GeoIpResolverFilterPlugin";
+        return "org.graylog.plugins.map.MapWidgetPlugin";
     }
 
     @Override
     public String getName() {
-        return "GeoIpResolverFilter";
+        return "MapWidgetPlugin";
     }
 
     @Override
@@ -36,7 +36,7 @@ public class GeoIpResolverFilterMetaData implements PluginMetaData {
 
     @Override
     public String getDescription() {
-        return "Resolves GeoIp information from messages";
+        return "Map widget for Graylog";
     }
 
     @Override
