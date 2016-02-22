@@ -26,11 +26,11 @@ import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 
 import javax.inject.Inject;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class WidgetResultCache {
-    private final Map<String, Supplier<ComputationResult>> cache;
+    private final ConcurrentMap<String, Supplier<ComputationResult>> cache;
     private final MetricRegistry metricRegistry;
     private final WidgetStrategyFactory widgetStrategyFactory;
 
@@ -38,7 +38,7 @@ public class WidgetResultCache {
     public WidgetResultCache(MetricRegistry metricRegistry, WidgetStrategyFactory widgetStrategyFactory) {
         this.metricRegistry = metricRegistry;
         this.widgetStrategyFactory = widgetStrategyFactory;
-        this.cache = Maps.newHashMap();
+        this.cache = Maps.newConcurrentMap();
     }
 
     public ComputationResult getComputationResultForDashboardWidget(final DashboardWidget dashboardWidget) throws InvalidWidgetConfigurationException {
@@ -46,7 +46,7 @@ public class WidgetResultCache {
         if (!this.cache.containsKey(widgetId)) {
             final WidgetStrategy widgetStrategy = this.widgetStrategyFactory.getWidgetForType(dashboardWidget.getType().toString(),
                     dashboardWidget.getConfig(), dashboardWidget.getTimeRange(), widgetId);
-            this.cache.put(widgetId, Suppliers.memoizeWithExpiration(
+            this.cache.putIfAbsent(widgetId, Suppliers.memoizeWithExpiration(
                     new ComputationResultSupplier(metricRegistry, dashboardWidget, widgetStrategy),
                     dashboardWidget.getCacheTime(),
                     TimeUnit.SECONDS
@@ -56,10 +56,7 @@ public class WidgetResultCache {
     }
 
     public void invalidate(final DashboardWidget dashboardWidget) {
-        final String widgetId = dashboardWidget.getId();
-        if (this.cache.containsKey(widgetId)) {
-            this.cache.remove(widgetId);
-        }
+        this.cache.remove(dashboardWidget.getId());
     }
 
     private class ComputationResultSupplier implements Supplier<ComputationResult> {
