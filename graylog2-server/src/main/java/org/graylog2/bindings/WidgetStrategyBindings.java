@@ -16,7 +16,6 @@
  */
 package org.graylog2.bindings;
 
-import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.FieldChartWidget;
 import org.graylog2.dashboards.widgets.QuickvaluesWidget;
 import org.graylog2.dashboards.widgets.SearchResultChartWidget;
@@ -29,12 +28,12 @@ import org.graylog2.plugin.inject.Graylog2Module;
 public class WidgetStrategyBindings extends Graylog2Module {
     @Override
     protected void configure() {
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.FIELD_CHART.toString(), FieldChartWidget.class, FieldChartWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.QUICKVALUES.toString(), QuickvaluesWidget.class, QuickvaluesWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.SEARCH_RESULT_CHART.toString(), SearchResultChartWidget.class, SearchResultChartWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.SEARCH_RESULT_COUNT.toString(), SearchResultCountWidget.class, SearchResultCountWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STACKED_CHART.toString(), StackedChartWidget.class, StackedChartWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STATS_COUNT.toString(), StatisticalCountWidget.class, StatisticalCountWidget.Factory.class);
-        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT.toString(), StreamSearchResultCountWidget.class, StreamSearchResultCountWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "FIELD_CHART", FieldChartWidget.class, FieldChartWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "QUICKVALUES", QuickvaluesWidget.class, QuickvaluesWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "SEARCH_RESULT_CHART", SearchResultChartWidget.class, SearchResultChartWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "SEARCH_RESULT_COUNT", SearchResultCountWidget.class, SearchResultCountWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "STACKED_CHART", StackedChartWidget.class, StackedChartWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "STATS_COUNT", StatisticalCountWidget.class, StatisticalCountWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "STREAM_SEARCH_RESULT_COUNT", StreamSearchResultCountWidget.class, StreamSearchResultCountWidget.Factory.class);
     }
 }

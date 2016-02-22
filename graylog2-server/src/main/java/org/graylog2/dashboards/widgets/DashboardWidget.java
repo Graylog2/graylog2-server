@@ -33,16 +33,6 @@ public class DashboardWidget implements EmbeddedPersistable {
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_CONFIG = "config";
 
-    public enum Type {
-        SEARCH_RESULT_COUNT,
-        STREAM_SEARCH_RESULT_COUNT,
-        FIELD_CHART,
-        QUICKVALUES,
-        SEARCH_RESULT_CHART,
-        STATS_COUNT,
-        STACKED_CHART
-    }
-
     private final String type;
     private final String id;
     private final TimeRange timeRange;
