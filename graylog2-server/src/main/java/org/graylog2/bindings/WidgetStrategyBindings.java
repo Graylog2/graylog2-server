@@ -35,6 +35,6 @@ public class WidgetStrategyBindings extends Graylog2Module {
         installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.SEARCH_RESULT_COUNT.toString(), SearchResultCountWidget.class, SearchResultCountWidget.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STACKED_CHART.toString(), StackedChartWidget.class, StackedChartWidget.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STATS_COUNT.toString(), StatisticalCountWidget.class, StatisticalCountWidget.Factory.class);
-        installWidgetStrategy(widgetStrategyBinder(), StreamSearchResultCountWidget.class, StreamSearchResultCountWidget.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT.toString(), StreamSearchResultCountWidget.class, StreamSearchResultCountWidget.Factory.class);
     }
 }
