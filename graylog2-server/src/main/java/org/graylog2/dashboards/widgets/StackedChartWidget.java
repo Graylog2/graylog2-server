@@ -17,7 +17,6 @@
 
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -46,8 +45,6 @@ public class StackedChartWidget extends ChartWidget {
 
     private static final Logger LOG = LoggerFactory.getLogger(StackedChartWidget.class);
 
-    private final String renderer;
-    private final String interpolation;
     private final List<Series> chartSeries;
     private final Searches searches;
     private final TimeRange timeRange;
@@ -64,9 +61,6 @@ public class StackedChartWidget extends ChartWidget {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
 
-        this.renderer = (String) config.get("renderer");
-        this.interpolation = (String) config.get("interpolation");
-
         final Object persistedSeries = config.get("series");
 
         if (persistedSeries instanceof List) {
@@ -79,23 +73,6 @@ public class StackedChartWidget extends ChartWidget {
         } else {
             throw new InvalidWidgetConfigurationException("Invalid widget configuration, 'series' should be a list: " + config.toString());
         }
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableList.Builder<Map<String, Object>> seriesBuilder = ImmutableList.builder();
-        for (Series series : chartSeries) {
-            seriesBuilder.add(series.toMap());
-        }
-
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
-                .put("renderer", renderer)
-                .put("interpolation", interpolation)
-                .put("series", seriesBuilder.build());
-
-
-        return persistedConfig.build();
     }
 
     @Override

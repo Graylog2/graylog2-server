@@ -17,7 +17,6 @@
 
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Searches.DateHistogramInterval;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
@@ -25,8 +24,6 @@ import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Map;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class ChartWidget implements WidgetStrategy {
 
@@ -42,16 +39,5 @@ public abstract class ChartWidget implements WidgetStrategy {
         } else {
             this.interval = Searches.DateHistogramInterval.MINUTE;
         }
-    }
-
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .put("interval", interval.toString().toLowerCase(Locale.ENGLISH));
-
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
     }
 }

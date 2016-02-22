@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -57,15 +56,6 @@ public class SearchResultCountWidget implements WidgetStrategy {
 
     protected Searches getSearches() {
         return searches;
-    }
-
-    public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
-                .putAll(ImmutableMap.of("timerange", this.timeRange.getPersistedConfig()))
-                .put("query", query)
-                .put("trend", trend)
-                .put("lower_is_better", lowerIsBetter)
-                .build();
     }
 
     @Override

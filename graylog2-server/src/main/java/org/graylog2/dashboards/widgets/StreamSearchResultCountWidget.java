@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.searches.Searches;
@@ -40,18 +39,6 @@ public class StreamSearchResultCountWidget extends SearchResultCountWidget {
     public StreamSearchResultCountWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
         super(searches, config, timeRange, widgetId);
         this.streamId = (String) config.get("stream_id");
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final Map<String, Object> inheritedConfig = super.getPersistedConfig();
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.builder();
-        persistedConfig.putAll(inheritedConfig);
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
     }
 
     @Override

@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.HistogramResult;
@@ -43,8 +42,6 @@ public class FieldChartWidget extends ChartWidget {
     private final String query;
     private final String field;
     private final String statisticalFunction;
-    private final String renderer;
-    private final String interpolation;
     private final Searches searches;
     private final TimeRange timeRange;
     private final String widgetId;
@@ -70,21 +67,6 @@ public class FieldChartWidget extends ChartWidget {
 
         this.field = (String) config.get("field");
         this.statisticalFunction = (String) config.get("valuetype");
-        this.renderer = (String) config.get("renderer");
-        this.interpolation = (String) config.get("interpolation");
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
-                .put("query", query)
-                .put("field", field)
-                .put("valuetype", statisticalFunction)
-                .put("renderer", renderer)
-                .put("interpolation", interpolation);
-
-        return persistedConfig.build();
     }
 
     @Override

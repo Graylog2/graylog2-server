@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -95,20 +94,6 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
         // We accidentally modified the standard deviation function name, we need this to make old widgets work again
         this.statsFunction = (statsFunction.equals("stddev")) ? StatisticalFunction.STANDARD_DEVIATION : StatisticalFunction.fromString(statsFunction);
         this.streamId = (String) config.get("stream_id");
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final Map<String, Object> inheritedConfig = super.getPersistedConfig();
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.builder();
-        persistedConfig.putAll(inheritedConfig);
-        persistedConfig.put("field", field);
-        persistedConfig.put("stats_function", statsFunction.toString());
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
     }
 
     private Number getStatisticalValue(FieldStatsResult fieldStatsResult) {

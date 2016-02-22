@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -25,8 +24,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -40,8 +37,6 @@ public class QuickvaluesWidget implements WidgetStrategy {
         QuickvaluesWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
-
     private final String query;
     @Nullable
     private final String streamId;
@@ -49,9 +44,6 @@ public class QuickvaluesWidget implements WidgetStrategy {
     private final String field;
     private final Searches searches;
     private final TimeRange timeRange;
-
-    private final Boolean showPieChart;
-    private final Boolean showDataTable;
 
     @AssistedInject
     public QuickvaluesWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
@@ -66,28 +58,6 @@ public class QuickvaluesWidget implements WidgetStrategy {
 
         this.field = (String) config.get("field");
         this.streamId = (String) config.get("stream_id");
-
-        this.showPieChart = config.get("show_pie_chart") != null && Boolean.parseBoolean(String.valueOf(config.get("show_pie_chart")));
-        this.showDataTable = !config.containsKey("show_data_table") || Boolean.parseBoolean(String.valueOf(config.get("show_data_table")));
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(ImmutableMap.of("timerange", this.timeRange.getPersistedConfig()))
-                .put("query", query)
-                .put("field", field)
-                .put("show_pie_chart", showPieChart)
-                .put("show_data_table", showDataTable);
-
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
     }
 
     @Override

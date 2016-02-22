@@ -16,7 +16,6 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.HistogramResult;
@@ -57,15 +56,6 @@ public class SearchResultChartWidget extends ChartWidget {
 
     public String getQuery() {
         return query;
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
-                .put("query", query);
-
-        return persistedConfig.build();
     }
 
     @Override
