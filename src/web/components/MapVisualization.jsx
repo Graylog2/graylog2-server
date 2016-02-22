@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react';
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -21,7 +21,7 @@ const MapVisualization = React.createClass({
   _formatMarker(coordinates, occurrences) {
     const formattedCoordinates = coordinates.split(',').map(component => Number(component));
     return (
-      <Marker key={coordinates} position={formattedCoordinates}>
+      <CircleMarker key={coordinates} center={formattedCoordinates} radius={occurrences} color="#AF2228" fillColor="#D3242B" opacity={0.8}>
         <Popup>
             <dl>
               <dt>Coordinates:</dt>
@@ -30,7 +30,7 @@ const MapVisualization = React.createClass({
               <dd>{occurrences}</dd>
             </dl>
         </Popup>
-      </Marker>
+      </CircleMarker>
     );
   },
   render() {
