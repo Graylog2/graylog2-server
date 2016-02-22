@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.searches;
 
-import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

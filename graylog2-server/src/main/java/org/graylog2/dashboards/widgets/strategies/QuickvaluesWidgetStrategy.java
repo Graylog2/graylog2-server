@@ -14,25 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class QuickvaluesWidget extends DashboardWidget {
+public class QuickvaluesWidgetStrategy implements WidgetStrategy {
 
-    private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
+    public interface Factory extends WidgetStrategy.Factory<QuickvaluesWidgetStrategy> {
+        @Override
+        QuickvaluesWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
 
     private final String query;
     @Nullable
@@ -40,55 +44,31 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     private final String field;
     private final Searches searches;
+    private final TimeRange timeRange;
 
-    private final Boolean showPieChart;
-    private final Boolean showDataTable;
-
-    public QuickvaluesWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(metricRegistry, Type.QUICKVALUES, id, timeRange, description, cacheTime, config, creatorUserId);
+    @AssistedInject
+    public QuickvaluesWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         this.searches = searches;
+        this.timeRange = timeRange;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
 
-        this.query = query;
+        this.query = (String)config.get("query");
 
         this.field = (String) config.get("field");
         this.streamId = (String) config.get("stream_id");
-
-        this.showPieChart = config.get("show_pie_chart") != null && Boolean.parseBoolean(String.valueOf(config.get("show_pie_chart")));
-        this.showDataTable = !config.containsKey("show_data_table") || Boolean.parseBoolean(String.valueOf(config.get("show_data_table")));
-    }
-
-    public String getQuery() {
-        return query;
     }
 
     @Override
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
-                .put("query", query)
-                .put("field", field)
-                .put("show_pie_chart", showPieChart)
-                .put("show_data_table", showDataTable);
-
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
-    }
-
-    @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
-        final TermsResult terms = searches.terms(field, 50, query, filter, this.getTimeRange());
+        final TermsResult terms = searches.terms(field, 50, query, filter, this.timeRange);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("terms", terms.getTerms());

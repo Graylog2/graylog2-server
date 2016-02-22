@@ -14,27 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class SearchResultChartWidget extends ChartWidget {
+public class SearchResultChartWidgetStrategy extends ChartWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<SearchResultChartWidgetStrategy> {
+        @Override
+        SearchResultChartWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
 
     private final String query;
     private final Searches searches;
+    private final TimeRange timeRange;
 
-    public SearchResultChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, WidgetCacheTime cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.SEARCH_RESULT_CHART, id, timeRange, description, cacheTime, config, creatorUserId);
+    @AssistedInject
+    public SearchResultChartWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
+        super(config);
         this.searches = searches;
-        this.query = getNonEmptyQuery(query);
+        this.timeRange = timeRange;
+        this.query = getNonEmptyQuery((String)config.get("query"));
     }
 
     // We need to ensure query is not empty, or the histogram calculation will fail
@@ -50,22 +59,13 @@ public class SearchResultChartWidget extends ChartWidget {
     }
 
     @Override
-    public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .putAll(super.getPersistedConfig())
-                .put("query", query);
-
-        return persistedConfig.build();
-    }
-
-    @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         String filter = null;
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
-        HistogramResult histogram = searches.histogram(query, interval, filter, this.getTimeRange());
+        HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
         return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
     }
 }

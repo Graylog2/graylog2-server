@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.Seconds;
 
 public final class TimeRanges {

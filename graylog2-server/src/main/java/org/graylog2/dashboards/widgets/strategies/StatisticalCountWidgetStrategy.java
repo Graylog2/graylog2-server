@@ -14,16 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.dashboards.widgets.ComputationResult;
+import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
@@ -33,8 +35,13 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class StatisticalCountWidget extends SearchResultCountWidget {
-    private static final Logger log = LoggerFactory.getLogger(StatisticalCountWidget.class);
+public class StatisticalCountWidgetStrategy extends SearchResultCountWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<StatisticalCountWidgetStrategy> {
+        @Override
+        StatisticalCountWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+    }
+
+    private static final Logger log = LoggerFactory.getLogger(StatisticalCountWidgetStrategy.class);
 
     public enum StatisticalFunction {
         COUNT("count"),
@@ -73,44 +80,20 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String field;
     private final String streamId;
 
-    public StatisticalCountWidget(MetricRegistry metricRegistry,
-                                  Searches searches,
-                                  String id,
-                                  String description,
-                                  WidgetCacheTime cacheTime,
-                                  Map<String, Object> config,
-                                  String query,
-                                  TimeRange timeRange,
-                                  String creatorUserId) {
-        super(metricRegistry,
-              Type.STATS_COUNT,
-              searches,
-              id,
-              description,
-              cacheTime,
-              config,
-              query,
-              timeRange,
-              creatorUserId);
+    @AssistedInject
+    public StatisticalCountWidgetStrategy(Searches searches,
+                                          @Assisted Map<String, Object> config,
+                                          @Assisted TimeRange timeRange,
+                                          @Assisted String widgetId) {
+        super(searches,
+                config,
+                timeRange,
+                widgetId);
         this.field = (String) config.get("field");
         String statsFunction = (String) config.get("stats_function");
         // We accidentally modified the standard deviation function name, we need this to make old widgets work again
         this.statsFunction = (statsFunction.equals("stddev")) ? StatisticalFunction.STANDARD_DEVIATION : StatisticalFunction.fromString(statsFunction);
         this.streamId = (String) config.get("stream_id");
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        final Map<String, Object> inheritedConfig = super.getPersistedConfig();
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.builder();
-        persistedConfig.putAll(inheritedConfig);
-        persistedConfig.put("field", field);
-        persistedConfig.put("stats_function", statsFunction.toString());
-        if (!isNullOrEmpty(streamId)) {
-            persistedConfig.put("stream_id", streamId);
-        }
-
-        return persistedConfig.build();
     }
 
     private Number getStatisticalValue(FieldStatsResult fieldStatsResult) {
@@ -139,7 +122,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     }
 
     @Override
-    protected ComputationResult compute() {
+    public ComputationResult compute() {
         try {
             final String filter;
             if (!isNullOrEmpty(streamId)) {
@@ -148,7 +131,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
                 filter = null;
             }
 
-            final TimeRange timeRange = this.getTimeRange();
+            final TimeRange timeRange = this.timeRange;
 
             boolean needsCardinality = statsFunction.equals(StatisticalFunction.CARDINALITY);
             boolean needsCount = statsFunction.equals(StatisticalFunction.COUNT);
