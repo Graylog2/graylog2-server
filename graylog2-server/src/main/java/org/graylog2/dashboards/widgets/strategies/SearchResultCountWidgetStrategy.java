@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
@@ -31,11 +31,11 @@ import org.joda.time.Seconds;
 
 import java.util.Map;
 
-public class SearchResultCountWidget implements WidgetStrategy {
+public class SearchResultCountWidgetStrategy implements WidgetStrategy {
 
-    public interface Factory extends WidgetStrategy.Factory<SearchResultCountWidget> {
+    public interface Factory extends WidgetStrategy.Factory<SearchResultCountWidgetStrategy> {
         @Override
-        SearchResultCountWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        SearchResultCountWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
     protected final Searches searches;
@@ -45,7 +45,7 @@ public class SearchResultCountWidget implements WidgetStrategy {
     protected final Boolean lowerIsBetter;
 
     @AssistedInject
-    public SearchResultCountWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
+    public SearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
         this.searches = searches;
 
         this.query = (String)config.get("query");

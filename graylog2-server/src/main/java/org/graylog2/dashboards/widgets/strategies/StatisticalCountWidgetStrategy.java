@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
@@ -35,13 +35,13 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class StatisticalCountWidget extends SearchResultCountWidget {
-    public interface Factory extends WidgetStrategy.Factory<StatisticalCountWidget> {
+public class StatisticalCountWidgetStrategy extends SearchResultCountWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<StatisticalCountWidgetStrategy> {
         @Override
-        StatisticalCountWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        StatisticalCountWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(StatisticalCountWidget.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticalCountWidgetStrategy.class);
 
     public enum StatisticalFunction {
         COUNT("count"),
@@ -81,10 +81,10 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String streamId;
 
     @AssistedInject
-    public StatisticalCountWidget(Searches searches,
-                                  @Assisted Map<String, Object> config,
-                                  @Assisted TimeRange timeRange,
-                                  @Assisted String widgetId) {
+    public StatisticalCountWidgetStrategy(Searches searches,
+                                          @Assisted Map<String, Object> config,
+                                          @Assisted TimeRange timeRange,
+                                          @Assisted String widgetId) {
         super(searches,
                 config,
                 timeRange,

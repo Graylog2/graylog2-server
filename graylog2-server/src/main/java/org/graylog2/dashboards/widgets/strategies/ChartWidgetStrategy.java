@@ -15,7 +15,7 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Searches.DateHistogramInterval;
@@ -25,13 +25,13 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class ChartWidget implements WidgetStrategy {
+public abstract class ChartWidgetStrategy implements WidgetStrategy {
 
     @Nullable
     protected final String streamId;
     protected final DateHistogramInterval interval;
 
-    protected ChartWidget(Map<String, Object> config) {
+    protected ChartWidgetStrategy(Map<String, Object> config) {
         this.streamId = (String) config.get("stream_id");
 
         if (config.containsKey("interval")) {

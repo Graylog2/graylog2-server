@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
@@ -30,11 +31,11 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class QuickvaluesWidget implements WidgetStrategy {
+public class QuickvaluesWidgetStrategy implements WidgetStrategy {
 
-    public interface Factory extends WidgetStrategy.Factory<QuickvaluesWidget> {
+    public interface Factory extends WidgetStrategy.Factory<QuickvaluesWidgetStrategy> {
         @Override
-        QuickvaluesWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        QuickvaluesWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
     private final String query;
@@ -46,7 +47,7 @@ public class QuickvaluesWidget implements WidgetStrategy {
     private final TimeRange timeRange;
 
     @AssistedInject
-    public QuickvaluesWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
+    public QuickvaluesWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         this.searches = searches;
         this.timeRange = timeRange;
 

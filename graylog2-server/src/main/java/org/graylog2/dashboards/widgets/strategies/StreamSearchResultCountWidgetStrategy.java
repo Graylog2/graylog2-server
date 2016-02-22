@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
@@ -28,34 +27,18 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class SearchResultChartWidget extends ChartWidget {
-    public interface Factory extends WidgetStrategy.Factory<SearchResultChartWidget> {
+public class StreamSearchResultCountWidgetStrategy extends SearchResultCountWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<StreamSearchResultCountWidgetStrategy> {
         @Override
-        SearchResultChartWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        StreamSearchResultCountWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
-    private final String query;
-    private final Searches searches;
-    private final TimeRange timeRange;
+    private final String streamId;
 
     @AssistedInject
-    public SearchResultChartWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
-        super(config);
-        this.searches = searches;
-        this.timeRange = timeRange;
-        this.query = getNonEmptyQuery((String)config.get("query"));
-    }
-
-    // We need to ensure query is not empty, or the histogram calculation will fail
-    private String getNonEmptyQuery(String query) {
-        if (isNullOrEmpty(query)) {
-            return "*";
-        }
-        return query;
-    }
-
-    public String getQuery() {
-        return query;
+    public StreamSearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
+        super(searches, config, timeRange, widgetId);
+        this.streamId = (String) config.get("stream_id");
     }
 
     @Override
@@ -64,8 +47,6 @@ public class SearchResultChartWidget extends ChartWidget {
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
-
-        HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
-        return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
+        return computeInternal(filter);
     }
 }

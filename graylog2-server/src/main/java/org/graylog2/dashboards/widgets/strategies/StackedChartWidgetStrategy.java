@@ -15,11 +15,12 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.dashboards.widgets;
+package org.graylog2.dashboards.widgets.strategies;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
@@ -37,13 +38,13 @@ import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class StackedChartWidget extends ChartWidget {
-    public interface Factory extends WidgetStrategy.Factory<StackedChartWidget> {
+public class StackedChartWidgetStrategy extends ChartWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<StackedChartWidgetStrategy> {
         @Override
-        StackedChartWidget create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        StackedChartWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(StackedChartWidget.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StackedChartWidgetStrategy.class);
 
     private final List<Series> chartSeries;
     private final Searches searches;
@@ -51,7 +52,7 @@ public class StackedChartWidget extends ChartWidget {
     private final String widgetId;
 
     @AssistedInject
-    public StackedChartWidget(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
+    public StackedChartWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         super(config);
         this.searches = searches;
         this.timeRange = timeRange;
