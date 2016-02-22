@@ -123,7 +123,7 @@ public class DashboardWidget implements EmbeddedPersistable {
         DashboardWidget that = (DashboardWidget) o;
 
         if (cacheTime != that.cacheTime) return false;
-        if (type != that.type) return false;
+        if (!type.equals(that.type)) return false;
         if (!id.equals(that.id)) return false;
         if (!timeRange.equals(that.timeRange)) return false;
         if (!config.equals(that.config)) return false;
