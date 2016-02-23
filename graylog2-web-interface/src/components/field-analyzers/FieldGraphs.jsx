@@ -14,6 +14,10 @@ const FieldGraphs = React.createClass({
     resolution: PropTypes.any.isRequired,
     stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    query: PropTypes.string.isRequired,
+    page: PropTypes.number.isRequired,
+    rangeType: PropTypes.string.isRequired,
+    rangeParams: PropTypes.object.isRequired,
   },
   mixins: [PureRenderMixin],
   getInitialState() {
