@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
@@ -13,6 +14,9 @@ const WidgetConfigModal = React.createClass({
     widget: PropTypes.object.isRequired,
     dashboardId: PropTypes.string.isRequired,
   },
+
+  widgetPlugins: PluginStore.exports('widgets'),
+
   open() {
     this.refs.configModal.open();
   },
@@ -21,17 +25,19 @@ const WidgetConfigModal = React.createClass({
   },
   _getBasicConfiguration() {
     let basicConfigurationMessage;
+    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
+    const widgetType = (widgetPlugin ? widgetPlugin.readable_type : 'Not available');
     if (this.props.boundToStream) {
       basicConfigurationMessage = (
         <p>
-          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cache_time} seconds.&nbsp;
+          Type: {widgetType}, cached for {this.props.widget.cache_time} seconds.&nbsp;
           Widget is bound to stream {this.props.widget.config.stream_id}.
         </p>
       );
     } else {
       basicConfigurationMessage = (
         <p>
-          Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cache_time} seconds.&nbsp;
+          Type: {widgetType}, cached for {this.props.widget.cache_time} seconds.&nbsp;
           Widget is <strong>not</strong> bound to a stream.
         </p>
       );

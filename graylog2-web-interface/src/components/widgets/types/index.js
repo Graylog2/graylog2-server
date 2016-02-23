@@ -16,6 +16,7 @@ PluginStore.register(new PluginManifest({}, {
   widgets: [
     {
       type: 'SEARCH_RESULT_COUNT',
+      readable_type: 'Search result count',
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
@@ -23,6 +24,7 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'STREAM_SEARCH_RESULT_COUNT',
+      readable_type: 'Stream search result count',
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
@@ -30,6 +32,7 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'STATS_COUNT',
+      readable_type: 'Statistical value',
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
@@ -37,12 +40,14 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'SEARCH_RESULT_CHART',
+      readable_type: 'Search result graph',
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: HistogramVisualization,
     },
     {
       type: 'QUICKVALUES',
+      readable_type: 'Quick values',
       defaultHeight: 1,
       defaultWidth: 2,
       visualization: QuickValuesVisualization,
@@ -50,6 +55,7 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'FIELD_CHART',
+      readable_type: 'Field graph',
       defaultHeight: 1,
       defaultWidth: 2,
       visualization: GraphVisualization,
@@ -57,6 +63,7 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'STACKED_CHART',
+      readable_type: 'Stacked graph',
       defaultHeight: 1,
       defaultWidth: 2,
       visualization: StackedGraphVisualization,
