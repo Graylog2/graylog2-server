@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Qs from 'qs';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import URLUtils from 'util/URLUtils';
 
@@ -58,6 +59,7 @@ const Widget = React.createClass({
     $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
 
+  widgetPlugins: PluginStore.exports('widgets'),
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
   WIDGET_HEADER_HEIGHT: 25,
   WIDGET_FOOTER_HEIGHT: 20,
@@ -164,7 +166,19 @@ const Widget = React.createClass({
                                                     width={this.state.width}/>);
         break;
       default:
-        throw new Error(`Error: Widget type '${this.props.widget.type}' not supported`);
+        const widgetPlugin = this.widgetPlugins.filter(widget => widget.type === this.props.widget.type)[0];
+        if (widgetPlugin) {
+          visualization = React.createElement(widgetPlugin.visualization, {
+            id: this.props.widget.id,
+            config: this.props.widget.config,
+            data: this.state.result,
+            height: this.state.height,
+            width: this.state.width,
+          });
+          break;
+        }
+
+        throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
     }
 
     return visualization;
@@ -229,7 +243,7 @@ const Widget = React.createClass({
   },
   render() {
     if (this.state.deleted) {
-      return <span></span>;
+      return <span/>;
     }
     const showConfigModal = (
       <WidgetConfigModal ref="configModal"
