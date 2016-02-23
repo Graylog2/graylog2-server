@@ -124,9 +124,8 @@ const SearchResult = React.createClass({
         return React.createElement(analyzer.component, {
           key: idx,
           ref: analyzer.refId,
-          widgetType: analyzer.widgetType,
           permissions: this.props.permissions,
-          searchInStream: this.props.searchInStream,
+          stream: this.props.searchInStream,
           resolution: this.props.histogram.interval,
           from: this.props.histogram.histogram_boundaries.from,
           to: this.props.histogram.histogram_boundaries.to,

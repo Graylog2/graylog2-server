@@ -11,7 +11,11 @@ import UserNotification from 'util/UserNotification';
 
 const FieldStatistics = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    from: PropTypes.any.isRequired,
+    to: PropTypes.any.isRequired,
+    resolution: PropTypes.any.isRequired,
+    stream: PropTypes.object,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   getInitialState() {
     return {

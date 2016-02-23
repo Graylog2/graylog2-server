@@ -14,7 +14,11 @@ import RefreshStore from 'stores/tools/RefreshStore';
 
 const FieldQuickValues = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    from: PropTypes.any.isRequired,
+    to: PropTypes.any.isRequired,
+    resolution: PropTypes.any.isRequired,
+    stream: PropTypes.object,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {
