@@ -11,6 +11,8 @@ const MapVisualization = React.createClass({
     config: PropTypes.object.isRequired,
     height: PropTypes.number,
     width: PropTypes.number,
+    url: PropTypes.string,
+    attribution: PropTypes.string,
   },
   getDefaultProps() {
     return {
@@ -30,11 +32,13 @@ const MapVisualization = React.createClass({
     this.setState({isComponentMounted: true});
   },
   position: [0, 0],
+  DEFAULT_URL: `https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${window.mapConfig.mapboxAccessToken}`,
+  DEFAULT_ATTRIBUTION: `<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>`,
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, occurrences) {
     const formattedCoordinates = coordinates.split(',').map(component => Number(component));
     return (
-      <CircleMarker key={coordinates} center={formattedCoordinates} radius={occurrences * 5 / this.state.zoomLevel} color="#AF2228" fillColor="#D3242B" opacity={0.8}>
+      <CircleMarker key={coordinates} center={formattedCoordinates} radius={5} color="#AF2228" fillColor="#D3242B" opacity={0.8}>
         <Popup>
             <dl>
               <dt>Coordinates:</dt>
@@ -54,15 +58,17 @@ const MapVisualization = React.createClass({
       return <Spinner/>;
     }
 
-    const data = this.props.data.terms;
+    const data = this.props.data;
     const coordinates = Object.keys(data);
     const markers = coordinates.map(aCoordinates => this._formatMarker(aCoordinates, data[aCoordinates]));
+    const leafletUrl = this.props.url || this.DEFAULT_URL;
+    const leafletAttribution = this.props.attribution || this.DEFAULT_ATTRIBUTION;
 
     return (
       <Map center={this.position} zoom={this.state.zoomLevel} style={{height: this.props.height, width: this.props.width}} scrollWheelZoom={false}>
-        <TileLayer url={`https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${window.mapConfig.mapboxAccessToken}`}
+        <TileLayer url={leafletUrl}
                    maxZoom={19}
-                   attribution={`<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>`}/>
+                   attribution={leafletAttribution}/>
         {markers}
       </Map>
     );
