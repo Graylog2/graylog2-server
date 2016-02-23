@@ -8,13 +8,6 @@ import URLUtils from 'util/URLUtils';
 
 import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader } from 'components/widgets';
 
-import {
-  NumericVisualization,
-  HistogramVisualization,
-  QuickValuesVisualization,
-  GraphVisualization,
-  StackedGraphVisualization } from 'components/visualizations';
-
 import WidgetsStore from 'stores/widgets/WidgetsStore';
 import WidgetsActions from 'actions/widgets/WidgetsActions';
 
@@ -126,62 +119,19 @@ const Widget = React.createClass({
       return <div className="not-available">{this.state.result}</div>;
     }
 
-    let visualization;
-
-    switch (this.props.widget.type.toUpperCase()) {
-      case this.constructor.Type.SEARCH_RESULT_COUNT:
-      case this.constructor.Type.STREAM_SEARCH_RESULT_COUNT:
-      case this.constructor.Type.STATS_COUNT:
-        visualization = <NumericVisualization data={this.state.result} config={this.props.widget.config}/>;
-        break;
-      case this.constructor.Type.SEARCH_RESULT_CHART:
-        visualization = (<HistogramVisualization id={this.props.widget.id}
-                                                 data={this.state.result}
-                                                 config={this.props.widget.config}
-                                                 computationTimeRange={this.state.computationTimeRange}
-                                                 height={this.state.height}
-                                                 width={this.state.width}/>);
-        break;
-      case this.constructor.Type.QUICKVALUES:
-        visualization = (<QuickValuesVisualization id={this.props.widget.id}
-                                                   config={this.props.widget.config}
-                                                   data={this.state.result}
-                                                   height={this.state.height}
-                                                   width={this.state.width}/>);
-        break;
-      case this.constructor.Type.FIELD_CHART:
-        visualization = (<GraphVisualization id={this.props.widget.id}
-                                             data={this.state.result}
-                                             config={this.props.widget.config}
-                                             computationTimeRange={this.state.computationTimeRange}
-                                             height={this.state.height}
-                                             width={this.state.width}/>);
-        break;
-      case this.constructor.Type.STACKED_CHART:
-        visualization = (<StackedGraphVisualization id={this.props.widget.id}
-                                                    data={this.state.result}
-                                                    config={this.props.widget.config}
-                                                    computationTimeRange={this.state.computationTimeRange}
-                                                    height={this.state.height}
-                                                    width={this.state.width}/>);
-        break;
-      default:
-        const widgetPlugin = this.widgetPlugins.filter(widget => widget.type === this.props.widget.type)[0];
-        if (widgetPlugin) {
-          visualization = React.createElement(widgetPlugin.visualization, {
-            id: this.props.widget.id,
-            config: this.props.widget.config,
-            data: this.state.result,
-            height: this.state.height,
-            width: this.state.width,
-          });
-          break;
-        }
-
-        throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
+    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
+    if (!widgetPlugin) {
+      throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
     }
 
-    return visualization;
+    return React.createElement(widgetPlugin.visualization, {
+      id: this.props.widget.id,
+      config: this.props.widget.config,
+      data: this.state.result,
+      height: this.state.height,
+      width: this.state.width,
+      computationTimeRange: this.state.computationTimeRange,
+    });
   },
   _getUrlPath() {
     if (this._isBoundToStream()) {
@@ -210,6 +160,8 @@ const Widget = React.createClass({
       case 'keyword':
         query[rangeType] = config.timerange.keyword;
         break;
+      default:
+        // do nothing
     }
 
     return Qs.stringify(query);

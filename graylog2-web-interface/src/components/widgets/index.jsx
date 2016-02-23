@@ -1,3 +1,5 @@
+import {} from './types';
+
 export { default as Widget } from './Widget';
 export { default as WidgetConfigModal } from './WidgetConfigModal';
 export { default as WidgetCreationModal } from './WidgetCreationModal';
