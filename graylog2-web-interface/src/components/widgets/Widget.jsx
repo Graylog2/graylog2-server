@@ -206,7 +206,6 @@ const Widget = React.createClass({
 
     const editConfigModal = (
       <WidgetEditConfigModal ref="editModal"
-                             widgetTypes={this.constructor.Type}
                              widget={this.props.widget}
                              onUpdate={this.updateWidget}/>
     );

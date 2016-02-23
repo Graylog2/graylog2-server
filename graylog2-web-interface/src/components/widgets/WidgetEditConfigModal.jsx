@@ -1,5 +1,6 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -7,8 +8,6 @@ import StringUtils from 'util/StringUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
-import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const WidgetEditConfigModal = React.createClass({
@@ -16,7 +15,6 @@ const WidgetEditConfigModal = React.createClass({
     onModalHidden: React.PropTypes.func,
     onUpdate: React.PropTypes.func.isRequired,
     widget: React.PropTypes.object.isRequired,
-    widgetTypes: React.PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -36,6 +34,8 @@ const WidgetEditConfigModal = React.createClass({
   hide() {
     this.refs.editModal.close();
   },
+
+  widgetPlugins: PluginStore.exports('widgets'),
 
   _getWidgetData() {
     const widget = {};
@@ -78,6 +78,21 @@ const WidgetEditConfigModal = React.createClass({
     this._setConfigurationSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
   },
 
+  _onConfigurationValueChange() {
+    switch (arguments.length) {
+      // When a single value is passed, we treat it as an event handling
+      case 1:
+        this._bindConfigurationValue(arguments[0]);
+        break;
+      // When two arguments are given, treat it as a configuration key-value
+      case 2:
+        this._setConfigurationSetting(arguments[0], arguments[1]);
+        break;
+      default:
+        throw new Error('Wrong number of arguments, method only accepts an event or a configuration key-value pair');
+    }
+  },
+
   _setTimeRangeSetting(key, value) {
     const newTimeRange = ObjectUtils.clone(this.state.config.timerange);
 
@@ -104,17 +119,6 @@ const WidgetEditConfigModal = React.createClass({
 
   _bindTimeRangeValue(event) {
     this._setTimeRangeSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
-  },
-
-  _setSeriesSetting(seriesNo, key, value, type) {
-    const newSeries = ObjectUtils.clone(this.state.config.series);
-    newSeries[seriesNo][key] = this._formatSettingValue(value, type);
-
-    this._setConfigurationSetting('series', newSeries);
-  },
-
-  _bindSeriesValue(event) {
-    this._setSeriesSetting(event.target.getAttribute('data-series'), event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
   },
 
   _formatDateTime(dateTime) {
@@ -199,160 +203,17 @@ const WidgetEditConfigModal = React.createClass({
   },
 
   _getSpecificConfigurationControls() {
-    const controls = [];
-
-    if (this.state.type !== this.props.widgetTypes.STACKED_CHART) {
-      controls.push(
-        <Input type="text"
-               key="query"
-               id="query"
-               name="query"
-               label="Search query"
-               defaultValue={this.state.config.query}
-               onChange={this._bindConfigurationValue}
-               help="Search query that will be executed to get the widget value."/>
-      );
+    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.state.type.toUpperCase())[0];
+    if (widgetPlugin.configuration) {
+      return React.createElement(widgetPlugin.configuration, {
+        id: this.props.widget.id,
+        config: this.state.config,
+        onChange: this._onConfigurationValueChange,
+      });
     }
 
-    switch (this.state.type.toUpperCase()) {
-      case this.props.widgetTypes.STATS_COUNT:
-        const defaultStatisticalFunction = this.state.config.stats_function === 'stddev' ? 'std_deviation' : this.state.config.stats_function;
-        controls.push(
-          <Input key="statsCountStatisticalFunction"
-                 type="select"
-                 id="count-statistical-function"
-                 name="stats_function"
-                 label="Statistical function"
-                 defaultValue={defaultStatisticalFunction}
-                 onChange={this._bindConfigurationValue}
-                 help="Statistical function applied to the data.">
-            {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
-              return (
-                <option key={statFunction} value={statFunction}>
-                  {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
-                </option>
-              );
-            })}
-          </Input>
-        );
-      /* falls through */
-      case this.props.widgetTypes.SEARCH_RESULT_COUNT:
-      case this.props.widgetTypes.STREAM_SEARCH_RESULT_COUNT:
-        controls.push(
-          <Input key="trend"
-                 type="checkbox"
-                 id="count-trend"
-                 name="trend"
-                 label="Display trend"
-                 defaultChecked={this.state.config.trend}
-                 onChange={this._bindConfigurationValue}
-                 help="Show trend information for this number."/>
-        );
-
-        controls.push(
-          <Input key="lowerIsBetter"
-                 type="checkbox"
-                 id="count-lower-is-better"
-                 name="lower_is_better"
-                 label="Lower is better"
-                 disabled={this.state.config.trend === false}
-                 defaultChecked={this.state.config.lower_is_better}
-                 onChange={this._bindConfigurationValue}
-                 help="Use green colour when trend goes down."/>
-        );
-        break;
-      case this.props.widgetTypes.QUICKVALUES:
-        controls.push(
-          <Input key="showPieChart"
-                 type="checkbox"
-                 id="quickvalues-show-pie-chart"
-                 name="show_pie_chart"
-                 label="Show pie chart"
-                 defaultChecked={this.state.config.show_pie_chart}
-                 onChange={this._bindConfigurationValue}
-                 help="Represent data in a pie chart"/>
-        );
-
-        controls.push(
-          <Input key="showDataTable"
-                 type="checkbox"
-                 id="quickvalues-show-data-table"
-                 name="show_data_table"
-                 label="Show data table"
-                 defaultChecked={this.state.config.show_data_table}
-                 onChange={this._bindConfigurationValue}
-                 help="Include a table with quantitative information."/>
-        );
-        break;
-      case this.props.widgetTypes.FIELD_CHART:
-        controls.push(
-          <Input key="fieldChartStatisticalFunction"
-                 id="chart-statistical-function"
-                 name="valuetype"
-                 type="select"
-                 label="Statistical function"
-                 defaultValue={this.state.config.valuetype}
-                 onChange={this._bindConfigurationValue}
-                 help="Statistical function applied to the data.">
-            {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
-              return (
-                <option key={statFunction} value={statFunction}>
-                  {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
-                </option>
-              );
-            })}
-          </Input>
-        );
-        break;
-      case this.props.widgetTypes.STACKED_CHART:
-        this.state.config.series.forEach((series) => {
-          const seriesNo = this.state.config.series.indexOf(series);
-          controls.push(
-            <fieldset key={'series' + seriesNo}>
-              <legend>Series #{seriesNo + 1}</legend>
-              <Input type="text"
-                     id={`series-${seriesNo}-field`}
-                     name="field"
-                     label="Field"
-                     data-series={seriesNo}
-                     defaultValue={series.field}
-                     onChange={this._bindSeriesValue}
-                     help="Field used to get the series value."
-                     required/>
-              <Input type="text"
-                     id={`series-${seriesNo}-query`}
-                     name="query"
-                     label="Search query"
-                     data-series={seriesNo}
-                     defaultValue={series.query}
-                     onChange={this._bindSeriesValue}
-                     help="Search query that will be executed to get the series value."/>
-              <Input type="select"
-                     id={`series-${seriesNo}-statistical-function`}
-                     name="statistical_function"
-                     label="Statistical function"
-                     data-series={seriesNo}
-                     defaultValue={series.statistical_function}
-                     onChange={this._bindSeriesValue}
-                     help="Statistical function applied to the series.">
-                {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
-                  return (
-                    <option key={statFunction} value={statFunction}>
-                      {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
-                    </option>
-                  );
-                })}
-              </Input>
-            </fieldset>
-          );
-        }, this);
-        break;
-      default:
-    }
-
-    return controls;
+    return null;
   },
-
   render() {
     return (
       <BootstrapModalForm ref="editModal"
