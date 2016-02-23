@@ -5,7 +5,7 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import StringUtils from 'util/StringUtils';
 import ObjectUtils from 'util/ObjectUtils';
-import NumberUtils from 'util/NumberUtils';
+import FormsUtils from 'util/FormsUtils';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
@@ -58,41 +58,27 @@ const WidgetEditConfigModal = React.createClass({
     this.hide();
   },
 
-  _formatSettingValue(value, type) {
-    let formattedValue = value;
-    if (type) {
-      switch (type) {
-        case 'number':
-          formattedValue = NumberUtils.isNumber(formattedValue) ? Number(formattedValue) : undefined;
-          break;
-        default:
-          // do nothing
-      }
-    }
-    return formattedValue;
-  },
-
-  _setSetting(key, value, type) {
+  _setSetting(key, value) {
     const newState = ObjectUtils.clone(this.state);
-    newState[key] = this._formatSettingValue(value, type);
+    newState[key] = value;
     this.setState(newState);
   },
 
   _bindValue(event) {
-    this._setSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
+    this._setSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
   },
 
-  _setConfigurationSetting(key, value, type) {
+  _setConfigurationSetting(key, value) {
     const newConfig = ObjectUtils.clone(this.state.config);
-    newConfig[key] = this._formatSettingValue(value, type);
+    newConfig[key] = value;
     this.setState({config: newConfig});
   },
 
   _bindConfigurationValue(event) {
-    this._setConfigurationSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
+    this._setConfigurationSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
   },
 
-  _setTimeRangeSetting(key, value, type) {
+  _setTimeRangeSetting(key, value) {
     const newTimeRange = ObjectUtils.clone(this.state.config.timerange);
 
     switch (key) {
@@ -110,14 +96,14 @@ const WidgetEditConfigModal = React.createClass({
         this.setState({errors: errors});
         break;
       default:
-        newTimeRange[key] = this._formatSettingValue(value, type);
+        newTimeRange[key] = value;
     }
 
     this._setConfigurationSetting('timerange', newTimeRange);
   },
 
   _bindTimeRangeValue(event) {
-    this._setTimeRangeSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
+    this._setTimeRangeSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
   },
 
   _setSeriesSetting(seriesNo, key, value, type) {
