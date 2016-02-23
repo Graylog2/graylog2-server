@@ -18,6 +18,7 @@ const WidgetEditConfigModal = React.createClass({
     widget: React.PropTypes.object.isRequired,
     widgetTypes: React.PropTypes.object.isRequired,
   },
+
   getInitialState() {
     return {
       description: this.props.widget.description,
@@ -27,12 +28,15 @@ const WidgetEditConfigModal = React.createClass({
       errors: {},
     };
   },
+
   open() {
     this.refs.editModal.open();
   },
+
   hide() {
     this.refs.editModal.close();
   },
+
   _getWidgetData() {
     const widget = {};
     const stateKeys = Object.keys(this.state);
@@ -45,6 +49,7 @@ const WidgetEditConfigModal = React.createClass({
 
     return widget;
   },
+
   save() {
     const errorKeys = Object.keys(this.state.errors);
     if (!errorKeys.some((key) => this.state.errors[key] === true)) {
@@ -52,77 +57,80 @@ const WidgetEditConfigModal = React.createClass({
     }
     this.hide();
   },
-  _onTitleChange(event) {
-    this.setState({description: event.target.value});
+
+  _formatSettingValue(value, type) {
+    let formattedValue = value;
+    if (type) {
+      switch (type) {
+        case 'number':
+          formattedValue = NumberUtils.isNumber(formattedValue) ? Number(formattedValue) : undefined;
+          break;
+        default:
+          // do nothing
+      }
+    }
+    return formattedValue;
   },
-  _onCacheTimeChange(event) {
-    const numericValue = NumberUtils.isNumber(event.target.value) ? Number(event.target.value) : undefined;
-    this.setState({cache_time: numericValue});
+
+  _setSetting(key, value, type) {
+    const newState = ObjectUtils.clone(this.state);
+    newState[key] = this._formatSettingValue(value, type);
+    this.setState(newState);
   },
-  _onConfigurationChange(key, value) {
+
+  _bindValue(event) {
+    this._setSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
+  },
+
+  _setConfigurationSetting(key, value, type) {
     const newConfig = ObjectUtils.clone(this.state.config);
-    newConfig[key] = value;
+    newConfig[key] = this._formatSettingValue(value, type);
     this.setState({config: newConfig});
   },
-  _onQueryChange(event) {
-    this._onConfigurationChange('query', event.target.value);
+
+  _bindConfigurationValue(event) {
+    this._setConfigurationSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
   },
-  _onConfigurationCheckboxChange(key) {
-    return (event) => {
-      this._onConfigurationChange(key, event.target.checked);
-    };
-  },
-  _onTimeRangeParamChange(key, value) {
+
+  _setTimeRangeSetting(key, value, type) {
     const newTimeRange = ObjectUtils.clone(this.state.config.timerange);
-    newTimeRange[key] = value;
-    this._onConfigurationChange('timerange', newTimeRange);
-  },
-  _onRelativeTimeRangeChange(event) {
-    const numericValue = NumberUtils.isNumber(event.target.value) ? Number(event.target.value) : undefined;
-    this._onTimeRangeParamChange('range', numericValue);
-  },
-  _onAbsoluteTimeRangeFromChange(event) {
-    const errors = ObjectUtils.clone(this.state.errors);
 
-    try {
-      const from = DateTime.parseFromString(event.target.value).toISOString();
-      this._onTimeRangeParamChange('from', from);
-      errors.from = false;
-    } catch (e) {
-      errors.from = true;
+    switch (key) {
+      case 'from':
+      case 'to':
+        const errors = ObjectUtils.clone(this.state.errors);
+
+        try {
+          newTimeRange[key] = DateTime.parseFromString(value).toISOString();
+          errors[key] = false;
+        } catch (e) {
+          errors[key] = true;
+        }
+
+        this.setState({errors: errors});
+        break;
+      default:
+        newTimeRange[key] = this._formatSettingValue(value, type);
     }
 
-    this.setState({errors: errors});
+    this._setConfigurationSetting('timerange', newTimeRange);
   },
-  _onAbsoluteTimeRangeToChange(event) {
-    const errors = ObjectUtils.clone(this.state.errors);
 
-    try {
-      const to = DateTime.parseFromString(event.target.value).toISOString();
-      this._onTimeRangeParamChange('to', to);
-      errors.to = false;
-    } catch (e) {
-      errors.to = true;
-    }
+  _bindTimeRangeValue(event) {
+    this._setTimeRangeSetting(event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
+  },
 
-    this.setState({errors: errors});
-  },
-  _onKeywordTimeRangeChange(event) {
-    this._onTimeRangeParamChange('keyword', event.target.value);
-  },
-  _onSeriesChange(seriesNo, field) {
-    return (event) => {
-      const newSeries = ObjectUtils.clone(this.state.config.series);
-      newSeries[seriesNo][field] = event.target.value;
+  _setSeriesSetting(seriesNo, key, value, type) {
+    const newSeries = ObjectUtils.clone(this.state.config.series);
+    newSeries[seriesNo][key] = this._formatSettingValue(value, type);
 
-      this._onConfigurationChange('series', newSeries);
-    };
+    this._setConfigurationSetting('series', newSeries);
   },
-  _onStatisticalFunctionChange(field) {
-    return (event) => {
-      this._onConfigurationChange(field, event.target.value);
-    };
+
+  _bindSeriesValue(event) {
+    this._setSeriesSetting(event.target.getAttribute('data-series'), event.target.name, (event.target.type === 'checkbox' ? event.target.checked : event.target.value), event.target.type);
   },
+
   _formatDateTime(dateTime) {
     try {
       return DateTime.parseFromString(dateTime).toString();
@@ -130,6 +138,7 @@ const WidgetEditConfigModal = React.createClass({
       return dateTime;
     }
   },
+
   _getTimeRangeFormControls() {
     const rangeTypeSelector = (
       <Input type="text"
@@ -145,11 +154,13 @@ const WidgetEditConfigModal = React.createClass({
       case 'relative':
         rangeValueInput = (
           <Input type="number"
+                 id="timerange-relative"
+                 name="range"
                  label="Search relative time"
                  required
                  min="0"
                  defaultValue={this.state.config.timerange.range}
-                 onChange={this._onRelativeTimeRangeChange}
+                 onChange={this._bindTimeRangeValue}
                  help="Number of seconds relative to the moment the search executes. 0 searches in all messages."/>
         );
         break;
@@ -157,18 +168,22 @@ const WidgetEditConfigModal = React.createClass({
         rangeValueInput = (
           <div>
             <Input type="text"
+                   id="timerange-absolute-from"
+                   name="from"
                    label="Search from"
                    required
                    bsStyle={this.state.errors.from === true ? 'error' : null}
                    defaultValue={this._formatDateTime(this.state.config.timerange.from)}
-                   onChange={this._onAbsoluteTimeRangeFromChange}
+                   onChange={this._bindTimeRangeValue}
                    help="Earliest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
             <Input type="text"
+                   id="timerange-absolute-to"
+                   name="to"
                    label="Search to"
                    required
                    bsStyle={this.state.errors.to === true ? 'error' : null}
                    defaultValue={this._formatDateTime(this.state.config.timerange.to)}
-                   onChange={this._onAbsoluteTimeRangeToChange}
+                   onChange={this._bindTimeRangeValue}
                    help="Latest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
           </div>
         );
@@ -176,10 +191,12 @@ const WidgetEditConfigModal = React.createClass({
       case 'keyword':
         rangeValueInput = (
           <Input type="text"
+                 id="timerange-keyword"
+                 name="keyword"
                  label="Search keyword"
                  required
                  defaultValue={this.state.config.timerange.keyword}
-                 onChange={this._onKeywordTimeRangeChange}
+                 onChange={this._bindTimeRangeValue}
                  help="Search keyword representing the time to be included in the search. E.g. last day"/>
         );
         break;
@@ -194,6 +211,7 @@ const WidgetEditConfigModal = React.createClass({
       </div>
     );
   },
+
   _getSpecificConfigurationControls() {
     const controls = [];
 
@@ -201,9 +219,11 @@ const WidgetEditConfigModal = React.createClass({
       controls.push(
         <Input type="text"
                key="query"
+               id="query"
+               name="query"
                label="Search query"
                defaultValue={this.state.config.query}
-               onChange={this._onQueryChange}
+               onChange={this._bindConfigurationValue}
                help="Search query that will be executed to get the widget value."/>
       );
     }
@@ -214,16 +234,18 @@ const WidgetEditConfigModal = React.createClass({
         controls.push(
           <Input key="statsCountStatisticalFunction"
                  type="select"
+                 id="count-statistical-function"
+                 name="stats_function"
                  label="Statistical function"
                  defaultValue={defaultStatisticalFunction}
-                 onChange={this._onStatisticalFunctionChange('stats_function')}
+                 onChange={this._bindConfigurationValue}
                  help="Statistical function applied to the data.">
             {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
               return (
-              <option key={statFunction} value={statFunction}>
-                {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
-              </option>
-                );
+                <option key={statFunction} value={statFunction}>
+                  {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
+                </option>
+              );
             })}
           </Input>
         );
@@ -233,19 +255,23 @@ const WidgetEditConfigModal = React.createClass({
         controls.push(
           <Input key="trend"
                  type="checkbox"
+                 id="count-trend"
+                 name="trend"
                  label="Display trend"
                  defaultChecked={this.state.config.trend}
-                 onChange={this._onConfigurationCheckboxChange('trend')}
+                 onChange={this._bindConfigurationValue}
                  help="Show trend information for this number."/>
         );
 
         controls.push(
           <Input key="lowerIsBetter"
                  type="checkbox"
+                 id="count-lower-is-better"
+                 name="lower_is_better"
                  label="Lower is better"
                  disabled={this.state.config.trend === false}
                  defaultChecked={this.state.config.lower_is_better}
-                 onChange={this._onConfigurationCheckboxChange('lower_is_better')}
+                 onChange={this._bindConfigurationValue}
                  help="Use green colour when trend goes down."/>
         );
         break;
@@ -253,35 +279,41 @@ const WidgetEditConfigModal = React.createClass({
         controls.push(
           <Input key="showPieChart"
                  type="checkbox"
+                 id="quickvalues-show-pie-chart"
+                 name="show_pie_chart"
                  label="Show pie chart"
                  defaultChecked={this.state.config.show_pie_chart}
-                 onChange={this._onConfigurationCheckboxChange('show_pie_chart')}
+                 onChange={this._bindConfigurationValue}
                  help="Represent data in a pie chart"/>
         );
 
         controls.push(
           <Input key="showDataTable"
                  type="checkbox"
+                 id="quickvalues-show-data-table"
+                 name="show_data_table"
                  label="Show data table"
                  defaultChecked={this.state.config.show_data_table}
-                 onChange={this._onConfigurationCheckboxChange('show_data_table')}
+                 onChange={this._bindConfigurationValue}
                  help="Include a table with quantitative information."/>
         );
         break;
       case this.props.widgetTypes.FIELD_CHART:
         controls.push(
           <Input key="fieldChartStatisticalFunction"
+                 id="chart-statistical-function"
+                 name="valuetype"
                  type="select"
                  label="Statistical function"
                  defaultValue={this.state.config.valuetype}
-                 onChange={this._onStatisticalFunctionChange('valuetype')}
+                 onChange={this._bindConfigurationValue}
                  help="Statistical function applied to the data.">
             {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
               return (
-              <option key={statFunction} value={statFunction}>
-                {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
-              </option>
-                );
+                <option key={statFunction} value={statFunction}>
+                  {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
+                </option>
+              );
             })}
           </Input>
         );
@@ -293,27 +325,36 @@ const WidgetEditConfigModal = React.createClass({
             <fieldset key={'series' + seriesNo}>
               <legend>Series #{seriesNo + 1}</legend>
               <Input type="text"
+                     id={`series-${seriesNo}-field`}
+                     name="field"
                      label="Field"
+                     data-series={seriesNo}
                      defaultValue={series.field}
-                     onChange={this._onSeriesChange(seriesNo, 'field')}
+                     onChange={this._bindSeriesValue}
                      help="Field used to get the series value."
                      required/>
               <Input type="text"
+                     id={`series-${seriesNo}-query`}
+                     name="query"
                      label="Search query"
+                     data-series={seriesNo}
                      defaultValue={series.query}
-                     onChange={this._onSeriesChange(seriesNo, 'query')}
+                     onChange={this._bindSeriesValue}
                      help="Search query that will be executed to get the series value."/>
               <Input type="select"
+                     id={`series-${seriesNo}-statistical-function`}
+                     name="statistical_function"
                      label="Statistical function"
+                     data-series={seriesNo}
                      defaultValue={series.statistical_function}
-                     onChange={this._onSeriesChange(seriesNo, 'statistical_function')}
+                     onChange={this._bindSeriesValue}
                      help="Statistical function applied to the series.">
                 {FieldGraphsStore.constructor.FUNCTIONS.keySeq().map((statFunction) => {
                   return (
-                  <option key={statFunction} value={statFunction}>
-                    {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
-                  </option>
-                    );
+                    <option key={statFunction} value={statFunction}>
+                      {FieldGraphsStore.constructor.FUNCTIONS.get(statFunction)}
+                    </option>
+                  );
                 })}
               </Input>
             </fieldset>
@@ -325,6 +366,7 @@ const WidgetEditConfigModal = React.createClass({
 
     return controls;
   },
+
   render() {
     return (
       <BootstrapModalForm ref="editModal"
@@ -334,18 +376,22 @@ const WidgetEditConfigModal = React.createClass({
                           submitButtonText="Update">
         <fieldset>
           <Input type="text"
+                 id="title"
+                 name="description"
                  label="Title"
                  required
                  defaultValue={this.state.description}
-                 onChange={this._onTitleChange}
+                 onChange={this._bindValue}
                  help="Type a name that describes your widget."
-                 autoFocus />
+                 autoFocus/>
           <Input type="number"
                  min="1"
                  required
+                 id="cache_time"
+                 name="cache_time"
                  label="Cache time"
                  defaultValue={this.state.cache_time}
-                 onChange={this._onCacheTimeChange}
+                 onChange={this._bindValue}
                  help="Number of seconds the widget value will be cached."/>
           {this._getTimeRangeFormControls()}
           {this._getSpecificConfigurationControls()}
