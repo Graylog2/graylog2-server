@@ -18,7 +18,6 @@ class DocsHelper {
     LOAD_BALANCERS: 'load_balancers.html',
     PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors.html#the-flexible-date-converter',
     PAGE_STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
-    RADIO_ARCHITECTURE: 'architecture.html#highly-available-setup-with-graylog-radio',
     SEARCH_QUERY_LANGUAGE: 'queries.html',
     STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
     STREAMS: 'streams.html',

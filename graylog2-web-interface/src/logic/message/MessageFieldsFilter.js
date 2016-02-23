@@ -12,14 +12,15 @@ const MessageFieldsFilter = {
     // Our reserved fields.
     'gl2_source_node',
     'gl2_source_input',
-    'gl2_source_radio',
-    'gl2_source_radio_input',
     'gl2_source_collector',
     'gl2_source_collector_input',
     'gl2_remote_ip',
     'gl2_remote_port',
     'gl2_remote_hostname',
     'streams',
+    // TODO Due to be removed in Graylog 3.x
+    'gl2_source_radio',
+    'gl2_source_radio_input',
   ],
   filterFields(fields) {
     const result = {};

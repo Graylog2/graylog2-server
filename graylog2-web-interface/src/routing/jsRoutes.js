@@ -255,9 +255,6 @@ const jsRoutes = {
     NodesController: {
       node: (nodeId) => { return {url: `/system/nodes/${nodeId}`}; },
     },
-    RadiosController: {
-      show: (nodeId) => { return {url: `/system/radios/${nodeId}`}; },
-    },
     SearchController: {
       index: (query, rangetype, timerange) => {
         let route;
