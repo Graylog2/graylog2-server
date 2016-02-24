@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import { Input } from 'react-bootstrap';
 
-const CountWidgetConfiguration = React.createClass({
+const QueryConfiguration = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -20,4 +20,4 @@ const CountWidgetConfiguration = React.createClass({
   },
 });
 
-export default CountWidgetConfiguration;
+export default QueryConfiguration;

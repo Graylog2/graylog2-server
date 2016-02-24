@@ -4,7 +4,7 @@ import { Input } from 'react-bootstrap';
 import { QueryConfiguration } from 'components/widgets/configurations';
 import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
 
-const CountWidgetConfiguration = React.createClass({
+const FieldChartWidgetConfiguration = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -34,4 +34,4 @@ const CountWidgetConfiguration = React.createClass({
   },
 });
 
-export default CountWidgetConfiguration;
+export default FieldChartWidgetConfiguration;
