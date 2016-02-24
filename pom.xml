@@ -38,7 +38,6 @@
     </parent>
 
     <modules>
-        <module>graylog2-plugin-interfaces</module>
         <module>graylog2-server</module>
         <module>integration-tests</module>
     </modules>
@@ -156,11 +155,6 @@
     -->
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.graylog2</groupId>
-                <artifactId>graylog2-plugin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-server</artifactId>
