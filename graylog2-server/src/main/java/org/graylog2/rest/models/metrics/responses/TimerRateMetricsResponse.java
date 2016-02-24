@@ -16,11 +16,10 @@
  */
 package org.graylog2.rest.models.metrics.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+@JsonAutoDetect
 public class TimerRateMetricsResponse {
 
     public TimerMetricsResponse time;

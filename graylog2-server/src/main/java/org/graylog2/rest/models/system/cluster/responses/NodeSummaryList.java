@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.system.cluster.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -23,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import java.util.List;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class NodeSummaryList {
     @JsonProperty
     public abstract List<NodeSummary> nodes();

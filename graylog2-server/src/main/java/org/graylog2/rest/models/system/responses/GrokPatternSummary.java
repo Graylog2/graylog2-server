@@ -16,6 +16,9 @@
  */
 package org.graylog2.rest.models.system.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+@JsonAutoDetect
 public class GrokPatternSummary {
 
     public String id;
