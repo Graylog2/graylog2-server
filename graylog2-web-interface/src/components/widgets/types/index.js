@@ -6,10 +6,13 @@ import {
   QuickValuesVisualization,
   StackedGraphVisualization } from 'components/visualizations';
 import {
+  CountWidgetCreateConfiguration,
   CountWidgetEditConfiguration,
   FieldChartWidgetConfiguration,
+  QuickValuesWidgetCreateConfiguration,
   QuickValuesWidgetEditConfiguration,
   StackedChartWidgetConfiguration,
+  StatisticalCountWidgetCreateConfiguration,
   StatisticalCountWidgetEditConfiguration } from 'components/widgets/configurations';
 
 PluginStore.register(new PluginManifest({}, {
@@ -20,6 +23,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
+      createConfiguration: CountWidgetCreateConfiguration,
       editConfiguration: CountWidgetEditConfiguration,
     },
     {
@@ -28,6 +32,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
+      createConfiguration: CountWidgetCreateConfiguration,
       editConfiguration: CountWidgetEditConfiguration,
     },
     {
@@ -36,6 +41,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
+      createConfiguration: StatisticalCountWidgetCreateConfiguration,
       editConfiguration: StatisticalCountWidgetEditConfiguration,
     },
     {
@@ -51,6 +57,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 3,
       defaultWidth: 1,
       visualization: QuickValuesVisualization,
+      createConfiguration: QuickValuesWidgetCreateConfiguration,
       editConfiguration: QuickValuesWidgetEditConfiguration,
     },
     {
