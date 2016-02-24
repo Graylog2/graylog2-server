@@ -65,7 +65,7 @@ const MapVisualization = React.createClass({
     const leafletAttribution = this.props.attribution || this.DEFAULT_ATTRIBUTION;
 
     return (
-      <Map center={this.position} zoom={this.state.zoomLevel} style={{height: this.props.height, width: this.props.width}} scrollWheelZoom={false}>
+      <Map center={this.position} zoom={this.state.zoomLevel} onZoomend={this._onZoomChange} style={{height: this.props.height, width: this.props.width}} scrollWheelZoom={false}>
         <TileLayer url={leafletUrl}
                    maxZoom={19}
                    attribution={leafletAttribution}/>
