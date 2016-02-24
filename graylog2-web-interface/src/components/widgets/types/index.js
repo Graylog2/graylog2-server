@@ -6,11 +6,11 @@ import {
   QuickValuesVisualization,
   StackedGraphVisualization } from 'components/visualizations';
 import {
-  CountWidgetConfiguration,
+  CountWidgetEditConfiguration,
   FieldChartWidgetConfiguration,
-  QuickValuesWidgetConfiguration,
+  QuickValuesWidgetEditConfiguration,
   StackedChartWidgetConfiguration,
-  StatisticalCountWidgetConfiguration } from 'components/widgets/configurations';
+  StatisticalCountWidgetEditConfiguration } from 'components/widgets/configurations';
 
 PluginStore.register(new PluginManifest({}, {
   widgets: [
@@ -20,7 +20,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
-      configuration: CountWidgetConfiguration,
+      editConfiguration: CountWidgetEditConfiguration,
     },
     {
       type: 'STREAM_SEARCH_RESULT_COUNT',
@@ -28,7 +28,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
-      configuration: CountWidgetConfiguration,
+      editConfiguration: CountWidgetEditConfiguration,
     },
     {
       type: 'STATS_COUNT',
@@ -36,7 +36,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 1,
       visualization: NumericVisualization,
-      configuration: StatisticalCountWidgetConfiguration,
+      editConfiguration: StatisticalCountWidgetEditConfiguration,
     },
     {
       type: 'SEARCH_RESULT_CHART',
@@ -48,10 +48,10 @@ PluginStore.register(new PluginManifest({}, {
     {
       type: 'QUICKVALUES',
       readableType: 'Quick values',
-      defaultHeight: 1,
-      defaultWidth: 2,
+      defaultHeight: 3,
+      defaultWidth: 1,
       visualization: QuickValuesVisualization,
-      configuration: QuickValuesWidgetConfiguration,
+      editConfiguration: QuickValuesWidgetEditConfiguration,
     },
     {
       type: 'FIELD_CHART',
@@ -59,7 +59,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 2,
       visualization: GraphVisualization,
-      configuration: FieldChartWidgetConfiguration,
+      editConfiguration: FieldChartWidgetConfiguration,
     },
     {
       type: 'STACKED_CHART',
@@ -67,7 +67,7 @@ PluginStore.register(new PluginManifest({}, {
       defaultHeight: 1,
       defaultWidth: 2,
       visualization: StackedGraphVisualization,
-      configuration: StackedChartWidgetConfiguration,
+      editConfiguration: StackedChartWidgetConfiguration,
     },
   ],
 }));

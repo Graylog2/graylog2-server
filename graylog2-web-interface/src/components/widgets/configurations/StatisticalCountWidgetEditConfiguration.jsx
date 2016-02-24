@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import { Input } from 'react-bootstrap';
 
-import { QueryConfiguration, CountWidgetConfiguration } from 'components/widgets/configurations';
+import { QueryConfiguration, CountWidgetEditConfiguration } from 'components/widgets/configurations';
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 
 const StatisticalCountWidgetConfiguration = React.createClass({
@@ -23,7 +23,7 @@ const StatisticalCountWidgetConfiguration = React.createClass({
                defaultValue={defaultStatisticalFunction}
                onChange={this.props.onChange}
                help="Statistical function applied to the data.">
-          {FieldStatisticsStore.FUNCTIONS.keySeq().map((statFunction) => {
+          {FieldStatisticsStore.FUNCTIONS.keySeq().sort().map((statFunction) => {
             return (
               <option key={statFunction} value={statFunction}>
                 {FieldStatisticsStore.FUNCTIONS.get(statFunction)}
@@ -31,7 +31,7 @@ const StatisticalCountWidgetConfiguration = React.createClass({
             );
           })}
         </Input>
-        <CountWidgetConfiguration {...this.props} showQueryConfig={false}/>
+        <CountWidgetEditConfiguration {...this.props} showQueryConfig={false}/>
       </fieldset>
     );
   },

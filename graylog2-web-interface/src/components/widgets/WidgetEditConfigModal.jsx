@@ -27,6 +27,8 @@ const WidgetEditConfigModal = React.createClass({
     };
   },
 
+  widgetPlugins: PluginStore.exports('widgets'),
+
   open() {
     this.refs.editModal.open();
   },
@@ -34,8 +36,6 @@ const WidgetEditConfigModal = React.createClass({
   hide() {
     this.refs.editModal.close();
   },
-
-  widgetPlugins: PluginStore.exports('widgets'),
 
   _getWidgetData() {
     const widget = {};
@@ -204,8 +204,8 @@ const WidgetEditConfigModal = React.createClass({
 
   _getSpecificConfigurationControls() {
     const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.state.type.toUpperCase())[0];
-    if (widgetPlugin.configuration) {
-      return React.createElement(widgetPlugin.configuration, {
+    if (widgetPlugin.editConfiguration) {
+      return React.createElement(widgetPlugin.editConfiguration, {
         id: this.props.widget.id,
         config: this.state.config,
         onChange: this._onConfigurationValueChange,
