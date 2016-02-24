@@ -16,9 +16,6 @@ const SidebarMessageField = React.createClass({
       showActions: false,
     };
   },
-  _toggleShowActions() {
-    this.setState({showActions: !this.state.showActions});
-  },
   _setShowActions(isOpen) {
     this.setState({showActions: isOpen});
   },
@@ -52,7 +49,7 @@ const SidebarMessageField = React.createClass({
           <DropdownButton bsStyle="link"
                           id={'field-analyzers-' + this.props.field.name}
                           onToggle={this._setShowActions}
-                          title={<i className={toggleClassName} onClick={this._toggleShowActions} />}>
+                          title={<i className={toggleClassName} />}>
             {this._fieldAnalyzerMenuItems()}
           </DropdownButton>
         </div>
