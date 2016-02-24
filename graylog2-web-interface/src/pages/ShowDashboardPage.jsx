@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
@@ -35,6 +36,8 @@ const ShowDashboardPage = React.createClass({
       clearInterval(this.loadInterval);
     }
   },
+  widgetPlugins: PluginStore.exports('widgets'),
+  DASHBOARDS_EDIT: 'dashboards:edit',
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
@@ -43,7 +46,6 @@ const ShowDashboardPage = React.createClass({
         }
       });
   },
-  DASHBOARDS_EDIT: 'dashboards:edit',
   updateUnFocussed() {
     return this.state.currentUser.preferences.updateUnfocussed;
   },
@@ -70,24 +72,9 @@ const ShowDashboardPage = React.createClass({
   _defaultWidgetDimensions(widget) {
     const dimensions = {col: 0, row: 0};
 
-    switch (widget.type.toUpperCase()) {
-      case Widget.Type.SEARCH_RESULT_CHART:
-      case Widget.Type.STACKED_CHART:
-      case Widget.Type.FIELD_CHART:
-        dimensions.width = 2;
-        dimensions.height = 1;
-        break;
-      case Widget.Type.QUICKVALUES:
-        dimensions.width = 1;
-        dimensions.height = (widget.config.show_pie_chart && widget.config.show_data_table ? 3 : 2);
-        break;
-      case Widget.Type.SEARCH_RESULT_COUNT:
-      case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
-      case Widget.Type.STATS_COUNT:
-      default:
-        dimensions.width = 1;
-        dimensions.height = 1;
-    }
+    const widgetPlugin = this.widgetPlugins.filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
+    dimensions.height = widgetPlugin.defaultHeight;
+    dimensions.width = widgetPlugin.defaultWidth;
 
     return dimensions;
   },
