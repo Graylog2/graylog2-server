@@ -3,8 +3,6 @@ import { Input } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import Widget from 'components/widgets/Widget';
-import GraphVisualization from 'components/visualizations/GraphVisualization';
 
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
@@ -12,19 +10,18 @@ import StringUtils from 'util/StringUtils';
 
 const WidgetCreationModal = React.createClass({
   propTypes: {
-    configuration: React.PropTypes.object,
     fields: React.PropTypes.array,
-    isStreamSearch: React.PropTypes.bool,
     onConfigurationSaved: React.PropTypes.func.isRequired,
     onModalHidden: React.PropTypes.func,
     widgetType: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
+    const widgetPlugin = this._getWidgetPlugin(this.props.widgetType);
     return {
-      title: this._getDefaultWidgetTitle(),
+      title: this._getDefaultWidgetTitle(widgetPlugin),
       config: {},
-      widgetPlugin: this._getWidgetPlugin(this.props.widgetType),
+      widgetPlugin: widgetPlugin,
     };
   },
 
@@ -101,48 +98,8 @@ const WidgetCreationModal = React.createClass({
     }
   },
 
-  _getDefaultWidgetTitle() {
-    let title = '';
-
-    switch (this.props.widgetType.toUpperCase()) {
-      case Widget.Type.SEARCH_RESULT_COUNT:
-        title = 'message count';
-        break;
-      case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
-        title = 'stream message count';
-        break;
-      case Widget.Type.STATS_COUNT:
-        title = 'field statistical value';
-        break;
-      case Widget.Type.QUICKVALUES:
-        if (this.props.configuration.field !== undefined) {
-          title = this.props.configuration.field + ' quick values';
-        } else {
-          title = 'field quick values';
-        }
-        break;
-      case Widget.Type.FIELD_CHART:
-        if (this.props.configuration.field !== undefined && this.props.configuration.valuetype !== undefined) {
-          title = this.props.configuration.field + ' ' + GraphVisualization.getReadableFieldChartStatisticalFunction(this.props.configuration.valuetype) + ' value graph';
-        } else {
-          title = 'field graph';
-        }
-        break;
-      case Widget.Type.SEARCH_RESULT_CHART:
-        if (this.props.isStreamSearch) {
-          title = 'stream histogram';
-        } else {
-          title = 'search histogram';
-        }
-        break;
-      case Widget.Type.STACKED_CHART:
-        title = 'combined graph';
-        break;
-      default:
-        throw new Error('Unsupported widget type ' + this.props.widgetType);
-    }
-
-    return StringUtils.capitalizeFirstLetter(title);
+  _getDefaultWidgetTitle(widgetPlugin) {
+    return StringUtils.capitalizeFirstLetter(widgetPlugin.readableType);
   },
 
   _getSpecificWidgetInputs() {
