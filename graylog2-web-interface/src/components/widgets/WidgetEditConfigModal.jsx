@@ -24,6 +24,7 @@ const WidgetEditConfigModal = React.createClass({
       cache_time: this.props.widget.cache_time,
       config: ObjectUtils.clone(this.props.widget.config), // clone config to not modify it accidentally
       errors: {},
+      widgetPlugin: this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0],
     };
   },
 
@@ -42,7 +43,7 @@ const WidgetEditConfigModal = React.createClass({
     const stateKeys = Object.keys(this.state);
 
     stateKeys.forEach((key) => {
-      if (this.state.hasOwnProperty(key) && key !== 'errors') {
+      if (this.state.hasOwnProperty(key) && (key !== 'errors' || key !== 'widgetPlugin')) {
         widget[key] = this.state[key];
       }
     });
@@ -203,9 +204,8 @@ const WidgetEditConfigModal = React.createClass({
   },
 
   _getSpecificConfigurationControls() {
-    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.state.type.toUpperCase())[0];
-    if (widgetPlugin.editConfiguration) {
-      return React.createElement(widgetPlugin.editConfiguration, {
+    if (this.state.widgetPlugin.editConfiguration) {
+      return React.createElement(this.state.widgetPlugin.editConfiguration, {
         id: this.props.widget.id,
         config: this.state.config,
         onChange: this._onConfigurationValueChange,

@@ -37,12 +37,16 @@ const Widget = React.createClass({
       errorMessage: undefined,
       height: undefined,
       width: undefined,
+      widgetPlugin: this._getWidgetPlugin(this.props.widget.type),
     };
   },
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
+  },
+  componentWillReceiveProps(nextProps) {
+    this.setState({widgetPlugin: this._getWidgetPlugin(nextProps.widget.type)});
   },
   componentDidUpdate() {
     this._calculateWidgetSize();
@@ -56,6 +60,11 @@ const Widget = React.createClass({
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
   WIDGET_HEADER_HEIGHT: 25,
   WIDGET_FOOTER_HEIGHT: 20,
+
+  _getWidgetPlugin(widgetType) {
+    return this.widgetPlugins.filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
+  },
+
   _isBoundToStream() {
     return ('stream_id' in this.props.widget.config) && (this.props.widget.config.stream_id !== null);
   },
@@ -119,12 +128,11 @@ const Widget = React.createClass({
       return <div className="not-available">{this.state.result}</div>;
     }
 
-    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
-    if (!widgetPlugin) {
+    if (!this.state.widgetPlugin) {
       throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
     }
 
-    return React.createElement(widgetPlugin.visualization, {
+    return React.createElement(this.state.widgetPlugin.visualization, {
       id: this.props.widget.id,
       config: this.props.widget.config,
       data: this.state.result,
