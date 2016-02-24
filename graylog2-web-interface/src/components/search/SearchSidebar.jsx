@@ -18,9 +18,8 @@ const SearchSidebar = React.createClass({
     builtQuery: React.PropTypes.any,
     currentSavedSearch: React.PropTypes.string,
     fields: React.PropTypes.array,
-    onFieldSelectedForGraph: React.PropTypes.func,
-    onFieldSelectedForQuickValues: React.PropTypes.func,
-    onFieldSelectedForStats: React.PropTypes.func,
+    fieldAnalyzers: React.PropTypes.array,
+    onFieldAnalyzer: React.PropTypes.func,
     onFieldToggled: React.PropTypes.func,
     permissions: React.PropTypes.array,
     predefinedFieldSelection: React.PropTypes.func,
@@ -131,10 +130,9 @@ const SearchSidebar = React.createClass({
         return (
           <SidebarMessageField key={field.name}
                                field={field}
+                               fieldAnalyzers={this.props.fieldAnalyzers}
                                onToggled={this.props.onFieldToggled}
-                               onFieldSelectedForGraph={this.props.onFieldSelectedForGraph}
-                               onFieldSelectedForQuickValues={this.props.onFieldSelectedForQuickValues}
-                               onFieldSelectedForStats={this.props.onFieldSelectedForStats}
+                               onFieldAnalyzer={this.props.onFieldAnalyzer}
                                selected={this.props.selectedFields.contains(field.name)}/>
         );
       });

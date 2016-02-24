@@ -14,7 +14,7 @@ import RefreshStore from 'stores/tools/RefreshStore';
 
 const FieldQuickValues = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {
@@ -47,7 +47,7 @@ const FieldQuickValues = React.createClass({
       clearInterval(this.timer);
     }
   },
-  addFieldQuickValues(field) {
+  addField(field) {
     this.setState({field: field}, () => this._loadQuickValuesData(false));
   },
   _loadQuickValuesData() {

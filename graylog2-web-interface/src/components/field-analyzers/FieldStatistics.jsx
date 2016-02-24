@@ -11,7 +11,7 @@ import UserNotification from 'util/UserNotification';
 
 const FieldStatistics = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   getInitialState() {
     return {
@@ -30,7 +30,7 @@ const FieldStatistics = React.createClass({
       window.clearInterval(this.updateIntervalId);
     }
   },
-  addFieldStatistics(field) {
+  addField(field) {
     this._reloadFieldStatistics(field);
   },
   _reloadAllStatistics() {
