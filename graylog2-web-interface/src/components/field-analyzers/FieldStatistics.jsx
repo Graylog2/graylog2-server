@@ -11,15 +11,7 @@ import UserNotification from 'util/UserNotification';
 
 const FieldStatistics = React.createClass({
   propTypes: {
-    from: PropTypes.any.isRequired,
-    to: PropTypes.any.isRequired,
-    resolution: PropTypes.any.isRequired,
-    stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-    query: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired,
-    rangeType: PropTypes.string.isRequired,
-    rangeParams: PropTypes.object.isRequired,
   },
   getInitialState() {
     return {

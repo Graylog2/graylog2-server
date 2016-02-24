@@ -3,9 +3,6 @@ import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
 import { LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
-import FieldGraphs from 'components/field-analyzers/FieldGraphs';
-import FieldQuickValues from 'components/field-analyzers/FieldQuickValues';
-import FieldStatistics from 'components/field-analyzers/FieldStatistics';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Widget from 'components/widgets/Widget';
@@ -137,6 +134,13 @@ const SearchResult = React.createClass({
       });
   },
 
+  _shouldRenderAboveHistogram(analyzer) {
+    return analyzer.displayPriority > 0;
+  },
+  _shouldRenderBelowHistogram(analyzer) {
+    return analyzer.displayPriority <= 0;
+  },
+
   render() {
     const anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
@@ -215,14 +219,14 @@ const SearchResult = React.createClass({
           />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">
-          {this._fieldAnalyzerComponents((analyzer) => analyzer.displayPriority >= 100)}
+          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderAboveHistogram(analyzer))}
 
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
                            isStreamSearch={this.props.searchInStream !== null}/>
 
-          {this._fieldAnalyzerComponents((analyzer) => analyzer.displayPriority < 100)}
+          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderBelowHistogram(analyzer))}
 
           <ResultTable messages={this.props.result.messages}
                        page={SearchStore.page}

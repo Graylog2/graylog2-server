@@ -14,19 +14,19 @@ PluginStore.register(new PluginManifest({}, {
       refId: 'fieldStatisticsComponent',
       displayName: 'Statistics',
       component: FieldStatistics,
-      displayPriority: 100,
+      displayPriority: 2,
     },
     {
       refId: 'fieldQuickValuesComponent',
       displayName: 'Quick values',
       component: FieldQuickValues,
-      displayPriority: 100,
+      displayPriority: 1,
     },
     {
       refId: 'fieldGraphsComponent',
       displayName: 'Generate chart',
       component: FieldGraphs,
-      displayPriority: 50,
+      displayPriority: 0,
     },
   ],
 }));

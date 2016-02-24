@@ -1,5 +1,7 @@
 import React, {PropTypes} from 'react';
-import {Input, Button, ButtonGroup, DropdownButton, MenuItem} from 'react-bootstrap';
+
+import {Input, DropdownButton, MenuItem} from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 const SidebarMessageField = React.createClass({
   propTypes: {
@@ -28,7 +30,9 @@ const SidebarMessageField = React.createClass({
   },
 
   _fieldAnalyzerMenuItems() {
-    return this.props.fieldAnalyzers.map((analyzer, idx) => {
+    return this.props.fieldAnalyzers
+      .sort((a, b) => naturalSort(a.displayName, b.displayName))
+      .map((analyzer, idx) => {
       return (
         <MenuItem key={'field-analyzer-button-' + idx}
                   onClick={this._onFieldAnalyzer(analyzer.refId, this.props.field.name)}>
