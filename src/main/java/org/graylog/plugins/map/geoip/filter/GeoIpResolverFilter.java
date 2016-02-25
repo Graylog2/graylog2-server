@@ -38,6 +38,7 @@ import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -124,8 +125,13 @@ public class GeoIpResolverFilter implements MessageFilter {
 
             try {
                 final File database = new File(config.dbPath());
-                this.databaseReader = new DatabaseReader.Builder(database).build();
-                this.enabled = config.enabled();
+                if (Files.exists(database.toPath())) {
+                    this.databaseReader = new DatabaseReader.Builder(database).build();
+                    this.enabled = config.enabled();
+                } else {
+                    LOG.warn("GeoIP database file does not exist: {}", config.dbPath());
+                    this.enabled = false;
+                }
             } catch (IOException e) {
                 LOG.error("Could not open GeoIP database {}", config.dbPath(), e);
                 this.enabled = false;
