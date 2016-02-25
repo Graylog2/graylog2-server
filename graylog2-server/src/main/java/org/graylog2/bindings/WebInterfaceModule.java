@@ -19,18 +19,12 @@ package org.graylog2.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.initializers.BufferSynchronizerService;
-import org.graylog2.initializers.IndexerSetupService;
-import org.graylog2.initializers.MetricsReporterService;
-import org.graylog2.initializers.OutputSetupService;
+import org.graylog2.initializers.WebInterfaceService;
 
-public class InitializerBindings extends AbstractModule {
+public class WebInterfaceModule extends AbstractModule {
     @Override
     protected void configure() {
-        Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-        serviceBinder.addBinding().to(MetricsReporterService.class);
-        serviceBinder.addBinding().to(IndexerSetupService.class);
-        serviceBinder.addBinding().to(BufferSynchronizerService.class);
-        serviceBinder.addBinding().to(OutputSetupService.class);
+        final Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        serviceBinder.addBinding().to(WebInterfaceService.class);
     }
 }

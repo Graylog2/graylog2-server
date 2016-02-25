@@ -123,6 +123,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
+    @Parameter(value = "web_enable")
+    private boolean webEnable = true;
+
     @Parameter(value = "web_enable_cors")
     private boolean webEnableCors = false;
 
@@ -329,6 +332,10 @@ public abstract class BaseConfiguration {
 
     public String getInstallationSource() {
         return installationSource;
+    }
+
+    public boolean isWebEnable() {
+        return webEnable;
     }
 
     public boolean isWebEnableCors() {

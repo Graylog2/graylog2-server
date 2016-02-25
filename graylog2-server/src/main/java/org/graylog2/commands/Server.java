@@ -16,6 +16,7 @@
  */
 package org.graylog2.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -32,6 +33,7 @@ import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.WebInterfaceModule;
 import org.graylog2.bindings.WidgetStrategyBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
@@ -106,23 +108,30 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(
-                new ServerBindings(configuration),
-                new PersistenceServicesBindings(),
-                new MessageFilterBindings(),
-                new MessageProcessorModule(),
-                new AlarmCallbackBindings(),
-                new InitializerBindings(),
-                new MessageOutputBindings(configuration),
-                new RotationStrategyBindings(),
-                new RetentionStrategyBindings(),
-                new PeriodicalBindings(),
-                new ObjectMapperModule(classLoader),
-                new RestApiBindings(),
-                new PasswordAlgorithmBindings(),
-                new WidgetStrategyBindings(),
-                new DashboardBindings()
+        final ImmutableList.Builder<Module> modules = ImmutableList.builder();
+        modules.add(
+            new ServerBindings(configuration),
+            new PersistenceServicesBindings(),
+            new MessageFilterBindings(),
+            new MessageProcessorModule(),
+            new AlarmCallbackBindings(),
+            new InitializerBindings(),
+            new MessageOutputBindings(configuration),
+            new RotationStrategyBindings(),
+            new RetentionStrategyBindings(),
+            new PeriodicalBindings(),
+            new ObjectMapperModule(classLoader),
+            new RestApiBindings(),
+            new PasswordAlgorithmBindings(),
+            new WidgetStrategyBindings(),
+            new DashboardBindings()
         );
+
+        if (configuration.isWebEnable()) {
+            modules.add(new WebInterfaceModule());
+        }
+
+        return modules.build();
     }
 
     @Override
