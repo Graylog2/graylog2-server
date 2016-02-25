@@ -25,7 +25,6 @@ const FieldAnalyzerMapComponent = React.createClass({
   getInitialState() {
     return {
       field: undefined,
-      loadPending: false,
     };
   },
 
@@ -41,8 +40,6 @@ const FieldAnalyzerMapComponent = React.createClass({
 
   _loadData() {
     if (this.state.field !== undefined) {
-      this.setState({loadPending: true});
-
       const promise = MapsActions.getMapData(
         this.props.query,
         this.state.field,
@@ -50,7 +47,6 @@ const FieldAnalyzerMapComponent = React.createClass({
         this.props.rangeParams,
         this._getStreamId()
       );
-      promise.then(() => this.setState({loadPending: false}));
       promise.catch(() => this._resetStatus());
     }
   },
