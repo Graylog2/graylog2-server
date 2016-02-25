@@ -2,6 +2,7 @@ import packageJson from '../../package.json';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import MapVisualization from 'components/MapVisualization';
 import FieldAnalyzerMapComponent from 'components/FieldAnalyzerMapComponent';
+import GeoIpResolverConfig from 'components/GeoIpResolverConfig';
 
 PluginStore.register(new PluginManifest(packageJson, {
   widgets: [
@@ -19,6 +20,12 @@ PluginStore.register(new PluginManifest(packageJson, {
       displayName: 'World Map',
       component: FieldAnalyzerMapComponent,
       displayPriority: 100,
+    },
+  ],
+  systemConfigurations: [
+    {
+      component: GeoIpResolverConfig,
+      configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
     },
   ],
 }));
