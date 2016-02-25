@@ -121,4 +121,8 @@ public class ChainingClassLoader extends ClassLoader {
     public boolean addClassLoader(ClassLoader classLoader) {
         return classLoaders.add(classLoader);
     }
+
+    public Class<?> classForName(String className) throws ClassNotFoundException {
+        return Class.forName(className, true, this);
+    }
 }

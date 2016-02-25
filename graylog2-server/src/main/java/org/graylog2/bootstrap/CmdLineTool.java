@@ -93,6 +93,7 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected final JadConfig jadConfig;
     protected final BaseConfiguration configuration;
+    protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
     protected boolean dumpConfig = false;
@@ -129,6 +130,7 @@ public abstract class CmdLineTool implements CliCommand {
             this.commandName = commandName;
         }
         this.configuration = configuration;
+        this.chainingClassLoader = new ChainingClassLoader(this.getClass().getClassLoader());
     }
 
 
@@ -154,8 +156,6 @@ public abstract class CmdLineTool implements CliCommand {
     @Override
     public void run() {
         final Level logLevel = setupLogger();
-        final ClassLoader parentClassLoader = this.getClass().getClassLoader();
-        final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parentClassLoader);
 
         final PluginBindings pluginBindings = installPluginConfigAndBindings(getPluginPath(configFile), chainingClassLoader);
 
@@ -177,7 +177,7 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
-        injector = setupInjector(configModule, pluginBindings);
+        injector = setupInjector(configModule, pluginBindings, binder -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader));
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug reports.)");
