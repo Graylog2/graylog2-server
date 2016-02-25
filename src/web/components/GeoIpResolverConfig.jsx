@@ -133,7 +133,7 @@ const GeoIpResolverConfig = React.createClass({
             </div>
             <Input type="text"
                    label="Path to the MaxMind GeoLite2 database"
-                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/">MaxMind</a>.</span>}
+                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank">MaxMind</a>.</span>}
 
                    name="db_path"
                    value={this.state.config.db_path}
