@@ -132,7 +132,7 @@ const Widget = React.createClass({
       throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
     }
 
-    return React.createElement(this.widgetPlugin.visualization, {
+    return React.createElement(this.widgetPlugin.visualizationComponent, {
       id: this.props.widget.id,
       config: this.props.widget.config,
       data: this.state.result,

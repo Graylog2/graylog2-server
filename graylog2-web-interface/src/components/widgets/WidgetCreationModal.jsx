@@ -104,8 +104,8 @@ const WidgetCreationModal = React.createClass({
   },
 
   _getSpecificWidgetInputs() {
-    if (this.widgetPlugin.createConfiguration) {
-      return React.createElement(this.widgetPlugin.createConfiguration, {
+    if (this.widgetPlugin.configurationCreateComponent) {
+      return React.createElement(this.widgetPlugin.configurationCreateComponent, {
         ref: 'pluginConfiguration',
         config: this.state.config,
         fields: this.props.fields,
