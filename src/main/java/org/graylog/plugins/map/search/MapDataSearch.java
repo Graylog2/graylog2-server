@@ -3,8 +3,8 @@ package org.graylog.plugins.map.search;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.common.Strings;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.rest.models.search.responses.TermsResult;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -24,7 +24,7 @@ public class MapDataSearch {
     }
 
     public MapDataSearchResult searchMapData(final MapDataSearchRequest request) throws ValueTypeException {
-        final ImmutableMap.Builder<String, Map<String, Long>> termResults = ImmutableMap.<String, Map<String, Long>>builder();
+        final ImmutableMap.Builder<String, TermsResult> termResults = ImmutableMap.<String, TermsResult>builder();
 
         String filter = null;
         if (!isNullOrEmpty(request.streamId())) {
@@ -32,9 +32,11 @@ public class MapDataSearch {
         }
 
         for (final String field : request.fields()) {
-            final TermsResult terms = searches.terms(field, request.limit(), request.query(), filter, request.timerange());
+            final org.graylog2.indexer.results.TermsResult terms = searches.terms(field, request.limit(), request.query(), filter, request.timerange());
             // TODO: Validate data!
-            termResults.put(field, validateTerms(field, terms.getTerms()));
+            final Map<String, Long> validatedTerms = validateTerms(field, terms.getTerms());
+            final TermsResult result = TermsResult.create(terms.took().millis(), validatedTerms, terms.getMissing(), terms.getOther(), terms.getTotal(), terms.getBuiltQuery());
+            termResults.put(field, result);
         }
 
         return MapDataSearchResult.builder()

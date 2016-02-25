@@ -67,7 +67,7 @@ const MapVisualization = React.createClass({
       return <Spinner/>;
     }
 
-    const data = this.props.data;
+    const data = this.props.data.terms;
     const occurrences = Object.keys(data).map((k) => data[k]);
     const minOccurrences = occurrences.reduce((prev, cur) => Math.min(prev, cur), Infinity);
     const maxOccurrences = occurrences.reduce((prev, cur) => Math.max(prev, cur), -Infinity);

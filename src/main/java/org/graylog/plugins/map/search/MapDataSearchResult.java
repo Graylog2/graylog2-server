@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.models.search.responses.TermsResult;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -26,14 +27,14 @@ public abstract class MapDataSearchResult {
     public abstract String streamId();
 
     @JsonProperty("fields")
-    public abstract Map<String, Map<String, Long>> fields();
+    public abstract Map<String, TermsResult> fields();
 
     @JsonCreator
     public static MapDataSearchResult create(@JsonProperty("query") String query,
                                              @JsonProperty("timerange") TimeRange timerange,
                                              @JsonProperty("limit") int limit,
                                              @JsonProperty("stream_id") @Nullable String streamId,
-                                             @JsonProperty("fields") Map<String, Map<String, Long>> fields) {
+                                             @JsonProperty("fields") Map<String, TermsResult> fields) {
         return builder()
                 .query(query)
                 .timerange(timerange)
@@ -54,7 +55,7 @@ public abstract class MapDataSearchResult {
         public abstract Builder timerange(TimeRange timerange);
         public abstract Builder limit(int limit);
         public abstract Builder streamId(String streamId);
-        public abstract Builder fields(Map<String, Map<String, Long>> fields);
+        public abstract Builder fields(Map<String, TermsResult> fields);
 
         public abstract MapDataSearchResult build();
     }
