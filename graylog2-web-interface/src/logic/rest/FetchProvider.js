@@ -6,7 +6,14 @@ import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityAction
 export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
-    this.message = message ? message : additional.message;
+    this.message = message ? message : (additional.message ? additional.message : 'Undefined error.');
+    try {
+      console.error(`There was an error fetching a resource: ${this.message}.`,
+        `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
+    } catch (e) {
+      // do nothing
+    }
+
     this.additional = additional;
   }
 }

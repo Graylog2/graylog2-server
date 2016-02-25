@@ -39,9 +39,13 @@ const IndicesConfigurationStore = Reflux.createStore({
   loadRotationConfig() {
     const promise = fetch('GET', this._url('/rotation/config'));
 
-    promise.then((response) => {
-      this.trigger({activeRotationConfig: response});
-    }, this._errorHandler('Fetching rotation config failed', 'Could not retrieve rotation config'));
+    promise.then(
+      response => {
+        this.trigger({activeRotationConfig: response});
+      },
+      error => {
+        UserNotification.error(`Fetching rotation config failed: ${error}`, 'Could not retrieve rotation config');
+      });
 
     IndicesConfigurationActions.loadRotationConfig.promise(promise);
   },
@@ -49,10 +53,14 @@ const IndicesConfigurationStore = Reflux.createStore({
   loadRotationStrategies() {
     const promise = fetch('GET', this._url('/rotation/strategies'));
 
-    promise.then((response) => {
-      this.rotationStrategies = response.strategies;
-      this.trigger({rotationStrategies: response.strategies});
-    }, this._errorHandler('Fetching rotation strategies failed', 'Could not retrieve rotation strategies'));
+    promise.then(
+      response => {
+        this.rotationStrategies = response.strategies;
+        this.trigger({rotationStrategies: response.strategies});
+      },
+      error => {
+        UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
+      });
 
     IndicesConfigurationActions.loadRotationStrategies.promise(promise);
   },
@@ -60,9 +68,13 @@ const IndicesConfigurationStore = Reflux.createStore({
   loadRetentionConfig() {
     const promise = fetch('GET', this._url('/retention/config'));
 
-    promise.then((response) => {
-      this.trigger({activeRetentionConfig: response});
-    }, this._errorHandler('Fetching retention config failed', 'Could not retrieve retention config'));
+    promise.then(
+      response => {
+        this.trigger({activeRetentionConfig: response});
+      },
+      error => {
+        UserNotification.error(`Fetching retention config failed: ${error}`, 'Could not retrieve retention config');
+      });
 
     IndicesConfigurationActions.loadRetentionConfig.promise(promise);
   },
@@ -70,10 +82,14 @@ const IndicesConfigurationStore = Reflux.createStore({
   loadRetentionStrategies() {
     const promise = fetch('GET', this._url('/retention/strategies'));
 
-    promise.then((response) => {
-      this.retentionStrategies = response.strategies;
-      this.trigger({retentionStrategies: response.strategies});
-    }, this._errorHandler('Fetching retention strategies failed', 'Could not retrieve retention strategies'));
+    promise.then(
+      response => {
+        this.retentionStrategies = response.strategies;
+        this.trigger({retentionStrategies: response.strategies});
+      },
+      error => {
+        UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
+      });
 
     IndicesConfigurationActions.loadRetentionStrategies.promise(promise);
   },
@@ -83,10 +99,14 @@ const IndicesConfigurationStore = Reflux.createStore({
 
     const promise = fetch('PUT', this._url('/rotation/config'), data);
 
-    promise.then((response) => {
-      this.trigger({activeRotationConfig: response});
-      UserNotification.success('Index rotation configuration updated successfully');
-    }, this._errorHandler('Updating index rotation config failed', 'Unable to update index rotation config'));
+    promise.then(
+      response => {
+        this.trigger({activeRotationConfig: response});
+        UserNotification.success('Index rotation configuration updated successfully');
+      },
+      error => {
+        UserNotification.error(`Updating index rotation config failed: ${error}`, 'Unable to update index rotation config');
+      });
 
     IndicesConfigurationActions.updateRotationConfiguration.promise(promise);
   },
@@ -96,24 +116,16 @@ const IndicesConfigurationStore = Reflux.createStore({
 
     const promise = fetch('PUT', this._url('/retention/config'), data);
 
-    promise.then((response) => {
-      this.trigger({activeRetentionConfig: response});
-      UserNotification.success('Index retention configuration updated successfully');
-    }, this._errorHandler('Updating index retention config failed', 'Unable to update index retention config'));
+    promise.then(
+      response => {
+        this.trigger({activeRetentionConfig: response});
+        UserNotification.success('Index retention configuration updated successfully');
+      },
+      error => {
+        UserNotification.error(`Updating index retention config failed: ${error}`, 'Unable to update index retention config');
+      });
 
     IndicesConfigurationActions.updateRetentionConfiguration.promise(promise);
-  },
-
-  _errorHandler(message, title) {
-    return (error) => {
-      let errorMessage;
-      try {
-        errorMessage = error.additional.body.message;
-      } catch (e) {
-        errorMessage = error.message;
-      }
-      UserNotification.error(`${message}: ${errorMessage}`, title);
-    };
   },
 });
 

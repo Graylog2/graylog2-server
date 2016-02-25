@@ -36,25 +36,17 @@ const ConfigurationsStore = Reflux.createStore({
   update(configType, config) {
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
-    promise.then((response) => {
-      this.configuration[configType] = response;
-      this.trigger({configuration: this.configuration});
-      UserNotification.success('Configuration updated successfully');
-    }, this._errorHandler('Search config update failed', `Could not update search config: ${configType}`));
+    promise.then(
+      response => {
+        this.configuration[configType] = response;
+        this.trigger({configuration: this.configuration});
+        UserNotification.success('Configuration updated successfully');
+      },
+      error => {
+        UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
+      });
 
     ConfigurationActions.update.promise(promise);
-  },
-
-  _errorHandler(message, title) {
-    return (error) => {
-      let errorMessage;
-      try {
-        errorMessage = error.additional.body.message;
-      } catch (e) {
-        errorMessage = error.message;
-      }
-      UserNotification.error(`${message}: ${errorMessage}`, title);
-    };
   },
 });
 
