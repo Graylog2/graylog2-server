@@ -26,7 +26,7 @@ const WidgetConfigModal = React.createClass({
   _getBasicConfiguration() {
     let basicConfigurationMessage;
     const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
-    const widgetType = (widgetPlugin ? widgetPlugin.readableType : 'Not available');
+    const widgetType = (widgetPlugin ? widgetPlugin.displayName : 'Not available');
     if (this.props.boundToStream) {
       basicConfigurationMessage = (
         <p>

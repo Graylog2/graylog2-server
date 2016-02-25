@@ -100,7 +100,7 @@ const WidgetCreationModal = React.createClass({
   },
 
   _getDefaultWidgetTitle(widgetPlugin) {
-    return StringUtils.capitalizeFirstLetter(widgetPlugin.readableType);
+    return StringUtils.capitalizeFirstLetter(widgetPlugin.displayName);
   },
 
   _getSpecificWidgetInputs() {
