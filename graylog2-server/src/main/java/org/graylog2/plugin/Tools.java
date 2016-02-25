@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -28,7 +29,6 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Inet4Address;
@@ -185,13 +185,10 @@ public final class Tools {
      * @return A string containing the decompressed data
      */
     public static String decompressZlib(byte[] compressedData) throws IOException {
-        byte[] buffer = new byte[compressedData.length];
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InflaterInputStream in = new InflaterInputStream(new ByteArrayInputStream(compressedData));
-        for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
-            out.write(buffer, 0, bytesRead);
+        try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
+             final InflaterInputStream in = new InflaterInputStream(dataStream)) {
+            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
         }
-        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -200,13 +197,11 @@ public final class Tools {
      * @return A string containing the decompressed data
      */
     public static String decompressGzip(byte[] compressedData) throws IOException {
-        byte[] buffer = new byte[compressedData.length];
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(compressedData));
-        for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
-            out.write(buffer, 0, bytesRead);
+        try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
+             final GZIPInputStream in = new GZIPInputStream(dataStream)) {
+            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
+
         }
-        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     /**
