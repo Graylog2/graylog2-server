@@ -30,10 +30,8 @@ const WidgetCreationModal = React.createClass({
     }
   },
 
-  widgetPlugins: PluginStore.exports('widgets'),
-
   _getWidgetPlugin(widgetType) {
-    return this.widgetPlugins.filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
+    return PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
   },
 
   _getInitialConfiguration() {

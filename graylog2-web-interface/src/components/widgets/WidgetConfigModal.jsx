@@ -15,8 +15,6 @@ const WidgetConfigModal = React.createClass({
     dashboardId: PropTypes.string.isRequired,
   },
 
-  widgetPlugins: PluginStore.exports('widgets'),
-
   open() {
     this.refs.configModal.open();
   },
@@ -25,7 +23,7 @@ const WidgetConfigModal = React.createClass({
   },
   _getBasicConfiguration() {
     let basicConfigurationMessage;
-    const widgetPlugin = this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
+    const widgetPlugin = PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0];
     const widgetType = (widgetPlugin ? widgetPlugin.displayName : 'Not available');
     if (this.props.boundToStream) {
       basicConfigurationMessage = (
