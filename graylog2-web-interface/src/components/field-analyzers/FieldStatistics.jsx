@@ -141,7 +141,7 @@ const FieldStatistics = React.createClass({
                                 widgetType={Widget.Type.STATS_COUNT}
                                 configuration={{}}
                                 bsStyle="default"
-                                fields={this.state.fieldStatistics.keySeq()}
+                                fields={this.state.fieldStatistics.keySeq().toJS()}
                                 pullRight
                                 permissions={this.props.permissions}>
 
