@@ -18,17 +18,25 @@ const WidgetEditConfigModal = React.createClass({
   },
 
   getInitialState() {
+    this.widgetPlugin = this._getWidgetPlugin(this.props.widget.type);
     return {
       description: this.props.widget.description,
       type: this.props.widget.type,
       cache_time: this.props.widget.cache_time,
       config: ObjectUtils.clone(this.props.widget.config), // clone config to not modify it accidentally
       errors: {},
-      widgetPlugin: this.widgetPlugins.filter(widget => widget.type.toUpperCase() === this.props.widget.type.toUpperCase())[0],
     };
   },
 
+  componentWillReceiveProps(nextProps) {
+    this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
+  },
+
   widgetPlugins: PluginStore.exports('widgets'),
+
+  _getWidgetPlugin(widgetType) {
+    return this.widgetPlugins.filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
+  },
 
   open() {
     this.refs.editModal.open();
@@ -204,8 +212,8 @@ const WidgetEditConfigModal = React.createClass({
   },
 
   _getSpecificConfigurationControls() {
-    if (this.state.widgetPlugin.editConfiguration) {
-      return React.createElement(this.state.widgetPlugin.editConfiguration, {
+    if (this.widgetPlugin.editConfiguration) {
+      return React.createElement(this.widgetPlugin.editConfiguration, {
         id: this.props.widget.id,
         config: this.state.config,
         onChange: this._onConfigurationValueChange,

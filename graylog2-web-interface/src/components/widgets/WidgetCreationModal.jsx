@@ -17,16 +17,17 @@ const WidgetCreationModal = React.createClass({
   },
 
   getInitialState() {
-    const widgetPlugin = this._getWidgetPlugin(this.props.widgetType);
+    this.widgetPlugin = this._getWidgetPlugin(this.props.widgetType);
     return {
-      title: this._getDefaultWidgetTitle(widgetPlugin),
+      title: this._getDefaultWidgetTitle(this.widgetPlugin),
       config: {},
-      widgetPlugin: widgetPlugin,
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    this.setState({widgetPlugin: this._getWidgetPlugin(nextProps.widgetType)});
+    if (this.props.widgetType !== nextProps.widgetType) {
+      this.widgetPlugin = this._getWidgetPlugin(nextProps.widgetType);
+    }
   },
 
   widgetPlugins: PluginStore.exports('widgets'),
@@ -103,8 +104,8 @@ const WidgetCreationModal = React.createClass({
   },
 
   _getSpecificWidgetInputs() {
-    if (this.state.widgetPlugin.createConfiguration) {
-      return React.createElement(this.state.widgetPlugin.createConfiguration, {
+    if (this.widgetPlugin.createConfiguration) {
+      return React.createElement(this.widgetPlugin.createConfiguration, {
         ref: 'pluginConfiguration',
         config: this.state.config,
         fields: this.props.fields,

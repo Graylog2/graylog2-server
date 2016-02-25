@@ -30,6 +30,7 @@ const Widget = React.createClass({
     },
   },
   getInitialState() {
+    this.widgetPlugin = this._getWidgetPlugin(this.props.widget.type);
     return {
       result: undefined,
       calculatedAt: undefined,
@@ -37,7 +38,6 @@ const Widget = React.createClass({
       errorMessage: undefined,
       height: undefined,
       width: undefined,
-      widgetPlugin: this._getWidgetPlugin(this.props.widget.type),
     };
   },
   componentDidMount() {
@@ -46,7 +46,7 @@ const Widget = React.createClass({
     $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentWillReceiveProps(nextProps) {
-    this.setState({widgetPlugin: this._getWidgetPlugin(nextProps.widget.type)});
+    this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
   },
   componentDidUpdate() {
     this._calculateWidgetSize();
@@ -128,11 +128,11 @@ const Widget = React.createClass({
       return <div className="not-available">{this.state.result}</div>;
     }
 
-    if (!this.state.widgetPlugin) {
+    if (!this.widgetPlugin) {
       throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
     }
 
-    return React.createElement(this.state.widgetPlugin.visualization, {
+    return React.createElement(this.widgetPlugin.visualization, {
       id: this.props.widget.id,
       config: this.props.widget.config,
       data: this.state.result,
