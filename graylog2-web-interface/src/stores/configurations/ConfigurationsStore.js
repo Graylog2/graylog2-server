@@ -17,7 +17,8 @@ const ConfigurationsStore = Reflux.createStore({
   },
 
   list(configType) {
-    const promise = fetch('GET', this._url(`/${configType}`)).then((response) => {
+    const promise = fetch('GET', this._url(`/${configType}`));
+    promise.then((response) => {
       this.configuration[configType] = response;
       this.trigger({configuration: this.configuration});
     });
