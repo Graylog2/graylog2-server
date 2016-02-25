@@ -12,6 +12,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
+import naturalSort from 'javascript-natural-sort';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -112,6 +113,7 @@ const Navigation = React.createClass({
       });
 
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+      .sort((a, b) => naturalSort(a.description, b.description))
       .map((pluginRoute) => {
         return (
           <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
@@ -205,6 +207,12 @@ const Navigation = React.createClass({
                 <MenuItem>Grok Patterns</MenuItem>
               </LinkContainer>
               }
+              {pluginSystemNavigations.length > 0 && (
+                <span>
+                  <MenuItem divider />
+                  <MenuItem header>Plugins</MenuItem>
+                </span>
+              )}
               {pluginSystemNavigations}
             </NavDropdown>
           </Nav>
