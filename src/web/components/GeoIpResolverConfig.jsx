@@ -133,13 +133,15 @@ const GeoIpResolverConfig = React.createClass({
             </div>
             <Input type="text"
                    label="Path to the MaxMind GeoLite2 database"
+                   help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/">MaxMind</a>.</span>}
+
                    name="db_path"
                    value={this.state.config.db_path}
                    onChange={this._onUpdate('db_path')}/>
             <Input type="checkbox"
                    ref="configRunBeforeExtractors"
                    label="Run GeoIP filter before running extractors"
-                   help="If this is enabled, the GeoIP extractor will run before any extractors have been executed. WARNING: Server restart required to activate change!"
+                   help={<span>If this is enabled, the GeoIP extractor will run before any extractors have been executed. <strong>WARNING: Server restart required to activate change!</strong></span>}
                    name="run_before_extractors"
                    checked={this.state.config.run_before_extractors}
                    onChange={this._onCheckboxClick('run_before_extractors', 'configRunBeforeExtractors')}/>
