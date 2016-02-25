@@ -12,9 +12,10 @@ PluginStore.register(new PluginManifest(packageJson, {
   widgets: [
     {
       type: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
+      displayName: 'Map',
       defaultHeight: 2,
       defaultWidth: 2,
-      visualization: MapVisualization,
+      visualizationComponent: MapVisualization,
     },
   ],
   fieldAnalyzers: [
