@@ -1,8 +1,8 @@
 package org.graylog.plugins.map.search;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.common.Strings;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.rest.models.search.responses.TermsResult;
 

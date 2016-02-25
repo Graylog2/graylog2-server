@@ -1,9 +1,9 @@
 package org.graylog.plugins.map.geoip.filter;
 
-import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
