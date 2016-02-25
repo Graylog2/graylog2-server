@@ -6,6 +6,7 @@ import { Button } from 'react-bootstrap';
 
 import { MapsActions, MapsStore } from 'stores/MapsStore';
 import MapVisualization from 'components/MapVisualization';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 const FieldAnalyzerMapComponent = React.createClass({
   propTypes: {
@@ -25,13 +26,36 @@ const FieldAnalyzerMapComponent = React.createClass({
   getInitialState() {
     return {
       field: undefined,
+      width: this.DEFAULT_WIDTH,
     };
   },
 
+  componentDidMount() {
+    window.addEventListener('resize', this._onResize);
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+  },
+
+  DEFAULT_WIDTH: 800,
   WIDGET_TYPE: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
+  eventThrottler: new EventHandlersThrottler(),
 
   addField(field) {
-    this.setState({field: field}, () => this._loadData());
+    this.setState({field: field}, () => {
+      // We need to update the map width when the container is rendered
+      this._updateMapWidth();
+      this._loadData();
+    });
+  },
+
+  _onResize() {
+    this.eventThrottler.throttle(() => this._updateMapWidth());
+  },
+
+  _updateMapWidth() {
+    this.setState({width: (this.refs.mapContainer ? this.refs.mapContainer.clientWidth : this.DEFAULT_WIDTH)});
   },
 
   _getStreamId() {
@@ -63,7 +87,7 @@ const FieldAnalyzerMapComponent = React.createClass({
       inner = <Spinner />;
     } else {
       inner = (
-        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={1200} config={{}}/>
+        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={this.state.width} config={{}}/>
       );
     }
 
@@ -82,7 +106,7 @@ const FieldAnalyzerMapComponent = React.createClass({
           </div>
           <h1>Map for field: {this.state.field}</h1>
 
-          <div style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
+          <div ref="mapContainer" style={{maxHeight: 400, overflow: 'auto', marginTop: 10}}>{inner}</div>
         </div>
       );
     }
