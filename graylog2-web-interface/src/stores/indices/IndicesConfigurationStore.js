@@ -29,7 +29,7 @@ const IndicesConfigurationStore = Reflux.createStore({
 
   _addConfigType(strategies, data) {
     // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = strategies.find((strategy) => strategy.type === data.strategy);
+    const result = strategies.filter((strategy) => strategy.type === data.strategy)[0];
 
     if (result) {
       data.config.type = result.default_config.type;

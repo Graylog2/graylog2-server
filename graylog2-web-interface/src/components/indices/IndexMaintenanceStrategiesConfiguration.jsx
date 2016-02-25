@@ -25,12 +25,12 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
   },
 
   _getDefaultStrategyConfig(selectedStrategy) {
-    const result = this.props.strategies.find((strategy) => strategy.type === selectedStrategy);
+    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
     return result ? result.default_config : undefined;
   },
 
   _getStrategyJsonSchema(selectedStrategy) {
-    const result = this.props.strategies.find((strategy) => strategy.type === selectedStrategy);
+    const result = this.props.strategies.filter((strategy) => strategy.type === selectedStrategy)[0];
     return result ? result.json_schema : undefined;
   },
 
@@ -72,7 +72,7 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
       return null;
     }
 
-    const strategy = this.props.pluginExports.find((exportedStrategy) => exportedStrategy.type === selectedStrategy);
+    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === selectedStrategy)[0];
 
     if (!strategy) {
       return null;

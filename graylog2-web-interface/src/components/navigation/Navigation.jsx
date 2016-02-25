@@ -76,7 +76,7 @@ const Navigation = React.createClass({
       return prefix + ' / Configurations';
     }
 
-    const pluginRoute = PluginStore.exports('systemnavigation').find((pluginRoute) => this._isActive(pluginRoute.path));
+    const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
       return prefix + ' / ' + pluginRoute.description;
     }
