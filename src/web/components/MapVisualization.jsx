@@ -34,10 +34,12 @@ const MapVisualization = React.createClass({
   position: [0, 0],
   DEFAULT_URL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
   DEFAULT_ATTRIBUTION: `&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors`,
+  MARKER_RADIUS_SIZES: 10,
+  MARKER_RADIUS_INCREMENT_SIZES: 10,
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, occurrences, min, max, increment) {
     const formattedCoordinates = coordinates.split(',').map(component => Number(component));
-    const radius = this._getBucket(occurrences, 10, min, max, increment);
+    const radius = this._getBucket(occurrences, this.MARKER_RADIUS_SIZES, min, max, increment);
     return (
       <CircleMarker key={coordinates} center={formattedCoordinates} radius={radius} color="#AF2228" fillColor="#D3242B" weight={2} opacity={0.8}>
         <Popup>
@@ -71,7 +73,7 @@ const MapVisualization = React.createClass({
     const occurrences = Object.keys(data).map((k) => data[k]);
     const minOccurrences = occurrences.reduce((prev, cur) => Math.min(prev, cur), Infinity);
     const maxOccurrences = occurrences.reduce((prev, cur) => Math.max(prev, cur), -Infinity);
-    const increment = this._getBucket(this.state.zoomLevel, 10, 1, 10, 1);
+    const increment = this._getBucket(this.state.zoomLevel, this.MARKER_RADIUS_INCREMENT_SIZES, 1, 10, 1);
 
     const coordinates = Object.keys(data);
     const markers = coordinates.map(aCoordinates => this._formatMarker(aCoordinates, data[aCoordinates], minOccurrences, maxOccurrences, increment));
