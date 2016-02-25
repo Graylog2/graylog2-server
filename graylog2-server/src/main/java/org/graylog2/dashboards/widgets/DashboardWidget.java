@@ -18,11 +18,10 @@ package org.graylog2.dashboards.widgets;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class DashboardWidget implements EmbeddedPersistable {
@@ -91,7 +90,7 @@ public class DashboardWidget implements EmbeddedPersistable {
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put(FIELD_ID, id)
-                .put(FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))
+                .put(FIELD_TYPE, type)
                 .put(FIELD_DESCRIPTION, description)
                 .put(FIELD_CACHE_TIME, cacheTime)
                 .put(FIELD_CREATOR_USER_ID, creatorUserId)
