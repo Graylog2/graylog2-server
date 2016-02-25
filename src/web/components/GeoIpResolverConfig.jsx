@@ -79,9 +79,9 @@ const GeoIpResolverConfig = React.createClass({
   },
 
   _availableDatabaseTypes() {
+    // TODO: Support country database as well.
     return [
       {value: 'MAXMIND_CITY', label: 'City database'},
-      {value: 'MAXMIND_COUNTRY', label: 'Country database'},
     ];
   },
 
