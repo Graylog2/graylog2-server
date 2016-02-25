@@ -14,7 +14,7 @@
     "graylog"
   ],
   "author": "Edmundo Alvarez <edmundo@graylog.com>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "history": "^1.17.0",
     "leaflet": "~0.7.7",
