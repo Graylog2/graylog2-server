@@ -1,5 +1,4 @@
 import packageJson from '../../package.json';
-import {} from '../../config.js';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import MapVisualization from 'components/MapVisualization';
 import MapPage from 'pages/MapPage';

@@ -58,14 +58,12 @@ const FieldAnalyzerMapComponent = React.createClass({
   render() {
     let content;
     let inner;
-    const url = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
-    const attribution = `&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors`;
 
     if (!this.state.mapCoordinates) {
       inner = <Spinner />;
     } else {
       inner = (
-        <MapVisualization id="1" url={url} attribution={attribution} data={this.state.mapCoordinates} height={400} width={1200} config={{}}/>
+        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={1200} config={{}}/>
       );
     }
 

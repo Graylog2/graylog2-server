@@ -32,8 +32,8 @@ const MapVisualization = React.createClass({
     this.setState({isComponentMounted: true});
   },
   position: [0, 0],
-  DEFAULT_URL: `https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=${window.mapConfig.mapboxAccessToken}`,
-  DEFAULT_ATTRIBUTION: `<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>`,
+  DEFAULT_URL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+  DEFAULT_ATTRIBUTION: `&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors`,
   // Coordinates are given as "lat,long"
   _formatMarker(coordinates, occurrences, min, max, increment) {
     const formattedCoordinates = coordinates.split(',').map(component => Number(component));
