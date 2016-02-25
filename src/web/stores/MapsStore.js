@@ -45,29 +45,6 @@ export const MapsStore = Reflux.createStore({
     MapsActions.getMapData.promise(promise);
   },
 
-  get(field) {
-    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldTerms(
-      'relative',
-      'gl2_source_input:56c5a578bee8a99a998705a1',
-      field,
-      {range: 28800}
-    ).url;
-
-    const promise = fetch('GET', URLUtils.qualifyUrl(url));
-    promise.then(
-      response => {
-        this.mapCoordinates = response.terms;
-        this.trigger({mapCoordinates: this.mapCoordinates});
-      },
-      error => {
-        UserNotification.error(`Loading map information failed with status: ${error}`,
-          'Could not load map information');
-      }
-    );
-
-    MapsActions.get.promise(promise);
-  },
-
   _errorHandler(message, title) {
     return (error) => {
       let errorMessage;
