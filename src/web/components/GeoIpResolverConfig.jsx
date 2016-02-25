@@ -24,7 +24,7 @@ const GeoIpResolverConfig = React.createClass({
     return {
       config: {
         enabled: this._getPropConfigValue(props, 'enabled', false),
-        db_type: this._getPropConfigValue(props, 'db_type', 'GEOLITE2_CITY'),
+        db_type: this._getPropConfigValue(props, 'db_type', 'MAXMIND_CITY'),
         db_path: this._getPropConfigValue(props, 'db_path', '/tmp/GeoLite2-City.mmdb'),
         run_before_extractors: this._getPropConfigValue(props, 'run_before_extractors', false),
       },
@@ -80,8 +80,8 @@ const GeoIpResolverConfig = React.createClass({
 
   _availableDatabaseTypes() {
     return [
-      {value: 'GEOLITE2_CITY', label: 'GeoLite2 City'},
-      {value: 'GEOLITE2_COUNTRY', label: 'GeoLite2 Country'},
+      {value: 'MAXMIND_CITY', label: 'City database'},
+      {value: 'MAXMIND_COUNTRY', label: 'Country database'},
     ];
   },
 
@@ -92,14 +92,14 @@ const GeoIpResolverConfig = React.createClass({
   render() {
     return (
       <div>
-        <h3>GeoIP Filter</h3>
+        <h3>Geo-Location Filter</h3>
 
         <dl className={style.deflist}>
           <dt>Enabled:</dt>
           <dd>{this.state.config.enabled === true ? 'yes' : 'no'}</dd>
-          <dt>DB type:</dt>
+          <dt>Database type:</dt>
           <dd>{this._activeDatabaseType(this.state.config.db_type)}</dd>
-          <dt>DB path:</dt>
+          <dt>Database path:</dt>
           <dd>{this.state.config.db_path}</dd>
           <dt>Run before extractors:</dt>
           <dd>{this.state.config.run_before_extractors === true ? 'yes' : 'no'}</dd>
@@ -110,29 +110,27 @@ const GeoIpResolverConfig = React.createClass({
         </IfPermitted>
 
         <BootstrapModalForm ref="geoIpConfigModal"
-                            title="Update GeoIP Filter Configuration"
+                            title="Update Geo-Location Filter Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
             <Input type="checkbox"
                    ref="configEnabled"
-                   label="Enable GeoIP filter"
+                   label="Enable Geo-Location filter"
                    name="enabled"
                    checked={this.state.config.enabled}
                    onChange={this._onCheckboxClick('enabled', 'configEnabled')}/>
-            <div className="form-group">
-              <label className="control-label">
-                Select the MaxMind GeoLite2 database type
-              </label>
-            <Select placeholder="Select MaxMind GeoLite2 database type"
-                    options={this._availableDatabaseTypes()}
-                    matchProp="value"
-                    value={this.state.config.db_type}
-                    onValueChange={this._onDbTypeSelect}/>
-            </div>
+            <Input label="Select the MaxMind database type"
+                   help="Select the MaxMind database type you want to use to extract geo-location information.">
+              <Select placeholder="Select MaxMind database type"
+                      options={this._availableDatabaseTypes()}
+                      matchProp="value"
+                      value={this.state.config.db_type}
+                      onValueChange={this._onDbTypeSelect}/>
+            </Input>
             <Input type="text"
-                   label="Path to the MaxMind GeoLite2 database"
+                   label="Path to the MaxMind database"
                    help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank">MaxMind</a>.</span>}
 
                    name="db_path"
@@ -140,8 +138,8 @@ const GeoIpResolverConfig = React.createClass({
                    onChange={this._onUpdate('db_path')}/>
             <Input type="checkbox"
                    ref="configRunBeforeExtractors"
-                   label="Run GeoIP filter before running extractors"
-                   help={<span>If this is enabled, the GeoIP extractor will run before any extractors have been executed. <strong>WARNING: Server restart required to activate change!</strong></span>}
+                   label="Run geo-location filter before running extractors"
+                   help={<span>Enable this to extract geo-location information <strong>before</strong> any extractors have been executed. <strong>WARNING: Changing this setting requires a server restart.</strong></span>}
                    name="run_before_extractors"
                    checked={this.state.config.run_before_extractors}
                    onChange={this._onCheckboxClick('run_before_extractors', 'configRunBeforeExtractors')}/>

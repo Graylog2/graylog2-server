@@ -9,7 +9,7 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class GeoIpResolverConfig {
     public enum DatabaseType {
-        GEOLITE2_CITY, GEOLITE2_COUNTRY
+        MAXMIND_CITY, MAXMIND_COUNTRY
     }
 
     @JsonProperty("enabled")
@@ -40,7 +40,7 @@ public abstract class GeoIpResolverConfig {
     public static GeoIpResolverConfig defaultConfig() {
        return builder()
                .enabled(false)
-               .dbType(DatabaseType.GEOLITE2_CITY)
+               .dbType(DatabaseType.MAXMIND_CITY)
                .dbPath("/tmp/GeoLite2-City.mmdb")
                .runBeforeExtractors(false)
                .build();
