@@ -2,10 +2,8 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
-import { LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
+import { AddSearchCountToDashboard, LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
 
-import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
@@ -156,10 +154,7 @@ const SearchResult = React.createClass({
             <Col md={12}>
               <h1>
                 <span className="pull-right">
-                  <AddToDashboardMenu title="Add count to dashboard"
-                                      pullRight
-                                      widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                      permissions={this.props.permissions}/>
+                  <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
                 </span>
                 <span>Nothing found {streamDescription}</span>
               </h1>

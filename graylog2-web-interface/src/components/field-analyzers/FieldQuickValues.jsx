@@ -5,7 +5,6 @@ import Reflux from 'reflux';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 
@@ -36,6 +35,9 @@ const FieldQuickValues = React.createClass({
   componentWillUnmount() {
     this._stopTimer();
   },
+
+  WIDGET_TYPE: 'QUICKVALUES',
+
   _setupTimer(refresh) {
     this._stopTimer();
     if (refresh.enabled) {
@@ -82,7 +84,7 @@ const FieldQuickValues = React.createClass({
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
-                                widgetType={Widget.Type.QUICKVALUES}
+                                widgetType={this.WIDGET_TYPE}
                                 configuration={{field: this.state.field}}
                                 bsStyle="default"
                                 pullRight

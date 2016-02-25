@@ -18,17 +18,6 @@ const Widget = React.createClass({
     shouldUpdate: PropTypes.bool.isRequired,
     locked: PropTypes.bool.isRequired,
   },
-  statics: {
-    Type: {
-      SEARCH_RESULT_COUNT: 'SEARCH_RESULT_COUNT',
-      STREAM_SEARCH_RESULT_COUNT: 'STREAM_SEARCH_RESULT_COUNT',
-      STATS_COUNT: 'STATS_COUNT',
-      SEARCH_RESULT_CHART: 'SEARCH_RESULT_CHART',
-      QUICKVALUES: 'QUICKVALUES',
-      FIELD_CHART: 'FIELD_CHART',
-      STACKED_CHART: 'STACKED_CHART',
-    },
-  },
   getInitialState() {
     this.widgetPlugin = this._getWidgetPlugin(this.props.widget.type);
     return {

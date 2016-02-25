@@ -1,3 +1,4 @@
+export { default as AddSearchCountToDashboard } from './AddSearchCountToDashboard';
 export { default as LegacyHistogram } from './LegacyHistogram';
 export { default as MessageDetail } from './MessageDetail';
 export { default as MessageFieldDescription } from './MessageFieldDescription';

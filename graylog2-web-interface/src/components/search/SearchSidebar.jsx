@@ -4,10 +4,8 @@ import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap'
 import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
 
-import Widget from 'components/widgets/Widget';
 import SearchStore from 'stores/search/SearchStore';
-import { SavedSearchControls, ShowQueryModal } from 'components/search';
-import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
+import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';
 
@@ -169,9 +167,7 @@ const SearchSidebar = React.createClass({
             </p>
 
             <div className="actions">
-              <AddToDashboardMenu title="Add count to dashboard"
-                                  widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                  permissions={this.props.permissions}/>
+              <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
 
               <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 

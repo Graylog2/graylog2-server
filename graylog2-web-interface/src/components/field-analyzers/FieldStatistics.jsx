@@ -3,7 +3,6 @@ import Immutable from 'immutable';
 import {Button} from 'react-bootstrap';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 
 import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
 import NumberUtils from 'util/NumberUtils';
@@ -30,6 +29,9 @@ const FieldStatistics = React.createClass({
       window.clearInterval(this.updateIntervalId);
     }
   },
+
+  WIDGET_TYPE: 'STATS_COUNT',
+
   addField(field) {
     this._reloadFieldStatistics(field);
   },
@@ -138,7 +140,7 @@ const FieldStatistics = React.createClass({
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
-                                widgetType={Widget.Type.STATS_COUNT}
+                                widgetType={this.WIDGET_TYPE}
                                 configuration={{}}
                                 bsStyle="default"
                                 fields={this.state.fieldStatistics.keySeq().toJS()}

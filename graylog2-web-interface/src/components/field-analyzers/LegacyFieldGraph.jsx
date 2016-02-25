@@ -4,7 +4,6 @@ import {Button, DropdownButton, MenuItem} from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 
 import SearchStore from 'stores/search/SearchStore';
@@ -34,9 +33,14 @@ const LegacyFieldGraph = React.createClass({
       FieldGraphsStore.updateFieldGraphData(this.props.graphId);
     }
   },
+
+  STACKED_WIDGET_TYPE: 'STACKED_CHART',
+  REGULAR_WIDGET_TYPE: 'FIELD_CHART',
+
   statisticalFunctions: ['mean', 'max', 'min', 'total', 'count', 'cardinality'],
   interpolations: ['linear', 'step-after', 'basis', 'bundle', 'cardinal', 'monotone'],
   resolutions: ['minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'],
+
   _getFirstGraphValue() {
     if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
       return null;
@@ -48,7 +52,7 @@ const LegacyFieldGraph = React.createClass({
     return this.props.stacked ? 'Combined graph' : `${this.props.graphOptions.field} graph`;
   },
   _getWidgetType() {
-    return this.props.stacked ? Widget.Type.STACKED_CHART : Widget.Type.FIELD_CHART;
+    return this.props.stacked ? this.STACKED_WIDGET_TYPE : this.REGULAR_WIDGET_TYPE;
   },
   _getWidgetConfiguration() {
     return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId) :

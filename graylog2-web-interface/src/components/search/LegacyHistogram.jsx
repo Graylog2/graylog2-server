@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Widget from 'components/widgets/Widget';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import SearchStore from 'stores/search/SearchStore';
@@ -33,6 +32,7 @@ const LegacyHistogram = React.createClass({
     window.removeEventListener('resize', this._onResize);
   },
 
+  WIDGET_TYPE: 'SEARCH_RESULT_CHART',
   RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
   eventThrottler: new EventHandlersThrottler(),
 
@@ -92,7 +92,7 @@ const LegacyHistogram = React.createClass({
     return (<div className="content-col">
       <div className="pull-right">
         <AddToDashboardMenu title="Add to dashboard"
-                            widgetType={Widget.Type.SEARCH_RESULT_CHART}
+                            widgetType={this.WIDGET_TYPE}
                             configuration={{interval: this.props.histogram.interval}}
                             pullRight
                             permissions={this.props.permissions}
