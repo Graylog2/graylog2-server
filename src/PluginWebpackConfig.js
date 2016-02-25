@@ -31,6 +31,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
         { test: /\.less$/, loaders: ['style', 'css', 'less'] },
         { test: /\.css$/, loaders: ['style', 'css'] },
         { test: /\.json$/, loader: 'json-loader' },
+        { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
         { test: /\.js(x)?$/, loader: 'babel-loader', exclude: /node_modules|\.node_cache/ }
       ],
     },
@@ -41,7 +42,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
     ],
     resolve: {
       root: [path.resolve(options.web_src_path, 'src')],
-      extensions: ['', '.js', '.json', '.jsx'],
+      extensions: ['', '.js', '.json', '.jsx', '.ts'],
       modulesDirectories: ['src/web', 'node_modules', 'src'],
     },
   };
