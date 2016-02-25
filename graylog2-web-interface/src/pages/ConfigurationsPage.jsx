@@ -2,11 +2,14 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import { PageHeader, Spinner } from 'components/common';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 import ConfigurationActions from 'actions/configurations/ConfigurationActions';
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
+
+import style from '!style!css!components/configurations/ConfigurationStyles.css';
 
 const ConfigurationsPage = React.createClass({
   mixins: [Reflux.connect(ConfigurationsStore)],
@@ -19,6 +22,10 @@ const ConfigurationsPage = React.createClass({
 
   componentDidMount() {
     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
+
+    PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
+      ConfigurationActions.list(systemConfig.configType);
+    });
   },
 
   SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
@@ -37,6 +44,39 @@ const ConfigurationsPage = React.createClass({
     };
   },
 
+  _pluginConfigs() {
+    return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
+      return React.createElement(systemConfig.component, {
+        key: `system-configuration-${idx}`,
+        config: this._getConfig(systemConfig.configType) || {},
+        updateConfig: this._onUpdate(systemConfig.configType),
+      });
+    });
+  },
+
+  _pluginConfigRows() {
+    const pluginConfigs = this._pluginConfigs();
+    const rows = [];
+    let idx = 0;
+
+    // Put two plugin config components per row.
+    while (pluginConfigs.length > 0) {
+      idx++;
+      rows.push(
+        <Row key={`plugin-config-row-${idx}`}>
+          <Col md={6}>
+            {pluginConfigs.shift()}
+          </Col>
+          <Col md={6}>
+            {pluginConfigs.shift() || (<span>&nbsp;</span>)}
+          </Col>
+        </Row>
+      );
+    }
+
+    return rows;
+  },
+
   render() {
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
     let searchesConfigComponent;
@@ -48,6 +88,8 @@ const ConfigurationsPage = React.createClass({
     } else {
       searchesConfigComponent = (<Spinner />);
     }
+
+    const pluginConfigRows = this._pluginConfigRows();
 
     return (
       <span>
@@ -62,6 +104,17 @@ const ConfigurationsPage = React.createClass({
             {searchesConfigComponent}
           </Col>
         </Row>
+
+        {pluginConfigRows.length > 0 && <Row className="content">
+          <Col md={12}>
+            <h2>Plugins</h2>
+            <p className="description">Configuration for installed plugins.</p>
+            <hr className={style.separator} />
+            <div className={style.topMargin}>
+              {pluginConfigRows}
+            </div>
+          </Col>
+        </Row>}
       </span>
     );
   },

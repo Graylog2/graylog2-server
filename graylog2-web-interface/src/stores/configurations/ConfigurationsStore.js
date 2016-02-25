@@ -10,15 +10,16 @@ const urlPrefix = '/system/cluster_config';
 const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],
 
+  configuration: {},
+
   _url(path) {
     return URLUtils.qualifyUrl(urlPrefix + path);
   },
 
   list(configType) {
     const promise = fetch('GET', this._url(`/${configType}`)).then((response) => {
-      const configuration = {};
-      configuration[configType] = response;
-      this.trigger({configuration: configuration});
+      this.configuration[configType] = response;
+      this.trigger({configuration: this.configuration});
     });
 
     ConfigurationActions.list.promise(promise);
@@ -36,9 +37,8 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
     promise.then((response) => {
-      const configuration = {};
-      configuration[configType] = response;
-      this.trigger({configuration: configuration});
+      this.configuration[configType] = response;
+      this.trigger({configuration: this.configuration});
       UserNotification.success('Configuration updated successfully');
     }, this._errorHandler('Search config update failed', `Could not update search config: ${configType}`));
 
