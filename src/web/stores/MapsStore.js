@@ -38,21 +38,18 @@ export const MapsStore = Reflux.createStore({
       response => {
         this.trigger({mapCoordinates: response.fields[field]});
       },
-      this._errorHandler('Loading map information failed:', 'Could not load map information')
+      error => {
+        let errorMessage;
+        if (error.additional && error.additional.status === 400) {
+          errorMessage = 'Map widget is only available for fields containing geo data.';
+        } else {
+          errorMessage = `Loading map information failed: ${error.message}`;
+        }
+
+        UserNotification.error(errorMessage, 'Could not load map information');
+      }
     );
 
     MapsActions.getMapData.promise(promise);
-  },
-
-  _errorHandler(message, title) {
-    return (error) => {
-      let errorMessage;
-      try {
-        errorMessage = error.additional.body.message;
-      } catch (e) {
-        errorMessage = error.message;
-      }
-      UserNotification.error(`${message}: ${errorMessage}`, title);
-    };
   },
 });
