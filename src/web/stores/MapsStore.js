@@ -1,6 +1,5 @@
 import Reflux from 'reflux';
 
-import jsRoutes from 'routing/jsRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
