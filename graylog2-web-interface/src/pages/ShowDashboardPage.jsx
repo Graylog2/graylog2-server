@@ -36,7 +36,6 @@ const ShowDashboardPage = React.createClass({
       clearInterval(this.loadInterval);
     }
   },
-  widgetPlugins: PluginStore.exports('widgets'),
   DASHBOARDS_EDIT: 'dashboards:edit',
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
@@ -72,7 +71,7 @@ const ShowDashboardPage = React.createClass({
   _defaultWidgetDimensions(widget) {
     const dimensions = {col: 0, row: 0};
 
-    const widgetPlugin = this.widgetPlugins.filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
+    const widgetPlugin = PluginStore.exports('widgets').filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
     dimensions.height = widgetPlugin.defaultHeight;
     dimensions.width = widgetPlugin.defaultWidth;
 

@@ -32,10 +32,8 @@ const WidgetEditConfigModal = React.createClass({
     this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
   },
 
-  widgetPlugins: PluginStore.exports('widgets'),
-
   _getWidgetPlugin(widgetType) {
-    return this.widgetPlugins.filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
+    return PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
   },
 
   open() {
