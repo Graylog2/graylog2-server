@@ -26,6 +26,7 @@ import org.graylog2.outputs.GelfOutput;
 import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +37,11 @@ public class MessageOutputBindings extends Graylog2Module {
     private static final Logger LOG = LoggerFactory.getLogger(MessageOutputBindings.class);
 
     private final Configuration configuration;
+    private final ChainingClassLoader chainingClassLoader;
 
-    public MessageOutputBindings(final Configuration configuration) {
+    public MessageOutputBindings(final Configuration configuration, ChainingClassLoader chainingClassLoader) {
         this.configuration = configuration;
+        this.chainingClassLoader = chainingClassLoader;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class MessageOutputBindings extends Graylog2Module {
 
         try {
             @SuppressWarnings("unchecked")
-            final Class<? extends MessageOutput> defaultMessageOutputClass = (Class<? extends MessageOutput>) Class.forName(configuration.getDefaultMessageOutputClass());
+            final Class<? extends MessageOutput> defaultMessageOutputClass = (Class<? extends MessageOutput>) chainingClassLoader.loadClass(configuration.getDefaultMessageOutputClass());
 
             if (MessageOutput.class.isAssignableFrom(defaultMessageOutputClass)) {
                 LOG.info("Using {} as default message output", defaultMessageOutputClass.getCanonicalName());

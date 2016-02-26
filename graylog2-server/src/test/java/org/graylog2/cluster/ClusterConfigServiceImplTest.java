@@ -39,6 +39,7 @@ import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.jackson.SizeSerializer;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -101,6 +102,7 @@ public class ClusterConfigServiceImplTest {
                 mongoRule.getMongoConnection(),
                 nodeId,
                 objectMapper,
+                new ChainingClassLoader(getClass().getClassLoader()),
                 clusterEventBus
         );
     }
