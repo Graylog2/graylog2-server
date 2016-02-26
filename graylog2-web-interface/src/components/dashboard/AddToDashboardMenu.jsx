@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import $ from 'jquery';
@@ -11,13 +11,39 @@ import { WidgetCreationModal } from 'components/widgets';
 import { EditDashboardModal } from 'components/dashboard';
 
 const AddToDashboardMenu = React.createClass({
+  propTypes: {
+    widgetType: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    bsStyle: PropTypes.string,
+    configuration: PropTypes.object,
+    fields: PropTypes.array,
+    hidden: PropTypes.bool,
+    pullRight: PropTypes.bool,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
+    ]),
+  },
+
   mixins: [PermissionsMixin],
+
   getInitialState() {
     return {
       dashboards: DashboardsStore.writableDashboards,
       selectedDashboard: '',
     };
   },
+
+  getDefaultProps() {
+    return {
+      bsStyle: 'info',
+      configuration: {},
+      hidden: false,
+      pullRight: false,
+    };
+  },
+
   componentDidMount() {
     DashboardsStore.addOnWritableDashboardsChangedCallback(dashboards => {
       if (this.isMounted()) {
@@ -100,7 +126,7 @@ const AddToDashboardMenu = React.createClass({
       });
 
     return (
-      <DropdownButton bsStyle={this.props.bsStyle || 'info'}
+      <DropdownButton bsStyle={this.props.bsStyle}
                       bsSize="small"
                       title={this.props.title}
                       pullRight={this.props.pullRight}
@@ -121,7 +147,7 @@ const AddToDashboardMenu = React.createClass({
 
     return (
       <div style={{display: 'inline'}}>
-        <DropdownButton bsStyle={this.props.bsStyle || 'info'}
+        <DropdownButton bsStyle={this.props.bsStyle}
                         bsSize="small"
                         title={this.props.title}
                         pullRight={this.props.pullRight}
@@ -144,11 +170,8 @@ const AddToDashboardMenu = React.createClass({
         </ButtonGroup>
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}
-                             supportsTrending
-                             configuration={this.props.configuration}
                              onConfigurationSaved={this._saveWidget}
-                             fields={this.props.fields}
-                             isStreamSearch={this.props.isStreamSearch}/>
+                             fields={this.props.fields}/>
       </div>
     );
   },
