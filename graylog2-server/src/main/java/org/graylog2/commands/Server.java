@@ -114,7 +114,7 @@ public class Server extends ServerBootstrap {
             new MessageProcessorModule(),
             new AlarmCallbackBindings(),
             new InitializerBindings(),
-            new MessageOutputBindings(configuration),
+            new MessageOutputBindings(configuration, chainingClassLoader),
             new RotationStrategyBindings(),
             new RetentionStrategyBindings(),
             new PeriodicalBindings(),

@@ -27,6 +27,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -53,6 +54,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     private final JacksonDBCollection<ClusterConfig, String> dbCollection;
     private final NodeId nodeId;
     private final ObjectMapper objectMapper;
+    private final ChainingClassLoader chainingClassLoader;
     private final EventBus clusterEventBus;
 
     @Inject
@@ -60,18 +62,21 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
                                     final MongoConnection mongoConnection,
                                     final NodeId nodeId,
                                     final ObjectMapper objectMapper,
+                                    final ChainingClassLoader chainingClassLoader,
                                     @ClusterEventBus final EventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
-                nodeId, objectMapper, clusterEventBus);
+                nodeId, objectMapper, chainingClassLoader, clusterEventBus);
     }
 
     ClusterConfigServiceImpl(final JacksonDBCollection<ClusterConfig, String> dbCollection,
                              final NodeId nodeId,
                              final ObjectMapper objectMapper,
+                             final ChainingClassLoader chainingClassLoader,
                              final EventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
         this.dbCollection = checkNotNull(dbCollection);
         this.objectMapper = checkNotNull(objectMapper);
+        this.chainingClassLoader = chainingClassLoader;
         this.clusterEventBus = checkNotNull(clusterEventBus);
     }
 
@@ -147,7 +152,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         for (ClusterConfig clusterConfig : clusterConfigs) {
             final String type = clusterConfig.type();
             try {
-                final Class<?> cls = Class.forName(type);
+                final Class<?> cls = chainingClassLoader.loadClass(type);
                 classes.add(cls);
             } catch (ClassNotFoundException e) {
                 LOG.debug("Couldn't find configuration class \"{}\"", type, e);
