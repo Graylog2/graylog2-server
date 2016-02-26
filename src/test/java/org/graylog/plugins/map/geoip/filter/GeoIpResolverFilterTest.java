@@ -43,7 +43,7 @@ public class GeoIpResolverFilterTest {
 
     @BeforeMethod
     public void setUp() {
-        config = GeoIpResolverConfig.defaultConfig();
+        config = this.getConfiguration(true);
         metricRegistry = new MetricRegistry();
     }
 
@@ -51,6 +51,10 @@ public class GeoIpResolverFilterTest {
     public void tearDown() {
         metricRegistry.removeMatching(MetricFilter.ALL);
         metricRegistry = null;
+    }
+
+    private GeoIpResolverConfig getConfiguration(boolean enabled) {
+        return GeoIpResolverConfig.create(enabled, GeoIpResolverConfig.DatabaseType.MAXMIND_CITY, this.getTestDatabasePath(), false);
     }
 
     private String getTestDatabasePath() {
@@ -87,7 +91,7 @@ public class GeoIpResolverFilterTest {
 
     @Test
     public void disabledFilterTest() throws Exception {
-        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(config, metricRegistry);
+        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(this.getConfiguration(false), metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());
