@@ -154,7 +154,7 @@ public class ClusterConfigResource extends RestResource {
     @Nullable
     private Class<?> classFromName(String className) {
         try {
-            return chainingClassLoader.classForName(className);
+            return chainingClassLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
             return null;
         }
