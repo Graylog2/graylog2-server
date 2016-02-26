@@ -1,5 +1,7 @@
 # Map Widget Plugin for Graylog
 
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-map-widget.svg)](https://travis-ci.org/Graylog2/graylog-plugin-map-widget)
+
 Provides a message filter plugin to lookup GeoIP information for IP addresses, and a map widget to display that location
 information.
 
