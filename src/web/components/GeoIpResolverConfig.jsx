@@ -94,6 +94,10 @@ const GeoIpResolverConfig = React.createClass({
       <div>
         <h3>Geo-Location Filter</h3>
 
+        <p>If enabled, the GeoIP filter plugin scans all fields of every message for IPv4 addresses and puts the
+          location information into a field named <code>fieldname_geolocation</code> where "fieldname" is the name
+          of the field in which an IP address has been found.</p>
+
         <dl className={style.deflist}>
           <dt>Enabled:</dt>
           <dd>{this.state.config.enabled === true ? 'yes' : 'no'}</dd>
