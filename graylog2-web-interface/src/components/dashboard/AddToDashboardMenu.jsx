@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import $ from 'jquery';
@@ -11,20 +11,61 @@ import { WidgetCreationModal } from 'components/widgets';
 import { EditDashboardModal } from 'components/dashboard';
 
 const AddToDashboardMenu = React.createClass({
+  propTypes: {
+    widgetType: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    bsStyle: PropTypes.string,
+    configuration: PropTypes.object,
+    fields: PropTypes.array,
+    hidden: PropTypes.bool,
+    pullRight: PropTypes.bool,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
+    ]),
+  },
+
   mixins: [PermissionsMixin],
+
   getInitialState() {
     return {
-      dashboards: DashboardsStore.writableDashboards,
+      dashboards: undefined,
       selectedDashboard: '',
     };
   },
+
+  getDefaultProps() {
+    return {
+      bsStyle: 'info',
+      configuration: {},
+      hidden: false,
+      pullRight: false,
+    };
+  },
+
   componentDidMount() {
+    this._initializeDashboards();
+    $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
+  },
+  _initializeDashboards() {
     DashboardsStore.addOnWritableDashboardsChangedCallback(dashboards => {
       if (this.isMounted()) {
-        this.setState({dashboards: dashboards});
+        this._updateDashboards(dashboards);
       }
     });
-    $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
+
+    const dashboards = DashboardsStore.writableDashboards;
+    // Trigger a dashboard update if the store haven't got any dashboards
+    if (dashboards.size === 0) {
+      DashboardsStore.updateWritableDashboards();
+      return;
+    }
+
+    this._updateDashboards(dashboards);
+  },
+  _updateDashboards(newDashboards) {
+    this.setState({dashboards: newDashboards});
   },
   _setOriginalSearchParams(originalSearchParams) {
     this.searchParams = originalSearchParams;
@@ -86,6 +127,17 @@ const AddToDashboardMenu = React.createClass({
   _createNewDashboard() {
     this.refs.createDashboardModal.open();
   },
+  _renderLoadingDashboardsMenu() {
+    return (
+      <DropdownButton bsStyle={this.props.bsStyle}
+                      bsSize="small"
+                      title={this.props.title}
+                      pullRight={this.props.pullRight}
+                      id="dashboard-selector-dropdown">
+        <MenuItem disabled>Loading dashboards...</MenuItem>
+      </DropdownButton>
+    );
+  },
   _renderDashboardMenu() {
     let dashboards = Immutable.List();
 
@@ -100,7 +152,7 @@ const AddToDashboardMenu = React.createClass({
       });
 
     return (
-      <DropdownButton bsStyle={this.props.bsStyle || 'info'}
+      <DropdownButton bsStyle={this.props.bsStyle}
                       bsSize="small"
                       title={this.props.title}
                       pullRight={this.props.pullRight}
@@ -121,7 +173,7 @@ const AddToDashboardMenu = React.createClass({
 
     return (
       <div style={{display: 'inline'}}>
-        <DropdownButton bsStyle={this.props.bsStyle || 'info'}
+        <DropdownButton bsStyle={this.props.bsStyle}
                         bsSize="small"
                         title={this.props.title}
                         pullRight={this.props.pullRight}
@@ -134,21 +186,23 @@ const AddToDashboardMenu = React.createClass({
     );
   },
   render() {
+    let dropdownMenu;
+    if (this.state.dashboards === undefined) {
+      dropdownMenu = this._renderLoadingDashboardsMenu();
+    } else {
+      dropdownMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
+    }
+
     return (
       <div style={{display: 'inline-block'}}>
         <ButtonGroup>
           {this.props.children}
-
-          {!this.props.hidden && (this.state.dashboards.size > 0 ?
-            this._renderDashboardMenu() : this._renderNoDashboardsMenu())}
+          {dropdownMenu}
         </ButtonGroup>
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}
-                             supportsTrending
-                             configuration={this.props.configuration}
                              onConfigurationSaved={this._saveWidget}
-                             fields={this.props.fields}
-                             isStreamSearch={this.props.isStreamSearch}/>
+                             fields={this.props.fields}/>
       </div>
     );
   },

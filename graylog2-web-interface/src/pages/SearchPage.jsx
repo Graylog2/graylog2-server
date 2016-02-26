@@ -4,7 +4,6 @@ import Immutable from 'immutable';
 import moment from 'moment';
 
 import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
@@ -49,7 +48,6 @@ const SearchPage = React.createClass({
     });
 
     NodesActions.list();
-    DashboardsStore.updateWritableDashboards();
   },
   componentWillUnmount() {
     this._stopTimer();

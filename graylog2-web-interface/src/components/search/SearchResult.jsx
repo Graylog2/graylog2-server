@@ -6,7 +6,6 @@ import { AddSearchCountToDashboard, LegacyHistogram, ResultTable, SearchSidebar,
 
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import SearchStore from 'stores/search/SearchStore';
 import DocsHelper from 'util/DocsHelper';
 
@@ -48,10 +47,6 @@ const SearchResult = React.createClass({
       showAllFields: false,
       shouldHighlight: true,
     };
-  },
-
-  componentDidMount() {
-    DashboardsStore.updateWritableDashboards();
   },
 
   onFieldToggled(fieldName) {

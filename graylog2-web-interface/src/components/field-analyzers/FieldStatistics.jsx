@@ -141,7 +141,6 @@ const FieldStatistics = React.createClass({
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                configuration={{}}
                                 bsStyle="default"
                                 fields={this.state.fieldStatistics.keySeq().toJS()}
                                 pullRight

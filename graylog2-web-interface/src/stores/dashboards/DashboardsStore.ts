@@ -65,21 +65,23 @@ class DashboardsStore {
 
   updateWritableDashboards() {
     const permissions = CurrentUserStore.get().permissions;
-    const dashboards = {};
-    this.updateDashboards();
-    this.getWritableDashboardList(permissions).forEach((dashboard) => {
-      dashboards[dashboard.id] = dashboard;
+    const promise = this.updateDashboards();
+    promise.then(() => {
+      const dashboards = {};
+      this.getWritableDashboardList(permissions).forEach((dashboard) => {
+        dashboards[dashboard.id] = dashboard;
+      });
+      this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards);
     });
-    this.writableDashboards = Immutable.Map<string, Dashboard>(dashboards);
   }
 
   updateDashboards() {
-    this.listDashboards()
-      .then((dashboardList) => {
-        this.dashboards = dashboardList;
+    const promise = this.listDashboards();
+    promise.then((dashboardList) => {
+      this.dashboards = dashboardList;
+    });
 
-        return dashboardList;
-      });
+    return promise;
   }
 
   listDashboards(): Promise<Immutable.List<Dashboard>> {
@@ -105,10 +107,10 @@ class DashboardsStore {
   get(id: string): Promise<Dashboard> {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
     const promise = new Builder('GET', url)
-        .authenticated()
-        .setHeader('X-Graylog-No-Session-Extension', 'true')
-        .json()
-        .build();
+      .authenticated()
+      .setHeader('X-Graylog-No-Session-Extension', 'true')
+      .json()
+      .build();
 
     promise.catch((error) => {
       if (error.additional.status !== 404) {
@@ -184,7 +186,7 @@ class DashboardsStore {
     const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updatePositions(dashboard.id).url);
     const promise = fetch('PUT', url, {positions: positions}).catch((error) => {
       UserNotification.error("Updating widget positions for dashboard \"" + dashboard.title + "\" failed with status: " + error.message,
-          "Could not update dashboard");
+        "Could not update dashboard");
     });
 
     return promise;
