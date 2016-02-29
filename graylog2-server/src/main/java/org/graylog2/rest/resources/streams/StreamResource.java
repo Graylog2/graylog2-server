@@ -42,9 +42,11 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
+import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -78,11 +80,13 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -151,7 +155,7 @@ public class StreamResource extends RestResource {
             }
         }
 
-        return StreamListResponse.create(streams.size(), streams);
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
     @GET
@@ -168,7 +172,7 @@ public class StreamResource extends RestResource {
             }
         }
 
-        return StreamListResponse.create(streams.size(), streams);
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
     @GET
@@ -180,11 +184,11 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Stream get(@ApiParam(name = "streamId", required = true)
+    public StreamResponse get(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        return streamService.load(streamId);
+        return streamToResponse(streamService.load(streamId));
     }
 
     @PUT
@@ -197,7 +201,7 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Stream update(@ApiParam(name = "streamId", required = true)
+    public StreamResponse update(@ApiParam(name = "streamId", required = true)
                          @PathParam("streamId") String streamId,
                          @ApiParam(name = "JSON body", required = true)
                          @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
@@ -223,7 +227,7 @@ public class StreamResource extends RestResource {
 
         streamService.save(stream);
 
-        return stream;
+        return streamToResponse(stream);
     }
 
     @DELETE
@@ -421,5 +425,26 @@ public class StreamResource extends RestResource {
         }
 
         return ImmutableMap.of("throughput", perStream);
+    }
+
+    private StreamResponse streamToResponse(Stream stream) {
+        return StreamResponse.create(
+            (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+            outputsToSummaries(stream.getOutputs()),
+            stream.getMatchingType().name(),
+            stream.getDescription(),
+            stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+            stream.getDisabled(),
+            stream.getStreamRules(),
+            stream.getTitle(),
+            stream.getContentPack()
+        );
+    }
+
+    private Collection<OutputSummary> outputsToSummaries(Collection<Output> outputs) {
+        return outputs.stream()
+            .map((output) -> OutputSummary.create(output.getId(),output.getTitle(), output.getType(),
+                output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()))
+            .collect(Collectors.toSet());
     }
 }
