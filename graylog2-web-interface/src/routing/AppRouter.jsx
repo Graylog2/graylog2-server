@@ -2,7 +2,7 @@ import React from 'react';
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { IndexRoute, Router, Route } from 'react-router';
+import { IndexRoute, Redirect, Router, Route } from 'react-router';
 import { createHistory } from 'history';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -62,6 +62,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
             <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage}/>
+            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
           </Route>
           <Route component={AppWithoutSearchBar}>
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage}/>

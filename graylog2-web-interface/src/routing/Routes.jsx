@@ -44,6 +44,7 @@ const Routes = {
   stream_outputs: (streamId) => '/streams/' + streamId + '/outputs',
   stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',
   stream_search: (streamId) => '/streams/' + streamId + '/search',
+  legacy_stream_search: (streamId) => '/streams/' + streamId + '/messages',
 
   dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
 

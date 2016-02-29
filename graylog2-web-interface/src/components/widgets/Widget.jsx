@@ -131,7 +131,7 @@ const Widget = React.createClass({
   },
   _getUrlPath() {
     if (this._isBoundToStream()) {
-      return '/streams/' + this.props.widget.config.stream_id + '/messages';
+      return '/streams/' + this.props.widget.config.stream_id + '/search';
     }
 
     return '/search';
