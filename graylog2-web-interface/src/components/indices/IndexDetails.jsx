@@ -63,7 +63,7 @@ const IndexDetails = React.createClass({
           </Col>
         </Row>
 
-        <ShardRoutingOverview routing={index.routing} />
+        <ShardRoutingOverview routing={index.routing} indexName={index.name} />
 
         <hr style={{marginBottom: '5', marginTop: '10'}}/>
 
