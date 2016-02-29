@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
-import ServerUnavailablePage from 'react-proxy?name=ServerUnavailablePage!pages/ServerUnavailablePage';
+import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import SessionStore from 'stores/sessions/SessionStore';
 import ServerAvailabilityStore from 'stores/sessions/ServerAvailabilityStore';
 

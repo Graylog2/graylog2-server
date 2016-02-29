@@ -56,7 +56,7 @@ const webpackConfig = {
 const commonConfigs = {
   module: {
     loaders: [
-      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
+      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
     ],
   },
 };
