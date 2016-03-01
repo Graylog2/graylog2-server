@@ -1,8 +1,12 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
+
+import { LinkContainer } from 'react-router-bootstrap';
+
 import PageHeader from 'components/common/PageHeader';
+import DocumentationLink from 'components/support/DocumentationLink';
 import Spinner from 'components/common/Spinner';
 
 import PipelineStreamComponent from 'PipelineStreamComponent';
@@ -15,6 +19,7 @@ import RulesActions from 'RulesActions';
 import RulesStore from 'RulesStore';
 import RulesComponent from 'RulesComponent';
 
+import RulesPage from 'rules/RulesPage';
 
 const PipelinesPage = React.createClass({
   mixins: [
@@ -47,15 +52,20 @@ const PipelinesPage = React.createClass({
       content = <Spinner />;
     } else {
       content = [
-        <PipelineStreamComponent key="assignments" pipelines={this.state.pipelines} streams={this.state.streams} assignments={this.state.assignments}/>,
-        <PipelinesComponent key="pipelines" pipelines={this.state.pipelines} />,
-        <RulesComponent key="rules" rules={this.state.rules} />
+
       ];
     }
     return (
       <span>
         <PageHeader title="Processing pipelines">
-          <span>Processing pipelines</span>
+          <span>Pipelines define how Graylog processes data by grouping rules into stages. Pipelines can apply to all incoming messages or only to messages on a certain stream.</span>
+          <span>
+            Read more about Graylog pipelines in the <DocumentationLink page={"TODO"} text="documentation"/>.
+          </span>
+
+          <LinkContainer to={'/system/pipelines/rules'}>
+            <Button bsStyle="info">Configure rules</Button>
+          </LinkContainer>
         </PageHeader>
         {content}
       </span>);
