@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 @Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor")
-@Path("/system/pipelines")
+@Path("/system/pipelines/pipelines")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class PipelineResource extends RestResource implements PluginRestResource {
