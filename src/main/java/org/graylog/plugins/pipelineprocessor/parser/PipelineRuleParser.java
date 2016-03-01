@@ -182,7 +182,8 @@ public class PipelineRuleParser {
     }
 
     public static String unquote(String string, char quoteChar) {
-        if (string.charAt(0) == quoteChar && string.charAt(string.length() - 1) == quoteChar) {
+        if (string.length() >= 2 &&
+                string.charAt(0) == quoteChar && string.charAt(string.length() - 1) == quoteChar) {
             return string.substring(1, string.length() - 1);
         }
         return string;
@@ -230,13 +231,13 @@ public class PipelineRuleParser {
         @Override
         public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
             final Rule.Builder ruleBuilder = Rule.builder();
-            ruleBuilder.name(unquote(ctx.name.getText(), '"'));
+            ruleBuilder.name(unquote(ctx.name == null ? "" : ctx.name.getText(), '"'));
             final Expression expr = exprs.get(ctx.condition);
 
             LogicalExpression condition;
             if (expr instanceof LogicalExpression) {
                 condition = (LogicalExpression) expr;
-            } else if (expr.getType().equals(Boolean.class)) {
+            } else if (expr != null && expr.getType().equals(Boolean.class)) {
                 condition = new BooleanValuedFunctionWrapper(expr);
             } else {
                 condition = new BooleanExpression(false);

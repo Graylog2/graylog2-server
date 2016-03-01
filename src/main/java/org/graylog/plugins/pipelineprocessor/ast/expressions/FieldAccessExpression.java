@@ -52,7 +52,7 @@ public class FieldAccessExpression implements Expression {
             log.debug("[field access] property {} of bean {}: {}", fieldName, bean.getClass().getTypeName(), property);
             return property;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            log.error("Unable to read property {} from {}", fieldName, bean);
+            log.debug("Unable to read property {} from {}", fieldName, bean);
             return null;
         }
     }
