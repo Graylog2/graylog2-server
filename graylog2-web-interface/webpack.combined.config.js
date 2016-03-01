@@ -2,7 +2,7 @@ const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
 
-const pluginConfigs = glob.sync('../../graylog-plugin-*/webpack.config.js');
+const pluginConfigs = process.env.disable_plugins == 'true' ? [] : glob.sync('../../graylog-plugin-*/webpack.config.js');
 
 process.env.web_src_path = path.resolve(__dirname);
 
