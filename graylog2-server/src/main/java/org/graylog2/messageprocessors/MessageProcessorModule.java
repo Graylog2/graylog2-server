@@ -21,7 +21,7 @@ import org.graylog2.plugin.PluginModule;
 public class MessageProcessorModule extends PluginModule {
     @Override
     protected void configure() {
-        addMessageProcessor(MessageFilterChainProcessor.class);
+        addMessageProcessor(MessageFilterChainProcessor.class, MessageFilterChainProcessor.Descriptor.class);
 
         bind(OrderedMessageProcessors.class).asEagerSingleton();
     }

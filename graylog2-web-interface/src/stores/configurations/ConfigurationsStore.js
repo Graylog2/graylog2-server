@@ -34,6 +34,15 @@ const ConfigurationsStore = Reflux.createStore({
     ConfigurationActions.listSearchesClusterConfig.promise(promise);
   },
 
+  listMessageProcessorsConfig(configType) {
+    const promise = fetch('GET', URLUtils.qualifyUrl('/system/messageprocessors/config')).then((response) => {
+      this.configuration[configType] = response;
+      this.trigger({configuration: this.configuration});
+    });
+
+    ConfigurationActions.listMessageProcessorsConfig.promise(promise);
+  },
+
   update(configType, config) {
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
@@ -48,6 +57,22 @@ const ConfigurationsStore = Reflux.createStore({
       });
 
     ConfigurationActions.update.promise(promise);
+  },
+
+  updateMessageProcessorsConfig(configType, config) {
+    const promise = fetch('PUT', URLUtils.qualifyUrl('/system/messageprocessors/config'), config);
+
+    promise.then(
+      response => {
+        this.configuration[configType] = response;
+        this.trigger({configuration: this.configuration});
+        UserNotification.success('Configuration updated successfully');
+      },
+      error => {
+        UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
+      });
+
+    ConfigurationActions.updateMessageProcessorsConfig.promise(promise);
   },
 });
 
