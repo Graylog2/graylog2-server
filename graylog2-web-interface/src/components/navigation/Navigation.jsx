@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -103,6 +104,7 @@ const Navigation = React.createClass({
     }
 
     const pluginNavigations = PluginStore.exports('navigation')
+      .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
         return (
           <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
@@ -112,6 +114,7 @@ const Navigation = React.createClass({
       });
 
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+      .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
         return (
           <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
