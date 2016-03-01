@@ -16,10 +16,13 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -45,7 +48,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor")
 @Path("/system/pipelines")
@@ -113,14 +119,25 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @GET
     @Path("/pipeline")
     public Collection<PipelineSource> getAll() {
-        return  pipelineSourceService.loadAll();
+        final Collection<PipelineSource> pipelineSources = pipelineSourceService.loadAll();
+        final ArrayList<PipelineSource> results = Lists.newArrayList();
+        for (PipelineSource p : pipelineSources) {
+            final Pipeline pipeline = pipelineRuleParser.parsePipeline(p);
+            final List<Integer> stages = pipeline.stages().stream().map(Stage::stage).collect(Collectors.toList());
+            results.add(p.toBuilder().stages(stages).build());
+        }
+
+        return results;
     }
 
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/pipeline/{id}")
     @GET
     public PipelineSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
-        return pipelineSourceService.load(id);
+        final PipelineSource pipelineSource = pipelineSourceService.load(id);
+        final Pipeline pipeline = pipelineRuleParser.parsePipeline(pipelineSource);
+        final List<Integer> stages = pipeline.stages().stream().map(Stage::stage).collect(Collectors.toList());
+        return pipelineSource.toBuilder().stages(stages).build();
     }
 
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")

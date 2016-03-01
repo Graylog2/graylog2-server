@@ -25,6 +25,8 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
@@ -54,6 +56,10 @@ public abstract class PipelineSource {
     @Nullable
     public abstract DateTime modifiedAt();
 
+    @JsonProperty
+    @Nullable
+    public abstract List<Integer> stages();
+
     public static Builder builder() {
         return new AutoValue_PipelineSource.Builder();
     }
@@ -74,6 +80,7 @@ public abstract class PipelineSource {
                 .source(source)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
+                .stages(Collections.emptyList())
                 .build();
     }
 
@@ -92,5 +99,7 @@ public abstract class PipelineSource {
         public abstract Builder createdAt(DateTime createdAt);
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
+
+        public abstract Builder stages(List<Integer> stages);
     }
 }
