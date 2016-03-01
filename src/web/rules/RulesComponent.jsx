@@ -12,19 +12,9 @@ const RulesComponent = React.createClass({
   },
 
   render() {
-    let rules;
-    if (this.props.rules.length == 0) {
-      rules =
-        <Alert bsStyle='warning'>
-          <i className="fa fa-info-circle" />&nbsp; No rules configured.
-      </Alert>
-    } else {
-      rules = <RuleList rules={this.props.rules} />;
-    }
-
     return (
       <div>
-        {rules}
+        <RuleList rules={this.props.rules} />
       </div>
     );
   },
