@@ -135,6 +135,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final PipelineSource toSave = pipelineSource.toBuilder()
+                .title(update.title())
+                .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now())
                 .build();

@@ -136,6 +136,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final RuleSource toSave = ruleSource.toBuilder()
+                .title(update.title())
+                .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now())
                 .build();
