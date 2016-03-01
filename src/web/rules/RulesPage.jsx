@@ -2,12 +2,33 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import Reflux from 'reflux';
+
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import DocsHelper from 'util/DocsHelper';
 
+import RulesComponent from './RulesComponent';
+import RulesStore from './RulesStore';
+import RulesActions from './RulesActions';
+
 const RulesPage = React.createClass({
+  mixins: [
+    Reflux.connect(RulesStore),
+  ],
+  contextTypes: {
+    storeProvider: React.PropTypes.object,
+  },
+  componentDidMount() {
+    RulesActions.list();
+  },
+
+  getInitialState() {
+    return {
+      rules: [],
+    };
+  },
 
   render() {
     return (
@@ -26,13 +47,12 @@ const RulesPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <span>TODO</span>
+            <RulesComponent rules={this.state.rules}/>
           </Col>
         </Row>
       </span>
     );
   },
-
 });
 
 export default RulesPage;

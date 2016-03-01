@@ -15,16 +15,9 @@ import PipelinesActions from 'PipelinesActions';
 import PipelinesStore from 'PipelinesStore';
 import PipelinesComponent from 'PipelinesComponent';
 
-import RulesActions from 'RulesActions';
-import RulesStore from 'RulesStore';
-import RulesComponent from 'RulesComponent';
-
-import RulesPage from 'rules/RulesPage';
-
 const PipelinesPage = React.createClass({
   mixins: [
     Reflux.connect(PipelinesStore),
-    Reflux.connect(RulesStore),
   ],
   contextTypes: {
     storeProvider: React.PropTypes.object,
@@ -32,7 +25,6 @@ const PipelinesPage = React.createClass({
   getInitialState() {
     return {
       pipelines: undefined,
-      rules: undefined,
       streams: undefined,
       assignments: [],
     }
@@ -40,7 +32,6 @@ const PipelinesPage = React.createClass({
 
   componentDidMount() {
     PipelinesActions.list();
-    RulesActions.list();
 
     var store = this.context.storeProvider.getStore('Streams');
     store.listStreams().then((streams) => this.setState({streams: streams}));
@@ -48,7 +39,7 @@ const PipelinesPage = React.createClass({
 
   render() {
     let content;
-    if (!this.state.pipelines || !this.state.rules || !this.state.streams) {
+    if (!this.state.pipelines || !this.state.streams) {
       content = <Spinner />;
     } else {
       content = [

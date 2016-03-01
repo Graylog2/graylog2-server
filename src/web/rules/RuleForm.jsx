@@ -124,7 +124,7 @@ const RuleForm = React.createClass({
   render() {
     let triggerButtonContent;
     if (this.props.create) {
-      triggerButtonContent = 'Create rule';
+      triggerButtonContent = 'Add new rule';
     } else {
       triggerButtonContent = <span>Edit</span>;
     }
@@ -135,13 +135,13 @@ const RuleForm = React.createClass({
           {triggerButtonContent}
         </button>
         <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Create' : 'Edit'} Processing Rule ${this.state.rule.title}`}
+                            title={`${this.props.create ? 'Add new' : 'Edit'} rule ${this.state.rule.title}`}
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
             <Input type="text"
                    id={this._getId('title')}
-                   label="Name"
+                   label="Title"
                    onChange={this._onTitleChange}
                    value={this.state.rule.title}
                    bsStyle={this.state.error ? 'error' : null}

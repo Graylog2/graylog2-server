@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 
-import RulesActions from 'RulesActions';
+import RulesActions from './RulesActions';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
@@ -41,8 +41,12 @@ const RulesStore = Reflux.createStore({
       source: ruleSource.source
     };
     return fetch('POST', url, rule).then((response) => {
-      this.rules = response;
-      this.trigger({rules: response});
+      if (this.rules === undefined) {
+        this.rules = [response];
+      } else {
+        this.rules.push(response);
+      }
+      this.trigger({rules: this.rules});
     }, failCallback);
   },
 
