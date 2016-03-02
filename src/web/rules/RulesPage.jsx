@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Reflux from 'reflux';
@@ -42,6 +42,12 @@ const RulesPage = React.createClass({
           <span>
             Read more about Graylog pipeline rules in the <DocumentationLink page={"TODO"}
                                                                     text="documentation"/>.
+          </span>
+
+          <span>
+            <LinkContainer to="/system/pipelines/overview">
+              <Button bsStyle="info">Manage pipelines</Button>
+            </LinkContainer>
           </span>
         </PageHeader>
 

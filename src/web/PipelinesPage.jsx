@@ -48,15 +48,21 @@ const PipelinesPage = React.createClass({
     }
     return (
       <span>
-        <PageHeader title="Processing pipelines">
+        <PageHeader title="Processing pipelines" titleSize={9} buttonSize={3}>
           <span>Pipelines define how Graylog processes data by grouping rules into stages. Pipelines can apply to all incoming messages or only to messages on a certain stream.</span>
           <span>
             Read more about Graylog pipelines in the <DocumentationLink page={"TODO"} text="documentation"/>.
           </span>
 
-          <LinkContainer to={'/system/pipelines/rules'}>
-            <Button bsStyle="info">Configure rules</Button>
-          </LinkContainer>
+          <span>
+            <LinkContainer to={'/system/pipelines/overview'}>
+              <Button bsStyle="info">Manage pipelines</Button>
+            </LinkContainer>
+            {' '}
+            <LinkContainer to={'/system/pipelines/rules'}>
+              <Button bsStyle="info">Manage rules</Button>
+            </LinkContainer>
+          </span>
         </PageHeader>
         {content}
       </span>);
