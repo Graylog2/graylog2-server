@@ -23,6 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
@@ -77,6 +78,16 @@ public class RuleService {
         final WriteResult<RuleDao, String> result = dbCollection.removeById(id);
         if (result.getN() != 1) {
             log.error("Unable to delete rule {}", id);
+        }
+    }
+
+    public Collection<RuleDao> loadNamed(Collection<String> ruleNames) {
+        try {
+            final DBCursor<RuleDao> ruleDaos = dbCollection.find(DBQuery.in("title", ruleNames));
+            return Sets.newHashSet(ruleDaos.iterator());
+        } catch (MongoException e) {
+            log.error("Unable to bulk load rules", e);
+            return Collections.emptySet();
         }
     }
 }

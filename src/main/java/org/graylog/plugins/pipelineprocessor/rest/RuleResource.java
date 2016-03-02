@@ -132,6 +132,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
     }
 
+    @ApiOperation("Retrieve the named processing rules in bulk")
+    @Path("/rule/multiple")
+    @POST
+    public Collection<RuleSource> getBulk(@ApiParam("rules") BulkRuleRequest rules) {
+        Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
+
+        return ruleDaos.stream()
+                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .collect(Collectors.toList());
+    }
+
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/rule/{id}")
     @PUT
