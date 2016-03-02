@@ -20,6 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -27,6 +33,8 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
@@ -60,6 +68,10 @@ public abstract class PipelineSource {
     @Nullable
     public abstract List<Integer> stages();
 
+    @JsonProperty
+    @Nullable
+    public abstract Set<ParseError> errors();
+
     public static Builder builder() {
         return new AutoValue_PipelineSource.Builder();
     }
@@ -84,6 +96,26 @@ public abstract class PipelineSource {
                 .build();
     }
 
+    public static PipelineSource fromDao(PipelineRuleParser parser, PipelineDao dao) {
+        Set<ParseError> errors = null;
+        Pipeline pipeline = null;
+        try {
+            pipeline = parser.parsePipeline(dao.id(), dao.source());
+        } catch (ParseException e) {
+            errors = e.getErrors();
+        }
+        return builder()
+                .id(dao.id())
+                .title(dao.title())
+                .description(dao.description())
+                .source(dao.source())
+                .createdAt(dao.createdAt())
+                .modifiedAt(dao.modifiedAt())
+                .stages(pipeline == null ? null : pipeline.stages().stream().map(Stage::stage).collect(Collectors.toList()))
+                .errors(errors)
+                .build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract PipelineSource build();
@@ -101,5 +133,7 @@ public abstract class PipelineSource {
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
         public abstract Builder stages(List<Integer> stages);
+
+        public abstract Builder errors(Set<ParseError> errors);
     }
 }

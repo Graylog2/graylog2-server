@@ -20,11 +20,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -54,6 +59,10 @@ public abstract class RuleSource {
     @Nullable
     public abstract DateTime modifiedAt();
 
+    @JsonProperty
+    @Nullable
+    public abstract Set<ParseError> errors();
+
     public static Builder builder() {
         return new AutoValue_RuleSource.Builder();
     }
@@ -77,6 +86,26 @@ public abstract class RuleSource {
                 .build();
     }
 
+    public static RuleSource fromDao(PipelineRuleParser parser, RuleDao dao) {
+        Set<ParseError> errors = null;
+        try {
+            parser.parseRule(dao.source());
+
+        } catch (ParseException e) {
+            errors = e.getErrors();
+        }
+
+        return builder()
+                .id(dao.id())
+                .source(dao.source())
+                .title(dao.title())
+                .description(dao.description())
+                .createdAt(dao.createdAt())
+                .modifiedAt(dao.modifiedAt())
+                .errors(errors)
+                .build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract RuleSource build();
@@ -92,5 +121,7 @@ public abstract class RuleSource {
         public abstract Builder createdAt(DateTime createdAt);
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
+
+        public abstract Builder errors(Set<ParseError> errors);
     }
 }

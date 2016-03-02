@@ -21,16 +21,16 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
-import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
-import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
-import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
@@ -50,29 +50,29 @@ public class PipelineInterpreterTest {
 
     @Test
     public void testCreateMessage() {
-        final RuleSourceService ruleSourceService = mock(RuleSourceService.class);
-        when(ruleSourceService.loadAll()).thenReturn(Collections.singleton(
-                RuleSource.create("abc",
-                                  "title",
-                                  "description",
-                                  "rule \"creates message\"\n" +
-                                          "when string(message.`message`) == \"original message\"\n" +
-                                          "then\n" +
-                                          "  create_message(\"derived message\");\n" +
-                                          "end",
-                                  Tools.nowUTC(),
-                                  null)
+        final RuleService ruleService = mock(RuleService.class);
+        when(ruleService.loadAll()).thenReturn(Collections.singleton(
+                RuleDao.create("abc",
+                               "title",
+                               "description",
+                               "rule \"creates message\"\n" +
+                                       "when tostring($message.message) == \"original message\"\n" +
+                                       "then\n" +
+                                       "  create_message(\"derived message\");\n" +
+                                       "end",
+                               Tools.nowUTC(),
+                               null)
         ));
 
-        final PipelineSourceService pipelineSourceService = mock(PipelineSourceService.class);
-        when(pipelineSourceService.loadAll()).thenReturn(Collections.singleton(
-                PipelineSource.create("cde", "title", "description",
-                                      "pipeline \"pipeline\"\n" +
-                                              "stage 0 match all\n" +
-                                              "    rule \"creates message\";\n" +
-                                              "end\n",
-                                      Tools.nowUTC(),
-                                      null)
+        final PipelineService pipelineService = mock(PipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                PipelineDao.create("cde", "title", "description",
+                                   "pipeline \"pipeline\"\n" +
+                                           "stage 0 match all\n" +
+                                           "    rule \"creates message\";\n" +
+                                           "end\n",
+                                   Tools.nowUTC(),
+                                   null)
         ));
 
         final PipelineStreamAssignmentService pipelineStreamAssignmentService = mock(PipelineStreamAssignmentService.class);
@@ -90,8 +90,8 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = setupParser(functions);
 
         final PipelineInterpreter interpreter = new PipelineInterpreter(
-                ruleSourceService,
-                pipelineSourceService,
+                ruleService,
+                pipelineService,
                 pipelineStreamAssignmentService,
                 parser,
                 mock(Journal.class),

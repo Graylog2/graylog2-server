@@ -33,16 +33,16 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
-import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
-import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -73,8 +73,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class PipelineInterpreter implements MessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
 
-    private final RuleSourceService ruleSourceService;
-    private final PipelineSourceService pipelineSourceService;
+    private final RuleService ruleService;
+    private final PipelineService pipelineService;
     private final PipelineStreamAssignmentService pipelineStreamAssignmentService;
     private final PipelineRuleParser pipelineRuleParser;
     private final Journal journal;
@@ -85,16 +85,16 @@ public class PipelineInterpreter implements MessageProcessor {
     private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineAssignments = new AtomicReference<>(ImmutableSetMultimap.of());
 
     @Inject
-    public PipelineInterpreter(RuleSourceService ruleSourceService,
-                               PipelineSourceService pipelineSourceService,
+    public PipelineInterpreter(RuleService ruleService,
+                               PipelineService pipelineService,
                                PipelineStreamAssignmentService pipelineStreamAssignmentService,
                                PipelineRuleParser pipelineRuleParser,
                                Journal journal,
                                MetricRegistry metricRegistry,
                                @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                @ClusterEventBus EventBus clusterBus) {
-        this.ruleSourceService = ruleSourceService;
-        this.pipelineSourceService = pipelineSourceService;
+        this.ruleService = ruleService;
+        this.pipelineService = pipelineService;
         this.pipelineStreamAssignmentService = pipelineStreamAssignmentService;
         this.pipelineRuleParser = pipelineRuleParser;
 
@@ -112,26 +112,26 @@ public class PipelineInterpreter implements MessageProcessor {
     private synchronized void reload() {
         // read all rules and compile them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();
-        for (RuleSource ruleSource : ruleSourceService.loadAll()) {
+        for (RuleDao ruleDao : ruleService.loadAll()) {
             Rule rule;
             try {
-                rule = pipelineRuleParser.parseRule(ruleSource.source());
+                rule = pipelineRuleParser.parseRule(ruleDao.source());
             } catch (ParseException e) {
-                rule = Rule.alwaysFalse("Failed to parse rule: " + ruleSource.id());
+                rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
             }
             ruleNameMap.put(rule.name(), rule);
         }
 
         Map<String, Pipeline> pipelineIdMap = Maps.newHashMap();
         // read all pipelines and compile them
-        for (PipelineSource pipelineSource : pipelineSourceService.loadAll()) {
+        for (PipelineDao pipelineDao : pipelineService.loadAll()) {
             Pipeline pipeline;
             try {
-                pipeline =  pipelineRuleParser.parsePipeline(pipelineSource);
+                pipeline =  pipelineRuleParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
             } catch (ParseException e) {
-                pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineSource.id());
+                pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineDao.id());
             }
-            pipelineIdMap.put(pipelineSource.id(), pipeline);
+            pipelineIdMap.put(pipelineDao.id(), pipeline);
         }
 
         // resolve all rules in the stages

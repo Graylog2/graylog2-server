@@ -20,7 +20,8 @@ import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -46,6 +47,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Api(value = "Pipeline/Rules", description = "Rules for the pipeline message processor")
 @Path("/system/pipelines")
@@ -55,15 +57,15 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
-    private final RuleSourceService ruleSourceService;
+    private final RuleService ruleService;
     private final PipelineRuleParser pipelineRuleParser;
     private final EventBus clusterBus;
 
     @Inject
-    public RuleResource(RuleSourceService ruleSourceService,
+    public RuleResource(RuleService ruleService,
                         PipelineRuleParser pipelineRuleParser,
                         @ClusterEventBus EventBus clusterBus) {
-        this.ruleSourceService = ruleSourceService;
+        this.ruleService = ruleService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.clusterBus = clusterBus;
     }
@@ -78,18 +80,18 @@ public class RuleResource extends RestResource implements PluginRestResource {
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
-        final RuleSource newRuleSource = RuleSource.builder()
+        final RuleDao newRuleSource = RuleDao.builder()
                 .title(ruleSource.title())
                 .description(ruleSource.description())
                 .source(ruleSource.source())
                 .createdAt(DateTime.now())
                 .modifiedAt(DateTime.now())
                 .build();
-        final RuleSource save = ruleSourceService.save(newRuleSource);
+        final RuleDao save = ruleService.save(newRuleSource);
         // TODO determine which pipelines could change because of this new rule (there could be pipelines referring to a previously unresolved rule)
         clusterBus.post(RulesChangedEvent.updatedRuleId(save.id()));
         log.info("Created new rule {}", save);
-        return save;
+        return RuleSource.fromDao(pipelineRuleParser, save);
     }
 
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
@@ -114,14 +116,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @GET
     @Path("/rule")
     public Collection<RuleSource> getAll() {
-        return  ruleSourceService.loadAll();
+        final Collection<RuleDao> ruleDaos = ruleService.loadAll();
+        return ruleDaos.stream()
+                .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/rule/{id}")
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
-        return ruleSourceService.load(id);
+        return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
     }
 
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
@@ -129,32 +134,32 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @PUT
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
-        final RuleSource ruleSource = ruleSourceService.load(id);
+        final RuleDao ruleDao = ruleService.load(id);
         try {
             pipelineRuleParser.parseRule(update.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
-        final RuleSource toSave = ruleSource.toBuilder()
+        final RuleDao toSave = ruleDao.toBuilder()
                 .title(update.title())
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now())
                 .build();
-        final RuleSource savedRule = ruleSourceService.save(toSave);
+        final RuleDao savedRule = ruleService.save(toSave);
 
         // TODO determine which pipelines could change because of this updated rule
         clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
 
-        return savedRule;
+        return RuleSource.fromDao(pipelineRuleParser, savedRule);
     }
 
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/rule/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
-        ruleSourceService.load(id);
-        ruleSourceService.delete(id);
+        ruleService.load(id);
+        ruleService.delete(id);
 
         // TODO determine which pipelines could change because of this deleted rule, causing them to recompile
         clusterBus.post(RulesChangedEvent.deletedRuleId(id));

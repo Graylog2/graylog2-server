@@ -36,7 +36,6 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.IndexedAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
@@ -48,6 +47,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.IndexedAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
@@ -75,7 +75,6 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,11 +156,11 @@ public class PipelineRuleParser {
         throw new ParseException(parseContext.getErrors());
     }
 
-    public Pipeline parsePipeline(PipelineSource pipelineSource) {
+    public Pipeline parsePipeline(String id, String source) {
         final ParseContext parseContext = new ParseContext();
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
-        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipelineSource.source()));
+        final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(source));
         lexer.removeErrorListeners();
         lexer.addErrorListener(errorListener);
 
@@ -176,7 +175,7 @@ public class PipelineRuleParser {
 
         if (parseContext.getErrors().isEmpty()) {
             final Pipeline pipeline = parseContext.pipelines.get(0);
-            return pipeline.withId(pipelineSource.id());
+            return pipeline.withId(id);
         }
         throw new ParseException(parseContext.getErrors());
     }

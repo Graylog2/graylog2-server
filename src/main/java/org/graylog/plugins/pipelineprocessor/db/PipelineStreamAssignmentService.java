@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -25,6 +24,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class PipelineStreamAssignmentService {
                 PipelineStreamAssignment.class,
                 String.class,
                 mapper.get());
-        dbCollection.createIndex(new BasicDBObject("stream_id", 1));
+        dbCollection.createIndex(DBSort.asc("stream_id"));
     }
 
 

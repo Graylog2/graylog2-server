@@ -20,7 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -46,17 +46,17 @@ import java.util.Set;
 public class PipelineStreamResource extends RestResource implements PluginRestResource {
 
     private final PipelineStreamAssignmentService assignmentService;
-    private final PipelineSourceService pipelineSourceService;
+    private final PipelineService pipelineService;
     private final StreamService streamService;
     private final EventBus clusterBus;
 
     @Inject
     public PipelineStreamResource(PipelineStreamAssignmentService assignmentService,
-                                  PipelineSourceService pipelineSourceService,
+                                  PipelineService pipelineService,
                                   StreamService streamService,
                                   @ClusterEventBus EventBus clusterBus) {
         this.assignmentService = assignmentService;
-        this.pipelineSourceService = pipelineSourceService;
+        this.pipelineService = pipelineService;
         this.streamService = streamService;
         this.clusterBus = clusterBus;
     }
@@ -71,7 +71,7 @@ public class PipelineStreamResource extends RestResource implements PluginRestRe
         }
         // verify the pipelines exist
         for (String s : assignment.pipelineIds()) {
-            pipelineSourceService.load(s);
+            pipelineService.load(s);
         }
         final PipelineStreamAssignment save = assignmentService.save(assignment);
         clusterBus.post(save);

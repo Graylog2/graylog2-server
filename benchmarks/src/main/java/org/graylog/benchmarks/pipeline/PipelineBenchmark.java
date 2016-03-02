@@ -24,17 +24,17 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
-import org.graylog.plugins.pipelineprocessor.db.PipelineSourceService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
-import org.graylog.plugins.pipelineprocessor.db.RuleSourceService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
-import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.filters.ExtractorFilter;
@@ -93,29 +93,29 @@ public class PipelineBenchmark {
         private final PipelineInterpreter interpreter;
 
         public InterpreterState() {
-            final RuleSourceService ruleSourceService = mock(RuleSourceService.class);
-            when(ruleSourceService.loadAll()).thenReturn(Collections.singleton(
-                    RuleSource.create("abc",
-                                      "title",
-                                      "description",
-                                      "rule \"add\"\n" +
-                                              "when tostring($message.message) == \"original message\"\n" +
-                                              "then\n" +
-                                              "  set_field(\"field\", \"derived message\");\n" +
-                                              "end",
-                                      Tools.nowUTC(),
-                                      null)
+            final RuleService ruleService = mock(RuleService.class);
+            when(ruleService.loadAll()).thenReturn(Collections.singleton(
+                    RuleDao.create("abc",
+                                   "title",
+                                   "description",
+                                   "rule \"add\"\n" +
+                                           "when tostring($message.message) == \"original message\"\n" +
+                                           "then\n" +
+                                           "  set_field(\"field\", \"derived message\");\n" +
+                                           "end",
+                                   Tools.nowUTC(),
+                                   null)
             ));
 
-            final PipelineSourceService pipelineSourceService = mock(PipelineSourceService.class);
-            when(pipelineSourceService.loadAll()).thenReturn(Collections.singleton(
-                    PipelineSource.create("cde", "title", "description",
-                                          "pipeline \"pipeline\"\n" +
-                                                  "stage 0 match all\n" +
-                                                  "    rule \"add\";\n" +
-                                                  "end\n",
-                                          Tools.nowUTC(),
-                                          null)
+            final PipelineService pipelineService = mock(PipelineService.class);
+            when(pipelineService.loadAll()).thenReturn(Collections.singleton(
+                    PipelineDao.create("cde", "title", "description",
+                                       "pipeline \"pipeline\"\n" +
+                                               "stage 0 match all\n" +
+                                               "    rule \"add\";\n" +
+                                               "end\n",
+                                       Tools.nowUTC(),
+                                       null)
             ));
 
             final PipelineStreamAssignmentService pipelineStreamAssignmentService = mock(PipelineStreamAssignmentService.class);
@@ -133,8 +133,8 @@ public class PipelineBenchmark {
             final PipelineRuleParser parser = setupParser(functions);
 
             interpreter = new PipelineInterpreter(
-                    ruleSourceService,
-                    pipelineSourceService,
+                    ruleService,
+                    pipelineService,
                     pipelineStreamAssignmentService,
                     parser,
                     mock(Journal.class),
@@ -174,7 +174,8 @@ public class PipelineBenchmark {
                 final ServerStatus serverStatus = mock(ServerStatus.class);
                 when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
 
-                final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setDaemon(true).build());
+                final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setDaemon(
+                        true).build());
 
                 final InputService inputService = mock(InputService.class);
                 // extractors for the single input we are pretending to have
@@ -196,7 +197,8 @@ public class PipelineBenchmark {
                         mock(NotificationService.class),
                         streamService
                 );
-                ExecutorService daemonExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setDaemon(true).build());
+                ExecutorService daemonExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setDaemon(
+                        true).build());
                 when(engineFactory.create(any(), any())).thenReturn(
                         new StreamRouterEngine(Collections.emptyList(),
                                                daemonExecutor,

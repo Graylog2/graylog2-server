@@ -18,11 +18,11 @@ package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.Sets;
 import com.mongodb.MongoException;
-import org.graylog.plugins.pipelineprocessor.rest.RuleSource;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.mongojack.DBCursor;
+import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 import org.slf4j.Logger;
@@ -32,49 +32,47 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 
-public class RuleSourceService {
-    private static final Logger log = LoggerFactory.getLogger(RuleSourceService.class);
+public class PipelineService {
+    private static final Logger log = LoggerFactory.getLogger(PipelineService.class);
 
-    public static final String COLLECTION = "pipeline_processor_rules";
+    public static final String COLLECTION = "pipeline_processor_pipelines";
 
-    private final JacksonDBCollection<RuleSource, String> dbCollection;
+    private final JacksonDBCollection<PipelineDao, String> dbCollection;
 
     @Inject
-    public RuleSourceService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
+    public PipelineService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
-                RuleSource.class,
+                PipelineDao.class,
                 String.class,
                 mapper.get());
+        dbCollection.createIndex(DBSort.asc("title"));
     }
 
-    public RuleSource save(RuleSource rule) {
-        final WriteResult<RuleSource, String> save = dbCollection.save(rule);
+    public PipelineDao save(PipelineDao pipeline) {
+        final WriteResult<PipelineDao, String> save = dbCollection.save(pipeline);
         return save.getSavedObject();
     }
 
-    public RuleSource load(String id) throws NotFoundException {
-        final RuleSource rule = dbCollection.findOneById(id);
-        if (rule == null) {
-            throw new NotFoundException("No rule with id " + id);
+    public PipelineDao load(String id) throws NotFoundException {
+        final PipelineDao pipeline = dbCollection.findOneById(id);
+        if (pipeline == null) {
+            throw new NotFoundException("No pipeline with id " + id);
         }
-        return rule;
+        return pipeline;
     }
 
-    public Collection<RuleSource> loadAll() {
+    public Collection<PipelineDao> loadAll() {
         try {
-            final DBCursor<RuleSource> ruleSources = dbCollection.find();
-            return Sets.newHashSet(ruleSources.iterator());
+            final DBCursor<PipelineDao> daos = dbCollection.find();
+            return Sets.newHashSet(daos.iterator());
         } catch (MongoException e) {
-            log.error("Unable to load processing rules", e);
+            log.error("Unable to load pipelines", e);
             return Collections.emptySet();
         }
     }
 
     public void delete(String id) {
-        final WriteResult<RuleSource, String> result = dbCollection.removeById(id);
-        if (result.getN() != 1) {
-            log.error("Unable to delete rule {}", id);
-        }
+        dbCollection.removeById(id);
     }
 }
