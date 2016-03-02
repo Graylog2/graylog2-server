@@ -12,6 +12,15 @@ const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],
   pipelines: undefined,
 
+  _updatePipelinesState(pipeline) {
+    if (!this.pipelines) {
+      this.pipelines = [pipeline];
+    } else {
+      this.pipelines = this.pipelines.map((p) => p.id === pipeline.id ? pipeline : p);
+    }
+    this.trigger({pipelines: this.pipelines});
+  },
+
   list() {
     const failCallback = (error) => {
       UserNotification.error('Fetching pipelines failed with status: ' + error.message,
@@ -26,7 +35,14 @@ const PipelinesStore = Reflux.createStore({
   },
 
   get(pipelineId) {
+    const failCallback = (error) => {
+      UserNotification.error('Fetching pipeline failed with status: ' + error.message,
+        `Could not retrieve processing pipeline "${pipelineId}"`);
+    };
 
+    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/pipeline/${pipelineId}`);
+    const promise = fetch('GET', url);
+    promise.then(this._updatePipelinesState, failCallback);
   },
 
   save(pipelineSource) {
@@ -38,12 +54,9 @@ const PipelinesStore = Reflux.createStore({
     const pipeline = {
       title: pipelineSource.title,
       description: pipelineSource.description,
-      source: pipelineSource.source
+      source: pipelineSource.source,
     };
-    return fetch('POST', url, pipeline).then((response) => {
-      this.pipelines = response;
-      this.trigger({pipelines: response});
-    }, failCallback);
+    return fetch('POST', url, pipeline).then(this._updatePipelinesState, failCallback);
   },
 
   update(pipelineSource) {
@@ -56,12 +69,9 @@ const PipelinesStore = Reflux.createStore({
       id: pipelineSource.id,
       title: pipelineSource.title,
       description: pipelineSource.description,
-      source: pipelineSource.source
+      source: pipelineSource.source,
     };
-    return fetch('PUT', url, pipeline).then((response) => {
-      this.pipelines = this.pipelines.map((e) => e.id === response.id ? response : e);
-      this.trigger({pipelines: this.pipelines});
-    }, failCallback);
+    return fetch('PUT', url, pipeline).then(this._updatePipelinesState, failCallback);
   },
   delete(pipelineId) {
     const failCallback = (error) => {
@@ -70,7 +80,8 @@ const PipelinesStore = Reflux.createStore({
     };
     const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/pipeline/' + pipelineId);
     return fetch('DELETE', url).then(() => {
-      this.pipelines = this.pipelines.filter((el) => el.id !== pipelineId);
+      const updatedPipelines = this.pipelines || [];
+      this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({pipelines: this.pipelines});
     }, failCallback);
   },
@@ -79,10 +90,10 @@ const PipelinesStore = Reflux.createStore({
     const pipeline = {
       title: pipelineSource.title,
       description: pipelineSource.description,
-      source: pipelineSource.source
+      source: pipelineSource.source,
     };
     return fetch('POST', url, pipeline).then(
-      (response) => {
+      () => {
         // call to clear the errors, the parsing was successful
         callback([]);
       },
@@ -94,7 +105,7 @@ const PipelinesStore = Reflux.createStore({
         }
       }
     );
-  }
+  },
 });
 
 export default PipelinesStore;
