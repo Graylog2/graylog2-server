@@ -6,6 +6,7 @@ import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import NodesStore from 'stores/nodes/NodesStore';
+import SessionStore from 'stores/sessions/SessionStore';
 
 import MetricsActions from 'actions/metrics/MetricsActions';
 import SessionActions from 'actions/sessions/SessionActions';
@@ -25,10 +26,6 @@ const MetricsStore = Reflux.createStore({
   updateNodes(update) {
     this.nodes = update.nodes;
   },
-  logout() {
-    this.registrations = {};
-    this.globalRegistrations = {};
-  },
   _allResults(promises) {
     const accumulator = [];
     let result = Promise.resolve(null);
@@ -40,6 +37,9 @@ const MetricsStore = Reflux.createStore({
     return result.then(() => accumulator);
   },
   list() {
+    if (!SessionStore.isLoggedIn()) {
+      return;
+    }
     const metricsToFetch = {};
     Object.keys(this.registrations)
       .filter((nodeId) => Object.keys(this.registrations[nodeId]).length > 0)
