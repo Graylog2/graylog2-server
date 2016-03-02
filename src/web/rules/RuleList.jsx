@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import DataTable from 'components/common/DataTable';
-import TimeStamp from 'components/common/TimeStamp';
+import Timestamp from 'components/common/Timestamp';
 
 import { Button } from 'react-bootstrap';
 
@@ -46,8 +46,8 @@ const RuleList = React.createClass({
       <tr key={rule.title}>
         <td>{rule.title}</td>
         <td className="limited">{rule.description}</td>
-        <td className="limited"><TimeStamp dateTime={rule.created_at} relative={true}/></td>
-        <td className="limited"><TimeStamp dateTime={rule.modified_at} relative={true}/></td>
+        <td className="limited"><Timestamp dateTime={rule.created_at} relative={true}/></td>
+        <td className="limited"><Timestamp dateTime={rule.modified_at} relative={true}/></td>
         <td style={{width: 150}}>{actions}</td>
       </tr>
     );
