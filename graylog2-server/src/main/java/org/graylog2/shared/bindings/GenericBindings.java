@@ -31,10 +31,10 @@ import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
+import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.bindings.providers.SystemOkHttpClientProvider;
 import org.graylog2.shared.buffers.InputBufferImpl;
@@ -76,7 +76,7 @@ public class GenericBindings extends AbstractModule {
         bind(InputRegistry.class).asEagerSingleton();
 
         bindEventBusListeners();
-        
+
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
         bind(OkHttpClient.class).annotatedWith(Names.named("systemHttpClient")).toProvider(SystemOkHttpClientProvider.class).asEagerSingleton();
     }

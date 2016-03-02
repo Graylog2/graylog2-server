@@ -17,6 +17,7 @@
 package org.graylog2.users;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -33,6 +34,8 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -71,7 +74,8 @@ public class UserServiceImplTest {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
         final UserImpl.Factory userFactory = new UserImplFactory(configuration);
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissionsResolver);
+        final Permissions permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissions, permissionsResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
