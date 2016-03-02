@@ -1,0 +1,142 @@
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Input, Button } from 'react-bootstrap';
+
+import { SelectableList, Spinner } from 'components/common';
+import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import ObjectUtils from 'util/ObjectUtils';
+import FormsUtils from 'util/FormsUtils';
+
+import RulesActions from 'rules/RulesActions';
+import RulesStore from 'rules/RulesStore';
+
+const StageForm = React.createClass({
+  propTypes: {
+    stage: PropTypes.object,
+    create: React.PropTypes.bool,
+    save: React.PropTypes.func.isRequired,
+    validateStage: React.PropTypes.func.isRequired,
+  },
+  mixins: [Reflux.connect(RulesStore)],
+
+  getDefaultProps() {
+    return {
+      stage: {
+        stage: 0,
+        match_all: false,
+        rules: [],
+      },
+    };
+  },
+
+  getInitialState() {
+    const stage = ObjectUtils.clone(this.props.stage);
+    return {
+      // when editing, take the stage that's been passed in
+      stage: {
+        stage: stage.stage,
+        match_all: stage.match_all,
+        rules: stage.rules,
+      },
+    };
+  },
+
+  componentDidMount() {
+    RulesActions.list();
+  },
+
+  openModal() {
+    this.refs.modal.open();
+  },
+
+  _onChange(event) {
+    const stage = ObjectUtils.clone(this.state.stage);
+    stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    this.setState({stage: stage});
+  },
+
+  _onRulesChange(newRules) {
+    const stage = ObjectUtils.clone(this.state.stage);
+    stage.rules = newRules;
+    this.setState({stage: stage});
+  },
+
+  _closeModal() {
+    this.refs.modal.close();
+  },
+
+  _saved() {
+    this._closeModal();
+    if (this.props.create) {
+      this.setState({stage: this.getInitialState()});
+    }
+  },
+
+  _save() {
+    this.props.save(this.state.stage, this._saved);
+  },
+
+  _getFormattedOptions(rules) {
+    return rules ? rules.map(rule => {
+      return {value: rule.title, label: rule.title};
+    }) : [];
+  },
+
+  render() {
+    let triggerButtonContent;
+    if (this.props.create) {
+      triggerButtonContent = 'Add new stage';
+    } else {
+      triggerButtonContent = <span>Edit</span>;
+    }
+
+    return (
+      <span>
+        <Button onClick={this.openModal}
+                bsStyle={this.props.create ? 'success' : 'info'}>
+          {triggerButtonContent}
+        </Button>
+        <BootstrapModalForm ref="modal"
+                            title={`${this.props.create ? 'Add new' : 'Edit'} stage ${this.state.stage.title}`}
+                            onSubmitForm={this._save}
+                            submitButtonText="Save">
+          <fieldset>
+            <Input type="number"
+                   id="stage"
+                   name="stage"
+                   label="Stage"
+                   autoFocus
+                   onChange={this._onChange}
+                   value={this.state.stage.stage}/>
+
+            <Input label="Continue processing on next stage when">
+              <Input type="radio"
+                     id="match_all"
+                     name="match_all"
+                     value="true"
+                     label="All rules on this stage match the message"
+                     onChange={this._onChange}
+                     checked={this.state.stage.match_all}/>
+
+              <Input type="radio"
+                     id="match_any"
+                     name="match_all"
+                     value="false"
+                     label="At least one of the rules on this stage matches the message"
+                     onChange={this._onChange}
+                     checked={!this.state.stage.match_all}/>
+
+              <Input label="Rules"
+                     help="Rules evaluated on this stage">
+                <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
+                                onChange={this._onRulesChange}/>
+              </Input>
+            </Input>
+          </fieldset>
+        </BootstrapModalForm>
+      </span>
+    );
+  },
+});
+
+export default StageForm;
