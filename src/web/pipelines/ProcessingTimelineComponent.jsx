@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Alert } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
 
@@ -24,7 +25,7 @@ const ProcessingTimelineComponent = React.createClass({
         // Concat stages in a single array removing duplicates
         return usedStages.concat(pipelineStages.map(stage => stage.stage).filter(stage => usedStages.indexOf(stage) === -1));
       }, [])
-      .sort();
+      .sort(naturalSort);
   },
 
   _headerCellFormatter(header) {

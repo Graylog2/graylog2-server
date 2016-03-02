@@ -18,6 +18,7 @@
   "dependencies": {
     "brace": "^0.7.0",
     "history": "^1.17.0",
+    "javascript-natural-sort": "^0.7.1",
     "react": "0.14.x",
     "react-ace": "^3.1.0",
     "react-bootstrap": "^0.28.1",
