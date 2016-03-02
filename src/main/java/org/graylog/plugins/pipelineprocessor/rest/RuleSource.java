@@ -42,6 +42,7 @@ public abstract class RuleSource {
     public abstract String id();
 
     @JsonProperty
+    @Nullable
     public abstract String title();
 
     @JsonProperty
