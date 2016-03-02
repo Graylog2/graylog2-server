@@ -62,6 +62,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final Configuration configuration;
     private final RoleService roleService;
     private final UserImpl.Factory userFactory;
+    private final RestPermissions permissions;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
@@ -69,11 +70,13 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final Configuration configuration,
                            final RoleService roleService,
                            final UserImpl.Factory userFactory,
+                           final RestPermissions permissions,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
         this.userFactory = userFactory;
+        this.permissions = permissions;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
 
         // ensure that the users' roles array is indexed
@@ -190,9 +193,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         }
 
         if (user.getPermissions() == null) {
-            user.setPermissions(Lists.newArrayList(RestPermissions.userSelfEditPermissions(username)));
+            user.setPermissions(Lists.newArrayList(permissions.userSelfEditPermissions(username)));
         } else {
-            user.setPermissions(Lists.newArrayList(Sets.union(RestPermissions.userSelfEditPermissions(username),
+            user.setPermissions(Lists.newArrayList(Sets.union(permissions.userSelfEditPermissions(username),
                                                               Sets.newHashSet(user.getPermissions()))));
         }
 

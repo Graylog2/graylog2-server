@@ -45,14 +45,17 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final RestPermissions permissions;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
     public UserPermissionMigrationPeriodical(final UserService userService,
                                              final RoleService roleService,
+                                             final RestPermissions permissions,
                                              final ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.roleService = roleService;
+        this.permissions = permissions;
         this.clusterConfigService = clusterConfigService;
     }
 
@@ -80,7 +83,7 @@ public class UserPermissionMigrationPeriodical extends Periodical {
                 fixedRoleIds.add(adminRoleId);
             }
 
-            final Set<String> basePermissions = RestPermissions.readerPermissions(user.getName());
+            final Set<String> basePermissions = permissions.readerPermissions(user.getName());
             final boolean hasCompleteReaderSet = permissionSet.containsAll(basePermissions);
 
             // only migrate the user if it looks like a pre-1.2 user:
@@ -105,7 +108,7 @@ public class UserPermissionMigrationPeriodical extends Periodical {
                                     }
                                 }));
             // add the minimal permission set back to the user
-            fixedPermissions.addAll(RestPermissions.userSelfEditPermissions(user.getName()));
+            fixedPermissions.addAll(permissions.userSelfEditPermissions(user.getName()));
             fixedPermissions.addAll(dashboardStreamPermissions);
 
             log.info("Migrating permissions to roles for user {} from permissions {} and roles {} to new permissions {} and roles {}",

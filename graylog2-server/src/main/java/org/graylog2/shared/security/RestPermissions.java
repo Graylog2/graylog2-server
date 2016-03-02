@@ -20,15 +20,20 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
+import org.graylog2.plugin.security.RestPermission;
+import org.graylog2.plugin.security.RestPermissionsPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -133,7 +138,7 @@ public class RestPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
 
     // Standard set of permissions of readers.
-    public static final Set<String> READER_BASE_PERMISSIONS = ImmutableSet.<String>builder().add(
+    private final Set<String> readerBasePermissions = ImmutableSet.<String>builder().add(
                     BUFFERS_READ,
                     FIELDNAMES_READ,
                     INDEXERCLUSTER_READ,
@@ -150,33 +155,23 @@ public class RestPermissions {
                     SAVEDSEARCHES_READ
     ).build();
 
-    private static final Map<String, Collection<String>> ALL_PERMISSIONS;
+    private final Map<String, Collection<String>> allPermissions;
 
-    static {
-        final Field[] declaredFields = RestPermissions.class.getDeclaredFields();
-        final ListMultimap<String, String> all = ArrayListMultimap.create();
-        for (Field declaredField : declaredFields) {
-            if (!Modifier.isStatic(declaredField.getModifiers())) {
-                continue;
-            }
-            if (!String.class.isAssignableFrom(declaredField.getType())) {
-                continue;
-            }
-            declaredField.setAccessible(true);
-            try {
-                final String permission = (String) declaredField.get(RestPermissions.class);
-                final Iterator<String> split = Splitter.on(':').limit(2).split(permission).iterator();
-                final String group = split.next();
-                final String action = split.next();
-                all.put(group, action);
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-        ALL_PERMISSIONS = all.asMap();
+    public RestPermissions() {
+        this(new HashSet<>());
     }
 
-    public static Set<String> readerPermissions(String username) {
-        final ImmutableSet.Builder<String> perms = ImmutableSet.<String>builder().addAll(READER_BASE_PERMISSIONS);
+    @Inject
+    public RestPermissions(final Set<RestPermissionsPlugin> pluginPermissions) {
+        this.allPermissions = buildAllPermissions(pluginPermissions);
+    }
+
+    public Set<String> readerBasePermissions() {
+        return readerBasePermissions;
+    }
+
+    public Set<String> readerPermissions(String username) {
+        final ImmutableSet.Builder<String> perms = ImmutableSet.<String>builder().addAll(readerBasePermissions);
         if (isNullOrEmpty(username)) {
             LOG.error("Username cannot be empty or null for creating reader permissions");
             throw new IllegalArgumentException("Username was null or empty when getting reader permissions.");
@@ -187,19 +182,76 @@ public class RestPermissions {
         return perms.build();
     }
 
-    public static Set<String> userSelfEditPermissions(String username) {
+    public Set<String> userSelfEditPermissions(String username) {
         ImmutableSet.Builder<String> perms = ImmutableSet.builder();
         perms.add(perInstance(USERS_EDIT, username));
         perms.add(perInstance(USERS_PASSWORDCHANGE, username));
         return perms.build();
     }
 
-    public static String perInstance(String permission, String instance) {
+    private String perInstance(String permission, String instance) {
         // TODO check for existing instance etc (use DomainPermission subclass)
         return permission + ":" + instance;
     }
 
-    public static Map<String, Collection<String>> allPermissions() {
-        return ALL_PERMISSIONS;
+    public Map<String, Collection<String>> allPermissions() {
+        return allPermissions;
+    }
+
+    private static Map<String, Collection<String>> buildAllPermissions(Set<RestPermissionsPlugin> pluginPermissions) {
+        final ListMultimap<String, String> all = ArrayListMultimap.create();
+
+        preparePermissions(all, getPermissionsForClass(RestPermissions.class));
+
+        for (RestPermissionsPlugin pluginPermission : pluginPermissions) {
+            final Set<String> permissions = pluginPermission.permissions().stream()
+                    .map(RestPermission::value)
+                    .collect(Collectors.toSet());
+
+            try {
+                preparePermissions(all, permissions);
+            } catch (IllegalArgumentException e) {
+                LOG.error("Error adding permissions for plugin: " + pluginPermission.getClass().getCanonicalName(), e);
+                throw e;
+            }
+        }
+
+        return all.asMap();
+    }
+
+    private static void preparePermissions(final ListMultimap<String, String> all, final Set<String> permissions) {
+        for (String permission : permissions) {
+            final Iterator<String> split = Splitter.on(':').limit(2).split(permission).iterator();
+            final String group = split.next();
+            final String action = split.next();
+
+            if (all.containsKey(group) && all.get(group).contains(action)) {
+                throw new IllegalArgumentException("Duplicate permission found. Permission \"" + permission + "\" already exists!");
+            }
+
+            all.put(group, action);
+        }
+    }
+
+    private static Set<String> getPermissionsForClass(Class<?> permissionsClass) {
+        final Field[] declaredFields = permissionsClass.getDeclaredFields();
+        final Set<String> permissions = new HashSet<>();
+
+        for (Field declaredField : declaredFields) {
+            if (!Modifier.isStatic(declaredField.getModifiers())) {
+                continue;
+            }
+            if (!String.class.isAssignableFrom(declaredField.getType())) {
+                continue;
+            }
+            declaredField.setAccessible(true);
+            try {
+                final String permission = (String) declaredField.get(permissionsClass);
+                permissions.add(permission);
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+
+        return permissions;
     }
 }

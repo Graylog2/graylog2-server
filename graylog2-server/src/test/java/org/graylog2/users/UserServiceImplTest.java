@@ -33,6 +33,7 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -71,7 +72,7 @@ public class UserServiceImplTest {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
         final UserImpl.Factory userFactory = new UserImplFactory(configuration);
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissionsResolver);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, new RestPermissions(), permissionsResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }

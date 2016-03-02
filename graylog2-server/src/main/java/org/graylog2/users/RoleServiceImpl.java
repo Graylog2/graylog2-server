@@ -67,6 +67,7 @@ public class RoleServiceImpl implements RoleService {
     @Inject
     protected RoleServiceImpl(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
+                              RestPermissions permissions,
                               Validator validator) {
         this.validator = validator;
 
@@ -81,7 +82,7 @@ public class RoleServiceImpl implements RoleService {
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
                                                            "Grants all permissions for Graylog administrators (built-in)"));
-        readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, RestPermissions.READER_BASE_PERMISSIONS, "Reader",
+        readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, permissions.readerBasePermissions(), "Reader",
                           "Grants basic permissions for every Graylog user (built-in)"));
 
     }
@@ -108,7 +109,7 @@ public class RoleServiceImpl implements RoleService {
             fixedAdmin.setName(name);
             fixedAdmin.setDescription(description);
             fixedAdmin.setPermissions(expectedPermissions);
-            
+
             try {
                 final RoleImpl savedRole = save(fixedAdmin);
                 return savedRole.getId();
