@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Alert } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { DataTable, Spinner } from 'components/common';
 
@@ -21,7 +22,7 @@ const ProcessingTimelineComponent = React.createClass({
       .map(pipeline => pipeline.stages)
       .reduce((usedStages, pipelineStages) => {
         // Concat stages in a single array removing duplicates
-        return usedStages.concat(pipelineStages.filter(stage => usedStages.indexOf(stage) === -1));
+        return usedStages.concat(pipelineStages.map(stage => stage.stage).filter(stage => usedStages.indexOf(stage) === -1));
       }, [])
       .sort();
   },
@@ -37,9 +38,10 @@ const ProcessingTimelineComponent = React.createClass({
 
   _formatStages(pipeline, stages) {
     const formattedStages = [];
+    const stageNumbers = stages.map(stage => stage.stage);
 
     this.usedStages.forEach(usedStage => {
-      if (stages.indexOf(usedStage) === -1) {
+      if (stageNumbers.indexOf(usedStage) === -1) {
         formattedStages.push(
           <div key={`${pipeline.id}-stage${usedStage}`} className="pipeline-stage idle-stage">Idle</div>
         );
@@ -56,7 +58,9 @@ const ProcessingTimelineComponent = React.createClass({
   _pipelineFormatter(pipeline) {
     return (
       <tr>
-        <td>{pipeline.title}</td>
+        <td>
+          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
+        </td>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
       </tr>
     );
