@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -65,8 +64,7 @@ public abstract class PipelineSource {
     public abstract DateTime modifiedAt();
 
     @JsonProperty
-    @Nullable
-    public abstract List<Integer> stages();
+    public abstract List<StageSource> stages();
 
     @JsonProperty
     @Nullable
@@ -80,7 +78,7 @@ public abstract class PipelineSource {
 
     @JsonCreator
     public static PipelineSource create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                        @JsonProperty("title")  String title,
+                                        @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("source") String source,
                                         @Nullable @JsonProperty("created_at") DateTime createdAt,
@@ -104,6 +102,15 @@ public abstract class PipelineSource {
         } catch (ParseException e) {
             errors = e.getErrors();
         }
+        final List<StageSource> stageSources = (pipeline == null) ? Collections.emptyList() :
+                pipeline.stages().stream()
+                        .map(stage -> StageSource.builder()
+                                .matchAll(stage.matchAll())
+                                .rules(stage.ruleReferences())
+                                .stage(stage.stage())
+                                .build())
+                        .collect(Collectors.toList());
+
         return builder()
                 .id(dao.id())
                 .title(dao.title())
@@ -111,7 +118,7 @@ public abstract class PipelineSource {
                 .source(dao.source())
                 .createdAt(dao.createdAt())
                 .modifiedAt(dao.modifiedAt())
-                .stages(pipeline == null ? null : pipeline.stages().stream().map(Stage::stage).collect(Collectors.toList()))
+                .stages(stageSources)
                 .errors(errors)
                 .build();
     }
@@ -132,7 +139,7 @@ public abstract class PipelineSource {
 
         public abstract Builder modifiedAt(DateTime modifiedAt);
 
-        public abstract Builder stages(List<Integer> stages);
+        public abstract Builder stages(List<StageSource> stages);
 
         public abstract Builder errors(Set<ParseError> errors);
     }
