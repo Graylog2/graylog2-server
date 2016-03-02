@@ -5,9 +5,13 @@ import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
 
 import SearchStore from 'stores/search/SearchStore';
+import SessionStore from 'stores/sessions/SessionStore';
 import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';
+
+import URLUtils from 'util/URLUtils';
+import jsRoutes from 'routing/jsRoutes';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
@@ -99,6 +103,22 @@ const SearchSidebar = React.createClass({
     event.preventDefault();
     this.refs.indicesModal.open();
   },
+  _getURLForExportAsCSV() {
+    const searchParams = SearchStore.getOriginalSearchURLParams();
+    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    const query = searchParams.get('q') === '' ? '*' : searchParams.get('q');
+    const fields = this.props.selectedFields;
+    const uriParser = document.createElement('a');
+    const timeRange = SearchStore.rangeType === 'relative' ? {range: SearchStore.rangeParams.get('relative')} : SearchStore.rangeParams.toJS();
+
+    uriParser.href = URLUtils.qualifyUrl(
+      jsRoutes.controllers.api.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
+    );
+    uriParser.username = SessionStore.getSessionId();
+    uriParser.password = 'session';
+
+    return uriParser.href;
+  },
   render() {
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
@@ -136,7 +156,7 @@ const SearchSidebar = React.createClass({
       });
     let searchTitle = null;
     const moreActions = [
-      <MenuItem key="export" href={SearchStore.getCsvExportURL()}>Export as CSV</MenuItem>,
+      <MenuItem key="export" href={this._getURLForExportAsCSV()}>Export as CSV</MenuItem>,
     ];
     if (this.props.searchInStream) {
       searchTitle = <span>{this.props.searchInStream.title}</span>;

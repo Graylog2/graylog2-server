@@ -51,6 +51,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 
@@ -130,16 +131,35 @@ public class KeywordSearchResource extends SearchResource {
         try {
             final ScrollResult scroll = searches
                     .scroll(query, timeRange, limit, offset, fieldList, filter);
-            final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
-
-            LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
-            Runnable scrollIterationAction = createScrollChunkProducer(scroll, output, limit);
-            // TODO use a shared executor for async responses here instead of a single thread that's not limited
-            new Thread(scrollIterationAction).start();
-            return output;
+            return buildChunkedOutput(scroll, limit);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
+    }
+
+    @GET
+    @Path("/export")
+    @Timed
+    @ApiOperation(value = "Export message search with keyword as timerange.",
+            notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
+    @Produces(AdditionalMediaType.TEXT_CSV)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid keyword provided.")
+    })
+    public Response exportSearchKeywordChunked(
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
+            @QueryParam("query") @NotEmpty String query,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = true) @QueryParam("fields") String fields) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+        final String filename = "graylog-search-result-keyword-" + keyword + ".csv";
+        return Response
+            .ok(searchKeywordChunked(query, keyword, limit, offset, filter, fields))
+            .header("Content-Disposition", "attachment; filename=" + filename)
+            .build();
     }
 
     @GET

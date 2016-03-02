@@ -196,6 +196,23 @@ const jsRoutes = {
 
           return {url: this._buildUrl(url, queryString)};
         },
+        export(type, query, timerange, streamId, limit, offset, fields) {
+          const url = `/search/universal/${type}/export`;
+          const queryString = this._buildBaseQueryString(query, timerange, streamId);
+
+          if (limit) {
+            queryString.limit = limit;
+          }
+          if (offset) {
+            queryString.offset = offset;
+          }
+
+          if (fields) {
+            queryString.fields = fields.join(',');
+          }
+
+          return {url: this._buildUrl(url, queryString)};
+        },
         histogram(type, query, resolution, timerange, streamId) {
           const url = `/search/universal/${type}/histogram`;
           const queryString = this._buildBaseQueryString(query, timerange, streamId);
