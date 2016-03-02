@@ -18,7 +18,7 @@ package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.security.RestPermission;
-import org.graylog2.plugin.security.RestPermissionsPlugin;
+import org.graylog2.plugin.security.PluginPermissions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class RestPermissionsTest {
 
     private RestPermissions permissions;
 
-    private static class PermissionsPlugin implements RestPermissionsPlugin {
+    private static class PermissionsPluginPermissions implements PluginPermissions {
         private final Set<RestPermission> permission;
 
-        public PermissionsPlugin(Set<RestPermission> permissions) {
+        public PermissionsPluginPermissions(Set<RestPermission> permissions) {
             this.permission = permissions;
         }
 
@@ -53,11 +53,11 @@ public class RestPermissionsTest {
     @Test
     public void testPluginPermissions() throws Exception {
         final ImmutableSet<RestPermission> pluginPermissions = ImmutableSet.of(
-                RestPermission.builder().value("foo:bar").description("bar").build(),
-                RestPermission.builder().value("foo:baz").description("baz").build(),
-                RestPermission.builder().value("hello:world").description("hello").build()
+                RestPermission.create("foo:bar", "bar"),
+                RestPermission.create("foo:baz", "baz"),
+                RestPermission.create("hello:world", "hello")
         );
-        final PermissionsPlugin plugin = new PermissionsPlugin(pluginPermissions);
+        final PermissionsPluginPermissions plugin = new PermissionsPluginPermissions(pluginPermissions);
         final RestPermissions permissions = new RestPermissions(ImmutableSet.of(plugin));
 
         assertThat(permissions.allPermissions().get("foo"))
@@ -69,9 +69,9 @@ public class RestPermissionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testPluginPermissionsWithDuplicatePermission() throws Exception {
         final ImmutableSet<RestPermission> pluginPermissions = ImmutableSet.of(
-                RestPermission.builder().value("users:edit").description("User edit").build()
+                RestPermission.create("users:edit", "User edit")
         );
-        final PermissionsPlugin plugin = new PermissionsPlugin(pluginPermissions);
+        final PermissionsPluginPermissions plugin = new PermissionsPluginPermissions(pluginPermissions);
 
         new RestPermissions(ImmutableSet.of(plugin));
     }

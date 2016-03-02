@@ -34,7 +34,7 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
-import org.graylog2.plugin.security.RestPermissionsPlugin;
+import org.graylog2.plugin.security.PluginPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -270,12 +270,12 @@ public abstract class Graylog2Module extends AbstractModule {
         widgetStrategyBinder.addBinding(key).to(Key.get(targetFactory));
     }
 
-    protected Multibinder<RestPermissionsPlugin> restPermissionsBinder() {
-        return Multibinder.newSetBinder(binder(), RestPermissionsPlugin.class);
+    protected Multibinder<PluginPermissions> permissionsBinder() {
+        return Multibinder.newSetBinder(binder(), PluginPermissions.class);
     }
 
-    protected void installRestPermissions(Multibinder<RestPermissionsPlugin> classMultibinder,
-                                          Class<? extends RestPermissionsPlugin> permissionsClass) {
+    protected void installPermissions(Multibinder<PluginPermissions> classMultibinder,
+                                      Class<? extends PluginPermissions> permissionsClass) {
         classMultibinder.addBinding().to(permissionsClass);
     }
 

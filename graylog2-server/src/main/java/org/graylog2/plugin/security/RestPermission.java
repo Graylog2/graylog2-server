@@ -20,37 +20,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotBlank;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class RestPermission {
-    @JsonProperty("value")
-    public abstract String value();
+    @JsonProperty("permission")
+    public abstract String permission();
 
     @JsonProperty("description")
     public abstract String description();
 
     @JsonCreator
-    public static RestPermission create(@JsonProperty("value") String value,
+    public static RestPermission create(@JsonProperty("permission") @NotBlank String permission,
                                         @JsonProperty("description") String description) {
-        return builder()
-                .value(value)
-                .description(description)
-                .build();
-    }
-
-    public static Builder builder() {
-        return new AutoValue_RestPermission.Builder();
-    }
-
-    public abstract Builder toBuilder();
-
-    @AutoValue.Builder
-    public static abstract class Builder {
-        public abstract Builder value(String value);
-
-        public abstract Builder description(String description);
-
-        public abstract RestPermission build();
+        return new AutoValue_RestPermission(permission, description);
     }
 }

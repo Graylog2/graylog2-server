@@ -21,7 +21,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import org.graylog2.plugin.security.RestPermission;
-import org.graylog2.plugin.security.RestPermissionsPlugin;
+import org.graylog2.plugin.security.PluginPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -158,11 +159,11 @@ public class RestPermissions {
     private final Map<String, Collection<String>> allPermissions;
 
     public RestPermissions() {
-        this(new HashSet<>());
+        this(Collections.emptySet());
     }
 
     @Inject
-    public RestPermissions(final Set<RestPermissionsPlugin> pluginPermissions) {
+    public RestPermissions(final Set<PluginPermissions> pluginPermissions) {
         this.allPermissions = buildAllPermissions(pluginPermissions);
     }
 
@@ -198,14 +199,14 @@ public class RestPermissions {
         return allPermissions;
     }
 
-    private static Map<String, Collection<String>> buildAllPermissions(Set<RestPermissionsPlugin> pluginPermissions) {
+    private static Map<String, Collection<String>> buildAllPermissions(Set<PluginPermissions> pluginPermissions) {
         final ListMultimap<String, String> all = ArrayListMultimap.create();
 
         preparePermissions(all, getPermissionsForClass(RestPermissions.class));
 
-        for (RestPermissionsPlugin pluginPermission : pluginPermissions) {
+        for (PluginPermissions pluginPermission : pluginPermissions) {
             final Set<String> permissions = pluginPermission.permissions().stream()
-                    .map(RestPermission::value)
+                    .map(RestPermission::permission)
                     .collect(Collectors.toSet());
 
             try {

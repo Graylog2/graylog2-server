@@ -34,7 +34,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
-import org.graylog2.plugin.security.RestPermissionsPlugin;
+import org.graylog2.plugin.security.PluginPermissions;
 
 import java.util.Collections;
 import java.util.Set;
@@ -145,7 +145,7 @@ public abstract class PluginModule extends Graylog2Module {
         installWidgetStrategy(widgetStrategyBinder(), widgetStrategyClass, factory);
     }
 
-    protected void addRestPermissions(Class<? extends RestPermissionsPlugin> permissionsClass) {
-        installRestPermissions(restPermissionsBinder(), permissionsClass);
+    protected void addPermissions(Class<? extends PluginPermissions> permissionsClass) {
+        installPermissions(permissionsBinder(), permissionsClass);
     }
 }

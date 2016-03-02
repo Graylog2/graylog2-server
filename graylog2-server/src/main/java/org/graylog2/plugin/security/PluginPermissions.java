@@ -18,6 +18,6 @@ package org.graylog2.plugin.security;
 
 import java.util.Set;
 
-public interface RestPermissionsPlugin {
+public interface PluginPermissions {
     Set<RestPermission> permissions();
 }
