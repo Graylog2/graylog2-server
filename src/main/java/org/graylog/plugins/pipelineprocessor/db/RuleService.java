@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -46,7 +47,7 @@ public class RuleService {
                 RuleDao.class,
                 String.class,
                 mapper.get());
-        dbCollection.createIndex(DBSort.asc("title"));
+        dbCollection.createIndex(DBSort.asc("title"), new BasicDBObject("unique", true));
     }
 
     public RuleDao save(RuleDao rule) {
