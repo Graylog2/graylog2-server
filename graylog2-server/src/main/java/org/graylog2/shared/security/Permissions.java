@@ -18,6 +18,7 @@ package org.graylog2.shared.security;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
 import org.graylog2.plugin.security.Permission;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -103,7 +105,7 @@ public class Permissions {
             }
         }
 
-        return permissionSet;
+        return ImmutableSet.copyOf(permissionSet);
     }
 
     private Map<String, Collection<String>> buildPermissionsMap(Set<String> permissions) {
@@ -117,6 +119,11 @@ public class Permissions {
             all.put(group, action);
         }
 
-        return all.asMap();
+        // Create an immutable copy of the map and the collections inside it.
+        return ImmutableMap.copyOf(all.asMap().entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> ImmutableSet.copyOf(e.getValue()))));
     }
 }

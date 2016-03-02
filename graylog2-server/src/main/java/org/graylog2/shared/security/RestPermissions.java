@@ -127,7 +127,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
 
-    private final ImmutableSet<Permission> permissions = ImmutableSet.<Permission>builder()
+    private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, ""))
             .add(create(USERS_LIST, ""))
@@ -222,8 +222,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(CLUSTER_CONFIG_ENTRY_DELETE, ""))
             .build();
 
-    // Standard set of permissions of readers.
-    private final Set<String> readerBasePermissionSelection = ImmutableSet.<String>builder().add(
+    // Standard set of PERMISSIONS of readers.
+    private static final Set<String> READER_BASE_PERMISSION_SELECTION = ImmutableSet.<String>builder().add(
             BUFFERS_READ,
             FIELDNAMES_READ,
             INDEXERCLUSTER_READ,
@@ -240,17 +240,17 @@ public class RestPermissions implements PluginPermissions {
             SAVEDSEARCHES_READ
     ).build();
 
-    private final Set<Permission> readerBasePermissions = permissions.stream()
-            .filter(readerBasePermissionSelection::contains)
+    private static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
+            .filter(READER_BASE_PERMISSION_SELECTION::contains)
             .collect(Collectors.toSet());
 
     @Override
     public Set<Permission> readerBasePermissions() {
-        return readerBasePermissions;
+        return READER_BASE_PERMISSIONS;
     }
 
     @Override
     public Set<Permission> permissions() {
-        return permissions;
+        return PERMISSIONS;
     }
 }
