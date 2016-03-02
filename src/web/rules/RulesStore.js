@@ -98,7 +98,14 @@ const RulesStore = Reflux.createStore({
         }
       }
     );
-  }
+  },
+  multiple(ruleNames, callback) {
+    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/multiple');
+    const promise = fetch('POST', url, {rules: ruleNames});
+    promise.then(callback);
+
+    return promise;
+  },
 });
 
 export default RulesStore;
