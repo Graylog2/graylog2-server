@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Api(value = "Pipelines/Pipelines", description = "Pipelines for the pipeline message processor")
-@Path("/system/pipelines")
+@Path("/system/pipelines/pipeline")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class PipelineResource extends RestResource implements PluginRestResource {
@@ -74,7 +74,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Create a processing pipeline from source", notes = "")
     @POST
-    @Path("/pipeline")
+    @Path("/")
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -97,7 +97,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Parse a processing pipeline without saving it", notes = "")
     @POST
-    @Path("/pipeline/parse")
+    @Path("/parse")
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -116,7 +116,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Get all processing pipelines")
     @GET
-    @Path("/pipeline")
+    @Path("/")
     public Collection<PipelineSource> getAll() {
         final Collection<PipelineDao> daos = pipelineService.loadAll();
         final ArrayList<PipelineSource> results = Lists.newArrayList();
@@ -128,7 +128,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
-    @Path("/pipeline/{id}")
+    @Path("/{id}")
     @GET
     public PipelineSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         final PipelineDao dao = pipelineService.load(id);
@@ -136,7 +136,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")
-    @Path("/pipeline/{id}")
+    @Path("/{id}")
     @PUT
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
@@ -160,7 +160,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")
-    @Path("/pipeline/{id}")
+    @Path("/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         pipelineService.load(id);

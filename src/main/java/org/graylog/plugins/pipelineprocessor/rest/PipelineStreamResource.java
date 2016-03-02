@@ -39,7 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
-@Api(value = "Pipeline/Streams", description = "Stream assignment of processing pipelines")
+@Api(value = "Pipelines/Streams", description = "Stream assignment of processing pipelines")
 @Path("/system/pipelines/streams")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
