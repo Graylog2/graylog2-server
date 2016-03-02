@@ -35,7 +35,7 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
@@ -62,7 +62,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final Configuration configuration;
     private final RoleService roleService;
     private final UserImpl.Factory userFactory;
-    private final RestPermissions permissions;
+    private final Permissions permissions;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
@@ -70,7 +70,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final Configuration configuration,
                            final RoleService roleService,
                            final UserImpl.Factory userFactory,
-                           final RestPermissions permissions,
+                           final Permissions permissions,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;

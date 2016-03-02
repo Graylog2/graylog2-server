@@ -16,33 +16,22 @@
  */
 package org.graylog2.shared.security;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
-import org.graylog2.plugin.security.RestPermission;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.plugin.security.Permission.create;
 
-public class RestPermissions {
+public class RestPermissions implements PluginPermissions {
     private static final Logger LOG = LoggerFactory.getLogger(RestPermissions.class);
 
     /**
-     *These should all be in the form of "group:action", because {@link #allPermissions()} below depends on it.
+     *These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
     public static final String USERS_CREATE = "users:create";
@@ -138,121 +127,130 @@ public class RestPermissions {
     public static final String CLUSTER_CONFIG_ENTRY_EDIT = "clusterconfigentry:edit";
     public static final String CLUSTER_CONFIG_ENTRY_DELETE = "clusterconfigentry:delete";
 
+    private final ImmutableSet<Permission> permissions = ImmutableSet.<Permission>builder()
+            .add(create(USERS_CREATE, ""))
+            .add(create(USERS_EDIT, ""))
+            .add(create(USERS_LIST, ""))
+            .add(create(USERS_PERMISSIONSEDIT, ""))
+            .add(create(USERS_PASSWORDCHANGE, ""))
+            .add(create(USERS_TOKENCREATE, ""))
+            .add(create(USERS_TOKENLIST, ""))
+            .add(create(USERS_TOKENREMOVE, ""))
+            .add(create(USERS_ROLESEDIT, ""))
+            .add(create(THROUGHPUT_READ, ""))
+            .add(create(MESSAGECOUNT_READ, ""))
+            .add(create(DASHBOARDS_CREATE, ""))
+            .add(create(DASHBOARDS_READ, ""))
+            .add(create(DASHBOARDS_EDIT, ""))
+            .add(create(MESSAGES_READ, ""))
+            .add(create(MESSAGES_ANALYZE, ""))
+            .add(create(SEARCHES_ABSOLUTE, ""))
+            .add(create(SEARCHES_KEYWORD, ""))
+            .add(create(SEARCHES_RELATIVE, ""))
+            .add(create(SAVEDSEARCHES_CREATE, ""))
+            .add(create(SAVEDSEARCHES_READ, ""))
+            .add(create(SAVEDSEARCHES_EDIT, ""))
+            .add(create(SOURCES_READ, ""))
+            .add(create(STREAMS_CREATE, ""))
+            .add(create(STREAMS_READ, ""))
+            .add(create(STREAMS_EDIT, ""))
+            .add(create(STREAMS_CHANGESTATE, ""))
+            .add(create(STREAM_OUTPUTS_CREATE, ""))
+            .add(create(STREAM_OUTPUTS_READ, ""))
+            .add(create(STREAM_OUTPUTS_DELETE, ""))
+            .add(create(INDEXERCLUSTER_READ, ""))
+            .add(create(INDICES_READ, ""))
+            .add(create(INDICES_CHANGESTATE, ""))
+            .add(create(INDICES_DELETE, ""))
+            .add(create(INDICES_FAILURES, ""))
+            .add(create(INPUTS_READ, ""))
+            .add(create(INPUTS_CREATE, ""))
+            .add(create(INPUTS_TERMINATE, ""))
+            .add(create(INPUTS_EDIT, ""))
+            .add(create(OUTPUTS_READ, ""))
+            .add(create(OUTPUTS_CREATE, ""))
+            .add(create(OUTPUTS_TERMINATE, ""))
+            .add(create(OUTPUTS_EDIT, ""))
+            .add(create(SYSTEMJOBS_READ, ""))
+            .add(create(SYSTEMJOBS_CREATE, ""))
+            .add(create(LDAP_EDIT, ""))
+            .add(create(LDAPGROUPS_READ, ""))
+            .add(create(LDAPGROUPS_EDIT, ""))
+            .add(create(LOGGERS_READ, ""))
+            .add(create(LOGGERS_EDIT, ""))
+            .add(create(LOGGERS_READSUBSYSTEM, ""))
+            .add(create(LOGGERS_EDITSUBSYSTEM, ""))
+            .add(create(BUFFERS_READ, ""))
+            .add(create(DEFLECTOR_READ, ""))
+            .add(create(DEFLECTOR_CYCLE, ""))
+            .add(create(INDEXRANGES_READ, ""))
+            .add(create(INDEXRANGES_REBUILD, ""))
+            .add(create(SYSTEMMESSAGES_READ, ""))
+            .add(create(METRICS_READALL, ""))
+            .add(create(METRICS_ALLKEYS, ""))
+            .add(create(METRICS_READ, ""))
+            .add(create(METRICS_READHISTORY, ""))
+            .add(create(NOTIFICATIONS_READ, ""))
+            .add(create(NOTIFICATIONS_DELETE, ""))
+            .add(create(SYSTEM_READ, ""))
+            .add(create(FIELDNAMES_READ, ""))
+            .add(create(PROCESSING_CHANGESTATE, ""))
+            .add(create(JVMSTATS_READ, ""))
+            .add(create(THREADS_DUMP, ""))
+            .add(create(NODE_SHUTDOWN, ""))
+            .add(create(LBSTATUS_CHANGE, ""))
+            .add(create(BLACKLISTENTRY_CREATE, ""))
+            .add(create(BLACKLISTENTRY_READ, ""))
+            .add(create(BLACKLISTENTRY_EDIT, ""))
+            .add(create(BLACKLISTENTRY_DELETE, ""))
+            .add(create(BUNDLE_CREATE, ""))
+            .add(create(BUNDLE_READ, ""))
+            .add(create(BUNDLE_UPDATE, ""))
+            .add(create(BUNDLE_DELETE, ""))
+            .add(create(BUNDLE_IMPORT, ""))
+            .add(create(BUNDLE_EXPORT, ""))
+            .add(create(JOURNAL_READ, ""))
+            .add(create(JOURNAL_EDIT, ""))
+            .add(create(COLLECTORS_READ, ""))
+            .add(create(ROLES_CREATE, ""))
+            .add(create(ROLES_READ, ""))
+            .add(create(ROLES_EDIT, ""))
+            .add(create(ROLES_DELETE, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_CREATE, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_READ, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_EDIT, ""))
+            .add(create(CLUSTER_CONFIG_ENTRY_DELETE, ""))
+            .build();
+
     // Standard set of permissions of readers.
-    private final Set<String> readerBasePermissions = ImmutableSet.<String>builder().add(
-                    BUFFERS_READ,
-                    FIELDNAMES_READ,
-                    INDEXERCLUSTER_READ,
-                    INPUTS_READ,
-                    JOURNAL_READ,
-                    JVMSTATS_READ,
-                    MESSAGECOUNT_READ,
-                    MESSAGES_READ,
-                    METRICS_READ,
-                    SYSTEM_READ,
-                    THROUGHPUT_READ,
-                    SAVEDSEARCHES_CREATE,
-                    SAVEDSEARCHES_EDIT,
-                    SAVEDSEARCHES_READ
+    private final Set<String> readerBasePermissionSelection = ImmutableSet.<String>builder().add(
+            BUFFERS_READ,
+            FIELDNAMES_READ,
+            INDEXERCLUSTER_READ,
+            INPUTS_READ,
+            JOURNAL_READ,
+            JVMSTATS_READ,
+            MESSAGECOUNT_READ,
+            MESSAGES_READ,
+            METRICS_READ,
+            SYSTEM_READ,
+            THROUGHPUT_READ,
+            SAVEDSEARCHES_CREATE,
+            SAVEDSEARCHES_EDIT,
+            SAVEDSEARCHES_READ
     ).build();
 
-    private final Map<String, Collection<String>> allPermissions;
+    private final Set<Permission> readerBasePermissions = permissions.stream()
+            .filter(readerBasePermissionSelection::contains)
+            .collect(Collectors.toSet());
 
-    public RestPermissions() {
-        this(Collections.emptySet());
-    }
-
-    @Inject
-    public RestPermissions(final Set<PluginPermissions> pluginPermissions) {
-        this.allPermissions = buildAllPermissions(pluginPermissions);
-    }
-
-    public Set<String> readerBasePermissions() {
+    @Override
+    public Set<Permission> readerBasePermissions() {
         return readerBasePermissions;
     }
 
-    public Set<String> readerPermissions(String username) {
-        final ImmutableSet.Builder<String> perms = ImmutableSet.<String>builder().addAll(readerBasePermissions);
-        if (isNullOrEmpty(username)) {
-            LOG.error("Username cannot be empty or null for creating reader permissions");
-            throw new IllegalArgumentException("Username was null or empty when getting reader permissions.");
-        }
-
-        perms.addAll(userSelfEditPermissions(username));
-
-        return perms.build();
-    }
-
-    public Set<String> userSelfEditPermissions(String username) {
-        ImmutableSet.Builder<String> perms = ImmutableSet.builder();
-        perms.add(perInstance(USERS_EDIT, username));
-        perms.add(perInstance(USERS_PASSWORDCHANGE, username));
-        return perms.build();
-    }
-
-    private String perInstance(String permission, String instance) {
-        // TODO check for existing instance etc (use DomainPermission subclass)
-        return permission + ":" + instance;
-    }
-
-    public Map<String, Collection<String>> allPermissions() {
-        return allPermissions;
-    }
-
-    private static Map<String, Collection<String>> buildAllPermissions(Set<PluginPermissions> pluginPermissions) {
-        final ListMultimap<String, String> all = ArrayListMultimap.create();
-
-        preparePermissions(all, getPermissionsForClass(RestPermissions.class));
-
-        for (PluginPermissions pluginPermission : pluginPermissions) {
-            final Set<String> permissions = pluginPermission.permissions().stream()
-                    .map(RestPermission::permission)
-                    .collect(Collectors.toSet());
-
-            try {
-                preparePermissions(all, permissions);
-            } catch (IllegalArgumentException e) {
-                LOG.error("Error adding permissions for plugin: " + pluginPermission.getClass().getCanonicalName(), e);
-                throw e;
-            }
-        }
-
-        return all.asMap();
-    }
-
-    private static void preparePermissions(final ListMultimap<String, String> all, final Set<String> permissions) {
-        for (String permission : permissions) {
-            final Iterator<String> split = Splitter.on(':').limit(2).split(permission).iterator();
-            final String group = split.next();
-            final String action = split.next();
-
-            if (all.containsKey(group) && all.get(group).contains(action)) {
-                throw new IllegalArgumentException("Duplicate permission found. Permission \"" + permission + "\" already exists!");
-            }
-
-            all.put(group, action);
-        }
-    }
-
-    private static Set<String> getPermissionsForClass(Class<?> permissionsClass) {
-        final Field[] declaredFields = permissionsClass.getDeclaredFields();
-        final Set<String> permissions = new HashSet<>();
-
-        for (Field declaredField : declaredFields) {
-            if (!Modifier.isStatic(declaredField.getModifiers())) {
-                continue;
-            }
-            if (!String.class.isAssignableFrom(declaredField.getType())) {
-                continue;
-            }
-            declaredField.setAccessible(true);
-            try {
-                final String permission = (String) declaredField.get(permissionsClass);
-                permissions.add(permission);
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-
+    @Override
+    public Set<Permission> permissions() {
         return permissions;
     }
 }

@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.security;
+package org.graylog2.shared.security;
 
-import java.util.Set;
+import org.graylog2.plugin.PluginModule;
 
-public interface PluginPermissions {
-    Set<Permission> permissions();
+public class SecurityBindings extends PluginModule {
+    @Override
+    protected void configure() {
+        bind(Permissions.class).asEagerSingleton();
 
-    Set<Permission> readerBasePermissions();
+        addPermissions(RestPermissions.class);
+    }
 }

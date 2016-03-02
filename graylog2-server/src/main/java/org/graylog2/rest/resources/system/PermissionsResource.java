@@ -26,7 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.Permissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -43,10 +43,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("/system/permissions")
 @Produces(APPLICATION_JSON)
 public class PermissionsResource extends RestResource {
-    private final RestPermissions permissions;
+    private final Permissions permissions;
 
     @Inject
-    public PermissionsResource(final RestPermissions permissions) {
+    public PermissionsResource(final Permissions permissions) {
         this.permissions = permissions;
     }
 
@@ -55,7 +55,7 @@ public class PermissionsResource extends RestResource {
     @RequiresGuest // turns off authentication for this action
     @ApiOperation(value = "Get all available user permissions.")
     public Map<String, Map<String, Collection<String>>> permissions() {
-        return ImmutableMap.of("permissions", permissions.allPermissions());
+        return ImmutableMap.of("permissions", permissions.allPermissionsMap());
     }
 
     @GET

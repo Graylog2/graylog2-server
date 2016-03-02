@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class RestPermission {
+public abstract class Permission {
     @JsonProperty("permission")
     public abstract String permission();
 
@@ -32,8 +32,8 @@ public abstract class RestPermission {
     public abstract String description();
 
     @JsonCreator
-    public static RestPermission create(@JsonProperty("permission") @NotBlank String permission,
-                                        @JsonProperty("description") String description) {
-        return new AutoValue_RestPermission(permission, description);
+    public static Permission create(@JsonProperty("permission") @NotBlank String permission,
+                                    @JsonProperty("description") String description) {
+        return new AutoValue_Permission(permission, description);
     }
 }

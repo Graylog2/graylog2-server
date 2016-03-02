@@ -26,7 +26,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.mongojack.DBCursor;
@@ -67,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
     @Inject
     protected RoleServiceImpl(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              RestPermissions permissions,
+                              Permissions permissions,
                               Validator validator) {
         this.validator = validator;
 

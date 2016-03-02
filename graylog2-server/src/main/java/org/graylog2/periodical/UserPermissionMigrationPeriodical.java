@@ -24,7 +24,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
@@ -45,13 +45,13 @@ public class UserPermissionMigrationPeriodical extends Periodical {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final RestPermissions permissions;
+    private final Permissions permissions;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
     public UserPermissionMigrationPeriodical(final UserService userService,
                                              final RoleService roleService,
-                                             final RestPermissions permissions,
+                                             final Permissions permissions,
                                              final ClusterConfigService clusterConfigService) {
         this.userService = userService;
         this.roleService = roleService;
