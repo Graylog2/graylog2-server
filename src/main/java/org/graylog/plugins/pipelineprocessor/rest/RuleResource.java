@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
@@ -75,13 +76,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @POST
     @Path("/rule")
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
+        final Rule rule;
         try {
-            pipelineRuleParser.parseRule(ruleSource.source());
+            rule = pipelineRuleParser.parseRule(ruleSource.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final RuleDao newRuleSource = RuleDao.builder()
-                .title(ruleSource.title())
+                .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
                 .source(ruleSource.source())
                 .createdAt(DateTime.now())
@@ -98,13 +100,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @POST
     @Path("/rule/parse")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
+        final Rule rule;
         try {
-            pipelineRuleParser.parseRule(ruleSource.source());
+            rule = pipelineRuleParser.parseRule(ruleSource.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         return RuleSource.builder()
-                .title(ruleSource.title())
+                .title(rule.name())
                 .description(ruleSource.description())
                 .source(ruleSource.source())
                 .createdAt(DateTime.now())
@@ -135,13 +138,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         final RuleDao ruleDao = ruleService.load(id);
+        final Rule rule;
         try {
-            pipelineRuleParser.parseRule(update.source());
+            rule = pipelineRuleParser.parseRule(update.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final RuleDao toSave = ruleDao.toBuilder()
-                .title(update.title())
+                .title(rule.name())
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now())

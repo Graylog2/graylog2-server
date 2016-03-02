@@ -72,18 +72,18 @@ public class PipelineResource extends RestResource implements PluginRestResource
         this.clusterBus = clusterBus;
     }
 
-
     @ApiOperation(value = "Create a processing pipeline from source", notes = "")
     @POST
     @Path("/pipeline")
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
+        final Pipeline pipeline;
         try {
-            final Pipeline pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
+            pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final PipelineDao pipelineDao = PipelineDao.builder()
-                .title(pipelineSource.title())
+                .title(pipeline.name())
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
                 .createdAt(DateTime.now())
@@ -99,13 +99,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @POST
     @Path("/pipeline/parse")
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
+        final Pipeline pipeline;
         try {
-            pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
+            pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         return PipelineSource.builder()
-                .title(pipelineSource.title())
+                .title(pipeline.name())
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
                 .createdAt(DateTime.now())
@@ -140,13 +141,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         final PipelineDao dao = pipelineService.load(id);
+        final Pipeline pipeline;
         try {
-            pipelineRuleParser.parsePipeline(update.id(), update.source());
+            pipeline = pipelineRuleParser.parsePipeline(update.id(), update.source());
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
         final PipelineDao toSave = dao.toBuilder()
-                .title(update.title())
+                .title(pipeline.name())
                 .description(update.description())
                 .source(update.source())
                 .modifiedAt(DateTime.now())
