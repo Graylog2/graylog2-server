@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
@@ -29,6 +30,9 @@ import java.util.Collection;
 @AutoValue
 @JsonAutoDetect
 public abstract class StreamResponse {
+    @JsonProperty("id")
+    public abstract String id();
+
     @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
 
@@ -51,6 +55,9 @@ public abstract class StreamResponse {
     @JsonProperty("rules")
     public abstract Collection<StreamRule> rules();
 
+    @JsonProperty("alert_conditions")
+    public abstract Collection<AlertCondition> alertConditions();
+
     @JsonProperty("title")
     public abstract String title();
 
@@ -59,15 +66,18 @@ public abstract class StreamResponse {
     public abstract String contentPack();
 
     @JsonCreator
-    public static StreamResponse create(@JsonProperty("creator_user_id") String creatorUserId,
+    public static StreamResponse create(@JsonProperty("id") String id,
+                                        @JsonProperty("creator_user_id") String creatorUserId,
                                         @JsonProperty("outputs") Collection<OutputSummary> outputs,
                                         @JsonProperty("matching_type") String matchingType,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("created_at") String createdAt,
                                         @JsonProperty("disabled") boolean disabled,
                                         @JsonProperty("rules") Collection<StreamRule> rules,
+                                        @JsonProperty("alert_conditions") Collection<AlertCondition> alertConditions,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack) {
-        return new AutoValue_StreamResponse(creatorUserId, outputs, matchingType, description, createdAt, disabled, rules, title, contentPack);
+        return new AutoValue_StreamResponse(id, creatorUserId, outputs, matchingType, description, createdAt, disabled,
+            rules, alertConditions, title, contentPack);
     }
 }

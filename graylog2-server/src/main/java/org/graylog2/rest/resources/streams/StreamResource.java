@@ -429,6 +429,7 @@ public class StreamResource extends RestResource {
 
     private StreamResponse streamToResponse(Stream stream) {
         return StreamResponse.create(
+            stream.getId(),
             (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
             outputsToSummaries(stream.getOutputs()),
             stream.getMatchingType().name(),
@@ -436,6 +437,7 @@ public class StreamResource extends RestResource {
             stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
             stream.getDisabled(),
             stream.getStreamRules(),
+            stream.getAlertConditions(),
             stream.getTitle(),
             stream.getContentPack()
         );
