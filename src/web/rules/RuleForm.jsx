@@ -139,15 +139,6 @@ const RuleForm = React.createClass({
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
-            <Input type="text"
-                   id={this._getId('title')}
-                   label="Title"
-                   onChange={this._onTitleChange}
-                   value={this.state.rule.title}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help={this.state.error ? this.state.error_message : null}
-                   autoFocus
-                   required/>
             <Input type="textarea"
                    id={this._getId('description')}
                    label="Description (optional)"
