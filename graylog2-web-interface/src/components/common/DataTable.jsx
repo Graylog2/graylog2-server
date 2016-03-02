@@ -60,9 +60,12 @@ const DataTable = React.createClass({
   },
   getFormattedDataRows() {
     let i = 0;
-    const sortedDataRows = this.state.filteredRows.sort((a, b) => {
-      return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
-    });
+    let sortedDataRows = this.state.filteredRows;
+    if (this.props.sortByKey) {
+      sortedDataRows = sortedDataRows.sort((a, b) => {
+        return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+      });
+    }
     const formattedDataRows = sortedDataRows.map((row) => {
       i++;
       return <DataTableElement key={'row-' + i} element={row} formatter={this.props.dataRowFormatter}/>;
