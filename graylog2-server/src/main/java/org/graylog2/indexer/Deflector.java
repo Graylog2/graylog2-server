@@ -182,7 +182,7 @@ public class Deflector { // extends Ablenkblech
 
         final List<Integer> indexNumbers = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
-            if (!isGraylog2Index(indexName)) {
+            if (!isGraylogIndex(indexName)) {
                 continue;
             }
 
@@ -204,7 +204,7 @@ public class Deflector { // extends Ablenkblech
         final Map<String, IndexStats> indices = this.indices.getAll();
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
-            if (isGraylog2Index(indexName)) {
+            if (isGraylogIndex(indexName)) {
                 result.add(indexName);
             }
         }
@@ -217,7 +217,7 @@ public class Deflector { // extends Ablenkblech
         for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
             final String name = e.getKey();
 
-            if (isGraylog2Index(name)) {
+            if (isGraylogIndex(name)) {
                 result.put(name, e.getValue());
             }
         }
@@ -282,7 +282,7 @@ public class Deflector { // extends Ablenkblech
         return getName().equals(indexName);
     }
 
-    public boolean isGraylog2Index(final String indexName) {
+    public boolean isGraylogIndex(final String indexName) {
         return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
     }
 }
