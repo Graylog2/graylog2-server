@@ -16,7 +16,12 @@ const PipelinesStore = Reflux.createStore({
     if (!this.pipelines) {
       this.pipelines = [pipeline];
     } else {
-      this.pipelines = this.pipelines.map((p) => p.id === pipeline.id ? pipeline : p);
+      const doesPipelineExist = this.pipelines.some(p => p.id === pipeline.id);
+      if (doesPipelineExist) {
+        this.pipelines = this.pipelines.map((p) => p.id === pipeline.id ? pipeline : p);
+      } else {
+        this.pipelines.push(pipeline);
+      }
     }
     this.trigger({pipelines: this.pipelines});
   },
@@ -56,7 +61,12 @@ const PipelinesStore = Reflux.createStore({
       description: pipelineSource.description,
       source: pipelineSource.source,
     };
-    return fetch('POST', url, pipeline).then(this._updatePipelinesState, failCallback);
+    return fetch('POST', url, pipeline).then(
+      response => {
+        this._updatePipelinesState(response);
+        UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
+      },
+      failCallback);
   },
 
   update(pipelineSource) {
@@ -71,18 +81,24 @@ const PipelinesStore = Reflux.createStore({
       description: pipelineSource.description,
       source: pipelineSource.source,
     };
-    return fetch('PUT', url, pipeline).then(this._updatePipelinesState, failCallback);
+    return fetch('PUT', url, pipeline).then(
+      response => {
+        this._updatePipelinesState(response);
+        UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
+      },
+      failCallback);
   },
   delete(pipelineId) {
     const failCallback = (error) => {
-      UserNotification.error('Updating pipeline failed with status: ' + error.message,
-        'Could not update processing pipeline');
+      UserNotification.error('Deleting pipeline failed with status: ' + error.message,
+        `Could not delete processing pipeline "${pipelineId}"`);
     };
     const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/pipeline/' + pipelineId);
     return fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
       this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({pipelines: this.pipelines});
+      UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
     }, failCallback);
   },
   parse(pipelineSource, callback) {

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Input, Button } from 'react-bootstrap';
 
-import { SelectableList, Spinner } from 'components/common';
+import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';

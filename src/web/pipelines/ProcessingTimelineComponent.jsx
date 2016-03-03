@@ -1,13 +1,17 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Alert } from 'react-bootstrap';
+import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
+import PipelineForm from './PipelineForm';
 
 import PipelinesActions from 'PipelinesActions';
 import PipelinesStore from 'PipelinesStore';
+
+import ObjectUtils from 'util/ObjectUtils';
+import SourceGenerator from 'logic/SourceGenerator';
 
 import {} from './ProcessingTimelineComponent.css';
 
@@ -30,8 +34,15 @@ const ProcessingTimelineComponent = React.createClass({
 
   _headerCellFormatter(header) {
     const style = {};
-    if (header === 'Pipeline') {
-      style.width = 300;
+    switch (header) {
+      case 'Pipeline':
+        style.width = 300;
+        break;
+      case 'Actions':
+        style.width = 120;
+        break;
+      default:
+        // Nothing to see here
     }
 
     return <th style={style}>{header}</th>;
@@ -58,13 +69,37 @@ const ProcessingTimelineComponent = React.createClass({
 
   _pipelineFormatter(pipeline) {
     return (
-      <tr>
+      <tr key={pipeline.id}>
         <td>
           <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
         </td>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
+        <td>
+          <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
+          &nbsp;
+          <PipelineForm pipeline={pipeline} save={this._savePipeline}/>
+        </td>
       </tr>
     );
+  },
+
+  _savePipeline(pipeline, callback) {
+    const requestPipeline = ObjectUtils.clone(pipeline);
+    requestPipeline.source = SourceGenerator.generatePipeline(pipeline);
+    if (requestPipeline.id) {
+      PipelinesActions.update(requestPipeline);
+    } else {
+      PipelinesActions.save(requestPipeline);
+    }
+    callback();
+  },
+
+  _deletePipeline(pipeline) {
+    return () => {
+      if (confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
+        PipelinesActions.delete(pipeline.id);
+      }
+    };
   },
 
   render() {
@@ -82,17 +117,20 @@ const ProcessingTimelineComponent = React.createClass({
 
     this.usedStages = this._calculateUsedStages(this.state.pipelines);
 
-    const headers = ['Pipeline', 'ProcessingTimeline'];
+    const headers = ['Pipeline', 'ProcessingTimeline', 'Actions'];
     return (
-      <DataTable id="processing-timeline"
-                 className="table-hover"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey={'title'}
-                 rows={this.state.pipelines}
-                 dataRowFormatter={this._pipelineFormatter}
-                 filterLabel=""
-                 filterKeys={[]}/>
+      <div>
+        <div className="pull-right"><PipelineForm create save={this._savePipeline}/></div>
+        <DataTable id="processing-timeline"
+                   className="table-hover"
+                   headers={headers}
+                   headerCellFormatter={this._headerCellFormatter}
+                   sortByKey={'title'}
+                   rows={this.state.pipelines}
+                   dataRowFormatter={this._pipelineFormatter}
+                   filterLabel="Filter pipelines"
+                   filterKeys={['title']}/>
+      </div>
     );
   },
 });
