@@ -261,11 +261,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.stephenc.high-scale-lib</groupId>
-            <artifactId>high-scale-lib</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
         </dependency>

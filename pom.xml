@@ -436,11 +436,6 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.10</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.stephenc.high-scale-lib</groupId>
-                <artifactId>high-scale-lib</artifactId>
-                <version>1.1.4</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.apache.directory.api</groupId>
