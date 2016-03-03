@@ -7,8 +7,8 @@ import naturalSort from 'javascript-natural-sort';
 import { DataTable, Spinner } from 'components/common';
 import PipelineForm from './PipelineForm';
 
-import PipelinesActions from 'PipelinesActions';
-import PipelinesStore from 'PipelinesStore';
+import PipelinesActions from 'pipelines/PipelinesActions';
+import PipelinesStore from 'pipelines/PipelinesStore';
 
 import ObjectUtils from 'util/ObjectUtils';
 import SourceGenerator from 'logic/SourceGenerator';

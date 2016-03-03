@@ -9,19 +9,18 @@ import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 import Spinner from 'components/common/Spinner';
 
-import PipelineStreamComponent from 'PipelineStreamComponent';
+import PipelinesActions from 'pipelines/PipelinesActions';
+import PipelinesStore from 'pipelines/PipelinesStore';
 
-import PipelinesActions from 'PipelinesActions';
-import PipelinesStore from 'PipelinesStore';
-import PipelinesComponent from 'PipelinesComponent';
+const PipelinesInputsPage = React.createClass({
+  contextTypes: {
+    storeProvider: PropTypes.object,
+  },
 
-const PipelinesPage = React.createClass({
   mixins: [
     Reflux.connect(PipelinesStore),
   ],
-  contextTypes: {
-    storeProvider: React.PropTypes.object,
-  },
+
   getInitialState() {
     return {
       pipelines: undefined,
@@ -33,7 +32,7 @@ const PipelinesPage = React.createClass({
   componentDidMount() {
     PipelinesActions.list();
 
-    var store = this.context.storeProvider.getStore('Streams');
+    const store = this.context.storeProvider.getStore('Streams');
     store.listStreams().then((streams) => this.setState({streams: streams}));
   },
 
@@ -42,9 +41,7 @@ const PipelinesPage = React.createClass({
     if (!this.state.pipelines || !this.state.streams) {
       content = <Spinner />;
     } else {
-      content = [
-
-      ];
+      content = [];
     }
     return (
       <span>
@@ -64,9 +61,14 @@ const PipelinesPage = React.createClass({
             </LinkContainer>
           </span>
         </PageHeader>
-        {content}
+
+        <Row className="content">
+          <Col md={12}>
+            {content}
+          </Col>
+        </Row>
       </span>);
   },
 });
 
-export default PipelinesPage;
+export default PipelinesInputsPage;

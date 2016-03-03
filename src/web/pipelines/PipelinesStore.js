@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 
-import PipelinesActions from 'PipelinesActions';
+import PipelinesActions from 'pipelines/PipelinesActions';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';

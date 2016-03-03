@@ -8,8 +8,8 @@ import Pipeline from './Pipeline';
 
 import SourceGenerator from 'logic/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
-import PipelinesActions from 'PipelinesActions';
-import PipelinesStore from 'PipelinesStore';
+import PipelinesActions from 'pipelines/PipelinesActions';
+import PipelinesStore from 'pipelines/PipelinesStore';
 import RulesStore from 'rules/RulesStore';
 
 function filterPipeline(state) {
