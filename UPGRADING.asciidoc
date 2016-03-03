@@ -93,3 +93,43 @@ For better consistency, these prefixes have been changed after the project has b
 | Environment variables | `GRAYLOG2_` | `GRAYLOG_` | `GRAYLOG_IS_MASTER`
 | System properties     | `graylog2.` | `graylog.` | `graylog.is_master`
 |===
+
+### REST API Changes
+
+The output ID key for the list of outputs in the `/streams/*` endpoints has been changed from `_id` to `id`.
+
+----
+{
+  "id": "564f47c41ec8fe7d920ef561",
+  "creator_user_id": "admin",
+  "outputs": [
+    {
+      "id": "56d6f2cce45e0e52d1e4b9cb",        <=== Changed from "_id" to "id"
+      "title": "GELF Output",
+      "type": "org.graylog2.outputs.GelfOutput",
+      "creator_user_id": "admin",
+      "created_at": "2016-03-02T14:03:56.686Z",
+      "configuration": {
+        "hostname": "127.0.0.1",
+        "protocol": "TCP",
+        "connect_timeout": 1000,
+        "reconnect_delay": 500,
+        "port": 12202,
+        "tcp_no_delay": false,
+        "tcp_keep_alive": false,
+        "tls_trust_cert_chain": "",
+        "tls_verification_enabled": false
+      },
+      "content_pack": null
+    }
+  ],
+  "matching_type": "AND",
+  "description": "All incoming messages",
+  "created_at": "2015-11-20T16:18:12.416Z",
+  "disabled": false,
+  "rules": [],
+  "alert_conditions": [],
+  "title": "ALL",
+  "content_pack": null
+}
+---
