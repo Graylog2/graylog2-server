@@ -22,15 +22,14 @@ const Stage = React.createClass({
   _ruleRowFormatter(rule) {
     return (
       <tr>
-        <td>{rule.title}</td>
+        <td style={{width: 400}}>{rule.title}</td>
         <td>{rule.description}</td>
-        <td></td>
       </tr>
     );
   },
 
   _formatRules(rules) {
-    const headers = ['Title', 'Description', 'Actions'];
+    const headers = ['Title', 'Description'];
 
     return (
       <DataTable id="processing-timeline"
@@ -69,11 +68,9 @@ const Stage = React.createClass({
     let content;
     // We check if we have the rules details before trying to render them
     if (this.state.rules) {
-      content = (
-        <Col md={12}>{this._formatRules(this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]))}</Col>
-      );
+      content = this._formatRules(this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]));
     } else {
-      content = <Col md={12}><Spinner/></Col>;
+      content = <Spinner/>;
     }
 
     return (
@@ -81,7 +78,7 @@ const Stage = React.createClass({
                       titleSuffix={suffix}
                       actions={actions}
                       description={description}
-                      contentRow={content}/>
+                      contentRow={<Col md={12}>{content}</Col>}/>
     );
   },
 });
