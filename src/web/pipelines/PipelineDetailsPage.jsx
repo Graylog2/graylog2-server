@@ -34,7 +34,9 @@ const PipelineDetailsPage = React.createClass({
     const pipelineSource = SourceGenerator.generatePipeline(newPipeline);
     newPipeline.source = pipelineSource;
     PipelinesActions.update(newPipeline);
-    callback();
+    if (typeof callback === 'function') {
+      callback();
+    }
   },
 
   render() {

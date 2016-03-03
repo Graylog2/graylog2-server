@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
-import { Col } from 'react-bootstrap';
+import { Col, Button } from 'react-bootstrap';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
 import RulesStore from 'rules/RulesStore';
@@ -10,7 +10,8 @@ const Stage = React.createClass({
   propTypes: {
     stage: PropTypes.object.isRequired,
     isLastStage: PropTypes.bool,
-    onSave: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
   },
   mixins: [Reflux.connect(RulesStore)],
 
@@ -49,7 +50,8 @@ const Stage = React.createClass({
     const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules` )}`;
 
     const actions = [
-      <StageForm key="edit-stage" stage={stage} save={this.props.onSave}/>,
+      <StageForm key="edit-stage" stage={stage} save={this.props.onUpdate}/>,
+      <Button key="delete-stage" bsStyle="danger" onClick={this.props.onDelete}>Delete</Button>,
     ];
 
     let description;

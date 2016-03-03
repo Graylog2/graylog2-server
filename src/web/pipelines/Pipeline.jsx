@@ -25,8 +25,20 @@ const Pipeline = React.createClass({
     };
   },
 
+  _deleteStage(stage) {
+    return () => {
+      if (confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
+        const newStages = this.props.pipeline.stages.filter(s => s.stage !== stage.stage);
+        this.props.onStagesChange(newStages);
+      }
+    };
+  },
+
   _formatStage(stage, maxStage) {
-    return <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage} onSave={this._updateStage(stage)}/>;
+    return (
+      <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage}
+             onUpdate={this._updateStage(stage)} onDelete={this._deleteStage(stage)}/>
+    );
   },
 
   render() {
