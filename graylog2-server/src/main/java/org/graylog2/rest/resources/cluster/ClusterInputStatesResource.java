@@ -24,7 +24,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -35,9 +34,6 @@ import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -49,19 +45,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "Cluster/InputState", description = "Cluster-wide input states")
 @Path("/cluster/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterInputStatesResource extends ProxiedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterInputStatesResource.class);
-
     @Inject
     public ClusterInputStatesResource(NodeService nodeService,
                                       RemoteInterfaceProvider remoteInterfaceProvider,
@@ -85,26 +77,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
             @ApiResponse(code = 404, message = "No such input."),
     })
     public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
-        final Map<String, Node> nodes = nodeService.allActive();
-        return nodes.entrySet()
-                .stream()
-                .parallel()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
-                            this.authenticationToken,
-                            RemoteInputStatesResource.class);
-                    try {
-                        final Response<InputCreated> response = remoteInputStatesResource.start(inputId).execute();
-                        if (response.isSuccess()) {
-                            return Optional.of(response.body());
-                        } else {
-                            LOG.warn("Unable to start input on node {}: {}", entry.getKey(), response.message());
-                        }
-                    } catch (IOException e) {
-                        LOG.warn("Unable to start input on node {}:",entry.getKey(), e);
-                    }
-                    return Optional.empty();
-                }));
+        return getForAllNodes(remoteResource -> remoteResource.start(inputId), createRemoteInterfaceProvider(RemoteInputStatesResource.class));
     }
 
     @DELETE
@@ -115,25 +88,6 @@ public class ClusterInputStatesResource extends ProxiedResource {
             @ApiResponse(code = 404, message = "No such input."),
     })
     public Map<String, Optional<InputDeleted>> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
-        final Map<String, Node> nodes = nodeService.allActive();
-        return nodes.entrySet()
-                .stream()
-                .parallel()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final RemoteInputStatesResource remoteInputStatesResource = remoteInterfaceProvider.get(entry.getValue(),
-                            this.authenticationToken,
-                            RemoteInputStatesResource.class);
-                    try {
-                        final Response<InputDeleted> response = remoteInputStatesResource.stop(inputId).execute();
-                        if (response.isSuccess()) {
-                            return Optional.of(response.body());
-                        } else {
-                            LOG.warn("Unable to stop input on node {}: {}", entry.getKey(), response.message());
-                        }
-                    } catch (IOException e) {
-                        LOG.warn("Unable to stop input on node {}:", entry.getKey(), e);
-                    }
-                    return Optional.empty();
-                }));
+        return getForAllNodes(remoteResource -> remoteResource.stop(inputId), createRemoteInterfaceProvider(RemoteInputStatesResource.class));
     }
 }
