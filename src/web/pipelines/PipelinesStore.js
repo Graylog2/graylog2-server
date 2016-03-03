@@ -12,6 +12,10 @@ const PipelinesStore = Reflux.createStore({
   listenables: [PipelinesActions],
   pipelines: undefined,
 
+  getInitialState() {
+    return {pipelines: this.pipelines};
+  },
+
   _updatePipelinesState(pipeline) {
     if (!this.pipelines) {
       this.pipelines = [pipeline];

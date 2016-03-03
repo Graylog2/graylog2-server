@@ -1,52 +1,64 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
-
 import { Button, Row, Col } from 'react-bootstrap';
-
 import { LinkContainer } from 'react-router-bootstrap';
 
-import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
-import Spinner from 'components/common/Spinner';
+import { PageHeader, Spinner } from 'components/common';
+import PipelineConnections from './PipelineConnections';
 
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
+import PipelineConnectionsActions from 'pipeline-connections/PipelineConnectionsActions';
+import PipelineConnectionsStore from 'pipeline-connections/PipelineConnectionsStore';
 
-const PipelinesInputsPage = React.createClass({
+const PipelineConnectionsPage = React.createClass({
   contextTypes: {
     storeProvider: PropTypes.object,
   },
 
-  mixins: [
-    Reflux.connect(PipelinesStore),
-  ],
+  mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
 
   getInitialState() {
     return {
-      pipelines: undefined,
       streams: undefined,
-      assignments: [],
-    }
+    };
   },
 
   componentDidMount() {
     PipelinesActions.list();
+    PipelineConnectionsActions.list();
 
     const store = this.context.storeProvider.getStore('Streams');
     store.listStreams().then((streams) => this.setState({streams: streams}));
   },
 
+  _updateConnections(connections, callback) {
+    PipelineConnectionsActions.update(connections);
+    callback();
+  },
+
+  _isLoading() {
+    return !this.state.pipelines || !this.state.streams || !this.state.connections;
+  },
+
   render() {
     let content;
-    if (!this.state.pipelines || !this.state.streams) {
+    if (this._isLoading()) {
       content = <Spinner />;
     } else {
-      content = [];
+      content = (
+        <PipelineConnections pipelines={this.state.pipelines} streams={this.state.streams}
+                             connections={this.state.connections} onConnectionsChange={this._updateConnections}/>
+      );
     }
     return (
       <span>
-        <PageHeader title="Processing pipelines" titleSize={9} buttonSize={3}>
-          <span>Pipelines define how Graylog processes data by grouping rules into stages. Pipelines can apply to all incoming messages or only to messages on a certain stream.</span>
+        <PageHeader title="Pipeline inputs" titleSize={9} buttonSize={3}>
+          <span>
+            Pipelines let you process messages sent to Graylog. Here you can select which streams will be used{' '}
+            as input for the different pipelines you configure.
+          </span>
           <span>
             Read more about Graylog pipelines in the <DocumentationLink page={"TODO"} text="documentation"/>.
           </span>
@@ -71,4 +83,4 @@ const PipelinesInputsPage = React.createClass({
   },
 });
 
-export default PipelinesInputsPage;
+export default PipelineConnectionsPage;
