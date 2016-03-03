@@ -7,6 +7,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader, Spinner } from 'components/common';
 import PipelineConnections from './PipelineConnections';
 
+import Routes from 'routing/Routes';
+
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
 import PipelineConnectionsActions from 'pipeline-connections/PipelineConnectionsActions';
@@ -54,7 +56,7 @@ const PipelineConnectionsPage = React.createClass({
     }
     return (
       <span>
-        <PageHeader title="Pipeline inputs" titleSize={9} buttonSize={3}>
+        <PageHeader title="Pipeline connections" titleSize={8} buttonSize={4}>
           <span>
             Pipelines let you process messages sent to Graylog. Here you can select which streams will be used{' '}
             as input for the different pipelines you configure.
@@ -64,10 +66,14 @@ const PipelineConnectionsPage = React.createClass({
           </span>
 
           <span>
+            <LinkContainer to={Routes.STREAMS}>
+              <Button bsStyle="info">Manage streams</Button>
+            </LinkContainer>
+            &nbsp;
             <LinkContainer to={'/system/pipelines/overview'}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
-            {' '}
+            &nbsp;
             <LinkContainer to={'/system/pipelines/rules'}>
               <Button bsStyle="info">Manage rules</Button>
             </LinkContainer>
