@@ -23,14 +23,14 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamConnection;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
@@ -75,12 +75,12 @@ public class PipelineInterpreterTest {
                                    null)
         ));
 
-        final PipelineStreamAssignmentService pipelineStreamAssignmentService = mock(PipelineStreamAssignmentService.class);
-        final PipelineStreamAssignment pipelineStreamAssignment = PipelineStreamAssignment.create(null,
+        final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(PipelineStreamConnectionsService.class);
+        final PipelineStreamConnection pipelineStreamConnection = PipelineStreamConnection.create(null,
                                                                                                   "default",
                                                                                                   newHashSet("cde"));
-        when(pipelineStreamAssignmentService.loadAll()).thenReturn(
-                newHashSet(pipelineStreamAssignment)
+        when(pipelineStreamConnectionsService.loadAll()).thenReturn(
+                newHashSet(pipelineStreamConnection)
         );
 
         final Map<String, Function<?>> functions = Maps.newHashMap();
@@ -92,7 +92,7 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 ruleService,
                 pipelineService,
-                pipelineStreamAssignmentService,
+                pipelineStreamConnectionsService,
                 parser,
                 mock(Journal.class),
                 mock(MetricRegistry.class),

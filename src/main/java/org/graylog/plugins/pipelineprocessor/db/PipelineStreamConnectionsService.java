@@ -17,8 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamAssignment;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamConnection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -34,50 +35,50 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Set;
 
-public class PipelineStreamAssignmentService {
-    private static final Logger log = LoggerFactory.getLogger(PipelineStreamAssignmentService.class);
+public class PipelineStreamConnectionsService {
+    private static final Logger log = LoggerFactory.getLogger(PipelineStreamConnectionsService.class);
 
     public static final String COLLECTION = "pipeline_processor_pipelines_streams";
 
-    private final JacksonDBCollection<PipelineStreamAssignment, String> dbCollection;
+    private final JacksonDBCollection<PipelineStreamConnection, String> dbCollection;
 
     @Inject
-    public PipelineStreamAssignmentService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
+    public PipelineStreamConnectionsService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION),
-                PipelineStreamAssignment.class,
+                PipelineStreamConnection.class,
                 String.class,
                 mapper.get());
-        dbCollection.createIndex(DBSort.asc("stream_id"));
+        dbCollection.createIndex(DBSort.asc("stream_id"), new BasicDBObject("unique", true));
     }
 
 
-    public PipelineStreamAssignment save(PipelineStreamAssignment assignment) {
-        PipelineStreamAssignment existingAssignment = dbCollection.findOne(DBQuery.is("stream_id", assignment.streamId()));
-        if (existingAssignment == null) {
-            existingAssignment = PipelineStreamAssignment.create(null, assignment.streamId(), Collections.emptySet());
+    public PipelineStreamConnection save(PipelineStreamConnection connections) {
+        PipelineStreamConnection existingConnections = dbCollection.findOne(DBQuery.is("stream_id", connections.streamId()));
+        if (existingConnections == null) {
+            existingConnections = PipelineStreamConnection.create(null, connections.streamId(), Collections.emptySet());
         }
 
-        final PipelineStreamAssignment toSave = existingAssignment.toBuilder()
-                .pipelineIds(assignment.pipelineIds()).build();
-        final WriteResult<PipelineStreamAssignment, String> save = dbCollection.save(toSave);
+        final PipelineStreamConnection toSave = existingConnections.toBuilder()
+                .pipelineIds(connections.pipelineIds()).build();
+        final WriteResult<PipelineStreamConnection, String> save = dbCollection.save(toSave);
         return save.getSavedObject();
     }
 
-    public PipelineStreamAssignment load(String streamId) throws NotFoundException {
-        final PipelineStreamAssignment oneById = dbCollection.findOne(DBQuery.is("stream_id", streamId));
+    public PipelineStreamConnection load(String streamId) throws NotFoundException {
+        final PipelineStreamConnection oneById = dbCollection.findOne(DBQuery.is("stream_id", streamId));
         if (oneById == null) {
-            throw new NotFoundException("No pipeline assignments with for stream " + streamId);
+            throw new NotFoundException("No pipeline connections with for stream " + streamId);
         }
         return oneById;
     }
 
-    public Set<PipelineStreamAssignment> loadAll() {
+    public Set<PipelineStreamConnection> loadAll() {
         try {
-            final DBCursor<PipelineStreamAssignment> assignments = dbCollection.find();
-            return Sets.newHashSet(assignments.iterator());
+            final DBCursor<PipelineStreamConnection> connections = dbCollection.find();
+            return Sets.newHashSet(connections.iterator());
         } catch (MongoException e) {
-            log.error("Unable to load pipelines", e);
+            log.error("Unable to load pipeline connections", e);
             return Collections.emptySet();
         }
     }

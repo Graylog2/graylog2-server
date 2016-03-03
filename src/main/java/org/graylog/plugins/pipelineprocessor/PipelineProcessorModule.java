@@ -19,7 +19,7 @@ package org.graylog.plugins.pipelineprocessor;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamResource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -40,7 +40,7 @@ public class PipelineProcessorModule extends PluginModule {
         addMessageProcessor(PipelineInterpreter.class);
         addRestResource(RuleResource.class);
         addRestResource(PipelineResource.class);
-        addRestResource(PipelineStreamResource.class);
+        addRestResource(PipelineConnectionsResource.class);
 
         install(new ProcessorFunctionsModule());
     }

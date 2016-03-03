@@ -21,7 +21,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamAssignmentService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -39,56 +39,56 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
-@Api(value = "Pipelines/Streams", description = "Stream assignment of processing pipelines")
-@Path("/system/pipelines/streams")
+@Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines")
+@Path("/system/pipelines/connections")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class PipelineStreamResource extends RestResource implements PluginRestResource {
+public class PipelineConnectionsResource extends RestResource implements PluginRestResource {
 
-    private final PipelineStreamAssignmentService assignmentService;
+    private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
     private final StreamService streamService;
     private final EventBus clusterBus;
 
     @Inject
-    public PipelineStreamResource(PipelineStreamAssignmentService assignmentService,
-                                  PipelineService pipelineService,
-                                  StreamService streamService,
-                                  @ClusterEventBus EventBus clusterBus) {
-        this.assignmentService = assignmentService;
+    public PipelineConnectionsResource(PipelineStreamConnectionsService connectionsService,
+                                       PipelineService pipelineService,
+                                       StreamService streamService,
+                                       @ClusterEventBus EventBus clusterBus) {
+        this.connectionsService = connectionsService;
         this.pipelineService = pipelineService;
         this.streamService = streamService;
         this.clusterBus = clusterBus;
     }
 
-    @ApiOperation(value = "Attach a processing pipeline to a stream", notes = "")
+    @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
     @POST
-    public PipelineStreamAssignment assignPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineStreamAssignment assignment) throws NotFoundException {
-        final String streamId = assignment.streamId();
+    public PipelineStreamConnection connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineStreamConnection connection) throws NotFoundException {
+        final String streamId = connection.streamId();
         // the default stream doesn't exist as an entity
         if (!streamId.equalsIgnoreCase("default")) {
             streamService.load(streamId);
         }
         // verify the pipelines exist
-        for (String s : assignment.pipelineIds()) {
+        for (String s : connection.pipelineIds()) {
             pipelineService.load(s);
         }
-        final PipelineStreamAssignment save = assignmentService.save(assignment);
+        final PipelineStreamConnection save = connectionsService.save(connection);
         clusterBus.post(save);
         return save;
     }
 
-    @ApiOperation("Get pipeline attachments for the given stream")
+    @ApiOperation("Get pipeline connections for the given stream")
     @GET
     @Path("/{streamId}")
-    public PipelineStreamAssignment getPipelinesForStream(@ApiParam(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
-        return assignmentService.load(streamId);
+    public PipelineStreamConnection getPipelinesForStream(@ApiParam(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
+        return connectionsService.load(streamId);
     }
 
-    @ApiOperation("Get all pipeline attachments")
+    @ApiOperation("Get all pipeline connections")
     @GET
-    public Set<PipelineStreamAssignment> getAllAttachments() throws NotFoundException {
-        return assignmentService.loadAll();
+    public Set<PipelineStreamConnection> getAll() throws NotFoundException {
+        return connectionsService.loadAll();
     }
 
 }
