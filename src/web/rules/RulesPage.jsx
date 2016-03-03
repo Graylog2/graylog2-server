@@ -24,12 +24,6 @@ const RulesPage = React.createClass({
     RulesActions.list();
   },
 
-  getInitialState() {
-    return {
-      rules: [],
-    };
-  },
-
   render() {
     return (
       <span>
