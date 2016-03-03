@@ -42,7 +42,6 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.InputStateListener;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import java.util.concurrent.Semaphore;
@@ -54,7 +53,6 @@ public class GenericBindings extends AbstractModule {
         // This is holding all our metrics.
         bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class).asEagerSingleton();
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE); // must not be a singleton!
-        bind(ThroughputStats.class).toInstance(new ThroughputStats());
 
         install(new FactoryModuleBuilder().build(DecodingProcessor.Factory.class));
 
