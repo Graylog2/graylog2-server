@@ -53,6 +53,8 @@ const Connection = React.createClass({
 
     return (
       <EntityListItem title={`Stream "${this.props.stream.title}"`}
+                      titleSuffix={`Connected to ${this.props.pipelines.length === 1 ? '1 pipeline' : `${this.props.pipelines.length} pipelines`}`}
+                      description={this.props.stream.description}
                       actions={actions}
                       contentRow={content}/>
     );
