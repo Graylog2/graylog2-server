@@ -19,6 +19,7 @@ const PipelineConnections = React.createClass({
 
   render() {
     // TODO: Sort this list by stream title
+    // TODO: Filter this list using the data filter
     const formattedConnections = this.props.connections.map(c => {
       return (
         <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
@@ -29,6 +30,7 @@ const PipelineConnections = React.createClass({
 
     const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id));
 
+    // TODO: Add default stream
     return (
       <div>
         <Row className="row-sm">

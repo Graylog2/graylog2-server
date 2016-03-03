@@ -49,8 +49,8 @@ const Stage = React.createClass({
     const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules` )}`;
 
     const actions = [
+      <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete} style={{marginRight: 5}}>Delete</Button>,
       <StageForm key="edit-stage" stage={stage} save={this.props.onUpdate}/>,
-      <Button key="delete-stage" bsStyle="danger" onClick={this.props.onDelete}>Delete</Button>,
     ];
 
     let description;
