@@ -21,6 +21,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -34,6 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class ProxiedResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ProxiedResource.class);
+
     protected final String authenticationToken;
     protected final NodeService nodeService;
 
@@ -59,18 +63,21 @@ public abstract class ProxiedResource extends RestResource {
             .entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                final Optional<T> remoteInterface = interfaceProvider.apply(entry.getKey());
+                if (!remoteInterface.isPresent()) {
+                    return Optional.empty();
+                }
+                final Call<L> call = fn.apply(remoteInterface.get());
                 try {
-                    final Optional<T> remoteInterface = interfaceProvider.apply(entry.getKey());
-                    if (!remoteInterface.isPresent()) {
-                        return Optional.empty();
-                    }
-                    final Response<L> response = fn.apply(remoteInterface.get()).execute();
+                    final Response<L> response = call.execute();
                     if (response.isSuccess()) {
                         return Optional.of(transformer.apply(response.body()));
                     } else {
+                        LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, result: " + response.message());
                         return Optional.empty();
                     }
                 } catch (IOException e) {
+                    LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, caught exception:", e);
                     return Optional.empty();
                 }
             }));
@@ -82,6 +89,7 @@ public abstract class ProxiedResource extends RestResource {
                 final Node targetNode = nodeService.byNodeId(nodeId);
                 return Optional.of(this.remoteInterfaceProvider.get(targetNode, this.authenticationToken, interfaceClass));
             } catch (NodeNotFoundException e) {
+                LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.")
                 return Optional.empty();
             }
         };
