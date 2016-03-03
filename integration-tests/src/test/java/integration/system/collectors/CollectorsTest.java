@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RequiresVersion(">=1.1.0")
+@Ignore("Collector code moved into a plugin. We have to figure out how to run these tests.")
 public class CollectorsTest extends BaseRestTest {
     private final String resourcePrefix = "/system/collectors";
 

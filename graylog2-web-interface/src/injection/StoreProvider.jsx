@@ -7,7 +7,6 @@ class StoreProvider {
       AlertConditions: () => require('stores/alertconditions/AlertConditionsStore'),
       Alerts: () => require('stores/alerts/AlertsStore'),
       ClusterOverview: () => require('stores/cluster/ClusterOverviewStore'),
-      Collectors: () => require('stores/collectors/CollectorsStore'),
       ConfigurationBundles: () => require('stores/configuration-bundles/ConfigurationBundlesStore'),
       CurrentUser: () => require('stores/users/CurrentUserStore'),
       Dashboards: () => require('stores/dashboards/DashboardsStore'),

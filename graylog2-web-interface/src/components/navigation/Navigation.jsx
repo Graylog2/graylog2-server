@@ -70,9 +70,6 @@ const Navigation = React.createClass({
     if (this._isActive('/system/grokpatterns')) {
       return prefix + ' / Grok Patterns';
     }
-    if (this._isActive('/system/collectors')) {
-      return prefix + ' / Collectors';
-    }
     if (this._isActive('/system/configurations')) {
       return prefix + ' / Configurations';
     }
@@ -171,11 +168,6 @@ const Navigation = React.createClass({
               {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
                   <MenuItem>Outputs</MenuItem>
-                </LinkContainer>
-              }
-              {this.isPermitted(this.props.permissions, ['COLLECTORS_READ']) &&
-                <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
-                  <MenuItem>Collectors</MenuItem>
                 </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['INDICES_READ']) &&

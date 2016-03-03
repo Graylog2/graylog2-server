@@ -6,7 +6,6 @@ const Routes = {
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
   SYSTEM: {
-    COLLECTORS: '/system/collectors',
     CONFIGURATIONS: '/system/configurations',
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
