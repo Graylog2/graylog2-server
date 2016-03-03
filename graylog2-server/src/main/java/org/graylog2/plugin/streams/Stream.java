@@ -17,8 +17,10 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.Persisted;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +49,8 @@ public interface Stream extends Persisted {
     Boolean getDisabled();
 
     String getContentPack();
+
+    Collection<AlertCondition> getAlertConditions();
 
     void setTitle(String title);
 
