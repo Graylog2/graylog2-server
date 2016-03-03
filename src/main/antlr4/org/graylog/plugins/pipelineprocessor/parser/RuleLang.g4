@@ -56,7 +56,7 @@ pipelineDeclaration
 
 stageDeclaration
     :   Stage stage=Integer Match modifier=(All|Either)
-        ruleRef+
+        ruleRef*
     ;
 
 ruleRef
