@@ -12,6 +12,10 @@ const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
   rules: undefined,
 
+  getInitialState() {
+    return {rules: this.rules};
+  },
+
   list() {
     const failCallback = (error) => {
       UserNotification.error('Fetching rules failed with status: ' + error.message,
@@ -38,7 +42,7 @@ const RulesStore = Reflux.createStore({
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
-      source: ruleSource.source
+      source: ruleSource.source,
     };
     return fetch('POST', url, rule).then((response) => {
       if (this.rules === undefined) {
@@ -60,7 +64,7 @@ const RulesStore = Reflux.createStore({
       id: ruleSource.id,
       title: ruleSource.title,
       description: ruleSource.description,
-      source: ruleSource.source
+      source: ruleSource.source,
     };
     return fetch('PUT', url, rule).then((response) => {
       this.rules = this.rules.map((e) => e.id === response.id ? response : e);
@@ -83,7 +87,7 @@ const RulesStore = Reflux.createStore({
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
-      source: ruleSource.source
+      source: ruleSource.source,
     };
     return fetch('POST', url, rule).then(
       (response) => {

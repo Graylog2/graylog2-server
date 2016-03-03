@@ -1,28 +1,18 @@
 import React, {PropTypes} from 'react';
+import Reflux from 'reflux';
 import { Col } from 'react-bootstrap';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
-import RulesActions from 'rules/RulesActions';
+import RulesStore from 'rules/RulesStore';
+import StageForm from './StageForm';
 
 const Stage = React.createClass({
   propTypes: {
     stage: PropTypes.object.isRequired,
     isLastStage: PropTypes.bool,
+    onSave: PropTypes.func.isRequired,
   },
-
-  getInitialState() {
-    return {
-      rules: undefined,
-    };
-  },
-
-
-  componentDidMount() {
-    RulesActions.multiple(this.props.stage.rules, (rules) => {
-      const newRules = this.props.stage.rules.map(ruleName => rules.filter(rule => rule.title === ruleName)[0]);
-      this.setState({rules: newRules});
-    });
-  },
+  mixins: [Reflux.connect(RulesStore)],
 
   _ruleHeaderFormatter(header) {
     return <th>{header}</th>;
@@ -58,6 +48,10 @@ const Stage = React.createClass({
 
     const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules` )}`;
 
+    const actions = [
+      <StageForm key="edit-stage" stage={stage} save={this.props.onSave}/>,
+    ];
+
     let description;
     if (this.props.isLastStage) {
       description = 'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
@@ -71,9 +65,10 @@ const Stage = React.createClass({
     }
 
     let content;
+    // We check if we have the rules details before trying to render them
     if (this.state.rules) {
       content = (
-        <Col md={12}>{this._formatRules(this.state.rules)}</Col>
+        <Col md={12}>{this._formatRules(this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]))}</Col>
       );
     } else {
       content = <Col md={12}><Spinner/></Col>;
@@ -82,6 +77,7 @@ const Stage = React.createClass({
     return (
       <EntityListItem title={`Stage ${stage.stage}`}
                       titleSuffix={suffix}
+                      actions={actions}
                       description={description}
                       contentRow={content}/>
     );

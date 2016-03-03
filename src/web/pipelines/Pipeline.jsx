@@ -17,8 +17,16 @@ const Pipeline = React.createClass({
     this.props.onStagesChange(newStages, callback);
   },
 
+  _updateStage(prevStage) {
+    return (stage, callback) => {
+      const newStages = this.props.pipeline.stages.filter(s => s.stage !== prevStage.stage);
+      newStages.push(stage);
+      this.props.onStagesChange(newStages, callback);
+    };
+  },
+
   _formatStage(stage, maxStage) {
-    return <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage}/>;
+    return <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage} onSave={this._updateStage(stage)}/>;
   },
 
   render() {

@@ -7,7 +7,6 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
-import RulesActions from 'rules/RulesActions';
 import RulesStore from 'rules/RulesStore';
 
 const StageForm = React.createClass({
@@ -41,10 +40,6 @@ const StageForm = React.createClass({
     };
   },
 
-  componentDidMount() {
-    RulesActions.list();
-  },
-
   openModal() {
     this.refs.modal.open();
   },
@@ -68,7 +63,7 @@ const StageForm = React.createClass({
   _saved() {
     this._closeModal();
     if (this.props.create) {
-      this.setState({stage: this.getInitialState()});
+      this.setState(this.getInitialState());
     }
   },
 
@@ -107,6 +102,7 @@ const StageForm = React.createClass({
                    label="Stage"
                    autoFocus
                    onChange={this._onChange}
+                   help="Stage priority. The lower the number, the earlier it will execute."
                    value={this.state.stage.stage}/>
 
             <Input label="Continue processing on next stage when">
@@ -126,10 +122,10 @@ const StageForm = React.createClass({
                      onChange={this._onChange}
                      checked={!this.state.stage.match_all}/>
 
-              <Input label="Rules"
-                     help="Rules evaluated on this stage">
+              <Input label="Stage rules"
+                     help="Select the rules evaluated on this stage">
                 <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
-                                onChange={this._onRulesChange}/>
+                                onChange={this._onRulesChange} selectedOptions={this.state.stage.rules}/>
               </Input>
             </Input>
           </fieldset>

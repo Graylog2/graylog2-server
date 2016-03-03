@@ -10,6 +10,7 @@ import SourceGenerator from 'logic/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import PipelinesActions from 'PipelinesActions';
 import PipelinesStore from 'PipelinesStore';
+import RulesStore from 'rules/RulesStore';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;
@@ -24,6 +25,7 @@ const PipelineDetailsPage = React.createClass({
 
   componentDidMount() {
     PipelinesActions.get(this.props.params.pipelineId);
+    RulesStore.list();
   },
 
   _onStagesChange(newStages, callback) {
@@ -64,7 +66,7 @@ const PipelineDetailsPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <Pipeline pipeline={this.state.pipeline} onStagesChange={this._onStagesChange}/>
+            <Pipeline pipeline={this.state.pipeline} rules={this.state.rules} onStagesChange={this._onStagesChange}/>
           </Col>
         </Row>
       </div>
