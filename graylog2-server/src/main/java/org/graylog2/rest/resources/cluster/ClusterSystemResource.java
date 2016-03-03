@@ -18,7 +18,6 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -49,7 +48,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 
@@ -60,42 +59,18 @@ import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 public class ClusterSystemResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemResource.class);
 
-    private final NodeService nodeService;
-    private final RemoteInterfaceProvider remoteInterfaceProvider;
-
     @Inject
     public ClusterSystemResource(NodeService nodeService,
                                  RemoteInterfaceProvider remoteInterfaceProvider,
                                  @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders);
-        this.nodeService = nodeService;
-        this.remoteInterfaceProvider = remoteInterfaceProvider;
+        super(httpHeaders, nodeService, remoteInterfaceProvider);
     }
 
     @GET
     @Timed
     @ApiOperation(value = "Get system overview of all Graylog nodes")
     public Map<String, Optional<SystemOverviewResponse>> get() {
-        final Map<String, Node> nodes = nodeService.allActive();
-        return nodes.entrySet()
-                .stream()
-                .parallel()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(entry.getValue(),
-                            this.authenticationToken,
-                            RemoteSystemResource.class);
-                    try {
-                        final Response<SystemOverviewResponse> response = remoteSystemResource.system().execute();
-                        if (response.isSuccess()) {
-                            return Optional.of(response.body());
-                        } else {
-                            LOG.warn("Unable to fetch system overview from node {}: {}", entry.getKey(), response.message());
-                        }
-                    } catch (IOException e) {
-                        LOG.warn("Unable to fetch system overview from node {}:", entry.getKey(), e);
-                    }
-                    return Optional.absent();
-                }));
+        return getForAllNodes(RemoteSystemResource::system, createRemoteInterfaceProvider(RemoteSystemResource.class));
     }
 
     @GET
