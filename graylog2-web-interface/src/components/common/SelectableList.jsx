@@ -1,13 +1,33 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 import { Select } from 'components/common';
 
 const SelectableList = React.createClass({
   propTypes: {
-    options: React.PropTypes.any,
-    selectedOptions: React.PropTypes.array,
-    onChange: React.PropTypes.func,
+    options: PropTypes.any,
+    selectedOptions: PropTypes.arrayOf([
+      PropTypes.string,
+      PropTypes.object,
+    ]),
+    displayKey: PropTypes.string,
+    idKey: PropTypes.string,
+    onChange: PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      displayKey: 'label',
+      idKey: 'value',
+    };
+  },
+  
+  _getOptionId(option) {
+    return (typeof option === 'string' ? option : option[this.props.idKey]);
+  },
+
+  _getOptionDisplayValue(option) {
+    return (typeof option === 'string' ? option : option[this.props.displayKey]);
   },
 
   _onAddOption(option) {
@@ -16,7 +36,7 @@ const SelectableList = React.createClass({
     }
 
     const newSelectedOptions = this.props.selectedOptions.slice();
-    newSelectedOptions.push(option);
+    newSelectedOptions.push(this.props.options.filter(o => this._getOptionId(o) === option)[0]);
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(newSelectedOptions);
     }
@@ -34,11 +54,11 @@ const SelectableList = React.createClass({
   render() {
     const formattedOptions = this.props.selectedOptions.map((option, idx) => {
       return (
-        <ListGroupItem key={`${option}-${idx}`}>
+        <ListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
           <div className="pull-right">
             <Button bsStyle="primary" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>Remove</Button>
           </div>
-          {option}
+          {this._getOptionDisplayValue(option)}
         </ListGroupItem>
       );
     });
