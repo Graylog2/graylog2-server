@@ -29,10 +29,6 @@ const RulesStore = Reflux.createStore({
     }, failCallback);
   },
 
-  get(ruleId) {
-
-  },
-
   save(ruleSource) {
     const failCallback = (error) => {
       UserNotification.error('Saving rule failed with status: ' + error.message,
