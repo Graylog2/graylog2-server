@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamComponent from 'components/streams/StreamComponent';
@@ -53,7 +53,9 @@ const StreamsPage = React.createClass({
         </PageHeader>
 
         <Row className="content">
-          <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}/>
+          <Col md={12}>
+            <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}/>
+          </Col>
         </Row>
       </div>
     );

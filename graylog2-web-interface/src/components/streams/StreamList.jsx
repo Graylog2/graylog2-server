@@ -1,55 +1,51 @@
-'use strict';
+import React from 'react';
+import { Alert } from 'react-bootstrap';
 
-var React = require('react');
-var Stream = require('./Stream');
-var Alert = require('react-bootstrap').Alert;
-var PermissionsMixin = require('../../util/PermissionsMixin');
-var CreateStreamButton = require('./CreateStreamButton');
+import Stream from './Stream';
+import PermissionsMixin from 'util/PermissionsMixin';
 
-var StreamList = React.createClass({
-    propTypes: {
-      onStreamSave: React.PropTypes.func.isRequired,
-    },
-    mixins: [PermissionsMixin],
-    getInitialState() {
-        return {};
-    },
-    _formatStream(stream) {
-        return <Stream key={"stream-" + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
-                       permissions={this.props.permissions} user={this.props.user}/>;
-    },
-    _sortByTitle(stream1, stream2) {
-        return stream1.title.localeCompare(stream2.title);
-    },
-    render() {
-        if (this.props.streams.length > 0) {
-            var streamList = this.props.streams.sort(this._sortByTitle).map(this._formatStream);
+const StreamList = React.createClass({
+  propTypes: {
+    streams: React.PropTypes.array.isRequired,
+    streamRuleTypes: React.PropTypes.array.isRequired,
+    user: React.PropTypes.object.isRequired,
+    permissions: React.PropTypes.array.isRequired,
+    onStreamSave: React.PropTypes.func.isRequired,
+  },
+  mixins: [PermissionsMixin],
 
-            return (
-                <ul className="streams">
-                    {streamList}
-                </ul>
-            );
-        } else {
-            var createStreamButton;
-            if (this.isPermitted(this.props.permissions, ["streams:create"])) {
-                createStreamButton = (
-                    <span>
-                        <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
-                                        buttonText="Create one now" ref='createStreamButton'
-                                        onSave={this.props.onStreamSave} />
-                    </span>
-                );
-            }
+  getInitialState() {
+    return {};
+  },
 
-            return (
-                <Alert bsStyle='warning'>
-                    <i className="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. {createStreamButton}
-                </Alert>
-            );
-        }
+  _formatStream(stream) {
+    return (
+      <Stream key={'stream-' + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+                   permissions={this.props.permissions} user={this.props.user}/>
+    );
+  },
+
+  _sortByTitle(stream1, stream2) {
+    return stream1.title.localeCompare(stream2.title);
+  },
+
+  render() {
+    if (this.props.streams.length > 0) {
+      const streamList = this.props.streams.sort(this._sortByTitle).map(this._formatStream);
+
+      return (
+        <ul className="streams">
+          {streamList}
+        </ul>
+      );
+    } else {
+      return (
+        <Alert bsStyle="info">
+          <i className="fa fa-info-circle"/>&nbsp;No streams match your search filter.
+        </Alert>
+      );
     }
+  },
 });
 
-module.exports = StreamList;
+export default StreamList;
