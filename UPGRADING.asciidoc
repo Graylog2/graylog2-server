@@ -98,13 +98,14 @@ For better consistency, these prefixes have been changed after the project has b
 
 The output ID key for the list of outputs in the `/streams/*` endpoints has been changed from `_id` to `id`.
 
+[source, json]
 ----
 {
   "id": "564f47c41ec8fe7d920ef561",
   "creator_user_id": "admin",
   "outputs": [
     {
-      "id": "56d6f2cce45e0e52d1e4b9cb",        <=== Changed from "_id" to "id"
+      "id": "56d6f2cce45e0e52d1e4b9cb", <1>
       "title": "GELF Output",
       "type": "org.graylog2.outputs.GelfOutput",
       "creator_user_id": "admin",
@@ -132,4 +133,5 @@ The output ID key for the list of outputs in the `/streams/*` endpoints has been
   "title": "ALL",
   "content_pack": null
 }
----
+----
+<1> Changed from `_id` to `id`
