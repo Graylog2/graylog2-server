@@ -6,13 +6,8 @@ import { Select } from 'components/common';
 const SelectableList = React.createClass({
   propTypes: {
     options: React.PropTypes.any,
+    selectedOptions: React.PropTypes.array,
     onChange: React.PropTypes.func,
-  },
-
-  getInitialState() {
-    return {
-      selectedOptions: [],
-    };
   },
 
   _onAddOption(option) {
@@ -20,9 +15,8 @@ const SelectableList = React.createClass({
       return;
     }
 
-    const newSelectedOptions = this.state.selectedOptions.slice();
+    const newSelectedOptions = this.props.selectedOptions.slice();
     newSelectedOptions.push(option);
-    this.setState({selectedOptions: newSelectedOptions});
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(newSelectedOptions);
     }
@@ -30,8 +24,7 @@ const SelectableList = React.createClass({
 
   _onRemoveOption(optionIndex) {
     return () => {
-      const newSelectedOptions = this.state.selectedOptions.filter((_, idx) => idx !== optionIndex);
-      this.setState({selectedOptions: newSelectedOptions});
+      const newSelectedOptions = this.props.selectedOptions.filter((_, idx) => idx !== optionIndex);
       if (typeof this.props.onChange === 'function') {
         this.props.onChange(newSelectedOptions);
       }
@@ -39,7 +32,7 @@ const SelectableList = React.createClass({
   },
 
   render() {
-    const formattedOptions = this.state.selectedOptions.map((option, idx) => {
+    const formattedOptions = this.props.selectedOptions.map((option, idx) => {
       return (
         <ListGroupItem key={`${option}-${idx}`}>
           <div className="pull-right">
