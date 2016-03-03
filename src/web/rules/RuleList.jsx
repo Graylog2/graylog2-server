@@ -13,7 +13,6 @@ const RuleList = React.createClass({
   },
 
   _save(rule, callback) {
-    console.log(rule);
     if (rule.id) {
       RulesActions.update(rule);
     } else {

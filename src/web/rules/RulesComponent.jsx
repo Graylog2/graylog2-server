@@ -1,17 +1,18 @@
 import React, {PropTypes} from 'react';
-import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
-import { Input, Alert } from 'react-bootstrap';
 
-import RulesActions from './RulesActions';
+import { Spinner } from 'components/common';
 import RuleList from './RuleList';
 
 const RulesComponent = React.createClass({
   propTypes: {
-    rules: PropTypes.array.isRequired,
+    rules: PropTypes.array,
   },
 
   render() {
+    if (!this.props.rules) {
+      return <Spinner/>;
+    }
+
     return (
       <div>
         <RuleList rules={this.props.rules} />
