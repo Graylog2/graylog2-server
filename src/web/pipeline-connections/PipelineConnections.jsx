@@ -13,20 +13,31 @@ const PipelineConnections = React.createClass({
     onConnectionsChange: React.PropTypes.func.isRequired,
   },
 
+  getInitialState() {
+    return {
+      filteredStreams: this.props.streams.slice(),
+    };
+  },
+
+  _updateFilteredStreams(filteredStreams) {
+    this.setState({filteredStreams: filteredStreams});
+  },
+
   _updateConnection(newConnection, callback) {
     this.props.onConnectionsChange(newConnection, callback);
   },
 
   render() {
     // TODO: Sort this list by stream title
-    // TODO: Filter this list using the data filter
-    const formattedConnections = this.props.connections.map(c => {
-      return (
-        <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
-                    pipelines={this.props.pipelines.filter(p => c.pipeline_ids.indexOf(p.id) !== -1)}
-                    onUpdate={this._updateConnection}/>
-      );
-    });
+    const formattedConnections = this.props.connections
+      .filter(c => this.state.filteredStreams.some(s => s.id === c.stream_id))
+      .map(c => {
+        return (
+          <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
+                      pipelines={this.props.pipelines.filter(p => c.pipeline_ids.indexOf(p.id) !== -1)}
+                      onUpdate={this._updateConnection}/>
+        );
+      });
 
     const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id));
 
@@ -40,7 +51,7 @@ const PipelineConnections = React.createClass({
                                  displayKey={'title'}
                                  filterSuggestions={[]}
                                  searchInKeys={['title', 'description']}
-                                 onDataFiltered={() => {}}/>
+                                 onDataFiltered={this._updateFilteredStreams}/>
           </Col>
           <Col md={4}>
             <div className="pull-right">
