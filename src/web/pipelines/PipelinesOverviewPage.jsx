@@ -20,7 +20,7 @@ const PipelinesOverviewPage = React.createClass({
 
           <span>
             <LinkContainer to={'/system/pipelines'}>
-              <Button bsStyle="info">Manage pipeline inputs</Button>
+              <Button bsStyle="info">Manage pipeline connections</Button>
             </LinkContainer>
             {' '}
             <LinkContainer to={'/system/pipelines/rules'}>
