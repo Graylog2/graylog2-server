@@ -16,12 +16,12 @@ const SystemStore = Reflux.createStore({
     return {system: this.system};
   },
   info() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.info().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.SystemApiController.info().url);
 
     return fetch('GET', url);
   },
   jvm() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.jvm().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.SystemApiController.jvm().url);
 
     return fetch('GET', url);
   },

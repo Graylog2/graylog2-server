@@ -10,27 +10,27 @@ interface Output {
 }
 
 const OutputsStore = {
-  OUTPUTS_URL: URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.index().url),
+  OUTPUTS_URL: URLUtils.qualifyUrl(jsRoutes.OutputsApiController.index().url),
 
   load(callback : (outputs: Array<Output>) => void) {
     fetch('GET', this.OUTPUTS_URL).then(callback, this._failCallback);
   },
   loadForStreamId(streamId: string, callback: (outputs: Array<Output>) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamOutputsApiController.index(streamId).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.StreamOutputsApiController.index(streamId).url);
     fetch('GET', url).then(callback, this._failCallback);
   },
   loadAvailableTypes(callback: (available: any) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.availableTypes().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.OutputsApiController.availableTypes().url);
     fetch('GET', url).then(callback, this._failCallback);
   },
   loadAvailable(typeName: string, callback: (available: any) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.availableTypes().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.OutputsApiController.availableTypes().url);
     fetch('GET', url).then((resp) => {
       return resp.types[typeName];
     }, this._failCallback).then(callback);
   },
   remove(outputId: string, callback: (error) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.delete(outputId).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.OutputsApiController.delete(outputId).url);
     fetch('DELETE', url).then(callback, (error) => {
       UserNotification.error("Terminating output failed with status: " + error,
         "Could not terminate output");
@@ -42,7 +42,7 @@ const OutputsStore = {
         "Could not save Output");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.create().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.OutputsApiController.create().url);
 
     fetch('POST', url, output).then(callback, failCallback);
   },
@@ -52,7 +52,7 @@ const OutputsStore = {
         "Could not update Output");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.OutputsApiController.update(output.id).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.OutputsApiController.update(output.id).url);
 
     fetch('PUT', url, deltas).then(callback, failCallback);
   },

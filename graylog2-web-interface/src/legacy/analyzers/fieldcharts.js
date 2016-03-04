@@ -304,7 +304,7 @@ export const FieldChart = {
   },
 
   _fetchData(opts, timeRangeParams) {
-    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
+    const url = jsRoutes.UniversalSearchApiController.fieldHistogram(
       opts.rangetype,
       opts.query || '*',
       opts.field,

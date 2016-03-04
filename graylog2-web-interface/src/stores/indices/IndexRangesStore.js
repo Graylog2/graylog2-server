@@ -18,7 +18,7 @@ const IndexRangesStore = Reflux.createStore({
     IndexRangesActions.list();
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexRangesApiController.list().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexRangesApiController.list().url);
     const promise = fetch('GET', url).then((response) => {
       this.indexRanges = response.ranges;
 
@@ -28,7 +28,7 @@ const IndexRangesStore = Reflux.createStore({
     IndexRangesActions.list.promise(promise);
   },
   recalculate() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexRangesApiController.rebuild().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexRangesApiController.rebuild().url);
     const promise = fetch ('POST', url);
     promise
       .then(UserNotification.success('Index ranges will be recalculated shortly'))
@@ -40,7 +40,7 @@ const IndexRangesStore = Reflux.createStore({
     IndexRangesActions.recalculate.promise(promise);
   },
   recalculateIndex(indexName) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexRangesApiController.rebuildSingle(indexName).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexRangesApiController.rebuildSingle(indexName).url);
     const promise = fetch ('POST', url);
     promise
       .then(UserNotification.success(`Index ranges for ${indexName} will be recalculated shortly`))

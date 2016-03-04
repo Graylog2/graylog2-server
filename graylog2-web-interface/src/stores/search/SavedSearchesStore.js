@@ -96,10 +96,10 @@ const SavedSearchesStore = Reflux.createStore({
     let verb;
 
     if (!searchId) {
-      url = jsRoutes.controllers.api.SavedSearchesApiController.create().url;
+      url = jsRoutes.SavedSearchesApiController.create().url;
       verb = 'POST';
     } else {
-      url = jsRoutes.controllers.api.SavedSearchesApiController.update(searchId).url;
+      url = jsRoutes.SavedSearchesApiController.update(searchId).url;
       verb = 'PUT';
     }
 
@@ -137,7 +137,7 @@ const SavedSearchesStore = Reflux.createStore({
   },
 
   delete(searchId) {
-    const url = jsRoutes.controllers.api.SavedSearchesApiController.delete(searchId).url;
+    const url = jsRoutes.SavedSearchesApiController.delete(searchId).url;
     const promise = fetch('DELETE', URLUtils.qualifyUrl(url));
     promise
       .then(() => {

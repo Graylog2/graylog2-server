@@ -24,7 +24,7 @@ const IndexerClusterStore = Reflux.createStore({
     return this.state;
   },
   health() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.health().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexerClusterApiController.health().url);
     const promise = fetch('GET', url);
 
     IndexerClusterActions.health.promise(promise);
@@ -32,7 +32,7 @@ const IndexerClusterStore = Reflux.createStore({
     return promise;
   },
   name() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.name().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexerClusterApiController.name().url);
     const promise = fetch('GET', url);
 
     IndexerClusterActions.name.promise(promise);

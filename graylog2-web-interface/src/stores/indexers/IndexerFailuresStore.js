@@ -10,14 +10,14 @@ const IndexerFailuresStore = Reflux.createStore({
   listenables: [],
 
   list(limit, offset) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerFailuresApiController.list(limit, offset).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexerFailuresApiController.list(limit, offset).url);
     return fetch('GET', url);
   },
 
   count(since) {
     const momentSince = since.format ? since : moment(since);
     const isoSince = momentSince.format('YYYY-MM-DDTHH:mm:ss.SSS');
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerFailuresApiController.count(isoSince).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.IndexerFailuresApiController.count(isoSince).url);
 
     return fetch('GET', url);
   },

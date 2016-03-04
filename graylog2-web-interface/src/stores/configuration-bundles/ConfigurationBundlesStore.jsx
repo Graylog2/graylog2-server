@@ -13,13 +13,13 @@ const ConfigurationBundlesStore = Reflux.createStore({
   listenables: [ConfigurationBundlesActions],
 
   apply(bundleId) {
-    const promise = fetch('POST', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.apply(bundleId).url));
+    const promise = fetch('POST', URLUtils.qualifyUrl(jsRoutes.BundlesApiController.apply(bundleId).url));
 
     ConfigurationBundlesActions.apply.promise(promise);
   },
 
   create(request) {
-    const promise = fetch('POST', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.create().url), request);
+    const promise = fetch('POST', URLUtils.qualifyUrl(jsRoutes.BundlesApiController.create().url), request);
 
     ConfigurationBundlesActions.create.promise(promise);
   },
@@ -29,7 +29,7 @@ const ConfigurationBundlesStore = Reflux.createStore({
   },
 
   delete(bundleId) {
-    const promise = fetch('DELETE', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.delete(bundleId).url));
+    const promise = fetch('DELETE', URLUtils.qualifyUrl(jsRoutes.BundlesApiController.delete(bundleId).url));
 
     ConfigurationBundlesActions.delete.promise(promise);
   },
@@ -39,7 +39,7 @@ const ConfigurationBundlesStore = Reflux.createStore({
   },
 
   export(request) {
-    const builder = new Builder('POST', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.export().url))
+    const builder = new Builder('POST', URLUtils.qualifyUrl(jsRoutes.BundlesApiController.export().url))
       .authenticated()
       .build();
     const promise = builder
@@ -63,7 +63,7 @@ const ConfigurationBundlesStore = Reflux.createStore({
   },
 
   list() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.BundlesApiController.list().url))
+    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.BundlesApiController.list().url))
       .then((result) => {
         this.trigger({configurationBundles: result});
 

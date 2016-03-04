@@ -38,13 +38,13 @@ const UsersStore = {
   },
 
   create(request: any): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.create().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.create().url);
     const promise = fetch('POST', url, request);
     return promise;
   },
 
   loadUsers(): Promise<User[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.list().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.list().url);
     const promise = fetch('GET', url)
       .then(
         response => response.users,
@@ -58,7 +58,7 @@ const UsersStore = {
   },
 
   load(username: string): Promise<User> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.load(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.load(username).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {
       UserNotification.error("Loading user failed with status: " + error,
@@ -69,7 +69,7 @@ const UsersStore = {
   },
 
   deleteUser(username: string): Promise<string[]> {
-    const  url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.delete(username).url);
+    const  url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.delete(username).url);
     const  promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -85,21 +85,21 @@ const UsersStore = {
   },
 
   updateRoles(username: string, roles: string[]): void {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.update(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.update(username).url);
     const promise = fetch('PUT', url, {roles: roles});
 
     return promise;
   },
 
   changePassword(username: string, request: ChangePasswordRequest): void {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.changePassword(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.changePassword(username).url);
     const promise = fetch('PUT', url, request);
 
     return promise;
   },
 
   update(username: string, request: any): void {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsersApiController.update(username).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UsersApiController.update(username).url);
     const promise = fetch('PUT', url, request);
 
     return promise;

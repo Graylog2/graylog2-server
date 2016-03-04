@@ -32,7 +32,7 @@ const WidgetsStore = Reflux.createStore({
 
     addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): Promise<string[]> {
         var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.DashboardsApiController.addWidget(dashboardId).url);
         var promise = fetch('POST', url, widgetData);
 
         promise.then(() => UserNotification.success("Widget created successfully"),
@@ -47,7 +47,7 @@ const WidgetsStore = Reflux.createStore({
     },
 
     loadWidget(dashboardId: string, widgetId: string): Promise<string[]> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.DashboardsApiController.widget(dashboardId, widgetId).url);
         const promise = new Builder('GET', url)
             .authenticated()
             .setHeader('X-Graylog-No-Session-Extension', 'true')
@@ -64,7 +64,7 @@ const WidgetsStore = Reflux.createStore({
     },
 
     updateWidget(dashboardId: string, widget: Widget): Promise<string[]> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.DashboardsApiController.updateWidget(dashboardId, widget.id).url);
         var promise = fetch('PUT', url, this._serializeWidgetForUpdate(widget));
 
         promise.then(
@@ -79,7 +79,7 @@ const WidgetsStore = Reflux.createStore({
     },
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): Promise<string[]> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
 
         return new Builder('GET', url)
             .authenticated()
@@ -89,7 +89,7 @@ const WidgetsStore = Reflux.createStore({
     },
 
     removeWidget(dashboardId: string, widgetId: string): Promise<string[]> {
-        const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.removeWidget(dashboardId, widgetId).url);
+        const url = URLUtils.qualifyUrl(jsRoutes.DashboardsApiController.removeWidget(dashboardId, widgetId).url);
 
         const promise = fetch('DELETE', url).then(() => {
             this.trigger({delete: widgetId});

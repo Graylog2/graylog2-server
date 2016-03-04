@@ -9,7 +9,7 @@ class AlertsStore {
             UserNotification.error("Fetching alerts failed with status: " + error.message,
                 "Could not retrieve alerts.");
         };
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlertsApiController.list(streamId, skip, limit).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.AlertsApiController.list(streamId, skip, limit).url);
         return fetch('GET', url).catch(failCallback);
     }
 }

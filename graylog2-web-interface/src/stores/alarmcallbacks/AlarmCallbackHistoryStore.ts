@@ -9,7 +9,7 @@ class AlarmCallbackHistoryStore {
             UserNotification.error("Fetching alarm callback history failed with status: " + error,
                 "Could not retrieve alarm callback history.");
         };
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
+        var url = URLUtils.qualifyUrl(jsRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
 
         return fetch('GET', url)
           .then(

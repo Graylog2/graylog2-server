@@ -26,7 +26,7 @@ const FieldQuickValuesStore = {
                 break;
         }
 
-        var url = jsRoutes.controllers.api.UniversalSearchApiController.fieldTerms(
+        var url = jsRoutes.UniversalSearchApiController.fieldTerms(
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,

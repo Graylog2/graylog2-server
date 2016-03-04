@@ -20,7 +20,7 @@ const TypeAheadFieldInput = React.createClass({
   componentDidMount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
-      fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.fields().url))
+      fetch('GET', URLUtils.qualifyUrl(jsRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
             fieldInput.typeahead(

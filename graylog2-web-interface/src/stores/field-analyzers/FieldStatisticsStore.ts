@@ -39,7 +39,7 @@ const FieldStatisticsStore = {
                 break;
         }
 
-        var url = jsRoutes.controllers.api.UniversalSearchApiController.fieldStats(
+        var url = jsRoutes.UniversalSearchApiController.fieldStats(
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,

@@ -17,7 +17,7 @@ const MessageFieldsStore = Reflux.createStore({
     return {fields: this.fields};
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MessageFieldsApiController.list().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.MessageFieldsApiController.list().url);
     const promise = fetch('GET', url).then((response) => {
       const result = response.fields.map((field) => {
         return {

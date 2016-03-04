@@ -19,7 +19,7 @@ const UniversalSearchStore = Reflux.createStore({
     const effectiveLimit = limit || this.DEFAULT_LIMIT;
     const offset = (page - 1) * effectiveLimit;
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query,
+    const url = URLUtils.qualifyUrl(jsRoutes.UniversalSearchApiController.search(type, query,
       timerangeParams, streamId, effectiveLimit, offset).url);
 
     return fetch('GET', url).then((response) => {
@@ -55,7 +55,7 @@ const UniversalSearchStore = Reflux.createStore({
   },
   histogram(type, query, timerange, interval, streamId, maxDataPoints) {
     const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;

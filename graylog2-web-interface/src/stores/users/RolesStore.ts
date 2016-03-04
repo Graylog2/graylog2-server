@@ -19,7 +19,7 @@ export interface RoleMembership {
 
 export const RolesStore = {
   loadRoles(): Promise<string[]> {
-    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.listRoles().url))
+    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.RolesApiController.listRoles().url))
       .then(
         response => response.roles,
         error => {
@@ -34,7 +34,7 @@ export const RolesStore = {
   },
 
   createRole(role: Role): Promise<Role> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.createRole().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.RolesApiController.createRole().url);
     const promise = fetch('POST', url, role);
 
     promise.then((newRole) => {
@@ -48,7 +48,7 @@ export const RolesStore = {
   },
 
   updateRole(rolename: string, role: Role): Promise<Role> {
-    const promise = fetch('PUT', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.updateRole(rolename).url), role);
+    const promise = fetch('PUT', URLUtils.qualifyUrl(jsRoutes.RolesApiController.updateRole(rolename).url), role);
 
     promise.then((newRole) => {
       UserNotification.success("Role \"" + newRole.name + "\" was updated successfully");
@@ -63,7 +63,7 @@ export const RolesStore = {
   },
 
   deleteRole(rolename: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.deleteRole(rolename).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.RolesApiController.deleteRole(rolename).url);
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -77,7 +77,7 @@ export const RolesStore = {
     return promise;
   },
   getMembers(rolename: string): Promise<RoleMembership[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.loadMembers(rolename).url);
+    const url = URLUtils.qualifyUrl(jsRoutes.RolesApiController.loadMembers(rolename).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {
       if (error.additional.status !== 404) {

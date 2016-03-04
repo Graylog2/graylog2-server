@@ -8,7 +8,7 @@ const URLUtils = require('util/URLUtils');
 
 var FieldsStore = {
     loadFields(): Promise<string[]> {
-        const url = jsRoutes.controllers.api.SystemApiController.fields().url;
+        const url = jsRoutes.SystemApiController.fields().url;
         let promise = fetch('GET', URLUtils.qualifyUrl(url));
         promise = promise.then((data) => data.fields);
         promise.catch((errorThrown) => {

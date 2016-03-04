@@ -12,7 +12,7 @@ export interface UsageStatsOptOutState {
 
 export var UsageStatsOptOutStore = {
     pluginEnabled(): Promise<boolean> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.pluginEnabled().url);
+        var url = URLUtils.qualifyUrl(jsRoutes.UsageStatsApiController.pluginEnabled().url);
         var promise = fetch('GET', url);
 
         promise = promise
@@ -28,7 +28,7 @@ export var UsageStatsOptOutStore = {
         return promise;
     },
     getOptOutState(): Promise<UsageStatsOptOutState> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.setOptOutState().url);
+        var url = URLUtils.qualifyUrl(jsRoutes.UsageStatsApiController.setOptOutState().url);
         var promise = fetch('GET', url);
 
         promise = promise.catch(() => {
@@ -60,7 +60,7 @@ export var UsageStatsOptOutStore = {
         });
     },
     _sendOptOutState(optOutState: UsageStatsOptOutState, success: Function, error: Function): Promise<boolean> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.setOptOutState().url);
+        var url = URLUtils.qualifyUrl(jsRoutes.UsageStatsApiController.setOptOutState().url);
         var promise = fetch('POST', url, JSON.stringify(optOutState));
 
         promise

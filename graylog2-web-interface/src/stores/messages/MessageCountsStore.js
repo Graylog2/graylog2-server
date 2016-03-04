@@ -15,7 +15,7 @@ const MessageCountsStore = Reflux.createStore({
     this.total();
   },
   total() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.CountsApiController.total().url);
+    const url = URLUtils.qualifyUrl(jsRoutes.CountsApiController.total().url);
     const promise = fetch('GET', url).then((response) => {
       this.events = response.events;
       this.trigger({events: response.events});

@@ -112,7 +112,7 @@ const SearchSidebar = React.createClass({
     const timeRange = SearchStore.rangeType === 'relative' ? {range: SearchStore.rangeParams.get('relative')} : SearchStore.rangeParams.toJS();
 
     uriParser.href = URLUtils.qualifyUrl(
-      jsRoutes.controllers.api.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
+      jsRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
     );
     uriParser.username = SessionStore.getSessionId();
     uriParser.password = 'session';
