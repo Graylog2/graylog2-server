@@ -8,6 +8,7 @@ export { default as EntityListItem } from './EntityListItem';
 export { default as GridsterContainer } from './GridsterContainer';
 export { default as GridsterWidget } from './GridsterWidget';
 export { default as IfPermitted } from './IfPermitted';
+export { default as ISODurationInput } from './ISODurationInput';
 export { default as LinkToNode } from './LinkToNode';
 export { default as KeyValueTable } from './KeyValueTable';
 export { default as MultiSelect } from './MultiSelect';
