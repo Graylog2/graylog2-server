@@ -25,6 +25,7 @@ const DataTable = React.createClass({
     headerCellFormatter: React.PropTypes.func.isRequired,
     headers: React.PropTypes.array.isRequired,
     id: React.PropTypes.string,
+    noDataText: React.PropTypes.string,
     rows: React.PropTypes.array.isRequired,
     sortByKey: React.PropTypes.string,
   },
@@ -32,6 +33,7 @@ const DataTable = React.createClass({
     return {
       filterSuggestions: [],
       displayKey: 'value',
+      noDataText: 'No data available.',
       rowClassName: '',
     };
   },
@@ -99,7 +101,7 @@ const DataTable = React.createClass({
 
     let data;
     if (this.state.rows.length === 0) {
-      data = <p>No data available.</p>;
+      data = <p>{this.props.noDataText}</p>;
     } else if (this.state.filteredRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
