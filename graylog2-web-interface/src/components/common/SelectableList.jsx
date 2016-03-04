@@ -6,6 +6,7 @@ import { Select } from 'components/common';
 const SelectableList = React.createClass({
   propTypes: {
     options: PropTypes.any,
+    selectedOptionsType: PropTypes.oneOf(['string', 'object']),
     selectedOptions: PropTypes.arrayOf([
       PropTypes.string,
       PropTypes.object,
@@ -17,6 +18,7 @@ const SelectableList = React.createClass({
 
   getDefaultProps() {
     return {
+      selectedOptionsType: 'string',
       displayKey: 'label',
       idKey: 'value',
     };
@@ -36,7 +38,7 @@ const SelectableList = React.createClass({
     }
 
     const newSelectedOptions = this.props.selectedOptions.slice();
-    if (typeof newSelectedOptions[0] === 'string') {
+    if (this.props.selectedOptionsType === 'string') {
       newSelectedOptions.push(option);
     } else {
       newSelectedOptions.push(this.props.options.filter(o => this._getOptionId(o) === option)[0]);
