@@ -11,7 +11,7 @@ export class FetchError extends Error {
       console.error(`There was an error fetching a resource: ${this.message}.`,
         `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
     } catch (e) {
-      // do nothing
+      console.error(`There was an error fetching a resource: ${this.message}. No additional information available.`);
     }
 
     this.additional = additional;
