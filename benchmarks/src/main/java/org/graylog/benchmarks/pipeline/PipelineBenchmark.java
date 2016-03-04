@@ -34,7 +34,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamConnection;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.filters.ExtractorFilter;
@@ -118,7 +118,7 @@ public class PipelineBenchmark {
             ));
 
             final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(PipelineStreamConnectionsService.class);
-            final PipelineStreamConnection pipelineStreamConnection = PipelineStreamConnection.create(null,
+            final PipelineConnections pipelineStreamConnection = PipelineConnections.create(null,
                                                                                                       "default",
                                                                                                       newHashSet("cde"));
             when(pipelineStreamConnectionsService.loadAll()).thenReturn(
