@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import LoggersActions from 'actions/system/LoggersActions';
@@ -26,7 +26,7 @@ const LoggersStore = Reflux.createStore({
     return this.state;
   },
   loggers() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterLoggersResource.loggers().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterLoggersResource.loggers().url);
     const promise = fetch('GET', url).then((response) => {
       this.state.loggers = response;
       this.trigger(this.state);
@@ -36,7 +36,7 @@ const LoggersStore = Reflux.createStore({
     LoggersActions.loggers.promise(promise);
   },
   subsystems() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterLoggersResource.subsystems().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterLoggersResource.subsystems().url);
     const promise = fetch('GET', url).then((response) => {
       this.state.subsystems = response;
       this.trigger(this.state);
@@ -46,7 +46,7 @@ const LoggersStore = Reflux.createStore({
     LoggersActions.loggers.promise(promise);
   },
   setSubsystemLoggerLevel(nodeId, subsystem, level) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterLoggersResource.setSubsystemLoggerLevel(nodeId, subsystem, level).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterLoggersResource.setSubsystemLoggerLevel(nodeId, subsystem, level).url);
     const promise = fetch('PUT', url);
     promise.then(() => {
       this.init();
