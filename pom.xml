@@ -24,9 +24,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:graylog-plugin-pipeline-processor.git</connection>
-        <developerConnection>scm:git:git@github.com:graylog-plugin-pipeline-processor.git</developerConnection>
-        <url>https://github.com/graylog-plugin-pipeline-processor</url>
+        <connection>scm:git:git@github.com:Graylog2/graylog-plugin-pipeline-processor.git</connection>
+        <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-pipeline-processor.git</developerConnection>
+        <url>https://github.com/Graylog2/graylog-plugin-pipeline-processor</url>
         <tag>HEAD</tag>
     </scm>
 
