@@ -143,6 +143,7 @@ const RuleForm = React.createClass({
                    id={this._getId('description')}
                    label="Description (optional)"
                    onChange={this._onDescriptionChange}
+                   autoFocus
                    value={this.state.rule.description}/>
 
             <label>Rule source</label>
