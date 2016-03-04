@@ -9,7 +9,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-pipeline-processor</artifactId>
-    <version>1.0.0-alpha.5</version>
+    <version>1.0.0-alpha.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
