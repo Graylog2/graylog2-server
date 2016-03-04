@@ -89,7 +89,12 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation("Get all pipeline connections")
     @GET
     public Set<PipelineConnections> getAll() throws NotFoundException {
-        return connectionsService.loadAll();
+        Set<PipelineConnections> pipelineConnections = connectionsService.loadAll();
+        // to simplify clients, we always return the default stream, until we have it as a true entity
+        if (!pipelineConnections.stream().anyMatch(pc -> pc.streamId().equals("default"))) {
+            pipelineConnections.add(PipelineConnections.create(null, "default", Collections.emptySet()));
+        }
+        return pipelineConnections;
     }
 
 }
