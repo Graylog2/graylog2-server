@@ -8,31 +8,29 @@ import style from '!style!css!components/configurations/ConfigurationStyles.css'
 
 const GeoIpResolverConfig = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
+    config: React.PropTypes.object,
     updateConfig: React.PropTypes.func.isRequired,
   },
 
-  getInitialState() {
-    return this._getStateFromProps(this.props);
-  },
-
-  componentWillReceiveProps(newProps) {
-    this.setState(this._getStateFromProps(newProps));
-  },
-
-  _getStateFromProps(props) {
+  getDefaultProps() {
     return {
       config: {
-        enabled: this._getPropConfigValue(props, 'enabled', false),
-        db_type: this._getPropConfigValue(props, 'db_type', 'MAXMIND_CITY'),
-        db_path: this._getPropConfigValue(props, 'db_path', '/tmp/GeoLite2-City.mmdb'),
-        run_before_extractors: this._getPropConfigValue(props, 'run_before_extractors', false),
+        enabled: false,
+        db_type: 'MAXMIND_CITY',
+        db_path: '/tmp/GeoLite2-City.mmdb',
+        run_before_extractors: false,
       },
     };
   },
 
-  _getPropConfigValue(props, field, defaultValue = null) {
-    return props.config ? props.config[field] || defaultValue : defaultValue;
+  getInitialState() {
+    return {
+      config: ObjectUtils.clone(this.props.config),
+    };
+  },
+
+  componentWillReceiveProps(newProps) {
+    this.setState({config: ObjectUtils.clone(newProps.config)});
   },
 
   _updateConfigField(field, value) {
