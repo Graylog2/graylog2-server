@@ -13,7 +13,7 @@
   "keywords": [
     "graylog"
   ],
-  "author": "Edmundo Alvarez <edmundo@graylog.com>",
+  "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "GPL-3.0",
   "dependencies": {
     "history": "^1.17.0",
