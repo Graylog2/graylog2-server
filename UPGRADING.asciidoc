@@ -55,13 +55,15 @@ Some settings, which have been deprecated in previous versions, have finally bee
 |===
 | Setting name              | Replacement
 
-| `mongodb_host`            | `mongodb_uri`
-| `mongodb_port`            | `mongodb_uri`
-| `mongodb_database`        | `mongodb_uri`
-| `mongodb_useauth`         | `mongodb_uri`
-| `mongodb_user`            | `mongodb_uri`
-| `mongodb_password`        | `mongodb_uri`
-| `elasticsearch_node_name` | `elasticsearch_node_name_prefix`
+| `mongodb_host`                  | `mongodb_uri`
+| `mongodb_port`                  | `mongodb_uri`
+| `mongodb_database`              | `mongodb_uri`
+| `mongodb_useauth`               | `mongodb_uri`
+| `mongodb_user`                  | `mongodb_uri`
+| `mongodb_password`              | `mongodb_uri`
+| `elasticsearch_node_name`       | `elasticsearch_node_name_prefix`
+| `collector_expiration_threshold`| (moved to collector plugin)
+| `collector_inactive_threshold`  | (moved to collector plugin)
 |===
 
 
