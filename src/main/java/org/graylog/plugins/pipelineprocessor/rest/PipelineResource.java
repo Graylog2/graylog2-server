@@ -91,7 +91,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .build();
         final PipelineDao save = pipelineService.save(pipelineDao);
         clusterBus.post(PipelinesChangedEvent.updatedPipelineId(save.id()));
-        log.info("Created new pipeline {}", save);
+        log.debug("Created new pipeline {}", save);
         return PipelineSource.fromDao(pipelineRuleParser, save);
     }
 

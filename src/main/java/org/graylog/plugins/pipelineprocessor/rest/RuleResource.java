@@ -92,7 +92,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao save = ruleService.save(newRuleSource);
         // TODO determine which pipelines could change because of this new rule (there could be pipelines referring to a previously unresolved rule)
         clusterBus.post(RulesChangedEvent.updatedRuleId(save.id()));
-        log.info("Created new rule {}", save);
+        log.debug("Created new rule {}", save);
         return RuleSource.fromDao(pipelineRuleParser, save);
     }
 

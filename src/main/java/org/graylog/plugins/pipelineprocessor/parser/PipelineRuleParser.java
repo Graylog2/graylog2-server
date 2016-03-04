@@ -246,7 +246,7 @@ public class PipelineRuleParser {
             ruleBuilder.then(parseContext.statements);
             final Rule rule = ruleBuilder.build();
             parseContext.addRule(rule);
-            log.info("Declaring rule {}", rule);
+            log.trace("Declaring rule {}", rule);
         }
 
         @Override
@@ -350,7 +350,7 @@ public class PipelineRuleParser {
                      new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
             );
 
-            log.info("FUNC: ctx {} => {}", ctx, expr);
+            log.trace("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -384,7 +384,7 @@ public class PipelineRuleParser {
             final Expression object = exprs.get(ctx.fieldSet);
             final Expression field = exprs.get(ctx.field);
             final FieldAccessExpression expr = new FieldAccessExpression(object, field);
-            log.info("FIELDACCESS: ctx {} => {}", ctx, expr);
+            log.trace("FIELDACCESS: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -392,7 +392,7 @@ public class PipelineRuleParser {
         public void exitNot(RuleLangParser.NotContext ctx) {
             final LogicalExpression expression = upgradeBoolFunctionExpression(ctx.expression());
             final NotExpression expr = new NotExpression(expression);
-            log.info("NOT: ctx {} => {}", ctx, expr);
+            log.trace("NOT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -404,7 +404,7 @@ public class PipelineRuleParser {
             final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
 
             final AndExpression expr = new AndExpression(left, right);
-            log.info("AND: ctx {} => {}", ctx, expr);
+            log.trace("AND: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -421,7 +421,7 @@ public class PipelineRuleParser {
             final LogicalExpression left = upgradeBoolFunctionExpression(ctx.left);
             final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
             final OrExpression expr = new OrExpression(left, right);
-            log.info("OR: ctx {} => {}", ctx, expr);
+            log.trace("OR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -431,7 +431,7 @@ public class PipelineRuleParser {
             final Expression right = exprs.get(ctx.right);
             final boolean equals = ctx.equality.getText().equals("==");
             final EqualityExpression expr = new EqualityExpression(left, right, equals);
-            log.info("EQUAL: ctx {} => {}", ctx, expr);
+            log.trace("EQUAL: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -441,7 +441,7 @@ public class PipelineRuleParser {
             final Expression right = exprs.get(ctx.right);
             final String operator = ctx.comparison.getText();
             final ComparisonExpression expr = new ComparisonExpression(left, right, operator);
-            log.info("COMPARE: ctx {} => {}", ctx, expr);
+            log.trace("COMPARE: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -449,14 +449,14 @@ public class PipelineRuleParser {
         public void exitInteger(RuleLangParser.IntegerContext ctx) {
             // TODO handle different radix and length
             final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
-            log.info("INT: ctx {} => {}", ctx, expr);
+            log.trace("INT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitFloat(RuleLangParser.FloatContext ctx) {
             final DoubleExpression expr = new DoubleExpression(Double.parseDouble(ctx.getText()));
-            log.info("FLOAT: ctx {} => {}", ctx, expr);
+            log.trace("FLOAT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -470,14 +470,14 @@ public class PipelineRuleParser {
         public void exitString(RuleLangParser.StringContext ctx) {
             final String text = unquote(ctx.getText(), '\"');
             final StringExpression expr = new StringExpression(text);
-            log.info("STRING: ctx {} => {}", ctx, expr);
+            log.trace("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitBoolean(RuleLangParser.BooleanContext ctx) {
             final BooleanExpression expr = new BooleanExpression(Boolean.valueOf(ctx.getText()));
-            log.info("BOOL: ctx {} => {}", ctx, expr);
+            log.trace("BOOL: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -523,7 +523,7 @@ public class PipelineRuleParser {
             isIdIsFieldAccess.pop(); // reset for error checks
             final Expression fieldExpr = exprs.get(ctx.field);
             final MessageRefExpression expr = new MessageRefExpression(fieldExpr);
-            log.info("$MSG: ctx {} => {}", ctx, expr);
+            log.trace("$MSG: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -545,7 +545,7 @@ public class PipelineRuleParser {
                 expr = new VarRefExpression(identifierName);
                 type = "VARREF";
             }
-            log.info("{}: ctx {} => {}", type, ctx, expr);
+            log.trace("{}: ctx {} => {}", type, ctx, expr);
             exprs.put(ctx, expr);
         }
 
@@ -563,7 +563,7 @@ public class PipelineRuleParser {
 
             final IndexedAccessExpression expr = new IndexedAccessExpression(array, index);
             exprs.put(ctx, expr);
-            log.info("IDXACCESS: ctx {} => {}", ctx, expr);
+            log.trace("IDXACCESS: ctx {} => {}", ctx, expr);
         }
     }
 
@@ -585,7 +585,7 @@ public class PipelineRuleParser {
                     log.error("Unable to retrieve expression for variable {}, this is a bug", name);
                     return;
                 }
-                log.info("Inferred type of variable {} to {}", name, expression.getType().getSimpleName());
+                log.trace("Inferred type of variable {} to {}", name, expression.getType().getSimpleName());
                 varRefExpression.setType(expression.getType());
             }
         }
@@ -601,7 +601,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
-            log.info("Type tree {}", sb.toString());
+            log.trace("Type tree {}", sb.toString());
         }
 
         @Override
@@ -841,7 +841,7 @@ public class PipelineRuleParser {
         public void exitInteger(RuleLangParser.IntegerContext ctx) {
             // TODO handle different radix and length
             final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
-            log.info("INT: ctx {} => {}", ctx, expr);
+            log.trace("INT: ctx {} => {}", ctx, expr);
             parseContext.exprs.put(ctx, expr);
         }
 
@@ -849,7 +849,7 @@ public class PipelineRuleParser {
         public void exitString(RuleLangParser.StringContext ctx) {
             final String text = unquote(ctx.getText(), '\"');
             final StringExpression expr = new StringExpression(text);
-            log.info("STRING: ctx {} => {}", ctx, expr);
+            log.trace("STRING: ctx {} => {}", ctx, expr);
             parseContext.exprs.put(ctx, expr);
         }
 
