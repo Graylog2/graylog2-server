@@ -92,7 +92,7 @@ const StageForm = React.createClass({
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Add new' : 'Edit'} stage ${this.state.stage.title}`}
+                            title={`${this.props.create ? 'Add new' : 'Edit'} stage ${this.state.stage.stage}`}
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
