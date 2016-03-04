@@ -1,10 +1,10 @@
 /// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-/// <reference path='../../routing/jsRoutes.d.ts' />
+/// <reference path='../../routing/ApiRoutes.d.ts' />
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 import Immutable = require('immutable');
 const UserNotification = require('util/UserNotification');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
@@ -85,7 +85,7 @@ class DashboardsStore {
   }
 
   listDashboards(): Promise<Immutable.List<Dashboard>> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.index().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.index().url);
     const promise = fetch('GET', url)
       .then((response) => {
         const dashboardList = Immutable.List<Dashboard>(response.dashboards);
@@ -105,7 +105,7 @@ class DashboardsStore {
   }
 
   get(id: string): Promise<Dashboard> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.get(id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.get(id).url);
     const promise = new Builder('GET', url)
       .authenticated()
       .setHeader('X-Graylog-No-Session-Extension', 'true')
@@ -123,7 +123,7 @@ class DashboardsStore {
   }
 
   createDashboard(title: string, description: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.create().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.create().url);
     const promise = fetch('POST', url, {title: title, description: description})
       .then((response) => {
         UserNotification.success("Dashboard successfully created");
@@ -143,7 +143,7 @@ class DashboardsStore {
   }
 
   saveDashboard(dashboard: Dashboard): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.update(dashboard.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.update(dashboard.id).url);
     const promise = fetch('PUT', url, {title: dashboard.title, description: dashboard.description});
 
     promise.then(() => {
@@ -163,7 +163,7 @@ class DashboardsStore {
   }
 
   remove(dashboard: Dashboard): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.delete(dashboard.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.delete(dashboard.id).url);
     const promise = fetch('DELETE', url)
 
     promise.then(() => {
@@ -183,7 +183,7 @@ class DashboardsStore {
   }
 
   updatePositions(dashboard: Dashboard, positions: any) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DashboardsApiController.updatePositions(dashboard.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.updatePositions(dashboard.id).url);
     const promise = fetch('PUT', url, {positions: positions}).catch((error) => {
       UserNotification.error("Updating widget positions for dashboard \"" + dashboard.title + "\" failed with status: " + error.message,
         "Could not update dashboard");

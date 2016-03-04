@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import IndexerClusterActions from 'actions/indexers/IndexerClusterActions';
@@ -24,7 +24,7 @@ const IndexerClusterStore = Reflux.createStore({
     return this.state;
   },
   health() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.health().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
     const promise = fetch('GET', url);
 
     IndexerClusterActions.health.promise(promise);
@@ -32,7 +32,7 @@ const IndexerClusterStore = Reflux.createStore({
     return promise;
   },
   name() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndexerClusterApiController.name().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.name().url);
     const promise = fetch('GET', url);
 
     IndexerClusterActions.name.promise(promise);

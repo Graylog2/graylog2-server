@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
@@ -16,7 +16,7 @@ const AlertConditionsStore = Reflux.createStore({
         'Could not remove Alert Conditions');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.delete(streamId, alertConditionId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.delete(streamId, alertConditionId).url);
     const promise = fetch('DELETE', url).then(() => {
       AlertConditionsActions.list(streamId);
     }, failCallback);
@@ -28,7 +28,7 @@ const AlertConditionsStore = Reflux.createStore({
         'Could not retrieve Alert Conditions');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.list(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => {
       const conditions = response.conditions.map((condition) => {
         condition.stream_id = streamId;
@@ -47,7 +47,7 @@ const AlertConditionsStore = Reflux.createStore({
         'Could not save Alert Condition');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.create(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.create(streamId).url);
     const promise = fetch('POST', url, alertCondition).then(() => {
       AlertConditionsActions.list(streamId);
     }, failCallback);
@@ -60,7 +60,7 @@ const AlertConditionsStore = Reflux.createStore({
         'Could not save Alert Condition');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamAlertsApiController.update(streamId, alertConditionId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.update(streamId, alertConditionId).url);
     const promise = fetch('PUT', url, request).then(() => {
       AlertConditionsActions.list(streamId);
     }, failCallback);

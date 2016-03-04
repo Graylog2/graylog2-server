@@ -1,6 +1,6 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 import Immutable = require('immutable');
 const UserNotification = require("util/UserNotification");
@@ -8,7 +8,7 @@ const URLUtils = require('util/URLUtils');
 
 var FieldsStore = {
     loadFields(): Promise<string[]> {
-        const url = jsRoutes.controllers.api.SystemApiController.fields().url;
+        const url = ApiRoutes.SystemApiController.fields().url;
         let promise = fetch('GET', URLUtils.qualifyUrl(url));
         promise = promise.then((data) => data.fields);
         promise.catch((errorThrown) => {

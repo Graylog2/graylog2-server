@@ -1,4 +1,4 @@
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
@@ -36,7 +36,7 @@ class StreamRulesStore {
                 "Could not retrieve Stream Rules");
         };
 
-        fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.list(streamId).url)).then(callback, failCallback);
+        fetch('GET', URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.list(streamId).url)).then(callback, failCallback);
     }
     update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
         var failCallback = (error) => {
@@ -44,7 +44,7 @@ class StreamRulesStore {
                 "Could not update Stream Rule");
         };
 
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.update(streamId, streamRuleId).url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.update(streamId, streamRuleId).url);
         var request = {field: data.field, type: data.type, value: data.value, inverted: data.inverted};
 
         fetch('PUT', url, request).then(callback, failCallback).then(this._emitChange.bind(this));
@@ -55,7 +55,7 @@ class StreamRulesStore {
                 "Could not delete Stream Rule");
         };
 
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.delete(streamId, streamRuleId).url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.delete(streamId, streamRuleId).url);
         fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
     }
     create(streamId: string, data: StreamRule, callback: (() => void)) {
@@ -64,7 +64,7 @@ class StreamRulesStore {
                 "Could not create Stream Rule");
         };
 
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.StreamRulesApiController.create(streamId).url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.create(streamId).url);
 
         fetch('POST', url, data).then(callback, failCallback).then(this._emitChange.bind(this));
     }

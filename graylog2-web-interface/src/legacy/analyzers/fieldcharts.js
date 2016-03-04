@@ -8,7 +8,7 @@ import DateTime from 'logic/datetimes/DateTime';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
@@ -304,7 +304,7 @@ export const FieldChart = {
   },
 
   _fetchData(opts, timeRangeParams) {
-    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
+    const url = ApiRoutes.UniversalSearchApiController.fieldHistogram(
       opts.rangetype,
       opts.query || '*',
       opts.field,

@@ -1,6 +1,6 @@
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
 class AlertsStore {
@@ -9,7 +9,7 @@ class AlertsStore {
             UserNotification.error("Fetching alerts failed with status: " + error.message,
                 "Could not retrieve alerts.");
         };
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlertsApiController.list(streamId, skip, limit).url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.list(streamId, skip, limit).url);
         return fetch('GET', url).catch(failCallback);
     }
 }

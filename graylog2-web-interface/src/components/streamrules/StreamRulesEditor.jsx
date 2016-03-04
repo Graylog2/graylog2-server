@@ -1,4 +1,4 @@
-/* global jsRoutes */
+/* global ApiRoutes */
 
 import React, { PropTypes } from 'react';
 import { Alert, Button } from 'react-bootstrap';

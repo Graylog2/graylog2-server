@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import DeflectorActions from 'actions/indices/DeflectorActions';
@@ -19,7 +19,7 @@ const DeflectorStore = Reflux.createStore({
     return { deflector: this.deflector };
   },
   cycle() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DeflectorApiController.cycle().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.cycle().url);
     const promise = fetch('POST', url);
 
     DeflectorActions.cycle.promise(promise);
@@ -28,7 +28,7 @@ const DeflectorStore = Reflux.createStore({
     DeflectorActions.list();
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.DeflectorApiController.list().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list().url);
     const promise = fetch('GET', url).then((info) => {
       this.deflector.info = info;
       this.trigger({deflector: this.deflector});

@@ -4,7 +4,7 @@
 
 const fetch = require('logic/rest/FetchProvider').default;
 import Immutable = require('immutable');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const UserNotification = require('util/UserNotification');
 import SearchStore = require('stores/search/SearchStore');
@@ -39,7 +39,7 @@ const FieldStatisticsStore = {
                 break;
         }
 
-        var url = jsRoutes.controllers.api.UniversalSearchApiController.fieldStats(
+        var url = ApiRoutes.UniversalSearchApiController.fieldStats(
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,

@@ -7,7 +7,7 @@ import Typeahead from 'typeahead.js'; // Need to import this to load typeahead, 
 
 import UniversalSearch from 'logic/search/UniversalSearch';
 
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
@@ -20,7 +20,7 @@ const TypeAheadFieldInput = React.createClass({
   componentDidMount() {
     if (this.refs.fieldInput) {
       const fieldInput = $(this.refs.fieldInput.getInputDOMNode());
-      fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.SystemApiController.fields().url))
+      fetch('GET', URLUtils.qualifyUrl(ApiRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
             fieldInput.typeahead(

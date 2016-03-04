@@ -9,7 +9,7 @@ import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import {Spinner, ClipboardButton, Timestamp} from 'components/common';
 
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
 const MessageDetail = React.createClass({
@@ -59,7 +59,7 @@ const MessageDetail = React.createClass({
     let nodeInformation;
 
     if (node) {
-      const nodeURL = jsRoutes.controllers.NodesController.node(nodeId).url;
+      const nodeURL = ApiRoutes.NodesController.node(nodeId).url;
       nodeInformation = (
         <a href={nodeURL}>
           <i className="fa fa-code-fork"/>
@@ -93,7 +93,7 @@ const MessageDetail = React.createClass({
       );
     }
 
-    const messageUrl = jsRoutes.controllers.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
+    const messageUrl = ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
 
     let streamList = null;
     this._getAllStreams().forEach((stream) => {

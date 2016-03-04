@@ -7,7 +7,7 @@ import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const UniversalSearchStore = Reflux.createStore({
@@ -19,7 +19,7 @@ const UniversalSearchStore = Reflux.createStore({
     const effectiveLimit = limit || this.DEFAULT_LIMIT;
     const offset = (page - 1) * effectiveLimit;
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.search(type, query,
+    const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query,
       timerangeParams, streamId, effectiveLimit, offset).url);
 
     return fetch('GET', url).then((response) => {
@@ -55,7 +55,7 @@ const UniversalSearchStore = Reflux.createStore({
   },
   histogram(type, query, timerange, interval, streamId, maxDataPoints) {
     const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {
       response.histogram_boundaries = response.queried_timerange;

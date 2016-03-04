@@ -3,7 +3,7 @@ import jQuery from 'jquery';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import IndicesActions from 'actions/indices/IndicesActions';
@@ -20,7 +20,7 @@ const IndicesStore = Reflux.createStore({
     return { indices: this.indices, closedIndices: this.closedIndices };
   },
   list() {
-    const urlList = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.list().url);
+    const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.list().url);
     const promise = fetch('GET', urlList).then((response) => {
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
@@ -31,7 +31,7 @@ const IndicesStore = Reflux.createStore({
     IndicesActions.list.promise(promise);
   },
   close(indexName) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.close(indexName).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
     const promise = fetch('POST', url);
 
     IndicesActions.close.promise(promise);
@@ -40,7 +40,7 @@ const IndicesStore = Reflux.createStore({
     IndicesActions.list();
   },
   delete(indexName) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.delete(indexName).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.delete(indexName).url);
     const promise = fetch('DELETE', url);
 
     IndicesActions.delete.promise(promise);
@@ -49,7 +49,7 @@ const IndicesStore = Reflux.createStore({
     IndicesActions.list();
   },
   reopen(indexName) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.IndicesApiController.reopen(indexName).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.reopen(indexName).url);
     const promise = fetch('POST', url);
 
     IndicesActions.reopen.promise(promise);
