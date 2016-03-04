@@ -21,7 +21,6 @@
 package org.graylog2.indexer;
 
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -29,6 +28,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
@@ -41,17 +41,21 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
+    @Mock
+    private SystemJobManager systemJobManager;
+    @Mock
+    private SystemMessageActivityWriter activityWriter;
+    @Mock
+    private SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
+    @Mock
+    private CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
+    @Mock
+    private Indices indices;
     private Deflector deflector;
 
     @Before
     public void setUp() {
-        deflector = new Deflector(
-                mock(SystemJobManager.class),
-                new ElasticsearchConfiguration(),
-                mock(SystemMessageActivityWriter.class),
-                mock(SetIndexReadOnlyJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class),
-                mock(Indices.class));
+        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory, indices);
     }
 
     @Test
@@ -75,14 +79,6 @@ public class DeflectorTest {
 
     @Test
     public void testBuildIndexName() {
-
-        Deflector d = new Deflector(mock(SystemJobManager.class),
-                mock(ElasticsearchConfiguration.class),
-                mock(SystemMessageActivityWriter.class),
-                mock(SetIndexReadOnlyJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class),
-                mock(Indices.class));
-
         assertEquals("graylog2_0", Deflector.buildIndexName("graylog2", 0));
         assertEquals("graylog2_1", Deflector.buildIndexName("graylog2", 1));
         assertEquals("graylog2_9001", Deflector.buildIndexName("graylog2", 9001));
@@ -95,27 +91,14 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrow() {
-        Deflector d = new Deflector(mock(SystemJobManager.class),
-                mock(ElasticsearchConfiguration.class),
-                mock(SystemMessageActivityWriter.class),
-                mock(SetIndexReadOnlyJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class),
-                mock(Indices.class));
-
-        final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
+        final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.size());
     }
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
-        Deflector d = new Deflector(mock(SystemJobManager.class),
-                mock(ElasticsearchConfiguration.class),
-                mock(SystemMessageActivityWriter.class),
-                mock(SetIndexReadOnlyJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class),
-                mock(Indices.class));
-        final String[] deflectorIndices = d.getAllDeflectorIndexNames();
+        final String[] deflectorIndices = deflector.getAllDeflectorIndexNames();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.length);
     }
@@ -129,12 +112,15 @@ public class DeflectorTest {
     }
 
     @Test
-    public void testIsGraylog2Index() {
-        assertTrue(deflector.isGraylog2Index("graylog_1"));
-        assertTrue(deflector.isGraylog2Index("graylog_42"));
-        assertTrue(deflector.isGraylog2Index("graylog_100000000"));
-        assertFalse(deflector.isGraylog2Index("graylog_deflector"));
-        assertFalse(deflector.isGraylog2Index("graylog2beta_1"));
-        assertFalse(deflector.isGraylog2Index("HAHA"));
+    public void testIsGraylogIndex() {
+        assertTrue(deflector.isGraylogIndex("graylog_1"));
+        assertTrue(deflector.isGraylogIndex("graylog_42"));
+        assertTrue(deflector.isGraylogIndex("graylog_100000000"));
+        assertFalse(deflector.isGraylogIndex(null));
+        assertFalse(deflector.isGraylogIndex(""));
+        assertFalse(deflector.isGraylogIndex("graylog_deflector"));
+        assertFalse(deflector.isGraylogIndex("graylog2beta_1"));
+        assertFalse(deflector.isGraylogIndex("graylog_1_suffix"));
+        assertFalse(deflector.isGraylogIndex("HAHA"));
     }
 }

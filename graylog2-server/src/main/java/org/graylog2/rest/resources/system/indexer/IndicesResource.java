@@ -81,7 +81,7 @@ public class IndicesResource extends RestResource {
     public IndexInfo single(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -192,7 +192,7 @@ public class IndicesResource extends RestResource {
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             LOG.info("Index [{}] doesn't look like an index managed by Graylog.", index);
             throw new NotFoundException();
         }
@@ -211,7 +211,7 @@ public class IndicesResource extends RestResource {
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             LOG.info("Index [{}] doesn't look like an index managed by Graylog.", index);
             throw new NotFoundException();
         }
@@ -235,7 +235,7 @@ public class IndicesResource extends RestResource {
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
