@@ -48,7 +48,7 @@ const ConfigurationsPage = React.createClass({
     return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
       return React.createElement(systemConfig.component, {
         key: `system-configuration-${idx}`,
-        config: this._getConfig(systemConfig.configType) || {},
+        config: this._getConfig(systemConfig.configType) || undefined,
         updateConfig: this._onUpdate(systemConfig.configType),
       });
     });
