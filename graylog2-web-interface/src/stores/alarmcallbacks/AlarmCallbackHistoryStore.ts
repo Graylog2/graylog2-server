@@ -1,6 +1,6 @@
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
 class AlarmCallbackHistoryStore {
@@ -9,7 +9,7 @@ class AlarmCallbackHistoryStore {
             UserNotification.error("Fetching alarm callback history failed with status: " + error,
                 "Could not retrieve alarm callback history.");
         };
-        var url = URLUtils.qualifyUrl(jsRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
 
         return fetch('GET', url)
           .then(

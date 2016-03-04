@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 
 import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
@@ -16,7 +16,7 @@ const ServerAvailabilityStore = Reflux.createStore({
     return { server: this.server };
   },
   ping() {
-    return new Builder('GET', URLUtils.qualifyUrl(jsRoutes.ClusterApiResource.node().url)).build().then(
+    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.node().url)).build().then(
       () => ServerAvailabilityActions.reportSuccess(),
       (error) => ServerAvailabilityActions.reportError(error)
     );

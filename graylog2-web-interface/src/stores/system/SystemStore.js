@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const SystemStore = Reflux.createStore({
@@ -16,12 +16,12 @@ const SystemStore = Reflux.createStore({
     return {system: this.system};
   },
   info() {
-    const url = URLUtils.qualifyUrl(jsRoutes.SystemApiController.info().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
 
     return fetch('GET', url);
   },
   jvm() {
-    const url = URLUtils.qualifyUrl(jsRoutes.SystemApiController.jvm().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
 
     return fetch('GET', url);
   },

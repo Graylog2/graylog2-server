@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Qs from 'qs';
 import fetch from 'logic/rest/FetchProvider';
 
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
 import SavedSearchesActions from 'actions/search/SavedSearchesActions';
@@ -96,10 +96,10 @@ const SavedSearchesStore = Reflux.createStore({
     let verb;
 
     if (!searchId) {
-      url = jsRoutes.SavedSearchesApiController.create().url;
+      url = ApiRoutes.SavedSearchesApiController.create().url;
       verb = 'POST';
     } else {
-      url = jsRoutes.SavedSearchesApiController.update(searchId).url;
+      url = ApiRoutes.SavedSearchesApiController.update(searchId).url;
       verb = 'PUT';
     }
 
@@ -137,7 +137,7 @@ const SavedSearchesStore = Reflux.createStore({
   },
 
   delete(searchId) {
-    const url = jsRoutes.SavedSearchesApiController.delete(searchId).url;
+    const url = ApiRoutes.SavedSearchesApiController.delete(searchId).url;
     const promise = fetch('DELETE', URLUtils.qualifyUrl(url));
     promise
       .then(() => {

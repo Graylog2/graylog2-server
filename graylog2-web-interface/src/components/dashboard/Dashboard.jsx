@@ -11,7 +11,7 @@ import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import StartpageStore from 'stores/users/StartpageStore';
 
 import Routes from 'routing/Routes';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 
 const Dashboard = React.createClass({
   propTypes: {
@@ -47,7 +47,7 @@ const Dashboard = React.createClass({
       dashboardActions = (
         <div className="stream-actions">
           <DropdownButton title="More actions" pullRight>
-            <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
+            <MenuItem href={ApiRoutes.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
               as startpage</MenuItem>
           </DropdownButton>
         </div>

@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const InputStaticFieldsStore = Reflux.createStore({

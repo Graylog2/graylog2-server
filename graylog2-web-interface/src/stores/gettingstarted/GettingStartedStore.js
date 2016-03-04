@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';

@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const InputStatesStore = Reflux.createStore({
@@ -17,7 +17,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.ClusterInputStatesController.list().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.list().url);
     return fetch('GET', url)
       .then((response) => {
         const result = {};
@@ -56,7 +56,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   start(input) {
-    const url = URLUtils.qualifyUrl(jsRoutes.ClusterInputStatesController.start(input.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.start(input.id).url);
     return fetch('PUT', url)
       .then(
         (response) => {
@@ -69,7 +69,7 @@ const InputStatesStore = Reflux.createStore({
   },
 
   stop(input) {
-    const url = URLUtils.qualifyUrl(jsRoutes.ClusterInputStatesController.stop(input.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.stop(input.id).url);
     return fetch('DELETE', url)
       .then(
         (response) => {

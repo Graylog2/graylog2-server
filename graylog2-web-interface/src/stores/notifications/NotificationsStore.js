@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch, {Builder} from 'logic/rest/FetchProvider';
 
 import NotificationsActions from 'actions/notifications/NotificationsActions';
@@ -21,7 +21,7 @@ const NotificationsStore = Reflux.createStore({
     return {};
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.NotificationsApiController.list().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
     const promise = new Builder('GET', url)
       .authenticated()
       .setHeader('X-Graylog-No-Session-Extension', 'true')
@@ -35,7 +35,7 @@ const NotificationsStore = Reflux.createStore({
     this.trigger(response);
   },
   delete(type) {
-    const url = URLUtils.qualifyUrl(jsRoutes.NotificationsApiController.delete(type).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
     const promise = fetch('DELETE', url);
 
     NotificationsActions.delete.promise(promise);

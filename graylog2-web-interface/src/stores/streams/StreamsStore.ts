@@ -1,6 +1,6 @@
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface Stream {
@@ -49,7 +49,7 @@ class StreamsStore {
         "Could not retrieve Stream");
     };
 
-    const url = jsRoutes.StreamsApiController.get(streamId).url;
+    const url = ApiRoutes.StreamsApiController.get(streamId).url;
     fetch('GET', URLUtils.qualifyUrl(url)).then(callback, failCallback);
   }
   remove(streamId: string, callback: (() => void)) {
@@ -58,7 +58,7 @@ class StreamsStore {
         "Could not remove Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.delete(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
     fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
   }
   pause(streamId: string, callback: (() => void)) {
@@ -67,7 +67,7 @@ class StreamsStore {
         "Could not pause Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.pause(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url);
     fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
   }
   resume(streamId: string, callback: (() => void)) {
@@ -76,7 +76,7 @@ class StreamsStore {
         "Could not resume Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.resume(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
     fetch('POST', url)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
@@ -86,7 +86,7 @@ class StreamsStore {
         "Could not save Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.create().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.create().url);
     fetch('POST', url, stream)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
@@ -96,7 +96,7 @@ class StreamsStore {
         "Could not update Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.update(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.update(streamId).url);
     fetch('PUT', url, data)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
@@ -106,12 +106,12 @@ class StreamsStore {
         "Could not clone Stream");
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.cloneStream(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.cloneStream(streamId).url);
     fetch('POST', url, data)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   removeOutput(streamId: string, outputId: string, callback: (errorThrown) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamOutputsApiController.delete(streamId, outputId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.delete(streamId, outputId).url);
 
     fetch('DELETE', url).then(callback, (errorThrown) => {
       UserNotification.error("Removing output from stream failed with status: " + errorThrown,
@@ -119,35 +119,35 @@ class StreamsStore {
     }).then(this._emitChange.bind(this));
   }
   addOutput(streamId: string, outputId: string, callback: (errorThrown) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamOutputsApiController.add(streamId, outputId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.add(streamId, outputId).url);
     fetch('POST', url, {outputs: [outputId]}).then(callback, (errorThrown) => {
       UserNotification.error("Adding output to stream failed with status: " + errorThrown,
         "Could not add output to stream");
     }).then(this._emitChange.bind(this));
   }
   testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamsApiController.testMatch(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.testMatch(streamId).url);
     fetch('POST', url, message).then(callback, (error) => {
       UserNotification.error("Testing stream rules of stream failed with status: " + error.message,
         "Could not test stream rules of stream");
     });
   }
   addReceiver(streamId: string, type: string, entity: string, callback: () => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamAlertsApiController.addReceiver(streamId, type, entity).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.addReceiver(streamId, type, entity).url);
     fetch('POST', url).then(callback, (error) => {
       UserNotification.error("Adding stream alert received failed with error: " + error.message,
           "Could not add stream alert receiver");
     }).then(this._emitChange.bind(this));
   }
   deleteReceiver(streamId: string, type: string, entity: string, callback: () => void) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamAlertsApiController.deleteReceiver(streamId, type, entity).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.deleteReceiver(streamId, type, entity).url);
     fetch('DELETE', url).then(callback, (error) => {
       UserNotification.error("Deleting stream alert received failed with error: " + error.message,
           "Could not delete stream alert receiver");
     }).then(this._emitChange.bind(this));
   }
   sendDummyAlert(streamId: string) {
-    const url = URLUtils.qualifyUrl(jsRoutes.StreamAlertsApiController.sendDummyAlert(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.sendDummyAlert(streamId).url);
     const promise = fetch('POST', url);
     return promise;
   }

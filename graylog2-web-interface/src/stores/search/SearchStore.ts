@@ -6,7 +6,7 @@
 
 import $ = require('jquery');
 import Immutable = require('immutable');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const Routes = require('routing/Routes');
 var Qs = require('qs');
 const URLUtils = require('util/URLUtils');

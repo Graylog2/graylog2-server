@@ -1,6 +1,6 @@
 import Qs from 'qs';
 
-const jsRoutes = {
+const ApiRoutes = {
   AlarmCallbacksApiController: {
     available: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks/available` }; },
     create: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
@@ -289,4 +289,4 @@ const jsRoutes = {
   },
 };
 
-export default jsRoutes;
+export default ApiRoutes;
