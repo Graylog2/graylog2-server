@@ -80,6 +80,11 @@ const jsRoutes = {
         start: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
         stop: (inputId) => { return {url: `/cluster/inputstates/${inputId}`}; },
       },
+      ClusterLoggersResource: {
+        loggers: () => { return {url: '/cluster/system/loggers'}; },
+        subsystems: () => { return {url: '/cluster/system/loggers/subsystems'}; },
+        setSubsystemLoggerLevel: (nodeId, subsystem, loglevel) => { return {url: '/cluster/system/loggers/' + nodeId + '/subsystems/' + subsystem + '/level/' + loglevel}; },
+      },
       MessageFieldsApiController: {
         list: () => { return {url: '/system/fields'}; },
       },
