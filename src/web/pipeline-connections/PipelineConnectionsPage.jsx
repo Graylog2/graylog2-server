@@ -65,7 +65,7 @@ const PipelineConnectionsPage = React.createClass({
             as input for the different pipelines you configure.
           </span>
           <span>
-            Read more about Graylog pipelines in the <DocumentationLink page={"TODO"} text="documentation"/>.
+            Read more about Graylog pipelines in the <DocumentationLink page={"pipelines.html"} text="documentation"/>.
           </span>
 
           <span>

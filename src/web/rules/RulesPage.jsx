@@ -34,7 +34,7 @@ const RulesPage = React.createClass({
           </span>
 
           <span>
-            Read more about Graylog pipeline rules in the <DocumentationLink page={"TODO"}
+            Read more about Graylog pipeline rules in the <DocumentationLink page={"pipelines_rules.html"}
                                                                     text="documentation"/>.
           </span>
 
