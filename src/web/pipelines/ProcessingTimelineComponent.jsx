@@ -42,7 +42,7 @@ const ProcessingTimelineComponent = React.createClass({
         style.width = 120;
         break;
       default:
-        // Nothing to see here
+      // Nothing to see here
     }
 
     return <th style={style}>{header}</th>;
@@ -109,9 +109,12 @@ const ProcessingTimelineComponent = React.createClass({
 
     if (this.state.pipelines.length === 0) {
       return (
-        <Alert>
-          There are no pipelines configured in your system. Create one to start processing your messages.
-        </Alert>
+        <div>
+          <div className="text-right"><PipelineForm create save={this._savePipeline}/></div>
+          <Alert>
+            There are no pipelines configured in your system. Create one to start processing your messages.
+          </Alert>
+        </div>
       );
     }
 
