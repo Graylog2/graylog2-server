@@ -171,7 +171,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 "    \"expensive\": 10\n" +
                 "}";
 
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule, new Message(json, "test", Tools.nowUTC()));
 
         assertThat(message.hasField("author_first")).isTrue();
@@ -181,7 +181,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void substring() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
@@ -195,7 +195,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         try {
             final Rule rule;
             try {
-                rule = parser.parseRule(ruleForTest());
+                rule = parser.parseRule(ruleForTest(), false);
             } catch (ParseException e) {
                 fail("Should not fail to parse", e);
                 return;
@@ -215,7 +215,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void digests() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
@@ -224,7 +224,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void regexMatch() {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
             final Message message = evaluateRule(rule);
             assertNotNull(message);
             assertTrue(message.hasField("matched_regex"));
@@ -236,7 +236,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void strings() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
@@ -247,7 +247,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void ipMatching() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message in = new Message("test", "test", Tools.nowUTC());
         in.addField("ip", "192.168.1.20");
         final Message message = evaluateRule(rule, in);

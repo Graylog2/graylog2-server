@@ -263,14 +263,14 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void basicRule() throws Exception {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         Assert.assertNotNull("rule should be successfully parsed", rule);
     }
 
     @Test
     public void undeclaredIdentifier() throws Exception {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
             fail("should throw error: undeclared variable x");
         } catch (ParseException e) {
             assertEquals(2,
@@ -283,7 +283,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void declaredFunction() throws Exception {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
         } catch (ParseException e) {
             fail("Should not fail to resolve function 'false'");
         }
@@ -292,7 +292,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void undeclaredFunction() throws Exception {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
             assertTrue("Should find error UndeclaredFunction",
@@ -303,7 +303,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void singleArgFunction() throws Exception {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
             final Message message = evaluateRule(rule);
 
             assertNotNull(message);
@@ -316,7 +316,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void positionalArguments() throws Exception {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
             evaluateRule(rule);
 
             assertTrue(actionsTriggered.get());
@@ -328,7 +328,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void inferVariableType() throws Exception {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
 
             evaluateRule(rule);
         } catch (ParseException e) {
@@ -339,7 +339,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void invalidArgType() throws Exception {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
         } catch (ParseException e) {
             assertEquals(2, e.getErrors().size());
             assertTrue("Should only find IncompatibleArgumentType errors",
@@ -350,7 +350,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void booleanValuedFunctionAsCondition() throws Exception {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
 
             evaluateRule(rule);
             assertTrue("actions should have triggered", actionsTriggered.get());
@@ -361,7 +361,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void messageRef() throws Exception {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         Message message = new Message("hello test", "source", DateTime.now());
         message.addField("responseCode", 500);
         final Message processedMsg = evaluateRule(rule, message);
@@ -372,7 +372,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void messageRefQuotedField() throws Exception {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         Message message = new Message("hello test", "source", DateTime.now());
         message.addField("@specialfieldname", "string");
         evaluateRule(rule, message);
@@ -382,7 +382,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void optionalArguments() throws Exception {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
 
         Message message = new Message("hello test", "source", DateTime.now());
         evaluateRule(rule, message);
@@ -392,7 +392,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void optionalParamsMustBeNamed() throws Exception {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().stream().count());
             assertTrue(e.getErrors().stream().allMatch(error -> error instanceof OptionalParametersMustBeNamed));
@@ -402,7 +402,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void mapArrayLiteral() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
         Message message = new Message("hello test", "source", DateTime.now());
         evaluateRule(rule, message);
         assertTrue(actionsTriggered.get());
@@ -411,7 +411,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void typedFieldAccess() throws Exception {
         try {
-            final Rule rule = parser.parseRule(ruleForTest());
+            final Rule rule = parser.parseRule(ruleForTest(), false);
             evaluateRule(rule, new Message("hallo", "test", DateTime.now()));
             assertTrue("condition should be true", actionsTriggered.get());
         } catch (ParseException e) {
@@ -441,7 +441,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void indexedAccess() {
-        final Rule rule = parser.parseRule(ruleForTest());
+        final Rule rule = parser.parseRule(ruleForTest(), false);
 
         evaluateRule(rule, new Message("hallo", "test", DateTime.now()));
         assertTrue("condition should be true", actionsTriggered.get());
@@ -450,7 +450,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void indexedAccessWrongType() {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(NonIndexableType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
@@ -460,7 +460,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void indexedAccessWrongIndexType() {
         try {
-            parser.parseRule(ruleForTest());
+            parser.parseRule(ruleForTest(), false);
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());

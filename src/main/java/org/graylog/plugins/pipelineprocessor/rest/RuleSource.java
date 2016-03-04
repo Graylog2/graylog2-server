@@ -90,7 +90,7 @@ public abstract class RuleSource {
     public static RuleSource fromDao(PipelineRuleParser parser, RuleDao dao) {
         Set<ParseError> errors = null;
         try {
-            parser.parseRule(dao.source());
+            parser.parseRule(dao.source(), false);
 
         } catch (ParseException e) {
             errors = e.getErrors();

@@ -101,8 +101,8 @@ public class PipelineRuleParser {
     private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
-    public Rule parseRule(String rule) throws ParseException {
-        final ParseContext parseContext = new ParseContext();
+    public Rule parseRule(String rule, boolean silent) throws ParseException {
+        final ParseContext parseContext = new ParseContext(silent);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
         final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(rule));
@@ -134,7 +134,7 @@ public class PipelineRuleParser {
     }
 
     public List<Pipeline> parsePipelines(String pipelines) throws ParseException {
-        final ParseContext parseContext = new ParseContext();
+        final ParseContext parseContext = new ParseContext(false);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
         final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(pipelines));
@@ -157,7 +157,7 @@ public class PipelineRuleParser {
     }
 
     public Pipeline parsePipeline(String id, String source) {
-        final ParseContext parseContext = new ParseContext();
+        final ParseContext parseContext = new ParseContext(false);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
         final RuleLangLexer lexer = new RuleLangLexer(new ANTLRInputStream(source));
@@ -582,7 +582,11 @@ public class PipelineRuleParser {
                 final String name = varRefExpression.varName();
                 final Expression expression = parseContext.getDefinedVar(name);
                 if (expression == null) {
-                    log.error("Unable to retrieve expression for variable {}, this is a bug", name);
+                    if (parseContext.isSilent()) {
+                        log.debug("Unable to retrieve expression for variable {}, this is a bug", name);
+                    } else {
+                        log.error("Unable to retrieve expression for variable {}, this is a bug", name);
+                    }
                     return;
                 }
                 log.trace("Inferred type of variable {} to {}", name, expression.getType().getSimpleName());
@@ -716,6 +720,10 @@ public class PipelineRuleParser {
     private static class ParseContext {
         private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
         private final ParseTreeProperty<Map<String, Expression>> args = new ParseTreeProperty<>();
+        /**
+         * Should the parser be more silent about its error logging, useful for interactive parsing in the UI.
+         */
+        private final boolean silent;
         private ParseTreeProperty<List<Expression>> argsLists = new ParseTreeProperty<>();
         private Set<ParseError> errors = Sets.newHashSet();
         // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
@@ -724,6 +732,10 @@ public class PipelineRuleParser {
         public List<Rule> rules = Lists.newArrayList();
         private Map<String, Expression> varDecls = Maps.newHashMap();
         public List<Pipeline> pipelines = Lists.newArrayList();
+
+        public ParseContext(boolean silent) {
+            this.silent = silent;
+        }
 
         public ParseTreeProperty<Expression> expressions() {
             return exprs;
@@ -781,6 +793,10 @@ public class PipelineRuleParser {
 
         public ParseTreeProperty<List<Expression>> argumentLists() {
             return argsLists;
+        }
+
+        public boolean isSilent() {
+            return silent;
         }
     }
 

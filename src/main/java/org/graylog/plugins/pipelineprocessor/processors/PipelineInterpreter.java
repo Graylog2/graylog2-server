@@ -115,7 +115,7 @@ public class PipelineInterpreter implements MessageProcessor {
         for (RuleDao ruleDao : ruleService.loadAll()) {
             Rule rule;
             try {
-                rule = pipelineRuleParser.parseRule(ruleDao.source());
+                rule = pipelineRuleParser.parseRule(ruleDao.source(), false);
             } catch (ParseException e) {
                 rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
             }
