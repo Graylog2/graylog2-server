@@ -28,7 +28,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class PipelineStreamConnection {
+public abstract class PipelineConnections {
 
     @JsonProperty("id")
     @Nullable
@@ -43,9 +43,9 @@ public abstract class PipelineStreamConnection {
     public abstract Set<String> pipelineIds();
 
     @JsonCreator
-    public static PipelineStreamConnection create(@Id @ObjectId @JsonProperty("id") @Nullable String _id,
-                                                  @JsonProperty("stream_id") String streamId,
-                                                  @JsonProperty("pipeline_ids") Set<String> pipelineIds) {
+    public static PipelineConnections create(@Id @ObjectId @JsonProperty("id") @Nullable String _id,
+                                             @JsonProperty("stream_id") String streamId,
+                                             @JsonProperty("pipeline_ids") Set<String> pipelineIds) {
         return builder()
                 ._id(_id)
                 .streamId(streamId)
@@ -54,14 +54,14 @@ public abstract class PipelineStreamConnection {
     }
 
     public static Builder builder() {
-        return new AutoValue_PipelineStreamConnection.Builder();
+        return new AutoValue_PipelineConnections.Builder();
     }
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract PipelineStreamConnection build();
+        public abstract PipelineConnections build();
 
         public abstract Builder _id(String _id);
 

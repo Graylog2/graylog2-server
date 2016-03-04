@@ -42,7 +42,7 @@ import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamConnection;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -157,7 +157,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
         // read all stream connections of those pipelines to allow processing messages through them
         final HashMultimap<String, Pipeline> connections = HashMultimap.create();
-        for (PipelineStreamConnection streamConnection : pipelineStreamConnectionsService.loadAll()) {
+        for (PipelineConnections streamConnection : pipelineStreamConnectionsService.loadAll()) {
             streamConnection.pipelineIds().stream()
                     .map(pipelineIdMap::get)
                     .filter(Objects::nonNull)
@@ -337,7 +337,7 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     @Subscribe
-    public void handlePipelineConnectionChanges(PipelineStreamConnection connection) {
+    public void handlePipelineConnectionChanges(PipelineConnections connection) {
         log.debug("Pipeline stream connection changed: {}", connection);
         scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
     }

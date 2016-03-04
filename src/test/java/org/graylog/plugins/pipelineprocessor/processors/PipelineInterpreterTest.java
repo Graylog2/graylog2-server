@@ -30,7 +30,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineStreamConnection;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
@@ -76,11 +76,11 @@ public class PipelineInterpreterTest {
         ));
 
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(PipelineStreamConnectionsService.class);
-        final PipelineStreamConnection pipelineStreamConnection = PipelineStreamConnection.create(null,
+        final PipelineConnections pipelineConnections = PipelineConnections.create(null,
                                                                                                   "default",
                                                                                                   newHashSet("cde"));
         when(pipelineStreamConnectionsService.loadAll()).thenReturn(
-                newHashSet(pipelineStreamConnection)
+                newHashSet(pipelineConnections)
         );
 
         final Map<String, Function<?>> functions = Maps.newHashMap();

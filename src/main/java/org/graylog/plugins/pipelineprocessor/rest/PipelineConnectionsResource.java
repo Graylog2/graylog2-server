@@ -37,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.Set;
 
 @Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines")
@@ -63,7 +64,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
     @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
     @POST
-    public PipelineStreamConnection connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineStreamConnection connection) throws NotFoundException {
+    public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
         // the default stream doesn't exist as an entity
         if (!streamId.equalsIgnoreCase("default")) {
@@ -73,7 +74,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         for (String s : connection.pipelineIds()) {
             pipelineService.load(s);
         }
-        final PipelineStreamConnection save = connectionsService.save(connection);
+        final PipelineConnections save = connectionsService.save(connection);
         clusterBus.post(save);
         return save;
     }
@@ -81,13 +82,13 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation("Get pipeline connections for the given stream")
     @GET
     @Path("/{streamId}")
-    public PipelineStreamConnection getPipelinesForStream(@ApiParam(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
+    public PipelineConnections getPipelinesForStream(@ApiParam(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
         return connectionsService.load(streamId);
     }
 
     @ApiOperation("Get all pipeline connections")
     @GET
-    public Set<PipelineStreamConnection> getAll() throws NotFoundException {
+    public Set<PipelineConnections> getAll() throws NotFoundException {
         return connectionsService.loadAll();
     }
 
