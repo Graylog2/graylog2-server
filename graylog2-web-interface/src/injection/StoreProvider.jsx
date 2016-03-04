@@ -29,7 +29,7 @@ class StoreProvider {
       InputStaticFields: () => require('stores/inputs/InputStaticFieldsStore'),
       InputTypes: () => require('stores/inputs/InputTypesStore'),
       Journal: () => require('stores/journal/JournalStore'),
-      Loggers: () => require('stores/loggers/LoggersStore'),
+      Loggers: () => require('stores/system/LoggersStore'),
       MessageCounts: () => require('stores/messages/MessageCountsStore'),
       MessageFields: () => require('stores/messages/MessageFieldsStore'),
       Messages: () => require('stores/messages/MessagesStore'),

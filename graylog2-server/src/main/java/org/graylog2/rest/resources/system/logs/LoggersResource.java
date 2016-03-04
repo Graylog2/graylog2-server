@@ -159,8 +159,8 @@ public class LoggersResource extends RestResource {
     })
     @Path("/subsystems/{subsystem}/level/{level}")
     public void setSubsystemLoggerLevel(
-            @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
-            @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
+        @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
+        @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             LOG.warn("No such subsystem: [{}]. Returning 404.", subsystemTitle);
             throw new NotFoundException();
@@ -180,8 +180,8 @@ public class LoggersResource extends RestResource {
             notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
     public void setSingleLoggerLevel(
-            @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
-            @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
+        @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
+        @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
         setLoggerLevel(loggerName, newLevel);
