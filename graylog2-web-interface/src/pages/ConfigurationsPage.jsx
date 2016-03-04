@@ -8,6 +8,7 @@ import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 import ConfigurationActions from 'actions/configurations/ConfigurationActions';
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
+import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 
 import style from '!style!css!components/configurations/ConfigurationStyles.css';
 
@@ -22,6 +23,7 @@ const ConfigurationsPage = React.createClass({
 
   componentDidMount() {
     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
+    ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
 
     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
       ConfigurationActions.list(systemConfig.configType);
@@ -29,6 +31,7 @@ const ConfigurationsPage = React.createClass({
   },
 
   SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
+  MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
 
   _getConfig(configType) {
     if (this.state.configuration && this.state.configuration[configType]) {
@@ -40,7 +43,12 @@ const ConfigurationsPage = React.createClass({
 
   _onUpdate(configType) {
     return (config) => {
-      return ConfigurationActions.update(configType, config);
+      switch (configType) {
+        case this.MESSAGE_PROCESSORS_CONFIG:
+          return ConfigurationActions.updateMessageProcessorsConfig(configType, config);
+        default:
+          return ConfigurationActions.update(configType, config);
+      }
     };
   },
 
@@ -79,7 +87,9 @@ const ConfigurationsPage = React.createClass({
 
   render() {
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
+    const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     let searchesConfigComponent;
+    let messageProcessorsConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -87,6 +97,14 @@ const ConfigurationsPage = React.createClass({
       );
     } else {
       searchesConfigComponent = (<Spinner />);
+    }
+    if (messageProcessorsConfig) {
+      messageProcessorsConfigComponent = (
+        <MessageProcessorsConfig config={messageProcessorsConfig}
+                                 updateConfig={this._onUpdate(this.MESSAGE_PROCESSORS_CONFIG)} />
+      );
+    } else {
+      messageProcessorsConfigComponent = (<Spinner />);
     }
 
     const pluginConfigRows = this._pluginConfigRows();
@@ -100,8 +118,11 @@ const ConfigurationsPage = React.createClass({
         </PageHeader>
 
         <Row className="content">
-          <Col md={12}>
+          <Col md={6}>
             {searchesConfigComponent}
+          </Col>
+          <Col md={6}>
+            {messageProcessorsConfigComponent}
           </Col>
         </Row>
 

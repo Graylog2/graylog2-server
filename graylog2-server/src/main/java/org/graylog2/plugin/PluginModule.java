@@ -137,8 +137,13 @@ public abstract class PluginModule extends Graylog2Module {
         return Multibinder.newSetBinder(binder(), MessageProcessor.class);
     }
 
-    protected void addMessageProcessor(Class<? extends MessageProcessor> processorClass) {
+    protected Multibinder<MessageProcessor.Descriptor> processorDescriptorBinder() {
+        return Multibinder.newSetBinder(binder(), MessageProcessor.Descriptor.class);
+    }
+
+    protected void addMessageProcessor(Class<? extends MessageProcessor> processorClass, Class<? extends MessageProcessor.Descriptor> descriptorClass) {
         processorBinder().addBinding().to(processorClass);
+        processorDescriptorBinder().addBinding().to(descriptorClass);
     }
 
     protected <T extends WidgetStrategy> void addWidgetStrategy(Class<T> widgetStrategyClass, Class<? extends WidgetStrategy.Factory<T>> factory) {

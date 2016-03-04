@@ -20,32 +20,24 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-@AutoValue
 @JsonAutoDetect
-public abstract class MessageProcessorOrder {
+@AutoValue
+public abstract class MessageProcessorDescriptor {
+    @JsonProperty("name")
+    public abstract String name();
 
-    @JsonProperty
-    public abstract long changeVersion();
-
-    @JsonProperty
-    public abstract List<String> classOrder();
-
-    @JsonProperty
-    public abstract Set<String> disabledMessageProcessors();
+    @JsonProperty("class_name")
+    public abstract String className();
 
     @JsonCreator
-    public static MessageProcessorOrder create(@JsonProperty("change_version") long changeVersion,
-                                               @JsonProperty("class_order") List<String> classOrder,
-                                               @JsonProperty("disabled_message_processors") Set<String> disabledMessageProcessors) {
-        return new AutoValue_MessageProcessorOrder(changeVersion, classOrder, disabledMessageProcessors);
+    public static MessageProcessorDescriptor create(@JsonProperty("name") String name,
+                                                    @JsonProperty("class_name") String className) {
+        return new AutoValue_MessageProcessorDescriptor(name, className);
     }
 
-    public static MessageProcessorOrder create(long changeVersion, List<String> classOrder) {
-        return create(changeVersion, classOrder, Collections.emptySet());
+    public static MessageProcessorDescriptor fromDescriptor(MessageProcessor.Descriptor descriptor) {
+        return create(descriptor.name(), descriptor.className());
     }
 }

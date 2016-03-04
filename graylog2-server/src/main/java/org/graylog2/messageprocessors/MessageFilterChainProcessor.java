@@ -42,6 +42,18 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class MessageFilterChainProcessor implements MessageProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(MessageFilterChainProcessor.class);
 
+    public static class Descriptor implements MessageProcessor.Descriptor {
+        @Override
+        public String name() {
+            return "Message Filter Chain";
+        }
+
+        @Override
+        public String className() {
+            return MessageFilterChainProcessor.class.getCanonicalName();
+        }
+    }
+
     private final List<MessageFilter> filterRegistry;
     private final MetricRegistry metricRegistry;
     private final Journal journal;
