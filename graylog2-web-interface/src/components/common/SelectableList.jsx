@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 import { Select } from 'components/common';
@@ -14,6 +14,7 @@ const SelectableList = React.createClass({
     displayKey: PropTypes.string,
     idKey: PropTypes.string,
     onChange: PropTypes.func,
+    autoFocus: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -22,6 +23,12 @@ const SelectableList = React.createClass({
       displayKey: 'label',
       idKey: 'value',
     };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.selectedOptions !== nextProps.selectedOptions) {
+      this.refs.select.clearValue();
+    }
   },
 
   _getOptionId(option) {
@@ -71,9 +78,9 @@ const SelectableList = React.createClass({
     });
     return (
       <div>
-        <Select options={this.props.options} onValueChange={this._onAddOption}/>
+        <Select ref="select" autofocus={this.props.autoFocus} options={this.props.options} onValueChange={this._onAddOption} />
         {formattedOptions.length > 0 &&
-        <ListGroup style={{marginTop: 10}}>{formattedOptions}</ListGroup>
+        <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>
         }
       </div>
     );

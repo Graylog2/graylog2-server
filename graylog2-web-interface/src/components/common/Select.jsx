@@ -25,6 +25,11 @@ const Select = React.createClass({
   getValue() {
     return this.state.value;
   },
+  clearValue() {
+    // Clear value needs an event, so we just give it one :grumpy:
+    // As someone said: "This can't do any more harm that we already do"
+    this.refs.select.clearValue(new CustomEvent('fake'));
+  },
   _onChange(value) {
     this.setState({value: value});
 
@@ -34,7 +39,7 @@ const Select = React.createClass({
   },
   reactSelectStyles: require('!style/useable!css!react-select/dist/default.css'),
   render() {
-    return <ReactSelect onChange={this._onChange} {...this.props} value={this.state.value} />;
+    return <ReactSelect ref="select" onChange={this._onChange} {...this.props} value={this.state.value} />;
   },
 });
 
