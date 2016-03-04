@@ -14,9 +14,9 @@
     "new-cap": 0,
     "indent": [2, 2, { "SwitchCase" : 1}],
     "max-len" : 0,
-    "prefer-es6-class": 0,
+    "react/prefer-es6-class": 0,
     "arrow-body-style": 0,
-    "jsx-indent-props": 0,
+    "react/jsx-indent-props": 0,
   },
 }
 
