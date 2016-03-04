@@ -41,7 +41,6 @@ const PipelineConnections = React.createClass({
 
     const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id));
 
-    // TODO: Add default stream
     return (
       <div>
         <Row className="row-sm">

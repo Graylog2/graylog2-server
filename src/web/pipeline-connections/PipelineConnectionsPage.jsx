@@ -32,7 +32,10 @@ const PipelineConnectionsPage = React.createClass({
     PipelineConnectionsActions.list();
 
     const store = this.context.storeProvider.getStore('Streams');
-    store.listStreams().then((streams) => this.setState({streams: streams}));
+    store.listStreams().then((streams) => {
+      streams.push({id: 'default', title: 'Incoming messages', description: 'Default stream of all incoming messages.'});
+      this.setState({streams: streams});
+    });
   },
 
   _updateConnections(connections, callback) {

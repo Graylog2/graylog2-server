@@ -128,7 +128,7 @@ const ConnectionForm = React.createClass({
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Add new' : 'Edit'} connection ${this.state.connection.title}`}
+                            title={`${this.props.create ? 'Add new' : 'Edit'} connection`}
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
@@ -138,6 +138,7 @@ const ConnectionForm = React.createClass({
               <SelectableList options={this._getFilteredFormattedOptions(this.state.pipelines)}
                               isLoading={!this.state.pipelines}
                               onChange={this._onConnectionsChange}
+                              selectedOptionsType="object"
                               selectedOptions={this.state.connection.pipelines}/>
             </Input>
           </fieldset>
