@@ -21,7 +21,7 @@ const SelectableList = React.createClass({
       idKey: 'value',
     };
   },
-  
+
   _getOptionId(option) {
     return (typeof option === 'string' ? option : option[this.props.idKey]);
   },
@@ -36,7 +36,12 @@ const SelectableList = React.createClass({
     }
 
     const newSelectedOptions = this.props.selectedOptions.slice();
-    newSelectedOptions.push(this.props.options.filter(o => this._getOptionId(o) === option)[0]);
+    if (typeof newSelectedOptions[0] === 'string') {
+      newSelectedOptions.push(option);
+    } else {
+      newSelectedOptions.push(this.props.options.filter(o => this._getOptionId(o) === option)[0]);
+    }
+
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(newSelectedOptions);
     }
