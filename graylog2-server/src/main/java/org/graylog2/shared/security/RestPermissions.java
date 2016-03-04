@@ -235,7 +235,8 @@ public class RestPermissions implements PluginPermissions {
             THROUGHPUT_READ,
             SAVEDSEARCHES_CREATE,
             SAVEDSEARCHES_EDIT,
-            SAVEDSEARCHES_READ
+            SAVEDSEARCHES_READ,
+            CLUSTER_CONFIG_ENTRY_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
