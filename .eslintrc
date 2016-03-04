@@ -7,20 +7,16 @@
   "extends": [
     "eslint:recommended",
     "airbnb",
-    "import/warnings"
   ],
   "rules": {
     "no-else-return": 1,
     "no-nested-ternary": 1,
     "new-cap": 0,
     "indent": [2, 2, { "SwitchCase" : 1}],
-    "import/no-unresolved": 1,
+    "max-len" : 0,
+    "react/prefer-es6-class": 0,
+    "arrow-body-style": 0,
+    "react/jsx-indent-props": 0,
   },
-  "settings": {
-    "import/resolve": {
-      "extensions": [".js", ".jsx", ".ts"],
-      "moduleDirectory": ["src", "node_modules", "public"]
-    }
-  }
 }
 
