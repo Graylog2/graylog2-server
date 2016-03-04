@@ -13,7 +13,7 @@
   "keywords": [
     "graylog"
   ],
-  "author": "Kay Roepke <kay@graylog.com>",
+  "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "GPL-3.0",
   "dependencies": {
     "brace": "^0.7.0",
