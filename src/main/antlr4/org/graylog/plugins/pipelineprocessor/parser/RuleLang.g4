@@ -79,20 +79,20 @@ expression
     |   fieldSet=expression '.' field=expression                        # Nested
     |   array=expression '[' index=expression ']'                       # IndexedAccess
     |   functionCall                                                    # Func
+    |   literal                                                         # LiteralPrimary
+    |   Identifier                                                      # Identifier
+    |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
+    |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
+    |   '(' expression ')'                                              # ParenExpr
 //    |   ('+'|'-') expression                                            # SignedExpression
-////    |   ('~'|'!') expression                                            # BitwiseNot
+//    |   ('~'|'!') expression                                            # BitwiseNot
 //    |   expression ('*'|'/'|'%') expression                             # Multiplication
 //    |   expression ('+'|'-') expression                                 # Addition
+    |   not=Not expression                                              # Not
     |   left=expression comparison=('<=' | '>=' | '>' | '<') right=expression # Comparison
     |   left=expression equality=('==' | '!=') right=expression         # Equality
     |   left=expression and=And right=expression                        # And
     |   left=expression or=Or right=expression                          # Or
-    |   not=Not expression                                              # Not
-    |   Identifier                                                      # Identifier
-    |   literal                                                         # LiteralPrimary
-    |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
-    |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
-    |   '(' expression ')'                                              # ParenExpr
     ;
 
 propAssignment
