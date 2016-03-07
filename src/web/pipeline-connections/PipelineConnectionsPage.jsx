@@ -12,6 +12,8 @@ import PipelinesStore from 'pipelines/PipelinesStore';
 import PipelineConnectionsActions from 'pipeline-connections/PipelineConnectionsActions';
 import PipelineConnectionsStore from 'pipeline-connections/PipelineConnectionsStore';
 
+import DocsHelper from 'util/DocsHelper';
+
 const PipelineConnectionsPage = React.createClass({
   contextTypes: {
     storeProvider: PropTypes.object,
@@ -67,7 +69,7 @@ const PipelineConnectionsPage = React.createClass({
             as input for the different pipelines you configure.
           </span>
           <span>
-            Read more about Graylog pipelines in the <DocumentationLink page={"pipelines.html"} text="documentation" />.
+            Read more about Graylog pipelines in the <DocumentationLink page={DocsHelper.PAGES.PIPELINES} text="documentation" />.
           </span>
 
           <span>
