@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Button, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -6,8 +6,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader, Spinner } from 'components/common';
 import PipelineConnections from './PipelineConnections';
-
-import Routes from 'routing/Routes';
 
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
@@ -33,8 +31,12 @@ const PipelineConnectionsPage = React.createClass({
 
     const store = this.context.storeProvider.getStore('Streams');
     store.listStreams().then((streams) => {
-      streams.push({id: 'default', title: 'Incoming messages', description: 'Default stream of all incoming messages.'});
-      this.setState({streams: streams});
+      streams.push({
+        id: 'default',
+        title: 'Incoming messages',
+        description: 'Default stream of all incoming messages.',
+      });
+      this.setState({ streams });
     });
   },
 
@@ -54,25 +56,21 @@ const PipelineConnectionsPage = React.createClass({
     } else {
       content = (
         <PipelineConnections pipelines={this.state.pipelines} streams={this.state.streams}
-                             connections={this.state.connections} onConnectionsChange={this._updateConnections}/>
+                             connections={this.state.connections} onConnectionsChange={this._updateConnections} />
       );
     }
     return (
       <span>
-        <PageHeader title="Pipeline connections" titleSize={8} buttonSize={4}>
+        <PageHeader title="Pipeline connections" titleSize={9} buttonSize={3}>
           <span>
             Pipelines let you process messages sent to Graylog. Here you can select which streams will be used{' '}
             as input for the different pipelines you configure.
           </span>
           <span>
-            Read more about Graylog pipelines in the <DocumentationLink page={"pipelines.html"} text="documentation"/>.
+            Read more about Graylog pipelines in the <DocumentationLink page={"pipelines.html"} text="documentation" />.
           </span>
 
           <span>
-            <LinkContainer to={Routes.STREAMS}>
-              <Button bsStyle="info">Manage streams</Button>
-            </LinkContainer>
-            &nbsp;
             <LinkContainer to={'/system/pipelines/overview'}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>

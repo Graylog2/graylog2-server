@@ -20,7 +20,7 @@ const PipelineConnections = React.createClass({
   },
 
   _updateFilteredStreams(filteredStreams) {
-    this.setState({filteredStreams: filteredStreams});
+    this.setState({ filteredStreams });
   },
 
   _updateConnection(newConnection, callback) {
@@ -35,7 +35,7 @@ const PipelineConnections = React.createClass({
         return (
           <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
                       pipelines={this.props.pipelines.filter(p => c.pipeline_ids.indexOf(p.id) !== -1)}
-                      onUpdate={this._updateConnection}/>
+                      onUpdate={this._updateConnection} />
         );
       });
 
@@ -50,16 +50,16 @@ const PipelineConnections = React.createClass({
                                  displayKey={'title'}
                                  filterSuggestions={[]}
                                  searchInKeys={['title', 'description']}
-                                 onDataFiltered={this._updateFilteredStreams}/>
+                                 onDataFiltered={this._updateFilteredStreams} />
           </Col>
           <Col md={4}>
             <div className="pull-right">
-              <ConnectionForm create streams={filteredStreams} save={this._updateConnection}/>
+              <ConnectionForm create streams={filteredStreams} save={this._updateConnection} />
             </div>
           </Col>
         </Row>
         <EntityList bsNoItemsStyle="info" noItemsText="There are no pipeline connections."
-                    items={formattedConnections}/>
+                    items={formattedConnections} />
       </div>
     );
   },

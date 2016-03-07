@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { DataTable, EntityListItem } from 'components/common';
 import ConnectionForm from './ConnectionForm';
@@ -18,7 +19,9 @@ const Connection = React.createClass({
   _pipelineRowFormatter(pipeline) {
     return (
       <tr>
-        <td style={{width: 400}}>{pipeline.title}</td>
+        <td style={{ width: 400 }}>
+          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
+        </td>
         <td>{pipeline.description}</td>
       </tr>
     );
@@ -34,15 +37,16 @@ const Connection = React.createClass({
                  headerCellFormatter={this._pipelineHeaderFormatter}
                  rows={pipelines}
                  dataRowFormatter={this._pipelineRowFormatter}
+                 noDataText={'This stream has no connected pipelines. Click on "Edit connections" to add one.'}
                  filterLabel=""
-                 filterKeys={[]}/>
+                 filterKeys={[]} />
     );
   },
 
   render() {
     const actions = (
-      <ConnectionForm connection={{stream: this.props.stream, pipelines: this.props.pipelines}}
-                      save={this.props.onUpdate}/>
+      <ConnectionForm connection={{ stream: this.props.stream, pipelines: this.props.pipelines }}
+                      save={this.props.onUpdate} />
     );
 
     const content = (
@@ -52,11 +56,11 @@ const Connection = React.createClass({
     );
 
     return (
-      <EntityListItem title={`Stream "${this.props.stream.title}"`}
+      <EntityListItem title={`${this.props.stream.title} stream`}
                       titleSuffix={`Connected to ${this.props.pipelines.length === 1 ? '1 pipeline' : `${this.props.pipelines.length} pipelines`}`}
                       description={this.props.stream.description}
                       actions={actions}
-                      contentRow={content}/>
+                      contentRow={content} />
     );
   },
 });

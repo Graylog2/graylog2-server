@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Input, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { Select, SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -48,13 +49,13 @@ const ConnectionForm = React.createClass({
   _onStreamChange(newStream) {
     const connection = ObjectUtils.clone(this.state.connection);
     connection.stream = this.props.streams.filter(s => s.id === newStream)[0];
-    this.setState({connection: connection});
+    this.setState({ connection });
   },
 
   _onConnectionsChange(newRules) {
     const connection = ObjectUtils.clone(this.state.connection);
     connection.pipelines = newRules;
-    this.setState({connection: connection});
+    this.setState({ connection });
   },
 
   _closeModal() {
@@ -82,7 +83,7 @@ const ConnectionForm = React.createClass({
     }
 
     return streams.map(s => {
-      return {value: s.id, label: s.title};
+      return { value: s.id, label: s.title };
     });
   },
 
@@ -93,7 +94,7 @@ const ConnectionForm = React.createClass({
 
     return pipelines
       .map(pipeline => {
-        return {value: pipeline.id, label: pipeline.title};
+        return { value: pipeline.id, label: pipeline.title };
       });
   },
 
@@ -113,13 +114,26 @@ const ConnectionForm = React.createClass({
 
     let streamSelector;
     if (this.props.create) {
+      const streamHelp = (
+        <span>
+          Select the stream you want to connect pipelines to, or create one in the{' '}
+          <LinkContainer to="/streams"><a>Streams page</a></LinkContainer>.
+        </span>
+      );
       streamSelector = (
         <Input label="Stream"
-               help="Select the stream you want to connect pipelines to.">
-          <Select options={this._getFormattedStreams(this.props.streams)} onValueChange={this._onStreamChange}/>
+               help={streamHelp}>
+          <Select options={this._getFormattedStreams(this.props.streams)} onValueChange={this._onStreamChange} />
         </Input>
       );
     }
+
+    const pipelineHelp = (
+      <span>
+        Select the pipelines to connect to this stream, or create one in the{' '}
+        <LinkContainer to="/system/pipelines/overview"><a>Pipelines Overview page</a></LinkContainer>.
+      </span>
+    );
 
     return (
       <span>
@@ -134,12 +148,12 @@ const ConnectionForm = React.createClass({
           <fieldset>
             {streamSelector}
             <Input label="Pipeline connections"
-                   help="Select the pipelines to connect to this stream.">
+                   help={pipelineHelp}>
               <SelectableList options={this._getFilteredFormattedOptions(this.state.pipelines)}
                               isLoading={!this.state.pipelines}
                               onChange={this._onConnectionsChange}
                               selectedOptionsType="object"
-                              selectedOptions={this.state.connection.pipelines}/>
+                              selectedOptions={this.state.connection.pipelines} />
             </Input>
           </fieldset>
         </BootstrapModalForm>
