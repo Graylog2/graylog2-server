@@ -1,15 +1,6 @@
 import React from 'react';
+import DataTableElement from './DataTableElement';
 import { TypeAheadDataFilter } from 'components/common';
-
-const DataTableElement = React.createClass({
-  propTypes: {
-    element: React.PropTypes.any,
-    formatter: React.PropTypes.func.isRequired,
-  },
-  render() {
-    return this.props.formatter(this.props.element);
-  },
-});
 
 const DataTable = React.createClass({
   propTypes: {
@@ -55,7 +46,7 @@ const DataTable = React.createClass({
     let i = 0;
     const formattedHeaders = this.state.headers.map((header) => {
       i++;
-      return <DataTableElement key={'header-' + i} element={header} formatter={this.props.headerCellFormatter}/>;
+      return <DataTableElement key={`header-${i}`} element={header} formatter={this.props.headerCellFormatter} />;
     });
 
     return <tr>{formattedHeaders}</tr>;
@@ -70,13 +61,13 @@ const DataTable = React.createClass({
     }
     const formattedDataRows = sortedDataRows.map((row) => {
       i++;
-      return <DataTableElement key={'row-' + i} element={row} formatter={this.props.dataRowFormatter}/>;
+      return <DataTableElement key={`row-${i}`} element={row} formatter={this.props.dataRowFormatter} />;
     });
 
     return formattedDataRows;
   },
   filterDataRows(filteredRows) {
-    this.setState({filteredRows: filteredRows});
+    this.setState({ filteredRows });
   },
   render() {
     let filter;
@@ -90,7 +81,7 @@ const DataTable = React.createClass({
                                  filterBy={this.props.filterBy}
                                  filterSuggestions={this.props.filterSuggestions}
                                  searchInKeys={this.props.filterKeys}
-                                 onDataFiltered={this.filterDataRows}/>
+                                 onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
             {this.props.children}
@@ -106,7 +97,7 @@ const DataTable = React.createClass({
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={'table ' + this.props.className}>
+        <table className={`table ${this.props.className}`}>
           <thead>
           {this.getFormattedHeaders()}
           </thead>

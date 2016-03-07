@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col } from 'react-bootstrap';
 
 const EntityListItem = React.createClass({
   propTypes: {
@@ -26,7 +26,9 @@ const EntityListItem = React.createClass({
           <Col md={6}>
             <h2>{this.props.title} {titleSuffix}</h2>
             <div className="item-description">
-              {this.props.createdFromContentPack && <span><i className="fa fa-cube" title="Created from content pack"/>&nbsp;</span>}
+              {this.props.createdFromContentPack &&
+              <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
+              }
               <span>{this.props.description}</span>
             </div>
           </Col>
