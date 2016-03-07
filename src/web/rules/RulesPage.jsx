@@ -14,12 +14,12 @@ import RulesStore from './RulesStore';
 import RulesActions from './RulesActions';
 
 const RulesPage = React.createClass({
-  mixins: [
-    Reflux.connect(RulesStore),
-  ],
   contextTypes: {
     storeProvider: React.PropTypes.object,
   },
+  mixins: [
+    Reflux.connect(RulesStore),
+  ],
   componentDidMount() {
     RulesActions.list();
   },

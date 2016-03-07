@@ -1,6 +1,5 @@
-import React, {PropTypes} from 'react';
-import DataTable from 'components/common/DataTable';
-import Timestamp from 'components/common/Timestamp';
+import React, { PropTypes } from 'react';
+import { DataTable, Timestamp } from 'components/common';
 
 import { Button } from 'react-bootstrap';
 
@@ -9,7 +8,7 @@ import RulesActions from './RulesActions';
 
 const RuleList = React.createClass({
   propTypes: {
-    rules: PropTypes.array.isRequired
+    rules: PropTypes.array.isRequired,
   },
 
   _save(rule, callback) {
@@ -22,7 +21,7 @@ const RuleList = React.createClass({
   },
 
   _delete(rule) {
-    if (window.confirm('Do you really want to delete rule ' + rule.title + '?')) {
+    if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
       RulesActions.delete(rule.id);
     }
   },
@@ -35,8 +34,8 @@ const RuleList = React.createClass({
     return <th>{header}</th>;
   },
   _ruleInfoFormatter(rule) {
-    let actions = [
-      <button key="delete" className="btn btn-primary btn-xs" onClick={() => this._delete(rule)} title="Delete rule">Delete</button>,
+    const actions = [
+      <Button key="delete" bsStyle="primary" bsSize="xsmall" onClick={() => this._delete(rule)} title="Delete rule">Delete</Button>,
       <span key="space">&nbsp;</span>,
       <RuleForm key="edit" rule={rule} validateRule={this._validateRule} save={this._save} />,
     ];
@@ -45,15 +44,15 @@ const RuleList = React.createClass({
       <tr key={rule.title}>
         <td>{rule.title}</td>
         <td className="limited">{rule.description}</td>
-        <td className="limited"><Timestamp dateTime={rule.created_at} relative={true}/></td>
-        <td className="limited"><Timestamp dateTime={rule.modified_at} relative={true}/></td>
-        <td style={{width: 150}}>{actions}</td>
+        <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>
+        <td className="limited"><Timestamp dateTime={rule.modified_at} relative /></td>
+        <td className="actions">{actions}</td>
       </tr>
     );
   },
   render() {
-    var filterKeys = ["title", "description"];
-    var headers = ["Title", "Description", "Created at", "Last modified", "Actions"];
+    const filterKeys = ['title', 'description'];
+    const headers = ['Title', 'Description', 'Created at', 'Last modified', 'Actions'];
 
     return (
       <div>

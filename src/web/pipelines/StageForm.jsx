@@ -48,13 +48,13 @@ const StageForm = React.createClass({
   _onChange(event) {
     const stage = ObjectUtils.clone(this.state.stage);
     stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState({stage: stage});
+    this.setState({ stage });
   },
 
   _onRulesChange(newRules) {
     const stage = ObjectUtils.clone(this.state.stage);
     stage.rules = newRules;
-    this.setState({stage: stage});
+    this.setState({ stage });
   },
 
   _closeModal() {
@@ -74,7 +74,7 @@ const StageForm = React.createClass({
 
   _getFormattedOptions(rules) {
     return rules ? rules.map(rule => {
-      return {value: rule.title, label: rule.title};
+      return { value: rule.title, label: rule.title };
     }) : [];
   },
 
@@ -111,7 +111,7 @@ const StageForm = React.createClass({
                    autoFocus
                    onChange={this._onChange}
                    help="Stage priority. The lower the number, the earlier it will execute."
-                   value={this.state.stage.stage}/>
+                   value={this.state.stage.stage} />
 
             <Input label="Continue processing on next stage when">
               <Input type="radio"
@@ -120,7 +120,7 @@ const StageForm = React.createClass({
                      value="true"
                      label="All rules on this stage match the message"
                      onChange={this._onChange}
-                     checked={this.state.stage.match_all}/>
+                     checked={this.state.stage.match_all} />
 
               <Input type="radio"
                      id="match_any"
@@ -128,12 +128,12 @@ const StageForm = React.createClass({
                      value="false"
                      label="At least one of the rules on this stage matches the message"
                      onChange={this._onChange}
-                     checked={!this.state.stage.match_all}/>
+                     checked={!this.state.stage.match_all} />
 
               <Input label="Stage rules"
                      help={rulesHelp}>
                 <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
-                                onChange={this._onRulesChange} selectedOptions={this.state.stage.rules}/>
+                                onChange={this._onRulesChange} selectedOptions={this.state.stage.rules} />
               </Input>
             </Input>
           </fieldset>

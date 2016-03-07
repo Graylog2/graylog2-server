@@ -98,13 +98,13 @@ const ProcessingTimelineComponent = React.createClass({
 
   render() {
     if (!this.state.pipelines) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     if (this.state.pipelines.length === 0) {
       return (
         <div>
-          <div className="text-right"><PipelineForm create save={this._savePipeline}/></div>
+          <div className="text-right"><PipelineForm create save={this._savePipeline} /></div>
           <Alert>
             There are no pipelines configured in your system. Create one to start processing your messages.
           </Alert>
@@ -126,7 +126,7 @@ const ProcessingTimelineComponent = React.createClass({
                    rows={this.state.pipelines}
                    dataRowFormatter={this._pipelineFormatter}
                    filterLabel="Filter pipelines"
-                   filterKeys={['title']}/>
+                   filterKeys={['title']} />
       </div>
     );
   },

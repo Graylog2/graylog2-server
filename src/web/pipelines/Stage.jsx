@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Col, Button } from 'react-bootstrap';
 
@@ -22,7 +22,7 @@ const Stage = React.createClass({
   _ruleRowFormatter(rule) {
     return (
       <tr>
-        <td style={{width: 400}}>{rule.title}</td>
+        <td style={{ width: 400 }}>{rule.title}</td>
         <td>{rule.description}</td>
       </tr>
     );
@@ -38,8 +38,9 @@ const Stage = React.createClass({
                  headerCellFormatter={this._ruleHeaderFormatter}
                  rows={rules}
                  dataRowFormatter={this._ruleRowFormatter}
+                 noDataText="This stage has no rules yet. Click on edit to add some."
                  filterLabel=""
-                 filterKeys={[]}/>
+                 filterKeys={[]} />
     );
   },
 
@@ -49,7 +50,8 @@ const Stage = React.createClass({
     const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
 
     const actions = [
-      <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete} style={{marginRight: 5}}>Delete</Button>,
+      <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete}
+              style={{ marginRight: 5 }}>Delete</Button>,
       <StageForm key="edit-stage" stage={stage} save={this.props.onUpdate} />,
     ];
 
@@ -70,7 +72,7 @@ const Stage = React.createClass({
     if (this.state.rules) {
       content = this._formatRules(this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]));
     } else {
-      content = <Spinner/>;
+      content = <Spinner />;
     }
 
     return (
@@ -78,7 +80,7 @@ const Stage = React.createClass({
                       titleSuffix={suffix}
                       actions={actions}
                       description={description}
-                      contentRow={<Col md={12}>{content}</Col>}/>
+                      contentRow={<Col md={12}>{content}</Col>} />
     );
   },
 });

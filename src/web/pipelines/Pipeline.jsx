@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import { EntityList } from 'components/common';
@@ -37,7 +37,7 @@ const Pipeline = React.createClass({
   _formatStage(stage, maxStage) {
     return (
       <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage}
-             onUpdate={this._updateStage(stage)} onDelete={this._deleteStage(stage)}/>
+             onUpdate={this._updateStage(stage)} onDelete={this._deleteStage(stage)} />
     );
   },
 
@@ -52,13 +52,13 @@ const Pipeline = React.createClass({
         <Row>
           <Col md={12}>
             <div className="pull-right">
-              <StageForm create save={this._saveStage}/>
+              <StageForm create save={this._saveStage} />
             </div>
             <h2>Description</h2>
-            <p style={{marginTop: 5}}>{this.props.pipeline.description}</p>
+            <p style={{ marginTop: 5 }}>{this.props.pipeline.description}</p>
           </Col>
         </Row>
-        <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages}/>
+        <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages} />
       </div>
     );
   },

@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { Input, Button } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -7,7 +7,7 @@ import FormsUtils from 'util/FormsUtils';
 
 const PipelineForm = React.createClass({
   propTypes: {
-    pipeline: PropTypes.object,
+    pipeline: React.PropTypes.object,
     create: React.PropTypes.bool,
     save: React.PropTypes.func.isRequired,
     validatePipeline: React.PropTypes.func.isRequired,
@@ -44,7 +44,7 @@ const PipelineForm = React.createClass({
   _onChange(event) {
     const pipeline = ObjectUtils.clone(this.state.pipeline);
     pipeline[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState({pipeline: pipeline});
+    this.setState({ pipeline });
   },
 
   _closeModal() {
@@ -90,7 +90,7 @@ const PipelineForm = React.createClass({
                    required
                    onChange={this._onChange}
                    help="Pipeline name."
-                   value={this.state.pipeline.title}/>
+                   value={this.state.pipeline.title} />
 
             <Input type="text"
                    id="description"
@@ -98,7 +98,7 @@ const PipelineForm = React.createClass({
                    label="Description"
                    onChange={this._onChange}
                    help="Pipeline description."
-                   value={this.state.pipeline.description}/>
+                   value={this.state.pipeline.description} />
           </fieldset>
         </BootstrapModalForm>
       </span>
