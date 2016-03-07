@@ -130,7 +130,7 @@ public abstract class BaseConfiguration {
     private boolean webEnableCors = false;
 
     @Parameter(value = "web_enable_gzip")
-    private boolean webEnableGzip = false;
+    private boolean webEnableGzip = true;
 
     @Parameter(value = "web_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
     private int webMaxInitialLineLength = 4096;
