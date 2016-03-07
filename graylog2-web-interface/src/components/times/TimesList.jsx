@@ -39,7 +39,7 @@ const TimesList = React.createClass({
           </p>
 
           <dl className="system-time">
-            <dt>User <em>{currentUser.username}</em></dt>
+            <dt>User <em>{currentUser.username}</em>:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat}/></dd>
             <dt>Your web browser:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat} tz={'browser'}/></dd>
