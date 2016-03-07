@@ -33,19 +33,12 @@ const ProcessingTimelineComponent = React.createClass({
   },
 
   _headerCellFormatter(header) {
-    const style = {};
-    switch (header) {
-      case 'Pipeline':
-        style.width = 300;
-        break;
-      case 'Actions':
-        style.width = 120;
-        break;
-      default:
-      // Nothing to see here
+    let className;
+    if (header === 'Actions') {
+      className = 'actions';
     }
 
-    return <th style={style}>{header}</th>;
+    return <th className={className}>{header}</th>;
   },
 
   _formatStages(pipeline, stages) {
@@ -70,8 +63,9 @@ const ProcessingTimelineComponent = React.createClass({
   _pipelineFormatter(pipeline) {
     return (
       <tr key={pipeline.id}>
-        <td>
-          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
+        <td className="pipeline-name">
+          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer><br />
+          {pipeline.description}
         </td>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
         <td>

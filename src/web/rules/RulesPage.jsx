@@ -27,7 +27,7 @@ const RulesPage = React.createClass({
   render() {
     return (
       <span>
-        <PageHeader title="Pipeline Rules">
+        <PageHeader title="Pipeline Rules" titleSize={9} buttonSize={3}>
           <span>
             Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
             Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
@@ -39,6 +39,10 @@ const RulesPage = React.createClass({
           </span>
 
           <span>
+            <LinkContainer to="/system/pipelines">
+              <Button bsStyle="info">Manage connections</Button>
+            </LinkContainer>
+            &nbsp;
             <LinkContainer to="/system/pipelines/overview">
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>

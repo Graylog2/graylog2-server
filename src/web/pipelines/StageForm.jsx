@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Input, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -85,6 +86,13 @@ const StageForm = React.createClass({
       triggerButtonContent = <span>Edit</span>;
     }
 
+    const rulesHelp = (
+      <span>
+        Select the rules evaluated on this stage, or create one in the{' '}
+        <LinkContainer to="/system/pipelines/rules"><a>Pipeline Rules page</a></LinkContainer>.
+      </span>
+    );
+
     return (
       <span>
         <Button onClick={this.openModal}
@@ -123,7 +131,7 @@ const StageForm = React.createClass({
                      checked={!this.state.stage.match_all}/>
 
               <Input label="Stage rules"
-                     help="Select the rules evaluated on this stage">
+                     help={rulesHelp}>
                 <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
                                 onChange={this._onRulesChange} selectedOptions={this.state.stage.rules}/>
               </Input>

@@ -16,3 +16,11 @@
 .pipeline-stage.used-stage {
     background-color: #FFFFFF;
 }
+
+.pipeline-name {
+    max-width: 300px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 300px;
+}
