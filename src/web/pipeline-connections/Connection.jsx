@@ -2,7 +2,7 @@ import React from 'react';
 import { Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { DataTable, EntityListItem } from 'components/common';
+import { DataTable, EntityListItem, Timestamp } from 'components/common';
 import ConnectionForm from './ConnectionForm';
 
 const Connection = React.createClass({
@@ -23,12 +23,14 @@ const Connection = React.createClass({
           <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
         </td>
         <td>{pipeline.description}</td>
+        <td><Timestamp dateTime={pipeline.created_at} relative /></td>
+        <td><Timestamp dateTime={pipeline.modified_at} relative /></td>
       </tr>
     );
   },
 
   _formatPipelines(pipelines) {
-    const headers = ['Title', 'Description'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified'];
 
     return (
       <DataTable id={`${this.props.stream.id}-pipelines`}

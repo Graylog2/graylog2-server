@@ -1,9 +1,11 @@
 import React, { PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import { EntityList } from 'components/common';
+import { EntityList, Timestamp } from 'components/common';
 import Stage from './Stage';
 import StageForm from './StageForm';
+
+import {} from './Pipeline.css';
 
 const Pipeline = React.createClass({
   propTypes: {
@@ -42,8 +44,9 @@ const Pipeline = React.createClass({
   },
 
   render() {
-    const maxStage = this.props.pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
-    const formattedStages = this.props.pipeline.stages
+    const pipeline = this.props.pipeline;
+    const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
+    const formattedStages = pipeline.stages
       .sort((s1, s2) => s1.stage - s2.stage)
       .map(stage => this._formatStage(stage, maxStage));
 
@@ -54,8 +57,15 @@ const Pipeline = React.createClass({
             <div className="pull-right">
               <StageForm create save={this._saveStage} />
             </div>
-            <h2>Description</h2>
-            <p style={{ marginTop: 5 }}>{this.props.pipeline.description}</p>
+            <h2>Information</h2>
+            <dl className="dl-horizontal pipeline-dl">
+              <dt>Description</dt>
+              <dd>{pipeline.description}</dd>
+              <dt>Created</dt>
+              <dd><Timestamp dateTime={pipeline.created_at} relative /></dd>
+              <dt>Last modified</dt>
+              <dd><Timestamp dateTime={pipeline.modified_at} relative /></dd>
+            </dl>
           </Col>
         </Row>
         <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages} />

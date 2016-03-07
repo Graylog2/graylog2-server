@@ -52,7 +52,7 @@ const RuleList = React.createClass({
   },
   render() {
     const filterKeys = ['title', 'description'];
-    const headers = ['Title', 'Description', 'Created at', 'Last modified', 'Actions'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Actions'];
 
     return (
       <div>
