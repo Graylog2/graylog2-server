@@ -25,7 +25,7 @@ const DataTable = React.createClass({
     headerCellFormatter: React.PropTypes.func.isRequired,
     headers: React.PropTypes.array.isRequired,
     id: React.PropTypes.string,
-    noDataText: React.PropTypes.string,
+    noDataText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.node]),
     rows: React.PropTypes.array.isRequired,
     sortByKey: React.PropTypes.string,
   },
