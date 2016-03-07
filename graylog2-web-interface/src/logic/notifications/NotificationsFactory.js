@@ -59,7 +59,7 @@ class NotificationsFactory {
               The Elasticsearch cluster state is RED which means shards are unassigned.
               This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will write
               into the local disk journal. Read how to fix this in {' '}
-              >DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_STATUS_RED} text="the Elasticsearch setup documentation." />
+              <DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_STATUS_RED} text="the Elasticsearch setup documentation." />
             </span>
           ),
         };
