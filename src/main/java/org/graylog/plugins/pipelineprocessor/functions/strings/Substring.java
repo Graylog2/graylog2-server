@@ -42,7 +42,11 @@ public class Substring extends AbstractFunction<String> {
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
-        final int start = Ints.saturatedCast(startParam.required(args, context));
+        final Long startValue = startParam.required(args, context);
+        if (value == null || startValue == null) {
+            return null;
+        }
+        final int start = Ints.saturatedCast(startValue);
         final int end = Ints.saturatedCast(endParam.optional(args, context).orElse((long) value.length()));
 
         return StringUtils.substring(value, start, end);

@@ -18,11 +18,13 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +45,7 @@ public class EvaluationContext {
     private final Message message;
     private Map<String, TypedValue> ruleVars;
     private List<Message> createdMessages = Lists.newArrayList();
+    private List<EvalError> evalErrors;
 
     private EvaluationContext() {
         this(new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"))); // first Graylog release
@@ -51,6 +54,7 @@ public class EvaluationContext {
     public EvaluationContext(Message message) {
         this.message = message;
         ruleVars = Maps.newHashMap();
+        evalErrors = Lists.newArrayList();
     }
 
     public void define(String identifier, Class type, Object value) {
@@ -81,6 +85,18 @@ public class EvaluationContext {
         return EMPTY_CONTEXT;
     }
 
+    public void addEvaluationError(int line, int charPositionInLine, FunctionDescriptor descriptor, Exception e) {
+        evalErrors.add(new EvalError(line, charPositionInLine, descriptor, e));
+    }
+
+    public boolean hasEvaluationErrors() {
+        return evalErrors.size() > 0;
+    }
+
+    public List<EvalError> evaluationErrors() {
+        return Collections.unmodifiableList(evalErrors);
+    }
+
     public class TypedValue {
         private final Class type;
         private final Object value;
@@ -96,6 +112,26 @@ public class EvaluationContext {
 
         public Object getValue() {
             return value;
+        }
+    }
+
+    public static class EvalError {
+        private final int line;
+        private final int charPositionInLine;
+        private final FunctionDescriptor descriptor;
+        private final Exception e;
+
+        public EvalError(int line, int charPositionInLine, FunctionDescriptor descriptor, Exception e) {
+            this.line = line;
+            this.charPositionInLine = charPositionInLine;
+            this.descriptor = descriptor;
+            this.e = e;
+        }
+
+        @Override
+        public String toString() {
+            return "In call to function '" + descriptor.name() + "' at " + line + ":" + charPositionInLine +
+                    " an exception was thrown: " + e.getMessage();
         }
     }
 }

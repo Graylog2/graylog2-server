@@ -73,6 +73,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class PipelineInterpreter implements MessageProcessor {
     private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
 
+    public static final String GL2_PROCESSING_ERROR = "gl2_processing_error";
+
     private final RuleService ruleService;
     private final PipelineService pipelineService;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
@@ -249,6 +251,13 @@ public class PipelineInterpreter implements MessageProcessor {
                         final ArrayList<Rule> rulesToRun = Lists.newArrayListWithCapacity(stage.getRules().size());
                         for (Rule rule : stage.getRules()) {
                             if (rule.when().evaluateBool(context)) {
+                                if (context.hasEvaluationErrors()) {
+                                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                                    appendProcessingError(rule, message, lastError.toString());
+                                    log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
+                                              lastError);
+                                    continue;
+                                }
                                 log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
                                 rulesToRun.add(rule);
                             } else {
@@ -259,6 +268,14 @@ public class PipelineInterpreter implements MessageProcessor {
                             log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
                             for (Statement statement : rule.then()) {
                                 statement.evaluate(context);
+                                if (context.hasEvaluationErrors()) {
+                                    // if the last statement resulted in an error, do not continue to execute this rules
+                                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                                    appendProcessingError(rule, message, lastError.toString());
+                                    log.debug("Encountered evaluation error, skipping rest of the rule: {}",
+                                              lastError);
+                                    break;
+                                }
                             }
                         }
                         // stage needed to match all rule conditions to enable the next stage,
@@ -312,6 +329,15 @@ public class PipelineInterpreter implements MessageProcessor {
         }
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
+    }
+
+    private void appendProcessingError(Rule rule, Message message, String errorString) {
+        final String msg = "For rule '" + rule.name() + "': " + errorString;
+        if (message.hasField(GL2_PROCESSING_ERROR)) {
+            message.addField(GL2_PROCESSING_ERROR, message.getFieldAs(String.class, GL2_PROCESSING_ERROR) + "," + msg);
+        } else {
+            message.addField(GL2_PROCESSING_ERROR, msg);
+        }
     }
 
     @Subscribe

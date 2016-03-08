@@ -24,6 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import java.net.InetAddress;
+import java.util.IllegalFormatException;
+import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -31,17 +33,32 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
     public static final String NAME = "toip";
     private final ParameterDescriptor<Object, Object> ipParam;
+    private final ParameterDescriptor<String, String> defaultParam;
 
     public IpAddressConversion() {
         ipParam = ParameterDescriptor.object("ip").build();
+        defaultParam = ParameterDescriptor.string("default").optional().build();
     }
 
     @Override
     public IpAddress evaluate(FunctionArgs args, EvaluationContext context) {
         final String ipString = String.valueOf(ipParam.required(args, context));
 
-        final InetAddress inetAddress = InetAddresses.forString(ipString);
-        return new IpAddress(inetAddress);
+        try {
+            final InetAddress inetAddress = InetAddresses.forString(ipString);
+            return new IpAddress(inetAddress);
+        } catch (IllegalFormatException e) {
+            final Optional<String> defaultValue = defaultParam.optional(args, context);
+            if (!defaultValue.isPresent()) {
+                return null;
+            }
+            try {
+                return new IpAddress(InetAddresses.forString(defaultValue.get()));
+            } catch (IllegalFormatException e1) {
+                log.warn("Parameter `default` for toip() is not a valid IP address: {}", defaultValue.get());
+                throw e1;
+            }
+        }
     }
 
     @Override
@@ -50,7 +67,8 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                 .name(NAME)
                 .returnType(IpAddress.class)
                 .params(of(
-                        ipParam
+                        ipParam,
+                        defaultParam
                 ))
                 .build();
     }

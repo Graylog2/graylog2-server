@@ -42,6 +42,9 @@ public class IndexedAccessExpression implements Expression {
     public Object evaluate(EvaluationContext context) {
         final Object idxObj = this.index.evaluate(context);
         final Object indexable = indexableObject.evaluate(context);
+        if (idxObj == null || indexable == null) {
+            return null;
+        }
 
         if (idxObj instanceof Long) {
             int idx = Ints.saturatedCast((long) idxObj);

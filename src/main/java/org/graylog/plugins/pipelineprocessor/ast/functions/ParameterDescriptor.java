@@ -87,6 +87,7 @@ public abstract class ParameterDescriptor<T, R> {
         return ParameterDescriptor.<T, R>param().type(typeClass).transformedType(transformedClass).name(name);
     }
 
+    @Nullable
     public R required(FunctionArgs args, EvaluationContext context) {
         final Object precomputedValue = args.getPreComputedValue(name());
         if (precomputedValue != null) {

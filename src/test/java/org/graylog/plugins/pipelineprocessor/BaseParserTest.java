@@ -79,6 +79,17 @@ public class BaseParserTest {
         actionsTriggered.set(false);
     }
 
+    protected EvaluationContext contextForRuleEval(Rule rule, Message message) {
+        final EvaluationContext context = new EvaluationContext(message);
+        if (rule.when().evaluateBool(context)) {
+
+            for (Statement statement : rule.then()) {
+                statement.evaluate(context);
+            }
+        }
+        return context;
+    }
+
     protected Message evaluateRule(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext(message);
         if (rule.when().evaluateBool(context)) {

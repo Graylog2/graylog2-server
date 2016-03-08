@@ -17,7 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
@@ -258,4 +260,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ipv6_anon")).isEqualTo("2001:db8::");
     }
 
+    @Test
+    public void evalError() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final EvaluationContext context = contextForRuleEval(rule, new Message("test", "test", Tools.nowUTC()));
+
+        assertThat(context).isNotNull();
+        assertThat(context.hasEvaluationErrors()).isTrue();
+        assertThat(Iterables.getLast(context.evaluationErrors()).toString()).isEqualTo("In call to function 'toip' at 5:28 an exception was thrown: 'null' is not an IP string literal.");
+    }
 }

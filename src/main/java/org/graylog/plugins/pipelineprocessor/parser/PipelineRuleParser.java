@@ -347,7 +347,8 @@ public class PipelineRuleParser {
             }
 
             final FunctionExpression expr = new FunctionExpression(
-                     new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
+                    ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
+                    new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
             );
 
             log.trace("FUNC: ctx {} => {}", ctx, expr);

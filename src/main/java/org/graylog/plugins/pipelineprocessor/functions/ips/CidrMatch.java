@@ -51,7 +51,9 @@ public class CidrMatch extends AbstractFunction<Boolean> {
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final CIDR cidr = cidrParam.required(args, context);
         final IpAddress ipAddress = ipParam.required(args, context);
-
+        if (cidr == null || ipAddress == null) {
+            return null;
+        }
         return cidr.contains(ipAddress.inetAddress());
     }
 

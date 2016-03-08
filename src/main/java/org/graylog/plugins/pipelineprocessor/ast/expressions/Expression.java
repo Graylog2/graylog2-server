@@ -18,10 +18,13 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
+import javax.annotation.Nullable;
+
 public interface Expression {
 
     boolean isConstant();
 
+    @Nullable
     Object evaluate(EvaluationContext context);
 
     Class getType();

@@ -59,6 +59,9 @@ public class StringConversion extends AbstractFunction<String> {
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = valueParam.required(args, context);
+        if (evaluated == null) {
+            return null;
+        }
         // fast path for the most common targets
         if (evaluated instanceof String
                 || evaluated instanceof Number
