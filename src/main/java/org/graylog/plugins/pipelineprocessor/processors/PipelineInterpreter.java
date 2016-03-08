@@ -251,7 +251,7 @@ public class PipelineInterpreter implements MessageProcessor {
                             if (rule.when().evaluateBool(context)) {
                                 if (context.hasEvaluationErrors()) {
                                     final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                                    appendProcessingError(message, lastError.toString());
+                                    appendProcessingError(rule, message, lastError.toString());
                                     log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
                                               lastError);
                                     continue;
@@ -269,7 +269,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                 if (context.hasEvaluationErrors()) {
                                     // if the last statement resulted in an error, do not continue to execute this rules
                                     final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                                    appendProcessingError(message, lastError.toString());
+                                    appendProcessingError(rule, message, lastError.toString());
                                     log.debug("Encountered evaluation error, skipping rest of the rule: {}",
                                               lastError);
                                     break;
@@ -329,11 +329,12 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
-    private void appendProcessingError(Message message, String errorString) {
+    private void appendProcessingError(Rule rule, Message message, String errorString) {
+        final String msg = "For rule '" + rule.name() + "': " + errorString;
         if (message.hasField("gl2_processing_error")) {
-            message.addField("gl2_processing_error", message.getFieldAs(String.class, "gl2_processor_error") + "," + errorString);
+            message.addField("gl2_processing_error", message.getFieldAs(String.class, "gl2_processor_error") + "," + msg);
         } else {
-            message.addField("gl2_processing_error", errorString);
+            message.addField("gl2_processing_error", msg);
         }
     }
 
