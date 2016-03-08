@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
 import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
+import URI from 'urijs';
 
 import SearchStore from 'stores/search/SearchStore';
 import SessionStore from 'stores/sessions/SessionStore';
@@ -108,16 +109,15 @@ const SearchSidebar = React.createClass({
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
     const query = searchParams.get('q') === '' ? '*' : searchParams.get('q');
     const fields = this.props.selectedFields;
-    const uriParser = document.createElement('a');
     const timeRange = SearchStore.rangeType === 'relative' ? {range: SearchStore.rangeParams.get('relative')} : SearchStore.rangeParams.toJS();
 
-    uriParser.href = URLUtils.qualifyUrl(
+    const url = new URI(URLUtils.qualifyUrl(
       ApiRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
-    );
-    uriParser.username = SessionStore.getSessionId();
-    uriParser.password = 'session';
+    ))
+      .username(SessionStore.getSessionId())
+      .password('session');
 
-    return uriParser.href;
+    return url.toString();
   },
   render() {
     const indicesModal = (
