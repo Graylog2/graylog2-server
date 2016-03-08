@@ -13,6 +13,7 @@ import OutputsStore from 'stores/outputs/OutputsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
 import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
+// eslint-disable-next-line no-unused-vars
 import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
 
 import PageHeader from 'components/common/PageHeader';
@@ -24,17 +25,17 @@ const ExportContentPackPage = React.createClass({
   },
   componentDidMount() {
     DashboardsStore.listDashboards().then((dashboards) => {
-      this.setState({dashboards: dashboards});
+      this.setState({ dashboards });
     });
     GrokPatternsStore.loadPatterns((grokPatterns) => {
-      this.setState({grok_patterns: grokPatterns});
+      this.setState({ grok_patterns: grokPatterns });
     });
     InputsActions.list();
     OutputsStore.load((resp) => {
-      this.setState({outputs: resp.outputs});
+      this.setState({ outputs: resp.outputs });
     });
     StreamsStore.listStreams().then((streams) => {
-      this.setState({streams: streams});
+      this.setState({ streams });
     });
   },
   onSubmit(evt) {
@@ -70,9 +71,9 @@ const ExportContentPackPage = React.createClass({
   inputDetails(input) {
     let details = input.name;
     if (input.attributes.bind_address) {
-      details += ' on ' + input.attributes.bind_address;
+      details += ` on ${input.attributes.bind_address}`;
       if (input.attributes.port) {
-        details += ' port ' + input.attributes.port;
+        details += ` port ${input.attributes.port}`;
       }
     }
 
@@ -80,38 +81,38 @@ const ExportContentPackPage = React.createClass({
   },
   formatDashboard(dashboard) {
     return (
-      <div className="checkbox" key={'dashboard_checkbox-' + dashboard.id}>
-        <label className="checkbox"><input ref={'dashboards.' + dashboard.id} type="checkbox" name="dashboards" id={'dashboard_' + dashboard.id} value={dashboard.id}/>{dashboard.title}</label>
+      <div className="checkbox" key={`dashboard_checkbox-${dashboard.id}`}>
+        <label className="checkbox"><input ref={`dashboards.${dashboard.id}`} type="checkbox" name="dashboards" id={`dashboard_${dashboard.id}`} value={dashboard.id} />{dashboard.title}</label>
       </div>
     );
   },
   formatGrokPattern(grokPattern) {
     return (
-      <div className="checkbox" key={'grok_pattern_checkbox-' + grokPattern.id}>
-        <label className="checkbox"><input ref={'grok_patterns.' + grokPattern.id} type="checkbox" name="grokPatterns" id={'grokPattern_' + grokPattern.id} value={grokPattern.id}/>{grokPattern.name}</label>
+      <div className="checkbox" key={`grok_pattern_checkbox-${grokPattern.id}`}>
+        <label className="checkbox"><input ref={`grok_patterns.${grokPattern.id}`} type="checkbox" name="grokPatterns" id={`grokPattern_${grokPattern.id}`} value={grokPattern.id} />{grokPattern.name}</label>
         <span className="help-inline">Pattern: <tt>{grokPattern.pattern}</tt></span>
       </div>
     );
   },
   formatInput(input) {
     return (
-      <div className="checkbox" key={'input_checkbox-' + input.id}>
-        <label className="checkbox"><input ref={'inputs.' + input.id} type="checkbox" name="inputs" id={'input_' + input.id} value={input.id}/>{input.title}</label>
+      <div className="checkbox" key={`input_checkbox-${input.id}`}>
+        <label className="checkbox"><input ref={`inputs.${input.id}`} type="checkbox" name="inputs" id={`input_${input.id}`} value={input.id} />{input.title}</label>
         <span className="help-inline">({this.inputDetails(input)})</span>
       </div>
     );
   },
   formatOutput(output) {
     return (
-      <div className="checkbox" key={'output_checkbox-' + output.id}>
-        <label className="checkbox"><input ref={'outputs.' + output.id} type="checkbox" name="outputs" id={'output_' + output.id} value={output.id}/>{output.title}</label>
+      <div className="checkbox" key={`output_checkbox-${output.id}`}>
+        <label className="checkbox"><input ref={`outputs.${output.id}`} type="checkbox" name="outputs" id={`output_${output.id}`} value={output.id} />{output.title}</label>
       </div>
     );
   },
   formatStream(stream) {
     return (
-      <div className="checkbox" key={'stream_checkbox-' + stream.id}>
-        <label className="checkbox"><input ref={'streams.' + stream.id} type="checkbox" name="streams" id={'stream_' + stream.id} value={stream.id}/>{stream.title}</label>
+      <div className="checkbox" key={`stream_checkbox-${stream.id}`}>
+        <label className="checkbox"><input ref={`streams.${stream.id}`} type="checkbox" name="streams" id={`stream_${stream.id}`} value={stream.id} />{stream.title}</label>
       </div>
     );
   },
@@ -121,6 +122,21 @@ const ExportContentPackPage = React.createClass({
         this.refs[key].checked = true;
       }
     });
+  },
+  selectAllInputs() {
+    this.selectAll('input');
+  },
+  selectAllGrokPatterns() {
+    this.selectAll('grok_pattern');
+  },
+  selectAllOutputs() {
+    this.selectAll('output');
+  },
+  selectAllStreams() {
+    this.selectAll('stream');
+  },
+  selectAllDashboards() {
+    this.selectAll('dashboard');
   },
   render() {
     return (
@@ -137,7 +153,7 @@ const ExportContentPackPage = React.createClass({
                   <label className="control-label" htmlFor="name">Name</label>
                 </Col>
                 <Col sm={10}>
-                  <input ref="name" type="text" id="name" className="input-xlarge form-control" name="name" required/>
+                  <input ref="name" type="text" id="name" className="input-xlarge form-control" name="name" required />
                   <span className="help-block">The name of your configuration bundle.</span>
                 </Col>
               </div>
@@ -147,7 +163,7 @@ const ExportContentPackPage = React.createClass({
                   <label className="control-label" htmlFor="description">Description</label>
                 </Col>
                 <Col sm={10}>
-                  <textarea ref="description" rows="6" id="description" name="description" className="input-xlarge form-control" required/>
+                  <textarea ref="description" rows="6" id="description" name="description" className="input-xlarge form-control" required />
                   <span className="help-block">
                     A description of what your bundle does and possible special instructions for the user.
                     You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
@@ -160,7 +176,7 @@ const ExportContentPackPage = React.createClass({
                   <label className="control-label" htmlFor="category">Category</label>
                 </Col>
                 <Col sm={10}>
-                  <input ref="category" type="text" id="category" name="category" className="input-xlarge form-control" required/>
+                  <input ref="category" type="text" id="category" name="category" className="input-xlarge form-control" required />
                   <span className="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
                 </Col>
               </div>
@@ -174,7 +190,7 @@ const ExportContentPackPage = React.createClass({
                   <span className="help-block help-standalone">There are no inputs to export.</span>
                     :
                   <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAll.bind(this, 'input')}>Select all</Button>
+                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllInputs}>Select all</Button>
                     {this.state.inputs.sort((i1, i2) => {return i1.title.localeCompare(i2.title); }).map(this.formatInput)}
                   </span>
                   }
@@ -190,7 +206,7 @@ const ExportContentPackPage = React.createClass({
                   <span className="help-block help-standalone">There are no grok patterns to export.</span>
                     :
                   <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAll.bind(this, 'grok_pattern')}>Select all</Button>
+                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllGrokPatterns}>Select all</Button>
                     {this.state.grok_patterns.sort((g1, g2) => {return g1.name.localeCompare(g2.name);}).map(this.formatGrokPattern)}
                   </span>
                     }
@@ -206,7 +222,7 @@ const ExportContentPackPage = React.createClass({
                   <span className="help-block help-standalone">There are no outputs to export.</span>
                     :
                   <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAll.bind(this, 'output')}>Select all</Button>
+                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllOutputs}>Select all</Button>
                     {this.state.outputs.sort((o1, o2) => {return o1.title.localeCompare(o2.title);}).map(this.formatOutput)}
                   </span>
                   }
@@ -222,7 +238,7 @@ const ExportContentPackPage = React.createClass({
                   <span className="help-block help-standalone">There are no streams to export.</span>
                     :
                   <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAll.bind(this, 'stream')}>Select all</Button>
+                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllStreams}>Select all</Button>
                     {this.state.streams.sort((s1, s2) => { return s1.title.localeCompare(s2.title); }).map(this.formatStream)}
                   </span>
                     }
@@ -238,7 +254,7 @@ const ExportContentPackPage = React.createClass({
                   <span className="help-block help-standalone">There are no dashboards to export.</span>
                     :
                   <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAll.bind(this, 'dashboard')}>Select all</Button>
+                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllDashboards}>Select all</Button>
                       {this.state.dashboards.sort((d1, d2) => {return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
                     </span>
                     }
@@ -248,12 +264,12 @@ const ExportContentPackPage = React.createClass({
               <div className="form-group">
                 <Col smOffset={2} sm={10}>
                   <Button bsStyle="success" type="submit">
-                    <i className="fa fa-cloud-download"/> Download my content pack
+                    <i className="fa fa-cloud-download" /> Download my content pack
                   </Button>
 
                   <br /><br />
                   <p>
-                    <i className="fa fa-lightbulb-o"/>&nbsp;
+                    <i className="fa fa-lightbulb-o" />&nbsp;
                     Share your content pack with the community on the <a href="https://marketplace.graylog.org/" target="_blank">Graylog Marketplace</a> after you have downloaded it.
                   </p>
                 </Col>
@@ -263,7 +279,7 @@ const ExportContentPackPage = React.createClass({
         </Row>
       </span>
     );
-  }
+  },
 });
 
 export default ExportContentPackPage;
