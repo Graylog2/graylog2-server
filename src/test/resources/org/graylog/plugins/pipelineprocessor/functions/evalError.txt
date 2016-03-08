@@ -1,0 +1,6 @@
+rule "trigger null"
+when
+  true
+then
+  set_field("this_is_null", toip($message.does_not_exist));
+end

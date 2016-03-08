@@ -66,7 +66,9 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
     public Map<String, Object> evaluate(FunctionArgs args, EvaluationContext context) {
         final JsonNode json = jsonParam.required(args, context);
         final Map<String, JsonPath> paths = pathsParam.required(args, context);
-
+        if (json == null || paths == null) {
+            return null;
+        }
         return paths
                 .entrySet().stream()
                 .collect(toMap(

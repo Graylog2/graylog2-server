@@ -51,6 +51,9 @@ public class FormatDate extends AbstractFunction<String> {
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final DateTime dateTime = value.required(args, context);
         final DateTimeFormatter formatter = format.required(args, context);
+        if (dateTime == null || formatter == null) {
+            return null;
+        }
         final DateTimeZone timeZone = timeZoneParam.optional(args, context).orElse(DateTimeZone.UTC);
 
         return formatter.withZone(timeZone).print(dateTime);

@@ -55,6 +55,9 @@ public class ParseDate extends TimezoneAwareFunction {
     public DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
         final String dateString = valueParam.required(args, context);
         final String pattern = patternParam.required(args, context);
+        if (dateString == null || pattern == null) {
+            return null;
+        }
         final DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern).withZone(timezone);
 
         return formatter.parseDateTime(dateString);

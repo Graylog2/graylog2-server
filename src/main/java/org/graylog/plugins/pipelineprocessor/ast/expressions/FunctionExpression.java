@@ -23,11 +23,15 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
 public class FunctionExpression implements Expression {
+    private final int line;
+    private final int charPositionInLine;
     private final FunctionArgs args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(FunctionArgs args) {
+    public FunctionExpression(int line, int charPositionInLine, FunctionArgs args) {
+        this.line = line;
+        this.charPositionInLine = charPositionInLine;
         this.args = args;
         this.function = args.getFunction();
         this.descriptor = this.function.descriptor();
@@ -51,7 +55,12 @@ public class FunctionExpression implements Expression {
 
     @Override
     public Object evaluate(EvaluationContext context) {
-        return descriptor.returnType().cast(function.evaluate(args, context));
+        try {
+            return descriptor.returnType().cast(function.evaluate(args, context));
+        } catch (Exception e) {
+            context.addEvaluationError(line, charPositionInLine, descriptor, e);
+            return null;
+        }
     }
 
     @Override

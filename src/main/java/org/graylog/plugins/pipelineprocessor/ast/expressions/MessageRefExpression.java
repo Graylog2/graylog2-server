@@ -33,6 +33,9 @@ public class MessageRefExpression implements Expression {
     @Override
     public Object evaluate(EvaluationContext context) {
         final Object fieldName = fieldExpr.evaluate(context);
+        if (fieldName == null) {
+            return null;
+        }
         return context.currentMessage().getField(fieldName.toString());
     }
 

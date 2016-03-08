@@ -249,6 +249,13 @@ public class PipelineInterpreter implements MessageProcessor {
                         final ArrayList<Rule> rulesToRun = Lists.newArrayListWithCapacity(stage.getRules().size());
                         for (Rule rule : stage.getRules()) {
                             if (rule.when().evaluateBool(context)) {
+                                if (context.hasEvaluationErrors()) {
+                                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                                    appendProcessingError(message, lastError.toString());
+                                    log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
+                                              lastError);
+                                    continue;
+                                }
                                 log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
                                 rulesToRun.add(rule);
                             } else {
@@ -259,6 +266,14 @@ public class PipelineInterpreter implements MessageProcessor {
                             log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
                             for (Statement statement : rule.then()) {
                                 statement.evaluate(context);
+                                if (context.hasEvaluationErrors()) {
+                                    // if the last statement resulted in an error, do not continue to execute this rules
+                                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                                    appendProcessingError(message, lastError.toString());
+                                    log.debug("Encountered evaluation error, skipping rest of the rule: {}",
+                                              lastError);
+                                    break;
+                                }
                             }
                         }
                         // stage needed to match all rule conditions to enable the next stage,
@@ -312,6 +327,14 @@ public class PipelineInterpreter implements MessageProcessor {
         }
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
+    }
+
+    private void appendProcessingError(Message message, String errorString) {
+        if (message.hasField("gl2_processing_error")) {
+            message.addField("gl2_processing_error", message.getFieldAs(String.class, "gl2_processor_error") + "," + errorString);
+        } else {
+            message.addField("gl2_processing_error", errorString);
+        }
     }
 
     @Subscribe

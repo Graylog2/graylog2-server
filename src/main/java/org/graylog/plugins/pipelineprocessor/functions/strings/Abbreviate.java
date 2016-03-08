@@ -42,7 +42,11 @@ public class Abbreviate extends AbstractFunction<String> {
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
-        final Long maxWidth = Math.max(widthParam.required(args, context), 4L);
+        final Long required = widthParam.required(args, context);
+        if (required == null) {
+            return null;
+        }
+        final Long maxWidth = Math.max(required, 4L);
 
         return StringUtils.abbreviate(value, saturatedCast(maxWidth));
     }

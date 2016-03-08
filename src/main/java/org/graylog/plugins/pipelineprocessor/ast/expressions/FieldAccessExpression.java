@@ -42,7 +42,11 @@ public class FieldAccessExpression implements Expression {
     @Override
     public Object evaluate(EvaluationContext context) {
         final Object bean = this.object.evaluate(context);
-        final String fieldName = field.evaluate(context).toString();
+        final Object fieldValue = field.evaluate(context);
+        if (bean == null || fieldValue == null) {
+            return null;
+        }
+        final String fieldName = fieldValue.toString();
         try {
             Object property = PropertyUtils.getProperty(bean, fieldName);
             if (property == null) {
