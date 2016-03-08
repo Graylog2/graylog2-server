@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
@@ -58,6 +59,9 @@ public abstract class StreamResponse {
     @JsonProperty("alert_conditions")
     public abstract Collection<AlertCondition> alertConditions();
 
+    @JsonProperty("alert_receivers")
+    public abstract AlertReceivers alertReceivers();
+
     @JsonProperty("title")
     public abstract String title();
 
@@ -75,9 +79,10 @@ public abstract class StreamResponse {
                                         @JsonProperty("disabled") boolean disabled,
                                         @JsonProperty("rules") Collection<StreamRule> rules,
                                         @JsonProperty("alert_conditions") Collection<AlertCondition> alertConditions,
+                                        @JsonProperty("alert_receivers") AlertReceivers alertReceivers,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack) {
         return new AutoValue_StreamResponse(id, creatorUserId, outputs, matchingType, description, createdAt, disabled,
-            rules, alertConditions, title, contentPack);
+            rules, alertConditions, alertReceivers, title, contentPack);
     }
 }

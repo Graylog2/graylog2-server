@@ -24,6 +24,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.elasticsearch.common.Strings;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
@@ -56,6 +57,8 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 @RequiresAuthentication
 @Api(value = "AlertReceivers", description = "Manage stream alert receivers")
@@ -96,6 +99,7 @@ public class StreamAlertReceiverResource extends RestResource {
             @QueryParam("type") String type
     ) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkArgument(!Strings.isNullOrEmpty(entity));
 
         if (type == null || (!type.equals("users") && !type.equals("emails"))) {
             LOG.warn("No such type: [{}]", type);
