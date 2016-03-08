@@ -16,6 +16,9 @@
  */
 package org.graylog2.web.resources;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
 
@@ -23,11 +26,23 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -41,24 +56,45 @@ public class WebInterfaceAssetsResource {
     }
 
     @GET
-    public Response get(@PathParam("filename") String filename) {
+    public Response get(@Context Request request, @Context HttpHeaders httpheaders, @PathParam("filename") String filename) {
         if (filename == null || filename.isEmpty() || filename.equals("/") || filename.equals("index.html")) {
             return getDefaultResponse();
         }
-        final InputStream stream = getStreamForFile(filename);
-        if (stream == null) {
-            return getDefaultResponse();
-        }
+        try {
+            final File resourceFile = getResourceFile(filename);
+            final InputStream stream = new FileInputStream(resourceFile);
+            final HashCode hashCode = Files.hash(resourceFile, Hashing.sha256());
+            final EntityTag entityTag = new EntityTag(hashCode.toString());
+            final Date lastModified = new Date(resourceFile.lastModified());
 
-        final String contentType = firstNonNull(URLConnection.guessContentTypeFromName(filename), MediaType.APPLICATION_OCTET_STREAM);
-        return Response
+            final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
+            if (response != null) {
+                return response.build();
+            }
+
+            final String contentType = firstNonNull(URLConnection.guessContentTypeFromName(filename), MediaType.APPLICATION_OCTET_STREAM);
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge((int)TimeUnit.DAYS.toSeconds(365));
+            cacheControl.setNoCache(false);
+            cacheControl.setPrivate(false);
+            return Response
                 .ok(stream)
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .tag(entityTag)
+                .cacheControl(cacheControl)
+                .lastModified(lastModified)
                 .build();
+        } catch (IOException | URISyntaxException e) {
+            return getDefaultResponse();
+        }
     }
 
-    private InputStream getStreamForFile(String filename) {
-        return this.getClass().getResourceAsStream("/" + PluginAssets.pathPrefix + "/" + filename);
+    private File getResourceFile(String filename) throws URISyntaxException, FileNotFoundException {
+        final URL resourceUrl =  this.getClass().getResource("/" + PluginAssets.pathPrefix + "/" + filename);
+        if (resourceUrl == null) {
+            throw new FileNotFoundException("Resource file " + filename + " not found.");
+        }
+        return new File(resourceUrl.toURI());
     }
 
     private Response getDefaultResponse() {
