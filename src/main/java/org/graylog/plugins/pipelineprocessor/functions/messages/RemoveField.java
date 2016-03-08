@@ -22,21 +22,28 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog2.plugin.Message;
+
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class RemoveField extends AbstractFunction<Void> {
 
     public static final String NAME = "remove_field";
     public static final String FIELD = "field";
     private final ParameterDescriptor<String, String> fieldParam;
+    private final ParameterDescriptor<Message, Message> messageParam;
 
     public RemoveField() {
         fieldParam = ParameterDescriptor.string(FIELD).build();
+        messageParam = type("message", Message.class).optional().build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         final String field = fieldParam.required(args, context);
-        context.currentMessage().removeField(field);
+        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+
+        message.removeField(field);
         return null;
     }
 
@@ -45,7 +52,7 @@ public class RemoveField extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(ImmutableList.of(fieldParam))
+                .params(ImmutableList.of(fieldParam, messageParam))
                 .build();
     }
 }

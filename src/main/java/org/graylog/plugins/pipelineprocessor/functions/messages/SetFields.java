@@ -21,26 +21,31 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog2.plugin.Message;
 
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class SetFields extends AbstractFunction<Void> {
 
     public static final String NAME = "set_fields";
     public static final String FIELDS = "fields";
     private final ParameterDescriptor<Map, Map> fieldsParam;
+    private final ParameterDescriptor<Message, Message> messageParam;
 
     public SetFields() {
         fieldsParam = ParameterDescriptor.type(FIELDS, Map.class).build();
+        messageParam = type("message", Message.class).optional().build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         //noinspection unchecked
         final Map<String, Object> fields = fieldsParam.required(args, context);
-        context.currentMessage().addFields(fields);
+        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+        message.addFields(fields);
         return null;
     }
 
@@ -49,9 +54,7 @@ public class SetFields extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(of(
-                        fieldsParam
-                ))
+                .params(of(fieldsParam, messageParam))
                 .build();
     }
 

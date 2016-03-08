@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -42,6 +43,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
@@ -58,7 +60,9 @@ import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Assert;
@@ -71,6 +75,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
 
@@ -93,8 +99,16 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
-        // TODO needs mock
-        //functions.put(RouteToStream.NAME, new RouteToStream()));
+
+        // route to stream mocks
+        final StreamService streamService = mock(StreamService.class);
+        final Stream stream = mock(Stream.class);
+        when(stream.isPaused()).thenReturn(false);
+        when(stream.getTitle()).thenReturn("some name");
+        when(stream.getId()).thenReturn("id");
+        when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream));
+
+        functions.put(RouteToStream.NAME, new RouteToStream(streamService));
 
         // input related functions
         // TODO needs mock
@@ -269,5 +283,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(context).isNotNull();
         assertThat(context.hasEvaluationErrors()).isTrue();
         assertThat(Iterables.getLast(context.evaluationErrors()).toString()).isEqualTo("In call to function 'toip' at 5:28 an exception was thrown: 'null' is not an IP string literal.");
+    }
+
+    @Test
+    public void newlyCreatedMessage() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final EvaluationContext context = contextForRuleEval(rule, new Message("test", "test", Tools.nowUTC()));
+
+        final Message origMessage = context.currentMessage();
+        final Message newMessage = Iterables.getOnlyElement(context.createdMessages());
+
+        assertThat(origMessage).isNotSameAs(newMessage);
+        assertThat(newMessage.hasField("removed_again")).isFalse();
+        assertThat(newMessage.getFieldAs(Boolean.class, "has_source")).isTrue();
+        assertThat(newMessage.getFieldAs(String.class, "only_in")).isEqualTo("new message");
+        assertThat(newMessage.getFieldAs(String.class, "multi")).isEqualTo("new message");
+
     }
 }

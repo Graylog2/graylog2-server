@@ -22,10 +22,12 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog2.plugin.Message;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class SetField extends AbstractFunction<Void> {
 
@@ -35,10 +37,12 @@ public class SetField extends AbstractFunction<Void> {
 
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Message, Message> messageParam;
 
     public SetField() {
         fieldParam = string(FIELD).build();
         valueParam = object(VALUE).build();
+        messageParam = type("message", Message.class).optional().build();
     }
 
     @Override
@@ -47,7 +51,8 @@ public class SetField extends AbstractFunction<Void> {
         final Object value = valueParam.required(args, context);
 
         if (!Strings.isNullOrEmpty(field)) {
-            context.currentMessage().addField(field, value);
+            final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+            message.addField(field, value);
         }
         return null;
     }
@@ -58,7 +63,8 @@ public class SetField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(fieldParam,
-                           valueParam))
+                           valueParam,
+                           messageParam))
                 .build();
     }
 }

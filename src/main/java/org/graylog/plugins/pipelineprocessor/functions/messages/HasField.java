@@ -22,21 +22,28 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog2.plugin.Message;
+
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class HasField extends AbstractFunction<Boolean> {
 
     public static final String NAME = "has_field";
     public static final String FIELD = "field";
     private final ParameterDescriptor<String, String> fieldParam;
+    private final ParameterDescriptor<Message, Message> messageParam;
 
     public HasField() {
         fieldParam = ParameterDescriptor.string(FIELD).build();
+        messageParam = type("message", Message.class).optional().build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final String field = fieldParam.required(args, context);
-        return context.currentMessage().hasField(field);
+        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+
+        return message.hasField(field);
     }
 
     @Override
@@ -44,7 +51,7 @@ public class HasField extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(ImmutableList.of(fieldParam))
+                .params(ImmutableList.of(fieldParam, messageParam))
                 .build();
     }
 }
