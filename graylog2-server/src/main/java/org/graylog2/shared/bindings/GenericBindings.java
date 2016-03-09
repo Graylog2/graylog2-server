@@ -41,7 +41,6 @@ import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.inputs.InputStateListener;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import java.util.concurrent.Semaphore;
@@ -73,13 +72,7 @@ public class GenericBindings extends AbstractModule {
 
         bind(InputRegistry.class).asEagerSingleton();
 
-        bindEventBusListeners();
-
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
         bind(OkHttpClient.class).annotatedWith(Names.named("systemHttpClient")).toProvider(SystemOkHttpClientProvider.class).asEagerSingleton();
-    }
-
-    private void bindEventBusListeners() {
-        bind(InputStateListener.class).asEagerSingleton();
     }
 }
