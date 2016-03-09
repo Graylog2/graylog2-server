@@ -18,6 +18,9 @@ package org.graylog2.shared.rest;
 
 import org.glassfish.grizzly.http.server.Response;
 import org.graylog2.shared.security.ShiroSecurityContext;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,19 +44,33 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
         this.response = requireNonNull(response);
     }
 
+    private String getUsernameFromSession(String sessionID) {
+    	String result = "anonymous";
+    	if (sessionID != null) {
+    	    final DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
+            Subject.Builder builder = new Subject.Builder(securityManager);
+            builder.sessionId(sessionID);
+            Subject subject = builder.buildSubject();
+    	    result = subject.getPrincipal().toString();
+    	}
+    	return result;
+    
+    }
+    
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         if (LOG.isDebugEnabled()) {
             try {
                 final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
                 final SecurityContext securityContext = requestContext.getSecurityContext();
-                final String remoteUser = securityContext instanceof ShiroSecurityContext ?
+                final String sessionID = securityContext instanceof ShiroSecurityContext ?
                         ((ShiroSecurityContext) securityContext).getUsername() : null;
+                final String userName = getUsernameFromSession(sessionID);
                 final Date requestDate = requestContext.getDate();
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
                         response.getRequest().getRemoteAddr(),
-                        (remoteUser == null ? "-" : remoteUser),
+                        (userName == null ? "-" : userName),
                         (requestDate == null ? "-" : requestDate),
                         requestContext.getMethod(),
                         requestContext.getUriInfo().getPath(),
