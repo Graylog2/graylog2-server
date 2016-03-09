@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.map.geoip.filter;
+package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
@@ -36,7 +36,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
-public class GeoIpResolverFilterTest {
+public class GeoIpResolverEngineTest {
 
     private MetricRegistry metricRegistry;
     private GeoIpResolverConfig config;
@@ -67,7 +67,7 @@ public class GeoIpResolverFilterTest {
 
     @Test
     public void getIpFromFieldValue() throws Exception {
-        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
         final String ip = "127.0.0.1";
 
         assertEquals(resolver.getIpFromFieldValue(ip), ip);
@@ -77,7 +77,7 @@ public class GeoIpResolverFilterTest {
 
     @Test
     public void extractGeoLocationInformation() throws Exception {
-        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
 
         List<Double> coordinates = resolver.extractGeoLocationInformation("1.2.3.4");
         assertEquals(coordinates.size(), 2, "Should extract geo location information from public addresses");
@@ -87,7 +87,7 @@ public class GeoIpResolverFilterTest {
 
     @Test
     public void disabledFilterTest() throws Exception {
-        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(config.toBuilder().enabled(false).build(), metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config.toBuilder().enabled(false).build(), metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());
@@ -104,7 +104,7 @@ public class GeoIpResolverFilterTest {
 
     @Test
     public void filterResolvesIpGeoLocation() throws Exception {
-        final GeoIpResolverFilter.FilterEngine resolver = new GeoIpResolverFilter.FilterEngine(config, metricRegistry);
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
 
         final Map<String, Object> messageFields = Maps.newHashMap();
         messageFields.put("_id", (new UUID()).toString());
@@ -117,7 +117,7 @@ public class GeoIpResolverFilterTest {
 
         assertFalse(filtered, "Message should not be filtered out");
         assertEquals(message.getFields().size(), messageFields.size() + 2, "Filter should add new message fields");
-        assertEquals(metricRegistry.timer(name(GeoIpResolverFilter.class, "resolveTime")).getCount(), 3, "Should have looked up three IPs");
+        assertEquals(metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime")).getCount(), 3, "Should have looked up three IPs");
         assertNull(message.getField("source_geolocation"), "Should not have resolved private IP");
         assertNotNull(message.getField("message_geolocation"), "Should have resolved public IP inside message");
         assertNotNull(message.getField("extracted_ip_geolocation"), "Should have resolved public IP inside extracted_ip");
