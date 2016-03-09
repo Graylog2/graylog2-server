@@ -20,8 +20,8 @@ import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class AndExpression extends BinaryExpression implements LogicalExpression {
-    public AndExpression(Token start, AbstractExpression left,
-                         AbstractExpression right) {
+    public AndExpression(Token start, Expression left,
+                         Expression right) {
         super(start, left, right);
     }
 

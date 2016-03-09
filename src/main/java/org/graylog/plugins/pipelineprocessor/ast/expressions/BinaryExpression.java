@@ -20,9 +20,9 @@ import org.antlr.v4.runtime.Token;
 
 public abstract class BinaryExpression extends UnaryExpression {
 
-    protected final AbstractExpression left;
+    protected final Expression left;
 
-    public BinaryExpression(Token start, AbstractExpression left, AbstractExpression right) {
+    public BinaryExpression(Token start, Expression left, Expression right) {
         super(start, right);
         this.left = left;
     }
@@ -32,7 +32,7 @@ public abstract class BinaryExpression extends UnaryExpression {
         return left.isConstant() && right.isConstant();
     }
 
-    public AbstractExpression left() {
+    public Expression left() {
         return left;
     }
 }

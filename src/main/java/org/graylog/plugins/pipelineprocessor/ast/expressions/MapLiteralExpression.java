@@ -25,10 +25,10 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapLiteralExpression extends AbstractExpression {
-    private final HashMap<String, AbstractExpression> map;
+public class MapLiteralExpression extends BaseExpression {
+    private final HashMap<String, Expression> map;
 
-    public MapLiteralExpression(Token start, HashMap<String, AbstractExpression> map) {
+    public MapLiteralExpression(Token start, HashMap<String, Expression> map) {
         super(start);
         this.map = map;
     }

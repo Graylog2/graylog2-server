@@ -22,7 +22,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 public class ComparisonExpression extends BinaryExpression implements LogicalExpression {
     private final String operator;
 
-    public ComparisonExpression(Token start, AbstractExpression left, AbstractExpression right, String operator) {
+    public ComparisonExpression(Token start, Expression left, Expression right, String operator) {
         super(start, left, right);
         this.operator = operator;
     }

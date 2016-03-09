@@ -18,7 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -93,7 +93,7 @@ public abstract class ParameterDescriptor<T, R> {
         if (precomputedValue != null) {
             return transformedType().cast(precomputedValue);
         }
-        final AbstractExpression valueExpr = args.expression(name());
+        final Expression valueExpr = args.expression(name());
         if (valueExpr == null) {
             return null;
         }

@@ -99,11 +99,11 @@ public class IndexedAccessExpressionTest {
                 .isThrownBy(() -> expression.evaluateUnsafe(context));
     }
 
-    private static AbstractExpression num(long idx) {
+    private static Expression num(long idx) {
         return new LongExpression(START, idx);
     }
 
-    private static AbstractExpression string(String string) {
+    private static Expression string(String string) {
         return new StringExpression(START, string);
     }
 

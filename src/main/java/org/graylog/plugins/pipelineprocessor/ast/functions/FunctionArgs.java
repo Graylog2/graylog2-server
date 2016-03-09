@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.Maps;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,25 +31,25 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class FunctionArgs {
 
     @Nonnull
-    private final Map<String, AbstractExpression> args;
+    private final Map<String, Expression> args;
 
     private final Map<String, Object> constantValues = Maps.newHashMap();
     private final Function function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionArgs(Function func, Map<String, AbstractExpression> args) {
+    public FunctionArgs(Function func, Map<String, Expression> args) {
         function = func;
         descriptor = function.descriptor();
         this.args = firstNonNull(args, Collections.emptyMap());
     }
 
     @Nonnull
-    public Map<String, AbstractExpression> getArgs() {
+    public Map<String, Expression> getArgs() {
         return args;
     }
 
     @Nonnull
-    public Map<String, AbstractExpression> getConstantArgs() {
+    public Map<String, Expression> getConstantArgs() {
         return args.entrySet().stream()
                 .filter(e -> e.getValue().isConstant())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -60,7 +60,7 @@ public class FunctionArgs {
     }
 
     @Nullable
-    public AbstractExpression expression(String key) {
+    public Expression expression(String key) {
         return args.get(key);
     }
 

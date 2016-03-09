@@ -16,16 +16,40 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
 
 import javax.annotation.Nullable;
+
+import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
 
 public interface Expression {
 
     boolean isConstant();
 
+    Token getStartToken();
+
     @Nullable
-    Object evaluate(EvaluationContext context);
+    default Object evaluate(EvaluationContext context) {
+        try {
+            return evaluateUnsafe(context);
+        } catch (FunctionEvaluationException fee) {
+            context.addEvaluationError(fee.getStartToken().getLine(),
+                                       fee.getStartToken().getCharPositionInLine(),
+                                       fee.getFunctionExpression().getFunction().descriptor(),
+                                       getRootCause(fee));
+        } catch (Exception e) {
+            context.addEvaluationError(getStartToken().getLine(), getStartToken().getCharPositionInLine(), null, getRootCause(e));
+        }
+        return null;
+    }
 
     Class getType();
+
+    /**
+     * This method is allow to throw exceptions. The outside world is supposed to call evaluate instead.
+     */
+    @Nullable
+    Object evaluateUnsafe(EvaluationContext context);
 }

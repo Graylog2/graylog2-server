@@ -17,8 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.parser.errors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.parser.RuleLangParser;
 
 public class IncompatibleTypes extends ParseError {
@@ -37,7 +37,7 @@ public class IncompatibleTypes extends ParseError {
         return "Incompatible types " + exprString(binaryExpr.left()) + " <=> " + exprString(binaryExpr.right()) + positionString();
     }
 
-    private String exprString(AbstractExpression e) {
+    private String exprString(Expression e) {
         return "(" + e.toString() + ") : " + e.getType().getSimpleName();
     }
 

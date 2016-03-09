@@ -20,8 +20,8 @@ import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class OrExpression extends BinaryExpression implements LogicalExpression {
-    public OrExpression(Token start, AbstractExpression left,
-                        AbstractExpression right) {
+    public OrExpression(Token start, Expression left,
+                        Expression right) {
         super(start, left, right);
     }
 

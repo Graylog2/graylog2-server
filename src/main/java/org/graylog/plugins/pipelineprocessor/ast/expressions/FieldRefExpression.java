@@ -19,7 +19,7 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-public class FieldRefExpression extends AbstractExpression {
+public class FieldRefExpression extends BaseExpression {
     private final String variableName;
 
     public FieldRefExpression(Token start, String variableName) {

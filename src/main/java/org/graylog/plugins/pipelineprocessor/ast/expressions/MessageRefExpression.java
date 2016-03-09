@@ -19,10 +19,10 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-public class MessageRefExpression extends AbstractExpression {
-    private final AbstractExpression fieldExpr;
+public class MessageRefExpression extends BaseExpression {
+    private final Expression fieldExpr;
 
-    public MessageRefExpression(Token start, AbstractExpression fieldExpr) {
+    public MessageRefExpression(Token start, Expression fieldExpr) {
         super(start);
         this.fieldExpr = fieldExpr;
     }

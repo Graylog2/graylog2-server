@@ -17,13 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.ast.statements;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
 public class FunctionStatement implements Statement {
 
-    private final AbstractExpression functionExpression;
+    private final Expression functionExpression;
 
-    public FunctionStatement(AbstractExpression functionExpression) {
+    public FunctionStatement(Expression functionExpression) {
         this.functionExpression = functionExpression;
     }
 

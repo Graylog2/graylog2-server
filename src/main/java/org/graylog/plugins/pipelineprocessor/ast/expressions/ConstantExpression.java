@@ -18,7 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 
-public abstract class ConstantExpression extends AbstractExpression {
+public abstract class ConstantExpression extends BaseExpression {
 
     private final Class type;
 

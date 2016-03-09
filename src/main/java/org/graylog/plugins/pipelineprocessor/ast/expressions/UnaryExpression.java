@@ -18,11 +18,11 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 
-public abstract class UnaryExpression extends AbstractExpression {
+public abstract class UnaryExpression extends BaseExpression {
 
-    protected final AbstractExpression right;
+    protected final Expression right;
 
-    public UnaryExpression(Token start, AbstractExpression right) {
+    public UnaryExpression(Token start, Expression right) {
         super(start);
         this.right = right;
     }
@@ -37,7 +37,7 @@ public abstract class UnaryExpression extends AbstractExpression {
         return right.getType();
     }
 
-    public AbstractExpression right() {
+    public Expression right() {
         return right;
     }
 }

@@ -21,7 +21,7 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VarRefExpression extends AbstractExpression {
+public class VarRefExpression extends BaseExpression {
     private static final Logger log = LoggerFactory.getLogger(VarRefExpression.class);
     private final String identifier;
     private Class type = Object.class;

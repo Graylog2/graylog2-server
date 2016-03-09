@@ -23,10 +23,10 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArrayLiteralExpression extends AbstractExpression {
-    private final List<AbstractExpression> elements;
+public class ArrayLiteralExpression extends BaseExpression {
+    private final List<Expression> elements;
 
-    public ArrayLiteralExpression(Token start, List<AbstractExpression> elements) {
+    public ArrayLiteralExpression(Token start, List<Expression> elements) {
         super(start);
         this.elements = elements;
     }

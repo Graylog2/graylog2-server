@@ -25,7 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
-public class FunctionExpression extends AbstractExpression {
+public class FunctionExpression extends BaseExpression {
     private final FunctionArgs args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;

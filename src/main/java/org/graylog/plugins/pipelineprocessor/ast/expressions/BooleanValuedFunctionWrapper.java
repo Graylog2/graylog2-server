@@ -19,10 +19,10 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-public class BooleanValuedFunctionWrapper extends AbstractExpression implements LogicalExpression {
-    private final AbstractExpression expr;
+public class BooleanValuedFunctionWrapper extends BaseExpression implements LogicalExpression {
+    private final Expression expr;
 
-    public BooleanValuedFunctionWrapper(Token start, AbstractExpression expr) {
+    public BooleanValuedFunctionWrapper(Token start, Expression expr) {
         super(start);
         this.expr = expr;
         if (!expr.getType().equals(Boolean.class)) {

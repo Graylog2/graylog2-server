@@ -24,13 +24,13 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class FieldAccessExpression extends AbstractExpression {
+public class FieldAccessExpression extends BaseExpression {
     private static final Logger log = LoggerFactory.getLogger(FieldAccessExpression.class);
 
-    private final AbstractExpression object;
-    private final AbstractExpression field;
+    private final Expression object;
+    private final Expression field;
 
-    public FieldAccessExpression(Token start, AbstractExpression object, AbstractExpression field) {
+    public FieldAccessExpression(Token start, Expression object, Expression field) {
         super(start);
         this.object = object;
         this.field = field;

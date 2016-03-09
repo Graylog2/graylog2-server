@@ -27,7 +27,7 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     private final boolean checkEquality;
 
-    public EqualityExpression(Token start, AbstractExpression left, AbstractExpression right, boolean checkEquality) {
+    public EqualityExpression(Token start, Expression left, Expression right, boolean checkEquality) {
         super(start, left, right);
         this.checkEquality = checkEquality;
     }

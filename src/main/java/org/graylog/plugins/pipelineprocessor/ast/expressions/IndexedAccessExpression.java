@@ -25,11 +25,11 @@ import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
-public class IndexedAccessExpression extends AbstractExpression {
-    private final AbstractExpression indexableObject;
-    private final AbstractExpression index;
+public class IndexedAccessExpression extends BaseExpression {
+    private final Expression indexableObject;
+    private final Expression index;
 
-    public IndexedAccessExpression(Token start, AbstractExpression indexableObject, AbstractExpression index) {
+    public IndexedAccessExpression(Token start, Expression indexableObject, Expression index) {
         super(start);
         this.indexableObject = indexableObject;
         this.index = index;
