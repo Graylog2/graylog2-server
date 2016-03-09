@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
 import com.google.common.collect.Maps;
+import com.google.common.net.InetAddresses;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
 import org.testng.annotations.AfterMethod;
@@ -70,9 +71,17 @@ public class GeoIpResolverEngineTest {
         final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
         final String ip = "127.0.0.1";
 
-        assertEquals(resolver.getIpFromFieldValue(ip), ip);
-        assertEquals(resolver.getIpFromFieldValue("Message from \"127.0.0.1\""), ip);
+        assertEquals(resolver.getIpFromFieldValue(ip), InetAddresses.forString(ip));
+        assertNull(resolver.getIpFromFieldValue("Message from \"127.0.0.1\""));
         assertNull(resolver.getIpFromFieldValue("Test message with no IP"));
+    }
+
+    @Test
+    public void trimFieldValueBeforeLookup() throws Exception {
+        final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
+        final String ip = "   2001:4860:4860::8888\t\n";
+
+        assertNotNull(resolver.getIpFromFieldValue(ip));
     }
 
     @Test
@@ -94,6 +103,7 @@ public class GeoIpResolverEngineTest {
         messageFields.put("source", "192.168.0.1");
         messageFields.put("message", "Hello from 1.2.3.4");
         messageFields.put("extracted_ip", "1.2.3.4");
+        messageFields.put("ipv6", "2001:4860:4860::8888");
 
         final Message message = new Message(messageFields);
         final boolean filtered = resolver.filter(message);
@@ -111,6 +121,7 @@ public class GeoIpResolverEngineTest {
         messageFields.put("source", "192.168.0.1");
         messageFields.put("message", "Hello from 1.2.3.4");
         messageFields.put("extracted_ip", "1.2.3.4");
+        messageFields.put("ipv6", "2001:4860:4860::8888");
 
         final Message message = new Message(messageFields);
         final boolean filtered = resolver.filter(message);
@@ -119,7 +130,8 @@ public class GeoIpResolverEngineTest {
         assertEquals(message.getFields().size(), messageFields.size() + 2, "Filter should add new message fields");
         assertEquals(metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime")).getCount(), 3, "Should have looked up three IPs");
         assertNull(message.getField("source_geolocation"), "Should not have resolved private IP");
-        assertNotNull(message.getField("message_geolocation"), "Should have resolved public IP inside message");
+        assertNull(message.getField("message_geolocation"), "Should have resolved public IP inside message");
         assertNotNull(message.getField("extracted_ip_geolocation"), "Should have resolved public IP inside extracted_ip");
+        assertNotNull(message.getField("ipv6_geolocation"), "Should have resolved public IPv6 inside ipv6");
     }
 }
