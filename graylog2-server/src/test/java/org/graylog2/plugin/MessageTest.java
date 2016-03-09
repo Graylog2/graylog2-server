@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -403,5 +404,16 @@ public class MessageTest {
         message.addField("__foo__", "bar");
 
         assertTrue(message.hasField("__foo__"));
+    }
+
+    @Test
+    public void testDateConvertedToDateTime() {
+        final Message message = new Message("", "source", Tools.nowUTC());
+
+        final Date dateObject = DateTime.parse("2010-07-30T16:03:25Z").toDate();
+        message.addField(Message.FIELD_TIMESTAMP, dateObject);
+
+        assertEquals(message.getTimestamp().toDate(), dateObject);
+        assertEquals(message.getField(Message.FIELD_TIMESTAMP).getClass(), DateTime.class);
     }
 }

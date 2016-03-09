@@ -257,7 +257,9 @@ public class Message implements Messages {
             return;
         }
 
-        if(value instanceof String) {
+        if (FIELD_TIMESTAMP.equals(key.trim()) && value != null && value instanceof Date) {
+            fields.put(FIELD_TIMESTAMP, new DateTime(value));
+        } else if(value instanceof String) {
             final String str = ((String) value).trim();
 
             if(!str.isEmpty()) {
