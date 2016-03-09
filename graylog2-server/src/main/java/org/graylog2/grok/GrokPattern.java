@@ -42,6 +42,18 @@ public class GrokPattern {
                 .toString();
     }
 
+    public static GrokPattern create(String name, String pattern) {
+        return create(null, name, pattern, null);
+    }
+    public static GrokPattern create(ObjectId id, String name, String pattern, String contentPack) {
+        final GrokPattern grokPattern = new GrokPattern();
+        grokPattern.id = id;
+        grokPattern.name = name;
+        grokPattern.pattern = pattern;
+        grokPattern.contentPack = contentPack;
+        return grokPattern;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
