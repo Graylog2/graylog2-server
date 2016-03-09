@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -64,6 +65,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
@@ -168,7 +170,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})")
         );
         when(grokPatternService.loadAll()).thenReturn(patterns);
-        functions.put(GrokMatch.NAME, new GrokMatch(grokPatternService, Executors.newScheduledThreadPool(1)));
+        final EventBus clusterBus = new EventBus();
+        final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
+                                                                                grokPatternService,
+                                                                                Executors.newScheduledThreadPool(1));
+        functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
 
         functionRegistry = new FunctionRegistry(functions);
     }

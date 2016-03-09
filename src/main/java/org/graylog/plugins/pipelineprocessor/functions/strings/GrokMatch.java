@@ -16,9 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.strings;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ForwardingMap;
 import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
@@ -27,36 +24,27 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog2.grok.GrokPattern;
-import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.GrokPatternRegistry;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.cache.CacheLoader.asyncReloading;
 import static com.google.common.collect.ImmutableList.of;
 
 public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
     public static final String NAME = "grok";
+
     private final ParameterDescriptor<String, String> valueParam;
     private final ParameterDescriptor<String, String> patternParam;
-    private final LoadingCache<String, Grok> grokCache;
+    private final GrokPatternRegistry grokPatternRegistry;
 
     @Inject
-    public GrokMatch(GrokPatternService grokPatternService, @Named("daemonScheduler") ScheduledExecutorService daemonExecutor) {
+    public GrokMatch(GrokPatternRegistry grokPatternRegistry) {
+        this.grokPatternRegistry = grokPatternRegistry;
+
         valueParam = ParameterDescriptor.string("value").build();
         patternParam = ParameterDescriptor.string("pattern").build();
-
-        grokCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(1, TimeUnit.MINUTES)
-                .build(asyncReloading(new GrokReloader(grokPatternService), daemonExecutor));
     }
 
     @Override
@@ -67,13 +55,8 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
             return null;
         }
 
-        final Grok grok;
-        try {
-            grok = grokCache.get(pattern);
-        } catch (ExecutionException e) {
-            // this can happen when the pattern is malformed
-            throw new RuntimeException(e);
-        }
+        final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern);
+
         final Match match = grok.match(value);
         match.captures();
         return new GrokResult(match.toMap());
@@ -105,23 +88,5 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
         }
     }
 
-    private static class GrokReloader extends CacheLoader<String, Grok> {
-        private final GrokPatternService grokPatternService;
 
-        public GrokReloader(GrokPatternService grokPatternService) {
-            this.grokPatternService = grokPatternService;
-        }
-
-        @Override
-        public Grok load(@Nonnull String pattern) throws Exception {
-            final Grok grok = new Grok();
-            for (GrokPattern grokPattern : grokPatternService.loadAll()) {
-                if (!isNullOrEmpty(grokPattern.name) || isNullOrEmpty(grokPattern.pattern)) {
-                    grok.addPattern(grokPattern.name, grokPattern.pattern);
-                }
-            }
-            grok.compile(pattern);
-            return grok;
-        }
-    }
 }
