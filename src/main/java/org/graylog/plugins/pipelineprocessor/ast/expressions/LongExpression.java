@@ -16,18 +16,19 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class LongExpression extends ConstantExpression implements NumericExpression {
     private final long value;
 
-    public LongExpression(long value) {
-        super(Long.class);
+    public LongExpression(Token start, long value) {
+        super(start, Long.class);
         this.value = value;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return value;
     }
 

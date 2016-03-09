@@ -17,21 +17,21 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.LocationAwareEvalException;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
-public class FunctionExpression implements Expression {
-    private final int line;
-    private final int charPositionInLine;
+public class FunctionExpression extends AbstractExpression {
     private final FunctionArgs args;
     private final Function<?> function;
     private final FunctionDescriptor descriptor;
 
-    public FunctionExpression(int line, int charPositionInLine, FunctionArgs args) {
-        this.line = line;
-        this.charPositionInLine = charPositionInLine;
+    public FunctionExpression(Token start, FunctionArgs args) {
+        super(start);
         this.args = args;
         this.function = args.getFunction();
         this.descriptor = this.function.descriptor();
@@ -54,12 +54,15 @@ public class FunctionExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         try {
             return descriptor.returnType().cast(function.evaluate(args, context));
+        } catch (LocationAwareEvalException laee) {
+            // the exception already has a location from the input source, simply propagate it.
+            throw laee;
         } catch (Exception e) {
-            context.addEvaluationError(line, charPositionInLine, descriptor, e);
-            return null;
+            // we need to wrap the original exception to retain the position in the tree where the exception originated
+            throw new FunctionEvaluationException(this, e);
         }
     }
 

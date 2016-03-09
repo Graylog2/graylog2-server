@@ -16,18 +16,19 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class BooleanExpression extends ConstantExpression implements LogicalExpression {
     private final boolean value;
 
-    public BooleanExpression(boolean value) {
-        super(Boolean.class);
+    public BooleanExpression(Token start, boolean value) {
+        super(start, Boolean.class);
         this.value = value;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return value;
     }
 

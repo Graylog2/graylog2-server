@@ -16,19 +16,20 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class StringExpression extends ConstantExpression {
 
     private final String value;
 
-    public StringExpression(String value) {
-        super(String.class);
+    public StringExpression(Token start, String value) {
+        super(start, String.class);
         this.value = value;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return value;
     }
 

@@ -18,7 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public interface Function<T> {
     };
 
     default void preprocessArgs(FunctionArgs args) {
-        for (Map.Entry<String, Expression> e : args.getConstantArgs().entrySet()) {
+        for (Map.Entry<String, AbstractExpression> e : args.getConstantArgs().entrySet()) {
             final String name = e.getKey();
             try {
                 final Object value = preComputeConstantArgument(args, name, e.getValue());
@@ -72,7 +72,7 @@ public interface Function<T> {
      * @param arg the expression tree for the argument
      * @return the precomputed value for the argument or <code>null</code> if the value should be dynamically calculated for each invocation
      */
-    Object preComputeConstantArgument(FunctionArgs args, String name, Expression arg);
+    Object preComputeConstantArgument(FunctionArgs args, String name, AbstractExpression arg);
 
     T evaluate(FunctionArgs args, EvaluationContext context);
 

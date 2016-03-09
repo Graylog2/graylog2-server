@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
+
 public abstract class BinaryExpression extends UnaryExpression {
 
-    protected final Expression left;
+    protected final AbstractExpression left;
 
-    public BinaryExpression(Expression left, Expression right) {
-        super(right);
+    public BinaryExpression(Token start, AbstractExpression left, AbstractExpression right) {
+        super(start, right);
         this.left = left;
     }
 
@@ -30,7 +32,7 @@ public abstract class BinaryExpression extends UnaryExpression {
         return left.isConstant() && right.isConstant();
     }
 
-    public Expression left() {
+    public AbstractExpression left() {
         return left;
     }
 }

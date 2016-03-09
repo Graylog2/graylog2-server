@@ -16,16 +16,18 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VarRefExpression implements Expression {
+public class VarRefExpression extends AbstractExpression {
     private static final Logger log = LoggerFactory.getLogger(VarRefExpression.class);
     private final String identifier;
     private Class type = Object.class;
 
-    public VarRefExpression(String identifier) {
+    public VarRefExpression(Token start, String identifier) {
+        super(start);
         this.identifier = identifier;
     }
 
@@ -35,7 +37,7 @@ public class VarRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         final EvaluationContext.TypedValue typedValue = context.get(identifier);
         if (typedValue != null) {
             return typedValue.getValue();

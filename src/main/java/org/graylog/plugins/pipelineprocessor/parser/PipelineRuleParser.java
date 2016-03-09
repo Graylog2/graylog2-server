@@ -35,6 +35,7 @@ import org.apache.mina.util.IdentityHashSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
@@ -43,7 +44,6 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFuncti
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ComparisonExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
@@ -210,9 +210,9 @@ public class PipelineRuleParser {
     private class RuleAstBuilder extends RuleLangBaseListener {
 
         private final ParseContext parseContext;
-        private final ParseTreeProperty<Map<String, Expression>> args;
-        private final ParseTreeProperty<List<Expression>> argsList;
-        private final ParseTreeProperty<Expression> exprs;
+        private final ParseTreeProperty<Map<String, AbstractExpression>> args;
+        private final ParseTreeProperty<List<AbstractExpression>> argsList;
+        private final ParseTreeProperty<AbstractExpression> exprs;
 
         private final Set<String> definedVars = Sets.newHashSet();
 
@@ -231,15 +231,15 @@ public class PipelineRuleParser {
         public void exitRuleDeclaration(RuleLangParser.RuleDeclarationContext ctx) {
             final Rule.Builder ruleBuilder = Rule.builder();
             ruleBuilder.name(unquote(ctx.name == null ? "" : ctx.name.getText(), '"'));
-            final Expression expr = exprs.get(ctx.condition);
+            final AbstractExpression expr = exprs.get(ctx.condition);
 
             LogicalExpression condition;
             if (expr instanceof LogicalExpression) {
                 condition = (LogicalExpression) expr;
             } else if (expr != null && expr.getType().equals(Boolean.class)) {
-                condition = new BooleanValuedFunctionWrapper(expr);
+                condition = new BooleanValuedFunctionWrapper(ctx.getStart(), expr);
             } else {
-                condition = new BooleanExpression(false);
+                condition = new BooleanExpression(ctx.getStart(), false);
                 log.debug("Unable to create condition, replacing with 'false'");
             }
             ruleBuilder.when(condition);
@@ -251,7 +251,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitFuncStmt(RuleLangParser.FuncStmtContext ctx) {
-            final Expression expr = exprs.get(ctx.functionCall());
+            final AbstractExpression expr = exprs.get(ctx.functionCall());
             final FunctionStatement functionStatement = new FunctionStatement(expr);
             parseContext.statements.add(functionStatement);
         }
@@ -259,7 +259,7 @@ public class PipelineRuleParser {
         @Override
         public void exitVarAssignStmt(RuleLangParser.VarAssignStmtContext ctx) {
             final String name = unquote(ctx.varName.getText(), '`');
-            final Expression expr = exprs.get(ctx.expression());
+            final AbstractExpression expr = exprs.get(ctx.expression());
             parseContext.defineVar(name, expr);
             definedVars.add(name);
             parseContext.statements.add(new VarAssignStatement(name, expr));
@@ -268,8 +268,8 @@ public class PipelineRuleParser {
         @Override
         public void exitFunctionCall(RuleLangParser.FunctionCallContext ctx) {
             final String name = ctx.funcName.getText();
-            Map<String, Expression> argsMap = this.args.get(ctx.arguments());
-            final List<Expression> positionalArgs = this.argsList.get(ctx.arguments());
+            Map<String, AbstractExpression> argsMap = this.args.get(ctx.arguments());
+            final List<AbstractExpression> positionalArgs = this.argsList.get(ctx.arguments());
 
             final Function<?> function = functionRegistry.resolve(name);
             if (function == null) {
@@ -284,7 +284,7 @@ public class PipelineRuleParser {
                         parseContext.addError(new WrongNumberOfArgs(ctx, function, argsMap.size()));
                     } else {
                         // there are optional parameters, check that all required ones are present
-                        final Map<String, Expression> givenArguments = argsMap;
+                        final Map<String, AbstractExpression> givenArguments = argsMap;
                         final List<ParameterDescriptor> missingParams =
                                 params.stream()
                                         .filter(p -> !p.optional())
@@ -335,7 +335,7 @@ public class PipelineRuleParser {
                                 // the remaining parameters were optional, so we can safely skip them
                                 break;
                             }
-                            final Expression argExpr = positionalArgs.get(i);
+                            final AbstractExpression argExpr = positionalArgs.get(i);
                             argsMap.put(p.name(), argExpr);
                             i++;
                         }
@@ -347,8 +347,7 @@ public class PipelineRuleParser {
             }
 
             final FunctionExpression expr = new FunctionExpression(
-                    ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(),
-                    new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
+                    ctx.getStart(), new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
             );
 
             log.trace("FUNC: ctx {} => {}", ctx, expr);
@@ -357,10 +356,10 @@ public class PipelineRuleParser {
 
         @Override
         public void exitNamedArgs(RuleLangParser.NamedArgsContext ctx) {
-            final Map<String, Expression> argMap = Maps.newHashMap();
+            final Map<String, AbstractExpression> argMap = Maps.newHashMap();
             for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
                 final String argName = unquote(propAssignmentContext.Identifier().getText(), '`');
-                final Expression argValue = exprs.get(propAssignmentContext.expression());
+                final AbstractExpression argValue = exprs.get(propAssignmentContext.expression());
                 argMap.put(argName, argValue);
             }
             args.put(ctx, argMap);
@@ -368,7 +367,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
-            List<Expression> expressions = Lists.newArrayListWithCapacity(ctx.expression().size());
+            List<AbstractExpression> expressions = Lists.newArrayListWithCapacity(ctx.expression().size());
             expressions.addAll(ctx.expression().stream().map(exprs::get).collect(toList()));
             argsList.put(ctx, expressions);
         }
@@ -382,17 +381,17 @@ public class PipelineRuleParser {
         @Override
         public void exitNested(RuleLangParser.NestedContext ctx) {
             isIdIsFieldAccess.pop(); // reset for error checks
-            final Expression object = exprs.get(ctx.fieldSet);
-            final Expression field = exprs.get(ctx.field);
-            final FieldAccessExpression expr = new FieldAccessExpression(object, field);
+            final AbstractExpression object = exprs.get(ctx.fieldSet);
+            final AbstractExpression field = exprs.get(ctx.field);
+            final FieldAccessExpression expr = new FieldAccessExpression(ctx.getStart(), object, field);
             log.trace("FIELDACCESS: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitNot(RuleLangParser.NotContext ctx) {
-            final LogicalExpression expression = upgradeBoolFunctionExpression(ctx.expression());
-            final NotExpression expr = new NotExpression(expression);
+            final AbstractExpression expression = upgradeBoolFunctionExpression(ctx.expression());
+            final NotExpression expr = new NotExpression(ctx.getStart(), expression);
             log.trace("NOT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -401,47 +400,47 @@ public class PipelineRuleParser {
         public void exitAnd(RuleLangParser.AndContext ctx) {
             // if the expressions are function calls but boolean valued, upgrade them,
             // we allow testing boolean valued functions without explicit comparison operator
-            final LogicalExpression left = upgradeBoolFunctionExpression(ctx.left);
-            final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
+            final AbstractExpression left = upgradeBoolFunctionExpression(ctx.left);
+            final AbstractExpression right = upgradeBoolFunctionExpression(ctx.right);
 
-            final AndExpression expr = new AndExpression(left, right);
+            final AndExpression expr = new AndExpression(ctx.getStart(), left, right);
             log.trace("AND: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
-        private LogicalExpression upgradeBoolFunctionExpression(RuleLangParser.ExpressionContext leftExprContext) {
-            Expression leftExpr = exprs.get(leftExprContext);
+        private AbstractExpression upgradeBoolFunctionExpression(RuleLangParser.ExpressionContext leftExprContext) {
+            AbstractExpression leftExpr = exprs.get(leftExprContext);
             if (leftExpr instanceof FunctionExpression && leftExpr.getType().equals(Boolean.class)) {
-                leftExpr = new BooleanValuedFunctionWrapper(leftExpr);
+                leftExpr = new BooleanValuedFunctionWrapper(leftExprContext.getStart(), leftExpr);
             }
-            return (LogicalExpression) leftExpr;
+            return leftExpr;
         }
 
         @Override
         public void exitOr(RuleLangParser.OrContext ctx) {
-            final LogicalExpression left = upgradeBoolFunctionExpression(ctx.left);
-            final LogicalExpression right = upgradeBoolFunctionExpression(ctx.right);
-            final OrExpression expr = new OrExpression(left, right);
+            final AbstractExpression left = upgradeBoolFunctionExpression(ctx.left);
+            final AbstractExpression right = upgradeBoolFunctionExpression(ctx.right);
+            final OrExpression expr = new OrExpression(ctx.getStart(), left, right);
             log.trace("OR: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitEquality(RuleLangParser.EqualityContext ctx) {
-            final Expression left = exprs.get(ctx.left);
-            final Expression right = exprs.get(ctx.right);
+            final AbstractExpression left = exprs.get(ctx.left);
+            final AbstractExpression right = exprs.get(ctx.right);
             final boolean equals = ctx.equality.getText().equals("==");
-            final EqualityExpression expr = new EqualityExpression(left, right, equals);
+            final EqualityExpression expr = new EqualityExpression(ctx.getStart(), left, right, equals);
             log.trace("EQUAL: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitComparison(RuleLangParser.ComparisonContext ctx) {
-            final Expression left = exprs.get(ctx.left);
-            final Expression right = exprs.get(ctx.right);
+            final AbstractExpression left = exprs.get(ctx.left);
+            final AbstractExpression right = exprs.get(ctx.right);
             final String operator = ctx.comparison.getText();
-            final ComparisonExpression expr = new ComparisonExpression(left, right, operator);
+            final ComparisonExpression expr = new ComparisonExpression(ctx.getStart(), left, right, operator);
             log.trace("COMPARE: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -449,14 +448,14 @@ public class PipelineRuleParser {
         @Override
         public void exitInteger(RuleLangParser.IntegerContext ctx) {
             // TODO handle different radix and length
-            final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
+            final LongExpression expr = new LongExpression(ctx.getStart(), Long.parseLong(ctx.getText()));
             log.trace("INT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitFloat(RuleLangParser.FloatContext ctx) {
-            final DoubleExpression expr = new DoubleExpression(Double.parseDouble(ctx.getText()));
+            final DoubleExpression expr = new DoubleExpression(ctx.getStart(), Double.parseDouble(ctx.getText()));
             log.trace("FLOAT: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -470,14 +469,14 @@ public class PipelineRuleParser {
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
             final String text = unquote(ctx.getText(), '\"');
-            final StringExpression expr = new StringExpression(text);
+            final StringExpression expr = new StringExpression(ctx.getStart(), text);
             log.trace("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
 
         @Override
         public void exitBoolean(RuleLangParser.BooleanContext ctx) {
-            final BooleanExpression expr = new BooleanExpression(Boolean.valueOf(ctx.getText()));
+            final BooleanExpression expr = new BooleanExpression(ctx.getStart(), Boolean.valueOf(ctx.getText()));
             log.trace("BOOL: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -491,19 +490,19 @@ public class PipelineRuleParser {
 
         @Override
         public void exitArrayLiteralExpr(RuleLangParser.ArrayLiteralExprContext ctx) {
-            final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(toList());
-            exprs.put(ctx, new ArrayLiteralExpression(elements));
+            final List<AbstractExpression> elements = ctx.expression().stream().map(exprs::get).collect(toList());
+            exprs.put(ctx, new ArrayLiteralExpression(ctx.getStart(), elements));
         }
 
         @Override
         public void exitMapLiteralExpr(RuleLangParser.MapLiteralExprContext ctx) {
-            final HashMap<String, Expression> map = Maps.newHashMap();
+            final HashMap<String, AbstractExpression> map = Maps.newHashMap();
             for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
                 final String key = unquote(propAssignmentContext.Identifier().getText(), '`');
-                final Expression value = exprs.get(propAssignmentContext.expression());
+                final AbstractExpression value = exprs.get(propAssignmentContext.expression());
                 map.put(key, value);
             }
-            exprs.put(ctx, new MapLiteralExpression(map));
+            exprs.put(ctx, new MapLiteralExpression(ctx.getStart(), map));
         }
 
         @Override
@@ -522,8 +521,8 @@ public class PipelineRuleParser {
         @Override
         public void exitMessageRef(RuleLangParser.MessageRefContext ctx) {
             isIdIsFieldAccess.pop(); // reset for error checks
-            final Expression fieldExpr = exprs.get(ctx.field);
-            final MessageRefExpression expr = new MessageRefExpression(fieldExpr);
+            final AbstractExpression fieldExpr = exprs.get(ctx.field);
+            final MessageRefExpression expr = new MessageRefExpression(ctx.getStart(), fieldExpr);
             log.trace("$MSG: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
         }
@@ -536,14 +535,14 @@ public class PipelineRuleParser {
             if (!isIdIsFieldAccess.peek() && !definedVars.contains(identifierName)) {
                 parseContext.addError(new UndeclaredVariable(ctx));
             }
-            final Expression expr;
+            final AbstractExpression expr;
             String type;
             // if the identifier is also a declared variable name prefer the variable
             if (isIdIsFieldAccess.peek() && !definedVars.contains(identifierName)) {
-                expr = new FieldRefExpression(identifierName);
+                expr = new FieldRefExpression(ctx.getStart(), identifierName);
                 type = "FIELDREF";
             } else {
-                expr = new VarRefExpression(identifierName);
+                expr = new VarRefExpression(ctx.getStart(), identifierName);
                 type = "VARREF";
             }
             log.trace("{}: ctx {} => {}", type, ctx, expr);
@@ -559,10 +558,10 @@ public class PipelineRuleParser {
 
         @Override
         public void exitIndexedAccess(RuleLangParser.IndexedAccessContext ctx) {
-            final Expression array = exprs.get(ctx.array);
-            final Expression index = exprs.get(ctx.index);
+            final AbstractExpression array = exprs.get(ctx.array);
+            final AbstractExpression index = exprs.get(ctx.index);
 
-            final IndexedAccessExpression expr = new IndexedAccessExpression(array, index);
+            final IndexedAccessExpression expr = new IndexedAccessExpression(ctx.getStart(), array, index);
             exprs.put(ctx, expr);
             log.trace("IDXACCESS: ctx {} => {}", ctx, expr);
         }
@@ -577,11 +576,11 @@ public class PipelineRuleParser {
 
         @Override
         public void exitIdentifier(RuleLangParser.IdentifierContext ctx) {
-            final Expression expr = parseContext.expressions().get(ctx);
+            final AbstractExpression expr = parseContext.expressions().get(ctx);
             if (expr instanceof VarRefExpression) {
                 final VarRefExpression varRefExpression = (VarRefExpression) expr;
                 final String name = varRefExpression.varName();
-                final Expression expression = parseContext.getDefinedVar(name);
+                final AbstractExpression expression = parseContext.getDefinedVar(name);
                 if (expression == null) {
                     if (parseContext.isSilent()) {
                         log.debug("Unable to retrieve expression for variable {}, this is a bug", name);
@@ -646,7 +645,7 @@ public class PipelineRuleParser {
             final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
             final FunctionArgs args = expr.getArgs();
             for (ParameterDescriptor p : descriptor.params()) {
-                final Expression argExpr = args.expression(p.name());
+                final AbstractExpression argExpr = args.expression(p.name());
                 if (argExpr != null && !p.type().isAssignableFrom(argExpr.getType())) {
                     parseContext.addError(new IncompatibleArgumentType(ctx, expr, p, argExpr));
                 }
@@ -663,7 +662,7 @@ public class PipelineRuleParser {
 
         @Override
         public void enterEveryRule(ParserRuleContext ctx) {
-            final Expression expression = parseContext.expressions().get(ctx);
+            final AbstractExpression expression = parseContext.expressions().get(ctx);
             if (expression != null && !parseContext.isInnerNode(ctx)) {
                 sb.append(" ( ");
                 sb.append(expression.getClass().getSimpleName());
@@ -675,7 +674,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitEveryRule(ParserRuleContext ctx) {
-            final Expression expression = parseContext.expressions().get(ctx);
+            final AbstractExpression expression = parseContext.expressions().get(ctx);
             if (expression != null && !parseContext.isInnerNode(ctx)) {
                 sb.append(" ) ");
             }
@@ -719,30 +718,30 @@ public class PipelineRuleParser {
      * Being used by tree walkers or visitors to perform AST construction, type checking and so on.
      */
     private static class ParseContext {
-        private final ParseTreeProperty<Expression> exprs = new ParseTreeProperty<>();
-        private final ParseTreeProperty<Map<String, Expression>> args = new ParseTreeProperty<>();
+        private final ParseTreeProperty<AbstractExpression> exprs = new ParseTreeProperty<>();
+        private final ParseTreeProperty<Map<String, AbstractExpression>> args = new ParseTreeProperty<>();
         /**
          * Should the parser be more silent about its error logging, useful for interactive parsing in the UI.
          */
         private final boolean silent;
-        private ParseTreeProperty<List<Expression>> argsLists = new ParseTreeProperty<>();
+        private ParseTreeProperty<List<AbstractExpression>> argsLists = new ParseTreeProperty<>();
         private Set<ParseError> errors = Sets.newHashSet();
         // inner nodes in the parse tree will be ignored during type checker printing, they only transport type information
         private Set<RuleContext> innerNodes = new IdentityHashSet<>();
         public List<Statement> statements = Lists.newArrayList();
         public List<Rule> rules = Lists.newArrayList();
-        private Map<String, Expression> varDecls = Maps.newHashMap();
+        private Map<String, AbstractExpression> varDecls = Maps.newHashMap();
         public List<Pipeline> pipelines = Lists.newArrayList();
 
         public ParseContext(boolean silent) {
             this.silent = silent;
         }
 
-        public ParseTreeProperty<Expression> expressions() {
+        public ParseTreeProperty<AbstractExpression> expressions() {
             return exprs;
         }
 
-        public ParseTreeProperty<Map<String, Expression>> arguments() {
+        public ParseTreeProperty<Map<String, AbstractExpression>> arguments() {
             return args;
         }
 
@@ -784,15 +783,15 @@ public class PipelineRuleParser {
          * @param expr expression
          * @return true if successful, false if previously declared
          */
-        public boolean defineVar(String name, Expression expr) {
+        public boolean defineVar(String name, AbstractExpression expr) {
             return varDecls.put(name, expr) == null;
         }
 
-        public Expression getDefinedVar(String name) {
+        public AbstractExpression getDefinedVar(String name) {
             return varDecls.get(name);
         }
 
-        public ParseTreeProperty<List<Expression>> argumentLists() {
+        public ParseTreeProperty<List<AbstractExpression>> argumentLists() {
             return argsLists;
         }
 
@@ -857,7 +856,7 @@ public class PipelineRuleParser {
         @Override
         public void exitInteger(RuleLangParser.IntegerContext ctx) {
             // TODO handle different radix and length
-            final LongExpression expr = new LongExpression(Long.parseLong(ctx.getText()));
+            final LongExpression expr = new LongExpression(ctx.getStart(), Long.parseLong(ctx.getText()));
             log.trace("INT: ctx {} => {}", ctx, expr);
             parseContext.exprs.put(ctx, expr);
         }
@@ -865,7 +864,7 @@ public class PipelineRuleParser {
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
             final String text = unquote(ctx.getText(), '\"');
-            final StringExpression expr = new StringExpression(text);
+            final StringExpression expr = new StringExpression(ctx.getStart(), text);
             log.trace("STRING: ctx {} => {}", ctx, expr);
             parseContext.exprs.put(ctx, expr);
         }

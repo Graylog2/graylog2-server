@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.google.auto.value.AutoValue;
+import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
@@ -38,7 +39,7 @@ public abstract class Rule {
     }
 
     public static Rule alwaysFalse(String name) {
-        return builder().name(name).when(new BooleanExpression(false)).then(Collections.emptyList()).build();
+        return builder().name(name).when(new BooleanExpression(new CommonToken(-1), false)).then(Collections.emptyList()).build();
     }
     @AutoValue.Builder
     public abstract static class Builder {

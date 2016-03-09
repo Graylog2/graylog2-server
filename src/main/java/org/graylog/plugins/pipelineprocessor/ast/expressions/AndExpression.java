@@ -16,16 +16,17 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class AndExpression extends BinaryExpression implements LogicalExpression {
-    public AndExpression(LogicalExpression left,
-                         LogicalExpression right) {
-        super(left, right);
+    public AndExpression(Token start, AbstractExpression left,
+                         AbstractExpression right) {
+        super(start, left, right);
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return evaluateBool(context);
     }
 

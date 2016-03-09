@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.slf4j.Logger;
@@ -23,13 +24,14 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class FieldAccessExpression implements Expression {
+public class FieldAccessExpression extends AbstractExpression {
     private static final Logger log = LoggerFactory.getLogger(FieldAccessExpression.class);
 
-    private final Expression object;
-    private final Expression field;
+    private final AbstractExpression object;
+    private final AbstractExpression field;
 
-    public FieldAccessExpression(Expression object, Expression field) {
+    public FieldAccessExpression(Token start, AbstractExpression object, AbstractExpression field) {
+        super(start);
         this.object = object;
         this.field = field;
     }
@@ -40,9 +42,9 @@ public class FieldAccessExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
-        final Object bean = this.object.evaluate(context);
-        final Object fieldValue = field.evaluate(context);
+    public Object evaluateUnsafe(EvaluationContext context) {
+        final Object bean = this.object.evaluateUnsafe(context);
+        final Object fieldValue = field.evaluateUnsafe(context);
         if (bean == null || fieldValue == null) {
             return null;
         }

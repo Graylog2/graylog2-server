@@ -16,18 +16,19 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class DoubleExpression extends ConstantExpression implements NumericExpression {
     private final double value;
 
-    public DoubleExpression(double value) {
-        super(Double.class);
+    public DoubleExpression(Token start, double value) {
+        super(start, Double.class);
         this.value = value;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return value;
     }
 

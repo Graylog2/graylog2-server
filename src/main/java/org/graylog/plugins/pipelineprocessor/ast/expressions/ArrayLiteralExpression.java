@@ -17,15 +17,17 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArrayLiteralExpression implements Expression {
-    private final List<Expression> elements;
+public class ArrayLiteralExpression extends AbstractExpression {
+    private final List<AbstractExpression> elements;
 
-    public ArrayLiteralExpression(List<Expression> elements) {
+    public ArrayLiteralExpression(Token start, List<AbstractExpression> elements) {
+        super(start);
         this.elements = elements;
     }
 
@@ -35,9 +37,9 @@ public class ArrayLiteralExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
-        return elements.stream()
-                .map(expression -> expression.evaluate(context))
+    public Object evaluateUnsafe(EvaluationContext context) {
+        return  elements.stream()
+                .map(expression -> expression.evaluateUnsafe(context))
                 .collect(Collectors.toList());
     }
 

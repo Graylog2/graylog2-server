@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -26,13 +27,13 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     private final boolean checkEquality;
 
-    public EqualityExpression(Expression left, Expression right, boolean checkEquality) {
-        super(left, right);
+    public EqualityExpression(Token start, AbstractExpression left, AbstractExpression right, boolean checkEquality) {
+        super(start, left, right);
         this.checkEquality = checkEquality;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return evaluateBool(context);
     }
 
@@ -43,8 +44,8 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
 
     @Override
     public boolean evaluateBool(EvaluationContext context) {
-        final Object left = this.left.evaluate(context);
-        final Object right = this.right.evaluate(context);
+        final Object left = this.left.evaluateUnsafe(context);
+        final Object right = this.right.evaluateUnsafe(context);
         if (left == null) {
             log.warn("left expression evaluated to null, returning false: {}", this.left);
             return false;

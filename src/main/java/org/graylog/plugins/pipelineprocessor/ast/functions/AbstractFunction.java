@@ -17,7 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 
 /**
  * Helper Function implementation which evaluates and memoizes all constant FunctionArgs.
@@ -27,7 +27,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 public abstract class AbstractFunction<T> implements Function<T> {
 
     @Override
-    public Object preComputeConstantArgument(FunctionArgs args, String name, Expression arg) {
-        return arg.evaluate(EvaluationContext.emptyContext());
+    public Object preComputeConstantArgument(FunctionArgs args, String name, AbstractExpression arg) {
+        return arg.evaluateUnsafe(EvaluationContext.emptyContext());
     }
 }

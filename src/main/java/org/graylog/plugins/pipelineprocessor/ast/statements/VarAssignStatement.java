@@ -17,13 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.ast.statements;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 
 public class VarAssignStatement implements Statement {
     private final String name;
-    private final Expression expr;
+    private final AbstractExpression expr;
 
-    public VarAssignStatement(String name, Expression expr) {
+    public VarAssignStatement(String name, AbstractExpression expr) {
         this.name = name;
         this.expr = expr;
     }

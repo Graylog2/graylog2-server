@@ -18,17 +18,19 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
-public class IndexedAccessExpression implements Expression {
-    private final Expression indexableObject;
-    private final Expression index;
+public class IndexedAccessExpression extends AbstractExpression {
+    private final AbstractExpression indexableObject;
+    private final AbstractExpression index;
 
-    public IndexedAccessExpression(Expression indexableObject, Expression index) {
+    public IndexedAccessExpression(Token start, AbstractExpression indexableObject, AbstractExpression index) {
+        super(start);
         this.indexableObject = indexableObject;
         this.index = index;
     }
@@ -39,9 +41,9 @@ public class IndexedAccessExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
-        final Object idxObj = this.index.evaluate(context);
-        final Object indexable = indexableObject.evaluate(context);
+    public Object evaluateUnsafe(EvaluationContext context) {
+        final Object idxObj = this.index.evaluateUnsafe(context);
+        final Object indexable = indexableObject.evaluateUnsafe(context);
         if (idxObj == null || indexable == null) {
             return null;
         }

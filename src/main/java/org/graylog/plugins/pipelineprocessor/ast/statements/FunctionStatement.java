@@ -17,27 +17,19 @@
 package org.graylog.plugins.pipelineprocessor.ast.statements;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AbstractExpression;
 
 public class FunctionStatement implements Statement {
-    private static final Logger log = LoggerFactory.getLogger(FunctionStatement.class);
 
-    private final Expression functionExpression;
+    private final AbstractExpression functionExpression;
 
-    public FunctionStatement(Expression functionExpression) {
+    public FunctionStatement(AbstractExpression functionExpression) {
         this.functionExpression = functionExpression;
     }
 
     @Override
     public Object evaluate(EvaluationContext context) {
-        try {
-            return functionExpression.evaluate(context);
-        } catch (Exception e) {
-            log.debug("Exception during statement evaluation, skipping statement", e);
-            return null;
-        }
+        return functionExpression.evaluate(context);
     }
 
     @Override
