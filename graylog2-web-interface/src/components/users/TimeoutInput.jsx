@@ -4,16 +4,14 @@ import { Input, Row, Col } from 'react-bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 const TimeoutInput = React.createClass({
-  MS_DAY: 24 * 60 * 60 * 1000,
-  MS_HOUR: 60 * 60 * 1000,
-  MS_MINUTE: 60 * 1000,
-  MS_SECOND: 1000,
   propTypes: {
+    controlSize: React.PropTypes.number,
+    labelSize: React.PropTypes.number,
     value: React.PropTypes.number,
   },
   getDefaultProps() {
     return {
-      value: 0,
+      value: 60 * 60 * 1000,
       labelSize: 2,
       controlSize: 10,
     };
@@ -32,6 +30,10 @@ const TimeoutInput = React.createClass({
     }
     return (this.refs.timeout.value * this.refs.session_timeout_unit.getValue());
   },
+  MS_DAY: 24 * 60 * 60 * 1000,
+  MS_HOUR: 60 * 60 * 1000,
+  MS_MINUTE: 60 * 1000,
+  MS_SECOND: 1000,
   _estimateUnit(value) {
     if (value === 0) {
       return this.MS_SECOND;
@@ -52,25 +54,25 @@ const TimeoutInput = React.createClass({
     return this.MS_SECOND;
   },
   _onClick(evt) {
-    this.setState({sessionTimeoutNever: evt.target.checked});
+    this.setState({ sessionTimeoutNever: evt.target.checked });
   },
   _onChangeValue(evt) {
-    this.setState({value: evt.target.value});
+    this.setState({ value: evt.target.value });
   },
   _onChangeUnit(evt) {
-    this.setState({unit: evt.target.value});
+    this.setState({ unit: evt.target.value });
   },
   render() {
     return (
       <span>
         <Input ref="session_timeout_never" type="checkbox" id="session-timeout-never" name="session_timeout_never"
-               labelClassName={'col-sm-' + this.props.controlSize} wrapperClassName={'col-sm-offset-' + this.props.labelSize + ' col-sm-' + this.props.controlSize}
+               labelClassName={`col-sm-${this.props.controlSize}`} wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
                label="Sessions do not time out" help="When checked sessions never time out due to inactivity."
                onClick={this._onClick} value={this.state.sessionTimeoutNever}/>
 
         <Input label="Timeout"
                help="Session automatically end after this amount of time, unless they are actively used."
-               labelClassName={'col-sm-' + this.props.labelSize} wrapperClassName={'col-sm-' + this.props.controlSize}>
+               labelClassName={`col-sm-${this.props.labelSize}`} wrapperClassName={`col-sm-${this.props.controlSize}`}>
           <Row>
             <Col sm={2}>
               <input ref="timeout" type="number" id="timeout"
