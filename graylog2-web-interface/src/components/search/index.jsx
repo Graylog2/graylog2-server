@@ -15,4 +15,5 @@ export { default as SearchBar } from './SearchBar';
 export { default as SearchResult } from './SearchResult';
 export { default as SearchSidebar } from './SearchSidebar';
 export { default as ShowQueryModal } from './ShowQueryModal';
+export { default as SurroundingSearchButton } from './SurroundingSearchButton';
 export { default as QueryInput } from './QueryInput';

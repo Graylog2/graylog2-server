@@ -8,6 +8,7 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import {Spinner, ClipboardButton, Timestamp} from 'components/common';
+import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
@@ -26,6 +27,7 @@ const MessageDetail = React.createClass({
     message: PropTypes.object,
     streams: PropTypes.object,
     customFieldActions: PropTypes.node,
+    searchConfig: PropTypes.object,
   },
 
   getInitialState() {
@@ -81,6 +83,7 @@ const MessageDetail = React.createClass({
       return this.state.allStreams;
     }
   },
+
   render() {
     // Short circuit when all messages are being expanded at the same time
     if (this.props.expandAllRenderAsync) {
@@ -167,6 +170,10 @@ const MessageDetail = React.createClass({
             <Button href={messageUrl}>Permalink</Button>
 
             <ClipboardButton title="Copy ID" text={this.props.message.id}/>
+            <SurroundingSearchButton id={this.props.message.id}
+                                     timestamp={this.props.message.timestamp}
+                                     searchConfig={this.props.searchConfig}
+                                     messageFields={this.props.message.fields} />
             {testAgainstStream}
           </ButtonGroup>
           <h3>

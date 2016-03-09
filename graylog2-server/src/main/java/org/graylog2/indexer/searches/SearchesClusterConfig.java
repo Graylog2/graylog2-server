@@ -21,9 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.joda.time.Period;
 
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -44,6 +46,19 @@ public abstract class SearchesClusterConfig {
             .put(Period.days(30), "Search in the last 30 days")
             .put(Period.ZERO, "Search in all messages")
             .build();
+    private static final Map<Period, String> DEFAULT_SURROUNDING_TIMERANGE_OPTIONS = ImmutableMap.<Period, String>builder()
+            .put(Period.seconds(1), "1 second")
+            .put(Period.seconds(5), "5 seconds")
+            .put(Period.seconds(10), "10 seconds")
+            .put(Period.minutes(1), "1 minute")
+            .put(Period.minutes(5), "5 minutes")
+            .build();
+    private static final Set<String> DEFAULT_SURROUNDING_FILTER_FIELDS = ImmutableSet.<String>builder()
+            .add("source")
+            .add("gl2_source_input")
+            .add("file")
+            .add("source_file")
+            .build();
 
     @JsonProperty("query_time_range_limit")
     public abstract Period queryTimeRangeLimit();
@@ -51,12 +66,22 @@ public abstract class SearchesClusterConfig {
     @JsonProperty("relative_timerange_options")
     public abstract Map<Period, String> relativeTimerangeOptions();
 
+    @JsonProperty("surrounding_timerange_options")
+    public abstract Map<Period, String> surroundingTimerangeOptions();
+
+    @JsonProperty("surrounding_filter_fields")
+    public abstract Set<String> surroundingFilterFields();
+
     @JsonCreator
     public static SearchesClusterConfig create(@JsonProperty("query_time_range_limit") Period queryTimeRangeLimit,
-                                               @JsonProperty("relative_timerange_options") Map<Period, String> relativeTimerangeOptions) {
+                                               @JsonProperty("relative_timerange_options") Map<Period, String> relativeTimerangeOptions,
+                                               @JsonProperty("surrounding_timerange_options") Map<Period, String> surroundingTimerangeOptions,
+                                               @JsonProperty("surrounding_filter_fields") Set<String> surroundingFilterFields) {
         return builder()
                 .queryTimeRangeLimit(queryTimeRangeLimit)
                 .relativeTimerangeOptions(relativeTimerangeOptions)
+                .surroundingTimerangeOptions(surroundingTimerangeOptions)
+                .surroundingFilterFields(surroundingFilterFields)
                 .build();
     }
 
@@ -64,6 +89,8 @@ public abstract class SearchesClusterConfig {
         return builder()
                 .queryTimeRangeLimit(DEFAULT_QUERY_TIME_RANGE_LIMIT)
                 .relativeTimerangeOptions(DEFAULT_RELATIVE_TIMERANGE_OPTIONS)
+                .surroundingTimerangeOptions(DEFAULT_SURROUNDING_TIMERANGE_OPTIONS)
+                .surroundingFilterFields(DEFAULT_SURROUNDING_FILTER_FIELDS)
                 .build();
     }
 
@@ -77,6 +104,8 @@ public abstract class SearchesClusterConfig {
     public static abstract class Builder {
         public abstract Builder queryTimeRangeLimit(Period queryTimeRangeLimit);
         public abstract Builder relativeTimerangeOptions(Map<Period, String> relativeTimerangeOptions);
+        public abstract Builder surroundingTimerangeOptions(Map<Period, String> surroundingTimerangeOptions);
+        public abstract Builder surroundingFilterFields(Set<String> surroundingFilterFields);
 
         public abstract SearchesClusterConfig build();
     }

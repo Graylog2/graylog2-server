@@ -59,6 +59,11 @@ const AppWithSearchBar = React.createClass({
   _isLoading() {
     return !this.state.savedSearches || (this.props.params.streamId && !this.state.stream);
   },
+  _decorateChildren(children) {
+    return React.Children.map(children, (child) => {
+      return React.cloneElement(child, {searchConfig: this.state.searchesClusterConfig});
+    });
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -76,7 +81,7 @@ const AppWithSearchBar = React.createClass({
                    config={this.state.searchesClusterConfig} />
         <Row id="main-row">
           <Col md={12} id="main-content">
-            {this.props.children}
+            {this._decorateChildren(this.props.children)}
           </Col>
         </Row>
       </div>

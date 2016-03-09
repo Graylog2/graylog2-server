@@ -24,6 +24,7 @@ const SearchResult = React.createClass({
     inputs: PropTypes.instanceOf(Immutable.Map),
     nodes: PropTypes.instanceOf(Immutable.Map),
     permissions: PropTypes.array.isRequired,
+    searchConfig: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -228,6 +229,7 @@ const SearchResult = React.createClass({
                        streams={this.props.streams}
                        nodes={this.props.nodes}
                        highlight={this.state.shouldHighlight}
+                       searchConfig={this.props.searchConfig}
           />
 
         </Col>

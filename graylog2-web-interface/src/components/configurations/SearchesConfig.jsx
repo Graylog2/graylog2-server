@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Button } from 'react-bootstrap';
+import { Input, Button, Row, Col } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
@@ -20,10 +20,15 @@ const SearchesConfig = React.createClass({
   getInitialState() {
     const queryTimeRangeLimit = this._getPropConfigValue('query_time_range_limit');
     const relativeTimerangeOptions = this._getPropConfigValue('relative_timerange_options');
+    const surroundingTimerangeOptions = this._getPropConfigValue('surrounding_timerange_options');
+    const surroundingFilterFields = this._getPropConfigValue('surrounding_filter_fields');
+
     return {
       config: {
         query_time_range_limit: queryTimeRangeLimit,
         relative_timerange_options: relativeTimerangeOptions,
+        surrounding_timerange_options: surroundingTimerangeOptions,
+        surrounding_filter_fields: surroundingFilterFields,
       },
       limitEnabled: moment.duration(queryTimeRangeLimit).asMilliseconds() > 0,
     };
@@ -41,6 +46,10 @@ const SearchesConfig = React.createClass({
 
       this.setState({config: update});
     };
+  },
+
+  _onFilterFieldsUpdate(e) {
+    this.setState({surroundingFilterFields: e.target.value});
   },
 
   _onChecked() {
@@ -62,7 +71,19 @@ const SearchesConfig = React.createClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const update = ObjectUtils.clone(this.state.config);
+
+    // Make sure to update filter fields
+    if (this.state.surroundingFilterFields) {
+      update.surrounding_filter_fields = this.state.surroundingFilterFields
+        .split(',')
+        .map((f) => f.trim())
+        .filter((f) => f.length > 0);
+
+      this.setState({surroundingFilterFields: undefined});
+    }
+
+    this.props.updateConfig(update).then(() => {
       this._closeModal();
     });
   },
@@ -85,6 +106,13 @@ const SearchesConfig = React.createClass({
     const duration = moment.duration(config.query_time_range_limit);
     const limit = this._isEnabled() ? `${config.query_time_range_limit} (${duration.format()})` : 'disabled';
 
+    let filterFields;
+    let filterFieldsString;
+    if (this.state.config.surrounding_filter_fields) {
+      filterFields = this.state.config.surrounding_filter_fields.map((f, idx) => <li key={idx}>{f}</li>);
+      filterFieldsString = this.state.config.surrounding_filter_fields.join(', ');
+    }
+
     return (
       <div>
         <h2>Search Configuration</h2>
@@ -96,10 +124,21 @@ const SearchesConfig = React.createClass({
             span a lot of data and would need a long time and many resources to complete (if at all).</dd>
         </dl>
 
-        <strong>Relative time range options</strong>
+        <Row>
+          <Col md={6}>
+            <strong>Relative time range options</strong>
+            <TimeRangeOptionsSummary options={this.state.config.relative_timerange_options} />
+          </Col>
+          <Col md={6}>
+            <strong>Surrounding time range options</strong>
+            <TimeRangeOptionsSummary options={this.state.config.surrounding_timerange_options} />
 
-        <TimeRangeOptionsSummary options={this.state.config.relative_timerange_options} />
-
+            <strong>Surrounding search filter fields</strong>
+            <ul>
+              {filterFields}
+            </ul>
+          </Col>
+        </Row>
         <IfPermitted permissions="clusterconfigentry:edit">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
@@ -128,6 +167,19 @@ const SearchesConfig = React.createClass({
                                   validator={(milliseconds, dur) => milliseconds >= 1 || dur === 'PT0S'}
                                   title="Relative Timerange Options"
                                   help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
+
+            <TimeRangeOptionsForm options={this.state.config.surrounding_timerange_options}
+                                  update={this._onUpdate('surrounding_timerange_options')}
+                                  validator={(milliseconds) => milliseconds >= 1}
+                                  title="Surrounding Timerange Options"
+                                  help={<span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
+
+            <Input type="text"
+                   label="Surrounding search filter fields"
+                   onChange={this._onFilterFieldsUpdate}
+                   value={this.state.surroundingFilterFields || filterFieldsString}
+                   help="foo bar"
+                   required />
           </fieldset>
         </BootstrapModalForm>
       </div>

@@ -59,7 +59,7 @@ const TimeRangeOptionsForm = React.createClass({
     const options = ObjectUtils.clone(this.state.optionsList);
 
     if (options) {
-      options.push({period: 'PT1S', description: ''});
+      options.push({period: 'PT0S', description: ''});
       this._update(options);
     }
   },
