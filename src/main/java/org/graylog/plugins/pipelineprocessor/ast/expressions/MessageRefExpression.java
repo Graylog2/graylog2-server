@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-public class MessageRefExpression implements Expression {
+public class MessageRefExpression extends BaseExpression {
     private final Expression fieldExpr;
 
-    public MessageRefExpression(Expression fieldExpr) {
+    public MessageRefExpression(Token start, Expression fieldExpr) {
+        super(start);
         this.fieldExpr = fieldExpr;
     }
 
@@ -31,8 +33,8 @@ public class MessageRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
-        final Object fieldName = fieldExpr.evaluate(context);
+    public Object evaluateUnsafe(EvaluationContext context) {
+        final Object fieldName = fieldExpr.evaluateUnsafe(context);
         if (fieldName == null) {
             return null;
         }

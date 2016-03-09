@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.antlr.v4.runtime.CommonToken;
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class IndexedAccessExpressionTest {
 
+    public static final Token START = new CommonToken(-1);
     private EvaluationContext context;
 
     @Before
@@ -40,9 +43,9 @@ public class IndexedAccessExpressionTest {
     @Test
     public void accessArray() {
         int ary[] = new int[] {23};
-        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(obj(ary), num(0));
+        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(START, obj(ary), num(0));
 
-        final Object evaluate = idxExpr.evaluate(context);
+        final Object evaluate = idxExpr.evaluateUnsafe(context);
         assertThat(evaluate).isOfAnyClassIn(Integer.class);
         assertThat(evaluate).isEqualTo(23);
     }
@@ -50,9 +53,9 @@ public class IndexedAccessExpressionTest {
     @Test
     public void accessList() {
         final ImmutableList<Integer> list = ImmutableList.of(23);
-        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(obj(list), num(0));
+        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(START, obj(list), num(0));
 
-        final Object evaluate = idxExpr.evaluate(context);
+        final Object evaluate = idxExpr.evaluateUnsafe(context);
         assertThat(evaluate).isOfAnyClassIn(Integer.class);
         assertThat(evaluate).isEqualTo(23);
     }
@@ -71,9 +74,9 @@ public class IndexedAccessExpressionTest {
                 return 23;
             }
         };
-        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(obj(iterable), num(0));
+        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(START, obj(iterable), num(0));
 
-        final Object evaluate = idxExpr.evaluate(context);
+        final Object evaluate = idxExpr.evaluateUnsafe(context);
         assertThat(evaluate).isOfAnyClassIn(Integer.class);
         assertThat(evaluate).isEqualTo(23);
     }
@@ -81,27 +84,27 @@ public class IndexedAccessExpressionTest {
     @Test
     public void accessMap() {
         final ImmutableMap<String, Integer> map = ImmutableMap.of("string", 23);
-        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(obj(map), string("string"));
+        final IndexedAccessExpression idxExpr = new IndexedAccessExpression(START, obj(map), string("string"));
 
-        final Object evaluate = idxExpr.evaluate(context);
+        final Object evaluate = idxExpr.evaluateUnsafe(context);
         assertThat(evaluate).isEqualTo(23);
     }
 
     @Test
     public void invalidObject() {
-        final IndexedAccessExpression expression = new IndexedAccessExpression(obj(23), num(0));
+        final IndexedAccessExpression expression = new IndexedAccessExpression(START, obj(23), num(0));
 
         // this should throw an exception
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> expression.evaluate(context));
+                .isThrownBy(() -> expression.evaluateUnsafe(context));
     }
 
     private static Expression num(long idx) {
-        return new LongExpression(idx);
+        return new LongExpression(START, idx);
     }
 
     private static Expression string(String string) {
-        return new StringExpression(string);
+        return new StringExpression(START, string);
     }
 
     private static ConstantObjectExpression obj(Object object) {
@@ -112,12 +115,12 @@ public class IndexedAccessExpressionTest {
         private final Object object;
 
         protected ConstantObjectExpression(Object object) {
-            super(object.getClass());
+            super(START, object.getClass());
             this.object = object;
         }
 
         @Override
-        public Object evaluate(EvaluationContext context) {
+        public Object evaluateUnsafe(EvaluationContext context) {
             return object;
         }
     }

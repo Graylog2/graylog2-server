@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.jooq.lambda.Seq;
 import org.jooq.lambda.tuple.Tuple2;
@@ -24,10 +25,11 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapLiteralExpression implements Expression {
+public class MapLiteralExpression extends BaseExpression {
     private final HashMap<String, Expression> map;
 
-    public MapLiteralExpression(HashMap<String, Expression> map) {
+    public MapLiteralExpression(Token start, HashMap<String, Expression> map) {
+        super(start);
         this.map = map;
     }
 
@@ -37,10 +39,10 @@ public class MapLiteralExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         // evaluate all values for each key and return the resulting map
         return Seq.seq(map)
-                .map(entry -> entry.map2(value -> value.evaluate(context)))
+                .map(entry -> entry.map2(value -> value.evaluateUnsafe(context)))
                 .toMap(Tuple2::v1, Tuple2::v2);
     }
 

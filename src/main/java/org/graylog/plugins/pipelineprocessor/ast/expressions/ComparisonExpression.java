@@ -16,18 +16,19 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class ComparisonExpression extends BinaryExpression implements LogicalExpression {
     private final String operator;
 
-    public ComparisonExpression(Expression left, Expression right, String operator) {
-        super(left, right);
+    public ComparisonExpression(Token start, Expression left, Expression right, String operator) {
+        super(start, left, right);
         this.operator = operator;
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return evaluateBool(context);
     }
 
@@ -39,8 +40,8 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
     @Override
     public boolean evaluateBool(EvaluationContext context) {
 
-        final Object leftValue = this.left.evaluate(context);
-        final Object rightValue = this.right.evaluate(context);
+        final Object leftValue = this.left.evaluateUnsafe(context);
+        final Object rightValue = this.right.evaluateUnsafe(context);
         if (leftValue instanceof Double || rightValue instanceof Double) {
             return compareDouble(operator, (double) leftValue, (double) rightValue);
         } else {

@@ -108,6 +108,10 @@ public class ProcessorFunctionsModule extends PluginModule {
         // ip handling
         addMessageProcessorFunction(CidrMatch.NAME, CidrMatch.class);
         addMessageProcessorFunction(IpAddressConversion.NAME, IpAddressConversion.class);
+
+        // null support
+        addMessageProcessorFunction(IsNull.NAME, IsNull.class);
+        addMessageProcessorFunction(IsNotNull.NAME, IsNotNull.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

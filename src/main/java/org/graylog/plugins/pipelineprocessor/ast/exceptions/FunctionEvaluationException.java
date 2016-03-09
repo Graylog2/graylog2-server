@@ -14,33 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.ast.expressions;
+package org.graylog.plugins.pipelineprocessor.ast.exceptions;
 
-import org.antlr.v4.runtime.Token;
-import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
 
-public class NotExpression extends UnaryExpression implements LogicalExpression {
-    public NotExpression(Token start, Expression right) {
-        super(start, right);
+public class FunctionEvaluationException extends LocationAwareEvalException {
+    private final FunctionExpression functionExpression;
+    private final Exception exception;
+
+    public FunctionEvaluationException(FunctionExpression functionExpression, Exception exception) {
+        super(functionExpression.getStartToken(), exception);
+        this.functionExpression = functionExpression;
+        this.exception = exception;
     }
 
-    @Override
-    public Object evaluateUnsafe(EvaluationContext context) {
-        return !evaluateBool(context);
+    public FunctionExpression getFunctionExpression() {
+        return functionExpression;
     }
 
-    @Override
-    public boolean evaluateBool(EvaluationContext context) {
-        return !((LogicalExpression)right).evaluateBool(context);
-    }
-
-    @Override
-    public Class getType() {
-        return Boolean.class;
-    }
-
-    @Override
-    public String toString() {
-        return "NOT " + right.toString();
+    public Exception getException() {
+        return exception;
     }
 }

@@ -24,6 +24,7 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class EvaluationContext {
         return EMPTY_CONTEXT;
     }
 
-    public void addEvaluationError(int line, int charPositionInLine, FunctionDescriptor descriptor, Exception e) {
+    public void addEvaluationError(int line, int charPositionInLine, @Nullable FunctionDescriptor descriptor, Throwable e) {
         evalErrors.add(new EvalError(line, charPositionInLine, descriptor, e));
     }
 
@@ -118,20 +119,31 @@ public class EvaluationContext {
     public static class EvalError {
         private final int line;
         private final int charPositionInLine;
+        @Nullable
         private final FunctionDescriptor descriptor;
-        private final Exception e;
+        private final Throwable throwable;
 
-        public EvalError(int line, int charPositionInLine, FunctionDescriptor descriptor, Exception e) {
+        public EvalError(int line, int charPositionInLine, @Nullable FunctionDescriptor descriptor, Throwable throwable) {
             this.line = line;
             this.charPositionInLine = charPositionInLine;
             this.descriptor = descriptor;
-            this.e = e;
+            this.throwable = throwable;
         }
 
         @Override
         public String toString() {
-            return "In call to function '" + descriptor.name() + "' at " + line + ":" + charPositionInLine +
-                    " an exception was thrown: " + e.getMessage();
+            final StringBuilder sb = new StringBuilder();
+            if (descriptor != null) {
+                sb.append("In call to function '").append(descriptor.name()).append("' at ");
+            } else {
+                sb.append("At ");
+            }
+            return sb.append(line)
+                    .append(":")
+                    .append(charPositionInLine)
+                    .append(" an exception was thrown: ")
+                    .append(throwable.getMessage())
+                    .toString();
         }
     }
 }

@@ -144,6 +144,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IpAddressConversion.NAME, new IpAddressConversion());
         functions.put(CidrMatch.NAME, new CidrMatch());
 
+        functions.put(IsNull.NAME, new IsNull());
+        functions.put(IsNotNull.NAME, new IsNotNull());
+
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -283,6 +286,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(context).isNotNull();
         assertThat(context.hasEvaluationErrors()).isTrue();
         assertThat(Iterables.getLast(context.evaluationErrors()).toString()).isEqualTo("In call to function 'toip' at 5:28 an exception was thrown: 'null' is not an IP string literal.");
+    }
+
+    @Test
+    public void evalErrorSuppressed() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("this_field_was_set", true);
+        final EvaluationContext context = contextForRuleEval(rule, message);
+
+        assertThat(context).isNotNull();
+        assertThat(context.hasEvaluationErrors()).isFalse();
+        assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test

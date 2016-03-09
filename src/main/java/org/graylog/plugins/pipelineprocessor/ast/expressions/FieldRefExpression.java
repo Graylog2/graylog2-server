@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
-public class FieldRefExpression implements Expression {
+public class FieldRefExpression extends BaseExpression {
     private final String variableName;
 
-    public FieldRefExpression(String variableName) {
+    public FieldRefExpression(Token start, String variableName) {
+        super(start);
         this.variableName = variableName;
     }
 
@@ -31,7 +33,7 @@ public class FieldRefExpression implements Expression {
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return variableName;
     }
 

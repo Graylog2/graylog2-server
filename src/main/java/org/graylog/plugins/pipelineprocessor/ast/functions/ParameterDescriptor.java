@@ -97,7 +97,7 @@ public abstract class ParameterDescriptor<T, R> {
         if (valueExpr == null) {
             return null;
         }
-        final Object value = valueExpr.evaluate(context);
+        final Object value = valueExpr.evaluateUnsafe(context);
         return transformedType().cast(transform().apply(type().cast(value)));
     }
 

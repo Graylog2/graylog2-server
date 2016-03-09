@@ -16,16 +16,17 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 public class OrExpression extends BinaryExpression implements LogicalExpression {
-    public OrExpression(LogicalExpression left,
-                        LogicalExpression right) {
-        super(left, right);
+    public OrExpression(Token start, Expression left,
+                        Expression right) {
+        super(start, left, right);
     }
 
     @Override
-    public Object evaluate(EvaluationContext context) {
+    public Object evaluateUnsafe(EvaluationContext context) {
         return evaluateBool(context);
     }
 
