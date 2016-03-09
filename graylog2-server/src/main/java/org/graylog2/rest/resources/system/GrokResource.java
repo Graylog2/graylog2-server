@@ -17,14 +17,18 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.GrokPatterns;
+import org.graylog2.grok.GrokPatternsChangedEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
@@ -46,6 +50,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 
 
 @RequiresAuthentication
@@ -56,10 +62,12 @@ import java.net.URI;
 public class GrokResource extends RestResource {
 
     private final GrokPatternService grokPatternService;
+    private final EventBus clusterBus;
 
     @Inject
-    public GrokResource(GrokPatternService grokPatternService) {
+    public GrokResource(GrokPatternService grokPatternService, @ClusterEventBus EventBus clusterBus) {
         this.grokPatternService = grokPatternService;
+        this.clusterBus = clusterBus;
     }
 
     @GET
@@ -70,7 +78,7 @@ public class GrokResource extends RestResource {
 
         return GrokPatternList.create(GrokPatterns.toSummarySet(grokPatternService.loadAll()));
     }
-    
+
     @GET
     @Timed
     @Path("/{patternId}")
@@ -81,7 +89,7 @@ public class GrokResource extends RestResource {
 
         return grokPatternService.load(patternId);
     }
-    
+
     @POST
     @Timed
     @ApiOperation(value = "Add a new named pattern", response = GrokPatternSummary.class)
@@ -91,8 +99,10 @@ public class GrokResource extends RestResource {
 
         final GrokPattern newPattern = grokPatternService.save(GrokPatterns.fromSummary(pattern));
 
+        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), Sets.newHashSet(newPattern.name)));
+
         final URI patternUri = getUriBuilderToSelf().path(GrokResource.class, "listPattern").build(newPattern.id);
-        
+
         return Response.created(patternUri).entity(newPattern).build();
     }
 
@@ -104,6 +114,7 @@ public class GrokResource extends RestResource {
                                        @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
+        final Set<String> updatedPatternNames = Sets.newHashSet();
         for (final GrokPatternSummary pattern : patternList.patterns()) {
             if (!grokPatternService.validate(GrokPatterns.fromSummary(pattern))) {
                 throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
@@ -111,10 +122,10 @@ public class GrokResource extends RestResource {
         }
 
         grokPatternService.saveAll(GrokPatterns.fromSummarySet(patternList.patterns()), replace);
-
+        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), updatedPatternNames));
         return Response.accepted().build();
     }
-    
+
     @PUT
     @Timed
     @Path("/{patternId}")
@@ -124,21 +135,27 @@ public class GrokResource extends RestResource {
                                      @ApiParam(name = "pattern", required = true)
                                      GrokPatternSummary pattern) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT);
-        
+
         final GrokPattern oldPattern = grokPatternService.load(patternId);
-        
+
+        final Set<String> updatedNames = Sets.newHashSet(pattern.name, oldPattern.name);
+
         oldPattern.name = pattern.name;
         oldPattern.pattern = pattern.pattern;
 
+        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), updatedNames));
         return grokPatternService.save(oldPattern);
     }
-    
+
     @DELETE
     @Timed
     @Path("/{patternId}")
     @ApiOperation("Remove an existing pattern by id")
-    public void removePattern(@PathParam("patternId") String patternId) {
+    public void removePattern(@PathParam("patternId") String patternId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT);
+        final GrokPattern pattern = grokPatternService.load(patternId);
+
+        clusterBus.post(GrokPatternsChangedEvent.create(Sets.newHashSet(pattern.name), Collections.emptySet()));
 
         if (grokPatternService.delete(patternId) == 0) {
             throw new javax.ws.rs.NotFoundException();

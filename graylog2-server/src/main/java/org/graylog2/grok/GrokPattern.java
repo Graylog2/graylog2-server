@@ -32,6 +32,18 @@ public class GrokPattern {
     public String pattern;
     public String contentPack;
 
+    public String name() {
+        return name;
+    }
+
+    public String pattern() {
+        return pattern;
+    }
+
+    public String contentPack() {
+        return contentPack;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
