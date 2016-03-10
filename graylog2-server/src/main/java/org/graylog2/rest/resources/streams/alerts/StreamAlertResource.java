@@ -61,7 +61,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @RequiresAuthentication
-@Api(value = "Alerts", description = "Manage stream alerts")
+@Api(value = "Stream/Alerts", description = "Manage stream alerts for a given stream")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertResource extends RestResource {
 
