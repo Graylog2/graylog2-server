@@ -24,7 +24,7 @@ const LegacyHistogram = React.createClass({
     window.addEventListener('resize', this._onResize);
   },
   componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.formattedHistogram) !== prevProps.formattedHistogram) {
+    if (JSON.stringify(this.props.formattedHistogram) !== JSON.stringify(prevProps.formattedHistogram)) {
       this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
     }
   },
