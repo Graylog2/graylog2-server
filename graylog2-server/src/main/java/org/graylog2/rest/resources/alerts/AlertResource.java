@@ -78,6 +78,7 @@ public class AlertResource extends RestResource {
         List<AlertSummary> alerts = streamService.loadAll().stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                 .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since).stream())
+                .limit(AlertImpl.MAX_LIST_COUNT)
                 .map(alert -> AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()))
                 .collect(Collectors.toList());
 
