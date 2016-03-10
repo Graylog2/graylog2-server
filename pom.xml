@@ -1064,6 +1064,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <!-- we don't care about assembling the parent, just run the goal on the project, pretty please -->
                     <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
+                    <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
             </plugin>
             <plugin>
