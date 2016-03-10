@@ -10,6 +10,7 @@ const resultHistogram = {
     _histogramContainer: $("#result-graph"),
     _yAxis: $("#y_axis"),
     _graphTimeline: $("#result-graph-timeline"),
+    _annotator: undefined,
     _resultHistogramGraph: undefined,
 
     _getHistogramContainerWidth: function() {
@@ -91,12 +92,12 @@ const resultHistogram = {
             graph: resultGraph
         });
 
-        var annotator = new Rickshaw.Graph.Annotate({
+        this._annotator = new Rickshaw.Graph.Annotate({
             graph: resultGraph,
             element: this._graphTimeline[0]
         });
 
-        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, annotator);
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, this._annotator);
 
         resultGraph.render();
 
@@ -106,10 +107,21 @@ const resultHistogram = {
     updateData: function(newData) {
         if (this._histogram.length > 0) {
             if (typeof this._resultHistogramGraph !== 'undefined') {
+                this._histogram = newData;
                 this._resultHistogramGraph.series[0].data = newData;
+                this._resetAlertAnnotator();
                 this._resultHistogramGraph.update();
             }
         }
+    },
+
+    // I'm really sorry about this, but I can't figure out a better way of refreshing the annotator without flickering
+    _resetAlertAnnotator() {
+        const $oldAnnotations = $('.content', this._graphTimeline);
+
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, this._annotator, () => {
+            $oldAnnotations.remove();
+        });
     },
 
     redrawResultGraph: function() {

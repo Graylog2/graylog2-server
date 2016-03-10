@@ -12,7 +12,7 @@ const AlertsAnnotator = {
     });
   },
 
-  fillAlertAnnotator(histogramData, stream, rickshawAnnotator) {
+  fillAlertAnnotator(histogramData, stream, rickshawAnnotator, callback) {
     if (!histogramData || !histogramData[0] || !histogramData[0].x) {
       return;
     }
@@ -28,6 +28,9 @@ const AlertsAnnotator = {
 
     promise.then(response => {
       this._addAnnotations(response.alerts, rickshawAnnotator);
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
   },
 
