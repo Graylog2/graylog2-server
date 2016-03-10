@@ -63,7 +63,12 @@ const ConfigurationBundles = React.createClass({
     });
     return bundles;
   },
-  onSubmit(evt) {
+  onSubmit(submitEvent) {
+    submitEvent.preventDefault();
+    if (!this.refs.uploadedFile.files || !this.refs.uploadedFile.files[0]) {
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = (evt) => {
