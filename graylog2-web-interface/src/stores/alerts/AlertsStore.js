@@ -11,6 +11,20 @@ import AlertsActions from 'actions/alerts/AlertsActions';
 const AlertsStore = Reflux.createStore({
   listenables: [AlertsActions],
 
+  list(stream, since) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.list(stream.id, since).url);
+    const promise = fetch('GET', url);
+    promise
+      .then(
+        response => this.trigger({ alerts: response }),
+        error => {
+          UserNotification.error(`Fetching alerts for stream "${stream.title}" failed with status: ${error.message}`,
+            `Could not retrieve alerts for stream "${stream.title}".`);
+        });
+
+    AlertsActions.list.promise(promise);
+  },
+
   listPaginated(streamId, skip, limit) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listPaginated(streamId, skip, limit).url);
     const promise = fetch('GET', url);

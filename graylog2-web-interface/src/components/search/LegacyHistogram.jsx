@@ -13,7 +13,7 @@ const LegacyHistogram = React.createClass({
   propTypes: {
     formattedHistogram: React.PropTypes.array.isRequired,
     histogram: React.PropTypes.object.isRequired,
-    isStreamSearch: React.PropTypes.bool.isRequired,
+    stream: React.PropTypes.object,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
   getInitialState() {
@@ -42,7 +42,7 @@ const LegacyHistogram = React.createClass({
 
   _renderHistogram(histogram) {
     resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
-    resultHistogram.setData(histogram);
+    resultHistogram.setData(histogram, this.props.stream);
     resultHistogram.drawResultGraph();
   },
   _updateHistogram(histogram) {
@@ -93,10 +93,10 @@ const LegacyHistogram = React.createClass({
       <div className="pull-right">
         <AddToDashboardMenu title="Add to dashboard"
                             widgetType={this.WIDGET_TYPE}
-                            configuration={{interval: this.props.histogram.interval}}
+                            configuration={{ interval: this.props.histogram.interval }}
                             pullRight
                             permissions={this.props.permissions}
-                            isStreamSearch={this.props.isStreamSearch}/>
+                            isStreamSearch={this.props.stream !== null}/>
       </div>
       <h1>Histogram</h1>
 

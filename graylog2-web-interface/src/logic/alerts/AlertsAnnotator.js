@@ -4,7 +4,7 @@ import StreamStore from 'stores/streams/StreamsStore';
 import DateTime from 'logic/datetimes/DateTime';
 
 const AlertsAnnotator = {
-  streams: undefined,
+  streams: [],
 
   initialize() {
     StreamStore.listStreams().then(streams => {
@@ -12,18 +12,34 @@ const AlertsAnnotator = {
     });
   },
 
-  fillAlertAnnotator(histogramData, rickshawAnnotator) {
-    if (!histogramData || !histogramData[0] || !histogramData[0].x || !this.streams) {
+  fillAlertAnnotator(histogramData, stream, rickshawAnnotator) {
+    if (!histogramData || !histogramData[0] || !histogramData[0].x) {
       return;
     }
 
     const earliestDataPoint = histogramData[0].x;
-    AlertsActions.listAllStreams.triggerPromise(earliestDataPoint).then(response => {
-      response.alerts.forEach(alert => {
-        const epoch = DateTime.fromUTCDateTime(alert.triggered_at).toMoment().unix();
-        rickshawAnnotator.add(epoch, this._getAlertAnnotation(alert));
-        rickshawAnnotator.update();
-      });
+
+    let promise;
+    if (stream) {
+      promise = AlertsActions.list.triggerPromise(stream, earliestDataPoint);
+    } else {
+      promise = AlertsActions.listAllStreams.triggerPromise(earliestDataPoint);
+    }
+
+    promise.then(response => {
+      this._addAnnotations(response.alerts, rickshawAnnotator);
+    });
+  },
+
+  _addAnnotations(alerts, annotator) {
+    if (alerts.length > 0 && !this.streams) {
+      console.warn('Could not resolve stream names on alert annotations: stream list was not loaded.');
+    }
+
+    alerts.forEach(alert => {
+      const epoch = DateTime.fromUTCDateTime(alert.triggered_at).toMoment().unix();
+      annotator.add(epoch, this._getAlertAnnotation(alert));
+      annotator.update();
     });
   },
 

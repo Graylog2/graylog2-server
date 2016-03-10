@@ -23,8 +23,9 @@ const resultHistogram = {
         this._graphTimeline = $("#result-graph-timeline", elem);
     },
 
-    setData: function(data) {
+    setData: function(data, stream) {
         this._histogram = data;
+        this._stream = stream;
     },
 
     drawResultGraph: function() {
@@ -95,7 +96,7 @@ const resultHistogram = {
             element: this._graphTimeline[0]
         });
 
-        AlertsAnnotator.fillAlertAnnotator(this._histogram, annotator);
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, annotator);
 
         resultGraph.render();
 

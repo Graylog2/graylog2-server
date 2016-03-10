@@ -214,7 +214,7 @@ const SearchResult = React.createClass({
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
-                           isStreamSearch={this.props.searchInStream !== null}/>
+                           stream={this.props.searchInStream}/>
 
           {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderBelowHistogram(analyzer))}
 
