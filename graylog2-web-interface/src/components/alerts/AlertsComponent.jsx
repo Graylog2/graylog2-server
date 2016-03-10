@@ -20,7 +20,7 @@ const AlertsComponent = React.createClass({
   },
 
   loadData(pageNo, limit) {
-    AlertsActions.list(this.props.streamId, (pageNo - 1) * limit, limit);
+    AlertsActions.listPaginated(this.props.streamId, (pageNo - 1) * limit, limit);
   },
 
   _onChangePaginatedList(page, size) {

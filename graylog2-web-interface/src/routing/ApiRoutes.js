@@ -12,7 +12,7 @@ const ApiRoutes = {
     list: (streamId, alertId) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
   },
   AlertsApiController: {
-    list: (streamId, skip, limit) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}` }; },
+    listPaginated: (streamId, skip, limit) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}` }; },
     listAllStreams: (since) => { return { url: `/streams/alerts/?since=${since}` }; },
   },
   BundlesApiController: {
