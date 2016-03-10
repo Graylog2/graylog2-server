@@ -1,5 +1,6 @@
 import Rickshaw from 'rickshaw';
 import DateTime from 'logic/datetimes/DateTime';
+import AlertsAnnotator from 'logic/alerts/AlertsAnnotator';
 import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
 import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
 import numeral from 'numeral';
@@ -94,7 +95,7 @@ const resultHistogram = {
             element: this._graphTimeline[0]
         });
 
-        /*fillAlertAnnotator(resultGraph, annotator);*/
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, annotator);
 
         resultGraph.render();
 
