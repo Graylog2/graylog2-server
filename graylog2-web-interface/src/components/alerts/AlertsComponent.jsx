@@ -1,7 +1,9 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 
+import AlertsActions from 'actions/alerts/AlertsActions';
 import AlertsStore from 'stores/alerts/AlertsStore';
 import { PaginatedList, Spinner } from 'components/common';
 import AlertsTable from 'components/alerts/AlertsTable';
@@ -11,20 +13,14 @@ const AlertsComponent = React.createClass({
     streamId: React.PropTypes.string.isRequired,
   },
 
-  mixins: [LinkedStateMixin],
-
-  getInitialState() {
-    return {};
-  },
+  mixins: [LinkedStateMixin, Reflux.connect(AlertsStore)],
 
   componentDidMount() {
     this.loadData(1, 10);
   },
 
   loadData(pageNo, limit) {
-    AlertsStore.list(this.props.streamId, (pageNo - 1) * limit, limit).done((alerts) => {
-      this.setState({ alerts });
-    });
+    AlertsActions.list(this.props.streamId, (pageNo - 1) * limit, limit);
   },
 
   _onChangePaginatedList(page, size) {
