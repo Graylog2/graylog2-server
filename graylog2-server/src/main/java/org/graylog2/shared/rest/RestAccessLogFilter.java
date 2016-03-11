@@ -45,7 +45,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
     }
 
     private String getUsernameFromSession(String sessionID) {
-    	String result = "anonymous";
+    	String result = "-";
     	if (sessionID != null) {
     	    final DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
             Subject.Builder builder = new Subject.Builder(securityManager);
