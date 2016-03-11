@@ -10,3 +10,4 @@
 * Elasticsearch Version:
 * MongoDB Version:
 * Operating System:
+* Browser version:
