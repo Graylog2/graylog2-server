@@ -47,8 +47,12 @@ const AlertsAnnotator = {
   },
 
   _getAlertAnnotation(alert) {
-    const stream = this.streams.filter(s => s.id === alert.stream_id)[0];
-    return `<i class='fa fa-warning'></i> Stream "${stream.title || 'Undefined'}" triggered an alert: ${alert.description}`;
+    let stream;
+    if (this.streams) {
+      stream = this.streams.filter(s => s.id === alert.stream_id)[0];
+    }
+    stream = stream || { title: 'Undefined' };
+    return `<i class='fa fa-warning'></i> Stream "${stream.title}" triggered an alert: ${alert.description}`;
   },
 };
 
