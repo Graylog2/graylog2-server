@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 
-import { Row, Col } from 'react-bootstrap';
 import { Input } from 'react-bootstrap';
 
 import AceEditor from 'react-ace';
@@ -12,7 +11,6 @@ import 'brace/theme/chrome';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const RuleForm = React.createClass({
-  parseTimer: undefined,
   propTypes: {
     rule: PropTypes.object,
     create: React.PropTypes.bool,
@@ -28,7 +26,7 @@ const RuleForm = React.createClass({
         description: '',
         source: '',
       },
-    }
+    };
   },
 
   getInitialState() {
@@ -39,11 +37,11 @@ const RuleForm = React.createClass({
         id: rule.id,
         title: rule.title,
         description: rule.description,
-        source: rule.source
+        source: rule.source,
       },
       editor: undefined,
       parseErrors: [],
-    }
+    };
   },
 
   componentWillUnmount() {
@@ -53,6 +51,8 @@ const RuleForm = React.createClass({
     }
   },
 
+  parseTimer: undefined,
+
   openModal() {
     this.refs.modal.open();
   },
@@ -60,13 +60,13 @@ const RuleForm = React.createClass({
   _updateEditor() {
     const session = this.state.editor.session;
     const annotations = this.state.parseErrors.map(e => {
-      return {row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: "error"}
+      return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
     session.setAnnotations(annotations);
   },
 
   _setParseErrors(errors) {
-    this.setState({parseErrors: errors}, this._updateEditor);
+    this.setState({ parseErrors: errors }, this._updateEditor);
   },
 
   _onSourceChange(value) {
@@ -76,7 +76,7 @@ const RuleForm = React.createClass({
     }
     const rule = this.state.rule;
     rule.source = value;
-    this.setState({rule: rule});
+    this.setState({ rule });
 
     if (this.props.validateRule) {
       // have the caller validate the rule after typing stopped for a while. usually this will mean send to server to parse
@@ -87,17 +87,17 @@ const RuleForm = React.createClass({
   _onDescriptionChange(event) {
     const rule = this.state.rule;
     rule.description = event.target.value;
-    this.setState({rule: rule});
+    this.setState({ rule });
   },
 
   _onTitleChange(event) {
     const rule = this.state.rule;
     rule.title = event.target.value;
-    this.setState({rule: rule});
+    this.setState({ rule });
   },
 
   _onLoad(editor) {
-    this.setState({editor: editor});
+    this.setState({ editor });
   },
 
   _getId(prefixIdName) {
@@ -111,7 +111,7 @@ const RuleForm = React.createClass({
   _saved() {
     this._closeModal();
     if (this.props.create) {
-      this.setState({rule: {}});
+      this.setState({ rule: {} });
     }
   },
 
@@ -144,18 +144,18 @@ const RuleForm = React.createClass({
                    label="Description (optional)"
                    onChange={this._onDescriptionChange}
                    autoFocus
-                   value={this.state.rule.description}/>
+                   value={this.state.rule.description} />
 
             <label>Rule source</label>
-            <div style={{border: "1px solid lightgray", borderRadius: 5}}>
+            <div style={{border: '1px solid lightgray', borderRadius: 5}}>
               <AceEditor
                 mode="text"
                 theme="chrome"
-                name={"source" + (this.props.create ? "-create" : "-edit")}
+                name={`source${this.props.create ? '-create' : '-edit'}`}
                 fontSize={11}
                 height="14em"
                 width="100%"
-                editorProps={{ $blockScrolling: "Infinity"}}
+                editorProps={{ $blockScrolling: 'Infinity'}}
                 value={this.state.rule.source}
                 onLoad={this._onLoad}
                 onChange={this._onSourceChange}
