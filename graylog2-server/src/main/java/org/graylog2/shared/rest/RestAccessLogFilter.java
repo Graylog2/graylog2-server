@@ -45,18 +45,13 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
     }
 
     private String getUsernameFromSession(String sessionID) {
-    	String result = "-";
-    	if (sessionID != null) {
-    	    final DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
-            Subject.Builder builder = new Subject.Builder(securityManager);
-            builder.sessionId(sessionID);
-            Subject subject = builder.buildSubject();
-    	    result = subject.getPrincipal().toString();
-    	}
-    	return result;
-    
+        final DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
+        Subject.Builder builder = new Subject.Builder(securityManager);
+        builder.sessionId(sessionID);
+        Subject subject = builder.buildSubject();
+        return subject.getPrincipal().toString();
     }
-    
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         if (LOG.isDebugEnabled()) {
@@ -65,12 +60,11 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
                 final SecurityContext securityContext = requestContext.getSecurityContext();
                 final String sessionID = securityContext instanceof ShiroSecurityContext ?
                         ((ShiroSecurityContext) securityContext).getUsername() : null;
-                final String userName = getUsernameFromSession(sessionID);
                 final Date requestDate = requestContext.getDate();
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
                         response.getRequest().getRemoteAddr(),
-                        (userName == null ? "-" : userName),
+                        (sessionID == null ? "-" : getUsernameFromSession(sessionID)),
                         (requestDate == null ? "-" : requestDate),
                         requestContext.getMethod(),
                         requestContext.getUriInfo().getPath(),
