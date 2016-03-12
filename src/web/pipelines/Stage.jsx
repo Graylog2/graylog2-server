@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Col, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
 import RulesStore from 'rules/RulesStore';
@@ -22,7 +23,11 @@ const Stage = React.createClass({
   _ruleRowFormatter(rule) {
     return (
       <tr>
-        <td style={{ width: 400 }}>{rule.title}</td>
+        <td style={{ width: 400 }}>
+          <LinkContainer to={`/system/pipelines/rules/${rule.id}`}>
+            <a>{rule.title}</a>
+          </LinkContainer>
+        </td>
         <td>{rule.description}</td>
       </tr>
     );

@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
-
-import { Input } from 'react-bootstrap';
+import { Row, Col, Button, Input } from 'react-bootstrap';
 
 import AceEditor from 'react-ace';
 import brace from 'brace';
@@ -8,14 +7,13 @@ import brace from 'brace';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-
 const RuleForm = React.createClass({
   propTypes: {
     rule: PropTypes.object,
     create: React.PropTypes.bool,
-    save: React.PropTypes.func.isRequired,
+    onSave: React.PropTypes.func.isRequired,
     validateRule: React.PropTypes.func.isRequired,
+    history: React.PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -52,10 +50,6 @@ const RuleForm = React.createClass({
   },
 
   parseTimer: undefined,
-
-  openModal() {
-    this.refs.modal.open();
-  },
 
   _updateEditor() {
     const session = this.state.editor.session;
@@ -104,50 +98,39 @@ const RuleForm = React.createClass({
     return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
   },
 
-  _closeModal() {
-    this.refs.modal.close();
+  _goBack() {
+    this.props.history.goBack();
   },
 
   _saved() {
-    this._closeModal();
-    if (this.props.create) {
-      this.setState({ rule: {} });
-    }
+    this.props.history.pushState(null, '/system/pipelines/rules');
   },
 
   _save() {
     if (this.state.parseErrors.length === 0) {
-      this.props.save(this.state.rule, this._saved);
+      this.props.onSave(this.state.rule, this._saved);
     }
   },
 
-  render() {
-    let triggerButtonContent;
-    if (this.props.create) {
-      triggerButtonContent = 'Add new rule';
-    } else {
-      triggerButtonContent = <span>Edit</span>;
-    }
-    return (
-      <span>
-        <button onClick={this.openModal}
-                className={this.props.create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
-          {triggerButtonContent}
-        </button>
-        <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Add new' : 'Edit'} rule ${this.state.rule.title}`}
-                            onSubmitForm={this._save}
-                            submitButtonText="Save">
-          <fieldset>
-            <Input type="textarea"
-                   id={this._getId('description')}
-                   label="Description (optional)"
-                   onChange={this._onDescriptionChange}
-                   autoFocus
-                   value={this.state.rule.description} />
+  _submit(event) {
+    event.preventDefault();
+    this._save();
+  },
 
-            <label>Rule source</label>
-            <div style={{border: '1px solid lightgray', borderRadius: 5}}>
+  render() {
+    return (
+      <form ref="form" onSubmit={this._submit}>
+        <fieldset>
+          <Input type="textarea"
+                 id={this._getId('description')}
+                 label="Description"
+                 onChange={this._onDescriptionChange}
+                 autoFocus
+                 help="Rule description (optional)."
+                 value={this.state.rule.description} />
+
+          <Input label="Rule source" help="Rule source, see help for more information.">
+            <div style={{ border: '1px solid lightgray', borderRadius: 5 }}>
               <AceEditor
                 mode="text"
                 theme="chrome"
@@ -161,9 +144,18 @@ const RuleForm = React.createClass({
                 onChange={this._onSourceChange}
               />
             </div>
-          </fieldset>
-        </BootstrapModalForm>
-      </span>
+          </Input>
+        </fieldset>
+
+        <Row>
+          <Col md={12}>
+            <div className="form-group">
+              <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+              <Button type="button" onClick={this._goBack}>Cancel</Button>
+            </div>
+          </Col>
+        </Row>
+      </form>
     );
   },
 });
