@@ -172,7 +172,7 @@ const ApiRoutes = {
   },
   UniversalSearchApiController: {
     _streamFilter(streamId) {
-      return (streamId ? { filter: `streams:${streamId}` } : '');
+      return (streamId ? { filter: `streams:${streamId}` } : {});
     },
     _buildBaseQueryString(query, timerange, streamId) {
       const queryString = {};
