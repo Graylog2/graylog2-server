@@ -14,7 +14,7 @@ const RuleList = React.createClass({
   _delete(rule) {
     return () => {
       if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
-        RulesActions.delete(rule.id);
+        RulesActions.delete(rule);
       }
     };
   },

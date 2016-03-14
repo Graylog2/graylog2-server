@@ -98,15 +98,16 @@ const RulesStore = Reflux.createStore({
     RulesActions.update.promise(promise);
     return promise;
   },
-  delete(ruleId) {
+  delete(rule) {
     const failCallback = (error) => {
-      UserNotification.error('Updating rule failed with status: ' + error.message,
-        'Could not update processing rule');
+      UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
+        `Could not delete processing rule "${rule.title}"`);
     };
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/' + ruleId);
+    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/${rule.id}`);
     return fetch('DELETE', url).then(() => {
-      this.rules = this.rules.filter((el) => el.id !== ruleId);
+      this.rules = this.rules.filter((el) => el.id !== rule.id);
       this.trigger({ rules: this.rules });
+      UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     }, failCallback);
   },
   parse(ruleSource, callback) {
