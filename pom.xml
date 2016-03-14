@@ -103,7 +103,7 @@
         <mongojack.version>2.5.1</mongojack.version>
         <swagger.version>1.3.12</swagger.version>
         <sigar.version>1.6.4</sigar.version>
-        <restassured.version>2.8.0</restassured.version>
+        <restassured.version>2.9.0</restassured.version>
         <elasticsearch.version>2.2.0</elasticsearch.version>
         <retrofit.version>2.0.0-beta4</retrofit.version>
         <forbiddenapis.version>2.0</forbiddenapis.version>
