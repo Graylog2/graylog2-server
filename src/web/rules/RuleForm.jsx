@@ -121,6 +121,10 @@ const RuleForm = React.createClass({
     return (
       <form ref="form" onSubmit={this._submit}>
         <fieldset>
+          <Input type="static"
+                 label="Title"
+                 value="You can set the rule title in the rule source. See the quick reference for more information." />
+
           <Input type="textarea"
                  id={this._getId('description')}
                  label="Description"
@@ -129,7 +133,7 @@ const RuleForm = React.createClass({
                  help="Rule description (optional)."
                  value={this.state.rule.description} />
 
-          <Input label="Rule source" help="Rule source, see help for more information.">
+          <Input label="Rule source" help="Rule source, see quick reference for more information.">
             <div style={{ border: '1px solid lightgray', borderRadius: 5 }}>
               <AceEditor
                 mode="text"
