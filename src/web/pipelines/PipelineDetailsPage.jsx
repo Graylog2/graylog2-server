@@ -1,10 +1,11 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { PageHeader, Spinner } from 'components/common';
 import Pipeline from './Pipeline';
+import NewPipeline from './NewPipeline';
 
 import SourceGenerator from 'logic/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
@@ -18,14 +19,23 @@ function filterPipeline(state) {
 
 const PipelineDetailsPage = React.createClass({
   propTypes: {
-    params: PropTypes.object.isRequired,
+    params: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline)],
 
   componentDidMount() {
-    PipelinesActions.get(this.props.params.pipelineId);
+    if (!this._isNewPipeline(this.props.params.pipelineId)) {
+      PipelinesActions.get(this.props.params.pipelineId);
+    }
     RulesStore.list();
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!this._isNewPipeline(nextProps.params.pipelineId)) {
+      PipelinesActions.get(nextProps.params.pipelineId);
+    }
   },
 
   _onStagesChange(newStages, callback) {
@@ -39,14 +49,49 @@ const PipelineDetailsPage = React.createClass({
     }
   },
 
+  _savePipeline(pipeline, callback) {
+    const requestPipeline = ObjectUtils.clone(pipeline);
+    requestPipeline.source = SourceGenerator.generatePipeline(pipeline);
+    let promise;
+    if (requestPipeline.id) {
+      promise = PipelinesActions.update(requestPipeline);
+    } else {
+      promise = PipelinesActions.save(requestPipeline);
+    }
+
+    promise.then(p => callback(p));
+  },
+
+  _isNewPipeline(pipelineId) {
+    return pipelineId === 'new';
+  },
+
+  _isLoading() {
+    return !this._isNewPipeline(this.props.params.pipelineId) && !this.state.pipeline;
+  },
+
   render() {
-    if (!this.state.pipeline) {
-      return <Spinner/>;
+    if (this._isLoading()) {
+      return <Spinner />;
+    }
+
+    let title;
+    if (this._isNewPipeline(this.props.params.pipelineId)) {
+      title = 'New pipeline';
+    } else {
+      title = <span>Pipeline <em>{this.state.pipeline.title}</em></span>;
+    }
+
+    let content;
+    if (this._isNewPipeline(this.props.params.pipelineId)) {
+      content = <NewPipeline onChange={this._savePipeline} history={this.props.history} />;
+    } else {
+      content = <Pipeline pipeline={this.state.pipeline} rules={this.state.rules} onStagesChange={this._onStagesChange} onPipelineChange={this._savePipeline} />;
     }
 
     return (
       <div>
-        <PageHeader title={<span>Pipeline <em>{this.state.pipeline.title}</em></span>} titleSize={9} buttonSize={3}>
+        <PageHeader title={title} titleSize={9} buttonSize={3}>
           <span>
             Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where{' '}
             rules are evaluated and applied. Messages can go through one or more stages.
@@ -68,7 +113,7 @@ const PipelineDetailsPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <Pipeline pipeline={this.state.pipeline} rules={this.state.rules} onStagesChange={this._onStagesChange}/>
+            {content}
           </Col>
         </Row>
       </div>

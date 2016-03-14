@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import { EntityList, Timestamp } from 'components/common';
+import { EntityList } from 'components/common';
 import Stage from './Stage';
 import StageForm from './StageForm';
+import PipelineDetails from './PipelineDetails';
 
 import {} from './Pipeline.css';
 
@@ -11,6 +12,7 @@ const Pipeline = React.createClass({
   propTypes: {
     pipeline: PropTypes.object.isRequired,
     onStagesChange: PropTypes.func.isRequired,
+    onPipelineChange: PropTypes.func.isRequired,
   },
 
   _saveStage(stage, callback) {
@@ -52,20 +54,17 @@ const Pipeline = React.createClass({
 
     return (
       <div>
-        <Row>
+        <PipelineDetails pipeline={this.props.pipeline} onChange={this.props.onPipelineChange} />
+        <Row className="row-sm" style={{ marginTop: 10 }}>
           <Col md={12}>
             <div className="pull-right">
               <StageForm create save={this._saveStage} />
             </div>
-            <h2>Information</h2>
-            <dl className="dl-horizontal pipeline-dl">
-              <dt>Description</dt>
-              <dd>{pipeline.description}</dd>
-              <dt>Created</dt>
-              <dd><Timestamp dateTime={pipeline.created_at} relative /></dd>
-              <dt>Last modified</dt>
-              <dd><Timestamp dateTime={pipeline.modified_at} relative /></dd>
-            </dl>
+            <h2>Pipeline Stages</h2>
+            <p style={{ marginTop: 5 }}>
+              Stages are groups of conditions and actions which need to run in order, and provide the necessary{' '}
+              control flow to decide whether or not to run the rest of a pipeline.
+            </p>
           </Col>
         </Row>
         <EntityList bsNoItemsStyle="info" noItemsText="There are no rules on this stage." items={formattedStages} />

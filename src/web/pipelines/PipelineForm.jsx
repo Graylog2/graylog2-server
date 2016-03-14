@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Button } from 'react-bootstrap';
+import { Row, Col, Input, Button } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import ObjectUtils from 'util/ObjectUtils';
@@ -9,12 +9,15 @@ const PipelineForm = React.createClass({
   propTypes: {
     pipeline: React.PropTypes.object,
     create: React.PropTypes.bool,
+    modal: React.PropTypes.bool,
     save: React.PropTypes.func.isRequired,
     validatePipeline: React.PropTypes.func.isRequired,
+    onCancel: React.PropTypes.func,
   },
 
   getDefaultProps() {
     return {
+      modal: true,
       pipeline: {
         id: undefined,
         title: '',
@@ -52,13 +55,20 @@ const PipelineForm = React.createClass({
   },
 
   _saved() {
-    this._closeModal();
+    if (this.props.modal) {
+      this._closeModal();
+    }
+
     if (this.props.create) {
       this.setState(this.getInitialState());
     }
   },
 
-  _save() {
+  _save(event) {
+    if (event) {
+      event.preventDefault();
+    }
+
     this.props.save(this.state.pipeline, this._saved);
   },
 
@@ -67,41 +77,58 @@ const PipelineForm = React.createClass({
     if (this.props.create) {
       triggerButtonContent = 'Add new pipeline';
     } else {
-      triggerButtonContent = <span>Edit</span>;
+      triggerButtonContent = 'Edit pipeline details';
+    }
+
+    const content = (
+      <fieldset>
+        <Input type="text"
+               id="title"
+               name="title"
+               label="Title"
+               autoFocus
+               required
+               onChange={this._onChange}
+               help="Pipeline name."
+               value={this.state.pipeline.title} />
+
+        <Input type="text"
+               id="description"
+               name="description"
+               label="Description"
+               onChange={this._onChange}
+               help="Pipeline description."
+               value={this.state.pipeline.description} />
+      </fieldset>
+    );
+
+    if (this.props.modal) {
+      return (
+        <span>
+          <Button onClick={this.openModal}
+                  bsStyle="success">
+            {triggerButtonContent}
+          </Button>
+          <BootstrapModalForm ref="modal"
+                              title={`${this.props.create ? 'Add new' : 'Edit'} pipeline ${this.state.pipeline.title}`}
+                              onSubmitForm={this._save}
+                              submitButtonText="Save">
+            {content}
+          </BootstrapModalForm>
+        </span>
+      );
     }
 
     return (
-      <span>
-        <Button onClick={this.openModal}
-                bsStyle={this.props.create ? 'success' : 'info'}
-                bsSize={this.props.create ? null : 'xsmall'}>
-          {triggerButtonContent}
-        </Button>
-        <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Add new' : 'Edit'} pipeline ${this.state.pipeline.title}`}
-                            onSubmitForm={this._save}
-                            submitButtonText="Save">
-          <fieldset>
-            <Input type="text"
-                   id="title"
-                   name="title"
-                   label="Title"
-                   autoFocus
-                   required
-                   onChange={this._onChange}
-                   help="Pipeline name."
-                   value={this.state.pipeline.title} />
-
-            <Input type="text"
-                   id="description"
-                   name="description"
-                   label="Description"
-                   onChange={this._onChange}
-                   help="Pipeline description."
-                   value={this.state.pipeline.description} />
-          </fieldset>
-        </BootstrapModalForm>
-      </span>
+      <form onSubmit={this._save}>
+        {content}
+        <Row>
+          <Col md={12}>
+            <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+            <Button type="button" onClick={this.props.onCancel}>Cancel</Button>
+          </Col>
+        </Row>
+      </form>
     );
   },
 });
