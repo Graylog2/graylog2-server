@@ -36,7 +36,11 @@ const RuleList = React.createClass({
 
     return (
       <tr key={rule.title}>
-        <td>{rule.title}</td>
+        <td>
+          <LinkContainer to={`/system/pipelines/rules/${rule.id}`}>
+            <a>{rule.title}</a>
+          </LinkContainer>
+        </td>
         <td className="limited">{rule.description}</td>
         <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>
         <td className="limited"><Timestamp dateTime={rule.modified_at} relative /></td>
