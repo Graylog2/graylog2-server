@@ -1,7 +1,5 @@
 import React, { PropTypes } from 'react';
-
-import { Row, Col } from 'react-bootstrap';
-import { Input } from 'react-bootstrap';
+import { Row, Col, Button, Input } from 'react-bootstrap';
 
 import AceEditor from 'react-ace';
 import brace from 'brace';
@@ -9,15 +7,13 @@ import brace from 'brace';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-
 const RuleForm = React.createClass({
-  parseTimer: undefined,
   propTypes: {
     rule: PropTypes.object,
     create: React.PropTypes.bool,
-    save: React.PropTypes.func.isRequired,
+    onSave: React.PropTypes.func.isRequired,
     validateRule: React.PropTypes.func.isRequired,
+    history: React.PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -28,7 +24,7 @@ const RuleForm = React.createClass({
         description: '',
         source: '',
       },
-    }
+    };
   },
 
   getInitialState() {
@@ -39,11 +35,11 @@ const RuleForm = React.createClass({
         id: rule.id,
         title: rule.title,
         description: rule.description,
-        source: rule.source
+        source: rule.source,
       },
       editor: undefined,
       parseErrors: [],
-    }
+    };
   },
 
   componentWillUnmount() {
@@ -53,20 +49,18 @@ const RuleForm = React.createClass({
     }
   },
 
-  openModal() {
-    this.refs.modal.open();
-  },
+  parseTimer: undefined,
 
   _updateEditor() {
     const session = this.state.editor.session;
     const annotations = this.state.parseErrors.map(e => {
-      return {row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: "error"}
+      return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
     session.setAnnotations(annotations);
   },
 
   _setParseErrors(errors) {
-    this.setState({parseErrors: errors}, this._updateEditor);
+    this.setState({ parseErrors: errors }, this._updateEditor);
   },
 
   _onSourceChange(value) {
@@ -76,7 +70,7 @@ const RuleForm = React.createClass({
     }
     const rule = this.state.rule;
     rule.source = value;
-    this.setState({rule: rule});
+    this.setState({ rule });
 
     if (this.props.validateRule) {
       // have the caller validate the rule after typing stopped for a while. usually this will mean send to server to parse
@@ -87,83 +81,85 @@ const RuleForm = React.createClass({
   _onDescriptionChange(event) {
     const rule = this.state.rule;
     rule.description = event.target.value;
-    this.setState({rule: rule});
+    this.setState({ rule });
   },
 
   _onTitleChange(event) {
     const rule = this.state.rule;
     rule.title = event.target.value;
-    this.setState({rule: rule});
+    this.setState({ rule });
   },
 
   _onLoad(editor) {
-    this.setState({editor: editor});
+    this.setState({ editor });
   },
 
   _getId(prefixIdName) {
     return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
   },
 
-  _closeModal() {
-    this.refs.modal.close();
+  _goBack() {
+    this.props.history.goBack();
   },
 
   _saved() {
-    this._closeModal();
-    if (this.props.create) {
-      this.setState({rule: {}});
-    }
+    this.props.history.pushState(null, '/system/pipelines/rules');
   },
 
   _save() {
     if (this.state.parseErrors.length === 0) {
-      this.props.save(this.state.rule, this._saved);
+      this.props.onSave(this.state.rule, this._saved);
     }
   },
 
-  render() {
-    let triggerButtonContent;
-    if (this.props.create) {
-      triggerButtonContent = 'Add new rule';
-    } else {
-      triggerButtonContent = <span>Edit</span>;
-    }
-    return (
-      <span>
-        <button onClick={this.openModal}
-                className={this.props.create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
-          {triggerButtonContent}
-        </button>
-        <BootstrapModalForm ref="modal"
-                            title={`${this.props.create ? 'Add new' : 'Edit'} rule ${this.state.rule.title}`}
-                            onSubmitForm={this._save}
-                            submitButtonText="Save">
-          <fieldset>
-            <Input type="textarea"
-                   id={this._getId('description')}
-                   label="Description (optional)"
-                   onChange={this._onDescriptionChange}
-                   autoFocus
-                   value={this.state.rule.description}/>
+  _submit(event) {
+    event.preventDefault();
+    this._save();
+  },
 
-            <label>Rule source</label>
-            <div style={{border: "1px solid lightgray", borderRadius: 5}}>
+  render() {
+    return (
+      <form ref="form" onSubmit={this._submit}>
+        <fieldset>
+          <Input type="static"
+                 label="Title"
+                 value="You can set the rule title in the rule source. See the quick reference for more information." />
+
+          <Input type="textarea"
+                 id={this._getId('description')}
+                 label="Description"
+                 onChange={this._onDescriptionChange}
+                 autoFocus
+                 help="Rule description (optional)."
+                 value={this.state.rule.description} />
+
+          <Input label="Rule source" help="Rule source, see quick reference for more information.">
+            <div style={{ border: '1px solid lightgray', borderRadius: 5 }}>
               <AceEditor
                 mode="text"
                 theme="chrome"
-                name={"source" + (this.props.create ? "-create" : "-edit")}
+                name={`source${this.props.create ? '-create' : '-edit'}`}
                 fontSize={11}
                 height="14em"
                 width="100%"
-                editorProps={{ $blockScrolling: "Infinity"}}
+                editorProps={{ $blockScrolling: 'Infinity'}}
                 value={this.state.rule.source}
                 onLoad={this._onLoad}
                 onChange={this._onSourceChange}
               />
             </div>
-          </fieldset>
-        </BootstrapModalForm>
-      </span>
+          </Input>
+        </fieldset>
+
+        <Row>
+          <Col md={12}>
+            <div className="form-group">
+              <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+              <Button type="button" onClick={this._goBack}>Cancel</Button>
+            </div>
+          </Col>
+        </Row>
+      </form>
     );
   },
 });
