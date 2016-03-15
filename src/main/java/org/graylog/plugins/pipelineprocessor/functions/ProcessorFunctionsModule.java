@@ -28,7 +28,11 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.Murmur3_128;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.Murmur3_32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
@@ -100,7 +104,11 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
 
         // hash digest
+        addMessageProcessorFunction(CRC32.NAME, CRC32.class);
+        addMessageProcessorFunction(CRC32C.NAME, CRC32C.class);
         addMessageProcessorFunction(MD5.NAME, MD5.class);
+        addMessageProcessorFunction(Murmur3_32.NAME, Murmur3_32.class);
+        addMessageProcessorFunction(Murmur3_128.NAME, Murmur3_128.class);
         addMessageProcessorFunction(SHA1.NAME, SHA1.class);
         addMessageProcessorFunction(SHA256.NAME, SHA256.class);
         addMessageProcessorFunction(SHA512.NAME, SHA512.class);
