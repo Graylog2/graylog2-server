@@ -30,7 +30,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class LongConversion extends AbstractFunction<Long> {
 
-    public static final String NAME = "tolong";
+    public static final String NAME = "to_long";
 
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";

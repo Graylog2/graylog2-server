@@ -26,7 +26,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
 public class BooleanConversion extends AbstractFunction<Boolean> {
-    public static final String NAME = "tobool";
+    public static final String NAME = "to_bool";
 
     private final ParameterDescriptor<Object, Boolean> valueParam;
 
