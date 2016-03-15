@@ -13,6 +13,10 @@ const defaultOptions = {
   build_path: path.resolve(defaultRootPath, 'build'),
 };
 
+const getPluginFullName = function(fqcn) {
+  return 'plugin.' + fqcn;
+}
+
 const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
   const options = merge(defaultOptions, _options);
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
@@ -36,7 +40,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
       ],
     },
     plugins: [
-      new HtmlWebpackPlugin({filename: 'module.json', template: moduleJsonTemplate}),
+      new HtmlWebpackPlugin({filename: getPluginFullName(fqcn) + '.module.json', template: moduleJsonTemplate}),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path}),
     ],
@@ -47,7 +51,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
     },
   };
   
-  config.entry['plugin.' + fqcn] = options.entry_path;
+  config.entry[getPluginFullName(fqcn)] = options.entry_path;
 
   if (TARGET === 'build') {
     config.plugins.push(new WebpackCleanupPlugin({}));
