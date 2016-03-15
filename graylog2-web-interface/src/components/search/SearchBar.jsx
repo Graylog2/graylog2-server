@@ -176,6 +176,7 @@ const SearchBar = React.createClass({
 
     this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
     this.refs.width.getInputDOMNode().value = SearchStore.width;
+    this.refs.highlightMessage.getInputDOMNode().value = SearchStore.highlightMessage;
   },
   _savedSearchSelected() {
     const selectedSavedSearch = this.refs.savedSearchesSelector.getValue();
@@ -354,6 +355,7 @@ const SearchBar = React.createClass({
                 <Input type="hidden" name="rangetype" value={this.state.rangeType}/>
                 <Input type="hidden" ref="fields" name="fields" value=""/>
                 <Input type="hidden" ref="width" name="width" value=""/>
+                <Input type="hidden" ref="highlightMessage" name="highlightMessage" value=""/>
 
                 <div className="timerange-selector-container">
                   <div className="row no-bm">
