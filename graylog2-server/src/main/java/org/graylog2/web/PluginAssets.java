@@ -83,7 +83,7 @@ public class PluginAssets {
     }
 
     private ModuleManifest manifestForPlugin(Plugin plugin) {
-        final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/" + manifestFilename);
+        final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/" + plugin.getClass().getCanonicalName() + "." + manifestFilename);
         if (manifestStream != null) {
             try {
                 final ModuleManifest manifest = objectMapper.readValue(manifestStream, ModuleManifest.class);
