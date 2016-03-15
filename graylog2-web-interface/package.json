@@ -23,7 +23,7 @@
     "crossfilter": "1.3.x",
     "d3": "<=3.5.0",
     "dc": "2.0.0-beta.19",
-    "graylog-web-plugin": "~0.0.x",
+    "graylog-web-plugin": "latest",
     "history": "^1.17.0",
     "immutable": "^3.7.5",
     "javascript-natural-sort": "^0.7.1",
