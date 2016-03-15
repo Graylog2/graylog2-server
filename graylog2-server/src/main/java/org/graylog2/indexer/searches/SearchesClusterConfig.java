@@ -50,6 +50,7 @@ public abstract class SearchesClusterConfig {
             .put(Period.seconds(1), "1 second")
             .put(Period.seconds(5), "5 seconds")
             .put(Period.seconds(10), "10 seconds")
+            .put(Period.seconds(30), "30 seconds")
             .put(Period.minutes(1), "1 minute")
             .put(Period.minutes(5), "5 minutes")
             .build();
