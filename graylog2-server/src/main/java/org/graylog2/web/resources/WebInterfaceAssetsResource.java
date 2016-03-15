@@ -16,12 +16,19 @@
  */
 package org.graylog2.web.resources;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,9 +45,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -48,11 +61,25 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Path("{filename: .*}")
 public class WebInterfaceAssetsResource {
+    private static final Logger log = LoggerFactory.getLogger(WebInterfaceAssetsResource.class);
     private final IndexHtmlGenerator indexHtmlGenerator;
+    private final LoadingCache<URI, FileSystem> fileSystemCache;
 
     @Inject
     public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator) {
         this.indexHtmlGenerator = indexHtmlGenerator;
+        fileSystemCache = CacheBuilder.newBuilder()
+                .maximumSize(1024)
+                .build(new CacheLoader<URI, FileSystem>() {
+            @Override
+            public FileSystem load(@Nonnull URI key) throws Exception {
+                try {
+                    return FileSystems.getFileSystem(key);
+                } catch (FileSystemNotFoundException e) {
+                    return FileSystems.newFileSystem(key, Collections.emptyMap());
+                }
+            }
+        });
     }
 
     @GET
@@ -61,11 +88,35 @@ public class WebInterfaceAssetsResource {
             return getDefaultResponse();
         }
         try {
-            final File resourceFile = getResourceFile(filename);
-            final InputStream stream = new FileInputStream(resourceFile);
-            final HashCode hashCode = Files.hash(resourceFile, Hashing.sha256());
+            final URL resourceUrl = getResourceUri(filename);
+            final Date lastModified;
+            final InputStream stream;
+            final HashCode hashCode;
+
+            switch (resourceUrl.getProtocol()) {
+                case "file": {
+                    String fileName = resourceUrl.getFile();
+                    final File file = new File(fileName);
+                    lastModified = new Date(file.lastModified());
+                    stream = new FileInputStream(file);
+                    hashCode = Files.hash(file, Hashing.sha256());
+                    break;
+                }
+                case "jar": {
+                    final URI uri = resourceUrl.toURI();
+                    final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
+                    final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(filename));
+                    final FileTime lastModifiedTime = java.nio.file.Files.getLastModifiedTime(path);
+                    lastModified = new Date(lastModifiedTime.toMillis());
+                    stream = resourceUrl.openStream();
+                    hashCode = Resources.asByteSource(resourceUrl).hash(Hashing.sha256());
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Not a jar or file");
+            }
+
             final EntityTag entityTag = new EntityTag(hashCode.toString());
-            final Date lastModified = new Date(resourceFile.lastModified());
 
             final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
             if (response != null) {
@@ -89,12 +140,17 @@ public class WebInterfaceAssetsResource {
         }
     }
 
-    private File getResourceFile(String filename) throws URISyntaxException, FileNotFoundException {
-        final URL resourceUrl =  this.getClass().getResource("/" + PluginAssets.pathPrefix + "/" + filename);
+    private URL getResourceUri(String filename) throws URISyntaxException, FileNotFoundException {
+        final URL resourceUrl =  this.getClass().getResource(pluginPrefixFilename(filename));
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource file " + filename + " not found.");
         }
-        return new File(resourceUrl.toURI());
+        return resourceUrl;
+    }
+
+    @Nonnull
+    private String pluginPrefixFilename(@PathParam("filename") String filename) {
+        return "/" + PluginAssets.pathPrefix + "/" + filename;
     }
 
     private Response getDefaultResponse() {
