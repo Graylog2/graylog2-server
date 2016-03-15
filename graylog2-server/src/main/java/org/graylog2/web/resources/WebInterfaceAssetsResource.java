@@ -16,14 +16,23 @@
  */
 package org.graylog2.web.resources;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
+import org.graylog2.plugin.Plugin;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.CacheControl;
@@ -38,63 +47,159 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-@Path("{filename: .*}")
+@Path("/")
 public class WebInterfaceAssetsResource {
+    private static final Logger log = LoggerFactory.getLogger(WebInterfaceAssetsResource.class);
     private final IndexHtmlGenerator indexHtmlGenerator;
+    private final Set<Plugin> plugins;
+    private final LoadingCache<URI, FileSystem> fileSystemCache;
 
     @Inject
-    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator) {
+    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator, Set<Plugin> plugins) {
         this.indexHtmlGenerator = indexHtmlGenerator;
+        this.plugins = plugins;
+        fileSystemCache = CacheBuilder.newBuilder()
+                .maximumSize(1024)
+                .build(new CacheLoader<URI, FileSystem>() {
+                    @Override
+                    public FileSystem load(@Nonnull URI key) throws Exception {
+                        try {
+                            return FileSystems.getFileSystem(key);
+                        } catch (FileSystemNotFoundException e) {
+                            try {
+                                return FileSystems.newFileSystem(key, Collections.emptyMap());
+                            } catch (FileSystemAlreadyExistsException f) {
+                                return FileSystems.getFileSystem(key);
+                            }
+                        }
+                    }
+                });
     }
 
+    @Path("/plugin/{plugin}/{filename}")
     @GET
-    public Response get(@Context Request request, @Context HttpHeaders httpheaders, @PathParam("filename") String filename) {
+    public Response get(@Context Request request,
+                        @PathParam("plugin") String pluginName,
+                        @PathParam("filename") String filename) {
+        final Optional<Plugin> plugin = getPluginForName(pluginName);
+        if (!plugin.isPresent()) {
+            throw new NotFoundException();
+        }
+
+        try {
+            final URL resourceUrl = getResourceUri(true, filename, plugin.get().metadata().getClass());
+            return getResponse(request, filename, resourceUrl, true);
+        } catch (URISyntaxException | IOException e) {
+            throw new NotFoundException();
+        }
+    }
+
+    private Optional<Plugin> getPluginForName(String pluginName) {
+        return this.plugins.stream().filter(plugin -> plugin.metadata().getUniqueId().equals(pluginName)).findFirst();
+    }
+
+    @Path("{filename: .*}")
+    @GET
+    public Response get(@Context Request request,
+                        @PathParam("filename") String filename) {
         if (filename == null || filename.isEmpty() || filename.equals("/") || filename.equals("index.html")) {
             return getDefaultResponse();
         }
         try {
-            final File resourceFile = getResourceFile(filename);
-            final InputStream stream = new FileInputStream(resourceFile);
-            final HashCode hashCode = Files.hash(resourceFile, Hashing.sha256());
-            final EntityTag entityTag = new EntityTag(hashCode.toString());
-            final Date lastModified = new Date(resourceFile.lastModified());
+            final URL resourceUrl = getResourceUri(false, filename, this.getClass());
+            return getResponse(request, filename, resourceUrl, false);
+        } catch (IOException | URISyntaxException e) {
+            return getDefaultResponse();
+        }
+    }
 
-            final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
-            if (response != null) {
-                return response.build();
+    private Response getResponse(@Context Request request,
+                                 @PathParam("filename") String filename,
+                                 URL resourceUrl, boolean fromPlugin) throws IOException, URISyntaxException {
+        final Date lastModified;
+        final InputStream stream;
+        final HashCode hashCode;
+
+        switch (resourceUrl.getProtocol()) {
+            case "file": {
+                String fileName = resourceUrl.getFile();
+                final File file = new File(fileName);
+                lastModified = new Date(file.lastModified());
+                stream = new FileInputStream(file);
+                hashCode = Files.hash(file, Hashing.sha256());
+                break;
             }
+            case "jar": {
+                final URI uri = resourceUrl.toURI();
+                final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
+                final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin,
+                                                                                        filename
+                ));
+                final FileTime lastModifiedTime = java.nio.file.Files.getLastModifiedTime(path);
+                lastModified = new Date(lastModifiedTime.toMillis());
+                stream = resourceUrl.openStream();
+                hashCode = Resources.asByteSource(resourceUrl).hash(Hashing.sha256());
+                break;
+            }
+            default:
+                throw new IllegalArgumentException("Not a jar or file");
+        }
 
-            final String contentType = firstNonNull(URLConnection.guessContentTypeFromName(filename), MediaType.APPLICATION_OCTET_STREAM);
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge((int)TimeUnit.DAYS.toSeconds(365));
-            cacheControl.setNoCache(false);
-            cacheControl.setPrivate(false);
-            return Response
+        final EntityTag entityTag = new EntityTag(hashCode.toString());
+
+        final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
+        if (response != null) {
+            return response.build();
+        }
+
+        final String contentType = firstNonNull(URLConnection.guessContentTypeFromName(filename),
+                                                MediaType.APPLICATION_OCTET_STREAM);
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
+        cacheControl.setNoCache(false);
+        cacheControl.setPrivate(false);
+        return Response
                 .ok(stream)
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .tag(entityTag)
                 .cacheControl(cacheControl)
                 .lastModified(lastModified)
                 .build();
-        } catch (IOException | URISyntaxException e) {
-            return getDefaultResponse();
-        }
     }
 
-    private File getResourceFile(String filename) throws URISyntaxException, FileNotFoundException {
-        final URL resourceUrl =  this.getClass().getResource("/" + PluginAssets.pathPrefix + "/" + filename);
+    private URL getResourceUri(boolean fromPlugin, String filename,
+                               Class<?> aClass) throws URISyntaxException, FileNotFoundException {
+        final URL resourceUrl = aClass.getResource(pluginPrefixFilename(fromPlugin, filename));
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource file " + filename + " not found.");
         }
-        return new File(resourceUrl.toURI());
+        return resourceUrl;
+    }
+
+    @Nonnull
+    private String pluginPrefixFilename(boolean fromPlugin, String filename) {
+        if (fromPlugin) {
+            return "/" + filename;
+        } else {
+            return "/" + PluginAssets.pathPrefix + "/" + filename;
+        }
     }
 
     private Response getDefaultResponse() {
