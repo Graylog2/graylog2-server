@@ -52,6 +52,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.attribute.FileTime;
@@ -82,7 +83,11 @@ public class WebInterfaceAssetsResource {
                         try {
                             return FileSystems.getFileSystem(key);
                         } catch (FileSystemNotFoundException e) {
-                            return FileSystems.newFileSystem(key, Collections.emptyMap());
+                            try {
+                                return FileSystems.newFileSystem(key, Collections.emptyMap());
+                            } catch (FileSystemAlreadyExistsException f) {
+                                return FileSystems.getFileSystem(key);
+                            }
                         }
                     }
                 });
@@ -102,7 +107,7 @@ public class WebInterfaceAssetsResource {
             final URL resourceUrl = getResourceUri(true, filename, plugin.get().metadata().getClass());
             return getResponse(request, filename, resourceUrl, true);
         } catch (URISyntaxException | IOException e) {
-            return getDefaultResponse();
+            throw new NotFoundException();
         }
     }
 
