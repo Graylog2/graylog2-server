@@ -70,7 +70,7 @@ public abstract class ProxiedResource extends RestResource {
                 final Call<RemoteCallResponseType> call = fn.apply(remoteInterface.get());
                 try {
                     final Response<RemoteCallResponseType> response = call.execute();
-                    if (response.isSuccess()) {
+                    if (response.isSuccessful()) {
                         return Optional.of(transformer.apply(response.body()));
                     } else {
                         LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, result: " + response.message());

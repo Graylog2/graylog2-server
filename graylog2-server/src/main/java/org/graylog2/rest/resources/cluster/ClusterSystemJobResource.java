@@ -78,7 +78,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
             final RemoteSystemJobResource remoteSystemJobResource = remoteInterfaceProvider.get(entry.getValue(), this.authenticationToken, RemoteSystemJobResource.class);
             try {
                 final Response<SystemJobSummary> response = remoteSystemJobResource.get(jobId).execute();
-                if (response.isSuccess()) {
+                if (response.isSuccessful()) {
                     // Return early because there can be only one job with the same ID in the cluster.
                     return response.body();
                 } else {

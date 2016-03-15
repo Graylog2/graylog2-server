@@ -85,7 +85,7 @@ public class ClusterSystemResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteSystemResource.class);
         final Response<SystemJVMResponse> response = remoteSystemResource.jvm().execute();
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return response.body();
         } else {
             LOG.warn("Unable to get jvm information on node {}: {}", nodeId, response.message());
@@ -106,7 +106,7 @@ public class ClusterSystemResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteSystemResource.class);
         final Response<SystemThreadDumpResponse> response = remoteSystemResource.threadDump().execute();
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return response.body();
         } else {
             LOG.warn("Unable to get thread dump on node {}: {}", nodeId, response.message());

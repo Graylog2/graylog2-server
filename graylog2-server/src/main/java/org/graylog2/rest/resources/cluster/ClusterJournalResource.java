@@ -74,7 +74,7 @@ public class ClusterJournalResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteJournalResource.class);
         final Response<JournalSummaryResponse> response = remoteJournalResource.get().execute();
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return response.body();
         } else {
             LOG.warn("Unable to get message journal information on node {}: {}", nodeId, response.message());

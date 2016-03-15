@@ -76,7 +76,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     public void pause(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to pause message processing on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
@@ -89,7 +89,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     public void resume(@ApiParam(name = "nodeId", value = "The id of the node where processing will be resumed.", required = true)
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to resume message processing on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }

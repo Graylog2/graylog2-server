@@ -77,7 +77,7 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteLoadBalancerStatusResource.class);
         final Response response = remoteLoadBalancerStatusResource.override(status).execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to override load balancer status on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }

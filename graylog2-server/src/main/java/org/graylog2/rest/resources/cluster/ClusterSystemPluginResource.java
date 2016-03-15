@@ -71,7 +71,7 @@ public class ClusterSystemPluginResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteSystemPluginResource.class);
         final Response<PluginList> response = remoteSystemPluginResource.list().execute();
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return response.body();
         } else {
             LOG.warn("Unable to get plugin list on node {}: {}", nodeId, response.message());

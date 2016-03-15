@@ -77,7 +77,7 @@ public class ClusterMetricsResource extends ProxiedResource {
     public MetricNamesResponse metricNames(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
                                            @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response<MetricNamesResponse> result = getResourceForNode(nodeId).metricNames().execute();
-        if (result.isSuccess()) {
+        if (result.isSuccessful()) {
             return result.body();
         } else {
             throw new WebApplicationException(result.message(), BAD_GATEWAY);
@@ -96,7 +96,7 @@ public class ClusterMetricsResource extends ProxiedResource {
                                                   @ApiParam(name = "Requested metrics", required = true)
                                                   @Valid @NotNull MetricsReadRequest request) throws IOException, NodeNotFoundException {
         final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId).multipleMetrics(request).execute();
-        if (result.isSuccess()) {
+        if (result.isSuccessful()) {
             return result.body();
         } else {
             throw new WebApplicationException(result.message(), BAD_GATEWAY);
@@ -115,7 +115,7 @@ public class ClusterMetricsResource extends ProxiedResource {
                                               @ApiParam(name = "namespace", required = true)
                                               @PathParam("namespace") String namespace) throws IOException, NodeNotFoundException {
         final Response<MetricsSummaryResponse> result = getResourceForNode(nodeId).byNamespace(namespace).execute();
-        if (result.isSuccess()) {
+        if (result.isSuccessful()) {
             return result.body();
         } else {
             throw new WebApplicationException(result.message(), BAD_GATEWAY);
