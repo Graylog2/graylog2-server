@@ -57,7 +57,7 @@ const AppWithSearchBar = React.createClass({
     }
   },
   _isLoading() {
-    return !this.state.savedSearches || (this.props.params.streamId && !this.state.stream);
+    return !this.state.savedSearches || !this.state.searchesClusterConfig || (this.props.params.streamId && !this.state.stream);
   },
   _decorateChildren(children) {
     return React.Children.map(children, (child) => {
