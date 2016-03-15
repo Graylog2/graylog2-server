@@ -1,5 +1,5 @@
 import React from 'react';
-import {DropdownButton, MenuItem} from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 import SearchStore from 'stores/search/SearchStore';
 
@@ -27,7 +27,9 @@ const SurroundingSearchButton = React.createClass({
     const fields = {};
 
     if (this.props.searchConfig) {
-      this.props.searchConfig.surrounding_filter_fields.forEach((field) => fields[field] = this.props.messageFields[field]);
+      this.props.searchConfig.surrounding_filter_fields.forEach((field) => {
+        fields[field] = this.props.messageFields[field];
+      });
     }
 
     return fields;
@@ -37,8 +39,8 @@ const SurroundingSearchButton = React.createClass({
     return (e) => {
       e.preventDefault();
 
-      const fromTime = moment.unix(this.props.timestamp - parseInt(range, 10)).toISOString();
-      const toTime = moment.unix(this.props.timestamp + parseInt(range, 10)).toISOString();
+      const fromTime = moment.unix(this.props.timestamp - Number(range)).toISOString();
+      const toTime = moment.unix(this.props.timestamp + Number(range)).toISOString();
 
       SearchStore.searchSurroundingMessages(this.props.id, fromTime, toTime, this._buildFilterFields());
     };

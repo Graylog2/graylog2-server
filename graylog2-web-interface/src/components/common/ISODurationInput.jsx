@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
-import ISODurationUtils from 'components/common/ISODurationUtils';
+import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({
   propTypes: {
@@ -13,8 +13,6 @@ const ISODurationInput = React.createClass({
     autoFocus: React.PropTypes.bool,
     required: React.PropTypes.bool,
   },
-
-  mixins: [ISODurationUtils],
 
   getDefaultProps() {
     return {
@@ -40,9 +38,9 @@ const ISODurationInput = React.createClass({
       duration = `P${duration}`;
     }
 
-    this.setState({duration: duration});
+    this.setState({ duration: duration });
 
-    if (this.isValidDuration(duration, this.props.validator)) {
+    if (ISODurationUtils.isValidDuration(duration, this.props.validator)) {
       // Only propagate state if the config is valid.
       this.props.update(duration);
     }
@@ -56,8 +54,8 @@ const ISODurationInput = React.createClass({
              onChange={this._onUpdate}
              value={this.state.duration}
              help={this.props.help}
-             addonAfter={this.humanizeDuration(this.state.duration, this.props.validator)}
-             bsStyle={this.durationStyle(this.state.duration, this.props.validator)}
+             addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator)}
+             bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
              autofocus={this.props.autoFocus}
              required={this.props.required} />
     );

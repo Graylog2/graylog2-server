@@ -31,6 +31,8 @@ const SearchesConfig = React.createClass({
         surrounding_filter_fields: surroundingFilterFields,
       },
       limitEnabled: moment.duration(queryTimeRangeLimit).asMilliseconds() > 0,
+      relativeTimeRangeOptionsUpdate: undefined,
+      surroundingTimeRangeOptionsUpdate: undefined,
     };
   },
 
@@ -44,12 +46,26 @@ const SearchesConfig = React.createClass({
 
       update[field] = newOptions;
 
-      this.setState({config: update});
+      this.setState({ config: update });
     };
   },
 
+  _onRelativeTimeRangeOptionsUpdate(data) {
+    this.setState({ relativeTimeRangeOptionsUpdate: data });
+  },
+
+  _onSurroundingTimeRangeOptionsUpdate(data) {
+    this.setState({ surroundingTimeRangeOptionsUpdate: data });
+  },
+
+  _buildTimeRangeOptions(options) {
+    return Object.keys(options).map((key) => {
+      return { period: key, description: options[key] };
+    });
+  },
+
   _onFilterFieldsUpdate(e) {
-    this.setState({surroundingFilterFields: e.target.value});
+    this.setState({ surroundingFilterFields: e.target.value });
   },
 
   _onChecked() {
@@ -63,7 +79,7 @@ const SearchesConfig = React.createClass({
       config.query_time_range_limit = 'P30D';
     }
 
-    this.setState({config: config, limitEnabled: !this.state.limitEnabled});
+    this.setState({ config: config, limitEnabled: !this.state.limitEnabled });
   },
 
   _isEnabled() {
@@ -73,6 +89,26 @@ const SearchesConfig = React.createClass({
   _saveConfig() {
     const update = ObjectUtils.clone(this.state.config);
 
+    if (this.state.relativeTimeRangeOptionsUpdate) {
+      update.relative_timerange_options = {};
+
+      this.state.relativeTimeRangeOptionsUpdate.forEach((entry) => {
+        update.relative_timerange_options[entry.period] = entry.description;
+      });
+
+      this.setState({ relativeTimeRangeOptionsUpdate: undefined });
+    }
+
+    if (this.state.surroundingTimeRangeOptionsUpdate) {
+      update.surrounding_timerange_options = {};
+
+      this.state.surroundingTimeRangeOptionsUpdate.forEach((entry) => {
+        update.surrounding_timerange_options[entry.period] = entry.description;
+      });
+
+      this.setState({ surroundingTimeRangeOptionsUpdate: undefined });
+    }
+
     // Make sure to update filter fields
     if (this.state.surroundingFilterFields) {
       update.surrounding_filter_fields = this.state.surroundingFilterFields
@@ -80,7 +116,7 @@ const SearchesConfig = React.createClass({
         .map((f) => f.trim())
         .filter((f) => f.length > 0);
 
-      this.setState({surroundingFilterFields: undefined});
+      this.setState({ surroundingFilterFields: undefined });
     }
 
     this.props.updateConfig(update).then(() => {
@@ -99,6 +135,18 @@ const SearchesConfig = React.createClass({
 
   _closeModal() {
     this.refs.searchesConfigModal.close();
+  },
+
+  queryTimeRangeLimitValidator(milliseconds) {
+    return milliseconds >= 1;
+  },
+
+  relativeTimeRangeValidator(milliseconds, duration) {
+    return milliseconds >= 1 || duration === 'PT0S';
+  },
+
+  surroundingTimeRangeValidator(milliseconds) {
+    return milliseconds >= 1;
   },
 
   render() {
@@ -158,19 +206,19 @@ const SearchesConfig = React.createClass({
                               update={this._onUpdate('query_time_range_limit')}
                               label="Query time range limit (ISO8601 Duration)"
                               help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
-                              validator={(milliseconds) => milliseconds >= 1}
+                              validator={this.queryTimeRangeLimitValidator}
                               required />
             }
 
-            <TimeRangeOptionsForm options={this.state.config.relative_timerange_options}
-                                  update={this._onUpdate('relative_timerange_options')}
-                                  validator={(milliseconds, dur) => milliseconds >= 1 || dur === 'PT0S'}
+            <TimeRangeOptionsForm options={this.state.relativeTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.relative_timerange_options)}
+                                  update={this._onRelativeTimeRangeOptionsUpdate}
+                                  validator={this.relativeTimeRangeValidator}
                                   title="Relative Timerange Options"
                                   help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
 
-            <TimeRangeOptionsForm options={this.state.config.surrounding_timerange_options}
-                                  update={this._onUpdate('surrounding_timerange_options')}
-                                  validator={(milliseconds) => milliseconds >= 1}
+            <TimeRangeOptionsForm options={ this.state.surroundingTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.surrounding_timerange_options)}
+                                  update={this._onSurroundingTimeRangeOptionsUpdate}
+                                  validator={this.surroundingTimeRangeValidator}
                                   title="Surrounding Timerange Options"
                                   help={<span>Configure the available options for the <strong>surrounding</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
 
@@ -178,7 +226,7 @@ const SearchesConfig = React.createClass({
                    label="Surrounding search filter fields"
                    onChange={this._onFilterFieldsUpdate}
                    value={this.state.surroundingFilterFields || filterFieldsString}
-                   help="foo bar"
+                   help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
                    required />
           </fieldset>
         </BootstrapModalForm>
