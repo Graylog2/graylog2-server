@@ -5,13 +5,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
-import PipelineForm from './PipelineForm';
 
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
-
-import ObjectUtils from 'util/ObjectUtils';
-import SourceGenerator from 'logic/SourceGenerator';
 
 import {} from './ProcessingTimelineComponent.css';
 
@@ -71,21 +67,12 @@ const ProcessingTimelineComponent = React.createClass({
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
-          <PipelineForm pipeline={pipeline} save={this._savePipeline}/>
+          <LinkContainer to={`/system/pipelines/${pipeline.id}`}>
+            <Button bsStyle="info" bsSize="xsmall">Edit</Button>
+          </LinkContainer>
         </td>
       </tr>
     );
-  },
-
-  _savePipeline(pipeline, callback) {
-    const requestPipeline = ObjectUtils.clone(pipeline);
-    requestPipeline.source = SourceGenerator.generatePipeline(pipeline);
-    if (requestPipeline.id) {
-      PipelinesActions.update(requestPipeline);
-    } else {
-      PipelinesActions.save(requestPipeline);
-    }
-    callback();
   },
 
   _deletePipeline(pipeline) {
@@ -101,10 +88,18 @@ const ProcessingTimelineComponent = React.createClass({
       return <Spinner />;
     }
 
+    const addNewPipelineButton = (
+      <div className="text-right">
+        <LinkContainer to="/system/pipelines/new">
+          <Button bsStyle="success">Add new pipeline</Button>
+        </LinkContainer>
+      </div>
+    );
+
     if (this.state.pipelines.length === 0) {
       return (
         <div>
-          <div className="text-right"><PipelineForm create save={this._savePipeline} /></div>
+          {addNewPipelineButton}
           <Alert>
             There are no pipelines configured in your system. Create one to start processing your messages.
           </Alert>
@@ -117,7 +112,7 @@ const ProcessingTimelineComponent = React.createClass({
     const headers = ['Pipeline', 'ProcessingTimeline', 'Actions'];
     return (
       <div>
-        <div className="pull-right"><PipelineForm create save={this._savePipeline}/></div>
+        {addNewPipelineButton}
         <DataTable id="processing-timeline"
                    className="table-hover"
                    headers={headers}

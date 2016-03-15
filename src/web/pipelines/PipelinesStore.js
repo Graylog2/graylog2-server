@@ -65,12 +65,15 @@ const PipelinesStore = Reflux.createStore({
       description: pipelineSource.description,
       source: pipelineSource.source,
     };
-    return fetch('POST', url, pipeline).then(
+    const promise = fetch('POST', url, pipeline);
+    promise.then(
       response => {
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
       },
       failCallback);
+
+    PipelinesActions.save.promise(promise);
   },
 
   update(pipelineSource) {
@@ -85,12 +88,15 @@ const PipelinesStore = Reflux.createStore({
       description: pipelineSource.description,
       source: pipelineSource.source,
     };
-    return fetch('PUT', url, pipeline).then(
+    const promise = fetch('PUT', url, pipeline);
+    promise.then(
       response => {
         this._updatePipelinesState(response);
         UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
       },
       failCallback);
+
+    PipelinesActions.update.promise(promise);
   },
   delete(pipelineId) {
     const failCallback = (error) => {
