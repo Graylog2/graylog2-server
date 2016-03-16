@@ -40,6 +40,7 @@ public class PluginAssets {
     private final ObjectMapper objectMapper;
     private final List<String> jsFiles;
     private final List<String> cssFiles;
+    private final String polyfillJsFile;
 
     @Inject
     public PluginAssets(Set<Plugin> plugins,
@@ -66,6 +67,7 @@ public class PluginAssets {
             }
             jsFiles.addAll(manifest.files().jsFiles());
             cssFiles.addAll(manifest.files().cssFiles());
+            polyfillJsFile = manifest.files().chunks().get("polyfill").entry();
         } else {
             throw new IllegalStateException("Unable to find web interface assets. Maybe the web interface was not built into server?");
         }
@@ -73,6 +75,21 @@ public class PluginAssets {
 
     public List<String> jsFiles() {
         return jsFiles;
+    }
+
+    // Sort JS files in the intended load order, so templates don't need to care about it.
+    public List<String> sortedJsFiles() {
+        List<String> sortedJsFiles = jsFiles().stream()
+                .sorted((file1, file2) -> {
+                    // Polyfill JS script goes first
+                    if (file1.equals(polyfillJsFile) || file2.equals(polyfillJsFile)) {
+                        return -1;
+                    }
+                    // App JS script goes last, as plugins need to be loaded before
+                    return file2.compareTo(file1);
+                })
+                .collect(Collectors.toList());
+        return sortedJsFiles;
     }
 
     public List<String> cssFiles() {
