@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Button} from 'react-bootstrap';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
 import UsersStore from 'stores/users/UsersStore';
 import StartpageStore from 'stores/users/StartpageStore';
@@ -12,7 +12,7 @@ import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const EditUsersPage = React.createClass({
   propTypes: {
-    username: PropTypes.string.isRequired,
+    params: React.PropTypes.object.isRequired,
   },
   getInitialState() {
     return {
@@ -24,7 +24,7 @@ const EditUsersPage = React.createClass({
   },
   _loadUser() {
     UsersStore.load(this.props.params.username).then((user) => {
-      this.setState({user: user});
+      this.setState({ user: user });
     });
   },
   _resetStartpage() {
@@ -45,13 +45,14 @@ const EditUsersPage = React.createClass({
 
     const userPreferencesButton = !user.read_only ?
       <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
-        <UserPreferencesButton userName={user.username}/>
+        <UserPreferencesButton userName={user.username} />
       </span>
       : null;
 
     return (
       <span>
-        <PageHeader title={'Edit user »' + this.props.params.username + '«'} titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
+        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>} titleSize={8} buttonSize={4}
+                    buttonStyle={{ textAlign: 'right', marginTop: 10 }}>
           <span>You can either change the details of a user here or set a new password.</span>
           {null}
           <div>
