@@ -25,7 +25,30 @@ const ExportExtractors = React.createClass({
     }
 
     const extractorsExportObject = {
-      extractors: this.state.extractors,
+      extractors: this.state.extractors.map((extractor) => {
+        const copy = {};
+
+        // Create Graylog 1.x compatible export format.
+        // TODO: This should be done on the server.
+        Object.keys(extractor).forEach((key) => {
+          switch (key) {
+            case 'type':
+              // The import expects "extractor_type", not "type".
+              copy.extractor_type = extractor[key];
+              break;
+            case 'id':
+            case 'metrics':
+            case 'creator_user_id':
+            case 'exceptions':
+            case 'converter_exceptions':
+              break;
+            default:
+              copy[key] = extractor[key];
+          }
+        });
+
+        return copy;
+      }),
       version: Version.getFullVersion(),
     };
 

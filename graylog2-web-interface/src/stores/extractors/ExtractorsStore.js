@@ -21,7 +21,7 @@ function getExtractorDTO(extractor) {
     cut_or_copy: extractor.cursor_strategy || 'copy',
     source_field: extractor.source_field,
     target_field: extractor.target_field,
-    extractor_type: extractor.type,
+    extractor_type: extractor.type || extractor.extractor_type, // "extractor_type" needed for imports
     extractor_config: extractor.extractor_config,
     converters: converters,
     condition_type: extractor.condition_type || 'none',
