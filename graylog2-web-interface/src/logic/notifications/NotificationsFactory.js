@@ -103,8 +103,8 @@ class NotificationsFactory {
         };
       case 'generic':
         return {
-          title: notification.title,
-          description: notification.description,
+          title: notification.details.title,
+          description: notification.details.description,
         };
       case 'index_ranges_recalculation':
         return {
