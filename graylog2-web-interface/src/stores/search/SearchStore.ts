@@ -10,6 +10,7 @@ import ApiRoutes = require('routing/ApiRoutes');
 const Routes = require('routing/Routes');
 var Qs = require('qs');
 const URLUtils = require('util/URLUtils');
+const moment = require('moment');
 
 class SearchStore {
     static NOT_OPERATOR = "NOT";
@@ -22,6 +23,7 @@ class SearchStore {
     private _page: number;
     private _resolution: string;
     private _fields: Immutable.Set<string>;
+    private _highlightMessage: string;
     public sortField: string;
     public sortOrder: string;
     public width: number;
@@ -52,12 +54,14 @@ class SearchStore {
             this.rangeParams = this.originalSearch.get('rangeParams');
             this.page = this.originalSearch.get('page');
             this.resolution = this.originalSearch.get('resolution');
+            this.highlightMessage = this.originalSearch.get('highlightMessage');
         } else {
             this._query = this.originalSearch.get('query');
             this._rangeType = this.originalSearch.get('rangeType');
             this._rangeParams = this.originalSearch.get('rangeParams');
             this._page = this.originalSearch.get('page');
             this._resolution = this.originalSearch.get('resolution');
+            this._highlightMessage = this.originalSearch.get('highlightMessage');
         }
         this.savedSearch = this.originalSearch.get('saved');
         this.sortField = this.originalSearch.get('sortField');
@@ -162,6 +166,14 @@ class SearchStore {
         this._fields = newFields;
     }
 
+    get highlightMessage(): string {
+        return this._highlightMessage;
+    }
+
+    set highlightMessage(id: string) {
+        this._highlightMessage = id;
+    }
+
     sort(sortField: string, sortOrder: string): void {
         this._reloadSearchWithNewParams(Immutable.Map<string, any>({sortField: sortField, sortOrder: sortOrder}));
     }
@@ -174,6 +186,7 @@ class SearchStore {
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
         originalSearch = originalSearch.set('sortField', parsedSearch.get('sortField', 'timestamp'));
         originalSearch = originalSearch.set('sortOrder', parsedSearch.get('sortOrder', 'desc'));
+        originalSearch = originalSearch.set('highlightMessage', parsedSearch.get('highlightMessage', ''));
 
         if (parsedSearch.get('saved') !== undefined) {
             originalSearch = originalSearch.set('saved', parsedSearch.get('saved'));
@@ -353,6 +366,26 @@ class SearchStore {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.delete('page');
         return this.searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
+    }
+
+    searchSurroundingMessages(messageId: string, fromTime: string, toTime: string, filter: any) {
+      var originalParams = this.getOriginalSearchParamsWithFields().toJS();
+
+      var query = Object.keys(filter)
+        .filter((key) => filter[key])
+        .map((key) => `${key}:"${filter[key]}"`)
+        .join(' AND ');
+
+      var params = {
+        rangetype: 'absolute',
+        from: fromTime,
+        to: toTime,
+        q: query,
+        highlightMessage: messageId,
+        fields: originalParams.fields,
+      };
+
+      URLUtils.openLink(this.searchBaseLocation('index') + '?' + Qs.stringify(params))
     }
 }
 

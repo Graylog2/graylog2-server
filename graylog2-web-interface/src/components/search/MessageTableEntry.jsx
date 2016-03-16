@@ -68,6 +68,9 @@ const MessageTableEntry = React.createClass({
     if (this.props.expanded) {
       classes += " message-group-toggled";
     }
+    if (this.props.message.id === this.props.highlightMessage) {
+      classes += ' message-highlight';
+    }
     return (
       <tbody className={classes}>
       <tr className="fields-row" onClick={this._toggleDetail}>
@@ -89,7 +92,7 @@ const MessageTableEntry = React.createClass({
           <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
                          allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
                          nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
-                         expandAllRenderAsync={this.props.expandAllRenderAsync}/>
+                         expandAllRenderAsync={this.props.expandAllRenderAsync} searchConfig={this.props.searchConfig} />
         </td>
       </tr>
         }

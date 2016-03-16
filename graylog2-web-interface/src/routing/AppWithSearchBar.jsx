@@ -1,8 +1,8 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import {Row, Col} from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
-import {Spinner} from 'components/common';
+import { Spinner } from 'components/common';
 import SearchBar from 'components/search/SearchBar';
 
 import SearchStore from 'stores/search/SearchStore';
@@ -44,9 +44,9 @@ const AppWithSearchBar = React.createClass({
   },
   _loadStream(streamId) {
     if (streamId) {
-      StreamsStore.get(streamId, (stream) => this.setState({stream: stream}, this._updateSearchParams));
+      StreamsStore.get(streamId, (stream) => this.setState({ stream: stream }, this._updateSearchParams));
     } else {
-      this.setState({stream: undefined}, this._updateSearchParams);
+      this.setState({ stream: undefined }, this._updateSearchParams);
     }
   },
   _updateSearchParams() {
@@ -57,7 +57,12 @@ const AppWithSearchBar = React.createClass({
     }
   },
   _isLoading() {
-    return !this.state.savedSearches || (this.props.params.streamId && !this.state.stream);
+    return !this.state.savedSearches || !this.state.searchesClusterConfig || (this.props.params.streamId && !this.state.stream);
+  },
+  _decorateChildren(children) {
+    return React.Children.map(children, (child) => {
+      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig });
+    });
   },
   render() {
     if (this._isLoading()) {
@@ -76,7 +81,7 @@ const AppWithSearchBar = React.createClass({
                    config={this.state.searchesClusterConfig} />
         <Row id="main-row">
           <Col md={12} id="main-content">
-            {this.props.children}
+            {this._decorateChildren(this.props.children)}
           </Col>
         </Row>
       </div>

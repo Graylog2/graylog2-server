@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
-import moment from 'moment';
+import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({
   propTypes: {
@@ -31,18 +31,6 @@ const ISODurationInput = React.createClass({
     };
   },
 
-  _isValidDuration(duration) {
-    return this.props.validator(moment.duration(duration).asMilliseconds());
-  },
-
-  _validationState() {
-    return this._isValidDuration(this.state.duration) ? null : 'error';
-  },
-
-  _formatDuration() {
-    return this._isValidDuration(this.state.duration) ? moment.duration(this.state.duration).humanize() : this.props.errorText;
-  },
-
   _onUpdate() {
     let duration = this.refs.isoDuration.getValue().toUpperCase();
 
@@ -50,9 +38,9 @@ const ISODurationInput = React.createClass({
       duration = `P${duration}`;
     }
 
-    this.setState({duration: duration});
+    this.setState({ duration: duration });
 
-    if (this._isValidDuration(duration)) {
+    if (ISODurationUtils.isValidDuration(duration, this.props.validator)) {
       // Only propagate state if the config is valid.
       this.props.update(duration);
     }
@@ -66,8 +54,8 @@ const ISODurationInput = React.createClass({
              onChange={this._onUpdate}
              value={this.state.duration}
              help={this.props.help}
-             addonAfter={this._formatDuration()}
-             bsStyle={this._validationState()}
+             addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator)}
+             bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
              autofocus={this.props.autoFocus}
              required={this.props.required} />
     );

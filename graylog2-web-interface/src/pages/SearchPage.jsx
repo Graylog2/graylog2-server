@@ -22,6 +22,7 @@ import { SearchResult } from 'components/search';
 const SearchPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
+    searchConfig: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
   },
   mixins: [
@@ -149,7 +150,8 @@ const SearchPage = React.createClass({
                     result={searchResult} histogram={this.state.histogram}
                     formattedHistogram={this.state.histogram.histogram}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions} />
+                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
+                    searchConfig={this.props.searchConfig} />
     );
   },
 });
