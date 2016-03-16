@@ -63,8 +63,14 @@ class QueryInput {
         });
     }
 
+    _value() {
+        return $(this.queryInputContainer).typeahead('val');
+    }
+
     update(newValue) {
-        $(this.queryInputContainer).typeahead('val', newValue);
+        if (this._value() !== newValue) {
+            $(this.queryInputContainer).typeahead('val', newValue);
+        }
     }
 
     private codeCompletionProvider(query: string, callback: (matches: Array<any>) => void) {
