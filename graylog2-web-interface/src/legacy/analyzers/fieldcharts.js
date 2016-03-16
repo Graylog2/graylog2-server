@@ -80,45 +80,30 @@ export const FieldChart = {
       opts.valuetype = 'mean';
     }
 
-    if (opts.streamid === undefined) {
-      opts.streamid = '';
-    }
-
     if (opts.query === undefined) {
       opts.query = searchParams.query;
-    }
-
-    if (opts.rangetype === undefined) {
-      opts.rangetype = searchParams.range_type;
-    }
-
-    if (opts.range === undefined) {
-      opts.range = {};
     }
 
     if (opts.createdAt === undefined) {
       opts.createdAt = moment().valueOf();
     }
 
+    // Always get stream and time range params from the current search request.
+    // Ignore the streamid, rangetype and range params that have been stored in localStorage. (see FieldGraphsStore)
+    opts.streamid = searchParams.streamId;
+    opts.rangetype = searchParams.range_type;
+    opts.range = {};
+
     switch (opts.rangetype) {
       case 'relative':
-        if (opts.range.relative === undefined) {
-          opts.range.relative = searchParams.relative;
-        }
+        opts.range.relative = searchParams.relative;
         break;
       case 'absolute':
-        if (opts.range.from === undefined) {
-          opts.range.from = searchParams.from;
-        }
-
-        if (opts.range.to === undefined) {
-          opts.range.to = searchParams.to;
-        }
+        opts.range.from = searchParams.from;
+        opts.range.to = searchParams.to;
         break;
       case 'keyword':
-        if (opts.range.keyword === undefined) {
-          opts.range.keyword = searchParams.keyword;
-        }
+        opts.range.keyword = searchParams.keyword;
         break;
       default:
     }
