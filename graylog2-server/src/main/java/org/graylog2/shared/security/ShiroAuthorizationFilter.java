@@ -50,7 +50,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
                 LOG.debug("Checking authorization for user [{}], needs permissions: {}", userName, annotation.value());
                 annotationHandler.assertAuthorized(annotation);
             } catch (AuthorizationException e) {
-                LOG.info("User [" + userName + "] not authorized.", e);
+                LOG.info("User [" + userName + "] not authorized.");
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
             }
         } else {
