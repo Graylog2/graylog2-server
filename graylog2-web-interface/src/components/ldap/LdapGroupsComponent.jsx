@@ -42,7 +42,8 @@ const LdapGroupsComponent = React.createClass({
     }
   },
 
-  _saveMapping() {
+  _saveMapping(event) {
+    event.preventDefault();
     LdapGroupsActions.saveMapping(this.state.mapping.toJS());
   },
 
@@ -93,13 +94,13 @@ const LdapGroupsComponent = React.createClass({
       );
     } else {
       return (
-        <form className="form-horizontal">
+        <form className="form-horizontal" onSubmit={this._saveMapping}>
           <Row>
             <Col md={12}>
               <ul style={{padding: 0}}>{content}</ul>
             </Col>
             <Col md={10} mdPush={2}>
-              <Button onClick={this._saveMapping} bsStyle="success">Save</Button>&nbsp;
+              <Button type="submit" bsStyle="success">Save</Button>&nbsp;
               <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
                 <Button>Cancel</Button>
               </LinkContainer>

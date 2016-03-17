@@ -31,7 +31,7 @@ const NewUserForm = React.createClass({
       </span>
     );
     return (
-      <form id="create-user-form" className="form-horizontal">
+      <form id="create-user-form" className="form-horizontal" onSubmit={this._onSubmit}>
         <Input ref="username" name="username" id="username" type="text" maxLength={100}
                labelClassName="col-sm-2" wrapperClassName="col-sm-10"
                label="Username" help="Select a unique user name used to log in with." required />
@@ -70,7 +70,7 @@ const NewUserForm = React.createClass({
 
         <div className="form-group">
           <Col smOffset={2} sm={10}>
-            <Button type="submit" bsStyle="success" className="create-user" onClick={this._onSubmit}>
+            <Button type="submit" bsStyle="success" className="create-user">
               Create User
             </Button>
           </Col>
