@@ -4,6 +4,7 @@ import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
+import ValidationsUtils from 'util/ValidationsUtils';
 
 import StreamsStore from 'stores/streams/StreamsStore';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
@@ -15,7 +16,7 @@ import Spinner from 'components/common/Spinner';
 import MultiSelect from 'components/common/MultiSelect';
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
-import {TimezoneSelect} from 'components/common';
+import { TimezoneSelect } from 'components/common';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -64,6 +65,16 @@ const UserForm = React.createClass({
       });
     }
   },
+
+  _onPasswordChange() {
+    const passwordField = this.refs.password.getInputDOMNode();
+    const passwordConfirmField = this.refs.password_repeat.getInputDOMNode();
+
+    if (passwordField.value !== '' && passwordConfirmField.value !== '') {
+      ValidationsUtils.setFieldValidity(passwordConfirmField, passwordField.value !== passwordConfirmField.value, 'Passwords do not match');
+    }
+  },
+
   _changePassword(evt) {
     evt.preventDefault();
     const request = {};
@@ -79,6 +90,7 @@ const UserForm = React.createClass({
       UserNotification.error('Updating password failed.', 'Error!');
     });
   },
+
   _updateUser(evt) {
     evt.preventDefault();
     const request = {};
@@ -233,11 +245,13 @@ const UserForm = React.createClass({
                 }
                 <Input ref="password" name="password" id="password" type="password" maxLength={100}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="New Password" help="Passwords must be at least 6 characters long. We recommend using a strong password." required />
+                       label="New Password" required minLength="6"
+                       help="Passwords must be at least 6 characters long. We recommend using a strong password."
+                       onChange={this._onPasswordChange} />
 
                 <Input ref="password_repeat" name="password_repeat" id="password_repeat" type="password" maxLength={100}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Repeat Password" required />
+                       label="Repeat Password" required minLength="6" onChange={this._onPasswordChange} />
 
                 <div className="form-group">
                   <Col smOffset={3} sm={9}>
