@@ -29,6 +29,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.util.Locale;
 
 @Priority(Priorities.AUTHORIZATION)
 public class ShiroAuthorizationFilter implements ContainerRequestFilter {
@@ -50,7 +51,9 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
                 LOG.debug("Checking authorization for user [{}], needs permissions: {}", userName, annotation.value());
                 annotationHandler.assertAuthorized(annotation);
             } catch (AuthorizationException e) {
-                LOG.info("User [" + userName + "] not authorized.");
+                final String msg = String.format(Locale.US, "User [%s] not authorized. (%s %s)", userName,
+                        requestContext.getMethod(), requestContext.getUriInfo().getPath());
+                LOG.info(msg);
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
             }
         } else {
