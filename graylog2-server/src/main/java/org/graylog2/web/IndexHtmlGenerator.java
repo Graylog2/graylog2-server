@@ -40,7 +40,7 @@ public class IndexHtmlGenerator {
         final Map<String, Object> model = new HashMap<String, Object>() {{
             put("title", title);
             put("cssFiles", pluginAssets.cssFiles());
-            put("jsFiles", pluginAssets.jsFiles());
+            put("jsFiles", pluginAssets.sortedJsFiles());
         }};
 
         this.content = engine.transform(template, model);

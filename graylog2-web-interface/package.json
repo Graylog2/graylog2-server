@@ -76,7 +76,7 @@
     "extract-text-webpack-plugin": "^0.9.x",
     "file-loader": "^0.8.4",
     "glob": "^6.0.4",
-    "html-webpack-plugin": "^1.6.1",
+    "html-webpack-plugin": "^1.7.0",
     "jasmine-core": "*",
     "json-loader": "^0.5.3",
     "karma": "^0.13.10",
