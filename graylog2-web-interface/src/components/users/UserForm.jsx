@@ -113,7 +113,12 @@ const UserForm = React.createClass({
 
     const user = this.props.user;
     const permissions = this.state.currentUser.permissions;
-    const requiresOldPassword = !this.isPermitted(permissions, 'users:passwordchange:*');
+
+    let requiresOldPassword = true;
+    if (this.isPermitted(permissions, 'users:passwordchange:*')) {
+      // Ask for old password if user is editing their own account
+      requiresOldPassword = this.props.user.username === this.state.currentUser.username;
+    }
 
     const streamReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:read', this.state.streams);
     const streamEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:edit', this.state.streams);
