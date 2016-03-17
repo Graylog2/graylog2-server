@@ -48,7 +48,7 @@ const Pipeline = React.createClass({
 
   _formatStage(stage, maxStage) {
     return (
-      <Stage key={`stage-${stage.stage}`} stage={stage} isLastStage={stage.stage === maxStage}
+      <Stage key={`stage-${stage.stage}`} pipeline={this.props.pipeline} stage={stage} isLastStage={stage.stage === maxStage}
              onUpdate={this._updateStage(stage)} onDelete={this._deleteStage(stage)} />
     );
   },

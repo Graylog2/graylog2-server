@@ -6,6 +6,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import RulesActions from './RulesActions';
 
+import { MetricContainer, CounterRate } from 'components/metrics';
+
 const RuleList = React.createClass({
   propTypes: {
     rules: PropTypes.array.isRequired,
@@ -44,13 +46,23 @@ const RuleList = React.createClass({
         <td className="limited">{rule.description}</td>
         <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>
         <td className="limited"><Timestamp dateTime={rule.modified_at} relative /></td>
+        <td>
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.executed`} zeroOnMissing>
+            <CounterRate suffix="msg/s" />
+          </MetricContainer>
+        </td>
+        <td>
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.failed`}>
+            <CounterRate showTotal suffix="errors/s" hideOnMissing />
+          </MetricContainer>
+        </td>
         <td className="actions">{actions}</td>
       </tr>
     );
   },
   render() {
     const filterKeys = ['title', 'description'];
-    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Actions'];
+    const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
 
     return (
       <div>
