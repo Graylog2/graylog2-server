@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Optional;
 
 public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
@@ -50,15 +51,15 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return MessageCountRotationStrategyConfig.createDefault();
+        return MessageCountRotationStrategyConfig.defaultConfig();
     }
 
     @Nullable
     @Override
     protected Result shouldRotate(String index) {
-        final MessageCountRotationStrategyConfig config = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
+        final Optional<MessageCountRotationStrategyConfig> config = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
 
-        if (config == null) {
+        if (!config.isPresent()) {
             log.warn("No rotation strategy configuration found, not running index rotation!");
             return null;
         }
@@ -67,8 +68,8 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
             final long numberOfMessages = indices.numberOfMessages(index);
             return new Result(index,
                               numberOfMessages,
-                              config.maxDocsPerIndex(),
-                              numberOfMessages > config.maxDocsPerIndex());
+                              config.get().maxDocsPerIndex(),
+                              numberOfMessages > config.get().maxDocsPerIndex());
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;

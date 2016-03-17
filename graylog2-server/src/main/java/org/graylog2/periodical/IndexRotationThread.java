@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
+import java.util.Optional;
 
 public class IndexRotationThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
@@ -85,17 +86,17 @@ public class IndexRotationThread extends Periodical {
     }
 
     protected void checkForRotation() {
-        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
+        final Optional<IndexManagementConfig> config = clusterConfigService.get(IndexManagementConfig.class);
 
-        if (config == null) {
+        if (!config.isPresent()) {
             LOG.warn("No index management configuration found, not running index rotation!");
             return;
         }
 
-        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategy());
+        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.get().rotationStrategy());
 
         if (rotationStrategyProvider == null) {
-            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategy());
+            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.get().rotationStrategy());
             return;
         }
 

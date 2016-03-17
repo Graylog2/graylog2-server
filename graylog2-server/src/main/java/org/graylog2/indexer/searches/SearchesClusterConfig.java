@@ -86,7 +86,7 @@ public abstract class SearchesClusterConfig {
                 .build();
     }
 
-    public static SearchesClusterConfig createDefault() {
+    public static SearchesClusterConfig defaultConfig() {
         return builder()
                 .queryTimeRangeLimit(DEFAULT_QUERY_TIME_RANGE_LIMIT)
                 .relativeTimerangeOptions(DEFAULT_RELATIVE_TIMERANGE_OPTIONS)
@@ -104,6 +104,7 @@ public abstract class SearchesClusterConfig {
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder queryTimeRangeLimit(Period queryTimeRangeLimit);
+
         public abstract Builder relativeTimerangeOptions(Map<Period, String> relativeTimerangeOptions);
         public abstract Builder surroundingTimerangeOptions(Map<Period, String> surroundingTimerangeOptions);
         public abstract Builder surroundingFilterFields(Set<String> surroundingFilterFields);

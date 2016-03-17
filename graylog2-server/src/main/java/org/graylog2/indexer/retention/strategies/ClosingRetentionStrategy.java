@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
@@ -27,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
@@ -47,13 +47,8 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
 
     @Override
     protected Optional<Integer> getMaxNumberOfIndices() {
-        final ClosingRetentionStrategyConfig config = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
-
-        if (config != null) {
-            return Optional.of(config.maxNumberOfIndices());
-        } else {
-            return Optional.absent();
-        }
+        return clusterConfigService.get(ClosingRetentionStrategyConfig.class)
+                .flatMap(config -> Optional.of(config.maxNumberOfIndices()));
     }
 
     @Override

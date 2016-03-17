@@ -45,7 +45,7 @@ public abstract class TimeBasedRotationStrategyConfig implements RotationStrateg
         return create(TimeBasedRotationStrategyConfig.class.getCanonicalName(), maxTimePerIndex);
     }
 
-    public static TimeBasedRotationStrategyConfig createDefault() {
+    public static TimeBasedRotationStrategyConfig defaultConfig() {
         return create(DEFAULT_DAYS);
     }
 }

@@ -24,9 +24,9 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.management.IndexManagementConfig;
-import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
 import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
 import org.graylog2.rest.models.system.indices.RetentionStrategySummary;
@@ -47,6 +47,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,12 +74,10 @@ public class RetentionStrategyResource extends RestResource {
     @ApiOperation(value = "Configuration of the current retention strategy",
             notes = "This resource returns the configuration of the currently used retention strategy.")
     public RetentionStrategySummary config() {
-        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (indexManagementConfig == null) {
-            throw new InternalServerErrorException("Couldn't retrieve index management configuration");
-        }
+        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class)
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't retrieve index management configuration"));
 
-        final String strategyName = indexManagementConfig.retentionStrategy();
+        final String strategyName = config.retentionStrategy();
         final Provider<RetentionStrategy> provider = retentionStrategies.get(strategyName);
         if (provider == null) {
             throw new InternalServerErrorException("Couldn't retrieve retention strategy provider");
@@ -87,9 +86,10 @@ public class RetentionStrategyResource extends RestResource {
         final RetentionStrategy retentionStrategy = provider.get();
         @SuppressWarnings("unchecked")
         final Class<RetentionStrategyConfig> configClass = (Class<RetentionStrategyConfig>) retentionStrategy.configurationClass();
-        final RetentionStrategyConfig config = clusterConfigService.get(configClass);
+        final RetentionStrategyConfig retentionStrategyConfig = clusterConfigService.get(configClass)
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't retrieve configuration class " + configClass.getCanonicalName()));
 
-        return RetentionStrategySummary.create(strategyName, config);
+        return RetentionStrategySummary.create(strategyName, retentionStrategyConfig);
     }
 
     @PUT
@@ -99,15 +99,14 @@ public class RetentionStrategyResource extends RestResource {
     @ApiOperation(value = "Configuration of the current retention strategy",
             notes = "This resource stores the configuration of the currently used retention strategy.")
     public RetentionStrategySummary config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
-                       @Valid @NotNull RetentionStrategySummary retentionStrategySummary) {
+                                           @Valid @NotNull RetentionStrategySummary retentionStrategySummary) {
         if (!retentionStrategies.containsKey(retentionStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find retention strategy for given type " + retentionStrategySummary.strategy());
         }
 
-        final IndexManagementConfig oldConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (oldConfig == null) {
-            throw new InternalServerErrorException("Couldn't retrieve index management configuration");
-        }
+        final Optional<IndexManagementConfig> oldIndexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
+        final IndexManagementConfig oldConfig = oldIndexManagementConfig.orElseThrow(
+                () -> new InternalServerErrorException("Couldn't retrieve index management configuration"));
 
         final IndexManagementConfig indexManagementConfig = IndexManagementConfig.create(
                 oldConfig.rotationStrategy(),
@@ -140,7 +139,7 @@ public class RetentionStrategyResource extends RestResource {
     @ApiOperation(value = "Show JSON schema for configuration of given retention strategies",
             notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
     public RetentionStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
-                                   @PathParam("strategy") @NotEmpty String strategyName) {
+                                                     @PathParam("strategy") @NotEmpty String strategyName) {
         return getRetentionStrategyDescription(strategyName);
     }
 

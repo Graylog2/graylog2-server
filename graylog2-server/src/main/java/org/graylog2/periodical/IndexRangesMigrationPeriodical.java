@@ -19,9 +19,7 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
@@ -37,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -79,8 +78,9 @@ public class IndexRangesMigrationPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        final MongoIndexRangesMigrationComplete migrationComplete = clusterConfigService.get(MongoIndexRangesMigrationComplete.class);
-        if (migrationComplete != null && migrationComplete.complete) {
+        final Optional<MongoIndexRangesMigrationComplete> migrationComplete =
+                clusterConfigService.get(MongoIndexRangesMigrationComplete.class);
+        if (migrationComplete.isPresent() && migrationComplete.get().complete) {
             LOG.debug("Migration of index ranges (pre Graylog 1.2.2) already complete. Skipping migration process.");
             return;
         }
@@ -94,7 +94,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
         // Migrate old MongoDB index ranges
         final SortedSet<IndexRange> mongoIndexRanges = legacyMongoIndexRangeService.findAll();
         for (IndexRange indexRange : mongoIndexRanges) {
-            if(indexNames.contains(indexRange.indexName())) {
+            if (indexNames.contains(indexRange.indexName())) {
                 LOG.info("Migrating index range from MongoDB: {}", indexRange);
                 indexRangeService.save(indexRange);
             } else {

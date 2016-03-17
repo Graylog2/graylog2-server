@@ -57,7 +57,7 @@ public class SystemResource extends RestResource {
     @Inject
     public SystemResource(ServerStatus serverStatus, ClusterConfigService clusterConfigService) {
         this.serverStatus = serverStatus;
-        this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
+        this.clusterId = clusterConfigService.getOrDefault(ClusterId.class).get();
     }
 
     @GET

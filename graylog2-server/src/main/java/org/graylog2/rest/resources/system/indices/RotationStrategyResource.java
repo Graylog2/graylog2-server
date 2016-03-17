@@ -24,9 +24,9 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.management.IndexManagementConfig;
-import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.models.system.indices.RotationStrategies;
 import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
 import org.graylog2.rest.models.system.indices.RotationStrategySummary;
@@ -73,10 +73,8 @@ public class RotationStrategyResource extends RestResource {
     @ApiOperation(value = "Configuration of the current rotation strategy",
             notes = "This resource returns the configuration of the currently used rotation strategy.")
     public RotationStrategySummary config() {
-        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (indexManagementConfig == null) {
-            throw new InternalServerErrorException("Couldn't retrieve index management configuration");
-        }
+        final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class)
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't retrieve index management configuration"));
 
         final String strategyName = indexManagementConfig.rotationStrategy();
         final Provider<RotationStrategy> provider = rotationStrategies.get(strategyName);
@@ -87,7 +85,8 @@ public class RotationStrategyResource extends RestResource {
         final RotationStrategy rotationStrategy = provider.get();
         @SuppressWarnings("unchecked")
         final Class<RotationStrategyConfig> configClass = (Class<RotationStrategyConfig>) rotationStrategy.configurationClass();
-        final RotationStrategyConfig config = clusterConfigService.get(configClass);
+        final RotationStrategyConfig config = clusterConfigService.get(configClass)
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't retrieve configuration class " + configClass.getCanonicalName()));
 
         return RotationStrategySummary.create(strategyName, config);
     }
@@ -99,15 +98,13 @@ public class RotationStrategyResource extends RestResource {
     @ApiOperation(value = "Configuration of the current rotation strategy",
             notes = "This resource stores the configuration of the currently used rotation strategy.")
     public RotationStrategySummary config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
-                       @Valid @NotNull RotationStrategySummary rotationStrategySummary) {
+                                          @Valid @NotNull RotationStrategySummary rotationStrategySummary) {
         if (!rotationStrategies.containsKey(rotationStrategySummary.strategy())) {
             throw new NotFoundException("Couldn't find rotation strategy for given type " + rotationStrategySummary.strategy());
         }
 
-        final IndexManagementConfig oldConfig = clusterConfigService.get(IndexManagementConfig.class);
-        if (oldConfig == null) {
-            throw new InternalServerErrorException("Couldn't retrieve index management configuration");
-        }
+        final IndexManagementConfig oldConfig = clusterConfigService.get(IndexManagementConfig.class)
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't retrieve index management configuration"));
 
         final IndexManagementConfig indexManagementConfig = IndexManagementConfig.create(
                 rotationStrategySummary.strategy(),
@@ -140,7 +137,7 @@ public class RotationStrategyResource extends RestResource {
     @ApiOperation(value = "Show JSON schema for configuration of given rotation strategies",
             notes = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
     public RotationStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the rotation strategy", required = true)
-                                   @PathParam("strategy") @NotEmpty String strategyName) {
+                                                    @PathParam("strategy") @NotEmpty String strategyName) {
         return getRotationStrategyDescription(strategyName);
     }
 

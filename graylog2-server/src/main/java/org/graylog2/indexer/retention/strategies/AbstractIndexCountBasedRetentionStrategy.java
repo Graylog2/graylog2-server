@@ -17,7 +17,6 @@
 
 package org.graylog2.indexer.retention.strategies;
 
-import com.google.common.base.Optional;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);

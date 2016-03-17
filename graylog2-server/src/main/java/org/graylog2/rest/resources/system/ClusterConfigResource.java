@@ -33,7 +33,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -49,6 +48,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -84,12 +84,9 @@ public class ClusterConfigResource extends RestResource {
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public Object read(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
-        final Class<?> cls = classFromName(configClass);
-        if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
-        }
-
-        return clusterConfigService.get(cls);
+        return classFromName(configClass)
+                .flatMap(clusterConfigService::get)
+                .orElseThrow(() -> new NotFoundException("Couldn't find configuration class \"" + configClass + "\""));
     }
 
     @PUT
@@ -102,11 +99,8 @@ public class ClusterConfigResource extends RestResource {
                            @PathParam("configClass") @NotBlank String configClass,
                            @ApiParam(name = "body", value = "The payload of the cluster configuration", required = true)
                            @NotNull InputStream body) throws IOException {
-        final Class<?> cls = classFromName(configClass);
-        if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
-        }
-
+        final Class<?> cls = classFromName(configClass)
+                .orElseThrow(() -> new NotFoundException("Couldn't find configuration class \"" + configClass + "\""));
         final Object o = objectMapper.readValue(body, cls);
         clusterConfigService.write(o);
 
@@ -120,10 +114,8 @@ public class ClusterConfigResource extends RestResource {
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_DELETE)
     public void delete(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
-        final Class<?> cls = classFromName(configClass);
-        if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
-        }
+        final Class<?> cls = classFromName(configClass)
+                .orElseThrow(() -> new NotFoundException("Couldn't find configuration class \"" + configClass + "\""));
 
         clusterConfigService.remove(cls);
     }
@@ -136,11 +128,8 @@ public class ClusterConfigResource extends RestResource {
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
     public JsonSchema schema(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                              @PathParam("configClass") @NotBlank String configClass) {
-        final Class<?> cls = classFromName(configClass);
-        if (cls == null) {
-            throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
-        }
-
+        final Class<?> cls = classFromName(configClass)
+                .orElseThrow(() -> new NotFoundException("Couldn't find configuration class \"" + configClass + "\""));
         final SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
         try {
             objectMapper.acceptJsonFormatVisitor(objectMapper.constructType(cls), visitor);
@@ -151,12 +140,25 @@ public class ClusterConfigResource extends RestResource {
         return visitor.finalSchema();
     }
 
-    @Nullable
-    private Class<?> classFromName(String className) {
+    @GET
+    @Path("{configClass}/default")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get default value for given configuration class")
+    @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_READ)
+    public Object defaultValue(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
+                               @PathParam("configClass") @NotBlank String configClass) {
+        return classFromName(configClass)
+                .flatMap(clusterConfigService::getDefault)
+                .orElseThrow(() -> new NotFoundException("Couldn't find default for configuration class \"" + configClass + "\""));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Optional<Class<?>> classFromName(String className) {
         try {
-            return chainingClassLoader.loadClass(className);
+            return Optional.of(chainingClassLoader.loadClass(className));
         } catch (ClassNotFoundException e) {
-            return null;
+            return Optional.empty();
         }
     }
 }

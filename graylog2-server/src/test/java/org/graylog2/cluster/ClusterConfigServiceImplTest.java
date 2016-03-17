@@ -56,6 +56,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -126,22 +127,22 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        CustomConfig customConfig = clusterConfigService.get(CustomConfig.class);
-        assertThat(customConfig.text).isEqualTo("TEST");
+        Optional<CustomConfig> customConfig = clusterConfigService.get(CustomConfig.class);
+        assertThat(customConfig.get().text).isEqualTo("TEST");
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void getReturnsNullOnNonExistingConfig() throws Exception {
+    public void getReturnsOptionalEmptyOnNonExistingConfig() throws Exception {
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
 
-        assertThat(clusterConfigService.get(CustomConfig.class)).isNull();
+        assertThat(clusterConfigService.get(CustomConfig.class).isPresent()).isFalse();
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void getReturnsNullOnInvalidPayload() throws Exception {
+    public void getReturnsOptionalEmptyOnInvalidPayload() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", "wrong payload")
@@ -153,7 +154,17 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        assertThat(clusterConfigService.get(CustomConfig.class)).isNull();
+        assertThat(clusterConfigService.get(CustomConfig.class).isPresent()).isFalse();
+    }
+
+    @Test
+    public void getDefaultReturnsExistingDefaultValue() throws Exception {
+        assertThat(clusterConfigService.getDefault(CustomConfig.class).get().text).isEqualTo("default");
+    }
+
+    @Test
+    public void getDefaultReturnsOptionalEmptyIfDefaultValueDoesNotExist() throws Exception {
+        assertThat(clusterConfigService.getDefault(AnotherCustomConfig.class).isPresent()).isFalse();
     }
 
     @Test
@@ -170,11 +181,8 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        CustomConfig defaultValue = new CustomConfig();
-        defaultValue.text = "DEFAULT";
-
-        CustomConfig customConfig = clusterConfigService.getOrDefault(CustomConfig.class, defaultValue);
-        assertThat(customConfig.text).isEqualTo("TEST");
+        Optional<CustomConfig> customConfig = clusterConfigService.getOrDefault(CustomConfig.class);
+        assertThat(customConfig.get().text).isEqualTo("TEST");
     }
 
     @Test
@@ -183,15 +191,12 @@ public class ClusterConfigServiceImplTest {
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
 
-        CustomConfig defaultValue = new CustomConfig();
-        defaultValue.text = "DEFAULT";
-
-        assertThat(clusterConfigService.getOrDefault(CustomConfig.class, defaultValue)).isSameAs(defaultValue);
+        assertThat(clusterConfigService.getOrDefault(CustomConfig.class).get().text).isEqualTo("default");
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void getOrDefaultReturnsDefaultValueOnInvalidPayload() throws Exception {
+    public void getOrDefaultReturnsDefaultValueOfClusterConfigClassOnInvalidPayload() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", "wrong payload")
@@ -203,10 +208,7 @@ public class ClusterConfigServiceImplTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        CustomConfig defaultValue = new CustomConfig();
-        defaultValue.text = "DEFAULT";
-
-        assertThat(clusterConfigService.getOrDefault(CustomConfig.class, defaultValue)).isSameAs(defaultValue);
+        assertThat(clusterConfigService.getOrDefault(CustomConfig.class).get().text).isEqualTo("default");
     }
 
     @Test

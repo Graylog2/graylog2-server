@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -57,13 +58,14 @@ public class IndexRetentionThread extends Periodical {
             return;
         }
 
-        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
+        final Optional<IndexManagementConfig> indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
 
-        if (config == null) {
+        if (!indexManagementConfig.isPresent()) {
             LOG.warn("No index management configuration found, not running index retention!");
             return;
         }
 
+        final IndexManagementConfig config = indexManagementConfig.get();
         final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategy());
 
         if (retentionStrategyProvider == null) {

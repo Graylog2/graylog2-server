@@ -115,8 +115,8 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        final ContentPackLoaderConfig contentPackLoaderConfig =
-                clusterConfigService.getOrDefault(ContentPackLoaderConfig.class, ContentPackLoaderConfig.EMPTY);
+        final ContentPackLoaderConfig contentPackLoaderConfig = clusterConfigService.getOrDefault(ContentPackLoaderConfig.class)
+                .orElseThrow(() -> new RuntimeException("Couldn't find content pack loader configuration in database"));
 
         final List<Path> files = getFiles(contentPacksDir, FILENAME_GLOB);
         final Map<String, ConfigurationBundle> contentPacks = new HashMap<>(files.size());

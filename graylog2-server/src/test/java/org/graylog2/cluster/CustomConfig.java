@@ -18,4 +18,11 @@ package org.graylog2.cluster;
 
 public class CustomConfig {
     public String text;
+
+    @SuppressWarnings("unused")
+    public static CustomConfig defaultConfig() {
+        final CustomConfig customConfig = new CustomConfig();
+        customConfig.text = "default";
+        return customConfig;
+    }
 }

@@ -44,7 +44,7 @@ public abstract class DeletionRetentionStrategyConfig implements RetentionStrate
         return new AutoValue_DeletionRetentionStrategyConfig(DeletionRetentionStrategyConfig.class.getCanonicalName(), maxNumberOfIndices);
     }
 
-    public static DeletionRetentionStrategyConfig createDefault() {
+    public static DeletionRetentionStrategyConfig defaultConfig() {
         return create(DEFAULT_MAX_NUMBER_OF_INDICES);
     }
 }

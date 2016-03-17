@@ -47,4 +47,8 @@ public abstract class ClosingRetentionStrategyConfig implements RetentionStrateg
     public static ClosingRetentionStrategyConfig createDefault() {
         return create(DEFAULT_MAX_NUMBER_OF_INDICES);
     }
+
+    public static ClosingRetentionStrategyConfig defaultConfig() {
+        return createDefault();
+    }
 }

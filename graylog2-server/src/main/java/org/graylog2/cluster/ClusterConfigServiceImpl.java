@@ -39,10 +39,12 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.Set;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClusterConfigServiceImpl implements ClusterConfigService {
@@ -89,6 +91,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         return coll;
     }
 
+    @Nullable
     private <T> T extractPayload(Object payload, Class<T> type) {
         try {
             return objectMapper.convertValue(payload, type);
@@ -99,12 +102,11 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     @Override
-    public <T> T get(Class<T> type) {
-        ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
-
+    public <T> Optional<T> get(Class<T> type) {
+        final ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
         if (config == null) {
             LOG.debug("Couldn't find cluster config of type {}", type.getCanonicalName());
-            return null;
+            return Optional.empty();
         }
 
         T result = extractPayload(config.payload(), type);
@@ -112,12 +114,28 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
             LOG.error("Couldn't extract payload from cluster config (type: {})", type.getCanonicalName());
         }
 
-        return result;
+        return Optional.ofNullable(result);
     }
 
     @Override
-    public <T> T getOrDefault(Class<T> type, T defaultValue) {
-        return firstNonNull(get(type), defaultValue);
+    public <T> Optional<T> getDefault(Class<T> type) {
+        try {
+            final Method method = type.getMethod("defaultConfig");
+            @SuppressWarnings("unchecked")
+            final T result = (T) method.invoke(null);
+            return Optional.of(result);
+        } catch (ReflectiveOperationException e) {
+            LOG.debug("Couldn't retrieve default value for config class " + type.getCanonicalName(), e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public <T> Optional<T> getOrDefault(Class<T> type) {
+        final Optional<T> config = get(type);
+        final Optional<T> defaultConfig = getDefault(type);
+
+        return config.isPresent() ? config : defaultConfig;
     }
 
     @Override

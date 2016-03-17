@@ -33,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Provider;
+import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -76,7 +77,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(Optional.of(IndexManagementConfig.create("strategy", "retention")));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -117,7 +118,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(Optional.of(IndexManagementConfig.create("strategy", "retention")));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -159,7 +160,7 @@ public class IndexRotationThreadTest {
             }
         };
 
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(Optional.of(IndexManagementConfig.create("strategy", "retention")));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -183,7 +184,7 @@ public class IndexRotationThreadTest {
         final Provider<RotationStrategy> provider = mock(Provider.class);
         when(cluster.isConnected()).thenReturn(false);
         when(cluster.isHealthy()).thenReturn(false);
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
+        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(Optional.of(IndexManagementConfig.create("strategy", "retention")));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,

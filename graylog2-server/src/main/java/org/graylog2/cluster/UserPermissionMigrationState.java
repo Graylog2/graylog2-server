@@ -32,4 +32,8 @@ public abstract class UserPermissionMigrationState {
     public static UserPermissionMigrationState create(@JsonProperty("migration_done") boolean migrationDone) {
         return new AutoValue_UserPermissionMigrationState(migrationDone);
     }
+
+    public static UserPermissionMigrationState defaultConfig() {
+        return create(false);
+    }
 }

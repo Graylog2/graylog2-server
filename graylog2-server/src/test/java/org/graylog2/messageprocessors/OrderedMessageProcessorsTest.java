@@ -16,7 +16,8 @@
  */
 package org.graylog2.messageprocessors;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
@@ -26,29 +27,33 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OrderedMessageProcessorsTest {
-
-    private OrderedMessageProcessors orderedMessageProcessors;
+    @Mock
     private ClusterConfigService clusterConfigService;
+    private OrderedMessageProcessors orderedMessageProcessors;
 
     @Before
     public void setUp() throws Exception {
-        Set<MessageProcessor> processors = Sets.newHashSet();
-        processors.add(new A());
-        processors.add(new B());
         clusterConfigService = mock(ClusterConfigService.class);
-        orderedMessageProcessors = new OrderedMessageProcessors(processors,
-                                                                clusterConfigService,
-                                                                mock(EventBus.class));
+        final MessageProcessorsConfig messageProcessorOrder = MessageProcessorsConfig.create(Collections.emptyList());
+        when(clusterConfigService.get(MessageProcessorsConfig.class)).thenReturn(Optional.of(messageProcessorOrder));
+        orderedMessageProcessors = new OrderedMessageProcessors(ImmutableSet.of(new A(), new B()),
+            clusterConfigService,
+            mock(EventBus.class));
     }
 
     private ClusterConfigChangedEvent getClusterConfigChangedEvent() {
@@ -63,8 +68,10 @@ public class OrderedMessageProcessorsTest {
         assertFalse("Iterator exhausted", iterator.hasNext());
 
         when(clusterConfigService.get(MessageProcessorsConfig.class)).thenReturn(
-                MessageProcessorsConfig.create(Lists.newArrayList(B.class.getCanonicalName(),
-                                                                  A.class.getCanonicalName())));
+            Optional.of(
+                MessageProcessorsConfig.create(ImmutableList.of(B.class.getCanonicalName(), A.class.getCanonicalName()))
+            )
+        );
 
         orderedMessageProcessors.handleOrderingUpdate(getClusterConfigChangedEvent());
 
@@ -75,9 +82,13 @@ public class OrderedMessageProcessorsTest {
 
 
         when(clusterConfigService.get(MessageProcessorsConfig.class)).thenReturn(
-                MessageProcessorsConfig.create(Lists.newArrayList(B.class.getCanonicalName(),
-                                                                  A.class.getCanonicalName()),
-                                               Sets.newHashSet(B.class.getCanonicalName())));
+            Optional.of(
+                MessageProcessorsConfig.create(
+                    ImmutableList.of(B.class.getCanonicalName(), A.class.getCanonicalName()),
+                    Sets.newHashSet(B.class.getCanonicalName())
+                )
+            )
+        );
 
         orderedMessageProcessors.handleOrderingUpdate(getClusterConfigChangedEvent());
 
