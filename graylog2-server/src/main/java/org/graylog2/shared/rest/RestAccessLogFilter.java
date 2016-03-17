@@ -17,10 +17,7 @@
 package org.graylog2.shared.rest;
 
 import org.glassfish.grizzly.http.server.Response;
-import org.graylog2.shared.security.ShiroSecurityContext;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +26,6 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.util.Date;
 
@@ -44,27 +40,17 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
         this.response = requireNonNull(response);
     }
 
-    private String getUsernameFromSession(String sessionID) {
-        final DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
-        Subject.Builder builder = new Subject.Builder(securityManager);
-        builder.sessionId(sessionID);
-        Subject subject = builder.buildSubject();
-        return subject.getPrincipal().toString();
-    }
-
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         if (LOG.isDebugEnabled()) {
             try {
                 final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
-                final SecurityContext securityContext = requestContext.getSecurityContext();
-                final String sessionID = securityContext instanceof ShiroSecurityContext ?
-                        ((ShiroSecurityContext) securityContext).getUsername() : null;
                 final Date requestDate = requestContext.getDate();
+                final String userName = RestTools.getUserNameFromRequest(requestContext);
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
                         response.getRequest().getRemoteAddr(),
-                        (sessionID == null ? "-" : getUsernameFromSession(sessionID)),
+                        userName == null ? "-" : userName,
                         (requestDate == null ? "-" : requestDate),
                         requestContext.getMethod(),
                         requestContext.getUriInfo().getPath(),
