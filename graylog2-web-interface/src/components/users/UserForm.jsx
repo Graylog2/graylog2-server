@@ -56,7 +56,7 @@ const UserForm = React.createClass({
   },
   _updateRoles(evt) {
     evt.preventDefault();
-    if (confirm(`Really update roles for "${user.username}"?`)) {
+    if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
       const roles = this.refs.roles.getValue().filter((value) => value !== "");
       UsersStore.updateRoles(this.props.user.username, roles).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
