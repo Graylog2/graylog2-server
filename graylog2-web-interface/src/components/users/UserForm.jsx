@@ -55,12 +55,14 @@ const UserForm = React.createClass({
   },
   _updateRoles(evt) {
     evt.preventDefault();
-    const roles = this.refs.roles.getValue().filter((value) => value !== "");
-    UsersStore.updateRoles(this.props.user.username, roles).then(() => {
-      UserNotification.success('Roles updated successfully.', 'Success!');
-    }, () => {
-      UserNotification.error('Updating roles failed.', 'Error!');
-    });
+    if (confirm(`Really update roles for "${user.username}"?`)) {
+      const roles = this.refs.roles.getValue().filter((value) => value !== "");
+      UsersStore.updateRoles(this.props.user.username, roles).then(() => {
+        UserNotification.success('Roles updated successfully.', 'Success!');
+      }, () => {
+        UserNotification.error('Updating roles failed.', 'Error!');
+      });
+    }
   },
   _changePassword(evt) {
     evt.preventDefault();
@@ -275,7 +277,7 @@ const UserForm = React.createClass({
                     </Input>
                     <div className="form-group">
                       <Col smOffset={3} sm={9}>
-                        <Button bsStyle="success" type="submit" data-confirm={'Really update roles for ' + user.username + '?'}>
+                        <Button bsStyle="success" type="submit">
                           Update role
                         </Button>
                       </Col>
