@@ -367,7 +367,7 @@ public class PipelineInterpreter implements MessageProcessor {
     public void handleRuleChanges(RulesChangedEvent event) {
         event.deletedRuleIds().forEach(id -> {
             log.debug("Invalidated rule {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Pipeline.class, id)));
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Rule.class, id)));
         });
         event.updatedRuleIds().forEach(id -> {
             log.debug("Refreshing rule {}", id);
