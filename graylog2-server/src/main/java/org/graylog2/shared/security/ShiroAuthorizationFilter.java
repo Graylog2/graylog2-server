@@ -18,7 +18,7 @@ package org.graylog2.shared.security;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
+import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +44,13 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (securityContext instanceof ShiroSecurityContext) {
             final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
-            final Subject subject = context.getSubject();
+            final String userName = RestTools.getUserNameFromRequest(requestContext);
             final ContextAwarePermissionAnnotationHandler annotationHandler = new ContextAwarePermissionAnnotationHandler(context);
             try {
-                LOG.debug("Checking authorization for user {}, needs permissions {}", subject, annotation.value());
+                LOG.debug("Checking authorization for user [{}], needs permissions: {}", userName, annotation.value());
                 annotationHandler.assertAuthorized(annotation);
             } catch (AuthorizationException e) {
-                LOG.info("User " + subject + "not authorized.", e);
+                LOG.info("User [" + userName + "] not authorized.", e);
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
             }
         } else {
