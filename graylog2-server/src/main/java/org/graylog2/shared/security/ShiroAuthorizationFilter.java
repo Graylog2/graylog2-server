@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
-import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -54,10 +54,10 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
                 final String msg = String.format(Locale.US, "User [%s] not authorized. (%s %s)", userName,
                         requestContext.getMethod(), requestContext.getUriInfo().getPath());
                 LOG.info(msg);
-                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
+                throw new ForbiddenException(msg);
             }
         } else {
-            throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
+            throw new ForbiddenException();
         }
     }
 }
