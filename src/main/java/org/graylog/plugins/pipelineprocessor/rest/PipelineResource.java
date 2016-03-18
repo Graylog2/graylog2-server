@@ -66,7 +66,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Inject
     public PipelineResource(PipelineService pipelineService,
                         PipelineRuleParser pipelineRuleParser,
-                        @ClusterEventBus EventBus clusterBus) {
+                        ClusterEventBus clusterBus) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.clusterBus = clusterBus;

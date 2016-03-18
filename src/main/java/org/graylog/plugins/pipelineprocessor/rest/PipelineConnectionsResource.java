@@ -55,7 +55,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     public PipelineConnectionsResource(PipelineStreamConnectionsService connectionsService,
                                        PipelineService pipelineService,
                                        StreamService streamService,
-                                       @ClusterEventBus EventBus clusterBus) {
+                                       ClusterEventBus clusterBus) {
         this.connectionsService = connectionsService;
         this.pipelineService = pipelineService;
         this.streamService = streamService;

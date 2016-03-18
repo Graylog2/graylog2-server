@@ -38,12 +38,12 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
@@ -94,7 +94,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                Journal journal,
                                MetricRegistry metricRegistry,
                                @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                               @ClusterEventBus EventBus clusterBus) {
+                               EventBus serverEventBus) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
@@ -105,7 +105,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
-        clusterBus.register(this);
+        serverEventBus.register(this);
 
         reload();
     }
