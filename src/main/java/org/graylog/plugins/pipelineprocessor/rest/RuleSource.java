@@ -71,7 +71,7 @@ public abstract class RuleSource {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static RuleSource create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                     @JsonProperty("title")  String title,
                                     @JsonProperty("description") @Nullable String description,
                                     @JsonProperty("source") String source,

@@ -34,7 +34,7 @@ public abstract class PipelineConnections {
     @Nullable
     @Id
     @ObjectId
-    public abstract String _id();
+    public abstract String id();
 
     @JsonProperty
     public abstract String streamId();
@@ -43,11 +43,11 @@ public abstract class PipelineConnections {
     public abstract Set<String> pipelineIds();
 
     @JsonCreator
-    public static PipelineConnections create(@Id @ObjectId @JsonProperty("id") @Nullable String _id,
+    public static PipelineConnections create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                              @JsonProperty("stream_id") String streamId,
                                              @JsonProperty("pipeline_ids") Set<String> pipelineIds) {
         return builder()
-                ._id(_id)
+                .id(id)
                 .streamId(streamId)
                 .pipelineIds(pipelineIds)
                 .build();
@@ -63,7 +63,7 @@ public abstract class PipelineConnections {
     public abstract static class Builder {
         public abstract PipelineConnections build();
 
-        public abstract Builder _id(String _id);
+        public abstract Builder id(String id);
 
         public abstract Builder streamId(String streamId);
 

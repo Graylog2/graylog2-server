@@ -78,7 +78,7 @@ public abstract class PipelineSource {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static PipelineSource create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static PipelineSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("source") String source,
