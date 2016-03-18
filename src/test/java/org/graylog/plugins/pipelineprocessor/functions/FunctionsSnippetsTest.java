@@ -31,7 +31,11 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.Murmur3_128;
+import org.graylog.plugins.pipelineprocessor.functions.hashing.Murmur3_32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
@@ -136,7 +140,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(ParseDate.NAME, new ParseDate());
         functions.put(FormatDate.NAME, new FormatDate());
 
+        functions.put(CRC32.NAME, new CRC32());
+        functions.put(CRC32C.NAME, new CRC32C());
         functions.put(MD5.NAME, new MD5());
+        functions.put(Murmur3_32.NAME, new Murmur3_32());
+        functions.put(Murmur3_128.NAME, new Murmur3_128());
         functions.put(SHA1.NAME, new SHA1());
         functions.put(SHA256.NAME, new SHA256());
         functions.put(SHA512.NAME, new SHA512());
