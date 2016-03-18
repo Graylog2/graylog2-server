@@ -1,7 +1,5 @@
 import React from 'react';
 
-import style from '!style!css!../IndicesConfiguration.css';
-
 const MessageCountRotationStrategySummary = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
@@ -10,7 +8,7 @@ const MessageCountRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Index rotation strategy:</dt>
           <dd>Message Count</dd>
           <dt>Max docs per index:</dt>

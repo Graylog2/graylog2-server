@@ -13,17 +13,22 @@ import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenan
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
 
-import style from '!style!css!./IndicesConfiguration.css';
-
 const IndicesConfiguration = React.createClass({
   mixins: [Reflux.connect(IndicesConfigurationStore)],
 
   componentDidMount() {
+    this.style.use();
     IndicesConfigurationActions.loadRotationConfig();
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionConfig();
     IndicesConfigurationActions.loadRetentionStrategies();
   },
+
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!components/configurations/ConfigurationStyles.css'),
 
   _saveConfiguration() {
     const promises = [];
@@ -115,7 +120,7 @@ const IndicesConfiguration = React.createClass({
       <div>
         <h2>Settings</h2>
 
-        <div className={style.topMargin}>
+        <div className="top-margin">
           <Row>
             <Col md={6}>
               {rotationSummary}
@@ -124,7 +129,7 @@ const IndicesConfiguration = React.createClass({
               {retentionSummary}
             </Col>
           </Row>
-          <hr className={style.separator}/>
+          <hr className="separator"/>
           <Button bsStyle="info" bsSize="xs" onClick={() => this._openModal()}>Update configuration</Button>{' '}
         </div>
 

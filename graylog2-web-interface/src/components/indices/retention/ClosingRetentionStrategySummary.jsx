@@ -1,7 +1,5 @@
 import React from 'react';
 
-import style from '!style!css!../IndicesConfiguration.css';
-
 const ClosingRetentionStrategySummary = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
@@ -10,7 +8,7 @@ const ClosingRetentionStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Index rotation strategy:</dt>
           <dd>Close</dd>
           <dt>Max number of indices:</dt>

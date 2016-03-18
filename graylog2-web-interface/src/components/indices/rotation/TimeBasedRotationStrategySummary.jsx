@@ -2,7 +2,6 @@ import React from 'react';
 
 import moment from 'moment';
 import {} from 'moment-duration-format';
-import style from '!style!css!../IndicesConfiguration.css';
 
 const TimeBasedRotationStrategySummary = React.createClass({
   propTypes: {
@@ -18,7 +17,7 @@ const TimeBasedRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Index rotation strategy:</dt>
           <dd>Index Time</dd>
           <dt>Rotation period:</dt>
