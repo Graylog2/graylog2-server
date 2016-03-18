@@ -16,7 +16,6 @@
  */
 package org.graylog2.bindings;
 
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -31,7 +30,6 @@ import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
-import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
@@ -45,6 +43,7 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
@@ -86,7 +85,6 @@ import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
-import org.graylog2.web.IndexHtmlGenerator;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -113,7 +111,7 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
-        bind(EventBus.class).annotatedWith(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {

@@ -23,7 +23,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.slf4j.Logger;
@@ -56,10 +55,10 @@ public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
     @Inject
     public OrderedMessageProcessors(Set<MessageProcessor> processors,
                                     ClusterConfigService clusterConfigService,
-                                    @ClusterEventBus EventBus clusterEventBus) {
+                                    EventBus eventBus) {
         this.processors = processors;
         this.clusterConfigService = clusterConfigService;
-        clusterEventBus.register(this);
+        eventBus.register(this);
         // TODO by default sort on class name this is probably not the best idea, but for now works.
         this.classNameOrdering = Ordering.from(String.CASE_INSENSITIVE_ORDER);
 

@@ -66,7 +66,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
                                   EventBus eventBus,
-                                  @ClusterEventBus EventBus clusterEventBus) {
+                                  ClusterEventBus clusterEventBus) {
         this.indices = indices;
         this.collection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
@@ -78,7 +78,6 @@ public class MongoIndexRangeService implements IndexRangeService {
         // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
         IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
-        clusterEventBus.register(this);
 
         collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
         collection.createIndex(BasicDBObjectBuilder.start()
