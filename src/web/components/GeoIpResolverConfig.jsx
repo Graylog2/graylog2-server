@@ -4,8 +4,6 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted, Select } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
-import style from '!style!css!components/configurations/ConfigurationStyles.css';
-
 const GeoIpResolverConfig = React.createClass({
   propTypes: {
     config: React.PropTypes.object,
@@ -96,7 +94,7 @@ const GeoIpResolverConfig = React.createClass({
           location information into a field named <code>fieldname_geolocation</code> where "fieldname" is the name
           of the field in which an IP address has been found.</p>
 
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Enabled:</dt>
           <dd>{this.state.config.enabled === true ? 'yes' : 'no'}</dd>
           <dt>Database type:</dt>
