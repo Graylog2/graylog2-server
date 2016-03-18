@@ -5,6 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
+import { MetricContainer, CounterRate } from 'components/metrics';
 
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
@@ -67,6 +68,10 @@ const ProcessingTimelineComponent = React.createClass({
         <td className="pipeline-name">
           <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer><br />
           {pipeline.description}
+          <br />
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
+            <CounterRate prefix="Throughput:" suffix="msg/s" />
+          </MetricContainer>
         </td>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
         <td>
@@ -114,7 +119,7 @@ const ProcessingTimelineComponent = React.createClass({
 
     this.usedStages = this._calculateUsedStages(this.state.pipelines);
 
-    const headers = ['Pipeline', 'ProcessingTimeline', 'Actions'];
+    const headers = ['Pipeline', 'Processing Timeline', 'Actions'];
     return (
       <div>
         {addNewPipelineButton}

@@ -6,10 +6,12 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { DataTable, EntityListItem, Spinner } from 'components/common';
 import RulesStore from 'rules/RulesStore';
 import StageForm from './StageForm';
+import { MetricContainer, CounterRate } from 'components/metrics';
 
 const Stage = React.createClass({
   propTypes: {
     stage: PropTypes.object.isRequired,
+    pipeline: PropTypes.object.isRequired,
     isLastStage: PropTypes.bool,
     onUpdate: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
@@ -20,7 +22,7 @@ const Stage = React.createClass({
     return <th>{header}</th>;
   },
 
-  _ruleRowFormatter(rule) {
+  _ruleRowFormatter(stage, rule) {
     return (
       <tr>
         <td style={{ width: 400 }}>
@@ -29,12 +31,22 @@ const Stage = React.createClass({
           </LinkContainer>
         </td>
         <td>{rule.description}</td>
+        <td>
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${this.props.pipeline.id}.${stage.stage}.executed`}>
+            <CounterRate zeroOnMissing suffix="msg/s" />
+          </MetricContainer>
+        </td>
+        <td>
+          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${this.props.pipeline.id}.${stage.stage}.failed`}>
+            <CounterRate showTotal zeroOnMissing suffix="errors/s"/>
+          </MetricContainer>
+        </td>
       </tr>
     );
   },
 
-  _formatRules(rules) {
-    const headers = ['Title', 'Description'];
+  _formatRules(stage, rules) {
+    const headers = ['Title', 'Description', 'Metrics', 'Errors'];
 
     return (
       <DataTable id="processing-timeline"
@@ -42,7 +54,7 @@ const Stage = React.createClass({
                  headers={headers}
                  headerCellFormatter={this._ruleHeaderFormatter}
                  rows={rules}
-                 dataRowFormatter={this._ruleRowFormatter}
+                 dataRowFormatter={(rule) => this._ruleRowFormatter(stage, rule)}
                  noDataText="This stage has no rules yet. Click on edit to add some."
                  filterLabel=""
                  filterKeys={[]} />
@@ -52,7 +64,11 @@ const Stage = React.createClass({
   render() {
     const stage = this.props.stage;
 
-    const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
+    let suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
+
+    const throughput = (<MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${this.props.pipeline.id}.stage.${stage.stage}.executed`}>
+      <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
+    </MetricContainer>);
 
     const actions = [
       <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete}
@@ -72,10 +88,15 @@ const Stage = React.createClass({
       );
     }
 
+    let block = (<span>
+      {description}
+      <br />
+      {throughput}
+    </span>);
     let content;
     // We check if we have the rules details before trying to render them
     if (this.state.rules) {
-      content = this._formatRules(this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]));
+      content = this._formatRules(stage, this.props.stage.rules.map(name => this.state.rules.filter(r => r.title === name)[0]));
     } else {
       content = <Spinner />;
     }
@@ -84,7 +105,7 @@ const Stage = React.createClass({
       <EntityListItem title={`Stage ${stage.stage}`}
                       titleSuffix={suffix}
                       actions={actions}
-                      description={description}
+                      description={block}
                       contentRow={<Col md={12}>{content}</Col>} />
     );
   },

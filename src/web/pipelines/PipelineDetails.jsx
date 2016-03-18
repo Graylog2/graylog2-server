@@ -4,6 +4,8 @@ import { Row, Col } from 'react-bootstrap';
 import { Timestamp } from 'components/common';
 import PipelineForm from './PipelineForm';
 
+import { MetricContainer, CounterRate } from 'components/metrics';
+
 const PipelineDetails = React.createClass({
   propTypes: {
     pipeline: React.PropTypes.object,
@@ -34,6 +36,12 @@ const PipelineDetails = React.createClass({
               <dd><Timestamp dateTime={pipeline.created_at} relative /></dd>
               <dt>Last modified</dt>
               <dd><Timestamp dateTime={pipeline.modified_at} relative /></dd>
+              <dt>Current throughput</dt>
+              <dd>
+                <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
+                  <CounterRate suffix="msg/s" />
+                </MetricContainer>
+              </dd>
             </dl>
           </Col>
         </Row>

@@ -22,11 +22,15 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 
 @AutoValue
 public abstract class Rule {
+
+    @Nullable
+    public abstract String id();
 
     public abstract String name();
 
@@ -38,12 +42,19 @@ public abstract class Rule {
         return new AutoValue_Rule.Builder();
     }
 
+    public abstract Builder toBuilder();
+
+    public Rule withId(String id) {
+        return toBuilder().id(id).build();
+    }
+
     public static Rule alwaysFalse(String name) {
         return builder().name(name).when(new BooleanExpression(new CommonToken(-1), false)).then(Collections.emptyList()).build();
     }
     @AutoValue.Builder
     public abstract static class Builder {
 
+        public abstract Builder id(String id);
         public abstract Builder name(String name);
         public abstract Builder when(LogicalExpression condition);
         public abstract Builder then(Collection<Statement> actions);

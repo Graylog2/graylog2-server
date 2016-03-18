@@ -101,7 +101,12 @@ public class PipelineRuleParser {
     private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
+
     public Rule parseRule(String rule, boolean silent) throws ParseException {
+        return parseRule(null, rule, silent);
+    }
+
+    public Rule parseRule(String id, String rule, boolean silent) throws ParseException {
         final ParseContext parseContext = new ParseContext(silent);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
@@ -128,7 +133,8 @@ public class PipelineRuleParser {
         WALKER.walk(new RuleTypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
-            return parseContext.getRules().get(0);
+            final Rule parsedRule = parseContext.getRules().get(0);
+            return parsedRule.withId(id);
         }
         throw new ParseException(parseContext.getErrors());
     }

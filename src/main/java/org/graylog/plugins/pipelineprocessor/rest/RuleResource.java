@@ -78,7 +78,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule;
         try {
-            rule = pipelineRuleParser.parseRule(ruleSource.source(), false);
+            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), false);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
@@ -103,7 +103,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final Rule rule;
         try {
             // be silent about parse errors here, many requests will result in invalid syntax
-            rule = pipelineRuleParser.parseRule(ruleSource.source(), true);
+            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), true);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
@@ -152,7 +152,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final RuleDao ruleDao = ruleService.load(id);
         final Rule rule;
         try {
-            rule = pipelineRuleParser.parseRule(update.source(), false);
+            rule = pipelineRuleParser.parseRule(id, update.source(), false);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
