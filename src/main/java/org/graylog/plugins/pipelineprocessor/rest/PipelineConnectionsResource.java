@@ -22,6 +22,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -75,7 +76,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             pipelineService.load(s);
         }
         final PipelineConnections save = connectionsService.save(connection);
-        clusterBus.post(save);
+        clusterBus.post(PipelineConnectionsChangedEvent.create(save.streamId(), save.pipelineIds()));
         return save;
     }
 
