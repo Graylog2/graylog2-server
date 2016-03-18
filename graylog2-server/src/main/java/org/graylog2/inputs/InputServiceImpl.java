@@ -61,19 +61,16 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     private final ExtractorFactory extractorFactory;
     private final MessageInputFactory messageInputFactory;
     private final EventBus clusterEventBus;
-    private final EventBus serverEventBus;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
                             MessageInputFactory messageInputFactory,
-                            @ClusterEventBus EventBus clusterEventBus,
-                            EventBus serverEventBus) {
+                            ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
-        this.serverEventBus = serverEventBus;
     }
 
     @Override
@@ -429,6 +426,5 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     private void publishChange(Object event) {
         this.clusterEventBus.post(event);
-        this.serverEventBus.post(event);
     }
 }

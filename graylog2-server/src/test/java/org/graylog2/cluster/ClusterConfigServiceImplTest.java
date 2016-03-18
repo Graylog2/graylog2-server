@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -36,6 +35,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.jackson.SizeSerializer;
@@ -84,7 +84,7 @@ public class ClusterConfigServiceImplTest {
     @Mock
     private NodeId nodeId;
     @Spy
-    private EventBus clusterEventBus;
+    private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;
     private ClusterConfigService clusterConfigService;
 
@@ -275,7 +275,7 @@ public class ClusterConfigServiceImplTest {
         customConfig.text = "TEST";
 
         final ClusterConfigChangedEventHandler eventHandler = new ClusterConfigChangedEventHandler();
-        clusterEventBus.register(eventHandler);
+        clusterEventBus.registerClusterEventSubscriber(eventHandler);
 
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);

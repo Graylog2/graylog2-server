@@ -27,6 +27,7 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
@@ -68,7 +69,7 @@ public class MongoIndexRangeServiceTest {
     private Indices indices;
     private EventBus localEventBus;
     @Mock
-    private EventBus clusterEventBus;
+    private ClusterEventBus clusterEventBus;
     private MongoIndexRangeService indexRangeService;
 
     @Before

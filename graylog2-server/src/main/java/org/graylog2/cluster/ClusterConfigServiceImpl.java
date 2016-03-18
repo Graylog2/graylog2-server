@@ -63,7 +63,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
                                     final NodeId nodeId,
                                     final ObjectMapper objectMapper,
                                     final ChainingClassLoader chainingClassLoader,
-                                    @ClusterEventBus final EventBus clusterEventBus) {
+                                    final ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
                 nodeId, objectMapper, chainingClassLoader, clusterEventBus);
     }

@@ -65,7 +65,7 @@ public class ClusterEventPeriodical extends Periodical {
                                   final ObjectMapper objectMapper,
                                   final ChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
-                                  @ClusterEventBus final EventBus clusterEventBus) {
+                                  final ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class, mapperProvider.get()),
                 nodeId, objectMapper, chainingClassLoader, serverEventBus, clusterEventBus);
     }
@@ -75,14 +75,14 @@ public class ClusterEventPeriodical extends Periodical {
                            final ObjectMapper objectMapper,
                            final ChainingClassLoader chainingClassLoader,
                            final EventBus serverEventBus,
-                           final EventBus clusterEventBus) {
+                           final ClusterEventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
         this.dbCollection = checkNotNull(dbCollection);
         this.objectMapper = checkNotNull(objectMapper);
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = checkNotNull(serverEventBus);
 
-        checkNotNull(clusterEventBus).register(this);
+        checkNotNull(clusterEventBus).registerClusterEventSubscriber(this);
     }
 
     @VisibleForTesting
@@ -190,14 +190,9 @@ public class ClusterEventPeriodical extends Periodical {
 
     private DBCursor<ClusterEvent> eventCursor(NodeId nodeId) {
         // Resorting to ugly MongoDB Java Client because of https://github.com/devbliss/mongojack/issues/88
-        final DBObject producerClause = new BasicDBObject("producer", new BasicDBObject("$ne", nodeId.toString()));
         final BasicDBList consumersList = new BasicDBList();
         consumersList.add(nodeId.toString());
-        final DBObject consumersClause = new BasicDBObject("consumers", new BasicDBObject("$nin", consumersList));
-        final BasicDBList and = new BasicDBList();
-        and.add(producerClause);
-        and.add(consumersClause);
-        final DBObject query = new BasicDBObject("$and", and);
+        final DBObject query = new BasicDBObject("consumers", new BasicDBObject("$nin", consumersList));
 
         return dbCollection.find(query).sort(DBSort.asc("timestamp"));
     }
