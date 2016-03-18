@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -32,22 +32,24 @@ const LoaderTabs = React.createClass({
       this.refs.messageLoader.submit(this.props.messageId, this.props.index);
     }
   },
-  _formatInputs(state) {
-    const inputs = InputsStore.inputsAsMap(state.inputs);
-    this.setState({inputs: Immutable.Map(inputs)});
-  },
   onMessageLoaded(message) {
-    this.setState({message: message});
+    this.setState({ message: message });
     if (this.props.onMessageLoaded) {
       this.props.onMessageLoaded(message);
     }
+  },
+  _formatInputs(state) {
+    const inputs = InputsStore.inputsAsMap(state.inputs);
+    this.setState({ inputs: Immutable.Map(inputs) });
   },
   loadData() {
     InputsActions.list();
     StreamsStore.listStreams().then((response) => {
       const streams = {};
-      response.forEach((stream) => { streams[stream.id] = stream });
-      this.setState({streams: Immutable.Map(streams)});
+      response.forEach((stream) => {
+        streams[stream.id] = stream;
+      });
+      this.setState({ streams: Immutable.Map(streams) });
     });
   },
   render() {
@@ -59,7 +61,7 @@ const LoaderTabs = React.createClass({
                        streams={this.state.streams}
                        disableTestAgainstStream
                        disableFieldActions={!this.props.customFieldActions}
-                       customFieldActions={this.props.customFieldActions}/>
+                       customFieldActions={this.props.customFieldActions} />
         </Col>
       );
     }
@@ -73,17 +75,17 @@ const LoaderTabs = React.createClass({
     return (
       <div>
         <Tabs defaultActiveKey={defaultActiveKey} animation={false}>
-          <Tab eventKey={1} title="Recent" style={{marginBottom: 10}}>
+          <Tab eventKey={1} title="Recent" style={{ marginBottom: 10 }}>
             <RecentMessageLoader inputs={this.state.inputs}
                                  selectedInputId={this.props.selectedInputId}
-                                 onMessageLoaded={this.onMessageLoaded}/>
+                                 onMessageLoaded={this.onMessageLoaded} />
           </Tab>
-          <Tab eventKey={2} title="Manual" style={{marginBottom: 10}}>
-            <div style={{marginTop: 5, marginBottom: 15}}>
+          <Tab eventKey={2} title="Manual" style={{ marginBottom: 10 }}>
+            <div style={{ marginTop: 5, marginBottom: 15 }}>
               Please provide the id and index of the message that you want to load in this form:
             </div>
 
-            <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText/>
+            <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
           </Tab>
         </Tabs>
         {displayMessage}

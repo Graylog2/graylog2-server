@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {ButtonGroup, Button, Row, Col, DropdownButton, MenuItem} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -7,7 +7,7 @@ import StreamsStore from 'stores/streams/StreamsStore';
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
-import {Spinner, ClipboardButton, Timestamp} from 'components/common';
+import { Spinner, ClipboardButton, Timestamp } from 'components/common';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 import ApiRoutes from 'routing/ApiRoutes';
@@ -49,12 +49,12 @@ const MessageDetail = React.createClass({
     }
   },
   _onStreamsLoaded(streams) {
-    this.setState({allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title)});
+    this.setState({ allStreamsLoaded: true, allStreams: Immutable.List(streams).sortBy(stream => stream.title) });
   },
 
   _inputName(inputId) {
     const input = this.props.inputs.get(inputId);
-    return input ? <span style={{wordBreak: 'break-word'}}>{input.title}</span> : 'deleted input';
+    return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
   },
   _nodeName(nodeId) {
     const node = this.props.nodes.get(nodeId);
@@ -64,14 +64,14 @@ const MessageDetail = React.createClass({
       const nodeURL = ApiRoutes.NodesController.node(nodeId).url;
       nodeInformation = (
         <a href={nodeURL}>
-          <i className="fa fa-code-fork"/>
+          <i className="fa fa-code-fork" />
           &nbsp;
-          <span style={{wordBreak: 'break-word'}}>{node.short_node_id}</span>&nbsp;/&nbsp;<span
-          style={{wordBreak: 'break-word'}}>{node.hostname}</span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span
+          style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
         </a>
       );
     } else {
-      nodeInformation = <span style={{wordBreak: 'break-word'}}>stopped node</span>;
+      nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
     }
     return nodeInformation;
   },
@@ -90,7 +90,7 @@ const MessageDetail = React.createClass({
       return (
         <Row>
           <Col md={12}>
-            <Spinner/>
+            <Spinner />
           </Col>
         </Row>
       );
@@ -104,7 +104,8 @@ const MessageDetail = React.createClass({
         streamList = [];
       }
       streamList.push(
-        <LinkContainer key={stream.id} to={Routes.stream_edit_example(stream.id, this.props.message.index, this.props.message.id)}>
+        <LinkContainer key={stream.id}
+                       to={Routes.stream_edit_example(stream.id, this.props.message.index, this.props.message.id)}>
           <MenuItem>{stream.title}</MenuItem>
         </LinkContainer>
       );
@@ -114,8 +115,9 @@ const MessageDetail = React.createClass({
     const streams = streamIds.map((id) => {
       const stream = this.props.streams.get(id);
       if (stream !== undefined) {
-        return <li key={stream.id}><StreamLink stream={stream}/></li>;
+        return <li key={stream.id}><StreamLink stream={stream} /></li>;
       }
+      return null;
     });
 
     // Legacy
@@ -123,7 +125,8 @@ const MessageDetail = React.createClass({
     if (viaRadio) {
       viaRadio = (
         <span>
-          via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on radio {this._nodeName(this.props.message.source_radio_id)}
+          via <em>{this._inputName(this.props.message.source_radio_input_id)}</em> on
+          radio {this._nodeName(this.props.message.source_radio_id)}
         </span>
       );
     }
@@ -133,8 +136,8 @@ const MessageDetail = React.createClass({
       timestamp = [];
       const rawTimestamp = this.props.message.fields.timestamp;
 
-      timestamp.push(<dt key={'dt-' + rawTimestamp}>Timestamp</dt>);
-      timestamp.push(<dd key={'dd-' + rawTimestamp}><Timestamp dateTime={rawTimestamp}/></dd>);
+      timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
+      timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>);
     }
 
     let receivedBy;
@@ -143,7 +146,8 @@ const MessageDetail = React.createClass({
         <div>
           <dt>Received by</dt>
           <dd>
-            <em>{this._inputName(this.props.message.source_input_id)}</em> on {this._nodeName(this.props.message.source_node_id)}
+            <em>{this._inputName(this.props.message.source_input_id)}</em>
+            on {this._nodeName(this.props.message.source_node_id)}
             { viaRadio && <br /> }
             {viaRadio}
           </dd>
@@ -157,9 +161,9 @@ const MessageDetail = React.createClass({
       <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
                       id="select-stream-dropdown">
         { streamList }
-        { (! streamList && ! this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner"/>
+        { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
           Loading streams</MenuItem> }
-        { (! streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
+        { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
       </DropdownButton>);
 
     return (<div>
@@ -169,7 +173,7 @@ const MessageDetail = React.createClass({
           <ButtonGroup className="pull-right" bsSize="small">
             <Button href={messageUrl}>Permalink</Button>
 
-            <ClipboardButton title="Copy ID" text={this.props.message.id}/>
+            <ClipboardButton title="Copy ID" text={this.props.message.id} />
             <SurroundingSearchButton id={this.props.message.id}
                                      timestamp={this.props.message.timestamp}
                                      searchConfig={this.props.searchConfig}
@@ -177,10 +181,10 @@ const MessageDetail = React.createClass({
             {testAgainstStream}
           </ButtonGroup>
           <h3>
-            <i className="fa fa-envelope"/>
+            <i className="fa fa-envelope" />
             &nbsp;
             <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-              <a href="#" style={{color: '#000'}}>{this.props.message.id}</a>
+              <a href="#" style={{ color: '#000' }}>{this.props.message.id}</a>
             </LinkContainer>
           </h3>
         </Col>
@@ -201,14 +205,14 @@ const MessageDetail = React.createClass({
                 {streams}
               </ul>
             </dd>
-              }
+            }
           </dl>
         </Col>
         <Col md={9}>
           <div ref="messageList">
             <MessageFields message={this.props.message} possiblyHighlight={this.props.possiblyHighlight}
                            disableFieldActions={this.props.disableFieldActions}
-                           customFieldActions={this.props.customFieldActions}/>
+                           customFieldActions={this.props.customFieldActions} />
           </div>
         </Col>
       </Row>
