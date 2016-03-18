@@ -14,6 +14,7 @@ import MessagesStore from 'stores/messages/MessagesStore';
 const ShowMessagePage = React.createClass({
   propTypes: {
     params: PropTypes.object,
+    searchConfig: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(NodesStore), Reflux.listenTo(InputsStore, '_formatInput')],
   getInitialState() {
@@ -49,7 +50,7 @@ const ShowMessagePage = React.createClass({
     if (this._isLoaded()) {
       return (
         <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                     streams={this.state.streams} allStreamsLoaded />
+                     streams={this.state.streams} allStreamsLoaded searchConfig={this.props.searchConfig} />
       );
     } else {
       return <Spinner />;

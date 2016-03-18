@@ -18,6 +18,7 @@ const MessageDetail = React.createClass({
     allStreams: PropTypes.object,
     allStreamsLoaded: PropTypes.bool,
     disableTestAgainstStream: PropTypes.bool,
+    disableSurroundingSearch: PropTypes.bool,
     expandAllRenderAsync: PropTypes.bool,
     showTimestamp: PropTypes.bool,
     disableFieldActions: PropTypes.bool,
@@ -166,6 +167,16 @@ const MessageDetail = React.createClass({
         { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
       </DropdownButton>);
 
+    let surroundingSearchButton;
+    if (!this.props.disableSurroundingSearch) {
+      surroundingSearchButton = (
+        <SurroundingSearchButton id={this.props.message.id}
+                                 timestamp={this.props.message.timestamp}
+                                 searchConfig={this.props.searchConfig}
+                                 messageFields={this.props.message.fields} />
+      );
+    }
+
     return (<div>
 
       <Row className="row-sm">
@@ -174,10 +185,7 @@ const MessageDetail = React.createClass({
             <Button href={messageUrl}>Permalink</Button>
 
             <ClipboardButton title="Copy ID" text={this.props.message.id} />
-            <SurroundingSearchButton id={this.props.message.id}
-                                     timestamp={this.props.message.timestamp}
-                                     searchConfig={this.props.searchConfig}
-                                     messageFields={this.props.message.fields} />
+            {surroundingSearchButton}
             {testAgainstStream}
           </ButtonGroup>
           <h3>
