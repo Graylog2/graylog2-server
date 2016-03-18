@@ -10,8 +10,6 @@ import ConfigurationActions from 'actions/configurations/ConfigurationActions';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 
-import style from '!style!css!components/configurations/ConfigurationStyles.css';
-
 const ConfigurationsPage = React.createClass({
   mixins: [Reflux.connect(ConfigurationsStore)],
 
@@ -22,6 +20,7 @@ const ConfigurationsPage = React.createClass({
   },
 
   componentDidMount() {
+    this.style.use();
     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
     ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
 
@@ -30,6 +29,11 @@ const ConfigurationsPage = React.createClass({
     });
   },
 
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!components/configurations/ConfigurationStyles.css'),
   SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
   MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
 
@@ -130,8 +134,8 @@ const ConfigurationsPage = React.createClass({
           <Col md={12}>
             <h2>Plugins</h2>
             <p className="description">Configuration for installed plugins.</p>
-            <hr className={style.separator} />
-            <div className={style.topMargin}>
+            <hr className="separator" />
+            <div className="top-margin">
               {pluginConfigRows}
             </div>
           </Col>

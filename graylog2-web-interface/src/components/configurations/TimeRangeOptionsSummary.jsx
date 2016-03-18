@@ -1,5 +1,4 @@
 import React from 'react';
-import style from '!style!css!components/configurations/ConfigurationStyles.css';
 
 const TimeRangeOptionsSummary = React.createClass({
   propTypes: {
@@ -20,7 +19,7 @@ const TimeRangeOptionsSummary = React.createClass({
     }
 
     return (
-      <dl className={style.deflist}>
+      <dl className="deflist">
         {timerangeOptionsSummary}
       </dl>
     );

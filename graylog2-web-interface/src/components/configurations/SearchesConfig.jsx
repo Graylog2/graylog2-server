@@ -9,7 +9,6 @@ import {} from 'moment-duration-format';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
-import style from '!style!css!components/configurations/ConfigurationStyles.css';
 
 const SearchesConfig = React.createClass({
   propTypes: {
@@ -165,7 +164,7 @@ const SearchesConfig = React.createClass({
       <div>
         <h2>Search Configuration</h2>
 
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Query time range limit</dt>
           <dd>{limit}</dd>
           <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which

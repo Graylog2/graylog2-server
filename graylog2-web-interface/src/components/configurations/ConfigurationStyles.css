@@ -1,25 +1,21 @@
-:local(.deflist) {
+.deflist {
     margin-top: 10px;
 }
 
-:local(.deflist) dt {
+.deflist dt {
     float: left;
     clear: left;
 }
 
-:local(.deflist) dd {
+.deflist dd {
     margin-left: 150px;
 }
 
-:local(.deflistWide) dd {
-    margin-left: 200px;
-}
-
-:local(.topMargin) {
+.top-margin {
     margin-top: 10px;
 }
 
-hr:local(.separator) {
+hr.separator {
     margin-top: 10px;
     margin-bottom: 5px;
 }

@@ -5,8 +5,6 @@ import { IfPermitted, SortableList } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import naturalSort from 'javascript-natural-sort';
 
-import style from '!style!css!components/configurations/ConfigurationStyles.css';
-
 const MessageProcessorsConfig = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
@@ -137,7 +135,7 @@ const MessageProcessorsConfig = React.createClass({
         <h2>Message Processors Configuration</h2>
         <p>The following message processors are executed in order. Disabled processors will be skipped.</p>
 
-        <Table striped bordered condensed className={style.deflist}>
+        <Table striped bordered condensed className="top-margin">
           <thead>
             <tr>
               <th>#</th>
@@ -165,7 +163,7 @@ const MessageProcessorsConfig = React.createClass({
 
           <h3>Status</h3>
           <p>Change the checkboxes to change the status of a message processor.</p>
-          <Table striped bordered condensed className={style.deflist}>
+          <Table striped bordered condensed className="top-margin">
             <thead>
               <tr>
                 <th>Processor</th>
