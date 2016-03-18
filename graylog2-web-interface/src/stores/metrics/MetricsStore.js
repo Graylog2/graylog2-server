@@ -13,7 +13,7 @@ import SessionActions from 'actions/sessions/SessionActions';
 
 const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions, SessionActions],
-  namespace: 'org.graylog2',
+  namespace: 'org',
   registrations: {},
   globalRegistrations: {},
 
