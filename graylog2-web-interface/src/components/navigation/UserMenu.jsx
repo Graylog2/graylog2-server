@@ -5,6 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 import Routes from 'routing/Routes';
+import history from 'util/History';
 
 const UserMenu = React.createClass({
   propTypes: {
@@ -12,7 +13,9 @@ const UserMenu = React.createClass({
     fullName: React.PropTypes.string.isRequired,
   },
   onLogoutClicked() {
-    SessionActions.logout(SessionStore.getSessionId());
+    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
+      history.pushState(null, Routes.STARTPAGE);
+    });
   },
   render() {
     return (
