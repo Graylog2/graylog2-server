@@ -82,6 +82,10 @@ const Navigation = React.createClass({
     return prefix;
   },
 
+  _shouldAddPluginRoute(pluginRoute) {
+    return !pluginRoute.permissions || (pluginRoute.permissions && this.isPermitted(this.props.permissions, pluginRoute.permissions));
+  },
+
   render() {
     const logoUrl = require('images/toplogo.png');
     const brand = (
@@ -103,21 +107,29 @@ const Navigation = React.createClass({
     const pluginNavigations = PluginStore.exports('navigation')
       .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
-        return (
-          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
-            <NavItem>{pluginRoute.description}</NavItem>
-          </LinkContainer>
-        );
+        if (this._shouldAddPluginRoute(pluginRoute)) {
+          return (
+            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+              <NavItem>{pluginRoute.description}</NavItem>
+            </LinkContainer>
+          );
+        } else {
+          return null;
+        }
       });
 
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
       .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
-        return (
-          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
-            <NavItem>{pluginRoute.description}</NavItem>
-          </LinkContainer>
-        );
+        if (this._shouldAddPluginRoute(pluginRoute)) {
+          return (
+            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+              <NavItem>{pluginRoute.description}</NavItem>
+            </LinkContainer>
+          );
+        } else {
+          return null;
+        }
       });
 
     return (
