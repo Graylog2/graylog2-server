@@ -1,7 +1,7 @@
 import React from 'react';
 import numeral from 'numeral';
 
-var CounterRate = React.createClass({
+const CounterRate = React.createClass({
   propTypes: {
     metric: React.PropTypes.object,
     showTotal: React.PropTypes.bool,
@@ -52,14 +52,14 @@ var CounterRate = React.createClass({
 
   _prefix() {
     if (this.props.prefix) {
-      return this.props.prefix + ' ';
+      return `${this.props.prefix} `;
     }
     return null;
   },
 
   _suffix() {
     if (this.props.suffix) {
-      return ' ' + this.props.suffix;
+      return ` ${this.props.suffix}`;
     }
     return null;
   },
@@ -78,7 +78,7 @@ var CounterRate = React.createClass({
     let rate = null;
     if (this._checkPrevMetric()) {
       const rateNum = (count - this.state.prevMetric.count) / (this.state.nowTs - this.state.prevTs);
-      rate = (<span key='rate' className="number-format">{this._prefix()}{numeral(rateNum).format('0,0')}{this._suffix()}</span>);
+      rate = (<span key="rate" className="number-format">{this._prefix()}{numeral(rateNum).format('0,0')}{this._suffix()}</span>);
     } else {
       return this._placeholder();
     }
@@ -89,9 +89,9 @@ var CounterRate = React.createClass({
 
     return (<span>
       {rate}
-      {this.props.showTotal && <span key='absolute' className="number-format"> ({numeral(count).format('0')} total)</span>}
+      {this.props.showTotal && <span key="absolute" className="number-format"> ({numeral(count).format('0')} total)</span>}
       </span>);
-  }
+  },
 });
 
 export default CounterRate;

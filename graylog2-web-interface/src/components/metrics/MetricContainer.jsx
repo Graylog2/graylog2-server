@@ -1,25 +1,18 @@
 import React from 'react';
-import String from 'string';
-
-import { Spinner } from 'components/common';
 
 import InjectStore from 'injection/InjectStore';
 import InjectActions from 'injection/InjectActions';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-var MetricContainer = React.createClass({
+const MetricContainer = React.createClass({
   propTypes: {
     name: React.PropTypes.string.isRequired,
-    zeroOnMissing: React.PropTypes.bool
+    zeroOnMissing: React.PropTypes.bool,
+    children: React.PropTypes.array.isRequired,
   },
   mixins: [InjectActions('Metrics'), InjectStore('Metrics')],
-  componentWillMount() {
-    this.MetricsActions.addGlobal(this.props.name);
-  },
-  componentWillUnmount() {
-    this.MetricsActions.removeGlobal(this.props.name);
-  },
+
   getDefaultProps() {
     return {
       zeroOnMissing: true,
@@ -30,6 +23,15 @@ var MetricContainer = React.createClass({
     return {
     };
   },
+
+  componentWillMount() {
+    this.MetricsActions.addGlobal(this.props.name);
+  },
+
+  componentWillUnmount() {
+    this.MetricsActions.removeGlobal(this.props.name);
+  },
+
   render() {
     if (!this.state.metrics) {
       return (<span>Loading...</span>);
@@ -45,12 +47,12 @@ var MetricContainer = React.createClass({
     }
     return (<div>
       {
-        React.Children.map(this.props.children, function (child) {
-          return React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput }})
+        React.Children.map(this.props.children, (child) => {
+          return React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } });
         })
       }
     </div>);
-  }
+  },
 });
 
 export default MetricContainer;
