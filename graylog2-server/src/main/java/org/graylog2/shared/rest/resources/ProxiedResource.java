@@ -77,7 +77,7 @@ public abstract class ProxiedResource extends RestResource {
                         return Optional.empty();
                     }
                 } catch (IOException e) {
-                    LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, caught exception:", e);
+                    LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, caught exception: {} ({})", e.getMessage(), e.getClass());
                     return Optional.empty();
                 }
             }));
