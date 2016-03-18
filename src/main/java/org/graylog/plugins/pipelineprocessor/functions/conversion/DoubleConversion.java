@@ -30,7 +30,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class DoubleConversion extends AbstractFunction<Double> {
 
-    public static final String NAME = "todouble";
+    public static final String NAME = "to_double";
 
     private static final String VALUE = "value";
     private static final String DEFAULT = "default";

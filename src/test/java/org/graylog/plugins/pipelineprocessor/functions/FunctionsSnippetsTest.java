@@ -293,7 +293,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         assertThat(context).isNotNull();
         assertThat(context.hasEvaluationErrors()).isTrue();
-        assertThat(Iterables.getLast(context.evaluationErrors()).toString()).isEqualTo("In call to function 'toip' at 5:28 an exception was thrown: 'null' is not an IP string literal.");
+        assertThat(Iterables.getLast(context.evaluationErrors()).toString()).isEqualTo("In call to function 'to_ip' at 5:28 an exception was thrown: 'null' is not an IP string literal.");
     }
 
     @Test

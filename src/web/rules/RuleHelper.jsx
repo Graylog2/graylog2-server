@@ -11,7 +11,7 @@ when
   has_field("transaction_date")
 then
   // the following date format assumes there's no time zone in the string
-  let new_date = parse_date(tostring($message.transaction_date), "yyyy-MM-dd HH:mm:ss");
+  let new_date = parse_date(to_string($message.transaction_date), "yyyy-MM-dd HH:mm:ss");
   set_field("transaction_year", new_date.year);
 end`,
 
@@ -46,19 +46,19 @@ end`,
                     </thead>
                     <tbody>
                     <tr>
-                      <td><code>tobool(any)</code></td>
+                      <td><code>to_bool(any)</code></td>
                       <td>Converts the single parameter to a boolean value using its string value.</td>
                     </tr>
                     <tr>
-                      <td><code>todouble(any, [default: double])</code></td>
+                      <td><code>to_double(any, [default: double])</code></td>
                       <td>Converts the first parameter to a double floating point value.</td>
                     </tr>
                     <tr>
-                      <td><code>tolong(any, [default: long])</code></td>
+                      <td><code>to_long(any, [default: long])</code></td>
                       <td>Converts the first parameter to a long integer value.</td>
                     </tr>
                     <tr>
-                      <td><code>tostring(any, [default: string])</code></td>
+                      <td><code>to_string(any, [default: string])</code></td>
                       <td>Converts the first parameter to its string representation.</td>
                     </tr>
                     <tr>
@@ -103,7 +103,7 @@ end`,
                       <td>Parse a string into a JSON tree.</td>
                     </tr>
                     <tr>
-                      <td><code>toip(ip: string)</code></td>
+                      <td><code>to_ip(ip: string)</code></td>
                       <td>Converts the given string to an IP object.</td>
                     </tr>
                     <tr>

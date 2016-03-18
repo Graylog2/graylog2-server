@@ -56,7 +56,7 @@ public class PipelineInterpreterTest {
                                "title",
                                "description",
                                "rule \"creates message\"\n" +
-                                       "when tostring($message.message) == \"original message\"\n" +
+                                       "when to_string($message.message) == \"original message\"\n" +
                                        "then\n" +
                                        "  create_message(\"derived message\");\n" +
                                        "end",

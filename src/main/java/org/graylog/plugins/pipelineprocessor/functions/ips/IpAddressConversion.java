@@ -31,7 +31,7 @@ import static com.google.common.collect.ImmutableList.of;
 
 public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
-    public static final String NAME = "toip";
+    public static final String NAME = "to_ip";
     private final ParameterDescriptor<Object, Object> ipParam;
     private final ParameterDescriptor<String, String> defaultParam;
 
@@ -55,7 +55,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
             try {
                 return new IpAddress(InetAddresses.forString(defaultValue.get()));
             } catch (IllegalFormatException e1) {
-                log.warn("Parameter `default` for toip() is not a valid IP address: {}", defaultValue.get());
+                log.warn("Parameter `default` for to_ip() is not a valid IP address: {}", defaultValue.get());
                 throw e1;
             }
         }

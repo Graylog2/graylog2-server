@@ -11,5 +11,5 @@ then
     trigger_test();
     let date = parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ");
     set_field("year", date.year);
-    set_field("timezone", tostring(date.zone));
+    set_field("timezone", to_string(date.zone));
 end

@@ -33,7 +33,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 
 public class StringConversion extends AbstractFunction<String> {
 
-    public static final String NAME = "tostring";
+    public static final String NAME = "to_string";
 
     // this is per-thread to save an expensive concurrent hashmap access
     private final ThreadLocal<LinkedHashMap<Class<?>, Class<?>>> declaringClassCache;
