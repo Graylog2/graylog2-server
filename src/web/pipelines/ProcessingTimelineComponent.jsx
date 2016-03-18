@@ -9,14 +9,19 @@ import { DataTable, Spinner } from 'components/common';
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
 
-import {} from './ProcessingTimelineComponent.css';
-
 const ProcessingTimelineComponent = React.createClass({
   mixins: [Reflux.connect(PipelinesStore)],
 
   componentDidMount() {
+    this.style.use();
     PipelinesActions.list();
   },
+
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!./ProcessingTimelineComponent.css'),
 
   _calculateUsedStages(pipelines) {
     return pipelines

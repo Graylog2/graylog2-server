@@ -6,14 +6,22 @@ import Stage from './Stage';
 import StageForm from './StageForm';
 import PipelineDetails from './PipelineDetails';
 
-import {} from './Pipeline.css';
-
 const Pipeline = React.createClass({
   propTypes: {
     pipeline: PropTypes.object.isRequired,
     onStagesChange: PropTypes.func.isRequired,
     onPipelineChange: PropTypes.func.isRequired,
   },
+
+  componentDidMount() {
+    this.style.use();
+  },
+
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!./Pipeline.css'),
 
   _saveStage(stage, callback) {
     const newStages = this.props.pipeline.stages.slice();
