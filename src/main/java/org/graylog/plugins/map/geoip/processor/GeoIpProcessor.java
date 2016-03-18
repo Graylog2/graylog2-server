@@ -22,7 +22,6 @@ import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog.plugins.map.geoip.GeoIpResolverEngine;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -61,7 +60,7 @@ public class GeoIpProcessor implements MessageProcessor {
     @Inject
     public GeoIpProcessor(ClusterConfigService clusterConfigService,
                           @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                          @ClusterEventBus EventBus clusterEventBus,
+                          EventBus eventBus,
                           MetricRegistry metricRegistry) {
         this.clusterConfigService = clusterConfigService;
         this.scheduler = scheduler;
@@ -72,7 +71,7 @@ public class GeoIpProcessor implements MessageProcessor {
         this.config = new AtomicReference<>(config);
         this.filterEngine = new AtomicReference<>(new GeoIpResolverEngine(config, metricRegistry));
 
-        clusterEventBus.register(this);
+        eventBus.register(this);
     }
 
     public Messages process(Messages messages) {
