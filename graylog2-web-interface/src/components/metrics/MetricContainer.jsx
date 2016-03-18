@@ -35,11 +35,11 @@ var MetricContainer = React.createClass({
       return (<span>Loading...</span>);
     }
     const fullName = this.props.name;
-    const throughput = Object.keys(this.state.metrics)
+    let throughput = Object.keys(this.state.metrics)
       .map(nodeId => MetricsExtractor.getValuesForNode(this.state.metrics[nodeId], { throughput: fullName }))
-      .reduce((one, two) => one.throughput + two.throughput);
+      .reduce((one, two) => (one.throughput || 0) + (two.throughput || 0));
     if (this.props.zeroOnMissing && (!throughput || !throughput.throughput)) {
-      throughput["throughput"] = 0;
+      throughput = { throughput: 0 };
     }
     return (<div>
       {
