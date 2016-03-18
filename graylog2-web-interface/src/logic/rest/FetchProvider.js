@@ -2,6 +2,8 @@ import request from 'superagent-bluebird-promise';
 import SessionStore from 'stores/sessions/SessionStore';
 import SessionActions from 'actions/sessions/SessionActions';
 import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
+import Routes from 'routing/Routes';
+import history from 'util/History';
 
 export class FetchError extends Error {
   constructor(message, additional) {
@@ -51,6 +53,11 @@ export class Builder {
       }, (error) => {
         if (SessionStore.isLoggedIn() && error.status === 401) {
           SessionActions.logout(SessionStore.getSessionId());
+        }
+
+        // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
+        if (SessionStore.isLoggedIn() && error.status === 403) {
+          history.replaceState(null, Routes.STARTPAGE);
         }
 
         if (error.originalError && !error.originalError.status) {
