@@ -129,6 +129,10 @@ public class ServerStatus {
         publishLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
     }
 
+    public void overrideLoadBalancerThrottled() {
+        publishLifecycle(Lifecycle.OVERRIDE_LB_THROTTLED);
+    }
+
     public void awaitRunning(final Runnable runnable) {
         LOG.debug("Waiting for server to enter RUNNING state");
         Uninterruptibles.awaitUninterruptibly(runningLatch);

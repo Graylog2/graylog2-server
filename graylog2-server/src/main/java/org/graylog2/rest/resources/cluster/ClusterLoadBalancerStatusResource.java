@@ -66,7 +66,7 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
     @RequiresAuthentication
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @ApiOperation(value = "Override load balancer status of this graylog2-server node. Next lifecycle " +
-            "change will override it again to its default. Set to ALIVE or DEAD.")
+            "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
     public void override(@ApiParam(name = "nodeId", value = "The id of the node whose LB status will be changed", required = true)
                          @PathParam("nodeId") String nodeId,

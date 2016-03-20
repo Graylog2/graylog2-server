@@ -105,6 +105,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
+    @Parameter(value = "lb_throttle_threshold_percentage", validator = PositiveIntegerValidator.class)
+    private int loadBalancerThrottleThresholdPercentage = 100; // 100% or over is effectively disabled
+
     @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
@@ -314,4 +317,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Set<IpSubnet> getTrustedProxies() { return trustedProxies; }
+
+    public int getLoadBalancerRequestThrottleJournalUsage() { return loadBalancerThrottleThresholdPercentage; }
+
 }

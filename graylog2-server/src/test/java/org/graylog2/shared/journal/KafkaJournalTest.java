@@ -20,10 +20,14 @@ import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.InstantMillisProvider;
+import org.graylog2.plugin.ServerStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -34,6 +38,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -51,19 +58,32 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class KafkaJournalTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private ScheduledThreadPoolExecutor scheduler;
     private File journalDirectory;
+    private File tempFile;
+
+    @Mock private Configuration configuration;
+    @Mock private EventBus eventBus;
+    private ServerStatus serverStatus;
 
     @Before
     public void setUp() throws IOException {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.prestartCoreThread();
         journalDirectory = temporaryFolder.newFolder();
+
+        // For Configuration and ServerStatus
+        tempFile = File.createTempFile("kafka-journal-test", "node-id");
+        tempFile.deleteOnExit();
+        when(configuration.getNodeIdFile()).thenReturn(tempFile.getPath());
+        serverStatus = new ServerStatus(configuration, Sets.newHashSet(ServerStatus.Capability.MASTER), eventBus);
     }
 
     @After
@@ -81,7 +101,9 @@ public class KafkaJournalTest {
                 Duration.standardHours(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);
@@ -104,7 +126,9 @@ public class KafkaJournalTest {
                 Duration.standardHours(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message1".getBytes(UTF_8);
@@ -158,7 +182,9 @@ public class KafkaJournalTest {
                 Duration.standardDays(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
 
         createBulkChunks(journal, segmentSize, 3);
 
@@ -185,7 +211,9 @@ public class KafkaJournalTest {
                 Duration.standardDays(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -219,7 +247,9 @@ public class KafkaJournalTest {
                     Duration.standardMinutes(1),
                     1_000_000,
                     Duration.standardMinutes(1),
-                    new MetricRegistry());
+                    100,
+                    new MetricRegistry(),
+                    serverStatus);
             final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
             assertTrue(messageJournalDir.exists());
 
@@ -271,7 +301,9 @@ public class KafkaJournalTest {
                 Duration.standardDays(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -319,6 +351,8 @@ public class KafkaJournalTest {
                 Duration.standardHours(1),
                 1_000_000,
                 Duration.standardMinutes(1),
-                new MetricRegistry());
+                100,
+                new MetricRegistry(),
+                serverStatus);
     }
 }

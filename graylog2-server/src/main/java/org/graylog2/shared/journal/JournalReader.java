@@ -111,6 +111,9 @@ public class JournalReader extends AbstractExecutionThreadService {
             case OVERRIDE_LB_ALIVE:
                 // don't care, keep processing journal
                 break;
+            case OVERRIDE_LB_THROTTLED:
+                // don't care, keep processing journal
+                break;
         }
     }
 
