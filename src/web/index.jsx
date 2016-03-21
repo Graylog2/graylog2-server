@@ -16,6 +16,6 @@ PluginStore.register(new PluginManifest(packageJson, {
   ],
 
   systemnavigation: [
-    { path: '/system/pipelines', description: 'Pipelines' },
+    { path: '/system/pipelines', description: 'Pipelines', permissions: 'INPUTS_CREATE' },
   ],
 }));
