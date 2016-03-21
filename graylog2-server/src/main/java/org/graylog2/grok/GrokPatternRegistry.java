@@ -22,7 +22,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import oi.thekraken.grok.api.Grok;
-import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class GrokPatternRegistry {
     private final LoadingCache<String, Grok> grokCache;
 
     @Inject
-    public GrokPatternRegistry(@ClusterEventBus EventBus clusterBus,
+    public GrokPatternRegistry(EventBus serverEventBus,
                                GrokPatternService grokPatternService,
                                @Named("daemonScheduler") ScheduledExecutorService daemonExecutor) {
         this.grokPatternService = grokPatternService;
@@ -64,13 +63,13 @@ public class GrokPatternRegistry {
         // trigger initial loading
         reload();
 
-        clusterBus.register(this);
+        serverEventBus.register(this);
     }
 
     @Subscribe
     public void grokPatternsChanged(GrokPatternsChangedEvent event) {
         // for now we simply reload everything and don't care what exactly has changed
-        daemonExecutor.execute(this::reload);
+        daemonExecutor.schedule(this::reload, 0, TimeUnit.SECONDS);
     }
 
     public Grok cachedGrokForPattern(String pattern) {
