@@ -84,14 +84,8 @@ class DateTime {
     return this;
   }
 
-  // Returns the relative time from now or to now, depending if the date is before or after now.
   toRelativeString() {
-    const now = DateTime.now();
-    if (this.dateTime.isBefore(now) || this.dateTime.isSame(now)) {
-      return this.dateTime.fromNow();
-    } else {
-      return this.dateTime.toNow();
-    }
+    return this.dateTime.fromNow();
   }
 
   // Returns internal moment object
