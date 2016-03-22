@@ -115,6 +115,7 @@ public class GrokResource extends RestResource {
 
         final Set<String> updatedPatternNames = Sets.newHashSet();
         for (final GrokPatternSummary pattern : patternList.patterns()) {
+            updatedPatternNames.add(pattern.name);
             if (!grokPatternService.validate(GrokPatterns.fromSummary(pattern))) {
                 throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
             }
@@ -137,12 +138,13 @@ public class GrokResource extends RestResource {
 
         final GrokPattern oldPattern = grokPatternService.load(patternId);
 
-        final Set<String> updatedNames = Sets.newHashSet(pattern.name, oldPattern.name);
+        final Set<String> deletedNames = Sets.newHashSet(oldPattern.name);
+        final Set<String> updatedNames = Sets.newHashSet(pattern.name);
 
         oldPattern.name = pattern.name;
         oldPattern.pattern = pattern.pattern;
 
-        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), updatedNames));
+        clusterBus.post(GrokPatternsChangedEvent.create(deletedNames, updatedNames));
         return grokPatternService.save(oldPattern);
     }
 
