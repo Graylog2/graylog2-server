@@ -4,8 +4,9 @@ import { Col } from 'react-bootstrap';
 import String from 'string';
 import numeral from 'numeral';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
 import MetricsStore from 'stores/metrics/MetricsStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { Spinner } from 'components/common';
 

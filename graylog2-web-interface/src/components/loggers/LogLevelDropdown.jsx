@@ -3,7 +3,9 @@ import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import String from 'string';
 
-import LoggersActions from 'actions/system/LoggersActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const LoggersActions = ActionsProvider.getActions('Loggers');
+
 import LoggersStore from 'stores/system/LoggersStore';
 
 const LogLevelDropdown = React.createClass({

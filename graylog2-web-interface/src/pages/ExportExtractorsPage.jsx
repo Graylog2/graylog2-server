@@ -5,7 +5,8 @@ import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
 import ExportExtractors from 'components/extractors/ExportExtractors';
 
-import InputsActions from 'actions/inputs/InputsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
 import InputsStore from 'stores/inputs/InputsStore';
 
 const ExportExtractorsPage = React.createClass({

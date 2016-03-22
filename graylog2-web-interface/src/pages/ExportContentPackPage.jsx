@@ -7,14 +7,16 @@ import UserNotification from 'util/UserNotification';
 
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
-import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import OutputsStore from 'stores/outputs/OutputsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
-import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
 // eslint-disable-next-line no-unused-vars
 import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
+const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 import PageHeader from 'components/common/PageHeader';
 

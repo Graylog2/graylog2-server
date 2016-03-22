@@ -2,7 +2,8 @@ import React from 'react';
 import { Row, Col, Input, Button } from 'react-bootstrap';
 import jQuery from 'jquery';
 
-import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 
 import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory';
 

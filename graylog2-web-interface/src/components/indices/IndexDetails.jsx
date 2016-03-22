@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 
-import { IndicesActions, IndexRangesActions } from 'actions/indices';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndicesActions = ActionsProvider.getActions('Indices');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 

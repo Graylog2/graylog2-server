@@ -11,7 +11,8 @@ import Routes from 'routing/Routes';
 
 import InputTypesStore from 'stores/inputs/InputTypesStore';
 
-import InputsActions from 'actions/inputs/InputsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 

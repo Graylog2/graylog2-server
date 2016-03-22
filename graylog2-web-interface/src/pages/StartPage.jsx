@@ -9,7 +9,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import GettingStartedStore from 'stores/gettingstarted/GettingStartedStore';
 
-import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = React.createClass({
   propTypes: {

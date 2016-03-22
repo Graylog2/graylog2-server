@@ -5,7 +5,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import IndexRangesActions from 'actions/indices/IndexRangesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 const IndexRangesStore = Reflux.createStore({
   listenables: [IndexRangesActions],

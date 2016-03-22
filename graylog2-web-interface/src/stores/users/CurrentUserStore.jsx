@@ -3,9 +3,11 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
 import StartpageStore from 'stores/users/StartpageStore';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
 
 const CurrentUserStore = Reflux.createStore({
   listenables: [SessionActions],

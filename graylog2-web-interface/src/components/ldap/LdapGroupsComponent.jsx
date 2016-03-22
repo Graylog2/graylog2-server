@@ -8,8 +8,10 @@ import { Spinner } from 'components/common';
 
 import Routes from 'routing/Routes';
 
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
+
 import RolesStore from 'stores/users/RolesStore';
-import LdapGroupsActions from 'actions/ldap/LdapGroupsActions';
 import LdapGroupsStore from 'stores/ldap/LdapGroupsStore';
 
 const LdapGroupsComponent = React.createClass({

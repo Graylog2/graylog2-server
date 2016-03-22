@@ -9,7 +9,8 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const JvmHeapUsage = React.createClass({
   propTypes: {

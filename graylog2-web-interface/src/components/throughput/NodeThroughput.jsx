@@ -8,7 +8,8 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 // TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
 const NodeThroughput = React.createClass({

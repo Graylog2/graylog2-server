@@ -3,7 +3,9 @@ import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 
-import AlertsActions from 'actions/alerts/AlertsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertsActions = ActionsProvider.getActions('Alerts');
+
 import AlertsStore from 'stores/alerts/AlertsStore';
 import { PaginatedList, Spinner } from 'components/common';
 import AlertsTable from 'components/alerts/AlertsTable';

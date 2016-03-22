@@ -4,7 +4,8 @@ import { markdown } from 'markdown';
 
 import UserNotification from 'util/UserNotification';
 
-import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 const ConfigurationBundlePreview = React.createClass({
   _confirmDeletion() {

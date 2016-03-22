@@ -6,7 +6,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import MetricsStore from 'stores/metrics/MetricsStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';

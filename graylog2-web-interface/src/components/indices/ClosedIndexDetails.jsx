@@ -1,7 +1,8 @@
 import React from 'react';
 import { Alert, Button } from 'react-bootstrap';
 
-import { IndicesActions } from 'actions/indices';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndicesActions = ActionsProvider.getActions('Indices');
 
 import { IndexRangeSummary } from 'components/indices';
 

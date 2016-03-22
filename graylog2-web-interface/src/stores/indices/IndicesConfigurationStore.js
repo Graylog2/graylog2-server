@@ -4,7 +4,8 @@ import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-import IndicesConfigurationActions from 'actions/indices/IndicesConfigurationActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndicesConfigurationActions = ActionsProvider.getActions('IndicesConfiguration');
 
 const urlPrefix = '/system/indices';
 

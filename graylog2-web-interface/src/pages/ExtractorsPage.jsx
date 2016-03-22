@@ -10,11 +10,12 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import NodesActions from 'actions/nodes/NodesActions';
 
-import InputsActions from 'actions/inputs/InputsActions';
 import InputsStore from 'stores/inputs/InputsStore';
 import NodesStore from 'stores/nodes/NodesStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const NodesActions = ActionsProvider.getActions('Nodes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 const ExtractorsPage = React.createClass({
   propTypes: {

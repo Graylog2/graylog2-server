@@ -13,8 +13,10 @@ import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 
 import RolesStore from 'stores/users/RolesStore';
-import LdapActions from 'actions/ldap/LdapActions';
 import LdapStore from 'stores/ldap/LdapStore';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapActions = ActionsProvider.getActions('Ldap');
 
 const HelperText = {
   activeDirectory: {

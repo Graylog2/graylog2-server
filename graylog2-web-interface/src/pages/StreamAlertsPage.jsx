@@ -5,7 +5,8 @@ import { Row, Col, Button } from 'react-bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
-import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 
 import StreamsStore from 'stores/streams/StreamsStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';

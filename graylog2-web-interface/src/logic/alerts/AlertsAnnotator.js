@@ -1,4 +1,6 @@
-import AlertsActions from 'actions/alerts/AlertsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertsActions = ActionsProvider.getActions('Alerts');
+
 import AlertsStore from 'stores/alerts/AlertsStore';
 import StreamStore from 'stores/streams/StreamsStore';
 import DateTime from 'logic/datetimes/DateTime';

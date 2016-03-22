@@ -4,7 +4,8 @@ import {Row, Col, Modal, Button} from 'react-bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SortableList from 'components/common/SortableList';
 
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 const ExtractorSortModal = React.createClass({
   propTypes: {

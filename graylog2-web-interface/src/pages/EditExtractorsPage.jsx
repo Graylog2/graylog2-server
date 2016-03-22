@@ -9,9 +9,10 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-import InputsActions from 'actions/inputs/InputsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 import InputsStore from 'stores/inputs/InputsStore';
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 import UniversalSearchstore from 'stores/search/UniversalSearchStore';
 

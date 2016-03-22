@@ -4,8 +4,9 @@ import URLUtils from 'util/URLUtils';
 import fetch, { Builder, FetchError } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 
-import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
-import SessionActions from 'actions/sessions/SessionActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
+const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 import SessionStore from 'stores/sessions/SessionStore';
 

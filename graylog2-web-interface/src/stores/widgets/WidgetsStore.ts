@@ -7,7 +7,9 @@ import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
-const WidgetsActions = require('actions/widgets/WidgetsActions');
+
+const ActionsProvider = require('injection/ActionsProvider');
+const WidgetsActions = ActionsProvider.getActions('Widgets');
 
 interface Widget {
     id: string;

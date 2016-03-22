@@ -8,8 +8,9 @@ import fetch from 'logic/rest/FetchProvider';
 import NodesStore from 'stores/nodes/NodesStore';
 import SessionStore from 'stores/sessions/SessionStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
-import SessionActions from 'actions/sessions/SessionActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions, SessionActions],

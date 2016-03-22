@@ -4,7 +4,8 @@ import Reflux from 'reflux';
 import MetricsStore from 'stores/metrics/MetricsStore';
 import NodesStore from 'stores/nodes/NodesStore';
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';

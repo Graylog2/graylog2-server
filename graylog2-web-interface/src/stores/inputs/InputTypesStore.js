@@ -4,7 +4,8 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
-import InputTypesActions from 'actions/inputs/InputTypesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
 const InputTypesStore = Reflux.createStore({
   listenables: [InputTypesActions],

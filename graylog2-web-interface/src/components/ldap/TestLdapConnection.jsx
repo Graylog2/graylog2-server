@@ -1,7 +1,8 @@
 import React, {PropTypes} from 'react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 
-import LdapActions from 'actions/ldap/LdapActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapActions = ActionsProvider.getActions('Ldap');
 
 const TestLdapConnection = React.createClass({
   propTypes: {

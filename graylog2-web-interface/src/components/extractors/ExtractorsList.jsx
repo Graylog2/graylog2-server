@@ -9,7 +9,8 @@ import EntityList from 'components/common/EntityList';
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 
 const ExtractorsList = React.createClass({

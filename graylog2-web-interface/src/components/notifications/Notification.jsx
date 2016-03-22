@@ -4,7 +4,8 @@ import {Timestamp} from 'components/common';
 
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 
-import NotificationsActions from 'actions/notifications/NotificationsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const NotificationsActions = ActionsProvider.getActions('Notifications');
 
 const Notification = React.createClass({
   propTypes: {

@@ -6,7 +6,8 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
-import SavedSearchesActions from 'actions/search/SavedSearchesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 import SearchStore from 'stores/search/SearchStore';
 

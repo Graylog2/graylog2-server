@@ -3,7 +3,8 @@ import { Row, Col, Badge, Button } from 'react-bootstrap';
 
 import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory';
 
-import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 
 import UnknownAlertCondition from 'components/alertconditions/UnknownAlertCondition';
 import AlertConditionForm from 'components/alertconditions/AlertConditionForm';

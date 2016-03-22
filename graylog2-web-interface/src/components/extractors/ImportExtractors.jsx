@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react';
 import {Row, Col, Input, Button} from 'react-bootstrap';
 
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
 import UserNotification from 'util/UserNotification';
 
 const ImportExtractors = React.createClass({

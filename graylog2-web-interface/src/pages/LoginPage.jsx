@@ -1,8 +1,10 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Input, ButtonInput, Alert } from 'react-bootstrap';
-import SessionActions from 'actions/sessions/SessionActions';
 import SessionStore from 'stores/sessions/SessionStore';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
 
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';

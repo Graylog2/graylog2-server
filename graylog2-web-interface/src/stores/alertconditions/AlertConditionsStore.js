@@ -5,7 +5,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import AlertConditionsActions from 'actions/alertconditions/AlertConditionsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 
 const AlertConditionsStore = Reflux.createStore({
   listenables: AlertConditionsActions,

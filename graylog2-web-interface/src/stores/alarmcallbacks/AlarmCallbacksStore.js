@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 
-import AlarmCallbacksActions from 'actions/alarmcallbacks/AlarmCallbacksActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';

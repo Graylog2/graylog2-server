@@ -6,7 +6,9 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Pluralize } from 'components/common';
 
 import RefreshStore from 'stores/tools/RefreshStore';
-import RefreshActions from 'actions/tools/RefreshActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const RefreshControls = React.createClass({
   mixins: [Reflux.connect(RefreshStore, 'refresh')],

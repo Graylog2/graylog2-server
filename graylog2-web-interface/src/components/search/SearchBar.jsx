@@ -12,7 +12,8 @@ import DocsHelper from 'util/DocsHelper';
 import SearchStore from 'stores/search/SearchStore';
 import ToolsStore from 'stores/tools/ToolsStore';
 
-import SavedSearchesActions from 'actions/search/SavedSearchesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 import UIUtils from 'util/UIUtils';
 

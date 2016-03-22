@@ -1,6 +1,7 @@
 import React from 'react';
 
-import AlarmCallbacksActions from 'actions/alarmcallbacks/AlarmCallbacksActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import { IfPermitted, Spinner } from 'components/common';
 import { AlarmCallbackList, CreateAlarmCallbackButton } from 'components/alarmcallbacks';

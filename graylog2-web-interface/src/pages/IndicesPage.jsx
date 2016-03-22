@@ -3,9 +3,12 @@ import Reflux from 'reflux';
 import { Alert, Col, Row } from 'react-bootstrap';
 import numeral from 'numeral';
 
-import IndexerClusterActions from 'actions/indexers/IndexerClusterActions';
-import { DeflectorActions, IndexRangesActions, IndicesActions } from 'actions/indices';
-import MessageCountsActions from 'actions/messages/MessageCountsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndexerClusterActions = ActionsProvider.getActions('IndexerCluster');
+const DeflectorActions = ActionsProvider.getActions('Deflector');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+const IndicesActions = ActionsProvider.getActions('Indices');
+const MessageCountsActions = ActionsProvider.getActions('MessageCounts');
 
 import IndexerClusterStore from 'stores/indexers/IndexerClusterStore';
 import { DeflectorStore, IndexRangesStore, IndicesStore } from 'stores/indices';

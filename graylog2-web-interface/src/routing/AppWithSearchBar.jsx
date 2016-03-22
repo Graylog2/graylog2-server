@@ -11,8 +11,9 @@ import CurrentUserStore from 'stores/users/CurrentUserStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
 
-import SavedSearchesActions from 'actions/search/SavedSearchesActions';
-import ConfigurationActions from 'actions/configurations/ConfigurationActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const AppWithSearchBar = React.createClass({
   propTypes: {

@@ -5,7 +5,8 @@ import Immutable from 'immutable';
 import StreamsStore from 'stores/streams/StreamsStore';
 import SearchStore from 'stores/search/SearchStore';
 
-import RefreshActions from 'actions/tools/RefreshActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const RefreshActions = ActionsProvider.getActions('Refresh');
 
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 

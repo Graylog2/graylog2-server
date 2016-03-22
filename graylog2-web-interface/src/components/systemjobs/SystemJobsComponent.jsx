@@ -4,7 +4,8 @@ import { Col, Row } from 'react-bootstrap';
 
 import SystemJobsStore from 'stores/systemjobs/SystemJobsStore';
 
-import SystemJobsActions from 'actions/systemjobs/SystemJobsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';

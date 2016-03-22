@@ -11,7 +11,9 @@ import Routes from 'routing/Routes';
 
 import ExtractorsStore from 'stores/extractors/ExtractorsStore';
 import InputsStore from 'stores/inputs/InputsStore';
-import InputsActions from 'actions/inputs/InputsActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
 import MessagesStore from 'stores/messages/MessagesStore';
 
 const CreateExtractorsPage = React.createClass({

@@ -5,7 +5,9 @@ import UserNotification from 'util/UserNotification';
 import URI from 'urijs';
 
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
-import HistogramDataActions from 'actions/sources/HistogramDataActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const HistogramDataActions = ActionsProvider.getActions('HistogramData');
 
 const HistogramDataStore = Reflux.createStore({
   listenables: [HistogramDataActions],
