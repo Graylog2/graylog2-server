@@ -49,4 +49,4 @@ const FieldQuickValuesStore = {
     },
 };
 
-export default FieldQuickValuesStore;
+module.exports = FieldQuickValuesStore;

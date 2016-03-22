@@ -9,18 +9,18 @@ import UsersStore = require('stores/users/UsersStore');
 import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
-export interface Role {
+interface Role {
   name: string;
   description: string;
   permissions: string[];
 }
 
-export interface RoleMembership {
+interface RoleMembership {
   role: string;
   users: UsersStore.User[];
 }
 
-export const RolesStore = {
+const RolesStore = {
   loadRoles(): Promise<string[]> {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
@@ -92,4 +92,4 @@ export const RolesStore = {
   }
 };
 
-export default RolesStore;
+module.exports = RolesStore;

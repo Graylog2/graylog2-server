@@ -102,4 +102,4 @@ const WidgetsStore = Reflux.createStore({
     },
 });
 
-export default WidgetsStore;
+module.exports = WidgetsStore;

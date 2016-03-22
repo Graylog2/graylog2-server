@@ -81,4 +81,4 @@ const GrokPatternsStore = {
   },
 };
 
-export default GrokPatternsStore;
+module.exports = GrokPatternsStore;

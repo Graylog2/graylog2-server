@@ -32,7 +32,7 @@ export interface ChangePasswordRequest {
   password: string;
 }
 
-const UsersStore = {
+export const UsersStore = {
   editUserFormUrl(username: string) {
     return URLUtils.qualifyUrl("/system/users/edit/" + username);
   },
@@ -106,4 +106,4 @@ const UsersStore = {
   },
 };
 
-export default UsersStore;
+module.exports = UsersStore;

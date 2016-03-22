@@ -61,4 +61,4 @@ const FieldStatisticsStore = {
     }
 };
 
-export default FieldStatisticsStore;
+module.exports = FieldStatisticsStore;
