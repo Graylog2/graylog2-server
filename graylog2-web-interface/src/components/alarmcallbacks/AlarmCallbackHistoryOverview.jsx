@@ -2,8 +2,9 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
-import AlarmCallbackHistoryStore from 'stores/alarmcallbacks/AlarmCallbackHistoryStore';
-import AlarmCallbacksStore from 'stores/alarmcallbacks/AlarmCallbacksStore';
+import StoreProvider from 'injection/StoreProvider';
+const AlarmCallbackHistoryStore = StoreProvider.getStore('AlarmCallbackHistory');
+const AlarmCallbacksStore = StoreProvider.getStore('AlarmCallbacks');
 
 import { Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';

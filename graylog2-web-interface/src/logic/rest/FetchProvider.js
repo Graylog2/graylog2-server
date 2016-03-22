@@ -1,5 +1,7 @@
 import request from 'superagent-bluebird-promise';
-import SessionStore from 'stores/sessions/SessionStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');

@@ -10,9 +10,12 @@ const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 const IndicesActions = ActionsProvider.getActions('Indices');
 const MessageCountsActions = ActionsProvider.getActions('MessageCounts');
 
-import IndexerClusterStore from 'stores/indexers/IndexerClusterStore';
-import { DeflectorStore, IndexRangesStore, IndicesStore } from 'stores/indices';
-import MessageCountsStore from 'stores/messages/MessageCountsStore';
+import StoreProvider from 'injection/StoreProvider';
+const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
+const DeflectorStore = StoreProvider.getStore('Deflector');
+const IndexRangesStore = StoreProvider.getStore('IndexRanges');
+const IndicesStore = StoreProvider.getStore('Indices');
+const MessageCountsStore = StoreProvider.getStore('MessageCounts');
 
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, Spinner } from 'components/common';

@@ -5,11 +5,12 @@ import { Row, Col } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import SearchBar from 'components/search/SearchBar';
 
-import SearchStore from 'stores/search/SearchStore';
-import SavedSearchesStore from 'stores/search/SavedSearchesStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const SearchStore = StoreProvider.getStore('Search');
+const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
+const StreamsStore = StoreProvider.getStore('Streams');
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');

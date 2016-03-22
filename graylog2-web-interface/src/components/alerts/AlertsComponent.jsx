@@ -6,7 +6,9 @@ import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import ActionsProvider from 'injection/ActionsProvider';
 const AlertsActions = ActionsProvider.getActions('Alerts');
 
-import AlertsStore from 'stores/alerts/AlertsStore';
+import StoreProvider from 'injection/StoreProvider';
+const AlertsStore = StoreProvider.getStore('Alerts');
+
 import { PaginatedList, Spinner } from 'components/common';
 import AlertsTable from 'components/alerts/AlertsTable';
 

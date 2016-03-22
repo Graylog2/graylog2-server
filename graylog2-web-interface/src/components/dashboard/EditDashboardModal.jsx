@@ -4,7 +4,9 @@ import React from 'react';
 import { Input } from 'react-bootstrap';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const DashboardsStore = StoreProvider.getStore('Dashboards');
 
 const EditDashboardModal = React.createClass({
   propTypes: {

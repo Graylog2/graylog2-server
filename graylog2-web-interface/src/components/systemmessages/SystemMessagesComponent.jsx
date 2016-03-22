@@ -1,7 +1,8 @@
 import React from 'react';
 import { Col, Pagination, Row } from 'react-bootstrap';
 
-import SystemMessagesStore from 'stores/systemmessages/SystemMessagesStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemMessagesStore = StoreProvider.getStore('SystemMessages');
 
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';

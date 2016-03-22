@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import Version from 'util/Version';
 
-import SystemStore from 'stores/system/SystemStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemStore = StoreProvider.getStore('System');
 
 const Footer = React.createClass({
   mixins: [Reflux.connect(SystemStore)],

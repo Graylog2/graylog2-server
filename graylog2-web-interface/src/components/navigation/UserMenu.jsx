@@ -2,7 +2,8 @@ import React from 'react';
 import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import SessionStore from 'stores/sessions/SessionStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');

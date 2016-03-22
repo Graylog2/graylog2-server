@@ -3,7 +3,8 @@ import { Input, Button } from 'react-bootstrap';
 
 import UserNotification from 'util/UserNotification';
 
-import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
+import StoreProvider from 'injection/StoreProvider';
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 

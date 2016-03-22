@@ -1,7 +1,9 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
 
-import PreferencesStore from 'stores/users/PreferencesStore';
+import StoreProvider from 'injection/StoreProvider';
+const PreferencesStore = StoreProvider.getStore('Preferences');
+
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const UserPreferencesModal = React.createClass({

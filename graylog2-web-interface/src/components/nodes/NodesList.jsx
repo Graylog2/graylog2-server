@@ -5,8 +5,9 @@ import { Row, Col } from 'react-bootstrap';
 import NodeListItem from './NodeListItem';
 import { Spinner, EntityList, Pluralize } from 'components/common';
 
-import NodesStore from 'stores/nodes/NodesStore';
-import ClusterOverviewStore from 'stores/cluster/ClusterOverviewStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 const NodesList = React.createClass({
   propTypes: {

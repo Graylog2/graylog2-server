@@ -9,12 +9,13 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
-import InputsStore from 'stores/inputs/InputsStore';
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
+const InputsStore = StoreProvider.getStore('Inputs');
+const MessagesStore = StoreProvider.getStore('Messages');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
-import MessagesStore from 'stores/messages/MessagesStore';
 
 const CreateExtractorsPage = React.createClass({
   propTypes: {

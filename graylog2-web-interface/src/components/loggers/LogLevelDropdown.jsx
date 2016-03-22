@@ -6,7 +6,8 @@ import String from 'string';
 import ActionsProvider from 'injection/ActionsProvider';
 const LoggersActions = ActionsProvider.getActions('Loggers');
 
-import LoggersStore from 'stores/system/LoggersStore';
+import StoreProvider from 'injection/StoreProvider';
+const LoggersStore = StoreProvider.getStore('Loggers');
 
 const LogLevelDropdown = React.createClass({
   propTypes: {

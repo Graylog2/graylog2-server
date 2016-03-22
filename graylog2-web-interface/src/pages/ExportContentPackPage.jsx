@@ -5,14 +5,14 @@ import { Row, Col, Button } from 'react-bootstrap';
 import FileSaver from 'logic/files/FileSaver';
 import UserNotification from 'util/UserNotification';
 
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
-import InputsStore from 'stores/inputs/InputsStore';
-import OutputsStore from 'stores/outputs/OutputsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-
+import StoreProvider from 'injection/StoreProvider';
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
+const InputsStore = StoreProvider.getStore('Inputs');
+const OutputsStore = StoreProvider.getStore('Outputs');
+const StreamsStore = StoreProvider.getStore('Streams');
 // eslint-disable-next-line no-unused-vars
-import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
+const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');

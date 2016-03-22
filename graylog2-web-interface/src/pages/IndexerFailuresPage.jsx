@@ -3,7 +3,8 @@ import { Col, Row } from 'react-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import IndexerFailuresStore from 'stores/indexers/IndexerFailuresStore';
+import StoreProvider from 'injection/StoreProvider';
+const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 import DocsHelper from 'util/DocsHelper';
 

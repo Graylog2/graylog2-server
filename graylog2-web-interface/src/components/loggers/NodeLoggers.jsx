@@ -5,9 +5,11 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { LinkToNode } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
+
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
 const NodeLoggers = React.createClass({
   propTypes: {

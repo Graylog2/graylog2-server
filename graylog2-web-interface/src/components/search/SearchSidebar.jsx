@@ -5,8 +5,10 @@ import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
 
-import SearchStore from 'stores/search/SearchStore';
-import SessionStore from 'stores/sessions/SessionStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+const SearchStore = StoreProvider.getStore('Search');
+
 import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';

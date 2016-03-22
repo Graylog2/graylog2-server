@@ -9,7 +9,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
-import InputTypesStore from 'stores/inputs/InputTypesStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');

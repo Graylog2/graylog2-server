@@ -1,7 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { PageHeader } from 'components/common';
 import { NodesList } from 'components/nodes';

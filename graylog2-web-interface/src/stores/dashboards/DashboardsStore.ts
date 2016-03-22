@@ -9,7 +9,9 @@ const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const PermissionsMixin = require('util/PermissionsMixin');
-const CurrentUserStore = require('stores/users/CurrentUserStore');
+
+const StoreProvider = require('injection/StoreProvider');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 interface Dashboard {
   id: string;

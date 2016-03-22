@@ -8,7 +8,8 @@ import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
+import StoreProvider from 'injection/StoreProvider';
+const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles');
 
 import SourceType from './SourceType';
 import ConfigurationBundlePreview from './ConfigurationBundlePreview';

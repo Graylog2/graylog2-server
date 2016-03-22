@@ -6,10 +6,11 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import UsersStore from 'stores/users/UsersStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const UsersStore = StoreProvider.getStore('Users');
 
 import TimeoutInput from 'components/users/TimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';

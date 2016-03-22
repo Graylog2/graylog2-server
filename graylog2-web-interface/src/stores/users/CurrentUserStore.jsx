@@ -3,8 +3,9 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-import SessionStore from 'stores/sessions/SessionStore';
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');

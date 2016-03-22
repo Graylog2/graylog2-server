@@ -3,8 +3,9 @@ import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';

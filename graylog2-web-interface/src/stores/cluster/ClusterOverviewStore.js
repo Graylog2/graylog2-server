@@ -3,9 +3,10 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
-import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
-import SystemLoadBalancerStore from 'stores/load-balancer/SystemLoadBalancerStore';
-import NodesStore from 'stores/nodes/NodesStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
+const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
 
 const ClusterOverviewStore = Reflux.createStore({
   sourceUrl: '/cluster',

@@ -3,7 +3,8 @@
 
 'use strict';
 
-import FieldsStore = require('../../stores/fields/FieldsStore');
+const StoreProvider = require('injection/StoreProvider');
+const FieldsStore = StoreProvider.getStore('Fields');
 import queryParser = require('../../logic/search/queryParser');
 import SerializeVisitor = require('../../logic/search/visitors/SerializeVisitor');
 import DumpVisitor = require('../../logic/search/visitors/DumpVisitor');

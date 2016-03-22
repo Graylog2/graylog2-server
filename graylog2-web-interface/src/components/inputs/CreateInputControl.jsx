@@ -8,7 +8,8 @@ import ActionsProvider from 'injection/ActionsProvider';
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
-import InputTypesStore from 'stores/inputs/InputTypesStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { InputForm } from 'components/inputs';
 

@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import String from 'string';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');

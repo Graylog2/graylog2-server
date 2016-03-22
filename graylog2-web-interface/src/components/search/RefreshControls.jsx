@@ -5,7 +5,8 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { Pluralize } from 'components/common';
 
-import RefreshStore from 'stores/tools/RefreshStore';
+import StoreProvider from 'injection/StoreProvider';
+const RefreshStore = StoreProvider.getStore('Refresh');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const RefreshActions = ActionsProvider.getActions('Refresh');

@@ -11,7 +11,9 @@ import ExtractorsSortModal from './ExtractorSortModal';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExtractorsList = React.createClass({
   propTypes: {

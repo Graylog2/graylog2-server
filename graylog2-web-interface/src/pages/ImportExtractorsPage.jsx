@@ -7,7 +7,9 @@ import ImportExtractors from 'components/extractors/ImportExtractors';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
-import InputsStore from 'stores/inputs/InputsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const InputsStore = StoreProvider.getStore('Inputs');
 
 const ImportExtractorsPage = React.createClass({
   propTypes: {

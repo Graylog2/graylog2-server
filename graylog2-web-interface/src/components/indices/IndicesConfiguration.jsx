@@ -9,7 +9,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import ActionsProvider from 'injection/ActionsProvider';
 const IndicesConfigurationActions = ActionsProvider.getActions('IndicesConfiguration');
 
-import IndicesConfigurationStore from 'stores/indices/IndicesConfigurationStore';
+import StoreProvider from 'injection/StoreProvider';
+const IndicesConfigurationStore = StoreProvider.getStore('IndicesConfiguration');
+
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.

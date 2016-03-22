@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
-import MessagesStore from 'stores/messages/MessagesStore';
+import StoreProvider from 'injection/StoreProvider';
+const MessagesStore = StoreProvider.getStore('Messages');
 
 const MessageLoader = React.createClass({
   propTypes: {

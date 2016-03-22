@@ -3,15 +3,15 @@ import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import InputsStore from 'stores/inputs/InputsStore';
-import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
-import NodesStore from 'stores/nodes/NodesStore';
-import RefreshStore from 'stores/tools/RefreshStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-import UniversalSearchStore from 'stores/search/UniversalSearchStore';
-
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const InputsStore = StoreProvider.getStore('Inputs');
+const MessageFieldsStore = StoreProvider.getStore('MessageFields');
+const RefreshStore = StoreProvider.getStore('Refresh');
+const StreamsStore = StoreProvider.getStore('Streams');
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
+const SearchStore = StoreProvider.getStore('Search');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 
-import GrokPatternsStore from 'stores/grok-patterns/GrokPatternsStore';
+import StoreProvider from 'injection/StoreProvider';
+const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';

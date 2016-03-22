@@ -1,7 +1,9 @@
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
-import SearchStore from 'stores/search/SearchStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 import moment from 'moment';
 

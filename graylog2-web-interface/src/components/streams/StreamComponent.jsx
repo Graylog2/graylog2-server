@@ -3,8 +3,9 @@ import { Row, Col, Alert } from 'react-bootstrap';
 
 import { IfPermitted, TypeAheadDataFilter } from 'components/common';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import StreamRulesStore from 'stores/streams/StreamRulesStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 import StreamList from './StreamList';
 import Spinner from 'components/common/Spinner';

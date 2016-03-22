@@ -2,7 +2,9 @@ import React, {PropTypes} from 'react';
 import { Input } from 'react-bootstrap';
 
 import { QueryConfiguration, CountWidgetEditConfiguration } from 'components/widgets/configurations';
-import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
 
 const StatisticalCountWidgetConfiguration = React.createClass({
   propTypes: {

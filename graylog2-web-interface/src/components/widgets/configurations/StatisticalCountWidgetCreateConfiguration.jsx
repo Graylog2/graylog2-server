@@ -3,7 +3,9 @@ import { Input } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { CountWidgetCreateConfiguration } from 'components/widgets/configurations';
-import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
 
 const StatisticalCountWidgetCreateConfiguration = React.createClass({
   propTypes: {

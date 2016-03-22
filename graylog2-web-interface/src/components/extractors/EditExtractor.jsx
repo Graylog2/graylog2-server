@@ -11,7 +11,8 @@ const ExtractorsActions = ActionsProvider.getActions('Extractors');
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-import ToolsStore from 'stores/tools/ToolsStore';
+import StoreProvider from 'injection/StoreProvider';
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const EditExtractor = React.createClass({
   propTypes: {

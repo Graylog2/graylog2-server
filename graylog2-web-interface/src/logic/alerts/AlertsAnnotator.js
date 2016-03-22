@@ -1,15 +1,17 @@
 import ActionsProvider from 'injection/ActionsProvider';
 const AlertsActions = ActionsProvider.getActions('Alerts');
 
-import AlertsStore from 'stores/alerts/AlertsStore';
-import StreamStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const AlertsStore = StoreProvider.getStore('Alerts');
+const StreamsStore = StoreProvider.getStore('Streams');
+
 import DateTime from 'logic/datetimes/DateTime';
 
 const AlertsAnnotator = {
   streams: [],
 
   initialize() {
-    StreamStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then(streams => {
       this.streams = streams;
     });
   },

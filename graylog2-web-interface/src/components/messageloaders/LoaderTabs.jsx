@@ -3,8 +3,9 @@ import Reflux from 'reflux';
 import { Tab, Tabs, Col } from 'react-bootstrap';
 import Immutable from 'immutable';
 
-import InputsStore from 'stores/inputs/InputsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputsStore = StoreProvider.getStore('Inputs');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');

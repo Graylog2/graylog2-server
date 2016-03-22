@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
-import SystemJobsStore from 'stores/systemjobs/SystemJobsStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemJobsStore = StoreProvider.getStore('SystemJobs');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');

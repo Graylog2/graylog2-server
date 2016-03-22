@@ -2,7 +2,8 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
+import StoreProvider from 'injection/StoreProvider';
+const DashboardsStore = StoreProvider.getStore('Dashboards');
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';

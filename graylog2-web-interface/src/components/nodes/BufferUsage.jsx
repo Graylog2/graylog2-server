@@ -4,7 +4,8 @@ import numeral from 'numeral';
 import { Button, ProgressBar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');

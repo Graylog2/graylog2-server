@@ -8,7 +8,8 @@ import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-import SessionStore from 'stores/sessions/SessionStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
 
 const ConfigurationBundlesStore = Reflux.createStore({
   listenables: [ConfigurationBundlesActions],

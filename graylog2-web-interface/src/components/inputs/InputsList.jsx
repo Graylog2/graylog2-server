@@ -13,8 +13,9 @@ const InputsActions = ActionsProvider.getActions('Inputs');
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
 
-import InputsStore from 'stores/inputs/InputsStore';
-import SingleNodeStore from 'stores/nodes/SingleNodeStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputsStore = StoreProvider.getStore('Inputs');
+const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
 const InputsList = React.createClass({
   propTypes: {

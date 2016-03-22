@@ -8,9 +8,10 @@ import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import AlertConditionsStore from 'stores/alertconditions/AlertConditionsStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const AlertConditionsStore = StoreProvider.getStore('AlertConditions');
 
 import { IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';

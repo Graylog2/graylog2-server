@@ -3,8 +3,9 @@ import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 import $ from 'jquery';
 
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import WidgetStore from 'stores/widgets/WidgetsStore';
+import StoreProvider from 'injection/StoreProvider';
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import { WidgetCreationModal } from 'components/widgets';
@@ -121,7 +122,7 @@ const AddToDashboardMenu = React.createClass({
     }
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
-    const promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
+    const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
     promise.done(() => this.refs.widgetModal.saved());
   },
   _createNewDashboard() {

@@ -9,8 +9,9 @@ import { RefreshControls, QueryInput } from 'components/search';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
-import SearchStore from 'stores/search/SearchStore';
-import ToolsStore from 'stores/tools/ToolsStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+const ToolsStore = StoreProvider.getStore('Tools');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');

@@ -4,7 +4,10 @@ var React = require('react');
 var StreamRuleForm = require('./StreamRuleForm');
 var PermissionsMixin = require('../../util/PermissionsMixin');
 var HumanReadableStreamRule = require('./HumanReadableStreamRule');
-var StreamRulesStore = require('../../stores/streams/StreamRulesStore');
+
+import StoreProvider from 'injection/StoreProvider';
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
+
 var UserNotification = require('../../util/UserNotification');
 
 var StreamRule = React.createClass({

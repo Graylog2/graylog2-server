@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import { Input } from 'react-bootstrap';
 
 import { QueryConfiguration } from 'components/widgets/configurations';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
+import StoreProvider from 'injection/StoreProvider';
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 const FieldChartWidgetConfiguration = React.createClass({
   propTypes: {

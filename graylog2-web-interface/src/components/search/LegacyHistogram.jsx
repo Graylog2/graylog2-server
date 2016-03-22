@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import resultHistogram from 'legacy/result-histogram';

@@ -7,11 +7,13 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
+
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
-import MetricsStore from 'stores/metrics/MetricsStore';
-import JournalStore from 'stores/journal/JournalStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
+const JournalStore = StoreProvider.getStore('Journal');
 
 import { Spinner, Timestamp } from 'components/common';
 

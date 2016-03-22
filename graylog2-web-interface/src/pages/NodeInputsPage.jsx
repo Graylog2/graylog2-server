@@ -2,9 +2,10 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import NodesStore from 'stores/nodes/NodesStore';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const InputStatesStore = StoreProvider.getStore('InputStates');
 
 import { PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';

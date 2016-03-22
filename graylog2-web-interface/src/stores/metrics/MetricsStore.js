@@ -5,8 +5,9 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import NodesStore from 'stores/nodes/NodesStore';
-import SessionStore from 'stores/sessions/SessionStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+const NodesStore = StoreProvider.getStore('Nodes');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');

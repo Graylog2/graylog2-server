@@ -7,7 +7,9 @@ import Immutable = require('immutable');
 import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const UserNotification = require('util/UserNotification');
-import SearchStore = require('stores/search/SearchStore');
+
+const StoreProvider = require('injection/StoreProvider');
+const SearchStore = StoreProvider.getStore('Search');
 
 const FieldStatisticsStore = {
     FUNCTIONS: Immutable.OrderedMap({

@@ -7,7 +7,9 @@ import Version from 'util/Version';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExportExtractors = React.createClass({
   propTypes: {

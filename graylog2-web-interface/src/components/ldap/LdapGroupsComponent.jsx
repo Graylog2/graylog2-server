@@ -11,8 +11,9 @@ import Routes from 'routing/Routes';
 import ActionsProvider from 'injection/ActionsProvider';
 const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
 
-import RolesStore from 'stores/users/RolesStore';
-import LdapGroupsStore from 'stores/ldap/LdapGroupsStore';
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles');
+const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 
 const LdapGroupsComponent = React.createClass({
   getInitialState() {

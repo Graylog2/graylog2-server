@@ -3,7 +3,8 @@ import {Input} from 'react-bootstrap';
 
 import {BootstrapModalForm} from 'components/bootstrap';
 
-import InputStaticFieldsStore from 'stores/inputs/InputStaticFieldsStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 
 const StaticFieldForm = React.createClass({
   propTypes: {

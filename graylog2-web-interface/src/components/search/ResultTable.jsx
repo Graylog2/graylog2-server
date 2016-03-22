@@ -2,8 +2,9 @@ import React from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const SearchStore = StoreProvider.getStore('Search');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const RefreshActions = ActionsProvider.getActions('Refresh');

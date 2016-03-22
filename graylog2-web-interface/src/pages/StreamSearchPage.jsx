@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react';
 import SearchPage from './SearchPage';
 import {Spinner} from 'components/common';
-import StreamsStore from 'stores/streams/StreamsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamSearchPage = React.createClass({
   propTypes: {

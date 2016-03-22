@@ -1,7 +1,8 @@
 import React, {PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 
-import InputStaticFieldsStore from 'stores/inputs/InputStaticFieldsStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 
 const InputStaticFields = React.createClass({
   propTypes: {

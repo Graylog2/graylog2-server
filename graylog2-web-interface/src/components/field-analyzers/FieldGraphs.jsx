@@ -4,7 +4,10 @@ import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import LegacyFieldGraph from './LegacyFieldGraph';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
+
 import UIUtils from 'util/UIUtils';
 
 const FieldGraphs = React.createClass({

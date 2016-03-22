@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-import UsersStore from 'stores/users/UsersStore';
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const UsersStore = StoreProvider.getStore('Users');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';

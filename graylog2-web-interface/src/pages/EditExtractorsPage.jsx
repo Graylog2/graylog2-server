@@ -12,9 +12,11 @@ import Routes from 'routing/Routes';
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
-import InputsStore from 'stores/inputs/InputsStore';
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
-import UniversalSearchstore from 'stores/search/UniversalSearchStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
+const InputsStore = StoreProvider.getStore('Inputs');
+const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 
 const EditExtractorsPage = React.createClass({
   propTypes: {

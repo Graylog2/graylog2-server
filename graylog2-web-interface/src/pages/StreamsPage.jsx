@@ -11,8 +11,9 @@ import { IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],

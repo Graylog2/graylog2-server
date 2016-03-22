@@ -9,7 +9,8 @@ import Routes from 'routing/Routes';
 import ActionsProvider from 'injection/ActionsProvider';
 const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

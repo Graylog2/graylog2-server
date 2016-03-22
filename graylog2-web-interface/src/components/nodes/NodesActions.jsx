@@ -4,9 +4,10 @@ import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
 
-import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
-import SystemLoadBalancerStore from 'stores/load-balancer/SystemLoadBalancerStore';
-import SystemShutdownStore from 'stores/system-shutdown/SystemShutdownStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
+const SystemLoadBalancerStore = StoreProvider.getStore('SystemLoadBalancer');
+const SystemShutdownStore = StoreProvider.getStore('SystemShutdown');
 
 import Routes from 'routing/Routes';
 

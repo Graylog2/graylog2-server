@@ -4,8 +4,10 @@ import {LinkContainer} from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
-import ToolsStore from 'stores/tools/ToolsStore';
 import FormUtils from 'util/FormsUtils';
+
+import StoreProvider from 'injection/StoreProvider';
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const GrokExtractorConfiguration = React.createClass({
   propTypes: {

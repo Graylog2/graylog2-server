@@ -3,7 +3,8 @@ import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem } from 'react-b
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
