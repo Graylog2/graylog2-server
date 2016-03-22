@@ -147,7 +147,7 @@ const MessageDetail = React.createClass({
         <div>
           <dt>Received by</dt>
           <dd>
-            <em>{this._inputName(this.props.message.source_input_id)}</em>
+            <em>{this._inputName(this.props.message.source_input_id)}</em>{' '}
             on {this._nodeName(this.props.message.source_node_id)}
             { viaRadio && <br /> }
             {viaRadio}
