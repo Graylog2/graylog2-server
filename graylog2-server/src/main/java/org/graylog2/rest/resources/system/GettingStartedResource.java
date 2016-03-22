@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system;
 
 import com.google.common.collect.Sets;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.gettingstarted.GettingStartedState;
 import org.graylog2.plugin.Version;

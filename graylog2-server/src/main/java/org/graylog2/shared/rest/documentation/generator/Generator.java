@@ -30,11 +30,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.graylog2.shared.ServerVersion;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -59,7 +59,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -69,11 +68,9 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
- * This is generating API information in Swagger format.
- * <p/>
- * http://swagger.wordnik.com/
- * <p/>
- * We decided to write this ourselves and not to use the Swagger JAXRS/Jersey integration
+ * This is generating API information in <a href="http://swagger.io/">Swagger</a> format.
+ *
+ * We decided to write this ourselves and not to use the Swagger JAX-RS/Jersey integration
  * because it was not compatible to Jersey2 at that point and just way too complicated
  * and too big for what we want to do with it.
  */
@@ -145,12 +142,7 @@ public class Generator {
 
             apis.add(apiDescription);
         }
-        Collections.sort(apis, new Comparator<Map<String, Object>>() {
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                return ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result();
-            }
-        });
+        Collections.sort(apis, (o1, o2) -> ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result());
         Map<String, String> info = Maps.newHashMap();
         info.put("title", "Graylog REST API");
 
@@ -269,14 +261,9 @@ public class Generator {
             basePath = basePath.substring(0, basePath.length() - 1);
         }
 
-        Collections.sort(apis, new Comparator<Map<String, Object>>() {
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                return ComparisonChain.start()
-                        .compare(o1.get("path").toString(), o2.get("path").toString())
-                        .result();
-            }
-        });
+        Collections.sort(apis, (o1, o2) -> ComparisonChain.start()
+                .compare(o1.get("path").toString(), o2.get("path").toString())
+                .result());
 
         // generate the json schema for the auto-mapped return types
         Map<String, Object> models = Maps.newHashMap();
@@ -376,6 +363,7 @@ public class Generator {
         return route;
     }
 
+    @Nullable
     private String determineHttpMethod(Method m) {
         if (m.isAnnotationPresent(GET.class)) {
             return "GET";
