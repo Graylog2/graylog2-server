@@ -26,7 +26,7 @@ import java.util.Set;
 
 @ImplementedBy(GrokPatternServiceImpl.class)
 public interface GrokPatternService {
-    GrokPattern load(String patternName) throws NotFoundException;
+    GrokPattern load(String patternId) throws NotFoundException;
 
     Set<GrokPattern> loadAll();
 
@@ -36,7 +36,7 @@ public interface GrokPatternService {
 
     boolean validate(GrokPattern pattern);
 
-    int delete(String patternName);
+    int delete(String patternId);
 
     int deleteAll();
 }

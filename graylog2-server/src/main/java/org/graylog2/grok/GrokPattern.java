@@ -32,6 +32,18 @@ public class GrokPattern {
     public String pattern;
     public String contentPack;
 
+    public String name() {
+        return name;
+    }
+
+    public String pattern() {
+        return pattern;
+    }
+
+    public String contentPack() {
+        return contentPack;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -40,6 +52,18 @@ public class GrokPattern {
                 .add("pattern", pattern)
                 .add("contentPack", contentPack)
                 .toString();
+    }
+
+    public static GrokPattern create(String name, String pattern) {
+        return create(null, name, pattern, null);
+    }
+    public static GrokPattern create(ObjectId id, String name, String pattern, String contentPack) {
+        final GrokPattern grokPattern = new GrokPattern();
+        grokPattern.id = id;
+        grokPattern.name = name;
+        grokPattern.pattern = pattern;
+        grokPattern.contentPack = contentPack;
+        return grokPattern;
     }
 
     @Override
