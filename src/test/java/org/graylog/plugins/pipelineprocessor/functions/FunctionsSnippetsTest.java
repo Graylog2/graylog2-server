@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.functions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -53,6 +55,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
+import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
@@ -61,6 +64,9 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog2.grok.GrokPattern;
+import org.graylog2.grok.GrokPatternRegistry;
+import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -74,6 +80,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -154,6 +162,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(IsNull.NAME, new IsNull());
         functions.put(IsNotNull.NAME, new IsNotNull());
+
+        final GrokPatternService grokPatternService = mock(GrokPatternService.class);
+        Set<GrokPattern> patterns = Sets.newHashSet(
+                GrokPattern.create("GREEDY", ".*"),
+                GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"),
+                GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})")
+        );
+        when(grokPatternService.loadAll()).thenReturn(patterns);
+        final EventBus clusterBus = new EventBus();
+        final GrokPatternRegistry grokPatternRegistry = new GrokPatternRegistry(clusterBus,
+                                                                                grokPatternService,
+                                                                                Executors.newScheduledThreadPool(1));
+        functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -323,5 +344,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(newMessage.getFieldAs(String.class, "only_in")).isEqualTo("new message");
         assertThat(newMessage.getFieldAs(String.class, "multi")).isEqualTo("new message");
 
+    }
+
+    @Test
+    public void grok() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getFieldCount()).isEqualTo(4);
+        assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2015-07-31T10:05:36.773Z"));
     }
 }
