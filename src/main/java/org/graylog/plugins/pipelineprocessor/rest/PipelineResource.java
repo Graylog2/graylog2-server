@@ -74,7 +74,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Create a processing pipeline from source", notes = "")
     @POST
-    @Path("/")
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -116,7 +115,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Get all processing pipelines")
     @GET
-    @Path("/")
     public Collection<PipelineSource> getAll() {
         final Collection<PipelineDao> daos = pipelineService.loadAll();
         final ArrayList<PipelineSource> results = Lists.newArrayList();
