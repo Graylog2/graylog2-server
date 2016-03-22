@@ -1,7 +1,11 @@
 import React from 'react';
+import Reflux from 'reflux';
 
-import InjectStore from 'injection/InjectStore';
-import InjectActions from 'injection/InjectActions';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
@@ -11,7 +15,7 @@ const MetricContainer = React.createClass({
     zeroOnMissing: React.PropTypes.bool,
     children: React.PropTypes.array.isRequired,
   },
-  mixins: [InjectActions('Metrics'), InjectStore('Metrics')],
+  mixins: [Reflux.connect(MetricsStore)],
 
   getDefaultProps() {
     return {
@@ -19,17 +23,12 @@ const MetricContainer = React.createClass({
     };
   },
 
-  getInitialState() {
-    return {
-    };
-  },
-
   componentWillMount() {
-    this.MetricsActions.addGlobal(this.props.name);
+    MetricsActions.addGlobal(this.props.name);
   },
 
   componentWillUnmount() {
-    this.MetricsActions.removeGlobal(this.props.name);
+    MetricsActions.removeGlobal(this.props.name);
   },
 
   render() {
