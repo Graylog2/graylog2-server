@@ -12,7 +12,8 @@ import 'stylesheets/typeahead.less';
 import 'c3/c3.css';
 import 'dc/dc.css';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const App = React.createClass({
   propTypes: {
