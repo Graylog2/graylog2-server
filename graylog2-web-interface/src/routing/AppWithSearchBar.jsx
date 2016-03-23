@@ -72,8 +72,7 @@ const AppWithSearchBar = React.createClass({
     }
 
     // TODO: Only show search bar if the user has the right permissions
-    // TODO: Check if the search is in a stream
-    // TODO: Take care of saved searches
+    SearchStore.load();
     SearchStore.initializeFieldsFromHash();
 
     return (
