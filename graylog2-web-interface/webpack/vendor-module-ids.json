@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 798,
+  "nextFreeModuleId": 799,
   "modules": {
     "byIdentifier": {
       "node_modules/react/react.js": 1,
@@ -799,7 +799,8 @@
       "node_modules/reflux-core/lib/joins.js": 794,
       "node_modules/reflux-core/lib/bindMethods.js": 795,
       "node_modules/reflux-core/lib/createAction.js": 796,
-      "node_modules/reflux-core/lib/mixer.js": 797
+      "node_modules/reflux-core/lib/mixer.js": 797,
+      "node_modules/jquery/dist/jquery.js": 798
     }
   },
   "nextFreeChunkId": 1,

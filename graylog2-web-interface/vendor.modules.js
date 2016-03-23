@@ -1,4 +1,5 @@
 module.exports = [
+  'jquery',
   'react',
   'react-dom',
   'react-addons-linked-state-mixin',
