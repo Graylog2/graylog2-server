@@ -9,14 +9,11 @@ import ValidationsUtils from 'util/ValidationsUtils';
 import StreamsStore from 'stores/streams/StreamsStore';
 import DashboardsStore from 'stores/dashboards/DashboardsStore';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
-import RolesStore from 'stores/users/RolesStore';
 import UsersStore from 'stores/users/UsersStore';
 
-import Spinner from 'components/common/Spinner';
-import MultiSelect from 'components/common/MultiSelect';
-import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
-import { TimezoneSelect } from 'components/common';
+import EditRolesForm from 'components/users/EditRolesForm';
+import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -37,35 +34,20 @@ const UserForm = React.createClass({
       });
     });
     DashboardsStore.listDashboards().then((dashboards) => {
-      this.setState({dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title))});
-    });
-    RolesStore.loadRoles().then(roles => {
-      this.setState({roles: roles.sort((r1, r2) => r1.name.localeCompare(r2.name))});
+      this.setState({ dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title)) });
     });
   },
   formatMultiselectOptions(collection) {
     return collection.map((item) => {
-      return {value: item.id, label: item.title};
+      return { value: item.id, label: item.title };
     });
   },
   formatSelectedOptions(permissions, permission, collection) {
     return collection
-      .filter((item) => this.isPermitted(permissions, [permission + ':' + item.id]))
+      .filter((item) => this.isPermitted(permissions, [`${permission}:${item.id}`]))
       .map((item) => item.id)
       .join(',');
   },
-  _updateRoles(evt) {
-    evt.preventDefault();
-    if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
-      const roles = this.refs.roles.getValue().filter((value) => value !== "");
-      UsersStore.updateRoles(this.props.user.username, roles).then(() => {
-        UserNotification.success('Roles updated successfully.', 'Success!');
-      }, () => {
-        UserNotification.error('Updating roles failed.', 'Error!');
-      });
-    }
-  },
-
   _onPasswordChange() {
     const passwordField = this.refs.password.getInputDOMNode();
     const passwordConfirmField = this.refs.password_repeat.getInputDOMNode();
@@ -98,8 +80,8 @@ const UserForm = React.createClass({
       'email',
       'session_timeout_ms',
       'timezone'].forEach((field) => {
-      request[field] = this.refs[field].getValue();
-    });
+        request[field] = this.refs[field].getValue();
+      });
     UsersStore.update(this.props.user.username, request).then(() => {
       UserNotification.success('User updated successfully.', 'Success!');
     }, () => {
@@ -107,7 +89,7 @@ const UserForm = React.createClass({
     });
   },
   render() {
-    if (!this.state.streams || !this.state.dashboards || !this.state.roles) {
+    if (!this.state.streams || !this.state.dashboards) {
       return <Spinner />;
     }
 
@@ -242,7 +224,7 @@ const UserForm = React.createClass({
                 </Alert>
               </Col>
               :
-              <form className="form-horizontal" style={{marginTop: 10}} onSubmit={this._changePassword}>
+              <form className="form-horizontal" style={{ marginTop: 10 }} onSubmit={this._changePassword}>
                 {requiresOldPassword &&
                   <Input ref="old_password" name="old_password" id="old_password" type="password" maxLength={100}
                          labelClassName="col-sm-3" wrapperClassName="col-sm-9"
@@ -269,44 +251,9 @@ const UserForm = React.createClass({
             }
           </Col>
         </Row>
-        {this.isPermitted(permissions, 'USERS_ROLESEDIT') &&
-          <Row className="content">
-            <Col lg={8}>
-              <h2>Change user role</h2>
-              {user.read_only ?
-                <Col smOffset={3} sm={9}>
-                  <Alert bsStyle="warning" role="alert">
-                    You cannot edit the admin's user role.
-                  </Alert>
-                </Col>
-              :
-                <span>
-                  {user.external &&
-                    <Col smOffset={3} sm={9} style={{marginBottom: 15}}>
-                      <Alert bsStyle="warning" role="alert">
-                        This user was created from an external LDAP system, please consider mapping LDAP groups instead of manually editing roles here.
-                        Please update the LDAP group mapping to make changes or contact an administrator for more information.
-                      </Alert>
-                    </Col>
-                  }
-                  <form className="form-horizontal" style={{marginTop: '10px'}} onSubmit={this._updateRoles}>
-                    <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
-                           labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-                      <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} />
-                    </Input>
-                    <div className="form-group">
-                      <Col smOffset={3} sm={9}>
-                        <Button bsStyle="success" type="submit">
-                          Update role
-                        </Button>
-                      </Col>
-                    </div>
-                  </form>
-                </span>
-              }
-            </Col>
-          </Row>
-        }
+        <IfPermitted permissions="USERS_ROLESEDIT">
+          <EditRolesForm user={user} />
+        </IfPermitted>
       </div>
     );
   },

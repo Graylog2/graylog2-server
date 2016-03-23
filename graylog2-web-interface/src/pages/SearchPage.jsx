@@ -68,7 +68,7 @@ const SearchPage = React.createClass({
     const query = this.state.query;
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
     UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page).then((response) => {
-      this.setState({searchResult: response});
+      this.setState({ searchResult: response });
 
       const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
