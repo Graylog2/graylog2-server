@@ -18,7 +18,7 @@ const RolesSelect = React.createClass({
   render() {
     const rolesValue = this.props.userRoles.join(',');
     const rolesOptions = this.props.availableRoles.map((role) => {
-      return {value: role.name, label: role.name};
+      return { value: role.name, label: role.name };
     });
     return (
       <MultiSelect
