@@ -37,6 +37,8 @@ const ShowDashboardPage = React.createClass({
     }
   },
   DASHBOARDS_EDIT: 'dashboards:edit',
+  DEFAULT_HEIGHT: 1,
+  DEFAULT_WIDTH: 2,
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
@@ -72,8 +74,13 @@ const ShowDashboardPage = React.createClass({
     const dimensions = {col: 0, row: 0};
 
     const widgetPlugin = PluginStore.exports('widgets').filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
-    dimensions.height = widgetPlugin.defaultHeight;
-    dimensions.width = widgetPlugin.defaultWidth;
+    if (widgetPlugin) {
+      dimensions.height = widgetPlugin.defaultHeight;
+      dimensions.width = widgetPlugin.defaultWidth;
+    } else {
+      dimensions.heigh = this.DEFAULT_HEIGHT;
+      dimensions.width = this.DEFAULT_WIDTH;
+    }
 
     return dimensions;
   },
@@ -100,7 +107,7 @@ const ShowDashboardPage = React.createClass({
       return position1.col - position2.col;
     }).map((widget) => {
       return (
-        <Widget id={widget.id} key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id}
+        <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
                 locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
       );
     });

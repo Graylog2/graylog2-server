@@ -6,7 +6,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import URLUtils from 'util/URLUtils';
 
-import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader } from 'components/widgets';
+import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader, WidgetVisualizationNotFound } from 'components/widgets';
 
 import WidgetsStore from 'stores/widgets/WidgetsStore';
 import WidgetsActions from 'actions/widgets/WidgetsActions';
@@ -85,7 +85,7 @@ const Widget = React.createClass({
       this.setState({
         result: newResult,
         error: true,
-        errorMessage: 'Error loading widget value: ' + error,
+        errorMessage: `Error loading widget value: ${error}`,
       });
     });
   },
@@ -96,7 +96,7 @@ const Widget = React.createClass({
     const availableHeight = $widgetNode.height() - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
     const availableWidth = $widgetNode.width();
     if (availableHeight !== this.state.height || availableWidth !== this.state.width) {
-      this.setState({height: availableHeight, width: availableWidth});
+      this.setState({ height: availableHeight, width: availableWidth });
     }
   },
   _getVisualization() {
@@ -117,7 +117,7 @@ const Widget = React.createClass({
     }
 
     if (!this.widgetPlugin) {
-      throw new Error(`Error: Widget type '${this.props.widget.type}' does not provide a visualization component.`);
+      return <WidgetVisualizationNotFound widgetClassName={this.props.widget.type}/>;
     }
 
     return React.createElement(this.widgetPlugin.visualizationComponent, {
@@ -131,7 +131,7 @@ const Widget = React.createClass({
   },
   _getUrlPath() {
     if (this._isBoundToStream()) {
-      return '/streams/' + this.props.widget.config.stream_id + '/search';
+      return `/streams/${this.props.widget.config.stream_id}/search`;
     }
 
     return '/search';
@@ -184,7 +184,7 @@ const Widget = React.createClass({
     WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData);
   },
   deleteWidget() {
-    if (window.confirm('Do you really want to delete "' + this.props.widget.description + '"?')) {
+    if (window.confirm(`Do you really want to delete "${this.props.widget.description}"?`)) {
       this.setState({deleted: true});
       WidgetsActions.removeWidget(this.props.dashboardId, this.props.widget.id);
     }

@@ -210,7 +210,7 @@ const WidgetEditConfigModal = React.createClass({
   },
 
   _getSpecificConfigurationControls() {
-    if (this.widgetPlugin.configurationEditComponent) {
+    if (this.widgetPlugin && this.widgetPlugin.configurationEditComponent) {
       return React.createElement(this.widgetPlugin.configurationEditComponent, {
         id: this.props.widget.id,
         config: this.state.config,
