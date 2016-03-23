@@ -1,5 +1,6 @@
 require('!script!../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../public/javascripts/bootstrap.min.js');
+import DateTime from 'logic/datetimes/DateTime';
 
 export function validate(formContainer) {
     var errors = false;
@@ -128,15 +129,27 @@ function validateNumber(el) {
 
 function validateDatetimeFormat(el) {
     var dateString = $(el).val();
-    return momentHelper.parseFromString(dateString).isValid();
+    try {
+        DateTime.parseFromString(dateString);
+        return true;
+    } catch (e) {
+        // Do nothing
+    }
+    return false;
 }
 
 function validateAbsoluteTimerange(el) {
     var parent = $(el).parent().parent();
     var fromStr = $("input[name='from']", parent).val();
     var toStr = $("input[name='to']", parent).val();
-    var from = momentHelper.parseFromString(fromStr);
-    var to = momentHelper.parseFromString(toStr);
+    try {
+        const from = DateTime.parseFromString(fromStr).toMoment();
+        const to = DateTime.parseFromString(toStr).toMoment();
 
-    return (from <= to)
+        return (from.isBefore(to) || from.isSame(to));
+    } catch (e) {
+        // Do nothing
+    }
+
+    return false;
 }
