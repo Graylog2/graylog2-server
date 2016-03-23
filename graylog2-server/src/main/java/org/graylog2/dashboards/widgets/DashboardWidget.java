@@ -16,6 +16,7 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -23,8 +24,9 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class DashboardWidget implements EmbeddedPersistable {
+public final class DashboardWidget implements EmbeddedPersistable {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_DESCRIPTION = "description";
@@ -114,25 +116,36 @@ public class DashboardWidget implements EmbeddedPersistable {
         }
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         DashboardWidget that = (DashboardWidget) o;
-
-        if (cacheTime != that.cacheTime) return false;
-        if (!type.equals(that.type)) return false;
-        if (!id.equals(that.id)) return false;
-        if (!timeRange.equals(that.timeRange)) return false;
-        if (!config.equals(that.config)) return false;
-        if (!creatorUserId.equals(that.creatorUserId)) return false;
-        return description.equals(that.description);
-
+        return cacheTime == that.cacheTime &&
+            Objects.equals(type, that.type) &&
+            Objects.equals(id, that.id) &&
+            Objects.equals(timeRange, that.timeRange) &&
+            Objects.equals(config, that.config) &&
+            Objects.equals(creatorUserId, that.creatorUserId) &&
+            Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return Objects.hash(type, id, timeRange, config, creatorUserId, cacheTime, description);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("type", type)
+            .add("id", id)
+            .add("timeRange", timeRange)
+            .add("config", config)
+            .add("creatorUserId", creatorUserId)
+            .add("cacheTime", cacheTime)
+            .add("description", description)
+            .toString();
     }
 }
