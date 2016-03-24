@@ -12,13 +12,12 @@ import PipelinesStore from 'pipelines/PipelinesStore';
 import PipelineConnectionsActions from 'pipeline-connections/PipelineConnectionsActions';
 import PipelineConnectionsStore from 'pipeline-connections/PipelineConnectionsStore';
 
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+
 import DocsHelper from 'util/DocsHelper';
 
 const PipelineConnectionsPage = React.createClass({
-  contextTypes: {
-    storeProvider: PropTypes.object,
-  },
-
   mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
 
   getInitialState() {
@@ -31,8 +30,7 @@ const PipelineConnectionsPage = React.createClass({
     PipelinesActions.list();
     PipelineConnectionsActions.list();
 
-    const store = this.context.storeProvider.getStore('Streams');
-    store.listStreams().then((streams) => {
+    StreamsStore.listStreams().then((streams) => {
       streams.push({
         id: 'default',
         title: 'Incoming messages',
