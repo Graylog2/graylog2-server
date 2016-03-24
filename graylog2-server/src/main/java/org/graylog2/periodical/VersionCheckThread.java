@@ -169,7 +169,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return config.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return config.isEnabled();
     }
 
     @Override

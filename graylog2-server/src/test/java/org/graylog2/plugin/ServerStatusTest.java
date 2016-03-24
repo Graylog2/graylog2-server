@@ -171,8 +171,8 @@ public class ServerStatusTest {
 
     @Test
     public void testAddCapabilities() throws Exception {
-        assertEquals(status.addCapabilities(ServerStatus.Capability.LOCALMODE), status);
-        assertTrue(status.hasCapabilities(ServerStatus.Capability.MASTER, ServerStatus.Capability.LOCALMODE));
+        assertEquals(status.addCapabilities(ServerStatus.Capability.SERVER), status);
+        assertTrue(status.hasCapabilities(ServerStatus.Capability.MASTER, ServerStatus.Capability.SERVER));
     }
 
     @Test
@@ -228,14 +228,5 @@ public class ServerStatusTest {
 
         status.unlockProcessingPause();
         assertFalse(status.processingPauseLocked());
-    }
-
-    @Test
-    public void testSetLocalMode() throws Exception {
-        status.setLocalMode(false);
-        assertFalse(status.hasCapability(ServerStatus.Capability.LOCALMODE));
-
-        status.setLocalMode(true);
-        assertTrue(status.hasCapability(ServerStatus.Capability.LOCALMODE));
     }
 }
