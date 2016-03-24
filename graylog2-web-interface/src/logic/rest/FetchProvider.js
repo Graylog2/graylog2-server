@@ -1,7 +1,6 @@
 import request from 'superagent-bluebird-promise';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SessionActions = ActionsProvider.getActions('Session');
@@ -31,6 +30,7 @@ export class Builder {
   }
 
   authenticated() {
+    const SessionStore = StoreProvider.getStore('Session');
     const token = SessionStore.getSessionId();
     this.request = this.request.auth(token, 'session');
 
@@ -56,6 +56,7 @@ export class Builder {
 
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
+        const SessionStore = StoreProvider.getStore('Session');
         if (SessionStore.isLoggedIn() && error.status === 401) {
           SessionActions.logout(SessionStore.getSessionId());
         }
@@ -85,6 +86,8 @@ export default function fetch(method, url, body) {
     .authenticated()
     .json(body)
     .build();
+
+  const SessionStore = StoreProvider.getStore('Session');
 
   if (!SessionStore.isLoggedIn()) {
     return new Promise((resolve, reject) => {
