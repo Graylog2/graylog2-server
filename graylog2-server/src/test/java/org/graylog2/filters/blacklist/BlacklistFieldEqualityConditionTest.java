@@ -16,25 +16,15 @@
  */
 package org.graylog2.filters.blacklist;
 
-import java.util.Objects;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
 
-public final class BlacklistFieldEqualityCondition extends FilterDescription {
-    public boolean matchesFieldStringValue(Object value) {
-        return (value != null) && pattern.equalsIgnoreCase(String.valueOf(value));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BlacklistFieldEqualityCondition)) return false;
-
-        BlacklistFieldEqualityCondition that = (BlacklistFieldEqualityCondition) o;
-
-        return Objects.equals(pattern, that.pattern);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(pattern);
+public class BlacklistFieldEqualityConditionTest {
+    @Test
+    public void testEquals() throws Exception {
+        EqualsVerifier.forClass(BlacklistFieldEqualityCondition.class)
+            .suppress(Warning.NONFINAL_FIELDS, Warning.ALL_FIELDS_SHOULD_BE_USED)
+            .verify();
     }
 }

@@ -21,7 +21,7 @@ import org.apache.shiro.authc.HostAuthenticationToken;
 
 import java.util.Objects;
 
-public class AccessTokenAuthToken implements HostAuthenticationToken {
+public final class AccessTokenAuthToken implements HostAuthenticationToken {
     private final String token;
     private final String host;
 

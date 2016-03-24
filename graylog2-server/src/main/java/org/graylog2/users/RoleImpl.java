@@ -27,7 +27,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-public class RoleImpl implements Role {
+public final class RoleImpl implements Role {
     @Id
     @org.mongojack.ObjectId
     @JsonProperty("id")

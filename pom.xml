@@ -747,6 +747,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>nl.jqno.equalsverifier</groupId>
+                <artifactId>equalsverifier</artifactId>
+                <version>2.0.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.directory.server</groupId>
                 <artifactId>apacheds-test-framework</artifactId>
                 <version>${apacheds-server.version}</version>
