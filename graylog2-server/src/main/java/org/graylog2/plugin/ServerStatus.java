@@ -43,8 +43,7 @@ public class ServerStatus {
 
     public enum Capability {
         SERVER,
-        MASTER,
-        LOCALMODE
+        MASTER
     }
 
     private final EventBus eventBus;
@@ -199,19 +198,6 @@ public class ServerStatus {
 
     public void unlockProcessingPause() {
         processingPauseLocked.set(false);
-    }
-
-    private ServerStatus removeCapability(Capability capability) {
-        this.capabilitySet.remove(capability);
-        return this;
-    }
-
-    public void setLocalMode(boolean localMode) {
-        if (localMode) {
-            addCapability(Capability.LOCALMODE);
-        } else {
-            removeCapability(Capability.LOCALMODE);
-        }
     }
 
     public enum MessageDetailRecordingStrategy {
