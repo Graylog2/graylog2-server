@@ -239,12 +239,14 @@ public abstract class SearchResource extends RestResource {
         QueryParseError errorMessage = QueryParseError.create(query, "Unable to execute search", e.getClass().getCanonicalName());
 
         // We're so going to hell for this…
-        if (e.getMessage().contains("nested: ParseException")) {
+        if (e.toString().contains("nested: QueryParsingException")) {
             final QueryParser queryParser = new QueryParser("", new StandardAnalyzer());
             try {
                 queryParser.parse(query);
             } catch (ParseException parseException) {
-                Token currentToken = parseException.currentToken;
+                // FIXME I have no idea why this is necessary but without that call currentToken will be null.
+                final ParseException exception = queryParser.generateParseException();
+                Token currentToken = exception.currentToken;
                 if (currentToken == null) {
                     LOG.warn("No position/token available for ParseException.", parseException);
                     errorMessage = QueryParseError.create(
