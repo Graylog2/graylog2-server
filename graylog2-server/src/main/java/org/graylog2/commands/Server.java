@@ -181,16 +181,6 @@ public class Server extends ServerBootstrap {
         }
     }
 
-    @Override
-    protected boolean validateConfiguration() {
-        if (configuration.getPasswordSecret().isEmpty()) {
-            LOG.error("No password secret set. Please define \"password_secret\" in your Graylog configuration.");
-            return false;
-        }
-
-        return true;
-    }
-
     private static class ShutdownHook implements Runnable {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;

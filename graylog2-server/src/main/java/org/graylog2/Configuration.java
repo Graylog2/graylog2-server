@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
+import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.joda.time.DateTimeZone;
 
@@ -44,7 +45,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;
 
-    @Parameter(value = "password_secret", required = true)
+    @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true)

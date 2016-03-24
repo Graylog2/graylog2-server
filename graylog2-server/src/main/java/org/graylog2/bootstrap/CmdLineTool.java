@@ -134,7 +134,14 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
 
-    protected abstract boolean validateConfiguration();
+    /**
+     * Validate the given configuration for this command.
+     *
+     * @return {@code true} if the configuration is valid, {@code false}.
+     */
+    protected boolean validateConfiguration() {
+        return true;
+    }
 
     public boolean isDumpConfig() {
         return dumpConfig;
