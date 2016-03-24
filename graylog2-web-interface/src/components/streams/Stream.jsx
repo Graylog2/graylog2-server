@@ -4,8 +4,11 @@ import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
 import PermissionsMixin from 'util/PermissionsMixin';
-import StreamsStore from 'stores/streams/StreamsStore';
-import StreamRulesStore from 'stores/streams/StreamRulesStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
+
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import UserNotification from 'util/UserNotification';
 import { Button } from 'react-bootstrap';

@@ -1,11 +1,12 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
-import NodesStore from 'stores/nodes/NodesStore';
-import ClusterOverviewStore from 'stores/cluster/ClusterOverviewStore';
-import PluginsStore from 'stores/plugins/PluginsStore';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
-import InputTypesStore from 'stores/inputs/InputTypesStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
+const PluginsStore = StoreProvider.getStore('Plugins');
+const InputStatesStore = StoreProvider.getStore('InputStates');
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { PageHeader, Spinner } from 'components/common';

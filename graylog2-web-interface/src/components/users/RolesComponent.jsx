@@ -2,9 +2,10 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import RolesStore from 'stores/users/RolesStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const RolesStore = StoreProvider.getStore('Roles');
 
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';

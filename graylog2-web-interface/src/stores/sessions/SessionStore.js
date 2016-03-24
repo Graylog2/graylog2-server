@@ -4,7 +4,8 @@ import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
 import { Builder } from 'logic/rest/FetchProvider';
 
-import SessionActions from 'actions/sessions/SessionActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
 
 const SessionStore = Reflux.createStore({
   listenables: [SessionActions],

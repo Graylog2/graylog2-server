@@ -6,11 +6,11 @@ const fetch = require('logic/rest/FetchProvider').default;
 
 const UserNotification = require('util/UserNotification');
 
-export interface UsageStatsOptOutState {
+interface UsageStatsOptOutState {
     opt_out: boolean
 }
 
-export var UsageStatsOptOutStore = {
+var UsageStatsOptOutStore = {
     pluginEnabled(): Promise<boolean> {
         var url = URLUtils.qualifyUrl(ApiRoutes.UsageStatsApiController.pluginEnabled().url);
         var promise = fetch('GET', url);
@@ -70,3 +70,5 @@ export var UsageStatsOptOutStore = {
         return promise;
     }
 };
+
+module.exports = UsageStatsOptOutStore;

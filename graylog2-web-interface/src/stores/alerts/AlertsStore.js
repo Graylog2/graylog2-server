@@ -6,7 +6,8 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-import AlertsActions from 'actions/alerts/AlertsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertsActions = ActionsProvider.getActions('Alerts');
 
 const AlertsStore = Reflux.createStore({
   listenables: [AlertsActions],

@@ -5,7 +5,8 @@ import { IfPermitted } from 'components/common';
 import StreamForm from './StreamForm';
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 const StreamControls = React.createClass({
   propTypes: {

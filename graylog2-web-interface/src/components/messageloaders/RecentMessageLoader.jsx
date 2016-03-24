@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 
-import UniversalSearchStore from 'stores/search/UniversalSearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 const RecentMessageLoader = React.createClass({
   propTypes: {

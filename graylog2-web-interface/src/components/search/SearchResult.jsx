@@ -6,7 +6,9 @@ import { AddSearchCountToDashboard, LegacyHistogram, ResultTable, SearchSidebar,
 
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 import DocsHelper from 'util/DocsHelper';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';

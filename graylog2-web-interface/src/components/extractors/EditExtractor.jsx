@@ -4,12 +4,15 @@ import {Row, Col, Input, Button, FormControls} from 'react-bootstrap';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import EditExtractorConverters from './EditExtractorConverters';
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-import ToolsStore from 'stores/tools/ToolsStore';
+import StoreProvider from 'injection/StoreProvider';
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const EditExtractor = React.createClass({
   propTypes: {

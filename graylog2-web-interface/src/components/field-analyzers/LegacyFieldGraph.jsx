@@ -6,8 +6,9 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 
-import SearchStore from 'stores/search/SearchStore';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 import StringUtils from 'util/StringUtils';
 

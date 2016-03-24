@@ -8,8 +8,11 @@ import URLUtils from 'util/URLUtils';
 
 import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader, WidgetVisualizationNotFound } from 'components/widgets';
 
-import WidgetsStore from 'stores/widgets/WidgetsStore';
-import WidgetsActions from 'actions/widgets/WidgetsActions';
+import StoreProvider from 'injection/StoreProvider';
+const WidgetsStore = StoreProvider.getStore('Widgets');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const WidgetsActions = ActionsProvider.getActions('Widgets');
 
 const Widget = React.createClass({
   propTypes: {

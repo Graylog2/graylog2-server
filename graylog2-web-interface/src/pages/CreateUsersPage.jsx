@@ -4,8 +4,9 @@ import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
 
-import RolesStore from 'stores/users/RolesStore';
-import UsersStore from 'stores/users/UsersStore';
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles');
+const UsersStore = StoreProvider.getStore('Users');
 
 import Spinner from 'components/common/Spinner';
 import PageHeader from 'components/common/PageHeader';

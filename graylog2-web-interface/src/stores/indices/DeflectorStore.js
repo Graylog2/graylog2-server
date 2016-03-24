@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import DeflectorActions from 'actions/indices/DeflectorActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const DeflectorActions = ActionsProvider.getActions('Deflector');
 
 const DeflectorStore = Reflux.createStore({
   listenables: [DeflectorActions],

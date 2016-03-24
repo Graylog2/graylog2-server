@@ -3,8 +3,9 @@ import Reflux from 'reflux';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const AlertReceiver = React.createClass({
   propTypes: {

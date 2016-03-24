@@ -4,8 +4,9 @@ import Reflux from 'reflux';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { PageHeader, Spinner } from 'components/common';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamEditPage = React.createClass({
   propTypes: {

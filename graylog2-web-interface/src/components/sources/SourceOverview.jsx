@@ -15,10 +15,13 @@ import DateTime from 'logic/datetimes/DateTime';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-import SourcesStore from 'stores/sources/SourcesStore';
-import HistogramDataActions from 'actions/sources/HistogramDataActions';
-import HistogramDataStore from 'stores/sources/HistogramDataStore';
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SourcesStore = StoreProvider.getStore('Sources');
+const HistogramDataStore = StoreProvider.getStore('HistogramData');
+const SearchStore = StoreProvider.getStore('Search');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const HistogramDataActions = ActionsProvider.getActions('HistogramData');
 
 const daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 const hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');

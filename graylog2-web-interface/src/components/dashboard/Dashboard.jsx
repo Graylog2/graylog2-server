@@ -6,9 +6,10 @@ import { LinkContainer } from 'react-router-bootstrap';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 import Routes from 'routing/Routes';
 import ApiRoutes from 'routing/ApiRoutes';

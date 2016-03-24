@@ -8,8 +8,9 @@ import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 
-import FieldQuickValuesStore from 'stores/field-analyzers/FieldQuickValuesStore';
-import RefreshStore from 'stores/tools/RefreshStore';
+import StoreProvider from 'injection/StoreProvider';
+const FieldQuickValuesStore = StoreProvider.getStore('FieldQuickValues');
+const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldQuickValues = React.createClass({
   propTypes: {

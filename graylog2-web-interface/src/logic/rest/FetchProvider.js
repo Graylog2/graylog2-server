@@ -1,7 +1,12 @@
 import request from 'superagent-bluebird-promise';
-import SessionStore from 'stores/sessions/SessionStore';
-import SessionActions from 'actions/sessions/SessionActions';
-import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
+
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
+const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+
 import Routes from 'routing/Routes';
 import history from 'util/History';
 

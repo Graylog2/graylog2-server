@@ -4,7 +4,8 @@ import UserNotification from 'util/UserNotification';
 
 import fetch from 'logic/rest/FetchProvider';
 
-import LdapGroupsActions from 'actions/ldap/LdapGroupsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
 
 const LdapGroupsStore = Reflux.createStore({
   listenables: [LdapGroupsActions],

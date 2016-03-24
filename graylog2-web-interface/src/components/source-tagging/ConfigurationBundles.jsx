@@ -5,8 +5,11 @@ import $ from 'jquery';
 
 import UserNotification from 'util/UserNotification';
 
-import ConfigurationBundlesActions from 'actions/configuration-bundles/ConfigurationBundlesActions';
-import ConfigurationBundlesStore from 'stores/configuration-bundles/ConfigurationBundlesStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
+
+import StoreProvider from 'injection/StoreProvider';
+const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles');
 
 import SourceType from './SourceType';
 import ConfigurationBundlePreview from './ConfigurationBundlePreview';

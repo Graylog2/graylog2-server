@@ -5,8 +5,11 @@ import {Row, Col, Input} from 'react-bootstrap';
 import {ClipboardButton, Spinner} from 'components/common';
 import Version from 'util/Version';
 
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExportExtractors = React.createClass({
   propTypes: {

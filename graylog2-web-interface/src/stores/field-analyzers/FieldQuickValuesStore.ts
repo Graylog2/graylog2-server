@@ -1,7 +1,10 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 const fetch = require('logic/rest/FetchProvider').default;
-import SearchStore = require('stores/search/SearchStore');
+
+const StoreProvider = require('injection/StoreProvider');
+const SearchStore = StoreProvider.getStore('Search');
+
 const UserNotification = require('util/UserNotification');
 import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
@@ -46,4 +49,4 @@ const FieldQuickValuesStore = {
     },
 };
 
-export default FieldQuickValuesStore;
+module.exports = FieldQuickValuesStore;

@@ -5,8 +5,10 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import UserNotification from 'util/UserNotification';
-import ToolsStore from 'stores/tools/ToolsStore';
 import FormUtils from 'util/FormsUtils';
+
+import StoreProvider from 'injection/StoreProvider';
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const RegexExtractorConfiguration = React.createClass({
   propTypes: {

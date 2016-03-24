@@ -7,7 +7,8 @@ import UsageStatsOptOut from 'components/usagestats/UsageStatsOptOut';
 
 import Routes from 'routing/Routes';
 
-import SystemStore from 'stores/system/SystemStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({

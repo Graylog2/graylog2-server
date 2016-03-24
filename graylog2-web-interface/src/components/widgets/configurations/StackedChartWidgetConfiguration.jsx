@@ -5,7 +5,9 @@ import { WidgetEditConfigModal } from 'components/widgets';
 
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 const StackedChartWidgetConfiguration = React.createClass({
   propTypes: {

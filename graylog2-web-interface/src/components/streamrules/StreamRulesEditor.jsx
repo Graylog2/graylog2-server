@@ -12,8 +12,9 @@ import StreamRuleList from './StreamRuleList';
 import StreamRuleForm from './StreamRuleForm';
 import Spinner from 'components/common/Spinner';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import StreamRulesStore from 'stores/streams/StreamRulesStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 const StreamRulesEditor = React.createClass({
   propTypes() {

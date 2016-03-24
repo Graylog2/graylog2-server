@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import SystemJobsActions from 'actions/systemjobs/SystemJobsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
 
 const SystemJobsStore = Reflux.createStore({
   listenables: [SystemJobsActions],

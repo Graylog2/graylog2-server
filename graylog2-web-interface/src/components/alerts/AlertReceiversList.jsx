@@ -4,9 +4,10 @@ import { Row, Col, Input, Alert, Button } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import UsersStore from 'stores/users/UsersStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const UsersStore = StoreProvider.getStore('Users');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import {TypeAheadInput} from 'components/common';
 import AlertReceiver from 'components/alerts/AlertReceiver';

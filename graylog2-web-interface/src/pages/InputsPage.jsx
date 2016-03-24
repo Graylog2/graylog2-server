@@ -1,8 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import InputStatesStore from 'stores/inputs/InputStatesStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const InputStatesStore = StoreProvider.getStore('InputStates');
 
 import { PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';

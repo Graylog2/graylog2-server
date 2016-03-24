@@ -4,10 +4,12 @@ import { Button, Row, Col } from 'react-bootstrap';
 
 import { Select } from 'components/common';
 
-import InputTypesActions from 'actions/inputs/InputTypesActions';
-import InputsActions from 'actions/inputs/InputsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputTypesActions = ActionsProvider.getActions('InputTypes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
-import InputTypesStore from 'stores/inputs/InputTypesStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { InputForm } from 'components/inputs';
 

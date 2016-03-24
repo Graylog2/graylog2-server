@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
-import IndexerClusterStore from 'stores/indexers/IndexerClusterStore';
+import StoreProvider from 'injection/StoreProvider';
+const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
 
 import { Spinner } from 'components/common';
 import { DocumentationLink, SmallSupportLink } from 'components/support';

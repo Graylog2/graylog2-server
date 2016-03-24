@@ -8,11 +8,14 @@ import InputListItem from './InputListItem';
 import {IfPermitted, Spinner} from 'components/common';
 import CreateInputControl from './CreateInputControl';
 
-import InputsActions from 'actions/inputs/InputsActions';
-import InputsStore from 'stores/inputs/InputsStore';
-import SingleNodeActions from 'actions/nodes/SingleNodeActions';
-import SingleNodeStore from 'stores/nodes/SingleNodeStore';
-import InputTypesActions from 'actions/inputs/InputTypesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
+const SingleNodeActions = ActionsProvider.getActions('SingleNode');
+const InputTypesActions = ActionsProvider.getActions('InputTypes');
+
+import StoreProvider from 'injection/StoreProvider';
+const InputsStore = StoreProvider.getStore('Inputs');
+const SingleNodeStore = StoreProvider.getStore('SingleNode');
 
 const InputsList = React.createClass({
   propTypes: {

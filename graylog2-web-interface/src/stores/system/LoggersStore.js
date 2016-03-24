@@ -4,7 +4,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import LoggersActions from 'actions/system/LoggersActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const LoggersActions = ActionsProvider.getActions('Loggers');
 
 const LoggersStore = Reflux.createStore({
   listenables: [LoggersActions],

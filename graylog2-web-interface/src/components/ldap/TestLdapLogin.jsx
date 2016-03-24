@@ -3,7 +3,8 @@ import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
 
 import ObjectUtils from 'util/ObjectUtils';
 
-import LdapActions from 'actions/ldap/LdapActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapActions = ActionsProvider.getActions('Ldap');
 
 const TestLdapLogin = React.createClass({
   propTypes: {

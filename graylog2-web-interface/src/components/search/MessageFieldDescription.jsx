@@ -2,7 +2,10 @@ import $ from 'jquery';
 import React, {PropTypes} from 'react';
 import {Alert} from 'react-bootstrap';
 import Immutable from 'immutable';
-import MessagesStore from 'stores/messages/MessagesStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const MessagesStore = StoreProvider.getStore('Messages');
+
 import MessageFieldSearchActions from './MessageFieldSearchActions';
 
 const MessageFieldDescription = React.createClass({

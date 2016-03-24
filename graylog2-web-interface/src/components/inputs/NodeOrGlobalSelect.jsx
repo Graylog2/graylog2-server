@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Input } from 'react-bootstrap';
 
-import NodesStore from 'stores/nodes/NodesStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
 
 import { Spinner } from 'components/common';
 

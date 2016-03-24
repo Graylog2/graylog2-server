@@ -9,7 +9,9 @@ const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
 const fetch = require('logic/rest/FetchProvider').default;
 const PermissionsMixin = require('util/PermissionsMixin');
-const CurrentUserStore = require('stores/users/CurrentUserStore');
+
+const StoreProvider = require('injection/StoreProvider');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 interface Dashboard {
   id: string;
@@ -127,12 +129,7 @@ class DashboardsStore {
     const promise = fetch('POST', url, {title: title, description: description})
       .then((response) => {
         UserNotification.success("Dashboard successfully created");
-
-        if (this._onDashboardsChanged.length > 0) {
-          this.updateDashboards();
-        } else if (this._onWritableDashboardsChanged.length > 0) {
-          this.updateWritableDashboards();
-        }
+        this.updateWritableDashboards();
         return response.dashboard_id;
       }, (error) => {
         UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + error,
@@ -148,12 +145,7 @@ class DashboardsStore {
 
     promise.then(() => {
       UserNotification.success("Dashboard successfully updated");
-
-      if (this._onDashboardsChanged.length > 0) {
-        this.updateDashboards();
-      } else if (this._onWritableDashboardsChanged.length > 0) {
-        this.updateWritableDashboards();
-      }
+      this.updateWritableDashboards();
     }, (error) => {
       UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + error,
         "Could not save dashboard");
@@ -168,12 +160,7 @@ class DashboardsStore {
 
     promise.then(() => {
       UserNotification.success("Dashboard successfully deleted");
-
-      if (this._onDashboardsChanged.length > 0) {
-        this.updateDashboards();
-      } else if (this._onWritableDashboardsChanged.length > 0) {
-        this.updateWritableDashboards();
-      }
+      this.updateWritableDashboards();
     }, (error) => {
       UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + error,
         "Could not delete dashboard");

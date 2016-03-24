@@ -4,9 +4,10 @@ import { Row, Col } from 'react-bootstrap';
 
 import { PageHeader, Spinner } from 'components/common';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import NodesStore from 'stores/nodes/NodesStore';
-import ClusterOverviewStore from 'stores/cluster/ClusterOverviewStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 import DateTime from 'logic/datetimes/DateTime';
 

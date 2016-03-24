@@ -6,9 +6,11 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
-import SavedSearchesActions from 'actions/search/SavedSearchesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

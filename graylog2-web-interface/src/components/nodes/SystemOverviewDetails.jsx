@@ -8,7 +8,8 @@ import NodeThroughput from 'components/throughput/NodeThroughput';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 
-import SystemProcessingStore from 'stores/system-processing/SystemProcessingStore';
+import StoreProvider from 'injection/StoreProvider';
+const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 
 const SystemOverviewDetails = React.createClass({
   propTypes: {

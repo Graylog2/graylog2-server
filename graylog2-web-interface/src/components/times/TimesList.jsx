@@ -4,8 +4,9 @@ import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import SystemStore from 'stores/system/SystemStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const SystemStore = StoreProvider.getStore('System');
 
 import { Spinner, Timestamp } from 'components/common';
 

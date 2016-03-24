@@ -3,7 +3,8 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
-import ConfigurationActions from 'actions/configurations/ConfigurationActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const urlPrefix = '/system/cluster_config';
 

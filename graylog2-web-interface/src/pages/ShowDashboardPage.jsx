@@ -3,10 +3,11 @@ import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import FocusStore from 'stores/tools/FocusStore';
-import WidgetsStore from 'stores/widgets/WidgetsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const FocusStore = StoreProvider.getStore('Focus');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';

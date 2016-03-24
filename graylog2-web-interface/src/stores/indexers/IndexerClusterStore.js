@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import IndexerClusterActions from 'actions/indexers/IndexerClusterActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndexerClusterActions = ActionsProvider.getActions('IndexerCluster');
 
 const IndexerClusterStore = Reflux.createStore({
   listenables: [IndexerClusterActions],

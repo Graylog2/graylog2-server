@@ -1,7 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import LoggersStore from 'stores/system/LoggersStore';
+import StoreProvider from 'injection/StoreProvider';
+const LoggersStore = StoreProvider.getStore('Loggers');
 
 import { LogLevelMetrics } from 'components/loggers';
 

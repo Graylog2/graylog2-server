@@ -4,7 +4,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 
-import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
 const ServerAvailabilityStore = Reflux.createStore({
   listenables: [ServerAvailabilityActions],

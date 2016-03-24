@@ -4,7 +4,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch, {Builder} from 'logic/rest/FetchProvider';
 
-import NotificationsActions from 'actions/notifications/NotificationsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const NotificationsActions = ActionsProvider.getActions('Notifications');
 
 const NotificationsStore = Reflux.createStore({
   listenables: [NotificationsActions],

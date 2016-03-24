@@ -4,7 +4,9 @@ import {Button} from 'react-bootstrap';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
-import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
+import StoreProvider from 'injection/StoreProvider';
+const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
+
 import NumberUtils from 'util/NumberUtils';
 import UserNotification from 'util/UserNotification';
 

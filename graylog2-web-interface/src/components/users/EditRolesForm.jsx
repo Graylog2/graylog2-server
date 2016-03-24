@@ -3,8 +3,9 @@ import { Alert, Col, Button, Input, Row } from 'react-bootstrap';
 
 import UserNotification from 'util/UserNotification';
 
-import RolesStore from 'stores/users/RolesStore';
-import UsersStore from 'stores/users/UsersStore';
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles');
+const UsersStore = StoreProvider.getStore('Users');
 
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';

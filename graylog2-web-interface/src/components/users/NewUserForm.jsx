@@ -5,7 +5,9 @@ import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
 import { TimezoneSelect } from 'components/common';
 
-import UsersStore from 'stores/users/UsersStore';
+import StoreProvider from 'injection/StoreProvider';
+const UsersStore = StoreProvider.getStore('Users');
+
 import ValidationsUtils from 'util/ValidationsUtils';
 
 const NewUserForm = React.createClass({

@@ -1,12 +1,11 @@
 import Reflux from 'reflux';
-import jQuery from 'jquery';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import IndicesActions from 'actions/indices/IndicesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const IndicesActions = ActionsProvider.getActions('Indices');
 
 const IndicesStore = Reflux.createStore({
   listenables: [IndicesActions],

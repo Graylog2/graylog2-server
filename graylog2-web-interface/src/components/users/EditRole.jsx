@@ -10,7 +10,6 @@ var FormControls = require('react-bootstrap').FormControls;
 var Alert = require('react-bootstrap').Alert;
 
 var PermissionSelector = require('./PermissionSelector');
-var RolesStore = require('../../stores/users/RolesStore').RolesStore;
 var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var EditRole = React.createClass({

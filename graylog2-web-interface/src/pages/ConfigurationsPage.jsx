@@ -4,8 +4,11 @@ import { Row, Col } from 'react-bootstrap';
 import { PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import ConfigurationsStore from 'stores/configurations/ConfigurationsStore';
-import ConfigurationActions from 'actions/configurations/ConfigurationActions';
+import StoreProvider from 'injection/StoreProvider';
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';

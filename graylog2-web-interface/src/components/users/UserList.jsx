@@ -1,13 +1,13 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
-import UsersStore from 'stores/users/UsersStore';
-import RolesStore from 'stores/users/RolesStore';
+import StoreProvider from 'injection/StoreProvider';
+const UsersStore = StoreProvider.getStore('Users');
+const RolesStore = StoreProvider.getStore('Roles');
 
 import DataTable from 'components/common/DataTable';
 import Spinner from 'components/common/Spinner';

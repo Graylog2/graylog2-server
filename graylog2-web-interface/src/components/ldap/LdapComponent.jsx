@@ -12,9 +12,12 @@ import Routes from 'routing/Routes';
 import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 
-import RolesStore from 'stores/users/RolesStore';
-import LdapActions from 'actions/ldap/LdapActions';
-import LdapStore from 'stores/ldap/LdapStore';
+import StoreProvider from 'injection/StoreProvider';
+const RolesStore = StoreProvider.getStore('Roles');
+const LdapStore = StoreProvider.getStore('Ldap');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const LdapActions = ActionsProvider.getActions('Ldap');
 
 const HelperText = {
   activeDirectory: {

@@ -1,10 +1,6 @@
 import React from 'react';
-import Reflux from 'reflux';
 import jQuery from 'jquery';
 
-import NodesStore from 'stores/nodes/NodesStore';
-
-import { Spinner } from 'components/common';
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
 

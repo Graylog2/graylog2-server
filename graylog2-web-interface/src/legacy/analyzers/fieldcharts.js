@@ -3,6 +3,8 @@ import jQueryUI from 'jquery-ui';
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
+import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
+import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
 
 import DateTime from 'logic/datetimes/DateTime';
 import GraphVisualization from 'components/visualizations/GraphVisualization';

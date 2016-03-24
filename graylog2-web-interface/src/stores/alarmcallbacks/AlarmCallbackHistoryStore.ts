@@ -19,4 +19,4 @@ class AlarmCallbackHistoryStore {
     }
 }
 const alarmCallbackHistoryStore = new AlarmCallbackHistoryStore();
-export default alarmCallbackHistoryStore;
+module.exports = alarmCallbackHistoryStore;

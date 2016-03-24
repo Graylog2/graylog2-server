@@ -1,7 +1,9 @@
 import React, {PropTypes} from 'react';
 import {Input, Button} from 'react-bootstrap';
 
-import ToolsStore from 'stores/tools/ToolsStore';
+import StoreProvider from 'injection/StoreProvider';
+const ToolsStore = StoreProvider.getStore('Tools');
+
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';

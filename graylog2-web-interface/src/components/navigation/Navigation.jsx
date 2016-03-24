@@ -7,7 +7,9 @@ import naturalSort from 'javascript-natural-sort';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
-import NotificationsStore from 'stores/notifications/NotificationsStore';
+import StoreProvider from 'injection/StoreProvider';
+const NotificationsStore = StoreProvider.getStore('Notifications');
+
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';

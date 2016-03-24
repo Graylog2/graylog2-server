@@ -4,12 +4,15 @@ import Immutable from 'immutable';
 import MessageShow from 'components/search/MessageShow';
 import Spinner from 'components/common/Spinner';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import NodesActions from 'actions/nodes/NodesActions';
-import NodesStore from 'stores/nodes/NodesStore';
-import InputsActions from 'actions/inputs/InputsActions';
-import InputsStore from 'stores/inputs/InputsStore';
-import MessagesStore from 'stores/messages/MessagesStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const NodesActions = ActionsProvider.getActions('Nodes');
+const InputsActions = ActionsProvider.getActions('Inputs');
+
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const StreamsStore = StoreProvider.getStore('Streams');
+const InputsStore = StoreProvider.getStore('Inputs');
+const MessagesStore = StoreProvider.getStore('Messages');
 
 const ShowMessagePage = React.createClass({
   propTypes: {
