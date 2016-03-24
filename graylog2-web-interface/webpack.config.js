@@ -55,7 +55,10 @@ const webpackConfig = {
       template: 'templates/index.html.template',
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
-        if (c1.names[0] === 'polyfill' || c2.names[0] === 'polyfill') {
+        if (c1.names[0] === 'polyfill') {
+          return -1;
+        }
+        if (c2.names[0] === 'polyfill') {
           return 1;
         }
         return c2.id - c1.id;

@@ -82,9 +82,14 @@ public class PluginAssets {
         List<String> sortedJsFiles = jsFiles().stream()
                 .sorted((file1, file2) -> {
                     // Polyfill JS script goes first
-                    if (file1.equals(polyfillJsFile) || file2.equals(polyfillJsFile)) {
+                    if (file1.equals(polyfillJsFile)) {
                         return -1;
                     }
+
+                    if (file2.equals(polyfillJsFile)) {
+                        return 1;
+                    }
+
                     // App JS script goes last, as plugins need to be loaded before
                     return file2.compareTo(file1);
                 })
