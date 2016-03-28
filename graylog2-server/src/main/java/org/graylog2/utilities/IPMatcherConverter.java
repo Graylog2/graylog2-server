@@ -35,7 +35,6 @@ public class IPMatcherConverter implements Converter<IPMatcher> {
                 // May throw IllegalArgumentException on garbage input
                 builder.addPatternOrHost(subnet.trim());
             }
-
         }
         return builder.build();
     }
