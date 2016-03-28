@@ -16,6 +16,7 @@
  */
 package org.graylog2;
 
+import com.atlassian.ip.IPMatcher;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
@@ -25,6 +26,7 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.utilities.IPMatcherConverter;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
@@ -152,6 +154,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
+
+    @Parameter(value = "trusted_proxies", converter = IPMatcherConverter.class)
+    private IPMatcher trustedProxies = IPMatcher.builder().build();
 
     public boolean isMaster() {
         return isMaster;
@@ -306,4 +311,6 @@ public class Configuration extends BaseConfiguration {
     public Duration getIndexRangesCleanupInterval() {
         return indexRangesCleanupInterval;
     }
+
+    public IPMatcher getTrustedProxies() { return trustedProxies; }
 }
