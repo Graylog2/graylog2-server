@@ -159,6 +159,10 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected abstract List<Object> getCommandConfigurationBeans();
 
+    /**
+     * Things that have to run before the {@link #startCommand()} method is being called.
+     */
+    protected void beforeStart() {}
 
     @Override
     public void run() {
@@ -180,6 +184,8 @@ public abstract class CmdLineTool implements CliCommand {
             LOG.error("Validating configuration file failed - exiting.");
             System.exit(1);
         }
+
+        beforeStart();
 
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
