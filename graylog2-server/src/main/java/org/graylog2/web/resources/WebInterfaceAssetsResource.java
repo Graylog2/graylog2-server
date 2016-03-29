@@ -30,6 +30,7 @@ import org.graylog2.web.PluginAssets;
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
@@ -62,6 +63,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
+@Singleton
 @Path("/")
 public class WebInterfaceAssetsResource {
     private static final MimetypesFileTypeMap MIME_TYPES = new MimetypesFileTypeMap();
