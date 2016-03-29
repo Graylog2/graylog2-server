@@ -131,7 +131,7 @@ public final class GELFMessageChunk {
     // lol duplication
     private void extractSequenceCount() {
         if (this.sequenceCount == -1) {
-            final int seqCnt = payload.getUnsignedByte(HEADER_PART_SEQCNT_START);;
+            final int seqCnt = payload.getUnsignedByte(HEADER_PART_SEQCNT_START);
             if (seqCnt >= 0) {
                 this.sequenceCount = seqCnt;
             } else {
