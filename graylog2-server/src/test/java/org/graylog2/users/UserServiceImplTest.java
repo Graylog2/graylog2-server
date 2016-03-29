@@ -154,12 +154,12 @@ public class UserServiceImplTest {
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, fields);
+            return new UserImpl(passwordAlgorithmFactory, null, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, null, id, fields);
         }
 
         @Override

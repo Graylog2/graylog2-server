@@ -38,6 +38,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.security.Permissions;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ import static com.google.common.base.Strings.nullToEmpty;
 @CollectionName(UserImpl.COLLECTION_NAME)
 public class UserImpl extends PersistedImpl implements User {
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+    private final Permissions permissions;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -90,17 +92,21 @@ public class UserImpl extends PersistedImpl implements User {
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                    Permissions permissions,
                     @Assisted final Map<String, Object> fields) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
+        this.permissions = permissions;
     }
 
     @AssistedInject
     protected UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                       Permissions permissions,
                        @Assisted final ObjectId id,
                        @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
+        this.permissions = permissions;
     }
 
     @Override
@@ -157,7 +163,9 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     @SuppressWarnings("unchecked")
     public List<String> getPermissions() {
-        return (List<String>) fields.get(PERMISSIONS);
+        final Set<String> permissionSet = Sets.newHashSet((List<String>) fields.get(PERMISSIONS));
+        permissionSet.addAll(permissions.userSelfEditPermissions(getName()));
+        return Lists.newArrayList(permissionSet);
     }
 
     @Override
@@ -320,7 +328,7 @@ public class UserImpl extends PersistedImpl implements User {
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                               Configuration configuration,
                               @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, (ObjectId)null, Collections.<String, Object>emptyMap());
+            super(passwordAlgorithmFactory, null, null, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }
