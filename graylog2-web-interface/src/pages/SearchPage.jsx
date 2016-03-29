@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -45,8 +45,8 @@ const SearchPage = React.createClass({
 
     StreamsStore.listStreams().then((streams) => {
       const streamsMap = {};
-      streams.forEach((stream) => streamsMap[stream.id] = stream);
-      this.setState({streams: Immutable.Map(streamsMap)});
+      streams.forEach((stream) => { streamsMap[stream.id] = stream; });
+      this.setState({ streams: Immutable.Map(streamsMap) });
     });
 
     NodesActions.list();
@@ -80,7 +80,7 @@ const SearchPage = React.createClass({
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
-    this.setState({inputs: Immutable.Map(inputs)});
+    this.setState({ inputs: Immutable.Map(inputs) });
   },
   _determineHistogramResolution(response) {
     let queryRangeInMinutes;
@@ -133,19 +133,23 @@ const SearchPage = React.createClass({
 
   _onToggled(fieldName) {
     if (this.state.selectedFields.indexOf(fieldName) > 0) {
-      this.setState({selectedFields: this.state.selectedFields.filter((field) => field !== fieldName)});
+      this.setState({ selectedFields: this.state.selectedFields.filter((field) => field !== fieldName) });
     } else {
-      this.setState({selectedFields: this.state.selectedFields.concat(fieldName)});
+      this.setState({ selectedFields: this.state.selectedFields.concat(fieldName) });
     }
   },
 
+  _isLoading() {
+    return !this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram;
+  },
+
   render() {
-    if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram) {
+    if (this._isLoading()) {
       return <Spinner />;
     }
+
     const searchResult = this.state.searchResult;
     searchResult.all_fields = this.state.fields;
-    const selectedFields = this.sortFields(Immutable.List(this.state.selectedFields));
     return (
       <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
                     result={searchResult} histogram={this.state.histogram}
