@@ -75,20 +75,20 @@ ruleDeclaration
     ;
 
 expression
-    :   MessageRef '.' field=expression                                 # MessageRef
-    |   fieldSet=expression '.' field=expression                        # Nested
-    |   array=expression '[' index=expression ']'                       # IndexedAccess
-    |   functionCall                                                    # Func
+    :   '(' expression ')'                                              # ParenExpr
     |   literal                                                         # LiteralPrimary
     |   Identifier                                                      # Identifier
     |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
     |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
-    |   '(' expression ')'                                              # ParenExpr
+    |   MessageRef '.' field=expression                                 # MessageRef
+    |   fieldSet=expression '.' field=expression                        # Nested
+    |   array=expression '[' index=expression ']'                       # IndexedAccess
+    |   functionCall                                                    # Func
+    |   not=Not expression                                              # Not
 //    |   ('+'|'-') expression                                            # SignedExpression
 //    |   ('~'|'!') expression                                            # BitwiseNot
 //    |   expression ('*'|'/'|'%') expression                             # Multiplication
 //    |   expression ('+'|'-') expression                                 # Addition
-    |   not=Not expression                                              # Not
     |   left=expression comparison=('<=' | '>=' | '>' | '<') right=expression # Comparison
     |   left=expression equality=('==' | '!=') right=expression         # Equality
     |   left=expression and=And right=expression                        # And
