@@ -94,6 +94,7 @@ const ApiRoutes = {
   },
   ClusterMetricsApiController: {
     multiple: (nodeId) => { return { url: `/cluster/${nodeId}/metrics/multiple` }; },
+    multipleAllNodes: () => { return { url: `/cluster/metrics/multiple` }; },
     byNamespace: (nodeId, namespace) => { return { url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }; },
   },
   NotificationsApiController: {

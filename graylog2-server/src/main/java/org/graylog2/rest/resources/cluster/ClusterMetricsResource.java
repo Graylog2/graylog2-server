@@ -49,12 +49,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog metrics")
-@Path("/cluster/{nodeId}/metrics")
+@Path("/cluster")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterMetricsResource extends ProxiedResource {
     @Inject
@@ -71,7 +73,7 @@ public class ClusterMetricsResource extends ProxiedResource {
 
     @GET
     @Timed
-    @Path("/names")
+    @Path("/{nodeId}/metrics/names")
     @ApiOperation(value = "Get all metrics keys/names from node")
     @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
     public MetricNamesResponse metricNames(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
@@ -86,7 +88,7 @@ public class ClusterMetricsResource extends ProxiedResource {
 
     @POST
     @Timed
-    @Path("/multiple")
+    @Path("/{nodeId}/metrics/multiple")
     @ApiOperation("Get the values of multiple metrics at once from node")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
@@ -105,7 +107,7 @@ public class ClusterMetricsResource extends ProxiedResource {
 
     @GET
     @Timed
-    @Path("/namespace/{namespace}")
+    @Path("/{nodeId}/metrics/namespace/{namespace}")
     @ApiOperation(value = "Get all metrics of a namespace from node")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such metric namespace")
@@ -120,5 +122,17 @@ public class ClusterMetricsResource extends ProxiedResource {
         } else {
             throw new WebApplicationException(result.message(), BAD_GATEWAY);
         }
+    }
+
+    @POST
+    @Timed
+    @Path("/metrics/multiple")
+    @ApiOperation(value = "Get all metrics of all nodes in the cluster")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Malformed body")
+    })
+    public Map<String, Optional<MetricsSummaryResponse>> multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
+                                                          @Valid @NotNull MetricsReadRequest request) throws IOException, NodeNotFoundException {
+        return getForAllNodes(remoteMetricsResource -> remoteMetricsResource.multipleMetrics(request), createRemoteInterfaceProvider(RemoteMetricsResource.class));
     }
 }
