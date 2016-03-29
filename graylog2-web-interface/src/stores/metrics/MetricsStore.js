@@ -1,6 +1,5 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -88,7 +87,7 @@ const MetricsStore = Reflux.createStore({
     const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
       return fetch('GET', url).then((response) => {
-        return {nodeId: nodeId, names: response.metrics};
+        return { nodeId: nodeId, names: response.metrics };
       });
     })).then((responses) => {
       const metricsNames = {};
@@ -97,7 +96,7 @@ const MetricsStore = Reflux.createStore({
           metricsNames[response.nodeId] = response.names;
         }
       });
-      this.trigger({metricsNames: metricsNames});
+      this.trigger({ metricsNames: metricsNames });
       this.metricsNames = metricsNames;
       return metricsNames;
     });
