@@ -176,7 +176,7 @@ public class InputsResource extends RestResource {
 
         final Input input = inputService.find(inputId);
 
-        final Map<String, Object> mergedInput = inputService.getMessageInput(input).asMap();
+        final Map<String, Object> mergedInput = input.getFields();
         final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
         messageInput.checkConfiguration();
