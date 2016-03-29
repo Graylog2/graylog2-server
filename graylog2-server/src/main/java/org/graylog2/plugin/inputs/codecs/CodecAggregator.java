@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.inputs.codecs;
 
+import com.google.common.base.MoreObjects;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import javax.annotation.Nonnull;
@@ -24,13 +25,13 @@ import javax.annotation.Nullable;
 public interface CodecAggregator {
 
     @Nonnull
-    public Result addChunk(ChannelBuffer buf);
+    Result addChunk(ChannelBuffer buf);
 
-    public class Result {
+    final class Result {
         private final ChannelBuffer message;
         private final boolean valid;
 
-        public Result(ChannelBuffer message, boolean valid) {
+        public Result(@Nullable ChannelBuffer message, boolean valid) {
             this.message = message;
             this.valid = valid;
         }
@@ -42,6 +43,14 @@ public interface CodecAggregator {
 
         public boolean isValid() {
             return valid;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                .add("message", message)
+                .add("valid", valid)
+                .toString();
         }
     }
 }
