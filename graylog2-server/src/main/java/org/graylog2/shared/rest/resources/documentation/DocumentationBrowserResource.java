@@ -20,21 +20,28 @@ import com.google.common.io.Resources;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
 
+import static java.util.Objects.requireNonNull;
+
 @Path("/api-browser")
 public class DocumentationBrowserResource extends RestResource {
-    private static final MimetypesFileTypeMap MIME_TYPES = new MimetypesFileTypeMap();
+    private final MimetypesFileTypeMap mimeTypes;
 
     private ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+    @Inject
+    public DocumentationBrowserResource(MimetypesFileTypeMap mimeTypes) {
+        this.mimeTypes = requireNonNull(mimeTypes);
+    }
 
     @GET
     public Response root() {
@@ -58,7 +65,7 @@ public class DocumentationBrowserResource extends RestResource {
             try {
                 final byte[] resourceBytes = Resources.toByteArray(resource);
 
-                return Response.ok(resourceBytes, MIME_TYPES.getContentType(route))
+                return Response.ok(resourceBytes, mimeTypes.getContentType(route))
                         .header("Content-Length", resourceBytes.length)
                         .build();
             } catch (IOException e) {

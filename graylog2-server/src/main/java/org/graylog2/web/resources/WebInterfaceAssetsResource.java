@@ -62,19 +62,21 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.util.Objects.requireNonNull;
 
 @Singleton
 @Path("/")
 public class WebInterfaceAssetsResource {
-    private static final MimetypesFileTypeMap MIME_TYPES = new MimetypesFileTypeMap();
+    private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;
     private final Set<Plugin> plugins;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
 
     @Inject
-    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator, Set<Plugin> plugins) {
+    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator, Set<Plugin> plugins, MimetypesFileTypeMap mimeTypes) {
         this.indexHtmlGenerator = indexHtmlGenerator;
         this.plugins = plugins;
+        this.mimeTypes = requireNonNull(mimeTypes);
         fileSystemCache = CacheBuilder.newBuilder()
                 .maximumSize(1024)
                 .build(new CacheLoader<URI, FileSystem>() {
@@ -168,7 +170,7 @@ public class WebInterfaceAssetsResource {
             return response.build();
         }
 
-        final String contentType = firstNonNull(MIME_TYPES.getContentType(filename),
+        final String contentType = firstNonNull(mimeTypes.getContentType(filename),
                                                 MediaType.APPLICATION_OCTET_STREAM);
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
