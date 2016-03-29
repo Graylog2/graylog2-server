@@ -5,6 +5,8 @@ import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';
+import FormsUtils from 'util/FormsUtils';
+import ObjectUtils from 'util/ObjectUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -26,6 +28,7 @@ const UserForm = React.createClass({
       streams: undefined,
       dashboards: undefined,
       roles: undefined,
+      user: this._getUserStateFromProps(this.props),
     };
   },
   componentDidMount() {
@@ -38,6 +41,25 @@ const UserForm = React.createClass({
       this.setState({ dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title)) });
     });
   },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.user.username !== nextProps.user.username) {
+      this.setState({
+        user: this._getUserStateFromProps(nextProps),
+      });
+    }
+  },
+
+  _getUserStateFromProps(props) {
+    return {
+      full_name: props.user.full_name,
+      email: props.user.email,
+      session_timeout_ms: props.user.session_timeout_ms,
+      timezone: props.user.timezone,
+      permissions: props.user.permissions,
+    };
+  },
+
   formatMultiselectOptions(collection) {
     return collection.map((item) => {
       return { value: item.id, label: item.title };
@@ -76,38 +98,55 @@ const UserForm = React.createClass({
 
   _updateUser(evt) {
     evt.preventDefault();
-    const request = {};
-    ['full_name', 'email', 'session_timeout_ms', 'timezone']
-      .forEach((field) => {
-        if (this.refs[field]) {
-          request[field] = this.refs[field].getValue();
-        }
-      });
+    const request = {
+      full_name: this.state.user.full_name,
+      email: this.state.user.email,
+      session_timeout_ms: this.state.user.session_timeout_ms,
+      timezone: this.state.user.timezone,
+    };
+
     UsersStore.update(this.props.user.username, request).then(() => {
       UserNotification.success('User updated successfully.', 'Success!');
     }, () => {
       UserNotification.error('Updating user failed.', 'Error!');
     });
   },
+
+  _updateField(name, value) {
+    const updatedUser = ObjectUtils.clone(this.state.user);
+    updatedUser[name] = value;
+    this.setState({ user: updatedUser });
+  },
+
+  _bindValue(event) {
+    this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+  },
+
+  _onFieldChange(name) {
+    return (value) => {
+      this._updateField(name, value);
+    };
+  },
+
   render() {
     if (!this.state.streams || !this.state.dashboards) {
       return <Spinner />;
     }
 
-    const user = this.props.user;
+    const user = this.state.user;
     const permissions = this.state.currentUser.permissions;
 
     let requiresOldPassword = true;
     if (this.isPermitted(permissions, 'users:passwordchange:*')) {
       // Ask for old password if user is editing their own account
-      requiresOldPassword = this.props.user.username === this.state.currentUser.username;
+      requiresOldPassword = this.state.user.username === this.state.currentUser.username;
     }
 
-    const streamReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:read', this.state.streams);
-    const streamEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:edit', this.state.streams);
+    const streamReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:read', this.state.streams);
+    const streamEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:edit', this.state.streams);
 
-    const dashboardReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:read', this.state.dashboards);
-    const dashboardEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:edit', this.state.dashboards);
+    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', this.state.dashboards);
+    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', this.state.dashboards);
 
     return (
       <div>
@@ -127,12 +166,13 @@ const UserForm = React.createClass({
                 </span>
               }
               <fieldset disabled={user.read_only}>
-                <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200} defaultValue={user.full_name}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
+                <Input name="full_name" id="full_name" type="text" maxLength={200} value={user.full_name}
+                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name."
+                       required />
 
-                <Input ref="email" name="email" id="email" type="email" maxLength={254} defaultValue={user.email}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                <Input ref="email" name="email" id="email" type="email" maxLength={254} value={user.email}
+                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Email Address" help="Give the contact email address." required />
 
                 {this.isPermitted(permissions, 'USERS_EDIT') &&
@@ -188,12 +228,15 @@ const UserForm = React.createClass({
                   </span>
                 }
                 {this.isPermitted(permissions, '*') &&
-                  <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9} />
+                <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9}
+                              onChange={this._onFieldChange('session_timeout_ms')} />
                 }
 
-                <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
+                <Input label="Time Zone"
+                       help="Choose your local time zone or leave it as it is to use the system's default."
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-                  <TimezoneSelect ref="timezone" className="timezone-select" value={user.timezone}/>
+                  <TimezoneSelect ref="timezone" className="timezone-select" value={user.timezone}
+                                  onChange={this._onFieldChange('timezone')} />
                 </Input>
 
                 <div className="form-group">
@@ -253,7 +296,7 @@ const UserForm = React.createClass({
           </Col>
         </Row>
         <IfPermitted permissions="USERS_ROLESEDIT">
-          <EditRolesForm user={user} />
+          <EditRolesForm user={this.props.user} />
         </IfPermitted>
       </div>
     );

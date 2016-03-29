@@ -5,6 +5,10 @@ import jQuery from 'jquery';
 import Select from 'components/common/Select';
 
 const TimezoneSelect = React.createClass({
+  propTypes: {
+    onChange: React.PropTypes.func,
+  },
+
   getValue() {
     return this.refs.timezone.getValue();
   },
