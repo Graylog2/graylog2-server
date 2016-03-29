@@ -19,20 +19,29 @@ package org.graylog2.shared.rest.resources.documentation;
 import com.google.common.io.Resources;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
 
+import static java.util.Objects.requireNonNull;
+
 @Path("/api-browser")
 public class DocumentationBrowserResource extends RestResource {
+    private final MimetypesFileTypeMap mimeTypes;
 
     private ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+
+    @Inject
+    public DocumentationBrowserResource(MimetypesFileTypeMap mimeTypes) {
+        this.mimeTypes = requireNonNull(mimeTypes);
+    }
 
     @GET
     public Response root() {
@@ -56,7 +65,7 @@ public class DocumentationBrowserResource extends RestResource {
             try {
                 final byte[] resourceBytes = Resources.toByteArray(resource);
 
-                return Response.ok(resourceBytes, guessContentType(route))
+                return Response.ok(resourceBytes, mimeTypes.getContentType(route))
                         .header("Content-Length", resourceBytes.length)
                         .build();
             } catch (IOException e) {
@@ -65,31 +74,5 @@ public class DocumentationBrowserResource extends RestResource {
         } else {
             throw new NotFoundException();
         }
-    }
-
-    private String guessContentType(final String filename) {
-        // A really dumb but for us good enough approach. We only need this for a very few static files we control.
-
-        if (filename.endsWith(".png")) {
-            return "image/png";
-        }
-
-        if (filename.endsWith(".gif")) {
-            return "image/gif";
-        }
-
-        if (filename.endsWith(".css")) {
-            return "text/css";
-        }
-
-        if (filename.endsWith(".js")) {
-            return "application/javascript";
-        }
-
-        if (filename.endsWith(".html")) {
-            return MediaType.TEXT_HTML;
-        }
-
-        return MediaType.TEXT_PLAIN;
     }
 }

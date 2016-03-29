@@ -43,6 +43,7 @@ import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.jboss.netty.util.HashedWheelTimer;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.util.concurrent.Semaphore;
 
 public class GenericBindings extends AbstractModule {
@@ -74,5 +75,7 @@ public class GenericBindings extends AbstractModule {
 
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
         bind(OkHttpClient.class).annotatedWith(Names.named("systemHttpClient")).toProvider(SystemOkHttpClientProvider.class).asEagerSingleton();
+
+        bind(MimetypesFileTypeMap.class).toInstance(new MimetypesFileTypeMap());
     }
 }
