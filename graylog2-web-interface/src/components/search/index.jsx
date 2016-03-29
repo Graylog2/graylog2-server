@@ -1,5 +1,6 @@
 export { default as AddSearchCountToDashboard } from './AddSearchCountToDashboard';
 export { default as LegacyHistogram } from './LegacyHistogram';
+export { default as MalformedSearchQuery } from './MalformedSearchQuery';
 export { default as MessageDetail } from './MessageDetail';
 export { default as MessageFieldDescription } from './MessageFieldDescription';
 export { default as MessageFieldExtractorActions } from './MessageFieldExtractorActions';

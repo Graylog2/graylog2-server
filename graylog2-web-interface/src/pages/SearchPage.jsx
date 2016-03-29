@@ -18,7 +18,7 @@ const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
 import { Spinner } from 'components/common';
-import { SearchResult } from 'components/search';
+import { MalformedSearchQuery, SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
   propTypes: {
@@ -37,6 +37,7 @@ const SearchPage = React.createClass({
     return {
       selectedFields: ['message', 'source'],
       query: SearchStore.query.length > 0 ? SearchStore.query : '*',
+      error: undefined,
     };
   },
   componentDidMount() {
@@ -68,15 +69,24 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this.state.query;
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page).then((response) => {
-      this.setState({ searchResult: response });
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page)
+      .then(
+        response => {
+          this.setState({ searchResult: response, error: undefined });
 
-      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
+          const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
-        this.setState({histogram: histogram});
-      });
-    });
+          UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
+            this.setState({ histogram: histogram });
+          });
+        },
+        error => {
+          // Treat searches with a malformed query
+          if (error.additional && error.additional.status === 400) {
+            this.setState({ error: error.additional.body });
+          }
+        }
+      );
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
@@ -144,6 +154,10 @@ const SearchPage = React.createClass({
   },
 
   render() {
+    if (this.state.error) {
+      return <MalformedSearchQuery error={this.state.error} />;
+    }
+
     if (this._isLoading()) {
       return <Spinner />;
     }
