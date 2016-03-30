@@ -25,11 +25,15 @@ const MessageTableEntry = React.createClass({
     }
     return false;
   },
-  possiblyHighlight(fieldName) {
-    const origValue = this.props.message.fields[fieldName];
-    if (origValue === undefined) {
+  possiblyHighlight(fieldName, truncate) {
+    const fullOrigValue = this.props.message.fields[fieldName];
+    if (fullOrigValue === undefined) {
       return '';
     }
+    // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
+    // It's not optimal, more like a workaround to at least being able to show the page...
+    const origValue = truncate ? fullOrigValue.slice(0, 2048) : fullOrigValue;
+
     if (this.props.highlight && this.props.message.highlight_ranges) {
       if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
         const chunks = [];
@@ -78,12 +82,12 @@ const MessageTableEntry = React.createClass({
           <Timestamp dateTime={this.props.message.fields.timestamp}/>
         </strong></td>
         { this.props.selectedFields.toSeq().map(selectedFieldName => <td
-          key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }
+          key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName, true)}</td>) }
       </tr>
 
       {this.props.showMessageRow &&
       <tr className="message-row" onClick={this._toggleDetail}>
-        <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message')}</div></td>
+        <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message', true)}</div></td>
       </tr>
         }
       {this.props.expanded &&
