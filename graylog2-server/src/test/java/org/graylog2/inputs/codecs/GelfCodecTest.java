@@ -45,8 +45,9 @@ public class GelfCodecTest {
         codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void decodeThrowsIllegalArgumentExceptionIfJsonIsInvalid() throws Exception {
+    @Test(expected = IllegalStateException.class)
+    public void decodeDoesNotThrowIllegalArgumentExceptionIfJsonIsInvalid() throws Exception {
+        // this fails gelf parsing, but empty Payloads are now ok.
         final RawMessage rawMessage = new RawMessage(new byte[0]);
         codec.decode(rawMessage);
     }
