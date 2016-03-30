@@ -45,6 +45,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -117,6 +118,12 @@ public class HttpTransport extends AbstractTcpTransport {
             @Override
             public ChannelHandler call() throws Exception {
                 return new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize);
+            }
+        });
+        baseChannelHandlers.put("aggregator", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new HttpChunkAggregator(maxChunkSize);
             }
         });
         baseChannelHandlers.put("encoder", new Callable<ChannelHandler>() {
