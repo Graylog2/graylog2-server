@@ -191,10 +191,22 @@ public abstract class NettyTransport implements Transport {
             @Override
             public ChannelHandler call() throws Exception {
                 return new SimpleChannelUpstreamHandler() {
+                    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
                     @Override
                     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-                        log.error("Error on Input [" + input.getName() + "/" + input.getId() + "] (channel "
-                                + e.getChannel().toString() + ")", e.getCause());
+                        if ("Connection reset by peer".equals(e.getCause().getMessage())) {
+                            log.trace("{} in Input [{}/{}] (channel {})",
+                                      e.getCause().getMessage(),
+                                      input.getName(),
+                                      input.getId(),
+                                      e.getChannel());
+                        } else {
+                            log.error("Error in Input [{}/{}] (channel {})",
+                                      input.getName(),
+                                      input.getId(),
+                                      e.getChannel(),
+                                      e.getCause());
+                        }
                         super.exceptionCaught(ctx, e);
                     }
                 };

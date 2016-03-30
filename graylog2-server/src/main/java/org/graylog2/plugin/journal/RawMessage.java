@@ -30,6 +30,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
@@ -68,26 +69,31 @@ public class RawMessage implements Serializable {
     private final long journalOffset;
     private Configuration codecConfig;
 
-    public RawMessage(byte[] payload) {
+    public RawMessage(@Nonnull byte[] payload) {
         this(payload, (ResolvableInetSocketAddress)null);
     }
 
-    public RawMessage(byte[] payload, InetSocketAddress remoteAddress) {
+    public RawMessage(@Nonnull byte[] payload, @Nullable InetSocketAddress remoteAddress) {
         this(Long.MIN_VALUE, new UUID(), Tools.nowUTC(), ResolvableInetSocketAddress.wrap(remoteAddress), payload);
     }
 
-    public RawMessage(byte[] payload, ResolvableInetSocketAddress remoteAddress) {
+    public RawMessage(@Nonnull byte[] payload, @Nullable ResolvableInetSocketAddress remoteAddress) {
         this(Long.MIN_VALUE, new UUID(), Tools.nowUTC(), remoteAddress, payload);
     }
 
     public RawMessage(long journalOffset,
-                      UUID id,
+                      @Nonnull UUID id,
                       DateTime timestamp,
-                      ResolvableInetSocketAddress remoteAddress,
-                      byte[] payload) {
+                      @Nullable ResolvableInetSocketAddress remoteAddress,
+                      @Nonnull byte[] payload) {
         checkNotNull(id, "The message id must not be null!");
         checkNotNull(payload, "The message payload must not be null!");
-        checkArgument(payload.length > 0, "The message payload must not be empty!");
+        if (payload.length == 0 && log.isTraceEnabled()) {
+            log.trace("The message payload should not be empty, message {} from {} will be discarded.",
+                      id,
+                      remoteAddress == null ? "unknown" : remoteAddress,
+                      new Throwable());
+        }
 
         msgBuilder = JournalMessage.newBuilder();
 

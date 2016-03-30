@@ -80,6 +80,7 @@ public abstract class MessageInput implements Stoppable {
      */
     private final Configuration codecConfig;
     private final Counter globalIncomingMessages;
+    private final Counter emptyMessages;
 
     protected String title;
     protected String creatorUserId;
@@ -115,6 +116,7 @@ public abstract class MessageInput implements Stoppable {
         rawSize = localRegistry.meter("rawSize");
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
+        emptyMessages = localRegistry.counter("emptyMessages");
     }
 
     public static long getDefaultRecvBufferSize() {
@@ -321,6 +323,16 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public void processRawMessage(RawMessage rawMessage) {
+        if (rawMessage.getPayload().length == 0) {
+            LOG.debug("Discarding empty message {} from input [{}/{}] (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
+                      rawMessage.getId(),
+                      getTitle(),
+                      getId(),
+                      rawMessage.getRemoteAddress() == null ? "unknown" : rawMessage.getRemoteAddress());
+            emptyMessages.inc();
+            return;
+        }
+
         // add the common message metadata for this input/codec
         rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
