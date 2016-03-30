@@ -98,14 +98,8 @@ const UserForm = React.createClass({
 
   _updateUser(evt) {
     evt.preventDefault();
-    const request = {
-      full_name: this.state.user.full_name,
-      email: this.state.user.email,
-      session_timeout_ms: this.state.user.session_timeout_ms,
-      timezone: this.state.user.timezone,
-    };
 
-    UsersStore.update(this.props.user.username, request).then(() => {
+    UsersStore.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success!');
     }, () => {
       UserNotification.error('Updating user failed.', 'Error!');
@@ -125,6 +119,46 @@ const UserForm = React.createClass({
   _onFieldChange(name) {
     return (value) => {
       this._updateField(name, value);
+    };
+  },
+
+  _onPermissionsChange(entity, permission) {
+    return (entityIds) => {
+      const userPermissions = this.state.user.permissions.slice();
+      let newUserPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) !== 0);
+
+      const updatedPermissions = entityIds === '' ? [] : entityIds.split(',').map(id => `${entity}:${permission}:${id}`);
+      const previousPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) === 0);
+
+      // Remove edit permissions to entities without read permissions
+      if (permission === 'read') {
+        previousPermissions.forEach(previousPermission => {
+          // Do nothing if permission is still there
+          if (updatedPermissions.some(p => p === previousPermission)) {
+            return;
+          }
+
+          // Remove edit permission
+          const entityId = previousPermission.split(':').pop();
+          newUserPermissions = newUserPermissions.filter(p => p !== `${entity}:edit:${entityId}`);
+        });
+      }
+
+      // Grant read permissions to entities with edit permissions
+      if (permission === 'edit') {
+        updatedPermissions.forEach(updatePermission => {
+          // Do nothing if permission was there before
+          if (previousPermissions.some(p => p === updatePermission)) {
+            return;
+          }
+
+          // Grant read permission
+          const entityId = updatePermission.split(':').pop();
+          newUserPermissions.push(`${entity}:read:${entityId}`);
+        });
+      }
+
+      this._updateField('permissions', newUserPermissions.concat(updatedPermissions));
     };
   },
 
@@ -186,20 +220,16 @@ const UserForm = React.createClass({
                       </Col>
                       <label className="col-sm-3 control-label" htmlFor="streampermissions">Streams Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect
-                          ref="streamReadOptions"
-                          options={this.formatMultiselectOptions(this.state.streams)}
-                          value={streamReadOptions}
-                          placeholder="Choose read permissions..."
-                        />
+                        <MultiSelect ref="streamReadOptions" placeholder="Choose streams read permissions..."
+                                     options={this.formatMultiselectOptions(this.state.streams)}
+                                     value={streamReadOptions}
+                                     onChange={this._onPermissionsChange('streams', 'read')} />
                         <span className="help-block">Choose streams the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <MultiSelect
-                          ref="streamEditOptions"
-                          options={this.formatMultiselectOptions(this.state.streams)}
-                          value={streamEditOptions}
-                          placeholder="Choose edit permissions..."
-                        />
+                        <MultiSelect ref="streamEditOptions" placeholder="Choose streams edit permissions..."
+                                     options={this.formatMultiselectOptions(this.state.streams)}
+                                     value={streamEditOptions}
+                                     onChange={this._onPermissionsChange('streams', 'edit')} />
                         <span className="help-block">Choose the streams the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </Col>
@@ -207,20 +237,16 @@ const UserForm = React.createClass({
                     <div className="form-group">
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect
-                          ref="dashboardReadOptions"
-                          options={this.formatMultiselectOptions(this.state.dashboards)}
-                          value={dashboardReadOptions}
-                          placeholder="Choose read permissions..."
-                        />
+                        <MultiSelect ref="dashboardReadOptions" placeholder="Choose dashboards read permissions..."
+                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     value={dashboardReadOptions}
+                                     onChange={this._onPermissionsChange('dashboards', 'read')} />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <MultiSelect
-                          ref="dashboardEditOptions"
-                          options={this.formatMultiselectOptions(this.state.dashboards)}
-                          value={dashboardEditOptions}
-                          placeholder="Choose edit permissions..."
-                        />
+                        <MultiSelect ref="dashboardEditOptions" placeholder="Choose dashboards edit permissions..."
+                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     value={dashboardEditOptions}
+                                     onChange={this._onPermissionsChange('dashboards', 'edit')} />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </Col>

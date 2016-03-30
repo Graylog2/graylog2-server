@@ -101,7 +101,7 @@ const NewUserForm = React.createClass({
 
         <TimeoutInput ref="session_timeout_ms" />
 
-        <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
+        <Input label="Time Zone" help="Choose the timezone to use to display times, or leave it as it is to use the system's default."
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
           <TimezoneSelect ref="timezone" className="timezone-select" />
         </Input>

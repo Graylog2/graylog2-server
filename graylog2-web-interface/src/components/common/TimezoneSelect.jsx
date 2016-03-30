@@ -44,7 +44,7 @@ const TimezoneSelect = React.createClass({
     const timezones = this._formatTimezones();
     return (
       <Select ref="timezone" {...this.props}
-              placeholder="Pick your time zone"
+              placeholder="Pick a time zone"
               options={timezones}
               optionRenderer={this._renderOption}/>
     );
