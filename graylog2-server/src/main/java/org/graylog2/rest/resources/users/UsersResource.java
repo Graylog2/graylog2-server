@@ -229,7 +229,7 @@ public class UsersResource extends RestResource {
         }
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
-            user.setPermissions(cr.permissions());
+            user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
@@ -294,7 +294,7 @@ public class UsersResource extends RestResource {
             throw new NotFoundException();
         }
 
-        user.setPermissions(permissionRequest.permissions());
+        user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userService.save(user);
     }
 
@@ -482,5 +482,12 @@ public class UsersResource extends RestResource {
                 user.getStartpage(),
                 roleNames
         );
+    }
+
+    // Filter the permissions granted by roles from the permissions list
+    private List<String> getEffectiveUserPermissions(final User user, final List<String> permissions) {
+        final List<String> effectivePermissions = Lists.newArrayList(permissions);
+        effectivePermissions.removeAll(userService.getUserPermissionsFromRoles(user));
+        return effectivePermissions;
     }
 }

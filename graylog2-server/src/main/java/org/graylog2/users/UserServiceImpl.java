@@ -298,13 +298,22 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public List<String> getPermissionsForUser(User user) {
-        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder().addAll(user.getPermissions());
+        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder()
+                .addAll(user.getPermissions())
+                .addAll(getUserPermissionsFromRoles(user));
+
+        return permSet.build().asList();
+    }
+
+    @Override
+    public Set<String> getUserPermissionsFromRoles(User user) {
+        final ImmutableSet.Builder<String> permSet = ImmutableSet.builder();
 
         for (String roleId : user.getRoleIds()) {
             permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
         }
 
-        return permSet.build().asList();
+        return permSet.build();
     }
 
     @Override

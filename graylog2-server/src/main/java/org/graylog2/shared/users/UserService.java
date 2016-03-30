@@ -48,5 +48,7 @@ public interface UserService extends PersistedService {
 
     List<String> getPermissionsForUser(User user);
 
+    Set<String> getUserPermissionsFromRoles(User user);
+
     void dissociateAllUsersFromRole(Role role);
 }
