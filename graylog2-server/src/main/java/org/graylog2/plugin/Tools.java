@@ -282,6 +282,10 @@ public final class Tools {
         return timestamp.toString(DateTimeFormat.forPattern(ES_DATE_FORMAT).withZoneUTC());
     }
 
+    public static String buildElasticSearchTimeFormatKeepZone(DateTime timestamp) {
+        return timestamp.toString(DateTimeFormat.forPattern(ES_DATE_FORMAT));
+    }
+
     /**
      * The double representation of a UNIX timestamp with milliseconds is a strange, human readable format.
      * <p/>
@@ -341,6 +345,19 @@ public final class Tools {
     public static String elasticSearchTimeFormatToISO8601(String time) {
         try {
             DateTime dt = DateTime.parse(time, ES_DATE_FORMAT_FORMATTER);
+            return getISO8601String(dt);
+        } catch (IllegalArgumentException e) {
+            return time;
+        }
+    }
+
+    /**
+     * Try to parse a date in ES_DATE_FORMAT format in the given time zone and convert it to an ISO8601 date.
+     * If an error is encountered in the process, it will return the original string.
+     */
+    public static String elasticSearchTimeFormatToISO8601(String time, String zone) {
+        try {
+            DateTime dt = ES_DATE_FORMAT_FORMATTER.withZone(DateTimeZone.forID(zone)).parseDateTime(time);
             return getISO8601String(dt);
         } catch (IllegalArgumentException e) {
             return time;

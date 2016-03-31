@@ -52,8 +52,17 @@ public abstract class HistogramResult extends IndexQueryResult {
                 JsonParser jp = mapper.getFactory().createParser(getBuiltQuery());
                 JsonNode rootNode = mapper.readTree(jp);
                 JsonNode timestampNode = rootNode.findValue("range").findValue("timestamp");
-                String from = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText());
-                String to = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText());
+
+                final JsonNode timeZone = timestampNode.findValue("time_zone");
+                final String from;
+                final String to;
+                if (timeZone != null) {
+                    from = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText(), timeZone.asText());
+                    to = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText(), timeZone.asText());
+                } else {
+                    from = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText());
+                    to = Tools.elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText());
+                }
                 boundaries = AbsoluteRange.create(from, to);
             } catch (Exception ignored) {}
         }
