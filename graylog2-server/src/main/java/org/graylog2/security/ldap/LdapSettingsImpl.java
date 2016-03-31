@@ -24,6 +24,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.mongodb.BasicDBList;
+import com.mongodb.DBObject;
 import org.apache.shiro.codec.Hex;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
@@ -47,9 +49,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CollectionName("ldap_settings")
 public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
+
 
     public interface Factory {
         LdapSettingsImpl createEmpty();
@@ -71,10 +75,14 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String DEFAULT_GROUP = "default_group";
     public static final String TRUST_ALL_CERTS = "trust_all_certificates";
     public static final String GROUP_MAPPING = "group_role_mapping";
+    public static final String GROUP_MAPPING_LIST = "group_role_mapping_list";
     public static final String GROUP_SEARCH_BASE = "group_search_base";
     public static final String GROUP_ID_ATTRIBUTE = "group_id_attribute";
     public static final String GROUP_SEARCH_PATTERN = "group_search_pattern";
     public static final String ADDITIONAL_DEFAULT_GROUPS = "additional_default_groups";
+
+    public static final String LDAP_GROUP_MAPPING_NAMEKEY = "group";
+    public static final String LDAP_GROUP_MAPPING_ROLEKEY = "role_id";
 
     protected Configuration configuration;
     private final RoleService roleService;
@@ -280,8 +288,22 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> getGroupMapping() {
-        final Map<String, String> groupMapping = (Map<String, String>) fields.get(GROUP_MAPPING);
+        final BasicDBList groupMappingList = (BasicDBList) fields.get(GROUP_MAPPING_LIST);
+        final Map<String, String> groupMapping;
 
+        if (groupMappingList == null) {
+            // pre-2.0 storage format, convert after read
+            // should actually have been converted during start, but let's play safe here
+            groupMapping = (Map<String, String>) fields.get(GROUP_MAPPING);
+        } else {
+            groupMapping = Maps.newHashMapWithExpectedSize(groupMappingList.size());
+            for (Object entry : groupMappingList) {
+                final DBObject field = (DBObject) entry;
+
+                groupMapping.put((String) field.get(LDAP_GROUP_MAPPING_NAMEKEY),
+                                 (String) field.get(LDAP_GROUP_MAPPING_ROLEKEY));
+            }
+        }
         if (groupMapping == null || groupMapping.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -323,7 +345,16 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             }
         }
 
-        fields.put(GROUP_MAPPING, internal);
+        // convert the group -> role_id map to a list of {"group" -> group, "role_id" -> roleid } maps
+        fields.put(GROUP_MAPPING_LIST,
+                   internal.entrySet().stream()
+                           .map(entry -> {
+                               Map<String, String> m = Maps.newHashMap();
+                               m.put(LDAP_GROUP_MAPPING_NAMEKEY, entry.getKey());
+                               m.put(LDAP_GROUP_MAPPING_ROLEKEY, entry.getValue());
+                               return m;
+                           })
+                           .collect(Collectors.toList()));
     }
 
     @Override
