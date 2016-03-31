@@ -29,8 +29,9 @@ const EditUsersPage = React.createClass({
     });
   },
   _resetStartpage() {
-    if (window.confirm('Are you sure you want to reset your current start page?')) {
-      StartpageStore.set(this.props.params.username).then(() => this._loadUser());
+    if (window.confirm('Are you sure you want to reset the start page?')) {
+      const username = this.props.params.username;
+      StartpageStore.set(username).then(() => this._loadUser(username));
     }
   },
   render() {
