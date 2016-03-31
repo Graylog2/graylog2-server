@@ -2,8 +2,6 @@ import React, {PropTypes} from 'react';
 import { Map, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { Spinner } from 'components/common';
 
-import 'leaflet/dist/leaflet.css';
-
 const MapVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -26,11 +24,23 @@ const MapVisualization = React.createClass({
     };
   },
   componentDidMount() {
+    this.leafletStyle.use();
+    this.style.use();
     this._onComponentMount();
   },
+
+  componentWillUnmount() {
+    this.leafletStyle.unuse();
+    this.style.unuse();
+  },
+
   _onComponentMount() {
     this.setState({isComponentMounted: true});
   },
+
+  leafletStyle: require('!style/useable!css!leaflet/dist/leaflet.css'),
+  style: require('!style/useable!css!./MapVisualization.css'),
+
   position: [0, 0],
   DEFAULT_URL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
   DEFAULT_ATTRIBUTION: `&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors`,

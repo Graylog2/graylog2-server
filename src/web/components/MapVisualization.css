@@ -1,0 +1,3 @@
+.leaflet-top, .leaflet-bottom {
+    z-index: 999; /* So it displays below bootstrap dropdowns */
+}
