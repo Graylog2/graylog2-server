@@ -42,7 +42,7 @@ const MapVisualization = React.createClass({
   style: require('!style/useable!css!./MapVisualization.css'),
 
   position: [0, 0],
-  DEFAULT_URL: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+  DEFAULT_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   DEFAULT_ATTRIBUTION: `&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors`,
   MARKER_RADIUS_SIZES: 10,
   MARKER_RADIUS_INCREMENT_SIZES: 10,
