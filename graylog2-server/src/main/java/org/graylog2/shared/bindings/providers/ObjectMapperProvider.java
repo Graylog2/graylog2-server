@@ -17,6 +17,7 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.codahale.metrics.json.MetricsModule;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -53,6 +54,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
