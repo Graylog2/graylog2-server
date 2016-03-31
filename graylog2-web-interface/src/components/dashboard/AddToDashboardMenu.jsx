@@ -1,9 +1,9 @@
 import React, {PropTypes} from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
-import $ from 'jquery';
 
 import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 const DashboardsStore = StoreProvider.getStore('Dashboards');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 
@@ -47,7 +47,7 @@ const AddToDashboardMenu = React.createClass({
 
   componentDidMount() {
     this._initializeDashboards();
-    $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
+    this._setOriginalSearchParams();
   },
   _initializeDashboards() {
     DashboardsStore.addOnWritableDashboardsChangedCallback(dashboards => {
@@ -68,8 +68,8 @@ const AddToDashboardMenu = React.createClass({
   _updateDashboards(newDashboards) {
     this.setState({dashboards: newDashboards});
   },
-  _setOriginalSearchParams(originalSearchParams) {
-    this.searchParams = originalSearchParams;
+  _setOriginalSearchParams() {
+    this.searchParams = SearchStore.getOriginalSearchParams();
   },
   _selectDashboard(event, dashboardId) {
     this.setState({selectedDashboard: dashboardId});
