@@ -33,6 +33,7 @@ import org.graylog2.periodical.IndexRangesMigrationPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
+import org.graylog2.periodical.LdapGroupMappingMigration;
 import org.graylog2.periodical.NodePingThread;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.UserPermissionMigrationPeriodical;
@@ -62,5 +63,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(UserPermissionMigrationPeriodical.class);
         periodicalBinder.addBinding().to(AlarmCallbacksMigrationPeriodical.class);
         periodicalBinder.addBinding().to(ConfigurationManagementPeriodical.class);
+        periodicalBinder.addBinding().to(LdapGroupMappingMigration.class);
     }
 }
