@@ -32,6 +32,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
@@ -44,7 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
@@ -59,6 +62,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "Indexer/Indices", description = "Index information")
@@ -66,12 +71,16 @@ import java.util.Set;
 public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
+    private final Indices indices;
+    private final Cluster cluster;
+    private final Deflector deflector;
+
     @Inject
-    private Indices indices;
-    @Inject
-    private Cluster cluster;
-    @Inject
-    private Deflector deflector;
+    public IndicesResource(Indices indices, Cluster cluster, Deflector deflector) {
+        this.indices = indices;
+        this.cluster = cluster;
+        this.deflector = deflector;
+    }
 
     @GET
     @Timed
@@ -101,6 +110,19 @@ public class IndicesResource extends RestResource {
 
         return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
                 routing.build(), indices.isReopened(index));
+    }
+
+    @POST
+    @Timed
+    @Path("/multiple")
+    @ApiOperation(value = "Get information of all specified indices and their shards.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
+                                  @Valid @NotNull IndicesReadRequest request) {
+        if (request.indices() != null)
+            return request.indices().stream().collect(Collectors.toMap(Function.identity(), this::single));
+
+        throw new BadRequestException("Missing or invalid list of indices passed in request.");
     }
 
     @GET
