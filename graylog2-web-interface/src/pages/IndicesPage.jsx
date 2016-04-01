@@ -69,7 +69,7 @@ const IndicesPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="success" style={{marginTop: '10'}}>
+            <Alert bsStyle="success" style={{ marginTop: '10' }}>
               <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
               {numeral(this.state.counts.events).format('0,0')} messages under management,
               current write-active index is <i>{deflectorInfo.current_target}</i>.

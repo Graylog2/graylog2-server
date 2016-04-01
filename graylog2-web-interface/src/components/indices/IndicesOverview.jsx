@@ -17,11 +17,11 @@ const IndicesOverview = React.createClass({
   _formatIndex(indexName, index) {
     const indexSummary = this.props.indices[indexName];
     const indexRange = indexSummary && indexSummary.range ? indexSummary.range : null;
-    index.name = indexName;
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
         <Col md={12}>
-          <IndexSummary index={index} count={indexSummary.size} indexRange={indexRange} isDeflector={indexSummary.is_deflector}>
+          <IndexSummary index={index} name={indexName} count={indexSummary.size}
+                        indexRange={indexRange} isDeflector={indexSummary.is_deflector}>
             <span>
               <IndexDetails index={this.props.indexDetails[indexName]}
                             indexName={indexName}
@@ -35,11 +35,10 @@ const IndicesOverview = React.createClass({
   },
   _formatClosedIndex(indexName, index) {
     const indexRange = index.range;
-    index.name = indexName;
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
         <Col md={12}>
-          <IndexSummary index={index} indexRange={indexRange} isDeflector={index.is_deflector}>
+          <IndexSummary index={index} name={indexName} indexRange={indexRange} isDeflector={index.is_deflector}>
             <span>
               <ClosedIndexDetails indexName={indexName} indexRange={indexRange} />
             </span>

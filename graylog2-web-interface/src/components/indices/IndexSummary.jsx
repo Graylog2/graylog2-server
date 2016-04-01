@@ -11,6 +11,7 @@ const IndexSummary = React.createClass({
     index: React.PropTypes.object.isRequired,
     indexRange: React.PropTypes.object.isRequired,
     isDeflector: React.PropTypes.bool.isRequired,
+    name: React.PropTypes.string.isRequired,
   },
   getInitialState() {
     return { showDetails: this.props.isDeflector };
@@ -18,15 +19,15 @@ const IndexSummary = React.createClass({
   _formatLabels(index) {
     const labels = [];
     if (index.is_deflector) {
-      labels.push(<Label key={`${index.name}-deflector-label`} bsStyle="primary">deflector</Label>);
+      labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">deflector</Label>);
     }
 
     if (index.is_closed) {
-      labels.push(<Label key={`${index.name}-closed-label`} bsStyle="warning">closed</Label>);
+      labels.push(<Label key={`${this.props.name}-closed-label`} bsStyle="warning">closed</Label>);
     }
 
     if (index.is_reopened) {
-      labels.push(<Label key={`${index.name}-reopened-label`} bsStyle="success">reopened</Label>);
+      labels.push(<Label key={`${this.props.name}-reopened-label`} bsStyle="success">reopened</Label>);
     }
 
     return <span>{labels}</span>;
@@ -71,7 +72,7 @@ const IndexSummary = React.createClass({
     return (
       <span>
         <h2>
-          {index.name}{' '}
+          {this.props.name}{' '}
 
           <small>
             {this._formatLabels(index)}{' '}

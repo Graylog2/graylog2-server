@@ -42,17 +42,17 @@ const IndexDetails = React.createClass({
     );
   },
   _onRecalculateIndex() {
-    if (window.confirm('Really recalculate the index ranges for index ' + this.props.indexName + '?')) {
+    if (window.confirm(`Really recalculate the index ranges for index ${this.props.indexName}?`)) {
       IndexRangesActions.recalculateIndex(this.props.indexName);
     }
   },
   _onCloseIndex() {
-    if (window.confirm('Really close index ' + this.props.indexName + '?')) {
+    if (window.confirm(`Really close index ${this.props.indexName}?`)) {
       IndicesActions.close(this.props.indexName);
     }
   },
   _onDeleteIndex() {
-    if (window.confirm('Really delete index ' + this.props.indexName + '?')) {
+    if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
       IndicesActions.delete(this.props.indexName);
     }
   },
@@ -69,7 +69,7 @@ const IndexDetails = React.createClass({
         {index.all_shards.open_search_contexts} open search contexts,{' '}
         {index.all_shards.documents.deleted} deleted messages
 
-        <Row style={{marginBottom: '10'}}>
+        <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
             <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
           </Col>
@@ -80,7 +80,7 @@ const IndexDetails = React.createClass({
 
         <ShardRoutingOverview routing={index.routing} indexName={indexName} />
 
-        <hr style={{marginBottom: '5', marginTop: '10'}}/>
+        <hr style={{ marginBottom: '5', marginTop: '10' }}/>
 
         {this._formatActionButtons()}
       </div>

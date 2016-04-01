@@ -55,7 +55,7 @@ const ApiRoutes = {
     list: (limit, offset) => { return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` }; },
   },
   IndexerOverviewApiResource: {
-    list: () => { return { url: '/system/indexer/overview' }},
+    list: () => { return { url: '/system/indexer/overview' }; },
   },
   IndexRangesApiController: {
     list: () => { return { url: '/system/indices/ranges' }; },
@@ -85,9 +85,9 @@ const ApiRoutes = {
     stop: (inputId) => { return { url: `/cluster/inputstates/${inputId}` }; },
   },
   ClusterLoggersResource: {
-    loggers: () => { return {url: '/cluster/system/loggers'}; },
-    subsystems: () => { return {url: '/cluster/system/loggers/subsystems'}; },
-    setSubsystemLoggerLevel: (nodeId, subsystem, loglevel) => { return {url: '/cluster/system/loggers/' + nodeId + '/subsystems/' + subsystem + '/level/' + loglevel}; },
+    loggers: () => { return { url: '/cluster/system/loggers' }; },
+    subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
+    setSubsystemLoggerLevel: (nodeId, subsystem, loglevel) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
@@ -98,7 +98,7 @@ const ApiRoutes = {
   },
   ClusterMetricsApiController: {
     multiple: (nodeId) => { return { url: `/cluster/${nodeId}/metrics/multiple` }; },
-    multipleAllNodes: () => { return { url: `/cluster/metrics/multiple` }; },
+    multipleAllNodes: () => { return { url: '/cluster/metrics/multiple' }; },
     byNamespace: (nodeId, namespace) => { return { url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }; },
   },
   NotificationsApiController: {

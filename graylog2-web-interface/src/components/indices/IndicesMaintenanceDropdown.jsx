@@ -6,7 +6,7 @@ const DeflectorActions = ActionsProvider.getActions('Deflector');
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 import StoreProvider from 'injection/StoreProvider';
-const DeflectorStore = StoreProvider.getStore('Deflector');
+const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-line no-unused-vars
 
 const IndicesMaintenanceDropdown = React.createClass({
   _onRecalculateIndexRange() {

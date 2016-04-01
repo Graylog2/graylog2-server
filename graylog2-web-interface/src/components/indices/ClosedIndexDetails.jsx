@@ -11,8 +11,11 @@ const ClosedIndexDetails = React.createClass({
     indexName: React.PropTypes.string.isRequired,
     indexRange: React.PropTypes.object.isRequired,
   },
+  _onReopen() {
+    IndicesActions.reopen(this.props.indexName);
+  },
   render() {
-    const { indexName, indexRange } = this.props;
+    const { indexRange } = this.props;
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />
@@ -21,7 +24,7 @@ const ClosedIndexDetails = React.createClass({
 
         <hr style={{ marginBottom: '5', marginTop: '10' }}/>
 
-        <Button bsStyle="warning" bsSize="xs" onClick={() => { IndicesActions.reopen(indexName)}}>Reopen index</Button>{' '}
+        <Button bsStyle="warning" bsSize="xs" onClick={this._onReopen}>Reopen index</Button>{' '}
       </div>
     );
   },
