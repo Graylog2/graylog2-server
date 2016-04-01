@@ -90,9 +90,11 @@ const GeoIpResolverConfig = React.createClass({
       <div>
         <h3>Geo-Location Processor</h3>
 
-        <p>If enabled, the GeoIP processor plugin scans all fields of every message for IPv4 addresses and puts the
-          location information into a field named <code>fieldname_geolocation</code> where "fieldname" is the name
-          of the field in which an IP address has been found.</p>
+        <p>
+          If enabled, the Geo-Location Processor plugin scans all messages for fields
+          containing <strong>exclusively</strong> an IP address, and puts their geo-location information into a field
+          named <code>fieldname_geolocation</code> where "fieldname" is the name of the field containing an IP address.
+        </p>
 
         <dl className="deflist">
           <dt>Enabled:</dt>
