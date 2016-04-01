@@ -5,6 +5,9 @@ import ActionsProvider from 'injection/ActionsProvider';
 const DeflectorActions = ActionsProvider.getActions('Deflector');
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
+import StoreProvider from 'injection/StoreProvider';
+const DeflectorStore = StoreProvider.getStore('Deflector');
+
 const IndicesMaintenanceDropdown = React.createClass({
   _onRecalculateIndexRange() {
     if (window.confirm('This will trigger a background system job. Go on?')) {

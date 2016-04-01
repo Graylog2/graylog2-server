@@ -19,7 +19,7 @@ const ClosedIndexDetails = React.createClass({
         <Alert bsStyle="info"><i className="fa fa-info-circle"/> This index is closed. Index information is not available{' '}
           at the moment, please reopen the index and try again.</Alert>
 
-        <hr style={{marginBottom: '5', marginTop: '10'}}/>
+        <hr style={{ marginBottom: '5', marginTop: '10' }}/>
 
         <Button bsStyle="warning" bsSize="xs" onClick={() => { IndicesActions.reopen(indexName)}}>Reopen index</Button>{' '}
       </div>
