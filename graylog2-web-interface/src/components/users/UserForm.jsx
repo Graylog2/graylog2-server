@@ -77,11 +77,11 @@ const UserForm = React.createClass({
   _updateUser(evt) {
     evt.preventDefault();
     const request = {};
-    ['full_name',
-      'email',
-      'session_timeout_ms',
-      'timezone'].forEach((field) => {
-        request[field] = this.refs[field].getValue();
+    ['full_name', 'email', 'session_timeout_ms', 'timezone']
+      .forEach((field) => {
+        if (this.refs[field]) {
+          request[field] = this.refs[field].getValue();
+        }
       });
     UsersStore.update(this.props.user.username, request).then(() => {
       UserNotification.success('User updated successfully.', 'Success!');
