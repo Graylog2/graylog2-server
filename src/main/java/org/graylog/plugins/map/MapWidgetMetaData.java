@@ -47,7 +47,7 @@ public class MapWidgetMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return new Version(1, 0, 0, "beta.1");
+        return new Version(1, 0, 0, "beta.2");
     }
 
     @Override
