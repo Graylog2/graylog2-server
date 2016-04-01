@@ -21,10 +21,17 @@ const EditUsersPage = React.createClass({
     };
   },
   componentDidMount() {
-    this._loadUser();
+    this._loadUser(this.props.params.username);
   },
-  _loadUser() {
-    UsersStore.load(this.props.params.username).then((user) => {
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.username !== nextProps.params.username) {
+      this._loadUser(nextProps.params.username);
+    }
+  },
+
+  _loadUser(username) {
+    UsersStore.load(username).then((user) => {
       this.setState({ user: user });
     });
   },

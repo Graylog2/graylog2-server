@@ -73,7 +73,7 @@ const EditRolesForm = React.createClass({
     );
     return (
       <Row className="content">
-        <Col lg={8}>
+        <Col md={8}>
           <h2>Change user role</h2>
           {editUserForm}
         </Col>

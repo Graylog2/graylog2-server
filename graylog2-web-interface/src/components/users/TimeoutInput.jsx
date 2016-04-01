@@ -8,7 +8,9 @@ const TimeoutInput = React.createClass({
     controlSize: React.PropTypes.number,
     labelSize: React.PropTypes.number,
     value: React.PropTypes.number,
+    onChange: React.PropTypes.func,
   },
+
   getDefaultProps() {
     return {
       value: 60 * 60 * 1000,
@@ -54,13 +56,18 @@ const TimeoutInput = React.createClass({
     return this.MS_SECOND;
   },
   _onClick(evt) {
-    this.setState({ sessionTimeoutNever: evt.target.checked });
+    this.setState({ sessionTimeoutNever: evt.target.checked }, this._notifyChange);
   },
   _onChangeValue(evt) {
-    this.setState({ value: evt.target.value });
+    this.setState({ value: evt.target.value }, this._notifyChange);
   },
   _onChangeUnit(evt) {
-    this.setState({ unit: evt.target.value });
+    this.setState({ unit: evt.target.value }, this._notifyChange);
+  },
+  _notifyChange() {
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(this.getValue());
+    }
   },
   render() {
     return (
