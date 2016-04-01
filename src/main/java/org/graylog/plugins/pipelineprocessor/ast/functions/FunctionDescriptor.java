@@ -55,6 +55,9 @@ public abstract class FunctionDescriptor<T> {
         public abstract Builder<T> name(String name);
         public abstract Builder<T> pure(boolean pure);
         public abstract Builder<T> returnType(Class<? extends T> type);
+        public Builder<T> params(ParameterDescriptor... params) {
+            return params(ImmutableList.<ParameterDescriptor>builder().add(params).build());
+        }
         public abstract Builder<T> params(ImmutableList<ParameterDescriptor> params);
         public abstract Builder<T> paramMap(ImmutableMap<String, ParameterDescriptor> map);
         public abstract ImmutableList<ParameterDescriptor> params();

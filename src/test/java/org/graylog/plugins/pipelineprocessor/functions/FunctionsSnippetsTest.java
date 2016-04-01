@@ -62,6 +62,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.grok.GrokPattern;
@@ -162,6 +163,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(IsNull.NAME, new IsNull());
         functions.put(IsNotNull.NAME, new IsNotNull());
+
+        functions.put(UrlConversion.NAME, new UrlConversion());
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         Set<GrokPattern> patterns = Sets.newHashSet(
@@ -354,5 +357,25 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message).isNotNull();
         assertThat(message.getFieldCount()).isEqualTo(4);
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2015-07-31T10:05:36.773Z"));
+    }
+
+    @Test
+    public void urls() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("protocol")).isEqualTo("https");
+        assertThat(message.getField("user_info")).isEqualTo("admin:s3cr31");
+        assertThat(message.getField("host")).isEqualTo("some.host.with.lots.of.subdomains.com");
+        assertThat(message.getField("port")).isEqualTo(9999);
+        assertThat(message.getField("file")).isEqualTo("/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
+        assertThat(message.getField("fragment")).isEqualTo("anchorstuff");
+        assertThat(message.getField("query")).isEqualTo("q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
+        assertThat(message.getField("q1")).isEqualTo("something");
+        assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
+        assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
+        assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
     }
 }

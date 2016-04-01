@@ -1,0 +1,21 @@
+rule "urls"
+when
+    true
+then
+    let url = to_url("https://admin:s3cr31@some.host.with.lots.of.subdomains.com:9999/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone#anchorstuff");
+    set_fields({
+        protocol: url.protocol,
+        authority: url.authority,
+        user_info: url.userInfo,
+        host: url.host,
+        port: url.port,
+        path: url.path,
+        file: url.file,
+        fragment: url.fragment,
+        query: url.query,
+        q1: url.queryParams.q1,
+        with_spaces: url.queryParams.with_spaces,
+        equal: url.queryParams.equal
+    });
+    trigger_test();
+end

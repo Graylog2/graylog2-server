@@ -56,6 +56,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
+import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog2.plugin.PluginModule;
 
 public class ProcessorFunctionsModule extends PluginModule {
@@ -120,6 +121,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         // null support
         addMessageProcessorFunction(IsNull.NAME, IsNull.class);
         addMessageProcessorFunction(IsNotNull.NAME, IsNotNull.class);
+
+        // URL parsing
+        addMessageProcessorFunction(UrlConversion.NAME, UrlConversion.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
