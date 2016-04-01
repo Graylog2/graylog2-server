@@ -95,7 +95,7 @@ public class PipelineInterpreterTest {
                 pipelineStreamConnectionsService,
                 parser,
                 mock(Journal.class),
-                mock(MetricRegistry.class),
+                new MetricRegistry(),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class)
         );
