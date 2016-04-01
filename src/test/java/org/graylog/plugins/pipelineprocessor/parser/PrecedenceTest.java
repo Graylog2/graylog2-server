@@ -61,10 +61,10 @@ public class PrecedenceTest extends BaseParserTest {
         assertThat(topEqual.left()).isInstanceOf(BooleanExpression.class);
         assertThat(topEqual.right()).isInstanceOf(EqualityExpression.class);
 
-        final BooleanExpression trueExpr = (BooleanExpression) topEqual.right();
+        final BooleanExpression trueExpr = (BooleanExpression) topEqual.left();
         assertThat(trueExpr.evaluateBool(null)).isTrue();
-        final BooleanExpression falseFalse = (BooleanExpression) topEqual.left();
-        assertThat(falseFalse.evaluateBool(null)).isFalse();
+        final EqualityExpression falseFalse = (EqualityExpression) topEqual.right();
+        assertThat(falseFalse.evaluateBool(null)).isTrue();
     }
 
     @Test
