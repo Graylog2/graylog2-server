@@ -50,7 +50,7 @@ public class PipelineProcessorMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return new Version(1, 0, 0, "alpha.6");
+        return new Version(1, 0, 0, "alpha.7");
     }
 
     @Override
