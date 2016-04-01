@@ -54,6 +54,9 @@ const ApiRoutes = {
     count: (since) => { return { url: `/system/indexer/failures/count?since=${since}` }; },
     list: (limit, offset) => { return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` }; },
   },
+  IndexerOverviewApiResource: {
+    list: () => { return { url: '/system/indexer/overview' }},
+  },
   IndexRangesApiController: {
     list: () => { return { url: '/system/indices/ranges' }; },
     rebuild: () => { return { url: '/system/indices/ranges/rebuild' }; },
@@ -64,6 +67,7 @@ const ApiRoutes = {
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
     list: () => { return { url: '/system/indexer/indices' }; },
     listClosed: () => { return { url: '/system/indexer/indices/closed' }; },
+    multiple: () => { return { url: '/system/indexer/indices/multiple' }; },
     reopen: (indexName) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
   },
   InputsApiController: {
