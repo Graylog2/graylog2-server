@@ -1,41 +1,24 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import MessageLoader from './MessageLoader';
 
 const ExtractorExampleMessage = React.createClass({
   propTypes: {
     field: PropTypes.string.isRequired,
     example: PropTypes.string,
+    onExampleLoad: PropTypes.func,
   },
-  getInitialState() {
-    return {
-      example: '',
-      field: '',
-      newMessageLoaded: false,
-    };
-  },
-  componentWillMount() {
-    this.setState({example: this.props.example});
-  },
-  componentWillReceiveProps(nextProps) {
-    if (!this.state.newMessageLoaded && this.state.example !== nextProps.example) {
-      this.setState({example: nextProps.example});
-    }
-  },
-  onExampleLoaded(message) {
+  _onExampleLoad(message) {
     const newExample = message.fields[this.props.field];
-
-    if (newExample) {
-      this.setState({example: newExample, newMessageLoaded: true});
-    }
+    this.props.onExampleLoad(newExample);
   },
   render() {
-    const originalMessage = <span id="xtrc-original-example" style={{display: 'none'}}>{this.state.example}</span>;
+    const originalMessage = <span id="xtrc-original-example" style={{display: 'none'}}>{this.props.example}</span>;
     let messagePreview;
 
-    if (this.state.example) {
+    if (this.props.example) {
       messagePreview = (
         <div className="well well-sm xtrc-new-example">
-          <span id="xtrc-example">{this.state.example}</span>
+          <span id="xtrc-example">{this.props.example}</span>
         </div>
       );
     } else {
@@ -51,7 +34,7 @@ const ExtractorExampleMessage = React.createClass({
       <div>
         {originalMessage}
         {messagePreview}
-        <MessageLoader onMessageLoaded={this.onExampleLoaded}/>
+        <MessageLoader onMessageLoaded={this._onExampleLoad}/>
       </div>
     );
   },

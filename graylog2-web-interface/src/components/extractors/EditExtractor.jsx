@@ -26,8 +26,20 @@ const EditExtractor = React.createClass({
     return {
       updatedExtractor: this.props.extractor,
       conditionTestResult: undefined,
+      exampleMessage: this.props.exampleMessage,
     };
   },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.exampleMessage !== nextProps.exampleMessage) {
+      this._updateExampleMessage(nextProps.exampleMessage);
+    }
+  },
+
+  _updateExampleMessage(nextExample) {
+    this.setState({ exampleMessage: nextExample });
+  },
+
   // Ensures the target field only contains alphanumeric characters and underscores
   _onTargetFieldChange(event) {
     const value = event.target.value;
@@ -76,11 +88,11 @@ const EditExtractor = React.createClass({
     this.setState({updatedExtractor: updatedExtractor});
   },
   _testCondition() {
-    const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.props.exampleMessage);
+    const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.state.exampleMessage);
     promise.then(result => this.setState({conditionTestResult: result.matched}));
   },
   _tryButtonDisabled() {
-    return this.state.updatedExtractor.condition_value === '' || !this.props.exampleMessage;
+    return this.state.updatedExtractor.condition_value === '' || !this.state.exampleMessage;
   },
   _getExtractorConditionControls() {
     if (!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none') {
@@ -162,7 +174,8 @@ const EditExtractor = React.createClass({
             <Row style={{marginTop: 5}}>
               <Col md={12}>
                 <ExtractorExampleMessage field={this.state.updatedExtractor.source_field}
-                                         example={this.props.exampleMessage}/>
+                                         example={this.state.exampleMessage}
+                                         onExampleLoad={this._updateExampleMessage}/>
               </Col>
             </Row>
             <h2>Extractor configuration</h2>
@@ -179,7 +192,7 @@ const EditExtractor = React.createClass({
                                               extractorType={this.state.updatedExtractor.type}
                                               configuration={this.state.updatedExtractor.extractor_config}
                                               onChange={this._onConfigurationChange}
-                                              exampleMessage={this.props.exampleMessage}/>
+                                              exampleMessage={this.state.exampleMessage}/>
 
                   <Input label="Condition" labelClassName="col-md-2" wrapperClassName="col-md-10"
                          help={conditionTypeHelpMessage}>
