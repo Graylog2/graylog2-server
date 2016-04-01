@@ -10,6 +10,9 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,6 +26,7 @@ public class PrecedenceTest extends BaseParserTest {
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
 
+        functions.put(StringConversion.NAME, new StringConversion());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -88,6 +92,21 @@ public class PrecedenceTest extends BaseParserTest {
         AndExpression and = (AndExpression) when;
         assertThat(and.left()).isInstanceOf(NotExpression.class);
         assertThat(and.right()).isInstanceOf(BooleanExpression.class);
+    }
+
+    @Test(expected = ParseException.class)
+    public void literalsMustBeQuotedInFieldref() {
+        final Rule rule = parseRule("rule \"test\" when to_string($message.true) == to_string($message.false) then end");
+    }
+
+    @Test
+    public void quotedLiteralInFieldRef() {
+        final Rule rule = parseRule("rule \"test\" when to_string($message.`true`) == \"true\" then end");
+        final Message message = new Message("hallo", "test", Tools.nowUTC());
+        message.addField("true", "true");
+        final Message result = evaluateRule(rule, message);
+
+        assertThat(result).isNotNull();
     }
 
     private static Rule parseRule(String rule) {
