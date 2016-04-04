@@ -67,7 +67,7 @@ public class IndexerOverviewResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get overview of current indexing state, including deflector config, cluster state, index rnages & message counts.")
+    @ApiOperation(value = "Get overview of current indexing state, including deflector config, cluster state, index ranges & message counts.")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexerOverview index() throws ClassNotFoundException {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();

@@ -49,7 +49,7 @@ const IndicesStore = Reflux.createStore({
       return { indices: this.indices, closedIndices: this.closedIndices };
     });
 
-    IndicesActions.list.promise(promise);
+    IndicesActions.multiple.promise(promise);
   },
   close(indexName) {
     const url = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.close(indexName).url);
