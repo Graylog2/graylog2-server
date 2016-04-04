@@ -38,13 +38,13 @@ const IndicesPage = React.createClass({
   },
   REFRESH_INTERVAL: 2000,
   _totalIndexCount() {
-    return (Object.keys(this.state.indices).length + this.state.indexDetails.closedIndices.length);
+    return (Object.keys(this.state.indexerOverview.indices).length + this.state.indexDetails.closedIndices.length);
   },
   render() {
-    if (!this.state.indices || !this.state.deflector || !this.state.indexer_cluster || !this.state.counts) {
+    if (!this.state.indexerOverview) {
       return <Spinner />;
     }
-    const deflectorInfo = this.state.deflector;
+    const deflectorInfo = this.state.indexerOverview.deflector;
     return (
       <span>
         <PageHeader title="Indices">
@@ -71,17 +71,17 @@ const IndicesPage = React.createClass({
           <Col md={12}>
             <Alert bsStyle="success" style={{ marginTop: '10' }}>
               <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
-              {numeral(this.state.counts.events).format('0,0')} messages under management,
+              {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
               current write-active index is <i>{deflectorInfo.current_target}</i>.
             </Alert>
-            <IndexerClusterHealthSummary health={this.state.indexer_cluster.health} />
+            <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
           </Col>
         </Row>
 
-        <IndicesOverview indices={this.state.indices}
+        <IndicesOverview indices={this.state.indexerOverview.indices}
                          indexDetails={this.state.indexDetails.indices}
                          closedIndices={this.state.indexDetails.closedIndices}
-                         deflector={this.state.deflector}/>
+                         deflector={this.state.indexerOverview.deflector}/>
       </span>
     );
   },

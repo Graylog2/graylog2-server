@@ -13,7 +13,7 @@ const IndexerOverviewStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list().url);
     const promise = fetch('GET', url);
     promise.then((response) => {
-      this.trigger(response);
+      this.trigger({ indexerOverview: response });
     });
 
     IndexerOverviewActions.list.promise(promise);
