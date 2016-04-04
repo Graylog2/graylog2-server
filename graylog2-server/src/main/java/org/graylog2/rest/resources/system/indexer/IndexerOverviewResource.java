@@ -91,7 +91,7 @@ public class IndexerOverviewResource extends RestResource {
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
                 deflectorSummary.currentTarget().equals(indexName),
                 true,
-                indices.isReopened(indexName)
+                false
             ));
         });
 
