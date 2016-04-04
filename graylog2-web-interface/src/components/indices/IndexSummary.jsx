@@ -40,7 +40,7 @@ const IndexSummary = React.createClass({
 
     const sizes = this.props.index.size;
     if (sizes) {
-      const count = sizes.count;
+      const count = sizes.events;
       const deleted = sizes.deleted;
       if (count === 0 || count - deleted === 0) {
         return 'Index does not contain any messages.';
