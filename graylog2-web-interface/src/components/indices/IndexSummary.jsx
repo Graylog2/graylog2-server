@@ -9,7 +9,7 @@ const IndexSummary = React.createClass({
   propTypes: {
     children: React.PropTypes.node.isRequired,
     index: React.PropTypes.object.isRequired,
-    indexRange: React.PropTypes.object.isRequired,
+    indexRange: React.PropTypes.object,
     isDeflector: React.PropTypes.bool.isRequired,
     name: React.PropTypes.string.isRequired,
   },

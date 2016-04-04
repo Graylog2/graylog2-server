@@ -9,7 +9,7 @@ import { IndexRangeSummary } from 'components/indices';
 const ClosedIndexDetails = React.createClass({
   propTypes: {
     indexName: React.PropTypes.string.isRequired,
-    indexRange: React.PropTypes.object.isRequired,
+    indexRange: React.PropTypes.object,
   },
   _onReopen() {
     IndicesActions.reopen(this.props.indexName);
