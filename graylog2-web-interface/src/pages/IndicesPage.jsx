@@ -25,7 +25,6 @@ const IndicesPage = React.createClass({
   ],
   componentDidMount() {
     IndicesActions.list();
-
     this.timerId = setInterval(() => {
       IndicesActions.multiple();
       IndexerOverviewActions.list();
@@ -41,7 +40,7 @@ const IndicesPage = React.createClass({
     return (Object.keys(this.state.indexerOverview.indices).length + this.state.indexDetails.closedIndices.length);
   },
   render() {
-    if (!this.state.indexerOverview) {
+    if (!this.state.indexerOverview || !this.state.indexDetails.closedIndices) {
       return <Spinner />;
     }
     const deflectorInfo = this.state.indexerOverview.deflector;
