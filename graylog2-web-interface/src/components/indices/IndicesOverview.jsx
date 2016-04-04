@@ -11,9 +11,6 @@ const IndicesOverview = React.createClass({
     indexDetails: React.PropTypes.object.isRequired,
     indices: React.PropTypes.object.isRequired,
   },
-  _isDeflector(index) {
-    return index.name === this.props.deflector.current_target;
-  },
   _formatIndex(indexName, index) {
     const indexSummary = this.props.indices[indexName];
     const indexRange = indexSummary && indexSummary.range ? indexSummary.range : null;
