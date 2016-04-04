@@ -53,17 +53,23 @@ Some settings, which have been deprecated in previous versions, have finally bee
 
 .Removed configuration settings
 |===
-| Setting name              | Replacement
+| Setting name                          | Replacement
 
-| `mongodb_host`                  | `mongodb_uri`
-| `mongodb_port`                  | `mongodb_uri`
-| `mongodb_database`              | `mongodb_uri`
-| `mongodb_useauth`               | `mongodb_uri`
-| `mongodb_user`                  | `mongodb_uri`
-| `mongodb_password`              | `mongodb_uri`
-| `elasticsearch_node_name`       | `elasticsearch_node_name_prefix`
-| `collector_expiration_threshold`| (moved to collector plugin)
-| `collector_inactive_threshold`  | (moved to collector plugin)
+| `mongodb_host`                        | `mongodb_uri`
+| `mongodb_port`                        | `mongodb_uri`
+| `mongodb_database`                    | `mongodb_uri`
+| `mongodb_useauth`                     | `mongodb_uri`
+| `mongodb_user`                        | `mongodb_uri`
+| `mongodb_password`                    | `mongodb_uri`
+| `elasticsearch_node_name`             | `elasticsearch_node_name_prefix`
+| `collector_expiration_threshold`      | (moved to collector plugin)
+| `collector_inactive_threshold`        | (moved to collector plugin)
+| `rotation_strategy`                   | UI in web interface (System/Indices)
+| `retention_strategy`                  | UI in web interface (System/Indices)
+| `elasticsearch_max_docs_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_size_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_time_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_number_of_indices` | UI in web interface (System/Indices)
 |===
 
 

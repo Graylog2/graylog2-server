@@ -85,15 +85,19 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String indexPrefix = "graylog";
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int maxDocsPerIndex = 80000000;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
     private long maxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
 
@@ -112,9 +116,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "no_retention")
     private boolean noRetention = false;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")
     private String rotationStrategy = "count";
 
@@ -195,18 +201,22 @@ public class ElasticsearchConfiguration {
         return indexPrefix.toLowerCase(Locale.ENGLISH);
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public int getMaxNumberOfIndices() {
         return maxNumberOfIndices;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public int getMaxDocsPerIndex() {
         return maxDocsPerIndex;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public long getMaxSizePerIndex() {
         return maxSizePerIndex;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public Period getMaxTimePerIndex() {
         return maxTimePerIndex;
     }
@@ -227,6 +237,7 @@ public class ElasticsearchConfiguration {
         return templateName;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public String getRotationStrategy() {
         return rotationStrategy;
     }
@@ -239,6 +250,7 @@ public class ElasticsearchConfiguration {
         noRetention = !retention;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public String getRetentionStrategy() {
         return retentionStrategy;
     }
