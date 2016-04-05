@@ -104,7 +104,7 @@
         <swagger.version>1.5.8</swagger.version>
         <sigar.version>1.6.4</sigar.version>
         <restassured.version>2.9.0</restassured.version>
-        <elasticsearch.version>2.3.0</elasticsearch.version>
+        <elasticsearch.version>2.3.1</elasticsearch.version>
         <retrofit.version>2.0.1</retrofit.version>
         <forbiddenapis.version>2.0</forbiddenapis.version>
     </properties>
