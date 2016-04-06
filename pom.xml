@@ -298,7 +298,7 @@
             <dependency>
                 <groupId>com.ning</groupId>
                 <artifactId>async-http-client</artifactId>
-                <version>1.9.31</version>
+                <version>1.9.38</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp</groupId>
