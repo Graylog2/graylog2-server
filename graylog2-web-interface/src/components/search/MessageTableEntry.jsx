@@ -30,9 +30,11 @@ const MessageTableEntry = React.createClass({
     if (fullOrigValue === undefined) {
       return '';
     }
+    const fullStringOrigValue = String(fullOrigValue); // Ensure the field is a string for later processing
+
     // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
     // It's not optimal, more like a workaround to at least being able to show the page...
-    const origValue = truncate ? fullOrigValue.slice(0, 2048) : fullOrigValue;
+    const origValue = truncate ? fullStringOrigValue.slice(0, 2048) : fullStringOrigValue;
 
     if (this.props.highlight && this.props.message.highlight_ranges) {
       if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
