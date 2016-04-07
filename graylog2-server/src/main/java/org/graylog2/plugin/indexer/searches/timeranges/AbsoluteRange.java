@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.Map;
@@ -108,13 +109,14 @@ public abstract class AbsoluteRange extends TimeRange {
         }
 
         private DateTime parseDateTime(String to) {
-            DateTime ts;
+            final DateTimeFormatter formatter;
             if (to.contains("T")) {
-                ts = DateTime.parse(to, ISODateTimeFormat.dateTime());
+                formatter = ISODateTimeFormat.dateTime();
             } else {
-                ts = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+                formatter = Tools.timeFormatterWithOptionalMilliseconds();
             }
-            return ts;
+            // Use withOffsetParsed() to keep the timezone!
+            return formatter.withOffsetParsed().parseDateTime(to);
         }
     }
 }
