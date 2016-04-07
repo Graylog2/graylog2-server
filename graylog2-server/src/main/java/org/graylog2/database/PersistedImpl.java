@@ -24,6 +24,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,22 +42,31 @@ public abstract class PersistedImpl implements Persisted {
     protected final ObjectId id;
     private final AtomicReference<String> hexId = new AtomicReference<>(null);
 
-    protected PersistedImpl(final Map<String, Object> fields) {
+    protected PersistedImpl(@Nullable final Map<String, Object> fields) {
         this(new ObjectId(), fields);
     }
 
-    protected PersistedImpl(final ObjectId id, final Map<String, Object> fields) {
+    protected PersistedImpl(final ObjectId id, @Nullable final Map<String, Object> fields) {
         this.id = id;
-        this.fields = fields;
 
         if (null != this.id) {
             hexId.set(this.id.toHexString());
         }
 
-        // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
-        for (Map.Entry<String, Object> field : fields.entrySet()) {
-            if (field.getValue() instanceof Date) {
-                fields.put(field.getKey(), new DateTime(field.getValue(), DateTimeZone.UTC));
+        if(fields == null) {
+            this.fields = new HashMap<>();
+        } else {
+            this.fields = new HashMap<>(fields.size());
+
+            // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
+            for (Map.Entry<String, Object> field : fields.entrySet()) {
+                final String key = field.getKey();
+                final Object value = field.getValue();
+                if (value instanceof Date) {
+                    this.fields.put(key, new DateTime(value, DateTimeZone.UTC));
+                } else {
+                    this.fields.put(key, value);
+                }
             }
         }
     }
