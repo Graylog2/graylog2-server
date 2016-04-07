@@ -17,9 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,7 +49,6 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -109,7 +106,7 @@ public class IndicesResource extends RestResource {
         }
 
         return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
-                routing.build(), indices.isReopened(index));
+            routing.build(), indices.isReopened(index));
     }
 
     @POST
@@ -118,7 +115,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get information of all specified indices and their shards.")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
-                                  @Valid @NotNull IndicesReadRequest request) {
+                                           @Valid @NotNull IndicesReadRequest request) {
         if (request.indices() != null)
             return request.indices().stream().collect(Collectors.toMap(Function.identity(), this::single));
 
@@ -143,10 +140,10 @@ public class IndicesResource extends RestResource {
             }
 
             final IndexInfo indexInfo = IndexInfo.create(
-                    indexStats(indexStatistics.primaries()),
-                    indexStats(indexStatistics.total()),
-                    routing.build(),
-                    areReopened.get(indexStatistics.indexName()));
+                indexStats(indexStatistics.primaries()),
+                indexStats(indexStatistics.total()),
+                routing.build(),
+                areReopened.get(indexStatistics.indexName()));
 
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
@@ -189,7 +186,7 @@ public class IndicesResource extends RestResource {
     public AllIndices all() {
         return AllIndices.create(this.closed(), this.reopened(), this.open());
     }
-    
+
     @POST
     @Timed
     @Path("/{index}/reopen")
@@ -212,7 +209,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
+        @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
@@ -236,7 +233,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Delete an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
+        @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
@@ -257,28 +254,28 @@ public class IndicesResource extends RestResource {
 
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
         return ShardRouting.create(route.shardId().getId(),
-                route.state().name().toLowerCase(Locale.ENGLISH),
-                route.active(),
-                route.primary(),
-                route.currentNodeId(),
-                cluster.nodeIdToName(route.currentNodeId()),
-                cluster.nodeIdToHostName(route.currentNodeId()),
-                route.relocatingNodeId());
+            route.state().name().toLowerCase(Locale.ENGLISH),
+            route.active(),
+            route.primary(),
+            route.currentNodeId(),
+            cluster.nodeIdToName(route.currentNodeId()),
+            cluster.nodeIdToHostName(route.currentNodeId()),
+            route.relocatingNodeId());
     }
 
     private IndexStats indexStats(final CommonStats stats) {
         return IndexStats.create(
-                IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
-                stats.getSearch().getOpenContexts(),
-                stats.getStore().getSize().getBytes(),
-                stats.getSegments().getCount(),
-                IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
+            IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
+            stats.getSearch().getOpenContexts(),
+            stats.getStore().getSize().getBytes(),
+            stats.getSegments().getCount(),
+            IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
         );
     }
 }

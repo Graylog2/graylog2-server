@@ -23,7 +23,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
-import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSizeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSummary;
