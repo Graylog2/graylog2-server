@@ -724,13 +724,13 @@
             <dependency>
                 <groupId>com.github.joschi.nosqlunit</groupId>
                 <artifactId>nosqlunit-elasticsearch2</artifactId>
-                <version>0.8.1-1</version>
+                <version>0.9.0-1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.lordofthejars</groupId>
                 <artifactId>nosqlunit-mongodb</artifactId>
-                <version>0.8.1</version>
+                <version>0.9.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
