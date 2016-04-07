@@ -135,6 +135,7 @@ public class IndicesResource extends RestResource {
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats();
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
+        final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
         for (IndexStatistics indexStatistics : indicesStats) {
             final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
             for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
@@ -145,7 +146,7 @@ public class IndicesResource extends RestResource {
                     indexStats(indexStatistics.primaries()),
                     indexStats(indexStatistics.total()),
                     routing.build(),
-                    indices.isReopened(indexStatistics.indexName()));
+                    areReopened.get(indexStatistics.indexName()));
 
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
@@ -159,18 +160,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
-        Set<String> closedIndices;
-        try {
-            closedIndices = Sets.filter(indices.getClosedIndices(), new Predicate<String>() {
-                @Override
-                public boolean apply(String indexName) {
-                    return isPermitted(RestPermissions.INDICES_READ, indexName);
-                }
-            });
-        } catch (Exception e) {
-            LOG.error("Could not get closed indices.", e);
-            throw new InternalServerErrorException(e);
-        }
+        final Set<String> closedIndices = indices.getClosedIndices()
+            .stream()
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName))
+            .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
@@ -181,18 +174,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
-        final Set<String> reopenedIndices;
-        try {
-            reopenedIndices = Sets.filter(indices.getReopenedIndices(), new Predicate<String>() {
-                @Override
-                public boolean apply(String indexName) {
-                    return isPermitted(RestPermissions.INDICES_READ, indexName);
-                }
-            });
-        } catch (Exception e) {
-            LOG.error("Could not get reopened indices.", e);
-            throw new InternalServerErrorException(e);
-        }
+        final Set<String> reopenedIndices = indices.getReopenedIndices()
+            .stream()
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName))
+            .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
@@ -204,8 +189,7 @@ public class IndicesResource extends RestResource {
     public AllIndices all() {
         return AllIndices.create(this.closed(), this.reopened(), this.open());
     }
-
-
+    
     @POST
     @Timed
     @Path("/{index}/reopen")

@@ -23,6 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSizeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSummary;
@@ -72,8 +73,11 @@ public class IndexerOverviewResource extends RestResource {
     public IndexerOverview index() throws ClassNotFoundException {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
-        final Map<String, IndexSummary> indicesSummaries = indices.getAll().values()
+        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts();
+        final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
+        final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()
             .stream()
+            .parallel()
             .collect(Collectors.toMap(IndexStats::getIndex,
                 (indexStats) -> IndexSummary.create(
                     IndexSizeSummary.create(indexStats.getPrimaries().getDocs().getCount(),
@@ -82,7 +86,7 @@ public class IndexerOverviewResource extends RestResource {
                     indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexStats.getIndex())).findFirst().orElse(null),
                     deflectorSummary.currentTarget().equals(indexStats.getIndex()),
                     false,
-                    indices.isReopened(indexStats.getIndex()))
+                    areReopened.get(indexStats.getIndex()))
             ));
 
         indices.getClosedIndices().stream().forEach((indexName) -> {
