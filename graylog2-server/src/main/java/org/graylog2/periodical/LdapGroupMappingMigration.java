@@ -48,13 +48,15 @@ public class LdapGroupMappingMigration extends Periodical {
     @Override
     public void doRun() {
         final LdapSettings ldapSettings = ldapSettingsService.load();
-        ldapSettings.setGroupMapping(ldapSettings.getGroupMapping());
-        try {
-            ldapSettingsService.save(ldapSettings);
-            clusterConfigService.write(LdapGroupMappingMigrationState.create(true));
-            log.info("Migrated LDAP group mapping format");
-        } catch (ValidationException e) {
-            log.error("Unable to save migrated LDAP settings!", e);
+        if (ldapSettings != null) {
+            ldapSettings.setGroupMapping(ldapSettings.getGroupMapping());
+            try {
+                ldapSettingsService.save(ldapSettings);
+                clusterConfigService.write(LdapGroupMappingMigrationState.create(true));
+                log.info("Migrated LDAP group mapping format");
+            } catch (ValidationException e) {
+                log.error("Unable to save migrated LDAP settings!", e);
+            }
         }
     }
 
