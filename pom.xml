@@ -51,7 +51,7 @@
         <connection>scm:git:git://github.com/Graylog2/graylog2-server.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog2-server.git</developerConnection>
         <url>https://github.com/Graylog2/graylog2-server</url>
-        <tag>2.0.0-alpha.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
