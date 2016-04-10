@@ -17,15 +17,43 @@
 package org.graylog2.plugin.rest;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.base.MoreObjects;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.PROPERTY, property="type")
+import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class ApiError {
     public final String message;
 
     public ApiError(String message) {
-        this.message = message;
+        this.message = requireNonNull(message);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final ApiError apiError = (ApiError) o;
+        return Objects.equals(message, apiError.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(message);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("message", message)
+                .toString();
     }
 }
