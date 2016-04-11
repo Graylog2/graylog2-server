@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.database;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.database.validators.ValidationResult;
 
@@ -41,5 +42,13 @@ public class ValidationException extends Exception {
 
     public Map<String, List<ValidationResult>> getErrors() {
         return errors;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("message", getLocalizedMessage())
+            .add("errors", errors)
+            .toString();
     }
 }

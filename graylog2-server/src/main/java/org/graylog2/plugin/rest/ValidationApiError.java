@@ -16,21 +16,24 @@
  */
 package org.graylog2.plugin.rest;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.database.validators.ValidationResult;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+@JsonAutoDetect
 public class ValidationApiError extends ApiError {
     private final Map<String, List<ValidationResult>> validationErrors;
+
     public ValidationApiError(String message, Map<String, List<ValidationResult>> validationErrors) {
         super(message);
-        this.validationErrors = validationErrors;
+        this.validationErrors = ImmutableMap.copyOf(validationErrors);
     }
 
+    @JsonProperty
     public Map<String, List<ValidationResult>> getValidationErrors() {
         return validationErrors;
     }

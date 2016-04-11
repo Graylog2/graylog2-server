@@ -16,16 +16,21 @@
  */
 package org.graylog2.plugin.rest;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.PROPERTY, property="type")
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class ApiError {
-    public final String message;
+    private final String message;
 
     public ApiError(String message) {
         this.message = message;
+    }
+
+    @JsonProperty
+    public String getMessage() {
+        return message;
     }
 }

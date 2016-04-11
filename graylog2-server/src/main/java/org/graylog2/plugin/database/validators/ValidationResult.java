@@ -16,9 +16,8 @@
  */
 package org.graylog2.plugin.database.validators;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import com.google.common.base.MoreObjects;
+
 public abstract class ValidationResult {
     public abstract boolean passed();
 
@@ -26,6 +25,13 @@ public abstract class ValidationResult {
         @Override
         public boolean passed() {
             return true;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                .add("passed", passed())
+                .toString();
         }
     }
 
@@ -43,6 +49,14 @@ public abstract class ValidationResult {
         @Override
         public boolean passed() {
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                .add("passed", passed())
+                .add("error", getError())
+                .toString();
         }
     }
 }
