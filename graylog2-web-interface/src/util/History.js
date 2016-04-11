@@ -1,3 +1,7 @@
 import { createHistory } from 'history';
 
-export default createHistory();
+if (!window.graylogHistory) {
+  window.graylogHistory = createHistory();
+}
+
+export default window.graylogHistory;
