@@ -189,7 +189,7 @@ const ApiRoutes = {
     _buildUrl(url, queryString) {
       return `${url}?${Qs.stringify(queryString)}`;
     },
-    search(type, query, timerange, streamId, limit, offset) {
+    search(type, query, timerange, streamId, limit, offset, sortField, sortOrder) {
       const url = `/search/universal/${type}`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);
 
@@ -198,6 +198,9 @@ const ApiRoutes = {
       }
       if (offset) {
         queryString.offset = offset;
+      }
+      if (sortField && sortOrder) {
+        queryString.sort = `${sortField}:${sortOrder}`;
       }
 
       return { url: this._buildUrl(url, queryString) };

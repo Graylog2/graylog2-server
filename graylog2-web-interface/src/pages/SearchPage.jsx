@@ -69,7 +69,7 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this.state.query;
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page)
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         response => {
           this.setState({ searchResult: response, error: undefined });

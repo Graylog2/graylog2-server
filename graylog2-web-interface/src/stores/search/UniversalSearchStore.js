@@ -14,13 +14,13 @@ const UniversalSearchStore = Reflux.createStore({
   DEFAULT_LIMIT: 150,
   listenables: [],
 
-  search(type, query, timerange, streamId, limit, page) {
+  search(type, query, timerange, streamId, limit, page, sortField, sortOrder) {
     const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
     const effectiveLimit = limit || this.DEFAULT_LIMIT;
     const offset = (page - 1) * effectiveLimit;
 
     const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query,
-      timerangeParams, streamId, effectiveLimit, offset).url);
+      timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder).url);
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
