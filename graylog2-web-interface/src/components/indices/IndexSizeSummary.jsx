@@ -7,10 +7,10 @@ const IndexSizeSummary = React.createClass({
   },
   render() {
     const { index } = this.props;
-    if (index.all_shards) {
+    if (index.size) {
       return (
-        <span>({numeral(index.all_shards.store_size_bytes).format('0.0b')}
-          / {numeral(index.all_shards.documents.count).format('0,0')} messages){' '}</span>
+        <span>({numeral(index.size.bytes).format('0.0b')}{' '}
+          / {numeral(index.size.events).format('0,0')} messages){' '}</span>
       );
     }
 

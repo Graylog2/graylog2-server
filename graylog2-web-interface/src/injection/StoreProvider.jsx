@@ -26,6 +26,7 @@ class StoreProvider {
       HistogramData: () => require('stores/sources/HistogramDataStore'),
       IndexerCluster: () => require('stores/indexers/IndexerClusterStore'),
       IndexerFailures: () => require('stores/indexers/IndexerFailuresStore'),
+      IndexerOverview: () => require('stores/indexers/IndexerOverviewStore'),
       IndexRanges: () => require('stores/indices/IndexRangesStore'),
       Indices: () => require('stores/indices/IndicesStore'),
       IndicesConfiguration: () => require('stores/indices/IndicesConfigurationStore'),

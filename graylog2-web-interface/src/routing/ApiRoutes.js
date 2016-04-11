@@ -54,6 +54,9 @@ const ApiRoutes = {
     count: (since) => { return { url: `/system/indexer/failures/count?since=${since}` }; },
     list: (limit, offset) => { return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` }; },
   },
+  IndexerOverviewApiResource: {
+    list: () => { return { url: '/system/indexer/overview' }; },
+  },
   IndexRangesApiController: {
     list: () => { return { url: '/system/indices/ranges' }; },
     rebuild: () => { return { url: '/system/indices/ranges/rebuild' }; },
@@ -64,6 +67,7 @@ const ApiRoutes = {
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
     list: () => { return { url: '/system/indexer/indices' }; },
     listClosed: () => { return { url: '/system/indexer/indices/closed' }; },
+    multiple: () => { return { url: '/system/indexer/indices/multiple' }; },
     reopen: (indexName) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
   },
   InputsApiController: {
@@ -81,9 +85,9 @@ const ApiRoutes = {
     stop: (inputId) => { return { url: `/cluster/inputstates/${inputId}` }; },
   },
   ClusterLoggersResource: {
-    loggers: () => { return {url: '/cluster/system/loggers'}; },
-    subsystems: () => { return {url: '/cluster/system/loggers/subsystems'}; },
-    setSubsystemLoggerLevel: (nodeId, subsystem, loglevel) => { return {url: '/cluster/system/loggers/' + nodeId + '/subsystems/' + subsystem + '/level/' + loglevel}; },
+    loggers: () => { return { url: '/cluster/system/loggers' }; },
+    subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
+    setSubsystemLoggerLevel: (nodeId, subsystem, loglevel) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
@@ -94,7 +98,7 @@ const ApiRoutes = {
   },
   ClusterMetricsApiController: {
     multiple: (nodeId) => { return { url: `/cluster/${nodeId}/metrics/multiple` }; },
-    multipleAllNodes: () => { return { url: `/cluster/metrics/multiple` }; },
+    multipleAllNodes: () => { return { url: '/cluster/metrics/multiple' }; },
     byNamespace: (nodeId, namespace) => { return { url: `/cluster/${nodeId}/metrics/namespace/${namespace}` }; },
   },
   NotificationsApiController: {

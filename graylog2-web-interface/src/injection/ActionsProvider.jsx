@@ -15,6 +15,7 @@ class ActionsProvider {
       GettingStarted: () => require('actions/gettingstarted/GettingStartedActions'),
       HistogramData: () => require('actions/sources/HistogramDataActions'),
       IndexerCluster: () => require('actions/indexers/IndexerClusterActions'),
+      IndexerOverview: () => require('actions/indexers/IndexerOverviewActions'),
       IndexRanges: () => require('actions/indices/IndexRangesActions'),
       Indices: () => require('actions/indices/IndicesActions'),
       IndicesConfiguration: () => require('actions/indices/IndicesConfigurationActions'),

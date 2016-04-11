@@ -4,18 +4,12 @@ import { Alert, Col, Row } from 'react-bootstrap';
 import numeral from 'numeral';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const IndexerClusterActions = ActionsProvider.getActions('IndexerCluster');
-const DeflectorActions = ActionsProvider.getActions('Deflector');
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
 const IndicesActions = ActionsProvider.getActions('Indices');
-const MessageCountsActions = ActionsProvider.getActions('MessageCounts');
 
 import StoreProvider from 'injection/StoreProvider';
-const IndexerClusterStore = StoreProvider.getStore('IndexerCluster');
-const DeflectorStore = StoreProvider.getStore('Deflector');
-const IndexRangesStore = StoreProvider.getStore('IndexRanges');
+const IndexerOverviewStore = StoreProvider.getStore('IndexerOverview');
 const IndicesStore = StoreProvider.getStore('Indices');
-const MessageCountsStore = StoreProvider.getStore('MessageCounts');
 
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, Spinner } from 'components/common';
@@ -25,20 +19,15 @@ import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices'
 import IndicesConfiguration from 'components/indices/IndicesConfiguration';
 
 const IndicesPage = React.createClass({
-  mixins: [Reflux.connect(IndicesStore), Reflux.connect(DeflectorStore),
-    Reflux.connect(IndexRangesStore), Reflux.connect(MessageCountsStore), Reflux.connect(IndexerClusterStore)],
+  mixins: [
+    Reflux.connect(IndicesStore, 'indexDetails'),
+    Reflux.connect(IndexerOverviewStore),
+  ],
   componentDidMount() {
+    IndicesActions.list();
     this.timerId = setInterval(() => {
-      DeflectorActions.list();
-
-      IndexRangesActions.list();
-
-      IndicesActions.list();
-
-      MessageCountsActions.total();
-
-      IndexerClusterActions.health();
-      IndexerClusterActions.name();
+      IndicesActions.multiple();
+      IndexerOverviewActions.list();
     }, this.REFRESH_INTERVAL);
   },
   componentWillUnmount() {
@@ -48,13 +37,13 @@ const IndicesPage = React.createClass({
   },
   REFRESH_INTERVAL: 2000,
   _totalIndexCount() {
-    return (Object.keys(this.state.indices).length + this.state.closedIndices.length);
+    return (Object.keys(this.state.indexerOverview.indices).length + this.state.indexDetails.closedIndices.length);
   },
   render() {
-    if (!this.state.indices || !this.state.indexRanges || !this.state.deflector || !this.state.health) {
+    if (!this.state.indexerOverview || !this.state.indexDetails.closedIndices) {
       return <Spinner />;
     }
-    const deflectorInfo = this.state.deflector.info;
+    const deflectorInfo = this.state.indexerOverview.deflector;
     return (
       <span>
         <PageHeader title="Indices">
@@ -79,17 +68,19 @@ const IndicesPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <Alert bsStyle="success" style={{marginTop: '10'}}>
+            <Alert bsStyle="success" style={{ marginTop: '10' }}>
               <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
-              {numeral(this.state.events).format('0,0')} messages under management,
-              current write-active index is <i>{deflectorInfo ? deflectorInfo.current_target : <Spinner />}</i>.
+              {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
+              current write-active index is <i>{deflectorInfo.current_target}</i>.
             </Alert>
-            <IndexerClusterHealthSummary health={this.state.health} />
+            <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
           </Col>
         </Row>
 
-        <IndicesOverview indices={this.state.indices} closedIndices={this.state.closedIndices}
-                         deflector={this.state.deflector} indexRanges={this.state.indexRanges} />
+        <IndicesOverview indices={this.state.indexerOverview.indices}
+                         indexDetails={this.state.indexDetails.indices}
+                         closedIndices={this.state.indexDetails.closedIndices}
+                         deflector={this.state.indexerOverview.deflector}/>
       </span>
     );
   },

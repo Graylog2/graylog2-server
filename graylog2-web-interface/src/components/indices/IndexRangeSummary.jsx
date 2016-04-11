@@ -3,7 +3,7 @@ import {Timestamp} from 'components/common';
 
 const IndexRangeSummary = React.createClass({
   propTypes: {
-    indexRange: React.PropTypes.object.isRequired,
+    indexRange: React.PropTypes.object,
   },
   render() {
     const { indexRange } = this.props;
