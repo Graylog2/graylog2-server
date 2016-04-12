@@ -16,17 +16,8 @@
  */
 package org.graylog2.system.jobs;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NoSuchJobException extends Exception {
-
-    public NoSuchJobException() {
-        super();
-    }
-
     public NoSuchJobException(String msg) {
         super(msg);
     }
-
 }
