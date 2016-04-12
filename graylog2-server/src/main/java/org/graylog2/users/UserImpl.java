@@ -19,9 +19,6 @@ package org.graylog2.users;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.bson.types.ObjectId;
@@ -44,7 +41,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,7 +83,6 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
-    public static final String HASH_ALGORITHM = "SHA-1";
     public static final String ROLES = "roles";
 
     public static final int MAX_USERNAME_LENGTH = 100;
@@ -161,11 +160,14 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getPermissions() {
-        final Set<String> permissionSet = Sets.newHashSet((List<String>) fields.get(PERMISSIONS));
-        permissionSet.addAll(permissions.userSelfEditPermissions(getName()));
-        return Lists.newArrayList(permissionSet);
+        final Set<String> permissionSet = new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        @SuppressWarnings("unchecked")
+        final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
+        if (permissions != null) {
+            permissionSet.addAll(permissions);
+        }
+        return new ArrayList<>(permissionSet);
     }
 
     @Override
@@ -190,7 +192,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Map<String, String> getStartpage() {
-        final Map<String, String> startpage = Maps.newHashMap();
+        final Map<String, String> startpage = new HashMap<>();
 
         if (fields.containsKey(STARTPAGE)) {
             @SuppressWarnings("unchecked")
@@ -302,17 +304,17 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public Set<String> getRoleIds() {
         final List<ObjectId> roles = firstNonNull((List<ObjectId>) fields.get(ROLES), Collections.<ObjectId>emptyList());
-        return Sets.newHashSet(Collections2.transform(roles, new ObjectIdStringFunction()));
+        return new HashSet<>(Collections2.transform(roles, new ObjectIdStringFunction()));
     }
 
     @Override
     public void setRoleIds(Set<String> roles) {
-        fields.put(ROLES, Lists.newArrayList(Collections2.transform(roles, new StringObjectIdFunction())));
+        fields.put(ROLES, new ArrayList<>(Collections2.transform(roles, new StringObjectIdFunction())));
     }
 
     @Override
     public void setStartpage(final String type, final String id) {
-        final Map<String, String> startpage = Maps.newHashMap();
+        final Map<String, String> startpage = new HashMap<>();
 
         if (type != null && id != null) {
             startpage.put("type", type);

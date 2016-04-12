@@ -44,6 +44,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,6 +85,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    @Nullable
     public User load(final String username) {
         LOG.debug("Loading user {}", username);
 
@@ -145,6 +147,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    @Nullable
     public User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username) {
         UserImpl user = (UserImpl) load(username);
 
@@ -192,13 +195,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             ((UserImpl) user).setHashedPassword("User synced from LDAP.");
         }
 
-        if (user.getPermissions() == null) {
-            user.setPermissions(Lists.newArrayList(permissions.userSelfEditPermissions(username)));
-        } else {
-            user.setPermissions(Lists.newArrayList(Sets.union(permissions.userSelfEditPermissions(username),
-                                                              Sets.newHashSet(user.getPermissions()))));
-        }
-
         // map ldap groups to user roles, if the mapping is present
         final Set<String> translatedRoleIds = Sets.newHashSet(Sets.union(Sets.newHashSet(ldapSettings.getDefaultGroupId()),
                                                                          ldapSettings.getAdditionalDefaultGroupIds()));
@@ -233,7 +229,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             translatedRoleIds.addAll(user.getRoleIds());
         }
         user.setRoleIds(translatedRoleIds);
-
+        user.setPermissions(Collections.emptyList());
     }
 
     @Override

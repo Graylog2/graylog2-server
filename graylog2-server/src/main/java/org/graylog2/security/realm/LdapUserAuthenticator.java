@@ -125,6 +125,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         } catch (CursorException e) {
             LOG.error("Unable to read LDAP entry", e);
             return null;
+        } catch (Exception e) {
+            LOG.error("Error during LDAP user account sync. Cannot log in user {}", principal, e);
         } finally {
             if (connection != null) {
                 try {
