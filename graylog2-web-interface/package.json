@@ -44,7 +44,7 @@
     "react-day-picker": "^1.1.5",
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.0",
-    "react-dom": "0.14.7",
+    "react-dom": "0.14.8",
     "react-overlays": "^0.5.4",
     "react-router": "1.0.3",
     "react-router-bootstrap": "0.19.3",
