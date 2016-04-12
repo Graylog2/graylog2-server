@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
@@ -50,6 +51,7 @@ public class IndexerOverviewResource extends RestResource {
     private final IndexerClusterResource indexerClusterResource;
     private final IndexRangesResource indexRangesResource;
     private final CountResource countResource;
+    private final Deflector deflector;
     private final Indices indices;
 
     @Inject
@@ -57,11 +59,13 @@ public class IndexerOverviewResource extends RestResource {
                                    IndexerClusterResource indexerClusterResource,
                                    IndexRangesResource indexRangesResource,
                                    CountResource countResource,
+                                   Deflector deflector,
                                    Indices indices) {
         this.deflectorResource = deflectorResource;
         this.indexerClusterResource = indexerClusterResource;
         this.indexRangesResource = indexRangesResource;
         this.countResource = countResource;
+        this.deflector = deflector;
         this.indices = indices;
     }
 
@@ -72,7 +76,9 @@ public class IndexerOverviewResource extends RestResource {
     public IndexerOverview index() throws ClassNotFoundException {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
-        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts();
+        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts().entrySet().stream()
+                .filter(entry -> deflector.isGraylogIndex(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
         final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()
             .stream()

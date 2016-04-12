@@ -37,7 +37,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
@@ -113,14 +112,41 @@ public class DeflectorTest {
 
     @Test
     public void testIsGraylogIndex() {
+        assertTrue(deflector.isGraylogDeflectorIndex("graylog_1"));
         assertTrue(deflector.isGraylogIndex("graylog_1"));
+
+        assertTrue(deflector.isGraylogDeflectorIndex("graylog_42"));
         assertTrue(deflector.isGraylogIndex("graylog_42"));
+
+        assertTrue(deflector.isGraylogDeflectorIndex("graylog_100000000"));
         assertTrue(deflector.isGraylogIndex("graylog_100000000"));
+
+        // The restored archive indices should NOT be taken into account when getting the new deflector number.
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog_42_restored_archive"));
+        assertTrue(deflector.isGraylogIndex("graylog_42_restored_archive"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog_42_restored_archive123"));
+        assertFalse(deflector.isGraylogIndex("graylog_42_restored_archive123"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog_42_restored_archive_123"));
+        assertFalse(deflector.isGraylogIndex("graylog_42_restored_archive_123"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex(null));
         assertFalse(deflector.isGraylogIndex(null));
+
+        assertFalse(deflector.isGraylogDeflectorIndex(""));
         assertFalse(deflector.isGraylogIndex(""));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog_deflector"));
         assertFalse(deflector.isGraylogIndex("graylog_deflector"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog2beta_1"));
         assertFalse(deflector.isGraylogIndex("graylog2beta_1"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("graylog_1_suffix"));
         assertFalse(deflector.isGraylogIndex("graylog_1_suffix"));
+
+        assertFalse(deflector.isGraylogDeflectorIndex("HAHA"));
         assertFalse(deflector.isGraylogIndex("HAHA"));
     }
 }
