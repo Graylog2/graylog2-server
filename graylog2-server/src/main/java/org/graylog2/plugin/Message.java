@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin;
 
+import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -33,6 +34,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +48,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
@@ -174,7 +177,7 @@ public class Message implements Messages {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
-    public Map<String, Object> toElasticSearchObject() {
+    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter) {
         final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
 
         obj.put(FIELD_MESSAGE, getMessage());
@@ -182,11 +185,26 @@ public class Message implements Messages {
         obj.putAll(fields);
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
-        DateTime dateTime = null;
+        DateTime dateTime;
         if (timestampValue instanceof Date) {
             dateTime = new DateTime(timestampValue);
         } else if (timestampValue instanceof DateTime) {
             dateTime = (DateTime) timestampValue;
+        } else if (timestampValue instanceof String) {
+            // if the timestamp value is a string, we try to parse it in the correct format.
+            // we fall back to "now", this avoids losing messages which happen to have the wrong timestamp format
+            try {
+                dateTime = ES_DATE_FORMAT_FORMATTER.parseDateTime((String) timestampValue);
+            } catch (IllegalArgumentException e) {
+                LOG.trace("Invalid format for field timestamp '{}' in message {}, forcing to current time.", timestampValue, getId());
+                invalidTimestampMeter.mark();
+                dateTime = Tools.nowUTC();
+            }
+        } else {
+            // don't allow any other types for timestamp, force to "now"
+            LOG.trace("Invalid type for field timestamp '{}' in message {}, forcing to current time.", timestampValue.getClass().getSimpleName(), getId());
+            invalidTimestampMeter.mark();
+            dateTime = Tools.nowUTC();
         }
         if (dateTime != null) {
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));

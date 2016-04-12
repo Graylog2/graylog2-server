@@ -82,7 +82,7 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION);
+        final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages);
         final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(), null, null, indices);
         indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, new MetricRegistry());

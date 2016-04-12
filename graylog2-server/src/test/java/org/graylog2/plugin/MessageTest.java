@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -38,6 +40,7 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -49,11 +52,15 @@ import static org.mockito.Mockito.when;
 public class MessageTest {
     private Message message;
     private DateTime originalTimestamp;
+    private MetricRegistry metricRegistry;
+    private Meter invalidTimestampMeter;
 
     @Before
     public void setUp() {
+        metricRegistry = new MetricRegistry();
         originalTimestamp = Tools.nowUTC();
         message = new Message("foo", "bar", originalTimestamp);
+        invalidTimestampMeter = metricRegistry.meter("test");
     }
 
     @Test
@@ -262,7 +269,7 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP,
                          dateTime.toDate());
 
-        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject();
+        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
@@ -300,7 +307,7 @@ public class MessageTest {
         message.addField("field1", "wat");
         message.addField("field2", "that");
 
-        final Map<String, Object> object = message.toElasticSearchObject();
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
@@ -314,9 +321,11 @@ public class MessageTest {
     public void testToElasticSearchObjectWithoutDateTimeTimestamp() throws Exception {
         message.addField("timestamp", "time!");
 
-        final Map<String, Object> object = message.toElasticSearchObject();
+        final Meter errorMeter = metricRegistry.meter("test-meter");
+        final Map<String, Object> object = message.toElasticSearchObject(errorMeter);
 
-        assertEquals("time!", object.get("timestamp"));
+        assertNotEquals("time!", object.get("timestamp"));
+        assertEquals(1, errorMeter.getCount());
     }
 
     @Test
@@ -327,7 +336,7 @@ public class MessageTest {
 
         message.setStreams(Lists.newArrayList(stream));
 
-        final Map<String, Object> object = message.toElasticSearchObject();
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
         assertEquals(Lists.newArrayList("stream-id"), object.get("streams"));
     }
