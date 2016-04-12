@@ -166,6 +166,20 @@ const EditExtractor = React.createClass({
       </span>
     );
 
+    let storeAsFieldInput;
+    // Grok and JSON extractors create their required fields, so no need to add an input for them
+    if (this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.GROK && this.state.updatedExtractor.type !== ExtractorUtils.ExtractorTypes.JSON) {
+      storeAsFieldInput = (
+        <Input type="text" ref="targetField" id="target_field" label="Store as field"
+               defaultValue={this.state.updatedExtractor.target_field}
+               labelClassName="col-md-2"
+               wrapperClassName="col-md-10"
+               onChange={this._onTargetFieldChange}
+               required
+               help={targetFieldHelpMessage} />
+      );
+    }
+
     return (
       <div>
         <Row className="content extractor-list">
@@ -223,14 +237,7 @@ const EditExtractor = React.createClass({
                   </Input>
                   {this._getExtractorConditionControls()}
 
-                  <Input type="text" ref="targetField" id="target_field" label="Store as field"
-                         defaultValue={this.state.updatedExtractor.target_field}
-                         labelClassName="col-md-2"
-                         wrapperClassName="col-md-10"
-                         onChange={this._onTargetFieldChange}
-                         required
-                         help={targetFieldHelpMessage}/>
-
+                  {storeAsFieldInput}
 
                   <Input label="Extraction strategy" labelClassName="col-md-2" wrapperClassName="col-md-10"
                          help={cursorStrategyHelpMessage}>

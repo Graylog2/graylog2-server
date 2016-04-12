@@ -64,6 +64,7 @@ const ExtractorsStore = Reflux.createStore({
       source_field: field,
       converters: [],
       extractor_config: {},
+      target_field: '',
     };
   },
 
