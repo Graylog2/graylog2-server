@@ -36,13 +36,7 @@ class SearchStore {
 
     constructor() {
         this.load(true);
-
         window.addEventListener('resize', () => this.width = window.innerWidth);
-        $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
-        $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
-        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).on('execute.graylog.search', this._submitSearch.bind(this));
-        $(document).on('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     load(firstLoad) {
@@ -71,11 +65,6 @@ class SearchStore {
 
     unload() {
         window.removeEventListener('resize', () => this.width = window.innerWidth);
-        $(document).off('add-search-term.graylog.search', this._addSearchTerm.bind(this));
-        $(document).off('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
-        $(document).off('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).off('execute.graylog.search', this._submitSearch.bind(this));
-        $(document).off('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     initializeFieldsFromHash() {
@@ -214,19 +203,10 @@ class SearchStore {
         return originalSearch.set('rangeParams', rangeParams);
     }
 
-    _addSearchTerm(event, data) {
-        var term = data.hasOwnProperty('field') ? data.field + ":" : "";
-        term += SearchStore.escape(data.value);
-        var operator = data.operator || SearchStore.AND_OPERATOR;
-        this.addQueryTerm(term, operator);
-    }
-
-    _getOriginalSearchRequest(event, data) {
-        data.callback(this.getOriginalSearchParams());
-    }
-
-    _changeTimeRange(event, data) {
-        this.changeTimeRange(data['rangeType'], data['rangeParams']);
+    addSearchTerm(field, value, operator) {
+        const term = `${field}:${SearchStore.escape(value)}`;
+        const effectiveOperator = operator || SearchStore.AND_OPERATOR;
+        this.addQueryTerm(term, effectiveOperator);
     }
 
     changeTimeRange(newRangeType: string, newRangeParams: Object) {
@@ -240,9 +220,9 @@ class SearchStore {
         }
     }
 
-    _savedSearchDeleted(event, data) {
-        if (data.savedSearchId === this.savedSearch) {
-            this._submitSearch(event);
+    savedSearchDeleted(savedSearchId) {
+        if (savedSearchId === this.savedSearch) {
+            this._submitSearch(null);
         }
     }
 

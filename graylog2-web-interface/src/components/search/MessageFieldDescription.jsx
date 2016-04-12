@@ -1,10 +1,10 @@
-import $ from 'jquery';
 import React, {PropTypes} from 'react';
 import {Alert} from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';
 const MessagesStore = StoreProvider.getStore('Messages');
+const SearchStore = StoreProvider.getStore('Search');
 
 import MessageFieldSearchActions from './MessageFieldSearchActions';
 
@@ -36,7 +36,7 @@ const MessageFieldDescription = React.createClass({
   },
   addFieldToSearchBar(event) {
     event.preventDefault();
-    $(document).trigger('add-search-term.graylog.search', {field: this.props.fieldName, value: this.props.fieldValue});
+    SearchStore.addSearchTerm(this.props.fieldName, this.props.fieldValue);
   },
   _getFormattedTerms() {
     const termsMarkup = [];
