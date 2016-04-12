@@ -279,7 +279,7 @@ public final class Tools {
     }
 
     public static String buildElasticSearchTimeFormat(DateTime timestamp) {
-        return timestamp.toString(DateTimeFormat.forPattern(ES_DATE_FORMAT).withZoneUTC());
+        return timestamp.toString(ES_DATE_FORMAT_FORMATTER);
     }
 
     /**
