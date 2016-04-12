@@ -12,14 +12,6 @@ const HelpMenu = React.createClass({
   render() {
     return (
       <NavDropdown navItem title="Help" id="user-menu-dropdown" active={this.props.active}>
-        <MenuItem href="http://info.graylog.org/report-a-problem" target="_blank">
-          <i className="fa fa-external-link"></i> Report a Problem
-        </MenuItem>
-        <MenuItem href="http://info.graylog.org/ask-a-question" target="_blank">
-          <i className="fa fa-external-link"></i> Ask a Question
-        </MenuItem>
-
-        <MenuItem divider />
         <LinkContainer to={Routes.getting_started(true)}>
           <MenuItem>Getting Started</MenuItem>
         </LinkContainer>
