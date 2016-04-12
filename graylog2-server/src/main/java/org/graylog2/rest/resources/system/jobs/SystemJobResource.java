@@ -27,8 +27,8 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJob;
@@ -43,7 +43,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -170,5 +172,35 @@ public class SystemJobResource extends RestResource {
         return Response.accepted().build();
     }
 
-    // TODO: DELETE: attempt to stop/cancel job
+    @DELETE
+    @Timed
+    @Path("/{jobId}")
+    @ApiOperation(value = "Cancel running job")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+        SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
+        if (systemJob == null) {
+            throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        }
+
+        checkPermission(RestPermissions.SYSTEMJOBS_DELETE, systemJob.getClassName());
+
+        if (systemJob.isCancelable()) {
+            systemJob.requestCancel();
+        } else {
+            throw new ClientErrorException("System job with ID <" + jobId + "> cannot be cancelled", 422);
+        }
+
+        return SystemJobSummary.create(
+                UUID.fromString(systemJob.getId()),
+                systemJob.getDescription(),
+                systemJob.getClassName(),
+                systemJob.getInfo(),
+                nodeId.toString(),
+                systemJob.getStartedAt(),
+                systemJob.getProgress(),
+                systemJob.isCancelable(),
+                systemJob.providesProgress()
+        );
+    }
 }

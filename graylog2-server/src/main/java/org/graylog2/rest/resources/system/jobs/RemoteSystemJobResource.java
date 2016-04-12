@@ -20,6 +20,7 @@ import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -33,6 +34,9 @@ public interface RemoteSystemJobResource {
 
     @GET("/system/jobs/{jobId}")
     Call<SystemJobSummary> get(@Path("jobId") String jobId);
+
+    @DELETE("/system/jobs/{jobId}")
+    Call<SystemJobSummary> delete(@Path("jobId") String jobId);
 
     @POST("/system/jobs")
     Call trigger(@Body TriggerRequest tr);
