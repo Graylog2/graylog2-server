@@ -139,6 +139,9 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input find(String id) throws NotFoundException {
+        if (!ObjectId.isValid(id)) {
+            throw new NotFoundException("Input id <" + id + "> is invalid!");
+        }
         final DBObject o = get(org.graylog2.inputs.InputImpl.class, id);
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
