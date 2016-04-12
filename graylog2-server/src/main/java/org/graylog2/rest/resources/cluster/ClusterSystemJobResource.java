@@ -111,10 +111,8 @@ public class ClusterSystemJobResource extends ProxiedResource {
                 .filter(response -> response != null && response.isSuccessful())
                 .findFirst(); // There should be only one job with the given ID in the cluster. Just take the first one.
 
-        if (summaryResponse.isPresent()) {
-            return summaryResponse.get().body();
-        } else {
-            throw new NotFoundException("System job with ID <" + jobId + "> not found!");
-        }
+        return summaryResponse
+                .orElseThrow(() -> new NotFoundException("System job with ID <" + jobId + "> not found!"))
+                .body();
     }
 }
