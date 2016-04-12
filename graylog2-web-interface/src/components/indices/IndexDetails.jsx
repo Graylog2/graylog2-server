@@ -59,7 +59,7 @@ const IndexDetails = React.createClass({
     }
   },
   render() {
-    if (!this.props.index || !this.props.index.all_shards || !this.props.indexRange) {
+    if (!this.props.index || !this.props.index.all_shards) {
       return <Spinner />;
     }
     const { index, indexRange, indexName } = this.props;
