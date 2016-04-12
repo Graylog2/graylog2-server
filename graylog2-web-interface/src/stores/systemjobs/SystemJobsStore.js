@@ -39,6 +39,14 @@ const SystemJobsStore = Reflux.createStore({
     });
     SystemJobsActions.getJob.promise(promise);
   },
+  cancelJob(jobId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);
+    const promise = fetch('DELETE', url).then((response) => {
+      delete(this.jobsById[response.id]);
+    });
+
+    SystemJobsActions.cancelJob.promise(promise);
+  },
 });
 
 export default SystemJobsStore;

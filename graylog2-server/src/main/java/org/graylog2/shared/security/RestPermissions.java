@@ -79,6 +79,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String OUTPUTS_EDIT = "outputs:edit";
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
+    public static final String SYSTEMJOBS_DELETE = "systemjobs:delete";
     public static final String LDAP_EDIT = "ldap:edit";
     public static final String LDAPGROUPS_READ = "ldapgroups:read";
     public static final String LDAPGROUPS_EDIT = "ldapgroups:edit";
@@ -172,6 +173,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(OUTPUTS_EDIT, ""))
             .add(create(SYSTEMJOBS_READ, ""))
             .add(create(SYSTEMJOBS_CREATE, ""))
+            .add(create(SYSTEMJOBS_DELETE, ""))
             .add(create(LDAP_EDIT, ""))
             .add(create(LDAPGROUPS_READ, ""))
             .add(create(LDAPGROUPS_EDIT, ""))
