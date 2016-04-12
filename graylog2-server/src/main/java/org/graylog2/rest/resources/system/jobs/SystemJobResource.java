@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
@@ -187,7 +186,7 @@ public class SystemJobResource extends RestResource {
         if (systemJob.isCancelable()) {
             systemJob.requestCancel();
         } else {
-            throw new ClientErrorException("System job with ID <" + jobId + "> cannot be cancelled", 422);
+            throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
         }
 
         return SystemJobSummary.create(
