@@ -6,6 +6,8 @@ import { Spinner } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 const IndicesActions = ActionsProvider.getActions('Indices');
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+import StoreProvider from 'injection/StoreProvider';
+StoreProvider.getStore('IndexRanges'); // To make IndexRangesActions work.
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
