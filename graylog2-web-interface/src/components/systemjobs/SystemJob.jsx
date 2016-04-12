@@ -19,7 +19,7 @@ const SystemJob = React.createClass({
     const job = this.props.job;
     const progress = job.percent_complete < 100 ?
       (<ProgressBar bsStyle="info" active now={job.percent_complete}/>) : <span className="label label-success finished">Finished!</span>;
-    const cancel = job.is_cancelable ? (<span> - <a href="" onClick={this._onCancel(job)}>cancel job</a></span>) : null;
+    const cancel = job.is_cancelable ? (<button type="button" className="btn btn-primary btn-xs" onClick={this._onCancel(job)}>Cancel Job</button>) : null;
 
     return (
       <div>
