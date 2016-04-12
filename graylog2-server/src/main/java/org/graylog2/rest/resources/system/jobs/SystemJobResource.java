@@ -122,7 +122,6 @@ public class SystemJobResource extends RestResource {
 
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
-            LOG.error("No system job with ID <{}> found.", jobId);
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
 

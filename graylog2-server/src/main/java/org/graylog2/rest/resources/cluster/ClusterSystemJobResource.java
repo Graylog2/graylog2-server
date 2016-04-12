@@ -82,8 +82,6 @@ public class ClusterSystemJobResource extends ProxiedResource {
                 if (response.isSuccessful()) {
                     // Return early because there can be only one job with the same ID in the cluster.
                     return response.body();
-                } else {
-                    LOG.warn("Unable to fetch system job {} from node {}: {}", jobId, entry.getKey(), response);
                 }
             } catch (IOException e) {
                 LOG.warn("Unable to fetch system jobs from node {}:", entry.getKey(), e);
