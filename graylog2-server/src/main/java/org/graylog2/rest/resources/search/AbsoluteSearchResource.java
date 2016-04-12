@@ -29,16 +29,16 @@ import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.graylog2.shared.rest.AdditionalMediaType;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class AbsoluteSearchResource extends SearchResource {
     @ApiOperation(value = "Message search with absolute timerange.",
             notes = "Search for messages using an absolute timerange, specified as from/to " +
                     "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
-    @Produces(AdditionalMediaType.TEXT_CSV)
+    @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
@@ -146,7 +146,7 @@ public class AbsoluteSearchResource extends SearchResource {
     @ApiOperation(value = "Export message search with absolute timerange.",
             notes = "Search for messages using an absolute timerange, specified as from/to " +
                     "with format yyyy-MM-ddTHH:mm:ss.SSSZ (e.g. 2014-01-23T15:34:49.000Z) or yyyy-MM-dd HH:mm:ss.")
-    @Produces(AdditionalMediaType.TEXT_CSV)
+    @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
