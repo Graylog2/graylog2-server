@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
         @CreateTransport(protocol = "LDAP")
 })
 @CreateDS(
-        name = "LdapConnectorTest",
+        name = "LdapUserAuthenticatorTest",
         partitions = {
                 @CreatePartition(
                         name = "example.com",
