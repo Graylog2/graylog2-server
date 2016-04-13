@@ -10,7 +10,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-map-widget</artifactId>
-    <version>1.0.0-beta.3</version>
+    <version>1.0.0-beta.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
