@@ -27,11 +27,11 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,15 +42,14 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -119,6 +118,11 @@ public class SessionsResource extends RestResource {
         }
         throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
     }
+
+    @GET
+    @ApiOperation(value = "Validate an existing session", notes = "Checks the session with the given ID: return OK if session is valid.")
+    @RequiresAuthentication
+    public void validateSession() {}
 
     @DELETE
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
