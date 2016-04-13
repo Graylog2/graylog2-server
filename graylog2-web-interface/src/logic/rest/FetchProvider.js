@@ -12,13 +12,15 @@ import history from 'util/History';
 export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
-    this.message = message ? message : (additional.message ? additional.message : 'Undefined error.');
+    this.message = message || (additional.message || 'Undefined error.');
+    /* eslint-disable no-console */
     try {
       console.error(`There was an error fetching a resource: ${this.message}.`,
         `Additional information: ${additional.body && additional.body.message ? additional.body.message : 'Not available'}`);
     } catch (e) {
       console.error(`There was an error fetching a resource: ${this.message}. No additional information available.`);
     }
+    /* eslint-enable no-console */
 
     this.additional = additional;
   }
@@ -32,7 +34,12 @@ export class Builder {
   authenticated() {
     const SessionStore = StoreProvider.getStore('Session');
     const token = SessionStore.getSessionId();
-    this.request = this.request.auth(token, 'session');
+
+    return this.session(token);
+  }
+
+  session(sessionId) {
+    this.request = this.request.auth(sessionId, 'session');
 
     return this;
   }
