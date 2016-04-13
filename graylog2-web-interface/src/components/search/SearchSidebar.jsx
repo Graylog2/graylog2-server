@@ -172,8 +172,8 @@ const SearchSidebar = React.createClass({
     moreActions.push(<MenuItem key="showQuery" onSelect={() => this.refs.showQueryModal.open()}>Show query</MenuItem>);
 
     return (
-      <AutoAffix viewportOffsetTop={45}>
-        <div className="content-col" ref="sidebar">
+      <AutoAffix affixClassName="affix">
+        <div className="content-col" ref="sidebar" style={{ top: undefined, position: undefined }}>
           <div ref="header">
             <h2>
               {searchTitle}
