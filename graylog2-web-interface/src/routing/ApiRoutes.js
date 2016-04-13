@@ -125,6 +125,9 @@ const ApiRoutes = {
     delete: (savedSearchId) => { return { url: `/search/saved/${savedSearchId}` }; },
     update: (savedSearchId) => { return { url: `/search/saved/${savedSearchId}` }; },
   },
+  SessionsApiController: {
+    validate: () => { return { url: '/system/sessions' }; },
+  },
   StreamAlertsApiController: {
     create: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     delete: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
