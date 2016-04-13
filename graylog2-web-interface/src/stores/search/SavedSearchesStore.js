@@ -1,5 +1,4 @@
 import Reflux from 'reflux';
-import $ from 'jquery';
 import Qs from 'qs';
 import fetch from 'logic/rest/FetchProvider';
 
@@ -144,7 +143,7 @@ const SavedSearchesStore = Reflux.createStore({
     promise
       .then(() => {
         UserNotification.success(`Saved search "${this.savedSearches[searchId]}" was deleted successfully.`);
-        $(document).trigger('deleted.graylog.saved-search', {savedSearchId: searchId});
+        SearchStore.savedSearchDeleted(searchId);
       })
       .catch(error => {
         UserNotification.error(`Deleting saved search "${this.savedSearches[searchId]}" failed with status: ${error}`,

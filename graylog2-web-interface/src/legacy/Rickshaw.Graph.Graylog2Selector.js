@@ -1,7 +1,11 @@
 import $ from 'jquery';
+import {} from 'jquery-ui';
 import Rickshaw from 'rickshaw';
 import NumberUtils from 'util/NumberUtils';
 import DateTime from 'logic/datetimes/DateTime';
+
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 
@@ -104,10 +108,7 @@ const Graylog2Selector = Rickshaw.Class.create({
             const fromDate = new DateTime((position.xMin) * 1000);
             const toDate = new DateTime((position.xMax) * 1000);
 
-            $(document).trigger('change-timerange.graylog.search', {
-                rangeType: 'absolute',
-                rangeParams: { from: fromDate.toString(), to: toDate.toString() },
-            });
+            SearchStore.changeTimeRange('absolute', { from: fromDate.toString(), to: toDate.toString() });
 
             $(".timerange-selector-container").effect("bounce", {
                 complete: function () {

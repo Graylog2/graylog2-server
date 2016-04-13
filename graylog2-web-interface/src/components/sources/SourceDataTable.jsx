@@ -8,6 +8,9 @@ import SourceTitle from './SourceTitle';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import StringUtils from 'util/StringUtils';
 
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 const SourceDataTable = React.createClass({
   propTypes: {
     numberOfTopValues: PropTypes.number.isRequired,
@@ -60,11 +63,7 @@ const SourceDataTable = React.createClass({
   _addSourceToSearchBarListener(table) {
     table.selectAll('td.dc-table-column .dc-search-button').on('click', () => {
       const source = $(d3.event.target).closest('button').data('source');
-      $(document).trigger('add-search-term.graylog.search', {
-        field: 'source',
-        value: source,
-        operator: UniversalSearch.orOperator(),
-      });
+      SearchStore.addSearchTerm('source', source, UniversalSearch.orOperator());
     });
   },
 

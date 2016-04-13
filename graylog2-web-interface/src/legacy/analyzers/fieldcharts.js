@@ -15,6 +15,9 @@ import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 function generateShortId() {
   return Math.random().toString(36).substr(2, 9);
 }
@@ -54,12 +57,7 @@ export const FieldChart = {
   },
 
   _getDefaultOptions(opts) {
-    let searchParams = {};
-    jQuery(document).trigger('get-original-search.graylog.search', {
-      callback(params) {
-        searchParams = params.toJS();
-      },
-    });
+    const searchParams = SearchStore.getOriginalSearchParams().toJS();
 
     // Options.
     if (opts.chartid === undefined) {
