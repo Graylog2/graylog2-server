@@ -91,7 +91,7 @@ const PipelineDetailsPage = React.createClass({
 
     return (
       <div>
-        <PageHeader title={title} titleSize={9} buttonSize={3}>
+        <PageHeader title={title} titleSize={8} buttonSize={4}>
           <span>
             Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where{' '}
             rules are evaluated and applied. Messages can go through one or more stages.

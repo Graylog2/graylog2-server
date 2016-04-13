@@ -29,7 +29,7 @@ const Rule = React.createClass({
 
     return (
       <div>
-        <PageHeader title={title} titleSize={9} buttonSize={3}>
+        <PageHeader title={title} titleSize={8} buttonSize={4}>
           <span>
             Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}
             of actions.{' '}

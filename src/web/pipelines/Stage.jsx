@@ -71,8 +71,7 @@ const Stage = React.createClass({
     </MetricContainer>);
 
     const actions = [
-      <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete}
-              style={{ marginRight: 5 }}>Delete</Button>,
+      <Button key="delete-stage" bsStyle="primary" onClick={this.props.onDelete}>Delete</Button>,
       <StageForm key="edit-stage" stage={stage} save={this.props.onUpdate} />,
     ];
 
