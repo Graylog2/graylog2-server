@@ -5,7 +5,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import PageHeader from 'components/common/PageHeader';
-import OutputComponent from 'components/outputs/OutputsComponent';
+import OutputsComponent from 'components/outputs/OutputsComponent';
 
 const SystemOutputsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
@@ -23,7 +23,7 @@ const SystemOutputsPage = React.createClass({
           </span>
         </PageHeader>
 
-        <OutputComponent permissions={this.state.currentUser.permissions}/>
+        <OutputsComponent permissions={this.state.currentUser.permissions}/>
       </span>
     );
   },
