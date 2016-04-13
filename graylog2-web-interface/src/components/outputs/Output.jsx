@@ -74,13 +74,13 @@ var Output = React.createClass({
                                 Type: {output.type}
                             </Col>
                             <Col md={6}>
-                                <span className="pull-right node-row-info">
+                                <div className="text-right node-row-info">
                                     {editButton}
                                     {' '}
                                     {deleteButton}
                                     {' '}
                                     {terminateButton}
-                                </span>
+                                </div>
                             </Col>
                         </Row>
                         <Row>

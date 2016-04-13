@@ -48,21 +48,20 @@ const SystemOverviewDetails = React.createClass({
       <Row>
         <Col md={4}>
           <Alert bsStyle="info">
+            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
             <i className="fa fa-exchange"/>&nbsp;
             Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
-            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
+            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
             <i className="fa fa-heart"/>&nbsp;
             Marked as <strong>{lbStatus}</strong> for load balancers
-            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={information.is_processing ? 'success' : 'danger'}>
-            {processingStatus}
             <IfPermitted permissions="processing:changestate">
               <span className="pull-right">
                 <Button onClick={this._toggleMessageProcessing} bsSize="xsmall" bsStyle={information.is_processing ? 'danger' : 'success'}>
@@ -70,6 +69,7 @@ const SystemOverviewDetails = React.createClass({
                 </Button>
               </span>
             </IfPermitted>
+            {processingStatus}
           </Alert>
         </Col>
       </Row>

@@ -34,7 +34,7 @@ const EntityListItem = React.createClass({
           </Col>
 
           <Col md={6}>
-            <div className="item-actions pull-right">
+            <div className="item-actions text-right">
               {this.props.actions}
             </div>
           </Col>

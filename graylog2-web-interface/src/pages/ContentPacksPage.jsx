@@ -12,7 +12,7 @@ const ContentPacksPage = React.createClass({
 
     return (
       <span>
-        <PageHeader title="Content packs">
+        <PageHeader title="Content packs" titleSize={9} buttonSize={3}>
           <span>
             Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
           </span>

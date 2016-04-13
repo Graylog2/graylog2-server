@@ -45,7 +45,7 @@ const DashboardListPage = React.createClass({
       <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg"/> : null;
 
     const pageHeader = (
-      <PageHeader title="Dashboards">
+      <PageHeader title="Dashboards" titleSize={9} buttonSize={3}>
         <span>
           Use dashboards to create specific views on your messages. Create a new dashboard here and add
           any graph or chart you create in other parts of Graylog with one click.

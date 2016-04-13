@@ -138,6 +138,7 @@ const Navigation = React.createClass({
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
           <Navbar.Brand>{brand}</Navbar.Brand>
+          <Navbar.Toggle />
         </Navbar.Header>
         <Navbar.Collapse eventKey={0}>
           <Nav navbar>
