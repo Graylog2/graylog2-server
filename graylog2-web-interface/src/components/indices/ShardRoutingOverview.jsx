@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ShardRouting } from 'components/indices';
+import naturalSort from 'javascript-natural-sort';
 
 const ShardRoutingOverview = React.createClass({
   propTypes: {
@@ -14,7 +15,9 @@ const ShardRoutingOverview = React.createClass({
         <h3>Shard routing</h3>
 
         <ul className="shards">
-          {routing.map((route) => <ShardRouting key={indexName + '-shard-route-' + route.id} route={route}/>)}
+          {routing
+            .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
+            .map((route) => <ShardRouting key={indexName + '-shard-route-' +route.node_id + "-" + route.id} route={route}/>)}
         </ul>
 
         <br style={{clear: 'both'}} />
