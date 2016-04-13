@@ -116,8 +116,11 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
                                            @Valid @NotNull IndicesReadRequest request) {
-        if (request.indices() != null)
-            return request.indices().stream().collect(Collectors.toMap(Function.identity(), this::single));
+        if (request.indices() != null) {
+            return request.indices().stream()
+                    .filter(deflector::isGraylogIndex)
+                    .collect(Collectors.toMap(Function.identity(), this::single));
+        }
 
         throw new BadRequestException("Missing or invalid list of indices passed in request.");
     }
@@ -129,7 +132,9 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats();
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats().stream()
+                .filter(indexStats -> deflector.isGraylogIndex(indexStats.indexName()))
+                .collect(Collectors.toSet());
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
         final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
@@ -159,7 +164,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices closed() {
         final Set<String> closedIndices = indices.getClosedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
@@ -173,7 +178,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices reopened() {
         final Set<String> reopenedIndices = indices.getReopenedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
