@@ -63,7 +63,8 @@ public class Message implements Messages {
     public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
 
-    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\-@]*$");
+    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
+    private static final char KEY_REPLACEMENT_CHAR = '_';
 
     public static final ImmutableSet<String> RESERVED_FIELDS = ImmutableSet.of(
             // ElasticSearch fields.
@@ -180,9 +181,39 @@ public class Message implements Messages {
     public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter) {
         final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
 
+        for (Map.Entry<String, Object> entry : fields.entrySet()) {
+            final String key = entry.getKey();
+
+            // Elasticsearch does not allow "." characters in keys since version 2.0.
+            // See: https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking_20_mapping_changes.html#_field_names_may_not_contain_dots
+            if (key != null && key.contains(".")) {
+                final String newKey = key.replace('.', KEY_REPLACEMENT_CHAR);
+
+                // If the message already contains the transformed key, we skip the field and emit a warning.
+                // This is still not optimal but better than implementing expensive logic with multiple replacement
+                // character options. Conflicts should be rare...
+                if (!obj.containsKey(newKey)) {
+                    obj.put(newKey, entry.getValue());
+                } else {
+                    LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
+                            key, entry.getValue(), getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
+                    LOG.debug("Full message with \".\" in message key: {}", this);
+                }
+            } else {
+                if (key != null && obj.containsKey(key)) {
+                    final String newKey = key.replace(KEY_REPLACEMENT_CHAR, '.');
+                    // Deliberate warning duplicates because the key with the "." might be transformed before reaching
+                    // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
+                    LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
+                            newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, entry.getValue());
+                    LOG.debug("Full message with \".\" in message key: {}", this);
+                }
+                obj.put(key, entry.getValue());
+            }
+        }
+
         obj.put(FIELD_MESSAGE, getMessage());
         obj.put(FIELD_SOURCE, getSource());
-        obj.putAll(fields);
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -268,9 +299,6 @@ public class Message implements Messages {
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key) || !validKey(key)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", key, getId());
-            }
-            if (key != null && key.contains(".")) {
-                LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}].", key, value, getId());
             }
             return;
         }
