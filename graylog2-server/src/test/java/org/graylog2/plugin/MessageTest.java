@@ -291,6 +291,7 @@ public class MessageTest {
         assertTrue(Message.validKey("foo123"));
         assertTrue(Message.validKey("foo-bar123"));
         assertTrue(Message.validKey("foo_bar123"));
+        assertTrue(Message.validKey("foo.bar123"));
         assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
         assertTrue(Message.validKey(""));
@@ -298,7 +299,6 @@ public class MessageTest {
         assertFalse(Message.validKey("foo bar"));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
-        assertFalse(Message.validKey("foo.bar123"));
         assertFalse(Message.validKey(" "));
     }
 
@@ -313,6 +313,22 @@ public class MessageTest {
         assertEquals("bar", object.get("source"));
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
+        assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
+        assertEquals(Collections.EMPTY_LIST, object.get("streams"));
+    }
+
+    @Test
+    public void testToElasticSearchObjectWithInvalidKey() throws Exception {
+        message.addField("field.3", "dot");
+
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+
+        // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
+        assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
+                "dot", object.get("field_3"));
+
+        assertEquals("foo", object.get("message"));
+        assertEquals("bar", object.get("source"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
         assertEquals(Collections.EMPTY_LIST, object.get("streams"));
     }
