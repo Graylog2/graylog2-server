@@ -19,8 +19,8 @@ package org.graylog2.grok;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.common.base.MoreObjects;
 import org.bson.types.ObjectId;
+import org.mongojack.Id;
 
-import javax.persistence.Id;
 import java.util.Objects;
 
 @JsonAutoDetect

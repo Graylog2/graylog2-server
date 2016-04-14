@@ -20,9 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Set;
