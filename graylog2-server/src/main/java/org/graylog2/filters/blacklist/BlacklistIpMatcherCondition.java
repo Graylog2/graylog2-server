@@ -16,24 +16,29 @@
  */
 package org.graylog2.filters.blacklist;
 
-import com.atlassian.ip.IPMatcher;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Objects;
 
 public final class BlacklistIpMatcherCondition extends FilterDescription {
-    private IPMatcher ipMatcher;
+    private IpSubnet ipSubnet;
 
     @JsonProperty
     public void setPattern(String pattern) {
         this.pattern = pattern;
-        ipMatcher = IPMatcher.builder().addPatternOrHost(pattern).build();
+        try {
+            this.ipSubnet = new IpSubnet(pattern);
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException("Invalid IP subnet pattern", e);
+        }
     }
 
     public boolean matchesInetAddress(InetAddress otherSource) {
         try {
-            return ipMatcher.matches(otherSource);
+            return ipSubnet.contains(otherSource);
         } catch (IllegalArgumentException e) {
             return false;
         }

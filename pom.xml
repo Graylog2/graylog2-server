@@ -133,18 +133,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>atlassian-m2-repository</id>
-            <name>Atlassian Public Repository</name>
-            <url>https://maven.atlassian.com/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <!-- Every dependency of the entire project is defined here. It will not be automatically inluded in the projects,
@@ -584,12 +572,6 @@
                 <groupId>com.floreysoft</groupId>
                 <artifactId>jmte</artifactId>
                 <version>3.2.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.atlassian.ip</groupId>
-                <artifactId>atlassian-ip</artifactId>
-                <version>3.1</version>
             </dependency>
 
             <dependency>
