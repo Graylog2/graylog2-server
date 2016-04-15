@@ -95,7 +95,7 @@ public class IndicesResource extends RestResource {
 
         final IndexStatistics stats = indices.getIndexStats(index);
         if (stats == null) {
-            final String msg = "Index [" + index + "] not found.";
+            final String msg = "Index [" + index + "] not found.";
             LOG.error(msg);
             throw new NotFoundException(msg);
         }
