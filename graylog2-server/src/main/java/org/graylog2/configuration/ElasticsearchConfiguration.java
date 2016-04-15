@@ -91,7 +91,7 @@ public class ElasticsearchConfiguration {
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
-    private int maxDocsPerIndex = 80000000;
+    private int maxDocsPerIndex = 20000000;
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
