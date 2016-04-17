@@ -1,18 +1,20 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import NodesStore from 'stores/nodes/NodesStore';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+const NodesStore = StoreProvider.getStore('Nodes');
 
-import MetricsActions from 'actions/metrics/MetricsActions';
-import SessionActions from 'actions/sessions/SessionActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const SessionActions = ActionsProvider.getActions('Session');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions, SessionActions],
-  namespace: 'org.graylog2',
+  namespace: 'org',
   registrations: {},
   globalRegistrations: {},
 
@@ -25,10 +27,6 @@ const MetricsStore = Reflux.createStore({
   updateNodes(update) {
     this.nodes = update.nodes;
   },
-  logout() {
-    this.registrations = {};
-    this.globalRegistrations = {};
-  },
   _allResults(promises) {
     const accumulator = [];
     let result = Promise.resolve(null);
@@ -40,47 +38,45 @@ const MetricsStore = Reflux.createStore({
     return result.then(() => accumulator);
   },
   list() {
-    const metricsToFetch = {};
-    Object.keys(this.registrations)
-      .filter((nodeId) => Object.keys(this.registrations[nodeId]).length > 0)
-      .forEach(nodeId => {
-        metricsToFetch[nodeId] = Object.keys(this.registrations[nodeId]).filter(metricName => this.registrations[nodeId][metricName] > 0);
-      });
-    const globalMetrics = Object.keys(this.globalRegistrations).filter(metricName => this.globalRegistrations[metricName] > 0);
-
-    if (this.nodes) {
-      Object.keys(this.nodes).forEach(nodeId => {
-        globalMetrics.forEach(metricName => {
-          if (!metricsToFetch[nodeId]) {
-            metricsToFetch[nodeId] = [];
-          }
-          if (metricsToFetch[nodeId].indexOf(metricName) == -1) {
-            metricsToFetch[nodeId].push(metricName);
-          }
-        });
-      });
+    if (!SessionStore.isLoggedIn()) {
+      return;
     }
+    const metricsToFetch = {};
 
-    const promises = Object.keys(metricsToFetch)
-      .map((nodeId) => {
-        const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterMetricsApiController.multiple(nodeId).url);
-        const body = {metrics: metricsToFetch[nodeId]};
-        return fetch('POST', url, body).then((response) => {
-          const metrics = {};
-          response.metrics.forEach((metric) => metrics[metric.full_name] = metric);
-          return {nodeId: nodeId, metrics: metrics};
-        });
+    // First collect all node metric registrations
+    Object.keys(this.registrations)
+      .filter((nodeId) => Object.keys(this.registrations[nodeId].length > 0))
+      .forEach((nodeId) => {
+        Object.keys(this.registrations[nodeId])
+          .filter((metricName) => this.registrations[nodeId][metricName] > 0)
+          .forEach((metricName) => {
+            metricsToFetch[metricName] = 1;
+          });
       });
 
-    const promise = this._allResults(promises).then((responses) => {
+    // Then collect all global metric registrations
+    Object.keys(this.globalRegistrations)
+      .filter((metricName) => this.globalRegistrations[metricName] > 0)
+      .forEach((metricName) => {
+        metricsToFetch[metricName] = 1;
+      });
+
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.multipleAllNodes().url);
+    const promise = fetch('POST', url, { metrics: Object.keys(metricsToFetch) });
+
+    promise.then((response) => {
       const metrics = {};
-      responses.forEach((response) => {
-        if (response.nodeId) {
-          metrics[response.nodeId] = response.metrics;
-        }
-      });
+      Object.keys(response)
+        .forEach((nodeId) => {
+          const nodeMetrics = {};
 
-      this.trigger({metrics: metrics});
+          response[nodeId].metrics.forEach((metric) => {
+            nodeMetrics[metric.full_name] = metric;
+          });
+
+          metrics[nodeId] = nodeMetrics;
+        });
+      this.trigger({ metrics: metrics });
       this.metrics = metrics;
       return metrics;
     });
@@ -89,9 +85,9 @@ const MetricsStore = Reflux.createStore({
   },
   names() {
     const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
-      const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
+      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
       return fetch('GET', url).then((response) => {
-        return {nodeId: nodeId, names: response.metrics};
+        return { nodeId: nodeId, names: response.metrics };
       });
     })).then((responses) => {
       const metricsNames = {};
@@ -100,7 +96,7 @@ const MetricsStore = Reflux.createStore({
           metricsNames[response.nodeId] = response.names;
         }
       });
-      this.trigger({metricsNames: metricsNames});
+      this.trigger({ metricsNames: metricsNames });
       this.metricsNames = metricsNames;
       return metricsNames;
     });

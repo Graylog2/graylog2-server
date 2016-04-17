@@ -4,18 +4,19 @@ import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
+import ValidationsUtils from 'util/ValidationsUtils';
+import FormsUtils from 'util/FormsUtils';
+import ObjectUtils from 'util/ObjectUtils';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import RolesStore from 'stores/users/RolesStore';
-import UsersStore from 'stores/users/UsersStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const UsersStore = StoreProvider.getStore('Users');
 
-import Spinner from 'components/common/Spinner';
-import MultiSelect from 'components/common/MultiSelect';
-import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
-import {TimezoneSelect} from 'components/common';
+import EditRolesForm from 'components/users/EditRolesForm';
+import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 
 const UserForm = React.createClass({
   propTypes: {
@@ -27,6 +28,7 @@ const UserForm = React.createClass({
       streams: undefined,
       dashboards: undefined,
       roles: undefined,
+      user: this._getUserStateFromProps(this.props),
     };
   },
   componentDidMount() {
@@ -36,32 +38,48 @@ const UserForm = React.createClass({
       });
     });
     DashboardsStore.listDashboards().then((dashboards) => {
-      this.setState({dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title))});
-    });
-    RolesStore.loadRoles().then(roles => {
-      this.setState({roles: roles.sort((r1, r2) => r1.name.localeCompare(r2.name))});
+      this.setState({ dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title)) });
     });
   },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.user.username !== nextProps.user.username) {
+      this.setState({
+        user: this._getUserStateFromProps(nextProps),
+      });
+    }
+  },
+
+  _getUserStateFromProps(props) {
+    return {
+      full_name: props.user.full_name,
+      email: props.user.email,
+      session_timeout_ms: props.user.session_timeout_ms,
+      timezone: props.user.timezone,
+      permissions: props.user.permissions,
+    };
+  },
+
   formatMultiselectOptions(collection) {
     return collection.map((item) => {
-      return {value: item.id, label: item.title};
+      return { value: item.id, label: item.title };
     });
   },
   formatSelectedOptions(permissions, permission, collection) {
     return collection
-      .filter((item) => this.isPermitted(permissions, [permission + ':' + item.id]))
+      .filter((item) => this.isPermitted(permissions, [`${permission}:${item.id}`]))
       .map((item) => item.id)
       .join(',');
   },
-  _updateRoles(evt) {
-    evt.preventDefault();
-    const roles = this.refs.roles.getValue().filter((value) => value !== "");
-    UsersStore.updateRoles(this.props.user.username, roles).then(() => {
-      UserNotification.success('Roles updated successfully.', 'Success!');
-    }, () => {
-      UserNotification.error('Updating roles failed.', 'Error!');
-    });
+  _onPasswordChange() {
+    const passwordField = this.refs.password.getInputDOMNode();
+    const passwordConfirmField = this.refs.password_repeat.getInputDOMNode();
+
+    if (passwordField.value !== '' && passwordConfirmField.value !== '') {
+      ValidationsUtils.setFieldValidity(passwordConfirmField, passwordField.value !== passwordConfirmField.value, 'Passwords do not match');
+    }
   },
+
   _changePassword(evt) {
     evt.preventDefault();
     const request = {};
@@ -77,35 +95,92 @@ const UserForm = React.createClass({
       UserNotification.error('Updating password failed.', 'Error!');
     });
   },
+
   _updateUser(evt) {
     evt.preventDefault();
-    const request = {};
-    ['full_name',
-      'email',
-      'session_timeout_ms',
-      'timezone'].forEach((field) => {
-      request[field] = this.refs[field].getValue();
-    });
-    UsersStore.update(this.props.user.username, request).then(() => {
+
+    UsersStore.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success!');
     }, () => {
       UserNotification.error('Updating user failed.', 'Error!');
     });
   },
+
+  _updateField(name, value) {
+    const updatedUser = ObjectUtils.clone(this.state.user);
+    updatedUser[name] = value;
+    this.setState({ user: updatedUser });
+  },
+
+  _bindValue(event) {
+    this._updateField(event.target.name, FormsUtils.getValueFromInput(event.target));
+  },
+
+  _onFieldChange(name) {
+    return (value) => {
+      this._updateField(name, value);
+    };
+  },
+
+  _onPermissionsChange(entity, permission) {
+    return (entityIds) => {
+      const userPermissions = this.state.user.permissions.slice();
+      let newUserPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) !== 0);
+
+      const updatedPermissions = entityIds === '' ? [] : entityIds.split(',').map(id => `${entity}:${permission}:${id}`);
+      const previousPermissions = userPermissions.filter(p => p.indexOf(`${entity}:${permission}`) === 0);
+
+      // Remove edit permissions to entities without read permissions
+      if (permission === 'read') {
+        previousPermissions.forEach(previousPermission => {
+          // Do nothing if permission is still there
+          if (updatedPermissions.some(p => p === previousPermission)) {
+            return;
+          }
+
+          // Remove edit permission
+          const entityId = previousPermission.split(':').pop();
+          newUserPermissions = newUserPermissions.filter(p => p !== `${entity}:edit:${entityId}`);
+        });
+      }
+
+      // Grant read permissions to entities with edit permissions
+      if (permission === 'edit') {
+        updatedPermissions.forEach(updatePermission => {
+          // Do nothing if permission was there before
+          if (previousPermissions.some(p => p === updatePermission)) {
+            return;
+          }
+
+          // Grant read permission
+          const entityId = updatePermission.split(':').pop();
+          newUserPermissions.push(`${entity}:read:${entityId}`);
+        });
+      }
+
+      this._updateField('permissions', newUserPermissions.concat(updatedPermissions));
+    };
+  },
+
   render() {
-    if (!this.state.streams || !this.state.dashboards || !this.state.roles) {
+    if (!this.state.streams || !this.state.dashboards) {
       return <Spinner />;
     }
 
-    const user = this.props.user;
+    const user = this.state.user;
     const permissions = this.state.currentUser.permissions;
-    const requiresOldPassword = !this.isPermitted(permissions, 'users:passwordchange:*');
 
-    const streamReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:read', this.state.streams);
-    const streamEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'streams:edit', this.state.streams);
+    let requiresOldPassword = true;
+    if (this.isPermitted(permissions, 'users:passwordchange:*')) {
+      // Ask for old password if user is editing their own account
+      requiresOldPassword = this.state.user.username === this.state.currentUser.username;
+    }
 
-    const dashboardReadOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:read', this.state.dashboards);
-    const dashboardEditOptions = this.formatSelectedOptions(this.props.user.permissions, 'dashboards:edit', this.state.dashboards);
+    const streamReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:read', this.state.streams);
+    const streamEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:edit', this.state.streams);
+
+    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', this.state.dashboards);
+    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', this.state.dashboards);
 
     return (
       <div>
@@ -125,12 +200,13 @@ const UserForm = React.createClass({
                 </span>
               }
               <fieldset disabled={user.read_only}>
-                <Input ref="full_name" name="fullname" id="fullname" type="text" maxLength={200} defaultValue={user.full_name}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
+                <Input name="full_name" id="full_name" type="text" maxLength={200} value={user.full_name}
+                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                       label="Full Name" help="Give a descriptive name for this account, e.g. the full name."
+                       required />
 
-                <Input ref="email" name="email" id="email" type="email" maxLength={254} defaultValue={user.email}
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9"
+                <Input ref="email" name="email" id="email" type="email" maxLength={254} value={user.email}
+                       onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Email Address" help="Give the contact email address." required />
 
                 {this.isPermitted(permissions, 'USERS_EDIT') &&
@@ -144,20 +220,16 @@ const UserForm = React.createClass({
                       </Col>
                       <label className="col-sm-3 control-label" htmlFor="streampermissions">Streams Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect
-                          ref="streamReadOptions"
-                          options={this.formatMultiselectOptions(this.state.streams)}
-                          value={streamReadOptions}
-                          placeholder="Choose read permissions..."
-                        />
+                        <MultiSelect ref="streamReadOptions" placeholder="Choose streams read permissions..."
+                                     options={this.formatMultiselectOptions(this.state.streams)}
+                                     value={streamReadOptions}
+                                     onChange={this._onPermissionsChange('streams', 'read')} />
                         <span className="help-block">Choose streams the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <MultiSelect
-                          ref="streamEditOptions"
-                          options={this.formatMultiselectOptions(this.state.streams)}
-                          value={streamEditOptions}
-                          placeholder="Choose edit permissions..."
-                        />
+                        <MultiSelect ref="streamEditOptions" placeholder="Choose streams edit permissions..."
+                                     options={this.formatMultiselectOptions(this.state.streams)}
+                                     value={streamEditOptions}
+                                     onChange={this._onPermissionsChange('streams', 'edit')} />
                         <span className="help-block">Choose the streams the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </Col>
@@ -165,20 +237,16 @@ const UserForm = React.createClass({
                     <div className="form-group">
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <Col sm={9}>
-                        <MultiSelect
-                          ref="dashboardReadOptions"
-                          options={this.formatMultiselectOptions(this.state.dashboards)}
-                          value={dashboardReadOptions}
-                          placeholder="Choose read permissions..."
-                        />
+                        <MultiSelect ref="dashboardReadOptions" placeholder="Choose dashboards read permissions..."
+                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     value={dashboardReadOptions}
+                                     onChange={this._onPermissionsChange('dashboards', 'read')} />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
-                        <MultiSelect
-                          ref="dashboardEditOptions"
-                          options={this.formatMultiselectOptions(this.state.dashboards)}
-                          value={dashboardEditOptions}
-                          placeholder="Choose edit permissions..."
-                        />
+                        <MultiSelect ref="dashboardEditOptions" placeholder="Choose dashboards edit permissions..."
+                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     value={dashboardEditOptions}
+                                     onChange={this._onPermissionsChange('dashboards', 'edit')} />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>
                           . Values chosen here will enable read access, too.</span>
                       </Col>
@@ -186,12 +254,15 @@ const UserForm = React.createClass({
                   </span>
                 }
                 {this.isPermitted(permissions, '*') &&
-                  <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9} />
+                <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9}
+                              onChange={this._onFieldChange('session_timeout_ms')} />
                 }
 
-                <Input label="Time Zone" help="Choose your local time zone or leave it as it is to use the system's default."
+                <Input label="Time Zone"
+                       help="Choose your local time zone or leave it as it is to use the system's default."
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-                  <TimezoneSelect ref="timezone" className="timezone-select" value={user.timezone}/>
+                  <TimezoneSelect ref="timezone" className="timezone-select" value={user.timezone}
+                                  onChange={this._onFieldChange('timezone')} />
                 </Input>
 
                 <div className="form-group">
@@ -223,7 +294,7 @@ const UserForm = React.createClass({
                 </Alert>
               </Col>
               :
-              <form className="form-horizontal" style={{marginTop: 10}} onSubmit={this._changePassword}>
+              <form className="form-horizontal" style={{ marginTop: 10 }} onSubmit={this._changePassword}>
                 {requiresOldPassword &&
                   <Input ref="old_password" name="old_password" id="old_password" type="password" maxLength={100}
                          labelClassName="col-sm-3" wrapperClassName="col-sm-9"
@@ -231,11 +302,13 @@ const UserForm = React.createClass({
                 }
                 <Input ref="password" name="password" id="password" type="password" maxLength={100}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="New Password" help="Passwords must be at least 6 characters long. We recommend using a strong password." required />
+                       label="New Password" required minLength="6"
+                       help="Passwords must be at least 6 characters long. We recommend using a strong password."
+                       onChange={this._onPasswordChange} />
 
                 <Input ref="password_repeat" name="password_repeat" id="password_repeat" type="password" maxLength={100}
                        labelClassName="col-sm-3" wrapperClassName="col-sm-9"
-                       label="Repeat Password" required />
+                       label="Repeat Password" required minLength="6" onChange={this._onPasswordChange} />
 
                 <div className="form-group">
                   <Col smOffset={3} sm={9}>
@@ -248,44 +321,9 @@ const UserForm = React.createClass({
             }
           </Col>
         </Row>
-        {this.isPermitted(permissions, 'USERS_ROLESEDIT') &&
-          <Row className="content">
-            <Col lg={8}>
-              <h2>Change user role</h2>
-              {user.read_only ?
-                <Col smOffset={3} sm={9}>
-                  <Alert bsStyle="warning" role="alert">
-                    You cannot edit the admin's user role.
-                  </Alert>
-                </Col>
-              :
-                <span>
-                  {user.external &&
-                    <Col smOffset={3} sm={9} style={{marginBottom: 15}}>
-                      <Alert bsStyle="warning" role="alert">
-                        This user was created from an external LDAP system, please consider mapping LDAP groups instead of manually editing roles here.
-                        Please update the LDAP group mapping to make changes or contact an administrator for more information.
-                      </Alert>
-                    </Col>
-                  }
-                  <form className="form-horizontal" style={{marginTop: '10px'}} onSubmit={this._updateRoles}>
-                    <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
-                           labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-                      <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} />
-                    </Input>
-                    <div className="form-group">
-                      <Col smOffset={3} sm={9}>
-                        <Button bsStyle="success" type="submit" data-confirm={'Really update roles for ' + user.username + '?'}>
-                          Update role
-                        </Button>
-                      </Col>
-                    </div>
-                  </form>
-                </span>
-              }
-            </Col>
-          </Row>
-        }
+        <IfPermitted permissions="USERS_ROLESEDIT">
+          <EditRolesForm user={this.props.user} />
+        </IfPermitted>
       </div>
     );
   },

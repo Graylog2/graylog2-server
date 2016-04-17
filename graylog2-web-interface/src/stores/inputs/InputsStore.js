@@ -4,8 +4,11 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
-import InputStaticFieldsStore from 'stores/inputs/InputStaticFieldsStore';
-import InputsActions from 'actions/inputs/InputsActions';
+import StoreProvider from 'injection/StoreProvider';
+const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 const InputsStore = Reflux.createStore({
   listenables: [InputsActions],

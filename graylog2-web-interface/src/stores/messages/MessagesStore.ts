@@ -2,7 +2,7 @@
 
 const moment = require('moment');
 
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
@@ -21,7 +21,7 @@ interface Message {
 
 var MessagesStore = {
     loadMessage(index: string, messageId: string): Promise<Message> {
-        var url = jsRoutes.controllers.MessagesController.single(index.trim(), messageId.trim()).url;
+        var url = ApiRoutes.MessagesController.single(index.trim(), messageId.trim()).url;
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
             .then(response => {
                 const message = response.message;
@@ -49,7 +49,7 @@ var MessagesStore = {
     },
 
     fieldTerms(index: string, string: string): Promise<Array<string>> {
-        const url = jsRoutes.controllers.MessagesController.analyze(index, string).url;
+        const url = ApiRoutes.MessagesController.analyze(index, string).url;
         const promise = fetch('GET', URLUtils.qualifyUrl(url))
             .then((response) => response.tokens)
             .catch((error) => {

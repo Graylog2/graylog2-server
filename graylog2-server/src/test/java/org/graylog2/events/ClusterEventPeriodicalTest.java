@@ -30,7 +30,6 @@ import com.google.common.eventbus.Subscribe;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -41,6 +40,7 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.jackson.SizeSerializer;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.graylog2.system.debug.DebugEvent;
 import org.joda.time.DateTime;
@@ -93,7 +93,7 @@ public class ClusterEventPeriodicalTest {
     @Spy
     private EventBus serverEventBus;
     @Spy
-    private EventBus clusterEventBus;
+    private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;
     private ClusterEventPeriodical clusterEventPeriodical;
 
@@ -111,6 +111,7 @@ public class ClusterEventPeriodicalTest {
                 mongoRule.getMongoConnection(),
                 nodeId,
                 objectMapper,
+                new ChainingClassLoader(getClass().getClassLoader()),
                 serverEventBus,
                 clusterEventBus
         );
@@ -123,7 +124,7 @@ public class ClusterEventPeriodicalTest {
 
     @Test
     public void clusterEventServiceRegistersItselfWithClusterEventBus() throws Exception {
-        verify(clusterEventBus, times(1)).register(clusterEventPeriodical);
+        verify(clusterEventBus, times(1)).registerClusterEventSubscriber(clusterEventPeriodical);
     }
 
     @Test

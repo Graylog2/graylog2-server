@@ -31,7 +31,6 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.metrics.CacheStatsSet;
@@ -62,7 +61,6 @@ public class EsIndexRangeService implements IndexRangeService {
     public EsIndexRangeService(Client client,
                                Deflector deflector,
                                EventBus eventBus,
-                               @ClusterEventBus EventBus clusterEventBus,
                                MetricRegistry metricRegistry) {
         this.client = requireNonNull(client);
         this.deflector = requireNonNull(deflector);
@@ -86,7 +84,6 @@ public class EsIndexRangeService implements IndexRangeService {
         MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(MetricRegistry.name(this.getClass(), "cache"), cache));
 
         eventBus.register(this);
-        clusterEventBus.register(this);
     }
 
     @Override

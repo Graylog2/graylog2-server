@@ -1,5 +1,9 @@
 import React from 'react';
-import PreferencesStore from 'stores/users/PreferencesStore';
+import { Input } from 'react-bootstrap';
+
+import StoreProvider from 'injection/StoreProvider';
+const PreferencesStore = StoreProvider.getStore('Preferences');
+
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const UserPreferencesModal = React.createClass({
@@ -7,14 +11,15 @@ const UserPreferencesModal = React.createClass({
     userName: React.PropTypes.string.isRequired,
   },
   getInitialState() {
-    return {preferences: []};
+    return { preferences: [] };
   },
-  _onPreferenceChanged(name, event) {
-    var preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
+  _onPreferenceChanged(event) {
+    const name = event.target.name;
+    const preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;
-      this.setState({preferences: this.state.preferences});
+      this.setState({ preferences: this.state.preferences });
     }
   },
   _save() {
@@ -22,24 +27,22 @@ const UserPreferencesModal = React.createClass({
   },
   openModal() {
     PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
-      this.setState({preferences: preferences});
+      this.setState({ preferences: preferences });
       this.refs.modal.open();
     });
   },
   render() {
-    // TODO: Add additional row where you can add a new preference
-    // TODO: Add delete button
     let shouldAutoFocus = true;
 
     const formattedPreferences = this.state.preferences.map((preference, index) => {
       const formattedPreference = (
-        <div className="form-group" key={index}>
-          <label htmlFor={preference.name + '-' + index}>{preference.name}</label>
-          <input id={preference.name + '-' + index}
-                 onChange={this._onPreferenceChanged.bind(this, preference.name)}
-                 className="form-control"
+        <div className="form-group" key={`${preference.name}-${index}`}>
+          <Input type="text"
+                 id={`${preference.name}-${index}`}
+                 name={preference.name}
+                 label={preference.name}
+                 onChange={this._onPreferenceChanged}
                  value={preference.value}
-                 type="text"
                  required
                  autoFocus={shouldAutoFocus} />
         </div>

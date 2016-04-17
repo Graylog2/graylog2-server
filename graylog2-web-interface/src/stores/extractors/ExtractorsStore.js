@@ -1,7 +1,10 @@
 import Reflux from 'reflux';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
 import ExtractorUtils from 'util/ExtractorUtils';
 import Promise from 'bluebird';
 
@@ -21,7 +24,7 @@ function getExtractorDTO(extractor) {
     cut_or_copy: extractor.cursor_strategy || 'copy',
     source_field: extractor.source_field,
     target_field: extractor.target_field,
-    extractor_type: extractor.type,
+    extractor_type: extractor.type || extractor.extractor_type, // "extractor_type" needed for imports
     extractor_config: extractor.extractor_config,
     converters: converters,
     condition_type: extractor.condition_type || 'none',
@@ -61,6 +64,7 @@ const ExtractorsStore = Reflux.createStore({
       source_field: field,
       converters: [],
       extractor_config: {},
+      target_field: '',
     };
   },
 
@@ -87,7 +91,7 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   _silentExtractorCreate(inputId, extractor) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.create(inputId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
     return fetch('POST', url, getExtractorDTO(extractor));
   },
 
@@ -112,7 +116,7 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   update(inputId, extractor, calledFromMethod) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.update(inputId, extractor.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
 
     const promise = fetch('PUT', url, getExtractorDTO(extractor));
     promise
@@ -134,7 +138,7 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   delete(inputId, extractor) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.delete(inputId, extractor.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
 
     const promise = fetch('DELETE', url);
     promise
@@ -153,7 +157,7 @@ const ExtractorsStore = Reflux.createStore({
   },
 
   order(inputId, orderedExtractors) {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.ExtractorsController.order(inputId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
     const orderedExtractorsMap = {};
     orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
 

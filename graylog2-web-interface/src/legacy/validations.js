@@ -1,56 +1,6 @@
 require('!script!../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../public/javascripts/bootstrap.min.js');
-
-$(document).ready(function () {
-    "use strict";
-
-    var $createUsernameField = $("form#create-user-form #username");
-    if ($createUsernameField.length > 0) {
-        var domElement = $createUsernameField[0];
-        delayedAjaxCallOnKeyup(domElement, function () {
-            var username = $createUsernameField.val();
-            $.ajax({
-                url: appPrefixed("/a/system/users/" + encodeURIComponent(username)),
-                type: "GET",
-                cache: false,
-                global: false,
-                statusCode: {
-                    204: function () {
-                        $createUsernameField.setCustomValidity('The entered user name is already taken.');
-                    },
-                    404: function () {
-                        $createUsernameField.setCustomValidity('');
-                    }
-                }
-            });
-        }, 150);
-    }
-
-    var $passwordField = $("form #password");
-    if ($passwordField.length > 0) {
-        $passwordField.on('keyup', function () {
-            var password = $passwordField.val();
-            if (password.length < 6) {
-                $passwordField.setCustomValidity("Password is too short!");
-            } else {
-                $passwordField.setCustomValidity('');
-            }
-        });
-    }
-
-    var $repeatPasswordField = $("form #password-repeat");
-    if ($repeatPasswordField.length) {
-        $repeatPasswordField.on('keyup', function () {
-            var $password = $("form #password").val();
-            if ($password == $repeatPasswordField.val()) {
-                $repeatPasswordField.setCustomValidity('');
-            } else {
-                $repeatPasswordField.setCustomValidity("Passwords do not match!");
-            }
-        });
-    }
-});
-
+import DateTime from 'logic/datetimes/DateTime';
 
 export function validate(formContainer) {
     var errors = false;
@@ -179,15 +129,27 @@ function validateNumber(el) {
 
 function validateDatetimeFormat(el) {
     var dateString = $(el).val();
-    return momentHelper.parseFromString(dateString).isValid();
+    try {
+        DateTime.parseFromString(dateString);
+        return true;
+    } catch (e) {
+        // Do nothing
+    }
+    return false;
 }
 
 function validateAbsoluteTimerange(el) {
     var parent = $(el).parent().parent();
     var fromStr = $("input[name='from']", parent).val();
     var toStr = $("input[name='to']", parent).val();
-    var from = momentHelper.parseFromString(fromStr);
-    var to = momentHelper.parseFromString(toStr);
+    try {
+        const from = DateTime.parseFromString(fromStr).toMoment();
+        const to = DateTime.parseFromString(toStr).toMoment();
 
-    return (from <= to)
+        return (from.isBefore(to) || from.isSame(to));
+    } catch (e) {
+        // Do nothing
+    }
+
+    return false;
 }

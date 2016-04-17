@@ -1,9 +1,10 @@
 import Reflux from 'reflux';
 
-import jsRoutes from 'routing/jsRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
+
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 

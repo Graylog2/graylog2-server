@@ -1,11 +1,11 @@
 import Reflux from 'reflux';
 
-import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import MessageCountsActions from 'actions/messages/MessageCountsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MessageCountsActions = ActionsProvider.getActions('MessageCounts');
 
 const MessageCountsStore = Reflux.createStore({
   listenables: [MessageCountsActions],
@@ -15,7 +15,7 @@ const MessageCountsStore = Reflux.createStore({
     this.total();
   },
   total() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.CountsApiController.total().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.CountsApiController.total().url);
     const promise = fetch('GET', url).then((response) => {
       this.events = response.events;
       this.trigger({events: response.events});

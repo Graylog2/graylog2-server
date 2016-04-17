@@ -17,14 +17,12 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
@@ -32,6 +30,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
@@ -44,11 +43,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -59,6 +59,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "Indexer/Indices", description = "Index information")
@@ -66,12 +68,16 @@ import java.util.Set;
 public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
+    private final Indices indices;
+    private final Cluster cluster;
+    private final Deflector deflector;
+
     @Inject
-    private Indices indices;
-    @Inject
-    private Cluster cluster;
-    @Inject
-    private Deflector deflector;
+    public IndicesResource(Indices indices, Cluster cluster, Deflector deflector) {
+        this.indices = indices;
+        this.cluster = cluster;
+        this.deflector = deflector;
+    }
 
     @GET
     @Timed
@@ -81,7 +87,7 @@ public class IndicesResource extends RestResource {
     public IndexInfo single(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -100,7 +106,23 @@ public class IndicesResource extends RestResource {
         }
 
         return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
-                routing.build(), indices.isReopened(index));
+            routing.build(), indices.isReopened(index));
+    }
+
+    @POST
+    @Timed
+    @Path("/multiple")
+    @ApiOperation(value = "Get information of all specified indices and their shards.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
+                                           @Valid @NotNull IndicesReadRequest request) {
+        if (request.indices() != null) {
+            return request.indices().stream()
+                    .filter(deflector::isGraylogIndex)
+                    .collect(Collectors.toMap(Function.identity(), this::single));
+        }
+
+        throw new BadRequestException("Missing or invalid list of indices passed in request.");
     }
 
     @GET
@@ -110,9 +132,12 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats();
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats().stream()
+                .filter(indexStats -> deflector.isGraylogIndex(indexStats.indexName()))
+                .collect(Collectors.toSet());
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
+        final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
         for (IndexStatistics indexStatistics : indicesStats) {
             final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
             for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
@@ -120,10 +145,10 @@ public class IndicesResource extends RestResource {
             }
 
             final IndexInfo indexInfo = IndexInfo.create(
-                    indexStats(indexStatistics.primaries()),
-                    indexStats(indexStatistics.total()),
-                    routing.build(),
-                    indices.isReopened(indexStatistics.indexName()));
+                indexStats(indexStatistics.primaries()),
+                indexStats(indexStatistics.total()),
+                routing.build(),
+                areReopened.get(indexStatistics.indexName()));
 
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
@@ -137,18 +162,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
-        Set<String> closedIndices;
-        try {
-            closedIndices = Sets.filter(indices.getClosedIndices(), new Predicate<String>() {
-                @Override
-                public boolean apply(String indexName) {
-                    return isPermitted(RestPermissions.INDICES_READ, indexName);
-                }
-            });
-        } catch (Exception e) {
-            LOG.error("Could not get closed indices.", e);
-            throw new InternalServerErrorException(e);
-        }
+        final Set<String> closedIndices = indices.getClosedIndices()
+            .stream()
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
+            .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
@@ -159,18 +176,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
-        final Set<String> reopenedIndices;
-        try {
-            reopenedIndices = Sets.filter(indices.getReopenedIndices(), new Predicate<String>() {
-                @Override
-                public boolean apply(String indexName) {
-                    return isPermitted(RestPermissions.INDICES_READ, indexName);
-                }
-            });
-        } catch (Exception e) {
-            LOG.error("Could not get reopened indices.", e);
-            throw new InternalServerErrorException(e);
-        }
+        final Set<String> reopenedIndices = indices.getReopenedIndices()
+            .stream()
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
+            .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
@@ -183,7 +192,6 @@ public class IndicesResource extends RestResource {
         return AllIndices.create(this.closed(), this.reopened(), this.open());
     }
 
-
     @POST
     @Timed
     @Path("/{index}/reopen")
@@ -192,7 +200,7 @@ public class IndicesResource extends RestResource {
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             LOG.info("Index [{}] doesn't look like an index managed by Graylog.", index);
             throw new NotFoundException();
         }
@@ -206,12 +214,12 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
+        @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             LOG.info("Index [{}] doesn't look like an index managed by Graylog.", index);
             throw new NotFoundException();
         }
@@ -230,12 +238,12 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Delete an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
+        @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -251,28 +259,28 @@ public class IndicesResource extends RestResource {
 
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
         return ShardRouting.create(route.shardId().getId(),
-                route.state().name().toLowerCase(Locale.ENGLISH),
-                route.active(),
-                route.primary(),
-                route.currentNodeId(),
-                cluster.nodeIdToName(route.currentNodeId()),
-                cluster.nodeIdToHostName(route.currentNodeId()),
-                route.relocatingNodeId());
+            route.state().name().toLowerCase(Locale.ENGLISH),
+            route.active(),
+            route.primary(),
+            route.currentNodeId(),
+            cluster.nodeIdToName(route.currentNodeId()),
+            cluster.nodeIdToHostName(route.currentNodeId()),
+            route.relocatingNodeId());
     }
 
     private IndexStats indexStats(final CommonStats stats) {
         return IndexStats.create(
-                IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
-                IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
-                stats.getSearch().getOpenContexts(),
-                stats.getStore().getSize().getBytes(),
-                stats.getSegments().getCount(),
-                IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
+            IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
+            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
+            stats.getSearch().getOpenContexts(),
+            stats.getStore().getSize().getBytes(),
+            stats.getSegments().getCount(),
+            IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
         );
     }
 }

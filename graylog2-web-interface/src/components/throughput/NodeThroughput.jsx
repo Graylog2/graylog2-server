@@ -6,9 +6,11 @@ import { Spinner } from 'components/common';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 // TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
 const NodeThroughput = React.createClass({

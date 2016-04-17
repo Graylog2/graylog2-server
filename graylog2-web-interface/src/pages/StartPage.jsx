@@ -6,10 +6,12 @@ import Routes from 'routing/Routes';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import GettingStartedStore from 'stores/gettingstarted/GettingStartedStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const GettingStartedStore = StoreProvider.getStore('GettingStarted');
 
-import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = React.createClass({
   propTypes: {

@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
-import { InputStatesStore } from 'stores/inputs';
+import StoreProvider from 'injection/StoreProvider';
+const InputStatesStore = StoreProvider.getStore('InputStates');
 
 function inputStateFilter(state) {
   return state.inputStates ? state.inputStates[this.props.input.id] : undefined;

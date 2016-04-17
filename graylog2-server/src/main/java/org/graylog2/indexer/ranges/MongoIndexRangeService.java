@@ -33,7 +33,6 @@ import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
 import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
@@ -59,26 +58,22 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     private final Indices indices;
     private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
-    private final EventBus clusterEventBus;
 
     @Inject
     public MongoIndexRangeService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
-                                  EventBus eventBus,
-                                  @ClusterEventBus EventBus clusterEventBus) {
+                                  EventBus eventBus) {
         this.indices = indices;
         this.collection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 MongoIndexRange.class,
                 ObjectId.class,
                 objectMapperProvider.get());
-        this.clusterEventBus = clusterEventBus;
 
         // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
         IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
-        clusterEventBus.register(this);
 
         collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
         collection.createIndex(BasicDBObjectBuilder.start()
@@ -133,8 +128,6 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void save(IndexRange indexRange) {
         collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, indexRange.indexName()));
         collection.save(MongoIndexRange.create(indexRange));
-
-        clusterEventBus.post(IndexRangeUpdatedEvent.create(indexRange.indexName()));
     }
 
     @Subscribe

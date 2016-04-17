@@ -23,7 +23,6 @@ import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.initializers.MetricsReporterService;
 import org.graylog2.initializers.OutputSetupService;
-import org.graylog2.initializers.WebInterfaceService;
 
 public class InitializerBindings extends AbstractModule {
     @Override
@@ -33,6 +32,5 @@ public class InitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(IndexerSetupService.class);
         serviceBinder.addBinding().to(BufferSynchronizerService.class);
         serviceBinder.addBinding().to(OutputSetupService.class);
-        serviceBinder.addBinding().to(WebInterfaceService.class);
     }
 }

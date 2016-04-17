@@ -1,4 +1,6 @@
 import React from 'react';
+import { Label } from 'react-bootstrap';
+
 import DateTime from 'logic/datetimes/DateTime';
 
 import { IndexSizeSummary } from 'components/indices';
@@ -7,30 +9,39 @@ const IndexSummary = React.createClass({
   propTypes: {
     children: React.PropTypes.node.isRequired,
     index: React.PropTypes.object.isRequired,
-    indexRange: React.PropTypes.object.isRequired,
+    indexRange: React.PropTypes.object,
     isDeflector: React.PropTypes.bool.isRequired,
+    name: React.PropTypes.string.isRequired,
   },
   getInitialState() {
     return { showDetails: this.props.isDeflector };
   },
-  _deflectorBadge() {
-    if (this.props.isDeflector) {
-      return <i className="fa fa-bolt" title="Write-active index"/>;
-    }
-  },
-  _reopenedBadged(index) {
-    if (index.reopened) {
-      return <i className="fa fa-retweet" title="Reopened index"/>;
-    }
-  },
-  _formatIndexRange() {
-    if (this.props.isDeflector) {
-      return 'Contains messages up to ' + new DateTime().toRelativeString();
+  _formatLabels(index) {
+    const labels = [];
+    if (index.is_deflector) {
+      labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">deflector</Label>);
     }
 
-    if (this.props.index.all_shards) {
-      const count = this.props.index.all_shards.documents.count;
-      const deleted = this.props.index.all_shards.documents.deleted;
+    if (index.is_closed) {
+      labels.push(<Label key={`${this.props.name}-closed-label`} bsStyle="warning">closed</Label>);
+    }
+
+    if (index.is_reopened) {
+      labels.push(<Label key={`${this.props.name}-reopened-label`} bsStyle="success">reopened</Label>);
+    }
+
+    return <span>{labels}</span>;
+  },
+
+  _formatIndexRange() {
+    if (this.props.isDeflector) {
+      return `Contains messages up to ${new DateTime().toRelativeString()}`;
+    }
+
+    const sizes = this.props.index.size;
+    if (sizes) {
+      const count = sizes.events;
+      const deleted = sizes.deleted;
       if (count === 0 || count - deleted === 0) {
         return 'Index does not contain any messages.';
       }
@@ -41,10 +52,10 @@ const IndexSummary = React.createClass({
     }
 
     if (this.props.indexRange.begin === 0) {
-      return 'Contains messages up to ' + new DateTime(this.props.indexRange.end).toRelativeString();
+      return `Contains messages up to ${new DateTime(this.props.indexRange.end).toRelativeString()}`;
     }
 
-    return 'Contains messages from ' + new DateTime(this.props.indexRange.begin).toRelativeString() + ' up to ' + new DateTime(this.props.indexRange.end).toRelativeString();
+    return `Contains messages from ${new DateTime(this.props.indexRange.begin).toRelativeString()} up to ${new DateTime(this.props.indexRange.end).toRelativeString()}`;
   },
   _formatShowDetailsLink() {
     if (this.state.showDetails) {
@@ -61,13 +72,10 @@ const IndexSummary = React.createClass({
     return (
       <span>
         <h2>
-          {this._deflectorBadge()}{' '}
-
-          {index.name}{' '}
-
-          {this._reopenedBadged(index)}{' '}
+          {this.props.name}{' '}
 
           <small>
+            {this._formatLabels(index)}{' '}
             {this._formatIndexRange(index)}{' '}
 
             <IndexSizeSummary index={index} />

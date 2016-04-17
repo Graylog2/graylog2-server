@@ -18,9 +18,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
@@ -54,16 +54,11 @@ import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 public class ClusterLoadBalancerStatusResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterLoadBalancerStatusResource.class);
 
-    private final NodeService nodeService;
-    private final RemoteInterfaceProvider remoteInterfaceProvider;
-
     @Inject
     public ClusterLoadBalancerStatusResource(NodeService nodeService,
                                              RemoteInterfaceProvider remoteInterfaceProvider,
                                              @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders);
-        this.nodeService = nodeService;
-        this.remoteInterfaceProvider = remoteInterfaceProvider;
+        super(httpHeaders, nodeService, remoteInterfaceProvider);
     }
 
     @PUT
@@ -82,7 +77,7 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteLoadBalancerStatusResource.class);
         final Response response = remoteLoadBalancerStatusResource.override(status).execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to override load balancer status on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }

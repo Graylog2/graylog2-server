@@ -1,9 +1,12 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
 const fetch = require('logic/rest/FetchProvider').default;
-import SearchStore = require('stores/search/SearchStore');
+
+const StoreProvider = require('injection/StoreProvider');
+const SearchStore = StoreProvider.getStore('Search');
+
 const UserNotification = require('util/UserNotification');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 
 const FieldQuickValuesStore = {
@@ -26,7 +29,7 @@ const FieldQuickValuesStore = {
                 break;
         }
 
-        var url = jsRoutes.controllers.api.UniversalSearchApiController.fieldTerms(
+        var url = ApiRoutes.UniversalSearchApiController.fieldTerms(
             rangeType,
             originalSearchURLParams.get('q') || '*',
             field,
@@ -46,4 +49,4 @@ const FieldQuickValuesStore = {
     },
 };
 
-export default FieldQuickValuesStore;
+module.exports = FieldQuickValuesStore;

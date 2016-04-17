@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
+import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.joda.time.DateTimeZone;
 
@@ -44,7 +45,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;
 
-    @Parameter(value = "password_secret", required = true)
+    @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true)
@@ -130,12 +131,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
-
-    @Parameter(value = "collector_expiration_threshold", validator = PositiveDurationValidator.class)
-    private Duration collectorExpirationThreshold = Duration.days(14);
-
-    @Parameter(value = "collector_inactive_threshold", validator = PositiveDurationValidator.class)
-    private Duration collectorInactiveThreshold = Duration.minutes(1);
 
     @Parameter(value = "dashboard_widget_default_cache_time", validator = PositiveDurationValidator.class)
     private Duration dashboardWidgetDefaultCacheTime = Duration.seconds(10L);
@@ -282,14 +277,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getDefaultMessageOutputClass() {
         return defaultMessageOutputClass;
-    }
-
-    public Duration getCollectorExpirationThreshold() {
-        return collectorExpirationThreshold;
-    }
-
-    public Duration getCollectorInactiveThreshold() {
-        return collectorInactiveThreshold;
     }
 
     public Duration getDashboardWidgetDefaultCacheTime() {

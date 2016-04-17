@@ -8,7 +8,7 @@ const MultiSelect = React.createClass({
     return this.refs.select.getValue();
   },
   render() {
-    return <Select ref="select" multi={true} {...this.props} />;
+    return <Select ref="select" multi {...this.props} />;
   },
 });
 

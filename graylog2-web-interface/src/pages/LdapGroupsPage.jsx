@@ -1,17 +1,18 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 
-import { PageHeader, Spinner } from 'components/common';
+import { IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import LdapStore from 'stores/ldap/LdapStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const LdapStore = StoreProvider.getStore('Ldap');
 
 const LdapGroupsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(LdapStore)],
@@ -49,14 +50,27 @@ const LdapGroupsPage = React.createClass({
   render() {
     return (
       <span>
-        <PageHeader title="LDAP Group Mapping" titleSize={8} buttonSize={4}
-                    buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
+        <PageHeader title="LDAP Group Mapping" titleSize={8} buttonSize={4}>
           <span>Map LDAP groups to Graylog roles</span>
 
           <span>
             LDAP groups with no defined mapping will use the defaults set in your{' '}
             <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}><a>LDAP settings</a></LinkContainer>.{' '}
             Read more about it in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.
+          </span>
+
+          <span>
+            <IfPermitted permissions="LDAP_EDIT">
+              <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}>
+                <Button bsStyle="info">Configure LDAP</Button>
+              </LinkContainer>
+            </IfPermitted>
+            &nbsp;
+            <IfPermitted permissions="USERS_LIST">
+              <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
+                <Button bsStyle="info">Manage users</Button>
+              </LinkContainer>
+            </IfPermitted>
           </span>
         </PageHeader>
 

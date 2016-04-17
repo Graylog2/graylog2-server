@@ -16,29 +16,29 @@
  */
 package org.graylog2.filters.blacklist;
 
-import com.atlassian.ip.IPMatcher;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Objects;
 
-public class BlacklistIpMatcherCondition extends FilterDescription {
-    private static final Logger LOG = LoggerFactory.getLogger(BlacklistIpMatcherCondition.class);
-
-    private IPMatcher ipMatcher;
-
-    public BlacklistIpMatcherCondition() {
-    }
+public final class BlacklistIpMatcherCondition extends FilterDescription {
+    private IpSubnet ipSubnet;
 
     @JsonProperty
     public void setPattern(String pattern) {
         this.pattern = pattern;
-        ipMatcher = IPMatcher.builder().addPatternOrHost(pattern).build();
+        try {
+            this.ipSubnet = new IpSubnet(pattern);
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException("Invalid IP subnet pattern", e);
+        }
     }
+
     public boolean matchesInetAddress(InetAddress otherSource) {
         try {
-            return ipMatcher.matches(otherSource);
+            return ipSubnet.contains(otherSource);
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -51,13 +51,11 @@ public class BlacklistIpMatcherCondition extends FilterDescription {
 
         BlacklistIpMatcherCondition that = (BlacklistIpMatcherCondition) o;
 
-        if (!pattern.equals(that.pattern)) return false;
-
-        return true;
+        return Objects.equals(pattern, that.pattern);
     }
 
     @Override
     public int hashCode() {
-        return pattern.hashCode();
+        return Objects.hash(pattern);
     }
 }

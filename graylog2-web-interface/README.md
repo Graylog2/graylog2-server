@@ -1,15 +1,13 @@
 # Graylog Web Interface
-[![Build Status](https://travis-ci.org/Graylog2/graylog2-web-interface.png)](https://travis-ci.org/Graylog2/graylog2-web-interface)
 
 ## Development Setup
 
 * Install [node.js](http://nodejs.org/) and npm.
-* `npm install`
-* `npm start`
+* Run `npm install`
+* Run `npm start` (if you don't want to include plugins in the build while developing, simply run `disable_plugins=true npm start`) 
+* Open http://localhost:8080
 
-* open http://localhost:8080
-
-The `npm start` command will run the `webpack-dev-server`, which allows in-browser hot reloading.
+The `npm start` (or `disable_plugins=true npm start`) command will run the `webpack-dev-server`, which allows in-browser hot reloading.
 In order to make switching between different branches faster, we use a script to store all `node_modules` folders
 into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
 
@@ -43,7 +41,3 @@ b. Update devDependencies
 * `npm install`
 * Do more work with the new devDependencies
 * `npm shrinkwrap --dev` to export the whole dependency tree with the new devDependencies into `npm-shrinkwrap.json`
-
-![YourKit](https://s3.amazonaws.com/graylog2public/images/yourkit.png)
-
-YourKit supports our open source project by sponsoring its full-featured Java Profiler. YourKit, LLC is the creator of [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp) and [YourKit .NET Profiler](http://www.yourkit.com/.net/profiler/index.jsp), innovative and intelligent tools for profiling Java and .NET applications.

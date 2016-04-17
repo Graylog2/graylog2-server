@@ -1,27 +1,36 @@
 import React from 'react';
-import { Row, Col, Input, Pagination } from 'react-bootstrap';
+import Reflux from 'reflux';
+import { Row, Col } from 'react-bootstrap';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 
-import AlertsStore from 'stores/alerts/AlertsStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlertsActions = ActionsProvider.getActions('Alerts');
+
+import StoreProvider from 'injection/StoreProvider';
+const AlertsStore = StoreProvider.getStore('Alerts');
+
 import { PaginatedList, Spinner } from 'components/common';
 import AlertsTable from 'components/alerts/AlertsTable';
 
 const AlertsComponent = React.createClass({
-  mixins: [LinkedStateMixin],
+  propTypes: {
+    streamId: React.PropTypes.string.isRequired,
+  },
+
+  mixins: [LinkedStateMixin, Reflux.connect(AlertsStore)],
+
   componentDidMount() {
     this.loadData(1, 10);
   },
-  getInitialState() {
-    return {};
-  },
+
   loadData(pageNo, limit) {
-    AlertsStore.list(this.props.streamId, (pageNo-1)*limit, limit).done((alerts) => {
-      this.setState({alerts: alerts});
-    });
+    AlertsActions.listPaginated(this.props.streamId, (pageNo - 1) * limit, limit);
   },
+
   _onChangePaginatedList(page, size) {
     this.loadData(page, size);
   },
+
   render() {
     if (!this.state.alerts) {
       return (
@@ -33,7 +42,10 @@ const AlertsComponent = React.createClass({
       );
     }
 
-    const triggeredAlertsText = this.state.alerts.total > 0 ? <span>&nbsp; <small>{this.state.alerts.total} alerts total</small></span> : null;
+    let triggeredAlertsText;
+    if (this.state.alerts.total > 0) {
+      triggeredAlertsText = <span>&nbsp;<small>{this.state.alerts.total} alerts total</small></span>;
+    }
 
     return (
       <Row className="content triggered-alerts">

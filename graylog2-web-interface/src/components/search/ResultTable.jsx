@@ -2,10 +2,12 @@ import React from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
 
-import StreamsStore from 'stores/streams/StreamsStore';
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+const SearchStore = StoreProvider.getStore('Search');
 
-import RefreshActions from 'actions/tools/RefreshActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const RefreshActions = ActionsProvider.getActions('Refresh');
 
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
@@ -21,6 +23,7 @@ const ResultTable = React.createClass({
     sortField: React.PropTypes.string.isRequired,
     sortOrder: React.PropTypes.string.isRequired,
     streams: React.PropTypes.object.isRequired,
+    searchConfig: React.PropTypes.object.isRequired,
   },
   getInitialState() {
     return {
@@ -158,7 +161,9 @@ const ResultTable = React.createClass({
                                                                       allStreamsLoaded={this.state.allStreamsLoaded}
                                                                       nodes={this.props.nodes}
                                                                       highlight={this.props.highlight}
+                                                                      highlightMessage={SearchStore.highlightMessage}
                                                                       expandAllRenderAsync={this.state.expandAllRenderAsync}
+                                                                      searchConfig={this.props.searchConfig}
             />) }
           </table>
         </div>

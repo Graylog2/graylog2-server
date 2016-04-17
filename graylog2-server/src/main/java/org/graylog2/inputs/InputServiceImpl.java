@@ -61,19 +61,16 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     private final ExtractorFactory extractorFactory;
     private final MessageInputFactory messageInputFactory;
     private final EventBus clusterEventBus;
-    private final EventBus serverEventBus;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
                             MessageInputFactory messageInputFactory,
-                            @ClusterEventBus EventBus clusterEventBus,
-                            EventBus serverEventBus) {
+                            ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
-        this.serverEventBus = serverEventBus;
     }
 
     @Override
@@ -142,6 +139,9 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Input find(String id) throws NotFoundException {
+        if (!ObjectId.isValid(id)) {
+            throw new NotFoundException("Input id <" + id + "> is invalid!");
+        }
         final DBObject o = get(org.graylog2.inputs.InputImpl.class, id);
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
@@ -429,6 +429,5 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     private void publishChange(Object event) {
         this.clusterEventBus.post(event);
-        this.serverEventBus.post(event);
     }
 }

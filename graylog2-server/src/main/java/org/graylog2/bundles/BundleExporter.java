@@ -327,7 +327,7 @@ public class BundleExporter {
             for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
                 org.graylog2.dashboards.widgets.DashboardWidget widget;
                 try {
-                    widget = dashboardWidgetCreator.fromPersisted(null, widgetFields);
+                    widget = dashboardWidgetCreator.fromPersisted(widgetFields);
                 } catch (Exception e) {
                     LOG.warn("Error while exporting widgets of dashboard " + dashboard.getId(), e);
                     continue;

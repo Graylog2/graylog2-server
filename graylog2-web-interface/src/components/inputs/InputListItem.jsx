@@ -6,12 +6,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
-import InputTypesStore from 'stores/inputs/InputTypesStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputTypesStore = StoreProvider.getStore('InputTypes');
 
-import InputsActions from 'actions/inputs/InputsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 
@@ -65,7 +67,7 @@ const InputListItem = React.createClass({
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={jsRoutes.controllers.SearchController.index(`gl2_source_input:${this.props.input.id}`, 'relative', 28800).url}>
+                       to={ApiRoutes.SearchController.index(`gl2_source_input:${this.props.input.id}`, 'relative', 28800).url}>
           <Button bsStyle="info">Show received messages</Button>
         </LinkContainer>
       );

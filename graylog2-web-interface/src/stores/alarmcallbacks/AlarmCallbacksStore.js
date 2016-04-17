@@ -1,10 +1,11 @@
 import Reflux from 'reflux';
 
-import AlarmCallbacksActions from 'actions/alarmcallbacks/AlarmCallbacksActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const AlarmCallbacksStore = Reflux.createStore({
@@ -30,7 +31,7 @@ const AlarmCallbacksStore = Reflux.createStore({
         'Could not retrieve available AlarmCallbacks');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.available(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available(streamId).url);
     const promise = fetch('GET', url).then((response) => {
       return response.types;
     }, failCallback);
@@ -45,7 +46,7 @@ const AlarmCallbacksStore = Reflux.createStore({
         'Could not retrieve AlarmCallbacks');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.list(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
 
     AlarmCallbacksActions.list.promise(promise);
@@ -56,7 +57,7 @@ const AlarmCallbacksStore = Reflux.createStore({
         'Could not save AlarmCallback');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.create(streamId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.create(streamId).url);
 
     const promise = fetch('POST', url, alarmCallback).catch(failCallback);
 
@@ -68,7 +69,7 @@ const AlarmCallbacksStore = Reflux.createStore({
         'Could not remove AlarmCallback');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);
 
     const promise = fetch('DELETE', url).catch(failCallback);
 
@@ -80,7 +81,7 @@ const AlarmCallbacksStore = Reflux.createStore({
         'Could not update Alarm Callback');
     };
 
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
 
     const promise = fetch('PUT', url, deltas).catch(failCallback);
 

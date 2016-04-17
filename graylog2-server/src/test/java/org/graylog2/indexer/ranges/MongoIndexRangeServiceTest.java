@@ -49,8 +49,6 @@ import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,14 +65,12 @@ public class MongoIndexRangeServiceTest {
     @Mock
     private Indices indices;
     private EventBus localEventBus;
-    @Mock
-    private EventBus clusterEventBus;
     private MongoIndexRangeService indexRangeService;
 
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, localEventBus, clusterEventBus);
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, localEventBus);
     }
 
     @Test
@@ -203,7 +199,6 @@ public class MongoIndexRangeServiceTest {
         indexRangeService.save(indexRange);
 
         final IndexRange result = indexRangeService.get(indexName);
-        verify(clusterEventBus, times(1)).post(IndexRangeUpdatedEvent.create(indexName));
         assertThat(result.indexName()).isEqualTo(indexName);
         assertThat(result.begin()).isEqualTo(begin);
         assertThat(result.end()).isEqualTo(end);
@@ -230,8 +225,6 @@ public class MongoIndexRangeServiceTest {
 
         final IndexRange after = indexRangeService.get(indexName);
         assertThat(after.calculationDuration()).isEqualTo(2);
-
-        verify(clusterEventBus, times(2)).post(IndexRangeUpdatedEvent.create(indexName));
     }
 
     @Test

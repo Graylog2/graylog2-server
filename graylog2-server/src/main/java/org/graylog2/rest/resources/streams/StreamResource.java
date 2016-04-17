@@ -21,15 +21,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
-import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.database.NotFoundException;
@@ -40,16 +39,18 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
+import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
@@ -78,11 +79,14 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -95,19 +99,16 @@ public class StreamResource extends RestResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
-    private final ThroughputStats throughputStats;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          ThroughputStats throughputStats,
                           AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
-        this.throughputStats = throughputStats;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
@@ -151,7 +152,7 @@ public class StreamResource extends RestResource {
             }
         }
 
-        return StreamListResponse.create(streams.size(), streams);
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
     @GET
@@ -168,7 +169,7 @@ public class StreamResource extends RestResource {
             }
         }
 
-        return StreamListResponse.create(streams.size(), streams);
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
     @GET
@@ -180,11 +181,11 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Stream get(@ApiParam(name = "streamId", required = true)
+    public StreamResponse get(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        return streamService.load(streamId);
+        return streamToResponse(streamService.load(streamId));
     }
 
     @PUT
@@ -197,7 +198,7 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Stream update(@ApiParam(name = "streamId", required = true)
+    public StreamResponse update(@ApiParam(name = "streamId", required = true)
                          @PathParam("streamId") String streamId,
                          @ApiParam(name = "JSON body", required = true)
                          @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
@@ -223,7 +224,7 @@ public class StreamResource extends RestResource {
 
         streamService.save(stream);
 
-        return stream;
+        return streamToResponse(stream);
     }
 
     @DELETE
@@ -384,42 +385,32 @@ public class StreamResource extends RestResource {
         return Response.created(streamUri).entity(result).build();
     }
 
-    @GET
-    @Timed
-    @Path("/{streamId}/throughput")
-    @ApiOperation(value = "Current throughput of this stream on this node in messages per second")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long> oneStreamThroughput(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) {
-        final Map<String, Long> result = Maps.newHashMap();
-        result.put("throughput", 0L);
-
-        final HashMap<String, Counter> currentStreamThroughput = throughputStats.getCurrentStreamThroughput();
-        if (currentStreamThroughput != null) {
-            final Counter counter = currentStreamThroughput.get(streamId);
-            if (counter != null && isPermitted(RestPermissions.STREAMS_READ, streamId))
-                result.put("throughput", counter.get());
-        }
-
-        return result;
+    private StreamResponse streamToResponse(Stream stream) {
+        final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
+        final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
+        return StreamResponse.create(
+            stream.getId(),
+            (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+            outputsToSummaries(stream.getOutputs()),
+            stream.getMatchingType().name(),
+            stream.getDescription(),
+            stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+            stream.getDisabled(),
+            stream.getStreamRules(),
+            stream.getAlertConditions(),
+            AlertReceivers.create(
+                emailAlertReceivers == null ? Collections.emptyList() : emailAlertReceivers,
+                usersAlertReceivers == null ? Collections.emptyList() : usersAlertReceivers
+            ),
+            stream.getTitle(),
+            stream.getContentPack()
+        );
     }
 
-    @GET
-    @Timed
-    @Path("/throughput")
-    @ApiOperation("Current throughput of all visible streams on this node in messages per second")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Map<String, Long>> streamThroughput() {
-        final Map<String, Long> perStream = Maps.newHashMap();
-
-        final Map<String, Counter> currentStreamThroughput = throughputStats.getCurrentStreamThroughput();
-        if (currentStreamThroughput != null) {
-            for (Map.Entry<String, Counter> entry : currentStreamThroughput.entrySet()) {
-                if (entry.getValue() != null && isPermitted(RestPermissions.STREAMS_READ, entry.getKey())) {
-                    perStream.put(entry.getKey(), entry.getValue().get());
-                }
-            }
-        }
-
-        return ImmutableMap.of("throughput", perStream);
+    private Collection<OutputSummary> outputsToSummaries(Collection<Output> outputs) {
+        return outputs.stream()
+            .map((output) -> OutputSummary.create(output.getId(),output.getTitle(), output.getType(),
+                output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()))
+            .collect(Collectors.toSet());
     }
 }

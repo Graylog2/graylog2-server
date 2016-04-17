@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.nosqlunit;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
@@ -54,7 +55,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            final Messages messages = new Messages(client, config);
+            final Messages messages = new Messages(client, config, new MetricRegistry());
             final Indices indices = new Indices(client, config, new IndexMapping(), messages);
 
             if (!indices.create(index)) {

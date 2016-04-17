@@ -2,9 +2,11 @@ import React from 'react';
 import Reflux from 'reflux';
 import String from 'string';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
 

@@ -1,3 +1,5 @@
+/* global storeProvider */
+
 class StoreProvider {
   constructor() {
     /* eslint-disable import/no-require */
@@ -7,8 +9,8 @@ class StoreProvider {
       AlertConditions: () => require('stores/alertconditions/AlertConditionsStore'),
       Alerts: () => require('stores/alerts/AlertsStore'),
       ClusterOverview: () => require('stores/cluster/ClusterOverviewStore'),
-      Collectors: () => require('stores/collectors/CollectorsStore'),
       ConfigurationBundles: () => require('stores/configuration-bundles/ConfigurationBundlesStore'),
+      Configurations: () => require('stores/configurations/ConfigurationsStore'),
       CurrentUser: () => require('stores/users/CurrentUserStore'),
       Dashboards: () => require('stores/dashboards/DashboardsStore'),
       Deflector: () => require('stores/indices/DeflectorStore'),
@@ -21,16 +23,21 @@ class StoreProvider {
       GettingStarted: () => require('stores/gettingstarted/GettingStartedStore'),
       GlobalThroughput: () => require('stores/metrics/GlobalThroughputStore'),
       GrokPatterns: () => require('stores/grok-patterns/GrokPatternsStore'),
+      HistogramData: () => require('stores/sources/HistogramDataStore'),
       IndexerCluster: () => require('stores/indexers/IndexerClusterStore'),
       IndexerFailures: () => require('stores/indexers/IndexerFailuresStore'),
+      IndexerOverview: () => require('stores/indexers/IndexerOverviewStore'),
       IndexRanges: () => require('stores/indices/IndexRangesStore'),
       Indices: () => require('stores/indices/IndicesStore'),
+      IndicesConfiguration: () => require('stores/indices/IndicesConfigurationStore'),
       Inputs: () => require('stores/inputs/InputsStore'),
       InputStates: () => require('stores/inputs/InputStatesStore'),
       InputStaticFields: () => require('stores/inputs/InputStaticFieldsStore'),
       InputTypes: () => require('stores/inputs/InputTypesStore'),
       Journal: () => require('stores/journal/JournalStore'),
-      Loggers: () => require('stores/loggers/LoggersStore'),
+      LdapGroups: () => require('stores/ldap/LdapGroupsStore'),
+      Ldap: () => require('stores/ldap/LdapStore'),
+      Loggers: () => require('stores/system/LoggersStore'),
       MessageCounts: () => require('stores/messages/MessageCountsStore'),
       MessageFields: () => require('stores/messages/MessageFieldsStore'),
       Messages: () => require('stores/messages/MessagesStore'),
@@ -40,9 +47,11 @@ class StoreProvider {
       Outputs: () => require('stores/outputs/OutputsStore'),
       Plugins: () => require('stores/plugins/PluginsStore'),
       Preferences: () => require('stores/users/PreferencesStore'),
+      Refresh: () => require('stores/tools/RefreshStore'),
       Roles: () => require('stores/users/RolesStore'),
       SavedSearches: () => require('stores/search/SavedSearchesStore'),
       Search: () => require('stores/search/SearchStore'),
+      ServerAvailability: () => require('stores/sessions/ServerAvailabilityStore'),
       Session: () => require('stores/sessions/SessionStore'),
       SingleNode: () => require('stores/nodes/SingleNodeStore'),
       Sources: () => require('stores/sources/SourcesStore'),
@@ -66,10 +75,14 @@ class StoreProvider {
 
   getStore(storeName) {
     if (!this.stores[storeName]) {
-      throw new Error('Requested store "' + storeName + '" is not registered.');
+      throw new Error(`Requested store "${storeName}" is not registered.`);
     }
     return this.stores[storeName]();
   }
 }
 
-export default StoreProvider;
+if (typeof storeProvider === 'undefined') {
+  window.storeProvider = new StoreProvider();
+}
+
+export default storeProvider;

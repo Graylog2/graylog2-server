@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamComponent from 'components/streams/StreamComponent';
@@ -11,8 +11,9 @@ import { IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 const StreamsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
@@ -53,7 +54,9 @@ const StreamsPage = React.createClass({
         </PageHeader>
 
         <Row className="content">
-          <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}/>
+          <Col md={12}>
+            <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}/>
+          </Col>
         </Row>
       </div>
     );

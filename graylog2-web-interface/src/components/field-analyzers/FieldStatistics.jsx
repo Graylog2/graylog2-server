@@ -1,43 +1,55 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
-import {Button} from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 
-import FieldStatisticsStore from 'stores/field-analyzers/FieldStatisticsStore';
+import StoreProvider from 'injection/StoreProvider';
+const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
+const RefreshStore = StoreProvider.getStore('Refresh');
+
 import NumberUtils from 'util/NumberUtils';
 import UserNotification from 'util/UserNotification';
 
 const FieldStatistics = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
+  mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
+
   getInitialState() {
     return {
       statsLoadPending: Immutable.Map(),
       fieldStatistics: Immutable.Map(),
       sortBy: 'field',
       sortDescending: false,
-      autoReload: false,
     };
   },
-  componentDidMount() {
-    this.updateIntervalId = window.setInterval(() => this._reloadAllStatistics(), 3000);
-  },
-  componentWillUnmount() {
-    if (this.updateIntervalId) {
-      window.clearInterval(this.updateIntervalId);
+
+  WIDGET_TYPE: 'STATS_COUNT',
+
+  _setupTimer(refresh) {
+    this._stopTimer();
+    if (refresh.enabled) {
+      this.timer = setInterval(this._reloadAllStatistics, refresh.interval);
     }
   },
-  addFieldStatistics(field) {
+
+  _stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  },
+
+  addField(field) {
     this._reloadFieldStatistics(field);
   },
+
   _reloadAllStatistics() {
-    if (this.state.autoReload) {
-      this.state.fieldStatistics.keySeq().forEach((field) => this._reloadFieldStatistics(field));
-    }
+    this.state.fieldStatistics.keySeq().forEach((field) => this._reloadFieldStatistics(field));
   },
+
   _reloadFieldStatistics(field) {
     if (this.isMounted) {
       this.setState({statsLoadPending: this.state.statsLoadPending.set(field, true)});
@@ -67,10 +79,6 @@ const FieldStatistics = React.createClass({
     } else {
       this.setState({sortBy: column, sortDescending: false});
     }
-  },
-  _toggleAutoReload() {
-    const shouldAutoReload = !this.state.autoReload;
-    this.setState({autoReload: shouldAutoReload});
   },
 
   _resetStatus() {
@@ -138,17 +146,13 @@ const FieldStatistics = React.createClass({
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
-                                widgetType={Widget.Type.STATS_COUNT}
-                                configuration={{}}
+                                widgetType={this.WIDGET_TYPE}
                                 bsStyle="default"
-                                fields={this.state.fieldStatistics.keySeq()}
+                                fields={this.state.fieldStatistics.keySeq().toJS()}
                                 pullRight
                                 permissions={this.props.permissions}>
 
               <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
-              <Button bsSize="small" onClick={() => this._toggleAutoReload()}>
-                {this.state.autoReload ? 'Stop reloading' : 'Reload automatically'}
-              </Button>
             </AddToDashboardMenu>
           </div>
           <h1>Field Statistics</h1>

@@ -1,5 +1,11 @@
+import $ from 'jquery';
+import {} from 'jquery-ui';
 import Rickshaw from 'rickshaw';
 import NumberUtils from 'util/NumberUtils';
+import DateTime from 'logic/datetimes/DateTime';
+
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 
@@ -99,13 +105,10 @@ const Graylog2Selector = Rickshaw.Class.create({
                 return;
             }
 
-            fromDate = momentHelper.toUserTimeZone((position.xMin) * 1000);
-            toDate = momentHelper.toUserTimeZone((position.xMax) * 1000);
+            const fromDate = new DateTime((position.xMin) * 1000);
+            const toDate = new DateTime((position.xMax) * 1000);
 
-            activateTimerangeChooserV2("absolute", {
-                from: fromDate.format(momentHelper.DATE_FORMAT_TZ),
-                to: toDate.format(momentHelper.DATE_FORMAT_TZ)
-            });
+            SearchStore.changeTimeRange('absolute', { from: fromDate.toString(), to: toDate.toString() });
 
             $(".timerange-selector-container").effect("bounce", {
                 complete: function () {

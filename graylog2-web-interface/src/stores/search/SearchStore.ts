@@ -6,10 +6,11 @@
 
 import $ = require('jquery');
 import Immutable = require('immutable');
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const Routes = require('routing/Routes');
 var Qs = require('qs');
 const URLUtils = require('util/URLUtils');
+const moment = require('moment');
 
 class SearchStore {
     static NOT_OPERATOR = "NOT";
@@ -22,6 +23,7 @@ class SearchStore {
     private _page: number;
     private _resolution: string;
     private _fields: Immutable.Set<string>;
+    private _highlightMessage: string;
     public sortField: string;
     public sortOrder: string;
     public width: number;
@@ -34,13 +36,7 @@ class SearchStore {
 
     constructor() {
         this.load(true);
-
         window.addEventListener('resize', () => this.width = window.innerWidth);
-        $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
-        $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
-        $(document).on('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).on('execute.graylog.search', this._submitSearch.bind(this));
-        $(document).on('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     load(firstLoad) {
@@ -52,12 +48,14 @@ class SearchStore {
             this.rangeParams = this.originalSearch.get('rangeParams');
             this.page = this.originalSearch.get('page');
             this.resolution = this.originalSearch.get('resolution');
+            this.highlightMessage = this.originalSearch.get('highlightMessage');
         } else {
             this._query = this.originalSearch.get('query');
             this._rangeType = this.originalSearch.get('rangeType');
             this._rangeParams = this.originalSearch.get('rangeParams');
             this._page = this.originalSearch.get('page');
             this._resolution = this.originalSearch.get('resolution');
+            this._highlightMessage = this.originalSearch.get('highlightMessage');
         }
         this.savedSearch = this.originalSearch.get('saved');
         this.sortField = this.originalSearch.get('sortField');
@@ -67,11 +65,6 @@ class SearchStore {
 
     unload() {
         window.removeEventListener('resize', () => this.width = window.innerWidth);
-        $(document).off('add-search-term.graylog.search', this._addSearchTerm.bind(this));
-        $(document).off('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
-        $(document).off('change-timerange.graylog.search', this._changeTimeRange.bind(this));
-        $(document).off('execute.graylog.search', this._submitSearch.bind(this));
-        $(document).off('deleted.graylog.saved-search', this._savedSearchDeleted.bind(this));
     }
 
     initializeFieldsFromHash() {
@@ -162,6 +155,14 @@ class SearchStore {
         this._fields = newFields;
     }
 
+    get highlightMessage(): string {
+        return this._highlightMessage;
+    }
+
+    set highlightMessage(id: string) {
+        this._highlightMessage = id;
+    }
+
     sort(sortField: string, sortOrder: string): void {
         this._reloadSearchWithNewParams(Immutable.Map<string, any>({sortField: sortField, sortOrder: sortOrder}));
     }
@@ -174,6 +175,7 @@ class SearchStore {
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
         originalSearch = originalSearch.set('sortField', parsedSearch.get('sortField', 'timestamp'));
         originalSearch = originalSearch.set('sortOrder', parsedSearch.get('sortOrder', 'desc'));
+        originalSearch = originalSearch.set('highlightMessage', parsedSearch.get('highlightMessage', ''));
 
         if (parsedSearch.get('saved') !== undefined) {
             originalSearch = originalSearch.set('saved', parsedSearch.get('saved'));
@@ -201,19 +203,10 @@ class SearchStore {
         return originalSearch.set('rangeParams', rangeParams);
     }
 
-    _addSearchTerm(event, data) {
-        var term = data.hasOwnProperty('field') ? data.field + ":" : "";
-        term += SearchStore.escape(data.value);
-        var operator = data.operator || SearchStore.AND_OPERATOR;
-        this.addQueryTerm(term, operator);
-    }
-
-    _getOriginalSearchRequest(event, data) {
-        data.callback(this.getOriginalSearchParams());
-    }
-
-    _changeTimeRange(event, data) {
-        this.changeTimeRange(data['rangeType'], data['rangeParams']);
+    addSearchTerm(field, value, operator) {
+        const term = `${field}:${SearchStore.escape(value)}`;
+        const effectiveOperator = operator || SearchStore.AND_OPERATOR;
+        this.addQueryTerm(term, effectiveOperator);
     }
 
     changeTimeRange(newRangeType: string, newRangeParams: Object) {
@@ -227,9 +220,9 @@ class SearchStore {
         }
     }
 
-    _savedSearchDeleted(event, data) {
-        if (data.savedSearchId === this.savedSearch) {
-            this._submitSearch(event);
+    savedSearchDeleted(savedSearchId) {
+        if (savedSearchId === this.savedSearch) {
+            this._submitSearch(null);
         }
     }
 
@@ -353,6 +346,26 @@ class SearchStore {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.delete('page');
         return this.searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
+    }
+
+    searchSurroundingMessages(messageId: string, fromTime: string, toTime: string, filter: any) {
+      var originalParams = this.getOriginalSearchParamsWithFields().toJS();
+
+      var query = Object.keys(filter)
+        .filter((key) => filter[key])
+        .map((key) => `${key}:"${filter[key]}"`)
+        .join(' AND ');
+
+      var params = {
+        rangetype: 'absolute',
+        from: fromTime,
+        to: toTime,
+        q: query,
+        highlightMessage: messageId,
+        fields: originalParams.fields,
+      };
+
+      URLUtils.openLink(this.searchBaseLocation('index') + '?' + Qs.stringify(params))
     }
 }
 

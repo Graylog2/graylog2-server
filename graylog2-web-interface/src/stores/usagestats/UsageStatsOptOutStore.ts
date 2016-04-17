@@ -1,18 +1,18 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
 
-import jsRoutes = require('routing/jsRoutes');
+import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;
 
 const UserNotification = require('util/UserNotification');
 
-export interface UsageStatsOptOutState {
+interface UsageStatsOptOutState {
     opt_out: boolean
 }
 
-export var UsageStatsOptOutStore = {
+var UsageStatsOptOutStore = {
     pluginEnabled(): Promise<boolean> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.pluginEnabled().url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.UsageStatsApiController.pluginEnabled().url);
         var promise = fetch('GET', url);
 
         promise = promise
@@ -28,7 +28,7 @@ export var UsageStatsOptOutStore = {
         return promise;
     },
     getOptOutState(): Promise<UsageStatsOptOutState> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.setOptOutState().url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.UsageStatsApiController.setOptOutState().url);
         var promise = fetch('GET', url);
 
         promise = promise.catch(() => {
@@ -60,7 +60,7 @@ export var UsageStatsOptOutStore = {
         });
     },
     _sendOptOutState(optOutState: UsageStatsOptOutState, success: Function, error: Function): Promise<boolean> {
-        var url = URLUtils.qualifyUrl(jsRoutes.controllers.api.UsageStatsApiController.setOptOutState().url);
+        var url = URLUtils.qualifyUrl(ApiRoutes.UsageStatsApiController.setOptOutState().url);
         var promise = fetch('POST', url, JSON.stringify(optOutState));
 
         promise
@@ -70,3 +70,5 @@ export var UsageStatsOptOutStore = {
         return promise;
     }
 };
+
+module.exports = UsageStatsOptOutStore;

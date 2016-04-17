@@ -2,11 +2,14 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
-import NotificationsStore from 'stores/notifications/NotificationsStore';
+import StoreProvider from 'injection/StoreProvider';
+const NotificationsStore = StoreProvider.getStore('Notifications');
+
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
@@ -69,16 +72,20 @@ const Navigation = React.createClass({
     if (this._isActive('/system/grokpatterns')) {
       return prefix + ' / Grok Patterns';
     }
-    if (this._isActive('/system/collectors')) {
-      return prefix + ' / Collectors';
+    if (this._isActive('/system/configurations')) {
+      return prefix + ' / Configurations';
     }
 
-    const pluginRoute = PluginStore.exports('systemnavigation').find((pluginRoute) => this._isActive(pluginRoute.path));
+    const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
       return prefix + ' / ' + pluginRoute.description;
     }
 
     return prefix;
+  },
+
+  _shouldAddPluginRoute(pluginRoute) {
+    return !pluginRoute.permissions || (pluginRoute.permissions && this.isPermitted(this.props.permissions, pluginRoute.permissions));
   },
 
   render() {
@@ -100,27 +107,38 @@ const Navigation = React.createClass({
     }
 
     const pluginNavigations = PluginStore.exports('navigation')
+      .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
-        return (
-          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
-            <NavItem>{pluginRoute.description}</NavItem>
-          </LinkContainer>
-        );
+        if (this._shouldAddPluginRoute(pluginRoute)) {
+          return (
+            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+              <NavItem>{pluginRoute.description}</NavItem>
+            </LinkContainer>
+          );
+        } else {
+          return null;
+        }
       });
 
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
+      .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
-        return (
-          <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
-            <NavItem>{pluginRoute.description}</NavItem>
-          </LinkContainer>
-        );
+        if (this._shouldAddPluginRoute(pluginRoute)) {
+          return (
+            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+              <NavItem>{pluginRoute.description}</NavItem>
+            </LinkContainer>
+          );
+        } else {
+          return null;
+        }
       });
 
     return (
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
           <Navbar.Brand>{brand}</Navbar.Brand>
+          <Navbar.Toggle />
         </Navbar.Header>
         <Navbar.Collapse eventKey={0}>
           <Nav navbar>
@@ -149,6 +167,11 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
+              {this.isPermitted(this.props.permissions, ['CLUSTER_CONFIG_ENTRY_READ']) &&
+              <LinkContainer to={Routes.SYSTEM.CONFIGURATIONS}>
+                <MenuItem>Configurations</MenuItem>
+              </LinkContainer>
+              }
               <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
@@ -162,17 +185,12 @@ const Navigation = React.createClass({
                   <MenuItem>Outputs</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['COLLECTORS_READ']) &&
-                <LinkContainer to={Routes.SYSTEM.COLLECTORS}>
-                  <MenuItem>Collectors</MenuItem>
-                </LinkContainer>
-              }
               {this.isPermitted(this.props.permissions, ['INDICES_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                   <MenuItem>Indices</MenuItem>
                 </LinkContainer>
               }
-              {false && this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
+              {this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
                 <LinkContainer to={Routes.SYSTEM.LOGGING}>
                   <MenuItem>Logging</MenuItem>
                 </LinkContainer>

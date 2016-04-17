@@ -1,16 +1,30 @@
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 
-import { IndicesActions, IndexRangesActions } from 'actions/indices';
+import { Spinner } from 'components/common';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const IndicesActions = ActionsProvider.getActions('Indices');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+import StoreProvider from 'injection/StoreProvider';
+StoreProvider.getStore('IndexRanges'); // To make IndexRangesActions work.
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
 const IndexDetails = React.createClass({
   propTypes: {
     index: React.PropTypes.object.isRequired,
+    indexName: React.PropTypes.string.isRequired,
     indexRange: React.PropTypes.object.isRequired,
     isDeflector: React.PropTypes.bool.isRequired,
   },
+  componentDidMount() {
+    IndicesActions.subscribe(this.props.indexName);
+  },
+  componentWillUnmount() {
+    IndicesActions.unsubscribe(this.props.indexName);
+  },
+
   _formatActionButtons() {
     if (this.props.isDeflector) {
       return (
@@ -30,22 +44,25 @@ const IndexDetails = React.createClass({
     );
   },
   _onRecalculateIndex() {
-    if (window.confirm('Really recalculate the index ranges for index ' + this.props.index.name + '?')) {
-      IndexRangesActions.recalculateIndex(this.props.index.name);
+    if (window.confirm(`Really recalculate the index ranges for index ${this.props.indexName}?`)) {
+      IndexRangesActions.recalculateIndex(this.props.indexName);
     }
   },
   _onCloseIndex() {
-    if (window.confirm('Really close index ' + this.props.index.name + '?')) {
-      IndicesActions.close(this.props.index.name);
+    if (window.confirm(`Really close index ${this.props.indexName}?`)) {
+      IndicesActions.close(this.props.indexName);
     }
   },
   _onDeleteIndex() {
-    if (window.confirm('Really delete index ' + this.props.index.name + '?')) {
-      IndicesActions.delete(this.props.index.name);
+    if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
+      IndicesActions.delete(this.props.indexName);
     }
   },
   render() {
-    const { index, indexRange } = this.props;
+    if (!this.props.index || !this.props.index.all_shards) {
+      return <Spinner />;
+    }
+    const { index, indexRange, indexName } = this.props;
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />{' '}
@@ -54,7 +71,7 @@ const IndexDetails = React.createClass({
         {index.all_shards.open_search_contexts} open search contexts,{' '}
         {index.all_shards.documents.deleted} deleted messages
 
-        <Row style={{marginBottom: '10'}}>
+        <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
             <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
           </Col>
@@ -63,9 +80,9 @@ const IndexDetails = React.createClass({
           </Col>
         </Row>
 
-        <ShardRoutingOverview routing={index.routing} />
+        <ShardRoutingOverview routing={index.routing} indexName={indexName} />
 
-        <hr style={{marginBottom: '5', marginTop: '10'}}/>
+        <hr style={{ marginBottom: '5', marginTop: '10' }}/>
 
         {this._formatActionButtons()}
       </div>

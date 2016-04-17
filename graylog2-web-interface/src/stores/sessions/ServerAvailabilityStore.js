@@ -1,10 +1,11 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 
-import ServerAvailabilityActions from 'actions/sessions/ServerAvailabilityActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
 const ServerAvailabilityStore = Reflux.createStore({
   listenables: [ServerAvailabilityActions],
@@ -16,7 +17,7 @@ const ServerAvailabilityStore = Reflux.createStore({
     return { server: this.server };
   },
   ping() {
-    return new Builder('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.ClusterApiResource.node().url)).build().then(
+    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.node().url)).build().then(
       () => ServerAvailabilityActions.reportSuccess(),
       (error) => ServerAvailabilityActions.reportError(error)
     );

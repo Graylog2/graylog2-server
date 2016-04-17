@@ -35,7 +35,7 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
@@ -44,6 +44,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,6 +63,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final Configuration configuration;
     private final RoleService roleService;
     private final UserImpl.Factory userFactory;
+    private final Permissions permissions;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
@@ -69,11 +71,13 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final Configuration configuration,
                            final RoleService roleService,
                            final UserImpl.Factory userFactory,
+                           final Permissions permissions,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
         this.userFactory = userFactory;
+        this.permissions = permissions;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
 
         // ensure that the users' roles array is indexed
@@ -81,6 +85,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    @Nullable
     public User load(final String username) {
         LOG.debug("Loading user {}", username);
 
@@ -142,6 +147,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    @Nullable
     public User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username) {
         UserImpl user = (UserImpl) load(username);
 
@@ -189,13 +195,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             ((UserImpl) user).setHashedPassword("User synced from LDAP.");
         }
 
-        if (user.getPermissions() == null) {
-            user.setPermissions(Lists.newArrayList(RestPermissions.userSelfEditPermissions(username)));
-        } else {
-            user.setPermissions(Lists.newArrayList(Sets.union(RestPermissions.userSelfEditPermissions(username),
-                                                              Sets.newHashSet(user.getPermissions()))));
-        }
-
         // map ldap groups to user roles, if the mapping is present
         final Set<String> translatedRoleIds = Sets.newHashSet(Sets.union(Sets.newHashSet(ldapSettings.getDefaultGroupId()),
                                                                          ldapSettings.getAdditionalDefaultGroupIds()));
@@ -230,7 +229,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             translatedRoleIds.addAll(user.getRoleIds());
         }
         user.setRoleIds(translatedRoleIds);
-
+        user.setPermissions(Collections.emptyList());
     }
 
     @Override
@@ -295,13 +294,22 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public List<String> getPermissionsForUser(User user) {
-        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder().addAll(user.getPermissions());
+        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder()
+                .addAll(user.getPermissions())
+                .addAll(getUserPermissionsFromRoles(user));
+
+        return permSet.build().asList();
+    }
+
+    @Override
+    public Set<String> getUserPermissionsFromRoles(User user) {
+        final ImmutableSet.Builder<String> permSet = ImmutableSet.builder();
 
         for (String roleId : user.getRoleIds()) {
             permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
         }
 
-        return permSet.build().asList();
+        return permSet.build();
     }
 
     @Override

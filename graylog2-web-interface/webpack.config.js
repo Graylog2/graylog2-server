@@ -17,6 +17,7 @@ process.env.BABEL_ENV = TARGET;
 const webpackConfig = {
   entry: {
     app: APP_PATH,
+    polyfill: ['babel-core/polyfill'],
   },
   output: {
     path: BUILD_PATH,
@@ -48,7 +49,21 @@ const webpackConfig = {
   devtool: 'eval',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
-    new HtmlWebpackPlugin({title: 'Graylog', favicon: 'public/images/favicon.png', template: 'templates/index.html.template'}),
+    new HtmlWebpackPlugin({
+      title: 'Graylog',
+      favicon: 'public/images/favicon.png',
+      template: 'templates/index.html.template',
+      chunksSortMode: (c1, c2) => {
+        // Render the polyfill chunk first
+        if (c1.names[0] === 'polyfill') {
+          return -1;
+        }
+        if (c2.names[0] === 'polyfill') {
+          return 1;
+        }
+        return c2.id - c1.id;
+      },
+    }),
     new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template', excludeChunks: ['config']}),
   ],
 };
@@ -56,7 +71,7 @@ const webpackConfig = {
 const commonConfigs = {
   module: {
     loaders: [
-      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache/ },
+      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
     ],
   },
 };

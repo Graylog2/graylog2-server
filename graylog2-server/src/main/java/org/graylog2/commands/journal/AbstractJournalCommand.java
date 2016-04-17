@@ -44,15 +44,6 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
     }
 
     @Override
-    protected boolean validateConfiguration() {
-        if (kafkaJournalConfiguration.getMessageJournalDir() == null) {
-            log.error("No message journal path set. Please define \"message_journal_dir\" in your graylog.conf.");
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     protected List<Module> getCommandBindings() {
         return Arrays.<Module>asList(new SchedulerBindings(),
                                      new KafkaJournalModule());

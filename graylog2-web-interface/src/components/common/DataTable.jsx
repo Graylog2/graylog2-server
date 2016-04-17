@@ -1,15 +1,6 @@
 import React from 'react';
+import DataTableElement from './DataTableElement';
 import { TypeAheadDataFilter } from 'components/common';
-
-const DataTableElement = React.createClass({
-  propTypes: {
-    element: React.PropTypes.any,
-    formatter: React.PropTypes.func.isRequired,
-  },
-  render() {
-    return this.props.formatter(this.props.element);
-  },
-});
 
 const DataTable = React.createClass({
   propTypes: {
@@ -25,6 +16,7 @@ const DataTable = React.createClass({
     headerCellFormatter: React.PropTypes.func.isRequired,
     headers: React.PropTypes.array.isRequired,
     id: React.PropTypes.string,
+    noDataText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.node]),
     rows: React.PropTypes.array.isRequired,
     sortByKey: React.PropTypes.string,
   },
@@ -32,6 +24,7 @@ const DataTable = React.createClass({
     return {
       filterSuggestions: [],
       displayKey: 'value',
+      noDataText: 'No data available.',
       rowClassName: '',
     };
   },
@@ -53,25 +46,28 @@ const DataTable = React.createClass({
     let i = 0;
     const formattedHeaders = this.state.headers.map((header) => {
       i++;
-      return <DataTableElement key={'header-' + i} element={header} formatter={this.props.headerCellFormatter}/>;
+      return <DataTableElement key={`header-${i}`} element={header} formatter={this.props.headerCellFormatter} />;
     });
 
     return <tr>{formattedHeaders}</tr>;
   },
   getFormattedDataRows() {
     let i = 0;
-    const sortedDataRows = this.state.filteredRows.sort((a, b) => {
-      return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
-    });
+    let sortedDataRows = this.state.filteredRows;
+    if (this.props.sortByKey) {
+      sortedDataRows = sortedDataRows.sort((a, b) => {
+        return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+      });
+    }
     const formattedDataRows = sortedDataRows.map((row) => {
       i++;
-      return <DataTableElement key={'row-' + i} element={row} formatter={this.props.dataRowFormatter}/>;
+      return <DataTableElement key={`row-${i}`} element={row} formatter={this.props.dataRowFormatter} />;
     });
 
     return formattedDataRows;
   },
   filterDataRows(filteredRows) {
-    this.setState({filteredRows: filteredRows});
+    this.setState({ filteredRows });
   },
   render() {
     let filter;
@@ -85,7 +81,7 @@ const DataTable = React.createClass({
                                  filterBy={this.props.filterBy}
                                  filterSuggestions={this.props.filterSuggestions}
                                  searchInKeys={this.props.filterKeys}
-                                 onDataFiltered={this.filterDataRows}/>
+                                 onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
             {this.props.children}
@@ -96,12 +92,12 @@ const DataTable = React.createClass({
 
     let data;
     if (this.state.rows.length === 0) {
-      data = <p>No data available.</p>;
+      data = <p>{this.props.noDataText}</p>;
     } else if (this.state.filteredRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={'table ' + this.props.className}>
+        <table className={`table ${this.props.className}`}>
           <thead>
           {this.getFormattedHeaders()}
           </thead>

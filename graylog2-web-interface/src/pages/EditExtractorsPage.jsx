@@ -9,11 +9,14 @@ import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
-import InputsActions from 'actions/inputs/InputsActions';
-import InputsStore from 'stores/inputs/InputsStore';
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
-import UniversalSearchstore from 'stores/search/UniversalSearchStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const InputsActions = ActionsProvider.getActions('Inputs');
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
+const InputsStore = StoreProvider.getStore('Inputs');
+const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 
 const EditExtractorsPage = React.createClass({
   propTypes: {

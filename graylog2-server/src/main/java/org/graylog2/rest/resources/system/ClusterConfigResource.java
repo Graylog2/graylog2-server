@@ -20,14 +20,15 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotBlank;
@@ -58,10 +59,12 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
+    private final ChainingClassLoader chainingClassLoader;
 
     @Inject
-    public ClusterConfigResource(ClusterConfigService clusterConfigService) {
+    public ClusterConfigResource(ClusterConfigService clusterConfigService, ChainingClassLoader chainingClassLoader) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
+        this.chainingClassLoader = chainingClassLoader;
     }
 
     @GET
@@ -151,7 +154,7 @@ public class ClusterConfigResource extends RestResource {
     @Nullable
     private Class<?> classFromName(String className) {
         try {
-            return Class.forName(className);
+            return chainingClassLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
             return null;
         }

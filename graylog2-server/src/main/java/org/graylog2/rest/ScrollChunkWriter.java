@@ -19,7 +19,6 @@ package org.graylog2.rest;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
-import org.graylog2.shared.rest.AdditionalMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +37,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Provider
-@Produces(AdditionalMediaType.TEXT_CSV)
+@Produces(MoreMediaTypes.TEXT_CSV)
 public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollChunk> {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollChunkWriter.class);
 
-    public static final MediaType TEXT_CSV = new MediaType("text", "csv");
-
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ScrollResult.ScrollChunk.class.equals(type) && TEXT_CSV.isCompatible(mediaType);
+        return ScrollResult.ScrollChunk.class.equals(type) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
 
     }
 

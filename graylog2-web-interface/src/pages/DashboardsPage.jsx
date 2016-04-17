@@ -1,7 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 import DashboardListPage from 'components/dashboard/DashboardListPage';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const DashboardsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],

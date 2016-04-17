@@ -1,7 +1,5 @@
 import React from 'react';
-
 import numeral from 'numeral';
-import style from '!style!css!../IndicesConfiguration.css';
 
 const SizeBasedRotationStrategySummary = React.createClass({
   propTypes: {
@@ -11,7 +9,7 @@ const SizeBasedRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className={style.deflist}>
+        <dl className="deflist">
           <dt>Index rotation strategy:</dt>
           <dd>Index Size</dd>
           <dt>Max index size:</dt>

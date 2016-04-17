@@ -21,11 +21,13 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 public interface UserService extends PersistedService {
+    @Nullable
     User load(String username);
 
     int delete(String username);
@@ -34,6 +36,7 @@ public interface UserService extends PersistedService {
 
     List<User> loadAll();
 
+    @Nullable
     User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username);
 
     void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
@@ -47,6 +50,8 @@ public interface UserService extends PersistedService {
     Set<String> getRoleNames(User user);
 
     List<String> getPermissionsForUser(User user);
+
+    Set<String> getUserPermissionsFromRoles(User user);
 
     void dissociateAllUsersFromRole(Role role);
 }

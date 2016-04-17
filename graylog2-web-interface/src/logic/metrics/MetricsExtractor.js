@@ -14,7 +14,13 @@ const MetricsExtractor = {
       const metricFullName = metricNames[metricShortName];
       const metricObject = nodeMetrics[metricFullName];
       if (metricObject) {
-        metrics[metricShortName] = metricObject.metric.value;
+        if (metricObject.type === 'gauge') {
+          metrics[metricShortName] = metricObject.metric.value;
+        } else if (metricObject.type === 'counter') {
+          metrics[metricShortName] = metricObject.metric.count;
+        } else {
+          metrics[metricShortName] = null;
+        }
       }
     });
 

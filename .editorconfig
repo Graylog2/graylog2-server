@@ -1,0 +1,17 @@
+# EditorConfig helps developers to maintain consistent coding styles between different editors and IDEs. 
+# For more information about the properties used in this file, please see http://editorconfig.org/.
+
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+insert_final_newline = true
+
+[*.java]
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{js,jsx}]
+indent_size = 2
+trim_trailing_whitespace = true

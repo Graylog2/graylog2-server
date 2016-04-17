@@ -16,7 +16,6 @@
  */
 package org.graylog2.system.debug;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
@@ -30,8 +29,8 @@ public class ClusterDebugEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterDebugEventListener.class);
 
     @Inject
-    public ClusterDebugEventListener(@ClusterEventBus EventBus clusterEventBus) {
-        checkNotNull(clusterEventBus).register(this);
+    public ClusterDebugEventListener(ClusterEventBus clusterEventBus) {
+        checkNotNull(clusterEventBus).registerClusterEventSubscriber(this);
     }
 
     @Subscribe

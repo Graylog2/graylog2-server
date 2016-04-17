@@ -16,6 +16,7 @@
  */
 package org.graylog2.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -32,6 +33,8 @@ import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.WebInterfaceModule;
+import org.graylog2.bindings.WidgetStrategyBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
@@ -39,6 +42,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
+import org.graylog2.dashboards.DashboardBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.messageprocessors.MessageProcessorModule;
@@ -50,7 +54,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
-import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -75,50 +78,44 @@ public class Server extends ServerBootstrap {
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
-    private final ChainingClassLoader classLoader = new ChainingClassLoader(Server.class.getClassLoader());
 
     public Server() {
         super("server", configuration);
     }
 
-    @Option(name = {"-t", "--configtest"}, description = "Validate Graylog configuration and exit")
-    private boolean configTest = false;
-
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
-
-    @Option(name = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
-    private boolean noRetention = false;
-
-    public boolean isConfigTest() {
-        return configTest;
-    }
 
     public boolean isLocal() {
         return local;
     }
 
-    public boolean performRetention() {
-        return !noRetention;
-    }
-
     @Override
     protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(
-                new ServerBindings(configuration),
-                new PersistenceServicesBindings(),
-                new MessageFilterBindings(),
-                new MessageProcessorModule(),
-                new AlarmCallbackBindings(),
-                new InitializerBindings(),
-                new MessageOutputBindings(configuration),
-                new RotationStrategyBindings(),
-                new RetentionStrategyBindings(),
-                new PeriodicalBindings(),
-                new ObjectMapperModule(classLoader),
-                new RestApiBindings(),
-                new PasswordAlgorithmBindings()
+        final ImmutableList.Builder<Module> modules = ImmutableList.builder();
+        modules.add(
+            new ServerBindings(configuration),
+            new PersistenceServicesBindings(),
+            new MessageFilterBindings(),
+            new MessageProcessorModule(),
+            new AlarmCallbackBindings(),
+            new InitializerBindings(),
+            new MessageOutputBindings(configuration, chainingClassLoader),
+            new RotationStrategyBindings(),
+            new RetentionStrategyBindings(),
+            new PeriodicalBindings(),
+            new ObjectMapperModule(chainingClassLoader),
+            new RestApiBindings(),
+            new PasswordAlgorithmBindings(),
+            new WidgetStrategyBindings(),
+            new DashboardBindings()
         );
+
+        if (configuration.isWebEnable()) {
+            modules.add(new WebInterfaceModule());
+        }
+
+        return modules.build();
     }
 
     @Override
@@ -168,16 +165,6 @@ public class Server extends ServerBootstrap {
                 LOG.warn("Stale master has gone. Starting as master.");
             }
         }
-    }
-
-    @Override
-    protected boolean validateConfiguration() {
-        if (configuration.getPasswordSecret().isEmpty()) {
-            LOG.error("No password secret set. Please define \"password_secret\" in your Graylog configuration.");
-            return false;
-        }
-
-        return true;
     }
 
     private static class ShutdownHook implements Runnable {

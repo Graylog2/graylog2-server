@@ -138,6 +138,10 @@ public class PluginLoader {
             return plugin.modules();
         }
 
+        public String getPluginClassName() {
+            return plugin.getClass().getCanonicalName();
+        }
+
         @Override
         public int hashCode() {
             return Objects.hash(plugin.metadata().getUniqueId());

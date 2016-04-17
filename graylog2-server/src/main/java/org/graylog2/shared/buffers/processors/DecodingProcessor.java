@@ -194,6 +194,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                     message.addField("gl2_source_input", node.inputId);
                     message.addField("gl2_source_node", node.nodeId);
                     break;
+                // TODO Due to be removed in Graylog 3.x
                 case RADIO:
                     // Always use the last source node.
                     if (message.getField("gl2_source_radio_input") != null) {

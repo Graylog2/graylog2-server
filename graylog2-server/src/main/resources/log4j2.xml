@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration packages="org.graylog2.log4j">
+<Configuration packages="org.graylog2.log4j" shutdownHook="disable">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %-5p: %c - %m%n"/>
@@ -25,6 +25,8 @@
         <!-- Silence Kafka log chatter -->
         <Logger name="kafka.log.Log" level="warn"/>
         <Logger name="kafka.log.OffsetIndex" level="warn"/>
+        <!-- Silence useless session validation messages -->
+        <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
         <Root level="warn">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>

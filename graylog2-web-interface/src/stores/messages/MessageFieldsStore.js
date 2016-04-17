@@ -3,7 +3,7 @@ import md5 from 'md5';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 const MessageFieldsStore = Reflux.createStore({
@@ -17,7 +17,7 @@ const MessageFieldsStore = Reflux.createStore({
     return {fields: this.fields};
   },
   list() {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.MessageFieldsApiController.list().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.MessageFieldsApiController.list().url);
     const promise = fetch('GET', url).then((response) => {
       const result = response.fields.map((field) => {
         return {

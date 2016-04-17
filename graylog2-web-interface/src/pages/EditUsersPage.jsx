@@ -1,8 +1,9 @@
-import React, {PropTypes} from 'react';
-import {Button} from 'react-bootstrap';
+import React from 'react';
+import { Button } from 'react-bootstrap';
 
-import UsersStore from 'stores/users/UsersStore';
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const UsersStore = StoreProvider.getStore('Users');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 import PageHeader from 'components/common/PageHeader';
 import Spinner from 'components/common/Spinner';
@@ -12,7 +13,7 @@ import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const EditUsersPage = React.createClass({
   propTypes: {
-    username: PropTypes.string.isRequired,
+    params: React.PropTypes.object.isRequired,
   },
   getInitialState() {
     return {
@@ -20,16 +21,24 @@ const EditUsersPage = React.createClass({
     };
   },
   componentDidMount() {
-    this._loadUser();
+    this._loadUser(this.props.params.username);
   },
-  _loadUser() {
-    UsersStore.load(this.props.params.username).then((user) => {
-      this.setState({user: user});
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.username !== nextProps.params.username) {
+      this._loadUser(nextProps.params.username);
+    }
+  },
+
+  _loadUser(username) {
+    UsersStore.load(username).then((user) => {
+      this.setState({ user: user });
     });
   },
   _resetStartpage() {
-    if (window.confirm('Are you sure you want to reset your current start page?')) {
-      StartpageStore.set(this.props.params.username).then(() => this._loadUser());
+    if (window.confirm('Are you sure you want to reset the start page?')) {
+      const username = this.props.params.username;
+      StartpageStore.set(username).then(() => this._loadUser(username));
     }
   },
   render() {
@@ -45,13 +54,14 @@ const EditUsersPage = React.createClass({
 
     const userPreferencesButton = !user.read_only ?
       <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
-        <UserPreferencesButton userName={user.username}/>
+        <UserPreferencesButton userName={user.username} />
       </span>
       : null;
 
     return (
       <span>
-        <PageHeader title={'Edit user »' + this.props.params.username + '«'} titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
+        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>} titleSize={8} buttonSize={4}
+                    buttonStyle={{ textAlign: 'right', marginTop: 10 }}>
           <span>You can either change the details of a user here or set a new password.</span>
           {null}
           <div>

@@ -1,28 +1,29 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import InputsActions from 'actions/inputs/InputsActions';
-import InputsStore from 'stores/inputs/InputsStore';
-import MessageFieldsStore from 'stores/messages/MessageFieldsStore';
-import NodesStore from 'stores/nodes/NodesStore';
-import RefreshStore from 'stores/tools/RefreshStore';
-import StreamsStore from 'stores/streams/StreamsStore';
-import UniversalSearchStore from 'stores/search/UniversalSearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const NodesStore = StoreProvider.getStore('Nodes');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const InputsStore = StoreProvider.getStore('Inputs');
+const MessageFieldsStore = StoreProvider.getStore('MessageFields');
+const RefreshStore = StoreProvider.getStore('Refresh');
+const StreamsStore = StoreProvider.getStore('Streams');
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
+const SearchStore = StoreProvider.getStore('Search');
 
-import SearchStore from 'stores/search/SearchStore';
-
-import NodesActions from 'actions/nodes/NodesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const NodesActions = ActionsProvider.getActions('Nodes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 import { Spinner } from 'components/common';
-import { SearchResult } from 'components/search';
+import { MalformedSearchQuery, SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
+    searchConfig: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
   },
   mixins: [
@@ -36,6 +37,7 @@ const SearchPage = React.createClass({
     return {
       selectedFields: ['message', 'source'],
       query: SearchStore.query.length > 0 ? SearchStore.query : '*',
+      error: undefined,
     };
   },
   componentDidMount() {
@@ -44,12 +46,11 @@ const SearchPage = React.createClass({
 
     StreamsStore.listStreams().then((streams) => {
       const streamsMap = {};
-      streams.forEach((stream) => streamsMap[stream.id] = stream);
-      this.setState({streams: Immutable.Map(streamsMap)});
+      streams.forEach((stream) => { streamsMap[stream.id] = stream; });
+      this.setState({ streams: Immutable.Map(streamsMap) });
     });
 
     NodesActions.list();
-    DashboardsStore.updateWritableDashboards();
   },
   componentWillUnmount() {
     this._stopTimer();
@@ -68,19 +69,28 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this.state.query;
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page).then((response) => {
-      this.setState({searchResult: response});
+    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
+      .then(
+        response => {
+          this.setState({ searchResult: response, error: undefined });
 
-      const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
+          const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-      UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
-        this.setState({histogram: histogram});
-      });
-    });
+          UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
+            this.setState({ histogram: histogram });
+          });
+        },
+        error => {
+          // Treat searches with a malformed query
+          if (error.additional && error.additional.status === 400) {
+            this.setState({ error: error.additional.body });
+          }
+        }
+      );
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
-    this.setState({inputs: Immutable.Map(inputs)});
+    this.setState({ inputs: Immutable.Map(inputs) });
   },
   _determineHistogramResolution(response) {
     let queryRangeInMinutes;
@@ -133,25 +143,34 @@ const SearchPage = React.createClass({
 
   _onToggled(fieldName) {
     if (this.state.selectedFields.indexOf(fieldName) > 0) {
-      this.setState({selectedFields: this.state.selectedFields.filter((field) => field !== fieldName)});
+      this.setState({ selectedFields: this.state.selectedFields.filter((field) => field !== fieldName) });
     } else {
-      this.setState({selectedFields: this.state.selectedFields.concat(fieldName)});
+      this.setState({ selectedFields: this.state.selectedFields.concat(fieldName) });
     }
   },
 
+  _isLoading() {
+    return !this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram;
+  },
+
   render() {
-    if (!this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram) {
+    if (this.state.error) {
+      return <MalformedSearchQuery error={this.state.error} />;
+    }
+
+    if (this._isLoading()) {
       return <Spinner />;
     }
+
     const searchResult = this.state.searchResult;
     searchResult.all_fields = this.state.fields;
-    const selectedFields = this.sortFields(Immutable.List(this.state.selectedFields));
     return (
       <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
                     result={searchResult} histogram={this.state.histogram}
                     formattedHistogram={this.state.histogram.histogram}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions} />
+                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
+                    searchConfig={this.props.searchConfig} />
     );
   },
 });

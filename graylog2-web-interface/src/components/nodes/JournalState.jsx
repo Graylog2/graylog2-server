@@ -6,9 +6,11 @@ import { Pluralize, Spinner } from 'components/common';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
 
-import MetricsActions from 'actions/metrics/MetricsActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const JournalState = React.createClass({
   propTypes: {
@@ -20,7 +22,7 @@ const JournalState = React.createClass({
       append: 'org.graylog2.journal.append.1-sec-rate',
       read: 'org.graylog2.journal.read.1-sec-rate',
       segments: 'org.graylog2.journal.segments',
-      entriesUncommited: 'org.graylog2.journal.entries-uncommitted',
+      entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
     };
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },

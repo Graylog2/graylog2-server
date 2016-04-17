@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.shared.system.activities.Activity;
@@ -34,10 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -53,6 +54,8 @@ public class Deflector { // extends Ablenkblech
 
     public static final String DEFLECTOR_SUFFIX = "deflector";
     public static final String SEPARATOR = "_";
+    // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
+    public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
 
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
@@ -61,23 +64,27 @@ public class Deflector { // extends Ablenkblech
     private final String deflectorName;
     private final Indices indices;
     private final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
+    private final Pattern deflectorIndexPattern;
+    private final Pattern indexPattern;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
-                     final ElasticsearchConfiguration configuration,
+                     @Named("elasticsearch_index_prefix") final String indexPrefix,
                      final ActivityWriter activityWriter,
                      final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices) {
-        this.indexPrefix = configuration.getIndexPrefix();
+        this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
-        this.deflectorName = buildName(configuration.getIndexPrefix());
+        this.deflectorName = buildName(indexPrefix);
         this.indices = indices;
+        this.deflectorIndexPattern = Pattern.compile("^" + indexPrefix + SEPARATOR + "\\d+");
+        this.indexPattern = Pattern.compile("^" + indexPrefix + SEPARATOR + "\\d+(?:"+ RESTORED_ARCHIVE_SUFFIX +")?");
     }
 
     public boolean isUp() {
@@ -182,7 +189,7 @@ public class Deflector { // extends Ablenkblech
 
         final List<Integer> indexNumbers = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
-            if (!isGraylog2Index(indexName)) {
+            if (!isGraylogDeflectorIndex(indexName)) {
                 continue;
             }
 
@@ -204,7 +211,7 @@ public class Deflector { // extends Ablenkblech
         final Map<String, IndexStats> indices = this.indices.getAll();
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
-            if (isGraylog2Index(indexName)) {
+            if (isGraylogIndex(indexName)) {
                 result.add(indexName);
             }
         }
@@ -217,7 +224,7 @@ public class Deflector { // extends Ablenkblech
         for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
             final String name = e.getKey();
 
-            if (isGraylog2Index(name)) {
+            if (isGraylogIndex(name)) {
                 result.put(name, e.getValue());
             }
         }
@@ -282,7 +289,11 @@ public class Deflector { // extends Ablenkblech
         return getName().equals(indexName);
     }
 
-    public boolean isGraylog2Index(final String indexName) {
-        return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
+    public boolean isGraylogDeflectorIndex(final String indexName) {
+        return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && deflectorIndexPattern.matcher(indexName).matches();
+    }
+
+    public boolean isGraylogIndex(final String indexName) {
+        return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexPattern.matcher(indexName).matches();
     }
 }

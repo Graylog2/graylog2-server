@@ -2,8 +2,8 @@ import React from 'react';
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { IndexRoute, Router, Route } from 'react-router';
-import { createHistory } from 'history';
+import { IndexRoute, Redirect, Router, Route } from 'react-router';
+import history from 'util/History';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
@@ -26,7 +26,6 @@ import CreateExtractorsPage from 'pages/CreateExtractorsPage';
 import EditExtractorsPage from 'pages/EditExtractorsPage';
 import ImportExtractorsPage from 'pages/ImportExtractorsPage';
 import ExportExtractorsPage from 'pages/ExportExtractorsPage';
-import CollectorsPage from 'pages/CollectorsPage';
 import SystemOutputsPage from 'pages/SystemOutputsPage';
 import RolesPage from 'pages/RolesPage';
 import ContentPacksPage from 'pages/ContentPacksPage';
@@ -46,6 +45,7 @@ import NodesPage from 'pages/NodesPage';
 import ThreadDumpPage from 'pages/ThreadDumpPage';
 import LdapPage from 'pages/LdapPage';
 import LdapGroupsPage from 'pages/LdapGroupsPage';
+import ConfigurationsPage from 'pages/ConfigurationsPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -53,7 +53,7 @@ const AppRouter = React.createClass({
       return <Route key={pluginRoute.component.displayName} path={pluginRoute.path} component={pluginRoute.component} />;
     });
     return (
-      <Router history={createHistory()}>
+      <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
@@ -61,6 +61,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage}/>
             <Route path={Routes.SOURCES} component={SourcesPage}/>
             <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage}/>
+            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
           </Route>
           <Route component={AppWithoutSearchBar}>
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage}/>
@@ -78,7 +79,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.edit_extractor(':nodeId', ':inputId', ':extractorId')} component={EditExtractorsPage}/>
             <Route path={Routes.import_extractors(':nodeId', ':inputId')} component={ImportExtractorsPage}/>
             <Route path={Routes.export_extractors(':nodeId', ':inputId')} component={ExportExtractorsPage}/>
-            <Route path={Routes.SYSTEM.COLLECTORS} component={CollectorsPage}/>
+            <Route path={Routes.SYSTEM.CONFIGURATIONS} component={ConfigurationsPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.LIST} component={ContentPacksPage}/>
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>

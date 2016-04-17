@@ -1,10 +1,6 @@
 import React from 'react';
-import Reflux from 'reflux';
 import jQuery from 'jquery';
 
-import NodesStore from 'stores/nodes/NodesStore';
-
-import { Spinner } from 'components/common';
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
 
@@ -16,7 +12,6 @@ const InputForm = React.createClass({
     submitAction: React.PropTypes.func.isRequired,
     values: React.PropTypes.object,
   },
-  mixins: [Reflux.connect(NodesStore)],
   getInitialState() {
     return {
       global: this.props.globalValue !== undefined ? this.props.globalValue : false,
@@ -36,9 +31,6 @@ const InputForm = React.createClass({
     this.refs.configurationForm.open();
   },
   render() {
-    if (!this.state.nodes) {
-      return <Spinner />;
-    }
     const values = this.props.values ? this.props.values :
       (this.refs.configurationForm ? this.refs.configurationForm.getValue().configuration : {});
     const titleValue = this.props.titleValue ? this.props.titleValue :

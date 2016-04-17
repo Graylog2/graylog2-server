@@ -358,6 +358,14 @@ a.fields-set-chooser {
   right: 4px;
 }
 
+.search-result-fields .dropdown .caret {
+  display: none;
+}
+
+.search-result-fields button.dropdown-toggle {
+  padding: 0;
+}
+
 .message-terms {
   margin-right: 8px;
   font-family: monospace;
@@ -1538,8 +1546,8 @@ table .dc-table-column {
 }
 
 .parse-error {
-  background-color: #b94a48;
-  color: #fff;
+  background-color: #f2dede;
+  color: #a94442;
   padding-left: 2px;
   padding-right: 2px;
 }
@@ -1959,7 +1967,7 @@ form.extractor-form .control-group label {
   line-height: inherit !important;
 }
 
-table th.actions {
+table th.actions, table td.actions {
   width: 110px;
 }
 
@@ -2061,8 +2069,9 @@ ul.entity-list {
       margin: 5px 0;
     }
 
-    .item-actions > .btn, .item-actions > .btn-group {
+    .item-actions > .btn, .item-actions > .btn-group, .item-actions > span > .btn {
       margin-left: 5px;
+      margin-bottom: 5px;
     }
   }
 
@@ -2151,6 +2160,10 @@ table.messages tbody.message-group {
 
 table.messages tbody.message-group-toggled {
   border-left: 5px solid #16ace3;
+}
+
+table.messages tbody.message-highlight {
+  border-left: 5px solid #8dc63f;
 }
 
 table.messages tr.fields-row {
@@ -2447,6 +2460,12 @@ dl.system-system, dl.system-rest {
   vertical-align: baseline;
 }
 
+.filter .form-inline .form-group {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
 .no-alarm-callbacks {
   margin-top: 10px;
 }
@@ -2472,20 +2491,6 @@ div.alert-callbacks {
 
 .triggered-alerts .page-size {
   margin-top: -23px; // Height of the header
-}
-
-.collector-os {
-  margin-right: 5px;
-  margin-left: 2px;
-}
-
-form.collectors-filter-form {
-  margin-top: 5px;
-}
-
-table.collectors-list {
-  margin-top: 15px;
-  margin-bottom: 0px;
 }
 
 // Ensure that the stream start/pause buttons have the same size.

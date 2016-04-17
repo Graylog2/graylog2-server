@@ -2,18 +2,17 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
-import { LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
-import FieldGraphs from 'components/field-analyzers/FieldGraphs';
-import FieldQuickValues from 'components/field-analyzers/FieldQuickValues';
-import FieldStatistics from 'components/field-analyzers/FieldStatistics';
+import { AddSearchCountToDashboard, LegacyHistogram, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
 
-import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 import DocsHelper from 'util/DocsHelper';
+
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import {} from 'components/field-analyzers'; // Make sure to load all field analyzer plugins!
 
 const SearchResult = React.createClass({
   propTypes: {
@@ -27,6 +26,7 @@ const SearchResult = React.createClass({
     inputs: PropTypes.instanceOf(Immutable.Map),
     nodes: PropTypes.instanceOf(Immutable.Map),
     permissions: PropTypes.array.isRequired,
+    searchConfig: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -50,10 +50,6 @@ const SearchResult = React.createClass({
       showAllFields: false,
       shouldHighlight: true,
     };
-  },
-
-  componentDidMount() {
-    DashboardsStore.updateWritableDashboards();
   },
 
   onFieldToggled(fieldName) {
@@ -102,18 +98,43 @@ const SearchResult = React.createClass({
     return sortedFields.concat(remainingFieldsSorted);
   },
 
-  addFieldGraph(field) {
-    this.refs.fieldGraphsComponent.addFieldGraph(field);
-  },
-  addFieldQuickValues(field) {
-    this.refs.fieldQuickValuesComponent.addFieldQuickValues(field);
-  },
-  addFieldStatistics(field) {
-    this.refs.fieldStatisticsComponent.addFieldStatistics(field);
+  addFieldAnalyzer(ref, field) {
+    this.refs[ref].addField(field);
   },
   _showQueryModal(event) {
     event.preventDefault();
     this.refs.showQueryModal.open();
+  },
+
+  _fieldAnalyzers(filter) {
+    return PluginStore.exports('fieldAnalyzers')
+      .filter(analyzer => filter !== undefined ? filter(analyzer) : true);
+  },
+
+  _fieldAnalyzerComponents(filter) {
+    return this._fieldAnalyzers(filter)
+      .map((analyzer, idx) => {
+        return React.createElement(analyzer.component, {
+          key: idx,
+          ref: analyzer.refId,
+          permissions: this.props.permissions,
+          query: SearchStore.query,
+          page: SearchStore.page,
+          rangeType: SearchStore.rangeType,
+          rangeParams: SearchStore.rangeParams.toJS(),
+          stream: this.props.searchInStream,
+          resolution: this.props.histogram.interval,
+          from: this.props.histogram.histogram_boundaries.from,
+          to: this.props.histogram.histogram_boundaries.to,
+        });
+      });
+  },
+
+  _shouldRenderAboveHistogram(analyzer) {
+    return analyzer.displayPriority > 0;
+  },
+  _shouldRenderBelowHistogram(analyzer) {
+    return analyzer.displayPriority <= 0;
   },
 
   render() {
@@ -131,10 +152,7 @@ const SearchResult = React.createClass({
             <Col md={12}>
               <h1>
                 <span className="pull-right">
-                  <AddToDashboardMenu title="Add count to dashboard"
-                                      pullRight
-                                      widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                      permissions={this.props.permissions}/>
+                  <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
                 </span>
                 <span>Nothing found {streamDescription}</span>
               </h1>
@@ -160,7 +178,7 @@ const SearchResult = React.createClass({
                   <li><i className="fa fa-group" /> <a href="https://www.graylog.org/community-support/"
                                                          target="_blank">Community support</a></li>
                   <li><i className="fa fa-github-alt" /> <a
-                    href="https://github.com/Graylog2/graylog2-web-interface/issues" target="_blank">Issue tracker</a>
+                    href="https://github.com/Graylog2/graylog2-server/issues" target="_blank">Issue tracker</a>
                   </li>
                   <li><i className="fa fa-heart" /> <a href="https://www.graylog.org/professional-support" target="_blank">
                     Professional support
@@ -179,12 +197,11 @@ const SearchResult = React.createClass({
                          builtQuery={this.props.builtQuery}
                          selectedFields={this.state.selectedFields}
                          fields={this._fields()}
+                         fieldAnalyzers={this._fieldAnalyzers()}
                          showAllFields={this.state.showAllFields}
                          togglePageFields={this.togglePageFields}
                          onFieldToggled={this.onFieldToggled}
-                         onFieldSelectedForGraph={this.addFieldGraph}
-                         onFieldSelectedForQuickValues={this.addFieldQuickValues}
-                         onFieldSelectedForStats={this.addFieldStatistics}
+                         onFieldAnalyzer={this.addFieldAnalyzer}
                          predefinedFieldSelection={this.predefinedFieldSelection}
                          showHighlightToggle={anyHighlightRanges}
                          shouldHighlight={this.state.shouldHighlight}
@@ -195,23 +212,14 @@ const SearchResult = React.createClass({
           />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">
-          <FieldStatistics ref="fieldStatisticsComponent"
-                           permissions={this.props.permissions}/>
-
-          <FieldQuickValues ref="fieldQuickValuesComponent"
-                            permissions={this.props.permissions}/>
+          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderAboveHistogram(analyzer))}
 
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
-                           isStreamSearch={this.props.searchInStream !== null}/>
+                           stream={this.props.searchInStream}/>
 
-          <FieldGraphs ref="fieldGraphsComponent"
-                       resolution={this.props.histogram.interval}
-                       from={this.props.histogram.histogram_boundaries.from}
-                       to={this.props.histogram.histogram_boundaries.to}
-                       permissions={this.props.permissions}
-                       searchInStream={this.props.searchInStream}/>
+          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderBelowHistogram(analyzer))}
 
           <ResultTable messages={this.props.result.messages}
                        page={SearchStore.page}
@@ -223,6 +231,7 @@ const SearchResult = React.createClass({
                        streams={this.props.streams}
                        nodes={this.props.nodes}
                        highlight={this.state.shouldHighlight}
+                       searchConfig={this.props.searchConfig}
           />
 
         </Col>

@@ -1,5 +1,6 @@
 import Rickshaw from 'rickshaw';
 import DateTime from 'logic/datetimes/DateTime';
+import AlertsAnnotator from 'logic/alerts/AlertsAnnotator';
 import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
 import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
 import numeral from 'numeral';
@@ -9,6 +10,7 @@ const resultHistogram = {
     _histogramContainer: $("#result-graph"),
     _yAxis: $("#y_axis"),
     _graphTimeline: $("#result-graph-timeline"),
+    _annotator: undefined,
     _resultHistogramGraph: undefined,
 
     _getHistogramContainerWidth: function() {
@@ -22,8 +24,9 @@ const resultHistogram = {
         this._graphTimeline = $("#result-graph-timeline", elem);
     },
 
-    setData: function(data) {
+    setData: function(data, stream) {
         this._histogram = data;
+        this._stream = stream;
     },
 
     drawResultGraph: function() {
@@ -89,12 +92,12 @@ const resultHistogram = {
             graph: resultGraph
         });
 
-        var annotator = new Rickshaw.Graph.Annotate({
+        this._annotator = new Rickshaw.Graph.Annotate({
             graph: resultGraph,
             element: this._graphTimeline[0]
         });
 
-        /*fillAlertAnnotator(resultGraph, annotator);*/
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, this._annotator);
 
         resultGraph.render();
 
@@ -104,10 +107,21 @@ const resultHistogram = {
     updateData: function(newData) {
         if (this._histogram.length > 0) {
             if (typeof this._resultHistogramGraph !== 'undefined') {
+                this._histogram = newData;
                 this._resultHistogramGraph.series[0].data = newData;
+                this._resetAlertAnnotator();
                 this._resultHistogramGraph.update();
             }
         }
+    },
+
+    // I'm really sorry about this, but I can't figure out a better way of refreshing the annotator without flickering
+    _resetAlertAnnotator() {
+        const $oldAnnotations = $('.content', this._graphTimeline);
+
+        AlertsAnnotator.fillAlertAnnotator(this._histogram, this._stream, this._annotator, () => {
+            $oldAnnotations.remove();
+        });
     },
 
     redrawResultGraph: function() {

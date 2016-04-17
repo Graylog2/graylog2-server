@@ -29,9 +29,6 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FixDeflectorByMoveJob extends SystemJob {
     public interface Factory {
         FixDeflectorByMoveJob create();
@@ -47,7 +44,6 @@ public class FixDeflectorByMoveJob extends SystemJob {
     private final Buffers bufferSynchronizer;
     private final NotificationService notificationService;
 
-    private boolean cancelRequested = false;
     private int progress = 0;
 
     @AssistedInject
@@ -136,7 +132,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void requestCancel() {
-        this.cancelRequested = true;
+        // Cannot be canceled.
     }
 
     @Override
@@ -156,7 +152,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public boolean isCancelable() {
-        return true;
+        return false;
     }
 
     @Override

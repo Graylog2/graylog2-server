@@ -29,6 +29,7 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -75,7 +76,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
 
         // All default retention strategy settings
         final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
-        final DeletionRetentionStrategy deletionRetentionStrategy = clusterConfigService.get(DeletionRetentionStrategy.class);
+        final DeletionRetentionStrategyConfig deletionRetentionStrategyConfig = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
 
         if (closingRetentionStrategyConfig == null) {
             final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
@@ -83,7 +84,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", closingConfig);
         }
 
-        if (deletionRetentionStrategy == null) {
+        if (deletionRetentionStrategyConfig == null) {
             final DeletionRetentionStrategyConfig deletionConfig = DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
             clusterConfigService.write(deletionConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", deletionConfig);
@@ -126,6 +127,13 @@ public class ConfigurationManagementPeriodical extends Periodical {
                     retentionStrategyClass.getCanonicalName());
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
+        }
+
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        if (searchesClusterConfig == null) {
+            final SearchesClusterConfig config = SearchesClusterConfig.createDefault();
+            LOG.info("Creating searches cluster config: {}", config);
+            clusterConfigService.write(config);
         }
     }
 

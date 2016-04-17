@@ -9,8 +9,9 @@ const D3Utils = require('../../util/D3Utils');
 const StringUtils = require('../../util/StringUtils');
 import NumberUtils from 'util/NumberUtils';
 
-// Need to import jQuery from node to be able to send events :grumpy:
-import jQuery from 'jquery';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap.min.js');
 
@@ -132,8 +133,8 @@ const QuickValuesVisualization = React.createClass({
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
-          const $term = $(d3.event.target).closest('button').data('term');
-          jQuery(document).trigger('add-search-term.graylog.search', {field: this.props.id, value: $term});
+          const term = $(d3.event.target).closest('button').data('term');
+          SearchStore.addSearchTerm(this.props.id, term);
         });
       });
 

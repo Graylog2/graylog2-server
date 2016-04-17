@@ -1,8 +1,9 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import OutputsStore from 'stores/outputs/OutputsStore';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StoreProvider from 'injection/StoreProvider';
+const OutputsStore = StoreProvider.getStore('Outputs');
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import UserNotification from 'util/UserNotification';
 import PermissionsMixin from 'util/PermissionsMixin';

@@ -5,7 +5,10 @@ import numeral from 'numeral';
 
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
 import Routes from 'routing/Routes';
 
 const ExtractorsListItem = React.createClass({

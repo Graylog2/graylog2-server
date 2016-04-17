@@ -6,12 +6,13 @@ import { LinkContainer } from 'react-router-bootstrap';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import StartpageStore from 'stores/users/StartpageStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const StartpageStore = StoreProvider.getStore('Startpage');
 
 import Routes from 'routing/Routes';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 
 const Dashboard = React.createClass({
   propTypes: {
@@ -29,6 +30,9 @@ const Dashboard = React.createClass({
   },
   _getDashboardActions() {
     let dashboardActions;
+    const setAsStartpageMenuItem = (
+      <MenuItem onSelect={this._setStartpage} disabled={this.state.currentUser.read_only}>Set as startpage</MenuItem>
+    );
 
     if (this.isPermitted(this.props.permissions, [`dashboards:edit:${this.props.dashboard.id}`])) {
       dashboardActions = (
@@ -37,7 +41,7 @@ const Dashboard = React.createClass({
                                      description={this.props.dashboard.description} buttonClass="btn-info"/>
           &nbsp;
           <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
-            <MenuItem onSelect={this._setStartpage} disabled={this.state.currentUser.read_only}>Set as startpage</MenuItem>
+            {setAsStartpageMenuItem}
             <MenuItem divider/>
             <MenuItem onSelect={this._onDashboardDelete}>Delete this dashboard</MenuItem>
           </DropdownButton>
@@ -46,9 +50,8 @@ const Dashboard = React.createClass({
     } else {
       dashboardActions = (
         <div className="stream-actions">
-          <DropdownButton title="More actions" pullRight>
-            <MenuItem href={jsRoutes.controllers.StartpageController.set('dashboard', this.props.dashboard.id).url}>Set
-              as startpage</MenuItem>
+          <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
+            {setAsStartpageMenuItem}
           </DropdownButton>
         </div>
       );

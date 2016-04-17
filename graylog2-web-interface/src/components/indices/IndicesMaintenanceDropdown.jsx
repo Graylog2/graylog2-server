@@ -1,8 +1,12 @@
 import React from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import DeflectorActions from 'actions/indices/DeflectorActions';
-import IndexRangesActions from 'actions/indices/IndexRangesActions';
+import ActionsProvider from 'injection/ActionsProvider';
+const DeflectorActions = ActionsProvider.getActions('Deflector');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+
+import StoreProvider from 'injection/StoreProvider';
+const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-line no-unused-vars
 
 const IndicesMaintenanceDropdown = React.createClass({
   _onRecalculateIndexRange() {

@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Widget from 'components/widgets/Widget';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
-import SearchStore from 'stores/search/SearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import resultHistogram from 'legacy/result-histogram';
@@ -14,7 +15,7 @@ const LegacyHistogram = React.createClass({
   propTypes: {
     formattedHistogram: React.PropTypes.array.isRequired,
     histogram: React.PropTypes.object.isRequired,
-    isStreamSearch: React.PropTypes.bool.isRequired,
+    stream: React.PropTypes.object,
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
   getInitialState() {
@@ -25,7 +26,7 @@ const LegacyHistogram = React.createClass({
     window.addEventListener('resize', this._onResize);
   },
   componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.formattedHistogram) !== prevProps.formattedHistogram) {
+    if (JSON.stringify(this.props.formattedHistogram) !== JSON.stringify(prevProps.formattedHistogram)) {
       this._updateHistogram(this.props.formattedHistogram, prevProps.formattedHistogram);
     }
   },
@@ -33,6 +34,7 @@ const LegacyHistogram = React.createClass({
     window.removeEventListener('resize', this._onResize);
   },
 
+  WIDGET_TYPE: 'SEARCH_RESULT_CHART',
   RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
   eventThrottler: new EventHandlersThrottler(),
 
@@ -42,7 +44,7 @@ const LegacyHistogram = React.createClass({
 
   _renderHistogram(histogram) {
     resultHistogram.resetContainerElements(ReactDOM.findDOMNode(this));
-    resultHistogram.setData(histogram);
+    resultHistogram.setData(histogram, this.props.stream);
     resultHistogram.drawResultGraph();
   },
   _updateHistogram(histogram) {
@@ -92,11 +94,11 @@ const LegacyHistogram = React.createClass({
     return (<div className="content-col">
       <div className="pull-right">
         <AddToDashboardMenu title="Add to dashboard"
-                            widgetType={Widget.Type.SEARCH_RESULT_CHART}
-                            configuration={{interval: this.props.histogram.interval}}
+                            widgetType={this.WIDGET_TYPE}
+                            configuration={{ interval: this.props.histogram.interval }}
                             pullRight
                             permissions={this.props.permissions}
-                            isStreamSearch={this.props.isStreamSearch}/>
+                            isStreamSearch={this.props.stream !== null}/>
       </div>
       <h1>Histogram</h1>
 

@@ -27,6 +27,7 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
@@ -59,6 +60,7 @@ import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -84,11 +86,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
@@ -174,6 +178,13 @@ public class Indices {
 
     public Map<String, IndexStats> getAll() {
         final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).request();
+        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
+
+        return response.getIndices();
+    }
+
+    public Map<String, IndexStats> getAllDocCounts() {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).setDocs(true).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         return response.getIndices();
@@ -338,6 +349,14 @@ public class Indices {
         }
 
         return checkForReopened(metaData);
+    }
+
+    public Map<String, Boolean> areReopened(Collection<String> indices) {
+        final ClusterStateResponse clusterState = c.admin().cluster().prepareState().all().get();
+        final ImmutableOpenMap<String, IndexMetaData> indicesMetaData = clusterState.getState().getMetaData().getIndices();
+        return indices.stream().collect(
+            Collectors.toMap((index) -> index, (index) -> checkForReopened(indicesMetaData.get(index)))
+        );
     }
 
     protected Boolean checkForReopened(IndexMetaData metaData) {

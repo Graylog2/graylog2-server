@@ -25,11 +25,17 @@ const MessageTableEntry = React.createClass({
     }
     return false;
   },
-  possiblyHighlight(fieldName) {
-    const origValue = this.props.message.fields[fieldName];
-    if (origValue === undefined) {
+  possiblyHighlight(fieldName, truncate) {
+    const fullOrigValue = this.props.message.fields[fieldName];
+    if (fullOrigValue === undefined) {
       return '';
     }
+    const fullStringOrigValue = String(fullOrigValue); // Ensure the field is a string for later processing
+
+    // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
+    // It's not optimal, more like a workaround to at least being able to show the page...
+    const origValue = truncate ? fullStringOrigValue.slice(0, 2048) : fullStringOrigValue;
+
     if (this.props.highlight && this.props.message.highlight_ranges) {
       if (this.props.message.highlight_ranges.hasOwnProperty(fieldName)) {
         const chunks = [];
@@ -68,6 +74,9 @@ const MessageTableEntry = React.createClass({
     if (this.props.expanded) {
       classes += " message-group-toggled";
     }
+    if (this.props.message.id === this.props.highlightMessage) {
+      classes += ' message-highlight';
+    }
     return (
       <tbody className={classes}>
       <tr className="fields-row" onClick={this._toggleDetail}>
@@ -75,12 +84,12 @@ const MessageTableEntry = React.createClass({
           <Timestamp dateTime={this.props.message.fields.timestamp}/>
         </strong></td>
         { this.props.selectedFields.toSeq().map(selectedFieldName => <td
-          key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName)}</td>) }
+          key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName, true)}</td>) }
       </tr>
 
       {this.props.showMessageRow &&
       <tr className="message-row" onClick={this._toggleDetail}>
-        <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message')}</div></td>
+        <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message', true)}</div></td>
       </tr>
         }
       {this.props.expanded &&
@@ -89,7 +98,7 @@ const MessageTableEntry = React.createClass({
           <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
                          allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
                          nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
-                         expandAllRenderAsync={this.props.expandAllRenderAsync}/>
+                         expandAllRenderAsync={this.props.expandAllRenderAsync} searchConfig={this.props.searchConfig} />
         </td>
       </tr>
         }

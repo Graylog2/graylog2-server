@@ -18,6 +18,7 @@ package org.graylog2.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ public class PluginAssets {
     private final ObjectMapper objectMapper;
     private final List<String> jsFiles;
     private final List<String> cssFiles;
+    private final String polyfillJsFile;
 
     @Inject
     public PluginAssets(Set<Plugin> plugins,
@@ -65,6 +67,7 @@ public class PluginAssets {
             }
             jsFiles.addAll(manifest.files().jsFiles());
             cssFiles.addAll(manifest.files().cssFiles());
+            polyfillJsFile = manifest.files().chunks().get("polyfill").entry();
         } else {
             throw new IllegalStateException("Unable to find web interface assets. Maybe the web interface was not built into server?");
         }
@@ -72,6 +75,26 @@ public class PluginAssets {
 
     public List<String> jsFiles() {
         return jsFiles;
+    }
+
+    // Sort JS files in the intended load order, so templates don't need to care about it.
+    public List<String> sortedJsFiles() {
+        List<String> sortedJsFiles = jsFiles().stream()
+                .sorted((file1, file2) -> {
+                    // Polyfill JS script goes first
+                    if (file1.equals(polyfillJsFile)) {
+                        return -1;
+                    }
+
+                    if (file2.equals(polyfillJsFile)) {
+                        return 1;
+                    }
+
+                    // App JS script goes last, as plugins need to be loaded before
+                    return file2.compareTo(file1);
+                })
+                .collect(Collectors.toList());
+        return sortedJsFiles;
     }
 
     public List<String> cssFiles() {
@@ -83,7 +106,13 @@ public class PluginAssets {
     }
 
     private ModuleManifest manifestForPlugin(Plugin plugin) {
-        final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/" + manifestFilename);
+        if (!(plugin instanceof PluginLoader.PluginAdapter)) {
+            LOG.warn("Unable to read web manifest from plugin " + plugin + ": Plugin is not an instance of PluginAdapter.");
+            return null;
+        }
+
+        final String pluginClassName = ((PluginLoader.PluginAdapter) plugin).getPluginClassName();
+        final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/plugin." + pluginClassName + "." + manifestFilename);
         if (manifestStream != null) {
             try {
                 final ModuleManifest manifest = objectMapper.readValue(manifestStream, ModuleManifest.class);

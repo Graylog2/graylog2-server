@@ -19,16 +19,16 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJob;
@@ -44,6 +44,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -120,7 +121,6 @@ public class SystemJobResource extends RestResource {
 
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
-            LOG.error("No system job with ID <{}> found.", jobId);
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
 
@@ -170,5 +170,35 @@ public class SystemJobResource extends RestResource {
         return Response.accepted().build();
     }
 
-    // TODO: DELETE: attempt to stop/cancel job
+    @DELETE
+    @Timed
+    @Path("/{jobId}")
+    @ApiOperation(value = "Cancel running job")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+        SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
+        if (systemJob == null) {
+            throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        }
+
+        checkPermission(RestPermissions.SYSTEMJOBS_DELETE, systemJob.getClassName());
+
+        if (systemJob.isCancelable()) {
+            systemJob.requestCancel();
+        } else {
+            throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
+        }
+
+        return SystemJobSummary.create(
+                UUID.fromString(systemJob.getId()),
+                systemJob.getDescription(),
+                systemJob.getClassName(),
+                systemJob.getInfo(),
+                nodeId.toString(),
+                systemJob.getStartedAt(),
+                systemJob.getProgress(),
+                systemJob.isCancelable(),
+                systemJob.providesProgress()
+        );
+    }
 }

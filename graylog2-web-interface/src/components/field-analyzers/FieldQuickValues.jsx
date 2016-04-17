@@ -5,16 +5,16 @@ import Reflux from 'reflux';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Widget from 'components/widgets/Widget';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 
-import FieldQuickValuesStore from 'stores/field-analyzers/FieldQuickValuesStore';
-import RefreshStore from 'stores/tools/RefreshStore';
+import StoreProvider from 'injection/StoreProvider';
+const FieldQuickValuesStore = StoreProvider.getStore('FieldQuickValues');
+const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldQuickValues = React.createClass({
   propTypes: {
-    permissions: PropTypes.arrayOf(React.PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {
@@ -36,6 +36,9 @@ const FieldQuickValues = React.createClass({
   componentWillUnmount() {
     this._stopTimer();
   },
+
+  WIDGET_TYPE: 'QUICKVALUES',
+
   _setupTimer(refresh) {
     this._stopTimer();
     if (refresh.enabled) {
@@ -47,7 +50,7 @@ const FieldQuickValues = React.createClass({
       clearInterval(this.timer);
     }
   },
-  addFieldQuickValues(field) {
+  addField(field) {
     this.setState({field: field}, () => this._loadQuickValuesData(false));
   },
   _loadQuickValuesData() {
@@ -82,7 +85,7 @@ const FieldQuickValues = React.createClass({
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
-                                widgetType={Widget.Type.QUICKVALUES}
+                                widgetType={this.WIDGET_TYPE}
                                 configuration={{field: this.state.field}}
                                 bsStyle="default"
                                 pullRight

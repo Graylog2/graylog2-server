@@ -1,7 +1,8 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import PermissionsMixin from 'util/PermissionsMixin';
 

@@ -53,15 +53,23 @@ Some settings, which have been deprecated in previous versions, have finally bee
 
 .Removed configuration settings
 |===
-| Setting name              | Replacement
+| Setting name                          | Replacement
 
-| `mongodb_host`            | `mongodb_uri`
-| `mongodb_port`            | `mongodb_uri`
-| `mongodb_database`        | `mongodb_uri`
-| `mongodb_useauth`         | `mongodb_uri`
-| `mongodb_user`            | `mongodb_uri`
-| `mongodb_password`        | `mongodb_uri`
-| `elasticsearch_node_name` | `elasticsearch_node_name_prefix`
+| `mongodb_host`                        | `mongodb_uri`
+| `mongodb_port`                        | `mongodb_uri`
+| `mongodb_database`                    | `mongodb_uri`
+| `mongodb_useauth`                     | `mongodb_uri`
+| `mongodb_user`                        | `mongodb_uri`
+| `mongodb_password`                    | `mongodb_uri`
+| `elasticsearch_node_name`             | `elasticsearch_node_name_prefix`
+| `collector_expiration_threshold`      | (moved to collector plugin)
+| `collector_inactive_threshold`        | (moved to collector plugin)
+| `rotation_strategy`                   | UI in web interface (System/Indices)
+| `retention_strategy`                  | UI in web interface (System/Indices)
+| `elasticsearch_max_docs_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_size_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_time_per_index`    | UI in web interface (System/Indices)
+| `elasticsearch_max_number_of_indices` | UI in web interface (System/Indices)
 |===
 
 
@@ -93,3 +101,45 @@ For better consistency, these prefixes have been changed after the project has b
 | Environment variables | `GRAYLOG2_` | `GRAYLOG_` | `GRAYLOG_IS_MASTER`
 | System properties     | `graylog2.` | `graylog.` | `graylog.is_master`
 |===
+
+### REST API Changes
+
+The output ID key for the list of outputs in the `/streams/*` endpoints has been changed from `_id` to `id`.
+
+[source, json]
+----
+{
+  "id": "564f47c41ec8fe7d920ef561",
+  "creator_user_id": "admin",
+  "outputs": [
+    {
+      "id": "56d6f2cce45e0e52d1e4b9cb", <1>
+      "title": "GELF Output",
+      "type": "org.graylog2.outputs.GelfOutput",
+      "creator_user_id": "admin",
+      "created_at": "2016-03-02T14:03:56.686Z",
+      "configuration": {
+        "hostname": "127.0.0.1",
+        "protocol": "TCP",
+        "connect_timeout": 1000,
+        "reconnect_delay": 500,
+        "port": 12202,
+        "tcp_no_delay": false,
+        "tcp_keep_alive": false,
+        "tls_trust_cert_chain": "",
+        "tls_verification_enabled": false
+      },
+      "content_pack": null
+    }
+  ],
+  "matching_type": "AND",
+  "description": "All incoming messages",
+  "created_at": "2015-11-20T16:18:12.416Z",
+  "disabled": false,
+  "rules": [],
+  "alert_conditions": [],
+  "title": "ALL",
+  "content_pack": null
+}
+----
+<1> Changed from `_id` to `id`

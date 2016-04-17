@@ -19,15 +19,15 @@ package org.graylog2.users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.shared.users.Role;
+import org.mongojack.Id;
 
 import javax.annotation.Nullable;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-public class RoleImpl implements Role {
+public final class RoleImpl implements Role {
     @Id
     @org.mongojack.ObjectId
     @JsonProperty("id")

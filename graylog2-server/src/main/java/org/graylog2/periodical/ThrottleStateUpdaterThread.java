@@ -232,9 +232,6 @@ public class ThrottleStateUpdaterThread extends Periodical {
         // the journal needs this to provide information to rest clients
         journal.setThrottleState(throttleState);
         
-        // publish to interested parties
-        eventBus.post(throttleState);
-
         // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
         final double journalUtilizationPercentage = throttleState.journalSizeLimit > 0 ? (throttleState.journalSize * 100) / throttleState.journalSizeLimit : 0.0;
 

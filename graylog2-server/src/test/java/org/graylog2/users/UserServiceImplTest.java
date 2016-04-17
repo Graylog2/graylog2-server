@@ -17,7 +17,7 @@
 package org.graylog2.users;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -33,7 +33,12 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.security.ldap.LdapEntry;
+import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
+import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -49,6 +54,7 @@ import java.util.Map;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,7 +66,9 @@ public class UserServiceImplTest {
 
     private MongoConnection mongoConnection;
     private Configuration configuration;
+    private UserImpl.Factory userFactory;
     private UserServiceImpl userService;
+    private Permissions permissions;
     @Mock
     private RoleService roleService;
     @Mock
@@ -70,8 +78,9 @@ public class UserServiceImplTest {
     public void setUp() throws Exception {
         this.mongoConnection = mongoRule.getMongoConnection();
         this.configuration = new Configuration();
-        final UserImpl.Factory userFactory = new UserImplFactory(configuration);
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissionsResolver);
+        this.userFactory = new UserImplFactory(configuration);
+        this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissions, permissionsResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -80,6 +89,7 @@ public class UserServiceImplTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testLoad() throws Exception {
         final User user = userService.load("user1");
+        assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("user1");
         assertThat(user.getEmail()).isEqualTo("user1@example.com");
     }
@@ -150,12 +160,12 @@ public class UserServiceImplTest {
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, id, fields);
         }
 
         @Override
@@ -195,15 +205,40 @@ public class UserServiceImplTest {
 
     @Test
     public void testGetPermissionsForUser() throws Exception {
+        final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
+        final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory, permissions, permissionResolver);
+
         final UserImplFactory factory = new UserImplFactory(new Configuration());
         final UserImpl user = factory.create(new HashMap<>());
+        user.setName("user");
         final Role role = createRole("Foo");
 
-        user.setRoleIds(Sets.newHashSet(role.getId()));
-        user.setPermissions(Lists.newArrayList("hello:world"));
+        user.setRoleIds(Collections.singleton(role.getId()));
+        user.setPermissions(Collections.singletonList("hello:world"));
 
-        when(permissionsResolver.resolveStringPermission(role.getId())).thenReturn(Sets.newHashSet("foo:bar"));
+        when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
 
-        assertThat(userService.getPermissionsForUser(user)).containsOnly("foo:bar", "hello:world");
+        assertThat(userService.getPermissionsForUser(user)).containsOnly("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void testSyncFromLdapEntry() {
+        final LdapEntry userEntry = new LdapEntry();
+        final LdapSettings ldapSettings = mock(LdapSettings.class);
+        when(ldapSettings.getDisplayNameAttribute()).thenReturn("displayName");
+        when(ldapSettings.getDefaultGroupId()).thenReturn("54e3deadbeefdeadbeef0001");
+        when(ldapSettings.getAdditionalDefaultGroupIds()).thenReturn(Collections.emptySet());
+
+        final User ldapUser = userService.syncFromLdapEntry(userEntry, ldapSettings, "user");
+
+        assertThat(ldapUser).isNotNull();
+        assertThat(ldapUser.isExternalUser()).isTrue();
+        assertThat(ldapUser.getName()).isEqualTo("user");
+        assertThat(ldapUser.getEmail()).isEqualTo("user@localhost");
+        assertThat(ldapUser.getHashedPassword()).isEqualTo("User synced from LDAP.");
+        assertThat(ldapUser.getTimeZone()).isEqualTo(DateTimeZone.UTC);
+        assertThat(ldapUser.getRoleIds()).containsOnly("54e3deadbeefdeadbeef0001");
+        assertThat(ldapUser.getPermissions()).isNotEmpty();
     }
 }

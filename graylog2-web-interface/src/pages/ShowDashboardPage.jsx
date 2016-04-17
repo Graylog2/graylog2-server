@@ -1,11 +1,13 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import DashboardsStore from 'stores/dashboards/DashboardsStore';
-import FocusStore from 'stores/tools/FocusStore';
-import WidgetsStore from 'stores/widgets/WidgetsStore';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const FocusStore = StoreProvider.getStore('Focus');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
@@ -35,6 +37,9 @@ const ShowDashboardPage = React.createClass({
       clearInterval(this.loadInterval);
     }
   },
+  DASHBOARDS_EDIT: 'dashboards:edit',
+  DEFAULT_HEIGHT: 1,
+  DEFAULT_WIDTH: 2,
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
@@ -43,7 +48,6 @@ const ShowDashboardPage = React.createClass({
         }
       });
   },
-  DASHBOARDS_EDIT: 'dashboards:edit',
   updateUnFocussed() {
     return this.state.currentUser.preferences.updateUnfocussed;
   },
@@ -70,23 +74,13 @@ const ShowDashboardPage = React.createClass({
   _defaultWidgetDimensions(widget) {
     const dimensions = {col: 0, row: 0};
 
-    switch (widget.type.toUpperCase()) {
-      case Widget.Type.SEARCH_RESULT_CHART:
-      case Widget.Type.STACKED_CHART:
-      case Widget.Type.FIELD_CHART:
-        dimensions.width = 2;
-        dimensions.height = 1;
-        break;
-      case Widget.Type.QUICKVALUES:
-        dimensions.width = 1;
-        dimensions.height = (widget.config.show_pie_chart && widget.config.show_data_table ? 3 : 2);
-        break;
-      case Widget.Type.SEARCH_RESULT_COUNT:
-      case Widget.Type.STREAM_SEARCH_RESULT_COUNT:
-      case Widget.Type.STATS_COUNT:
-      default:
-        dimensions.width = 1;
-        dimensions.height = 1;
+    const widgetPlugin = PluginStore.exports('widgets').filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
+    if (widgetPlugin) {
+      dimensions.height = widgetPlugin.defaultHeight;
+      dimensions.width = widgetPlugin.defaultWidth;
+    } else {
+      dimensions.heigh = this.DEFAULT_HEIGHT;
+      dimensions.width = this.DEFAULT_WIDTH;
     }
 
     return dimensions;
@@ -114,7 +108,7 @@ const ShowDashboardPage = React.createClass({
       return position1.col - position2.col;
     }).map((widget) => {
       return (
-        <Widget id={widget.id} key={'widget-' + widget.id} widget={widget} dashboardId={dashboard.id}
+        <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
                 locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
       );
     });

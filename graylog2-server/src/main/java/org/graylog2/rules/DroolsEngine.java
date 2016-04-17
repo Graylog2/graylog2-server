@@ -101,7 +101,7 @@ public class DroolsEngine implements RulesEngine {
             final String rulesSource = Files.toString(new File(rulesFile), Charsets.UTF_8);
             return addRule(rulesSource);
         } catch (IOException e) {
-            LOG.warn("Could not read drools source file. Not loading rules.", e);
+            LOG.warn("Could not read drools source file. Not loading rules: {}", e.getMessage());
         }
         return false;
     }

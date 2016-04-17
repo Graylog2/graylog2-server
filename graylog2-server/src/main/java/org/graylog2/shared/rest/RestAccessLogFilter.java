@@ -17,7 +17,7 @@
 package org.graylog2.shared.rest;
 
 import org.glassfish.grizzly.http.server.Response;
-import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,6 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.util.Date;
 
@@ -46,14 +45,12 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
         if (LOG.isDebugEnabled()) {
             try {
                 final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
-                final SecurityContext securityContext = requestContext.getSecurityContext();
-                final String remoteUser = securityContext instanceof ShiroSecurityContext ?
-                        ((ShiroSecurityContext) securityContext).getUsername() : null;
                 final Date requestDate = requestContext.getDate();
+                final String userName = RestTools.getUserNameFromRequest(requestContext);
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
                         response.getRequest().getRemoteAddr(),
-                        (remoteUser == null ? "-" : remoteUser),
+                        userName == null ? "-" : userName,
                         (requestDate == null ? "-" : requestDate),
                         requestContext.getMethod(),
                         requestContext.getUriInfo().getPath(),

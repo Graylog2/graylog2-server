@@ -22,11 +22,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertImpl;
@@ -61,7 +61,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @RequiresAuthentication
-@Api(value = "Alerts", description = "Manage stream alerts")
+@Api(value = "Stream/Alerts", description = "Manage stream alerts for a given stream")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertResource extends RestResource {
 

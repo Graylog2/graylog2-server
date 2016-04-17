@@ -1,4 +1,5 @@
 module.exports = [
+  'jquery',
   'react',
   'react-dom',
   'react-addons-linked-state-mixin',
@@ -7,6 +8,7 @@ module.exports = [
   'react-router',
   'react-router-bootstrap',
   'reflux',
+  'reflux-core',
   'moment',
   'moment-timezone',
 ];

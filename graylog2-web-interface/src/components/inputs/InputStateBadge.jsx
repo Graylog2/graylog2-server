@@ -2,8 +2,9 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { InputStatesStore } from 'stores/inputs';
-import NodesStore from 'stores/nodes/NodesStore';
+import StoreProvider from 'injection/StoreProvider';
+const InputStatesStore = StoreProvider.getStore('InputStates');
+const NodesStore = StoreProvider.getStore('Nodes');
 
 import { LinkToNode, Spinner } from 'components/common';
 

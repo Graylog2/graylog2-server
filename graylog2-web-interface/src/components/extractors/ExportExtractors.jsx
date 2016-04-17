@@ -5,8 +5,11 @@ import {Row, Col, Input} from 'react-bootstrap';
 import {ClipboardButton, Spinner} from 'components/common';
 import Version from 'util/Version';
 
-import ExtractorsActions from 'actions/extractors/ExtractorsActions';
-import ExtractorsStore from 'stores/extractors/ExtractorsStore';
+import ActionsProvider from 'injection/ActionsProvider';
+const ExtractorsActions = ActionsProvider.getActions('Extractors');
+
+import StoreProvider from 'injection/StoreProvider';
+const ExtractorsStore = StoreProvider.getStore('Extractors');
 
 const ExportExtractors = React.createClass({
   propTypes: {
@@ -25,7 +28,30 @@ const ExportExtractors = React.createClass({
     }
 
     const extractorsExportObject = {
-      extractors: this.state.extractors,
+      extractors: this.state.extractors.map((extractor) => {
+        const copy = {};
+
+        // Create Graylog 1.x compatible export format.
+        // TODO: This should be done on the server.
+        Object.keys(extractor).forEach((key) => {
+          switch (key) {
+            case 'type':
+              // The import expects "extractor_type", not "type".
+              copy.extractor_type = extractor[key];
+              break;
+            case 'id':
+            case 'metrics':
+            case 'creator_user_id':
+            case 'exceptions':
+            case 'converter_exceptions':
+              break;
+            default:
+              copy[key] = extractor[key];
+          }
+        });
+
+        return copy;
+      }),
       version: Version.getFullVersion(),
     };
 

@@ -22,8 +22,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
-
-import javax.persistence.Id;
+import org.mongojack.Id;
 
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

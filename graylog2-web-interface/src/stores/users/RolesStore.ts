@@ -2,24 +2,27 @@
 
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
+
+// Need to use explicit require here to be able to access the User interface
 import UsersStore = require('stores/users/UsersStore');
-import jsRoutes = require('routing/jsRoutes');
+
+import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
-export interface Role {
+interface Role {
   name: string;
   description: string;
   permissions: string[];
 }
 
-export interface RoleMembership {
+interface RoleMembership {
   role: string;
   users: UsersStore.User[];
 }
 
-export const RolesStore = {
+const RolesStore = {
   loadRoles(): Promise<string[]> {
-    const promise = fetch('GET', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.listRoles().url))
+    const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
         response => response.roles,
         error => {
@@ -34,7 +37,7 @@ export const RolesStore = {
   },
 
   createRole(role: Role): Promise<Role> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.createRole().url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.createRole().url);
     const promise = fetch('POST', url, role);
 
     promise.then((newRole) => {
@@ -48,7 +51,7 @@ export const RolesStore = {
   },
 
   updateRole(rolename: string, role: Role): Promise<Role> {
-    const promise = fetch('PUT', URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.updateRole(rolename).url), role);
+    const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(rolename).url), role);
 
     promise.then((newRole) => {
       UserNotification.success("Role \"" + newRole.name + "\" was updated successfully");
@@ -63,7 +66,7 @@ export const RolesStore = {
   },
 
   deleteRole(rolename: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.deleteRole(rolename).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.deleteRole(rolename).url);
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -77,7 +80,7 @@ export const RolesStore = {
     return promise;
   },
   getMembers(rolename: string): Promise<RoleMembership[]> {
-    const url = URLUtils.qualifyUrl(jsRoutes.controllers.api.RolesApiController.loadMembers(rolename).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(rolename).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {
       if (error.additional.status !== 404) {
@@ -89,4 +92,4 @@ export const RolesStore = {
   }
 };
 
-export default RolesStore;
+module.exports = RolesStore;

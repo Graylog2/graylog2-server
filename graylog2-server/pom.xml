@@ -38,7 +38,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>2.0.0-alpha.3-SNAPSHOT</version>
+        <version>2.0.0-beta.4-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -48,10 +48,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-        </dependency>
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>airline</artifactId>
@@ -138,6 +134,14 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
         </dependency>
         <dependency>
@@ -175,6 +179,10 @@
             <artifactId>commons-email</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
@@ -257,11 +265,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.stephenc.high-scale-lib</groupId>
-            <artifactId>high-scale-lib</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
         </dependency>
@@ -275,21 +278,13 @@
             <groupId>org.graylog2.repackaged</groupId>
             <artifactId>grok</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.atlassian.ip</groupId>
-            <artifactId>atlassian-ip</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>gelfclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wordnik</groupId>
+            <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
         </dependency>
         <dependency>
@@ -404,6 +399,25 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.zafarkhaja</groupId>
+            <artifactId>java-semver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -503,6 +517,15 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>com.versioneye</groupId>
+                <artifactId>versioneye-maven-plugin</artifactId>
+                <configuration>
+                    <organisation>Graylog</organisation>
+                    <team>Owners</team>
+                    <projectId>570f6fbbd1a090000fe62b58</projectId>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -548,7 +571,6 @@
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
-                        <version>0.0.28</version>
 
                         <configuration>
                             <workingDirectory>${webInterface.path}</workingDirectory>
@@ -561,8 +583,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v4.3.0</nodeVersion>
-                                    <npmVersion>3.7.2</npmVersion>
+                                    <nodeVersion>v4.4.3</nodeVersion>
+                                    <npmVersion>3.8.6</npmVersion>
                                 </configuration>
                             </execution>
 

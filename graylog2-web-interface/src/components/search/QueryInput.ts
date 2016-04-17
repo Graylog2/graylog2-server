@@ -3,7 +3,8 @@
 
 'use strict';
 
-import FieldsStore = require('../../stores/fields/FieldsStore');
+const StoreProvider = require('injection/StoreProvider');
+const FieldsStore = StoreProvider.getStore('Fields');
 import queryParser = require('../../logic/search/queryParser');
 import SerializeVisitor = require('../../logic/search/visitors/SerializeVisitor');
 import DumpVisitor = require('../../logic/search/visitors/DumpVisitor');
@@ -63,8 +64,14 @@ class QueryInput {
         });
     }
 
+    _value() {
+        return $(this.queryInputContainer).typeahead('val');
+    }
+
     update(newValue) {
-        $(this.queryInputContainer).typeahead('val', newValue);
+        if (this._value() !== newValue) {
+            $(this.queryInputContainer).typeahead('val', newValue);
+        }
     }
 
     private codeCompletionProvider(query: string, callback: (matches: Array<any>) => void) {

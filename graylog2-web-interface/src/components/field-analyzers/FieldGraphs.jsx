@@ -4,7 +4,10 @@ import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import LegacyFieldGraph from './LegacyFieldGraph';
-import FieldGraphsStore from 'stores/field-analyzers/FieldGraphsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
+
 import UIUtils from 'util/UIUtils';
 
 const FieldGraphs = React.createClass({
@@ -12,7 +15,7 @@ const FieldGraphs = React.createClass({
     from: PropTypes.any.isRequired,
     to: PropTypes.any.isRequired,
     resolution: PropTypes.any.isRequired,
-    searchInStream: PropTypes.object,
+    stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   mixins: [PureRenderMixin],
@@ -40,8 +43,8 @@ const FieldGraphs = React.createClass({
   componentWillUnmount() {
     FieldGraphsStore.resetStore();
   },
-  addFieldGraph(field) {
-    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+  addField(field) {
+    const streamId = this.props.stream ? this.props.stream.id : undefined;
     FieldGraphsStore.newFieldGraph(field, {interval: this.props.resolution, streamid: streamId});
   },
   deleteFieldGraph(graphId) {

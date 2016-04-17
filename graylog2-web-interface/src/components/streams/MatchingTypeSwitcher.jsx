@@ -1,9 +1,11 @@
 import React from 'react';
 import { PropTypes, Component } from 'react';
 import { Input } from 'react-bootstrap';
-import StreamsStore from '../../stores/streams/StreamsStore';
 
-import UserNotification from '../../util/UserNotification';
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
+
+import UserNotification from 'util/UserNotification';
 
 class MatchingTypeSwitcher extends Component {
   static propTypes = {

@@ -19,7 +19,6 @@ package org.graylog2.filters;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,30 +26,20 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class StreamMatcherFilter implements MessageFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamMatcherFilter.class);
 
     private final StreamRouter streamRouter;
-    private final ThroughputStats throughputStats;
 
     @Inject
-    public StreamMatcherFilter(StreamRouter streamRouter,
-                               ThroughputStats throughputStats) {
+    public StreamMatcherFilter(StreamRouter streamRouter) {
         this.streamRouter = streamRouter;
-        this.throughputStats = throughputStats;
     }
 
     @Override
     public boolean filter(Message msg) {
         List<Stream> streams = streamRouter.route(msg);
-
-        for (Stream stream : streams) {
-            throughputStats.incrementStreamThroughput(stream.getId());
-        }
         msg.addStreams(streams);
 
         LOG.debug("Routed message <{}> to {} streams.", msg.getId(), streams.size());

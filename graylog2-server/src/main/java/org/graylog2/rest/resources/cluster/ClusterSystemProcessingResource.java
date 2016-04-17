@@ -18,9 +18,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -52,16 +52,11 @@ import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 public class ClusterSystemProcessingResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemProcessingResource.class);
 
-    private final NodeService nodeService;
-    private final RemoteInterfaceProvider remoteInterfaceProvider;
-
     @Inject
     public ClusterSystemProcessingResource(NodeService nodeService,
                                            RemoteInterfaceProvider remoteInterfaceProvider,
                                            @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders);
-        this.nodeService = nodeService;
-        this.remoteInterfaceProvider = remoteInterfaceProvider;
+        super(httpHeaders, nodeService, remoteInterfaceProvider);
     }
 
     private RemoteSystemProcessingResource getRemoteSystemProcessingResource(String nodeId) throws NodeNotFoundException {
@@ -81,7 +76,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     public void pause(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to pause message processing on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
@@ -94,7 +89,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     public void resume(@ApiParam(name = "nodeId", value = "The id of the node where processing will be resumed.", required = true)
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();
-        if (!response.isSuccess()) {
+        if (!response.isSuccessful()) {
             LOG.warn("Unable to resume message processing on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }

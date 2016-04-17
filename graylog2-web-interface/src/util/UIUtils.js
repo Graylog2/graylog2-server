@@ -12,7 +12,7 @@ const UIUtils = {
         .on('click', (event) => {
           event.preventDefault();
           const top = window.pageYOffset - this.NAVBAR_HEIGHT + element.getBoundingClientRect().top;
-          $('html, body').animate({scrollTop: top}, 'fast');
+          $('html, body').animate({ scrollTop: top }, 'fast');
           $scrollHint.off('click');
         });
     }

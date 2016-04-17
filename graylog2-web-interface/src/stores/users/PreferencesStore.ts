@@ -32,7 +32,8 @@ var PreferencesStore = {
   convertPreferenceArrayToMap: function (preferences: Array<Preference>): PreferencesMap {
     var preferencesAsMap: PreferencesMap = {};
     preferences.forEach((element) => {
-      preferencesAsMap[element.name] = element.value;
+      // TODO: Converting all preferences to booleans for now, we should change this when we support more types
+      preferencesAsMap[element.name] = element.value === true || element.value === 'true';
     });
     return preferencesAsMap;
   },

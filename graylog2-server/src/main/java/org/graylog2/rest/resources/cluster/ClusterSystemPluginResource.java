@@ -18,9 +18,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -53,16 +53,11 @@ import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 public class ClusterSystemPluginResource extends ProxiedResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemResource.class);
 
-    private final NodeService nodeService;
-    private final RemoteInterfaceProvider remoteInterfaceProvider;
-
     @Inject
     public ClusterSystemPluginResource(NodeService nodeService,
                                        RemoteInterfaceProvider remoteInterfaceProvider,
                                        @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders);
-        this.nodeService = nodeService;
-        this.remoteInterfaceProvider = remoteInterfaceProvider;
+        super(httpHeaders, nodeService, remoteInterfaceProvider);
     }
 
     @GET
@@ -76,7 +71,7 @@ public class ClusterSystemPluginResource extends ProxiedResource {
                 this.authenticationToken,
                 RemoteSystemPluginResource.class);
         final Response<PluginList> response = remoteSystemPluginResource.list().execute();
-        if (response.isSuccess()) {
+        if (response.isSuccessful()) {
             return response.body();
         } else {
             LOG.warn("Unable to get plugin list on node {}: {}", nodeId, response.message());

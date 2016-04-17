@@ -3,13 +3,18 @@ import ReactDOM from 'react-dom';
 import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
 import {AutoAffix} from 'react-overlays';
 import numeral from 'numeral';
+import URI from 'urijs';
 
-import Widget from 'components/widgets/Widget';
-import SearchStore from 'stores/search/SearchStore';
-import { SavedSearchControls, ShowQueryModal } from 'components/search';
-import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
+import StoreProvider from 'injection/StoreProvider';
+const SessionStore = StoreProvider.getStore('Session');
+const SearchStore = StoreProvider.getStore('Search');
+
+import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';
+
+import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
@@ -18,9 +23,8 @@ const SearchSidebar = React.createClass({
     builtQuery: React.PropTypes.any,
     currentSavedSearch: React.PropTypes.string,
     fields: React.PropTypes.array,
-    onFieldSelectedForGraph: React.PropTypes.func,
-    onFieldSelectedForQuickValues: React.PropTypes.func,
-    onFieldSelectedForStats: React.PropTypes.func,
+    fieldAnalyzers: React.PropTypes.array,
+    onFieldAnalyzer: React.PropTypes.func,
     onFieldToggled: React.PropTypes.func,
     permissions: React.PropTypes.array,
     predefinedFieldSelection: React.PropTypes.func,
@@ -102,6 +106,21 @@ const SearchSidebar = React.createClass({
     event.preventDefault();
     this.refs.indicesModal.open();
   },
+  _getURLForExportAsCSV() {
+    const searchParams = SearchStore.getOriginalSearchURLParams();
+    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    const query = searchParams.get('q') === '' ? '*' : searchParams.get('q');
+    const fields = this.props.selectedFields;
+    const timeRange = SearchStore.rangeType === 'relative' ? {range: SearchStore.rangeParams.get('relative')} : SearchStore.rangeParams.toJS();
+
+    const url = new URI(URLUtils.qualifyUrl(
+      ApiRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
+    ))
+      .username(SessionStore.getSessionId())
+      .password('session');
+
+    return url.toString();
+  },
   render() {
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
@@ -131,16 +150,15 @@ const SearchSidebar = React.createClass({
         return (
           <SidebarMessageField key={field.name}
                                field={field}
+                               fieldAnalyzers={this.props.fieldAnalyzers}
                                onToggled={this.props.onFieldToggled}
-                               onFieldSelectedForGraph={this.props.onFieldSelectedForGraph}
-                               onFieldSelectedForQuickValues={this.props.onFieldSelectedForQuickValues}
-                               onFieldSelectedForStats={this.props.onFieldSelectedForStats}
+                               onFieldAnalyzer={this.props.onFieldAnalyzer}
                                selected={this.props.selectedFields.contains(field.name)}/>
         );
       });
     let searchTitle = null;
     const moreActions = [
-      <MenuItem key="export" href={SearchStore.getCsvExportURL()}>Export as CSV</MenuItem>,
+      <MenuItem key="export" href={this._getURLForExportAsCSV()}>Export as CSV</MenuItem>,
     ];
     if (this.props.searchInStream) {
       searchTitle = <span>{this.props.searchInStream.title}</span>;
@@ -154,8 +172,8 @@ const SearchSidebar = React.createClass({
     moreActions.push(<MenuItem key="showQuery" onSelect={() => this.refs.showQueryModal.open()}>Show query</MenuItem>);
 
     return (
-      <AutoAffix viewportOffsetTop={45}>
-        <div className="content-col" ref="sidebar">
+      <AutoAffix affixClassName="affix">
+        <div className="content-col" ref="sidebar" style={{ top: undefined, position: undefined }}>
           <div ref="header">
             <h2>
               {searchTitle}
@@ -171,9 +189,7 @@ const SearchSidebar = React.createClass({
             </p>
 
             <div className="actions">
-              <AddToDashboardMenu title="Add count to dashboard"
-                                  widgetType={this.props.searchInStream ? Widget.Type.STREAM_SEARCH_RESULT_COUNT : Widget.Type.SEARCH_RESULT_COUNT}
-                                  permissions={this.props.permissions}/>
+              <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
 
               <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 

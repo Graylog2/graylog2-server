@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class LdapEntry {
+public final class LdapEntry {
 
     private Map<String, String> attributes = Maps.newHashMap();
     private Set<String> groups = Sets.newHashSet();

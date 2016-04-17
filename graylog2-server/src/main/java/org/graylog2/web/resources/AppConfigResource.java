@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
+import org.graylog2.rest.MoreMediaTypes;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -27,7 +28,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,7 +49,7 @@ public class AppConfigResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MoreMediaTypes.APPLICATION_JAVASCRIPT)
     public String get(@Context HttpHeaders headers) {
         final URL templateUrl = this.getClass().getResource("/web-interface/config.js.template");
         final String template;

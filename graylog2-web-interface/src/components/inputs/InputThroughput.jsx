@@ -2,8 +2,11 @@ import React from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
-import MetricsActions from 'actions/metrics/MetricsActions';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { LinkToNode, Spinner } from 'components/common';
 
@@ -26,6 +29,7 @@ const InputThroughput = React.createClass({
   _metricNames() {
     return [
       this._prefix('incomingMessages'),
+      this._prefix('emptyMessages'),
       this._prefix('open_connections'),
       this._prefix('total_connections'),
       this._prefix('written_bytes_1sec'),
@@ -48,6 +52,8 @@ const InputThroughput = React.createClass({
         return metric.metric.rate.mean;
       case 'gauge':
         return metric.metric.value;
+      case 'counter':
+        return metric.metric.count;
       default:
         return undefined;
     }
@@ -127,6 +133,7 @@ const InputThroughput = React.createClass({
   _formatNodeDetails(nodeId, metrics) {
     const openConnections = this._getValueFromMetric(metrics[this._prefix('open_connections')]);
     const totalConnections = this._getValueFromMetric(metrics[this._prefix('total_connections')]);
+    const emptyMessages = this._getValueFromMetric(metrics[this._prefix('emptyMessages')]);
     const writtenBytes1Sec = this._getValueFromMetric(metrics[this._prefix('written_bytes_1sec')]);
     const writtenBytesTotal = this._getValueFromMetric(metrics[this._prefix('written_bytes_total')]);
     const readBytes1Sec = this._getValueFromMetric(metrics[this._prefix('read_bytes_1sec')]);
@@ -139,6 +146,7 @@ const InputThroughput = React.createClass({
         <br/>
         {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
         {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
+        {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br/></span>}
         {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>No metrics available for this node</span>}
         <br/>
       </span>
@@ -154,6 +162,7 @@ const InputThroughput = React.createClass({
     }
     const metrics = this._calculateMetrics(this.state.metrics);
     const incomingMessages = metrics[this._prefix('incomingMessages')];
+    const emptyMessages = metrics[this._prefix('emptyMessages')];
     const openConnections = metrics[this._prefix('open_connections')];
     const totalConnections = metrics[this._prefix('total_connections')];
     const writtenBytes1Sec = metrics[this._prefix('written_bytes_1sec')];
@@ -168,6 +177,7 @@ const InputThroughput = React.createClass({
           {!isNaN(incomingMessages) && <span>1 minute average rate: {this._formatCount(incomingMessages)} msg/s<br/></span>}
           {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
           {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
+          {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br/></span>}
           {!isNaN(writtenBytes1Sec) && this.props.input.global && <a href="" onClick={this._toggleShowDetails}>{this.state.showDetails ? 'Hide' : 'Show'} details</a>}
           {!isNaN(writtenBytes1Sec) && this.state.showDetails && this._formatAllNodeDetails(this.state.metrics)}
         </span>

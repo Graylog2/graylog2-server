@@ -29,12 +29,14 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +90,15 @@ public class StreamImpl extends PersistedImpl implements Stream {
     @Override
     public List<StreamRule> getStreamRules() {
         return this.streamRules;
+    }
+
+    @Override
+    public Collection<AlertCondition> getAlertConditions() {
+        if (!this.fields.containsKey(EMBEDDED_ALERT_CONDITIONS)) {
+            return Collections.emptyList();
+        } else {
+            return (Collection<AlertCondition>)this.fields.get(EMBEDDED_ALERT_CONDITIONS);
+        }
     }
 
     @Override

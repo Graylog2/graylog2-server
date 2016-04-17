@@ -1,7 +1,9 @@
 import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import SingleNodeActions from 'actions/nodes/SingleNodeActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const SingleNodeActions = ActionsProvider.getActions('SingleNode');
 
 const SingleNodeStore = Reflux.createStore({
   listenables: [SingleNodeActions],

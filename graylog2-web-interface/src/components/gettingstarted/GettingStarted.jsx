@@ -3,7 +3,9 @@ import { Button, Grid, Row, Col } from 'react-bootstrap';
 import Qs from 'qs';
 
 import {Spinner} from 'components/common';
-import GettingStartedActions from 'actions/gettingstarted/GettingStartedActions';
+
+import ActionsProvider from 'injection/ActionsProvider';
+const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const GettingStarted = React.createClass({
   propTypes() {

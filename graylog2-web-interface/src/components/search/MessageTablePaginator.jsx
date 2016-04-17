@@ -4,8 +4,9 @@ import { Page } from 'components/common';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-import SearchStore from 'stores/search/SearchStore';
-import UniversalSearchStore from 'stores/search/UniversalSearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
 require('!script!../../../public/javascripts/bootstrap.min.js');

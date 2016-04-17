@@ -3,15 +3,20 @@ import jQueryUI from 'jquery-ui';
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
+import Graylog2Time from 'legacy/Rickshaw.Fixtures.Graylog2Time';
+import Graylog2Selector from 'legacy/Rickshaw.Graph.Graylog2Selector';
 
 import DateTime from 'logic/datetimes/DateTime';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import jsRoutes from 'routing/jsRoutes';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
+
+import StoreProvider from 'injection/StoreProvider';
+const SearchStore = StoreProvider.getStore('Search');
 
 function generateShortId() {
   return Math.random().toString(36).substr(2, 9);
@@ -52,12 +57,7 @@ export const FieldChart = {
   },
 
   _getDefaultOptions(opts) {
-    let searchParams = {};
-    jQuery(document).trigger('get-original-search.graylog.search', {
-      callback(params) {
-        searchParams = params.toJS();
-      },
-    });
+    const searchParams = SearchStore.getOriginalSearchParams().toJS();
 
     // Options.
     if (opts.chartid === undefined) {
@@ -80,45 +80,30 @@ export const FieldChart = {
       opts.valuetype = 'mean';
     }
 
-    if (opts.streamid === undefined) {
-      opts.streamid = '';
-    }
-
     if (opts.query === undefined) {
       opts.query = searchParams.query;
-    }
-
-    if (opts.rangetype === undefined) {
-      opts.rangetype = searchParams.range_type;
-    }
-
-    if (opts.range === undefined) {
-      opts.range = {};
     }
 
     if (opts.createdAt === undefined) {
       opts.createdAt = moment().valueOf();
     }
 
+    // Always get stream and time range params from the current search request.
+    // Ignore the streamid, rangetype and range params that have been stored in localStorage. (see FieldGraphsStore)
+    opts.streamid = searchParams.streamId;
+    opts.rangetype = searchParams.range_type;
+    opts.range = {};
+
     switch (opts.rangetype) {
       case 'relative':
-        if (opts.range.relative === undefined) {
-          opts.range.relative = searchParams.relative;
-        }
+        opts.range.relative = searchParams.relative;
         break;
       case 'absolute':
-        if (opts.range.from === undefined) {
-          opts.range.from = searchParams.from;
-        }
-
-        if (opts.range.to === undefined) {
-          opts.range.to = searchParams.to;
-        }
+        opts.range.from = searchParams.from;
+        opts.range.to = searchParams.to;
         break;
       case 'keyword':
-        if (opts.range.keyword === undefined) {
-          opts.range.keyword = searchParams.keyword;
-        }
+        opts.range.keyword = searchParams.keyword;
         break;
       default:
     }
@@ -304,7 +289,7 @@ export const FieldChart = {
   },
 
   _fetchData(opts, timeRangeParams) {
-    const url = jsRoutes.controllers.api.UniversalSearchApiController.fieldHistogram(
+    const url = ApiRoutes.UniversalSearchApiController.fieldHistogram(
       opts.rangetype,
       opts.query || '*',
       opts.field,

@@ -33,9 +33,8 @@ import org.graylog2.periodical.IndexRangesMigrationPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
+import org.graylog2.periodical.LdapGroupMappingMigration;
 import org.graylog2.periodical.NodePingThread;
-import org.graylog2.periodical.PurgeExpiredCollectorsThread;
-import org.graylog2.periodical.StreamThroughputCounterManagerThread;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.UserPermissionMigrationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
@@ -54,17 +53,16 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(IndexRetentionThread.class);
         periodicalBinder.addBinding().to(IndexRotationThread.class);
         periodicalBinder.addBinding().to(NodePingThread.class);
-        periodicalBinder.addBinding().to(StreamThroughputCounterManagerThread.class);
         periodicalBinder.addBinding().to(VersionCheckThread.class);
         periodicalBinder.addBinding().to(ThrottleStateUpdaterThread.class);
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(ClusterIdGeneratorPeriodical.class);
-        periodicalBinder.addBinding().to(PurgeExpiredCollectorsThread.class);
         periodicalBinder.addBinding().to(IndexRangesMigrationPeriodical.class);
         periodicalBinder.addBinding().to(IndexRangesCleanupPeriodical.class);
         periodicalBinder.addBinding().to(UserPermissionMigrationPeriodical.class);
         periodicalBinder.addBinding().to(AlarmCallbacksMigrationPeriodical.class);
         periodicalBinder.addBinding().to(ConfigurationManagementPeriodical.class);
+        periodicalBinder.addBinding().to(LdapGroupMappingMigration.class);
     }
 }

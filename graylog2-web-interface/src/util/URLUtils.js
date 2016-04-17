@@ -43,13 +43,13 @@ const URLUtils = {
     origHash[name] = newValue;
     window.location.replace(`#${Qs.stringify(origHash)}`);
   },
-  concatURLPath() {
-    const args = Array(arguments.length);
-    for (let i = 0; i < arguments.length; i++) {
-      args[i] = arguments[i];
+  concatURLPath(...allArgs) {
+    const args = Array(allArgs.length);
+    for (let i = 0; i < allArgs.length; i++) {
+      args[i] = allArgs[i];
     }
 
-    const joinedPath = '/' + args.join('/');
+    const joinedPath = `/${args.join('/')}`;
     return joinedPath.replace(/[\/]+/g, '/');
   },
 };

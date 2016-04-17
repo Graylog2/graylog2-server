@@ -4,8 +4,11 @@ import {Button, DropdownButton, MenuItem, Input} from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
-import SavedSearchesStore from 'stores/search/SavedSearchesStore';
-import SavedSearchesActions from 'actions/search/SavedSearchesActions';
+import StoreProvider from 'injection/StoreProvider';
+const SavedSearchesStore = StoreProvider.getStore('SavedSearches');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SavedSearchControls = React.createClass({
   propTypes: {

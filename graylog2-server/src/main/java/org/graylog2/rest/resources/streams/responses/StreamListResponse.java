@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.streams.Stream;
 
 import java.util.Collection;
 
@@ -31,10 +30,10 @@ public abstract class StreamListResponse {
     public abstract long total();
 
     @JsonProperty
-    public abstract Collection<Stream> streams();
+    public abstract Collection<StreamResponse> streams();
 
     @JsonCreator
-    public static StreamListResponse create(@JsonProperty("total") long total, @JsonProperty("streams") Collection<Stream> streams) {
+    public static StreamListResponse create(@JsonProperty("total") long total, @JsonProperty("streams") Collection<StreamResponse> streams) {
         return new AutoValue_StreamListResponse(total, streams);
     }
 }

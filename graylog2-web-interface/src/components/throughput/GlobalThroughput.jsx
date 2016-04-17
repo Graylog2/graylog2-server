@@ -2,7 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
-import GlobalThroughputStore from 'stores/metrics/GlobalThroughputStore';
+import StoreProvider from 'injection/StoreProvider';
+const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 import { Spinner } from 'components/common';
 

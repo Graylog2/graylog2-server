@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { Alert, Button, Row, Col } from 'react-bootstrap';
-import { UsageStatsOptOutStore } from '../../stores/usagestats/UsageStatsOptOutStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const UsageStatsOptOutStore = StoreProvider.getStore('UsageStatsOptOut');
 
 const UsageStatsOptIn = React.createClass({
   getInitialState() {

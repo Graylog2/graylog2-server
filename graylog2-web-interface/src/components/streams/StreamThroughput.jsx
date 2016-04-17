@@ -1,8 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import MetricsStore from 'stores/metrics/MetricsStore';
-import MetricsActions from 'actions/metrics/MetricsActions';
+import StoreProvider from 'injection/StoreProvider';
+const MetricsStore = StoreProvider.getStore('Metrics');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { Spinner } from 'components/common';
 

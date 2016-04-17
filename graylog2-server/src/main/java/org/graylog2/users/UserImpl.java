@@ -19,9 +19,6 @@ package org.graylog2.users;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.bson.types.ObjectId;
@@ -38,12 +35,16 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
+import org.graylog2.shared.security.Permissions;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,7 @@ import static com.google.common.base.Strings.nullToEmpty;
 @CollectionName(UserImpl.COLLECTION_NAME)
 public class UserImpl extends PersistedImpl implements User {
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
+    private final Permissions permissions;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -81,7 +83,6 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
     public static final String STARTPAGE = "startpage";
-    public static final String HASH_ALGORITHM = "SHA-1";
     public static final String ROLES = "roles";
 
     public static final int MAX_USERNAME_LENGTH = 100;
@@ -90,17 +91,21 @@ public class UserImpl extends PersistedImpl implements User {
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                    Permissions permissions,
                     @Assisted final Map<String, Object> fields) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
+        this.permissions = permissions;
     }
 
     @AssistedInject
     protected UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                       Permissions permissions,
                        @Assisted final ObjectId id,
                        @Assisted final Map<String, Object> fields) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
+        this.permissions = permissions;
     }
 
     @Override
@@ -155,13 +160,20 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<String> getPermissions() {
-        return (List<String>) fields.get(PERMISSIONS);
+        final Set<String> permissionSet = new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        @SuppressWarnings("unchecked")
+        final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
+        if (permissions != null) {
+            permissionSet.addAll(permissions);
+        }
+        return new ArrayList<>(permissionSet);
     }
 
     @Override
     public void setPermissions(final List<String> permissions) {
+        // Do not store the dynamic user self edit permissions
+        permissions.removeAll(this.permissions.userSelfEditPermissions(getName()));
         fields.put(PERMISSIONS, permissions);
     }
 
@@ -180,7 +192,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public Map<String, String> getStartpage() {
-        final Map<String, String> startpage = Maps.newHashMap();
+        final Map<String, String> startpage = new HashMap<>();
 
         if (fields.containsKey(STARTPAGE)) {
             @SuppressWarnings("unchecked")
@@ -292,17 +304,17 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public Set<String> getRoleIds() {
         final List<ObjectId> roles = firstNonNull((List<ObjectId>) fields.get(ROLES), Collections.<ObjectId>emptyList());
-        return Sets.newHashSet(Collections2.transform(roles, new ObjectIdStringFunction()));
+        return new HashSet<>(Collections2.transform(roles, new ObjectIdStringFunction()));
     }
 
     @Override
     public void setRoleIds(Set<String> roles) {
-        fields.put(ROLES, Lists.newArrayList(Collections2.transform(roles, new StringObjectIdFunction())));
+        fields.put(ROLES, new ArrayList<>(Collections2.transform(roles, new StringObjectIdFunction())));
     }
 
     @Override
     public void setStartpage(final String type, final String id) {
-        final Map<String, String> startpage = Maps.newHashMap();
+        final Map<String, String> startpage = new HashMap<>();
 
         if (type != null && id != null) {
             startpage.put("type", type);
@@ -320,7 +332,7 @@ public class UserImpl extends PersistedImpl implements User {
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                               Configuration configuration,
                               @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, (ObjectId)null, Collections.<String, Object>emptyMap());
+            super(passwordAlgorithmFactory, null, null, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }

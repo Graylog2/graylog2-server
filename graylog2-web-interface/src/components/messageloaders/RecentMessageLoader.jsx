@@ -2,7 +2,8 @@ import React, {PropTypes} from 'react';
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 
-import UniversalSearchStore from 'stores/search/UniversalSearchStore';
+import StoreProvider from 'injection/StoreProvider';
+const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 const RecentMessageLoader = React.createClass({
   propTypes: {
@@ -16,7 +17,7 @@ const RecentMessageLoader = React.createClass({
       UserNotification.error('Invalid input selected: ' + inputId,
         'Could not load message from invalid Input ' + inputId);
     }
-    UniversalSearchStore.search('relative', 'gl2_source_input:' + inputId + ' OR gl2_source_radio_input:' + inputId, { range: 0 }, undefined, 1)
+    UniversalSearchStore.search('relative', 'gl2_source_input:' + inputId + ' OR gl2_source_radio_input:' + inputId, { range: 0 }, undefined, 1, undefined, undefined)
       .then((response) => {
         if (response.total_results > 0) {
           this.props.onMessageLoaded(response.messages[0]);

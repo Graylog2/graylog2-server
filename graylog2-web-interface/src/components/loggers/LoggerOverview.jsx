@@ -1,26 +1,26 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Button, Col, Row } from 'react-bootstrap';
+import { Spinner } from 'components/common';
+import { NodeLoggers } from 'components/loggers';
+
+import StoreProvider from 'injection/StoreProvider';
+const LoggersStore = StoreProvider.getStore('Loggers');
 
 const LoggerOverview = React.createClass({
-  mixins: [Reflux.connect(SampleStore({foo: 23}))],
+  mixins: [Reflux.connect(LoggersStore)],
   render() {
+    if (!this.state.loggers || !this.state.subsystems) {
+      return <Spinner />;
+    }
+    const nodeLoggers = Object.keys(this.state.loggers)
+      .map((nodeId) => <NodeLoggers key={'node-loggers-' + nodeId}
+                                    nodeId={nodeId}
+                                    subsystems={this.state.subsystems[nodeId].subsystems}/>);
     return (
-      <Row className="row-sm log-writing-node content">
-        <Col md={12}>
-          <div style={{marginBottom: '20'}}>
-            <div className="pull-right">
-              <Button bsSize="sm" bsStyle="primary" className="trigger-log-level-metrics">
-                <i className="fa fa-dashboard"/>{' '}
-                Show log level metrics
-              </Button>
-            </div>
-          </div>
-
-          <span>{this.state.foo}</span>
-        </Col>
-      </Row>
+      <span>
+        {nodeLoggers}
+      </span>
     );
   },
 });

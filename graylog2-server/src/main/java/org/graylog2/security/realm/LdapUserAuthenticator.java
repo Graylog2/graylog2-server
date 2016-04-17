@@ -119,12 +119,14 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                 LOG.error("Unable to sync LDAP user {} (DN {})", userEntry.getBindPrincipal(), userEntry.getDn());
                 return null;
             }
+
+            return new SimpleAccount(principal, null, "ldap realm");
         } catch (LdapException e) {
             LOG.error("LDAP error", e);
-            return null;
         } catch (CursorException e) {
             LOG.error("Unable to read LDAP entry", e);
-            return null;
+        } catch (Exception e) {
+            LOG.error("Error during LDAP user account sync. Cannot log in user {}", principal, e);
         } finally {
             if (connection != null) {
                 try {
@@ -134,7 +136,9 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                 }
             }
         }
-        return new SimpleAccount(principal, null, "ldap realm");
+
+        // Return null by default to ensure a login failure if anything goes wrong.
+        return null;
     }
 
     public boolean isEnabled() {

@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
@@ -112,7 +112,7 @@ public class IndexRangesResource extends RestResource {
     public IndexRangeSummary show(
             @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) throws NotFoundException {
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
         }
         checkPermission(RestPermissions.INDEXRANGES_READ, index);
@@ -144,8 +144,9 @@ public class IndexRangesResource extends RestResource {
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
-            LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new ForbiddenException();
+            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(errorMsg, e);
+            throw new ForbiddenException(errorMsg);
         }
 
         return Response.accepted().build();
@@ -165,7 +166,7 @@ public class IndexRangesResource extends RestResource {
     public Response rebuildIndex(
             @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) {
-        if (!deflector.isGraylog2Index(index)) {
+        if (!deflector.isGraylogIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);

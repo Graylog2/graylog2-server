@@ -16,11 +16,9 @@
  */
 package org.graylog2.filters.blacklist;
 
-public class BlacklistFieldEqualityCondition extends FilterDescription {
+import java.util.Objects;
 
-    public BlacklistFieldEqualityCondition() {
-    }
-
+public final class BlacklistFieldEqualityCondition extends FilterDescription {
     public boolean matchesFieldStringValue(Object value) {
         return (value != null) && pattern.equalsIgnoreCase(String.valueOf(value));
     }
@@ -32,12 +30,11 @@ public class BlacklistFieldEqualityCondition extends FilterDescription {
 
         BlacklistFieldEqualityCondition that = (BlacklistFieldEqualityCondition) o;
 
-        return pattern.equals(that.pattern);
-
+        return Objects.equals(pattern, that.pattern);
     }
 
     @Override
     public int hashCode() {
-        return pattern.hashCode();
+        return Objects.hashCode(pattern);
     }
 }
