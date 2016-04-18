@@ -26,6 +26,13 @@ const SearchBar = React.createClass({
     userPreferences: React.PropTypes.object,
     savedSearches: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     config: React.PropTypes.object,
+    displayRefreshControls: React.PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      displayRefreshControls: true,
+    };
   },
 
   getInitialState() {
@@ -392,9 +399,11 @@ const SearchBar = React.createClass({
                     <div className="col-md-6">
                       <div className="saved-searches-selector-container pull-right"
                            style={{ display: 'inline-flex', marginRight: 5 }}>
+                        {this.props.displayRefreshControls &&
                         <div style={{ marginRight: 5 }}>
                           <RefreshControls />
                         </div>
+                        }
                         <div style={{ width: 270 }}>
                           {this._getSavedSearchesSelector()}
                         </div>
