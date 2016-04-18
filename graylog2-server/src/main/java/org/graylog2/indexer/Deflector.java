@@ -212,7 +212,7 @@ public class Deflector { // extends Ablenkblech
      *
      * @return list of managed indices
      */
-    public String[] getAllIndexNames() {
+    public String[] getAllGraylogIndexNames() {
         final Map<String, IndexStats> indices = this.indices.getAll();
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
@@ -229,7 +229,7 @@ public class Deflector { // extends Ablenkblech
      *
      * @return index name and index stats
      */
-    public Map<String, IndexStats> getAllDeflectorIndices() {
+    public Map<String, IndexStats> getAllGraylogDeflectorIndices() {
         final ImmutableMap.Builder<String, IndexStats> result = ImmutableMap.builder();
         for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
             final String name = e.getKey();

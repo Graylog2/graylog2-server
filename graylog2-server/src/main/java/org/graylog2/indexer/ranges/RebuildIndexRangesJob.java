@@ -77,7 +77,7 @@ public class RebuildIndexRangesJob extends SystemJob {
     public void execute() {
         info("Re-calculating index ranges.");
 
-        String[] indices = deflector.getAllIndexNames();
+        String[] indices = deflector.getAllGraylogIndexNames();
         if (indices == null || indices.length == 0) {
             info("No indices, nothing to calculate.");
             return;
