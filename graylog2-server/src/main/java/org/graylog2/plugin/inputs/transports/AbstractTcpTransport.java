@@ -48,6 +48,9 @@ import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -56,6 +59,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractTcpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTcpTransport.class);
@@ -141,6 +146,13 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
         if (!tlsCertFile.exists() || !tlsKeyFile.exists()) {
             LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input [{}/{}].", input.getName(), input.getId());
+
+            final String tmpDir = System.getProperty("java.io.tmpdir");
+            checkState(tmpDir != null, "The temporary directory must not be null!");
+            final Path tmpPath = Paths.get(tmpDir);
+            if(!Files.isDirectory(tmpPath) || !Files.isWritable(tmpPath)) {
+                throw new IllegalStateException("Couldn't write to temporary directory: " + tmpPath.toAbsolutePath());
+            }
 
             try {
                 final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getString(CK_BIND_ADDRESS) + ":" + configuration.getString(CK_PORT));
