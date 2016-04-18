@@ -90,9 +90,9 @@ const UserForm = React.createClass({
     request.password = this.refs.password.getValue();
 
     UsersStore.changePassword(this.props.user.username, request).then(() => {
-      UserNotification.success('Password updated successfully.', 'Success!');
+      UserNotification.success('Password updated successfully.', 'Success');
     }, () => {
-      UserNotification.error('Updating password failed.', 'Error!');
+      UserNotification.error('Could not update password. Please verify that your current password is correct.', 'Updating password failed');
     });
   },
 
@@ -100,9 +100,9 @@ const UserForm = React.createClass({
     evt.preventDefault();
 
     UsersStore.update(this.props.user.username, this.state.user).then(() => {
-      UserNotification.success('User updated successfully.', 'Success!');
+      UserNotification.success('User updated successfully.', 'Success');
     }, () => {
-      UserNotification.error('Updating user failed.', 'Error!');
+      UserNotification.error('Could not update the user. Please check your logs for more information.', 'Updating user failed');
     });
   },
 
