@@ -97,7 +97,7 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
-        final String[] deflectorIndices = deflector.getAllDeflectorIndexNames();
+        final String[] deflectorIndices = deflector.getAllIndexNames();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.length);
     }

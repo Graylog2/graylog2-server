@@ -207,7 +207,12 @@ public class Deflector { // extends Ablenkblech
         return Collections.max(indexNumbers);
     }
 
-    public String[] getAllDeflectorIndexNames() {
+    /**
+     * Returns a list of all Graylog managed indices.
+     *
+     * @return list of managed indices
+     */
+    public String[] getAllIndexNames() {
         final Map<String, IndexStats> indices = this.indices.getAll();
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.size());
         for (String indexName : indices.keySet()) {
@@ -219,12 +224,17 @@ public class Deflector { // extends Ablenkblech
         return result.toArray(new String[result.size()]);
     }
 
+    /**
+     * Returns all Graylog deflector indices.
+     *
+     * @return index name and index stats
+     */
     public Map<String, IndexStats> getAllDeflectorIndices() {
         final ImmutableMap.Builder<String, IndexStats> result = ImmutableMap.builder();
         for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
             final String name = e.getKey();
 
-            if (isGraylogIndex(name)) {
+            if (isGraylogDeflectorIndex(name)) {
                 result.put(name, e.getValue());
             }
         }

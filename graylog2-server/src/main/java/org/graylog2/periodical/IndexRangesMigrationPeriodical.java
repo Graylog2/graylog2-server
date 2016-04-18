@@ -19,9 +19,7 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
@@ -89,7 +87,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         }
 
-        final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllDeflectorIndexNames());
+        final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllIndexNames());
 
         // Migrate old MongoDB index ranges
         final SortedSet<IndexRange> mongoIndexRanges = legacyMongoIndexRangeService.findAll();
