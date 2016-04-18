@@ -90,14 +90,14 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrow() {
-        final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
+        final Map<String, IndexStats> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.size());
     }
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
-        final String[] deflectorIndices = deflector.getAllDeflectorIndexNames();
+        final String[] deflectorIndices = deflector.getAllGraylogIndexNames();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.length);
     }
