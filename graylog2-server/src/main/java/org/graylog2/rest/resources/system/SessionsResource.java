@@ -50,6 +50,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -121,9 +122,13 @@ public class SessionsResource extends RestResource {
 
     @GET
     @ApiOperation(value = "Validate an existing session",
-        notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.")
+        notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
+        code = 204
+    )
     @RequiresAuthentication
-    public void validateSession() {}
+    public Response validateSession() {
+        return Response.noContent().build();
+    }
 
     @DELETE
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
