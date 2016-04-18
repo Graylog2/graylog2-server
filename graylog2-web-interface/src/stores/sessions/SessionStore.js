@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 
 import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -14,9 +15,13 @@ const SessionStore = Reflux.createStore({
   username: undefined,
 
   init() {
-    this.sessionId = Store.get('sessionId');
-    this.username = Store.get('username');
-    this._propagateState();
+    const sessionId = Store.get('sessionId');
+    const username = Store.get('username');
+    this._validateSession(sessionId).then(() => {
+      this.sessionId = sessionId;
+      this.username = username;
+      this._propagateState();
+    });
   },
   getInitialState() {
     return this.getSessionInfo();
@@ -24,7 +29,7 @@ const SessionStore = Reflux.createStore({
 
   login(username, password, host) {
     const builder = new Builder('POST', URLUtils.qualifyUrl(this.sourceUrl))
-      .json({username: username, password: password, host: host});
+      .json({ username: username, password: password, host: host });
     const promise = builder.build()
       .then((sessionInfo) => {
         return { sessionId: sessionInfo.session_id, username: username };
@@ -43,6 +48,12 @@ const SessionStore = Reflux.createStore({
       }, this._removeSession);
 
     SessionActions.logout.promise(promise);
+  },
+
+  _validateSession(sessionId) {
+    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
+      .session(sessionId)
+      .build();
   },
 
   _removeSession() {
@@ -71,7 +82,7 @@ const SessionStore = Reflux.createStore({
     return this.sessionId;
   },
   getSessionInfo() {
-    return {sessionId: this.sessionId, username: this.username};
+    return { sessionId: this.sessionId, username: this.username };
   },
 });
 
