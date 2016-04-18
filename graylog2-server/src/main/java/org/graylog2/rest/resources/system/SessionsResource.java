@@ -120,7 +120,8 @@ public class SessionsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Validate an existing session", notes = "Checks the session with the given ID: return OK if session is valid.")
+    @ApiOperation(value = "Validate an existing session",
+        notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.")
     @RequiresAuthentication
     public void validateSession() {}
 
