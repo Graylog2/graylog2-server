@@ -17,8 +17,11 @@
 package org.graylog2.indexer.indices;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.github.joschi.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
+import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
@@ -34,12 +37,15 @@ import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResp
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
+import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -51,6 +57,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
@@ -186,6 +194,51 @@ public class IndicesTest {
         final IndexTemplateMetaData templateMetaData = responseAfter.getIndexTemplates().get(0);
         assertThat(templateMetaData.getName()).isEqualTo(templateName);
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
+
+        final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
+        final DeleteIndexTemplateResponse deleteResponse = client.deleteTemplate(deleteRequest).actionGet();
+        assertThat(deleteResponse.isAcknowledged()).isTrue();
+
+        indices.delete("index_template_test");
+    }
+
+    @Test
+    public void testCreateOverwritesIndexTemplate() throws Exception {
+        final ObjectMapper mapper = new ObjectMapperProvider().get();
+        final String templateName = CONFIG.getTemplateName();
+        final IndicesAdminClient client = this.client.admin().indices();
+
+        final ImmutableMap<String, Object> beforeMapping = ImmutableMap.of(
+            "_source", ImmutableMap.of("enabled", false),
+            "properties", ImmutableMap.of("message",
+                ImmutableMap.of(
+                    "type", "binary",
+                    "index", "not_analyzed")));
+        assertThat(client.preparePutTemplate(templateName)
+                .setTemplate(indices.allIndicesAlias())
+                .addMapping(IndexMapping.TYPE_MESSAGE, beforeMapping)
+                .get()
+                .isAcknowledged())
+            .isTrue();
+
+        final GetIndexTemplatesResponse responseBefore = client.prepareGetTemplates(templateName).get();
+        final List<IndexTemplateMetaData> beforeIndexTemplates = responseBefore.getIndexTemplates();
+        assertThat(beforeIndexTemplates).hasSize(1);
+        final ImmutableOpenMap<String, CompressedXContent> beforeMappings = beforeIndexTemplates.get(0).getMappings();
+        final Map<String, Object> actualMapping = mapper.readValue(beforeMappings.get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
+        assertThat(actualMapping.get(IndexMapping.TYPE_MESSAGE)).isEqualTo(beforeMapping);
+
+        indices.create("index_template_test");
+
+        final GetIndexTemplatesResponse responseAfter = client.prepareGetTemplates(templateName).get();
+        assertThat(responseAfter.getIndexTemplates()).hasSize(1);
+        final IndexTemplateMetaData templateMetaData = responseAfter.getIndexTemplates().get(0);
+        assertThat(templateMetaData.getName()).isEqualTo(templateName);
+        assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
+
+        final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
+        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indices.allIndicesAlias(), CONFIG.getAnalyzer());
+        assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
         final DeleteIndexTemplateResponse deleteResponse = client.deleteTemplate(deleteRequest).actionGet();
