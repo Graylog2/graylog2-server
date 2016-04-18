@@ -115,8 +115,9 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange calculateRange(String index) {
-        final Stopwatch sw = Stopwatch.createStarted();
+        indices.waitForRecovery(index);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final Stopwatch sw = Stopwatch.createStarted();
         final TimestampStats stats = indices.timestampStatsOfIndex(index);
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
