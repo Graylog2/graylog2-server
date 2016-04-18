@@ -17,7 +17,6 @@
 package org.graylog2.web.resources;
 
 import com.floreysoft.jmte.Engine;
-import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.rest.MoreMediaTypes;
@@ -59,29 +58,34 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
 
-        final String serverTransportUri = serverUriFromHeadersOrDefault(headers);
         final Map<String, Object> model = new HashMap<String, Object>() {{
             put("rootTimeZone", configuration.getRootTimeZone());
-            put("serverUri", serverTransportUri);
+            put("serverUri", buildEndpointUri(headers));
             put("appPathPrefix", "");
         }};
         return engine.transform(template, model);
     }
 
-    private String serverUriFromHeadersOrDefault(HttpHeaders httpHeaders) {
-        final List<String> overrideServerUriHeaders = httpHeaders.getRequestHeader(CK_OVERRIDE_SERVER_URI);
-        if (overrideServerUriHeaders != null && !overrideServerUriHeaders.isEmpty()) {
-            Optional<String> firstHeader = overrideServerUriHeaders.stream().filter(s -> {
+    private String buildEndpointUri(HttpHeaders httpHeaders) {
+        Optional<String> endpointUri = Optional.empty();
+        final List<String> headers = httpHeaders.getRequestHeader(CK_OVERRIDE_SERVER_URI);
+        if (headers != null && !headers.isEmpty()) {
+            endpointUri = headers.stream().filter(s -> {
                 try {
-                    return !Strings.isNullOrEmpty(s) && new URL(s) != null;
+                    final URL url = new URL(s);
+                    switch (url.getProtocol()) {
+                        case "http":
+                        case "https":
+                            return true;
+                        default:
+                            return false;
+                    }
                 } catch (MalformedURLException e) {
                     return false;
                 }
             }).findFirst();
-
-            return firstHeader.orElse(configuration.getRestTransportUri().toString());
         }
 
-        return configuration.getRestTransportUri().toString();
+        return endpointUri.orElse(configuration.getWebEndpointUri().toString());
     }
 }
