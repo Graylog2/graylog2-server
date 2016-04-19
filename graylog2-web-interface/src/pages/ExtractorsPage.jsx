@@ -48,7 +48,9 @@ const ExtractorsPage = React.createClass({
       }
     }
 
-    this.setState({node: inputNode});
+    if (!this.state.node || this.state.node.node_id !== inputNode.node_id) {
+      this.setState({ node: inputNode });
+    }
   },
   _isLoading() {
     return !(this.state.input && this.state.node);
