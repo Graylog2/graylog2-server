@@ -46,7 +46,7 @@ const ConfigurationBundles = React.createClass({
     }, this);
 
     return (
-      <Panel key={category} header={category} eventKey={idx}>
+      <Panel key={category} header={category} eventKey={`${category}-${idx}`}>
         <ul>
           {bundlesJsx}
         </ul>
@@ -88,6 +88,9 @@ const ConfigurationBundles = React.createClass({
   handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
     this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
   },
+  _resetSelection() {
+    this.setState(this.getInitialState());
+  },
   render() {
     return (
       <Row className="configuration-bundles">
@@ -110,7 +113,9 @@ const ConfigurationBundles = React.createClass({
             }
         </Col>
         <Col md={6}>
-          <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>
+          <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId}
+                                      sourceTypeDescription={this.state.sourceTypeDescription}
+                                      onDelete={this._resetSelection} />
         </Col>
       </Row>
     );

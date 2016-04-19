@@ -8,31 +8,38 @@ import ActionsProvider from 'injection/ActionsProvider';
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 const ConfigurationBundlePreview = React.createClass({
+  propTypes: {
+    sourceTypeId: React.PropTypes.string,
+    sourceTypeDescription: React.PropTypes.string,
+    onDelete: React.PropTypes.func.isRequired,
+  },
+
   _confirmDeletion() {
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ConfigurationBundlesActions.delete(this.props.sourceTypeId).then(() => {
-        UserNotification.success('Bundle deleted successfully!', 'Success!');
+        UserNotification.success('Bundle deleted successfully.', 'Success');
+        this.props.onDelete();
       }, () => {
-        UserNotification.error('Deleting bundle failed!', 'Error!');
+        UserNotification.error('Deleting bundle failed, please check your logs for more information.', 'Error');
       });
     }
   },
   _onApply() {
     ConfigurationBundlesActions.apply(this.props.sourceTypeId).then(() => {
-      UserNotification.success('Bundle applied successfully!', 'Success!');
+      UserNotification.success('Bundle applied successfully.', 'Success');
     }, () => {
-      UserNotification.error('Applying bundle failed!', 'Error!');
+      UserNotification.error('Applying bundle failed, please check your logs for more information.', 'Error');
     });
   },
   render() {
     let preview = 'Select a content pack from the list to see its preview.';
-    let apply_action = '';
-    let delete_action = '';
+    let applyAction = '';
+    let deleteAction = '';
 
     if (this.props.sourceTypeDescription) {
       preview = this.props.sourceTypeDescription;
-      apply_action = <Button bsStyle="success" onClick={this._onApply}>Apply content</Button>;
-      delete_action = <Button className="pull-right" bsStyle="warning" bsSize="xsmall" onClick={this._confirmDeletion}>Remove pack</Button>;
+      applyAction = <Button bsStyle="success" onClick={this._onApply}>Apply content</Button>;
+      deleteAction = <Button className="pull-right" bsStyle="warning" bsSize="xsmall" onClick={this._confirmDeletion}>Remove pack</Button>;
     }
 
     const markdownPreview = markdown.toHTML(preview);
@@ -40,12 +47,12 @@ const ConfigurationBundlePreview = React.createClass({
     return (
       <div className="bundle-preview">
         <div style={{ marginBottom: 5 }}>
-          {delete_action}
+          {deleteAction}
           <h2>Content pack description:</h2>
         </div>
         <div dangerouslySetInnerHTML={{__html: markdownPreview}}/>
         <div className="preview-actions">
-          {apply_action}
+          {applyAction}
         </div>
       </div>
     );
