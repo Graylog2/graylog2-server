@@ -5,6 +5,8 @@ import { Row, Col } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import SearchBar from 'components/search/SearchBar';
 
+import Routes from 'routing/Routes';
+
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const SearchStore = StoreProvider.getStore('Search');
@@ -69,7 +71,7 @@ const AppWithSearchBar = React.createClass({
   },
   _searchBarShouldDisplayRefreshControls() {
     // Hide refresh controls on sources page
-    return this.props.location.pathname.indexOf('sources') !== 1;
+    return this.props.location.pathname !== Routes.SOURCES;
   },
   render() {
     if (this._isLoading()) {
