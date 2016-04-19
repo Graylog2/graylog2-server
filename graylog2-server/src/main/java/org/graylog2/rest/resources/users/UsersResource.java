@@ -341,9 +341,9 @@ public class UsersResource extends RestResource {
     @ApiOperation("Update the password for a user.")
     @ApiResponses({
             @ApiResponse(code = 204, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
-            @ApiResponse(code = 400, message = "If the old or new password is missing."),
-            @ApiResponse(code = 403, message = "If the requesting user has insufficient privileges to update the password for the given user or the old password was wrong."),
-            @ApiResponse(code = 404, message = "If the user does not exist.")
+            @ApiResponse(code = 400, message = "The new password is missing, or the old password is missing or incorrect."),
+            @ApiResponse(code = 403, message = "The requesting user has insufficient privileges to update the password for the given user."),
+            @ApiResponse(code = 404, message = "User does not exist.")
     })
     public void changePassword(
             @ApiParam(name = "username", value = "The name of the user whose password to change.", required = true)
@@ -391,7 +391,7 @@ public class UsersResource extends RestResource {
             user.setPassword(cr.password());
             userService.save(user);
         } else {
-            throw new ForbiddenException();
+            throw new BadRequestException("Old password is missing or incorrect.");
         }
     }
 
