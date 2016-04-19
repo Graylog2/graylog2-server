@@ -81,7 +81,7 @@ const GrokPatterns = React.createClass({
 
     return (
       <div>
-        <PageHeader title="Grok patterns" titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
+        <PageHeader title="Grok patterns">
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add
             your own manually or import a whole list of patterns from a so called pattern file.
