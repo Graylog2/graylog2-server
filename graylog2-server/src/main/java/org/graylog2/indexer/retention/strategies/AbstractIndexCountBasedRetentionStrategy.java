@@ -50,7 +50,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain() {
-        final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
+        final Map<String, IndexStats> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
         final int indexCount = deflectorIndices.size();
         final Optional<Integer> maxIndices = getMaxNumberOfIndices();
 
@@ -62,13 +62,13 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         // Do we have more indices than the configured maximum?
         if (indexCount <= maxIndices.get()) {
             LOG.debug("Number of indices ({}) lower than limit ({}). Not performing any retention actions.",
-                    indexCount, maxIndices);
+                    indexCount, maxIndices.get());
             return;
         }
 
         // We have more indices than the configured maximum! Remove as many as needed.
         final int removeCount = indexCount - maxIndices.get();
-        final String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). " +
+        final String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices.get() + "). " +
                 "Running retention for " + removeCount + " indices.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));

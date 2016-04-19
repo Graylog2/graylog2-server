@@ -81,7 +81,7 @@ public class CountsTest {
                 .get();
         assumeTrue(clusterHealthResponse.getStatus() == ClusterHealthStatus.GREEN);
 
-        when(deflector.getAllDeflectorIndexNames()).thenReturn(new String[]{INDEX_NAME});
+        when(deflector.getAllGraylogIndexNames()).thenReturn(new String[]{INDEX_NAME});
 
         counts = new Counts(client, deflector);
     }
