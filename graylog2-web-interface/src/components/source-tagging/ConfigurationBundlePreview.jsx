@@ -32,15 +32,17 @@ const ConfigurationBundlePreview = React.createClass({
     if (this.props.sourceTypeDescription) {
       preview = this.props.sourceTypeDescription;
       apply_action = <Button bsStyle="success" onClick={this._onApply}>Apply content</Button>;
-      delete_action = <Button className="pull-right" bsStyle="warning" onClick={this._confirmDeletion}>Remove pack</Button>;
+      delete_action = <Button className="pull-right" bsStyle="warning" bsSize="xsmall" onClick={this._confirmDeletion}>Remove pack</Button>;
     }
 
     const markdownPreview = markdown.toHTML(preview);
 
     return (
       <div className="bundle-preview">
-        {delete_action}
-        <h2>Content pack description:</h2>
+        <div style={{ marginBottom: 5 }}>
+          {delete_action}
+          <h2>Content pack description:</h2>
+        </div>
         <div dangerouslySetInnerHTML={{__html: markdownPreview}}/>
         <div className="preview-actions">
           {apply_action}

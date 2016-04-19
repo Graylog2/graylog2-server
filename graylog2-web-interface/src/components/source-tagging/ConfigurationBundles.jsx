@@ -96,9 +96,11 @@ const ConfigurationBundles = React.createClass({
           <Accordion>
             {this._getCategoriesHtml()}
             <Panel header="Import content pack" eventKey={-1}>
-              <form onSubmit={this.onSubmit} className="form-inline upload" encType="multipart/form-data">
-                <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
-                <input ref="uploadedFile" type="file" name="bundle"/>
+              <form onSubmit={this.onSubmit} className="upload" encType="multipart/form-data">
+                <span className="help-block">Remember to apply the content pack after uploading it, to make the changes effective.</span>
+                <div className="form-group">
+                  <input ref="uploadedFile" type="file" name="bundle"/>
+                </div>
                 <button type="submit" className="btn btn-success">Upload</button>
               </form>
             </Panel>
