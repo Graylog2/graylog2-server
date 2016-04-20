@@ -8,7 +8,8 @@ Upgrading
 The embedded Elasticsearch node being used by Graylog has been upgraded to Elasticsearch 2.x which includes some breaking changes.
 Graylog 2.x does not work with Elasticsearch 1.x anymore and cannot communicate with existing Elasticsearch 1.x clusters.
 
-Please see https://www.elastic.co/guide/en/elasticsearch/reference/2.x/breaking-changes.html[Breaking changes in Elasticsearch 2.x] for details.
+Please see https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking-changes.html[Breaking changes in Elasticsearch 2.0] for details.
+See also the breaking changes page of newer Elasticsearch releases if needed.
 
 The blog article https://www.elastic.co/blog/key-point-to-be-aware-of-when-upgrading-from-elasticsearch-1-to-2[Key points to be aware of when upgrading from Elasticsearch 1.x to 2.x] also contains interesting information about the upgrade path from Elasticsearch 1.x to 2.x.
 
