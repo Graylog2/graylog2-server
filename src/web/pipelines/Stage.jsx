@@ -22,13 +22,28 @@ const Stage = React.createClass({
     return <th>{header}</th>;
   },
 
-  _ruleRowFormatter(stage, rule) {
+  _ruleRowFormatter(stage, ruleArg, ruleIdx) {
+    let rule = ruleArg;
+
+    let ruleTitle;
+    // this can happen when a rule has been renamed, but not all references are updated
+    if (!rule) {
+      rule = {
+        id: `invalid-${ruleIdx}`,
+        description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
+      };
+      ruleTitle = <span><i className="fa fa-warning text-danger"/> {stage.rules[ruleIdx]}</span>;
+    } else {
+      ruleTitle = (<LinkContainer to={`/system/pipelines/rules/${rule.id}`}>
+          <a>{rule.title}</a>
+        </LinkContainer>
+      );
+
+    }
     return (
       <tr>
         <td style={{ width: 400 }}>
-          <LinkContainer to={`/system/pipelines/rules/${rule.id}`}>
-            <a>{rule.title}</a>
-          </LinkContainer>
+          {ruleTitle}
         </td>
         <td>{rule.description}</td>
         <td>
@@ -54,7 +69,7 @@ const Stage = React.createClass({
                  headers={headers}
                  headerCellFormatter={this._ruleHeaderFormatter}
                  rows={rules}
-                 dataRowFormatter={(rule) => this._ruleRowFormatter(stage, rule)}
+                 dataRowFormatter={(rule, i) => this._ruleRowFormatter(stage, rule, i)}
                  noDataText="This stage has no rules yet. Click on edit to add some."
                  filterLabel=""
                  filterKeys={[]} />
