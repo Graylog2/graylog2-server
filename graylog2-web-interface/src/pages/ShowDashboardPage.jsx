@@ -168,7 +168,7 @@ const ShowDashboardPage = React.createClass({
     let actions;
     if (!this._dashboardIsEmpty(dashboard)) {
       actions = (
-        <span className="pull-right">
+        <div>
           <Button id="update-unfocussed" bsStyle="info" onClick={this._toggleUpdateInBackground}>
             Update in {this.state.forceUpdateInBackground ? 'foreground' : 'background'}
           </Button>
@@ -178,7 +178,7 @@ const ShowDashboardPage = React.createClass({
             {' '}
             <Button bsStyle="success" onClick={this._onUnlock}>{this.state.locked ? 'Unlock / Edit' : 'Lock'}</Button>
           </IfPermitted>
-        </span>
+        </div>
       );
     }
 
@@ -207,7 +207,7 @@ const ShowDashboardPage = React.createClass({
     );
     return (
       <span>
-        <PageHeader title={dashboardTitle} titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'center'}}>
+        <PageHeader title={dashboardTitle}>
           <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
           {supportText}
           {actions}

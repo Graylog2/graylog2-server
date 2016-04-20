@@ -21,7 +21,7 @@ const UsersPage = React.createClass({
     // TODO: fix permission names
     return (
       <span>
-        <PageHeader title="User accounts" titleSize={8} buttonSize={4} buttonStyle={{textAlign: 'right', marginTop: '10px'}}>
+        <PageHeader title="User accounts">
           <span>Create as many users as you want next to the default administrator user here. You can also configure LDAP and make changes to already existing users.</span>
 
           <span>Read more about user management in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.</span>

@@ -50,7 +50,7 @@ const LdapGroupsPage = React.createClass({
   render() {
     return (
       <span>
-        <PageHeader title="LDAP Group Mapping" titleSize={8} buttonSize={4}>
+        <PageHeader title="LDAP Group Mapping">
           <span>Map LDAP groups to Graylog roles</span>
 
           <span>

@@ -5,6 +5,8 @@ import { Row, Col } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import SearchBar from 'components/search/SearchBar';
 
+import Routes from 'routing/Routes';
+
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const SearchStore = StoreProvider.getStore('Search');
@@ -19,6 +21,7 @@ const ConfigurationActions = ActionsProvider.getActions('Configuration');
 const AppWithSearchBar = React.createClass({
   propTypes: {
     children: PropTypes.element.isRequired,
+    location: PropTypes.object,
     params: PropTypes.object,
   },
   mixins: [
@@ -66,6 +69,10 @@ const AppWithSearchBar = React.createClass({
       return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig });
     });
   },
+  _searchBarShouldDisplayRefreshControls() {
+    // Hide refresh controls on sources page
+    return this.props.location.pathname !== Routes.SOURCES;
+  },
   render() {
     if (this._isLoading()) {
       return <Spinner/>;
@@ -79,7 +86,8 @@ const AppWithSearchBar = React.createClass({
       <div className="container-fluid">
         <SearchBar ref="searchBar" userPreferences={this.state.currentUser.preferences}
                    savedSearches={this.state.savedSearches}
-                   config={this.state.searchesClusterConfig} />
+                   config={this.state.searchesClusterConfig}
+                   displayRefreshControls={this._searchBarShouldDisplayRefreshControls()} />
         <Row id="main-row">
           <Col md={12} id="main-content">
             {this._decorateChildren(this.props.children)}

@@ -23,6 +23,8 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.assertj.jodatime.api.Assertions;
 import org.bson.types.ObjectId;
+import org.elasticsearch.ElasticsearchTimeoutException;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
@@ -165,6 +167,14 @@ public class MongoIndexRangeServiceTest {
         assertThat(indexRange.begin()).isEqualTo(min);
         assertThat(indexRange.end()).isEqualTo(max);
         Assertions.assertThat(indexRange.calculatedAt()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
+    }
+
+    @Test(expected = ElasticsearchTimeoutException.class)
+    public void calculateRangeFailsIfIndexIsNotHealthy() throws Exception {
+        final String index = "graylog";
+        when(indices.waitForRecovery(index)).thenThrow(new ElasticsearchTimeoutException("TEST"));
+
+        indexRangeService.calculateRange(index);
     }
 
     @Test

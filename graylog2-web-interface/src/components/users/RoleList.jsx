@@ -19,7 +19,8 @@ var RoleList = React.createClass({
     },
 
     _headerCellFormatter(header) {
-        return <th>{header}</th>;
+        const className = (header === 'Actions' ? 'actions' : '');
+        return <th className={className}>{header}</th>;
     },
     _roleInfoFormatter(role) {
 
@@ -33,7 +34,7 @@ var RoleList = React.createClass({
             <tr key={role.name}>
                 <td>{role.name}</td>
                 <td className="limited">{role.description}</td>
-                <td style={{width: 150}}>
+                <td>
                     {role.read_only ? null : actions}
                 </td>
             </tr>

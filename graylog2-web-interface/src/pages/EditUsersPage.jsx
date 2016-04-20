@@ -60,8 +60,7 @@ const EditUsersPage = React.createClass({
 
     return (
       <span>
-        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>} titleSize={8} buttonSize={4}
-                    buttonStyle={{ textAlign: 'right', marginTop: 10 }}>
+        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>}>
           <span>You can either change the details of a user here or set a new password.</span>
           {null}
           <div>

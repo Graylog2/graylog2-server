@@ -13,7 +13,7 @@ const LdapPage = React.createClass({
   render() {
     return (
       <span>
-        <PageHeader title="LDAP Settings" titleSize={8} buttonSize={4}>
+        <PageHeader title="LDAP Settings">
           <span>This page is the only resource you need to set up the Graylog LDAP integration. You can test the connection to your LDAP server and even try to log in with an LDAP account of your choice right away.</span>
 
           <span>Read more about LDAP configuration in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.</span>

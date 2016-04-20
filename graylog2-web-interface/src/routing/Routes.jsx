@@ -18,10 +18,10 @@ const Routes = {
     },
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
-    METRICS: (nodeId) => '/system/metrics/node/' + nodeId,
+    METRICS: (nodeId) => `/system/metrics/node/${nodeId}`,
     NODES: {
       LIST: '/system/nodes',
-      SHOW: (nodeId) => '/system/nodes/' + nodeId,
+      SHOW: (nodeId) => `/system/nodes/${nodeId}`,
     },
     THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
@@ -29,7 +29,7 @@ const Routes = {
     ROLES: '/system/roles',
     USERS: {
       CREATE: '/system/users/new',
-      edit: (username) => '/system/users/edit/' + username,
+      edit: (username) => `/system/users/edit/${username}`,
       LIST: '/system/users',
     },
     LDAP: {
@@ -38,14 +38,14 @@ const Routes = {
     },
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
-  stream_edit: (streamId) => '/streams/' + streamId + '/edit',
+  stream_edit: (streamId) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
-  stream_outputs: (streamId) => '/streams/' + streamId + '/outputs',
-  stream_alerts: (streamId) => '/streams/' + streamId + '/alerts',
-  stream_search: (streamId) => '/streams/' + streamId + '/search',
-  legacy_stream_search: (streamId) => '/streams/' + streamId + '/messages',
+  stream_outputs: (streamId) => `/streams/${streamId}/outputs`,
+  stream_alerts: (streamId) => `/streams/${streamId}/alerts`,
+  stream_search: (streamId) => `/streams/${streamId}/search`,
+  legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
 
-  dashboard_show: (dashboardId) => '/dashboards/' + dashboardId,
+  dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
 
   node: (nodeId) => `/system/nodes/${nodeId}`,
 

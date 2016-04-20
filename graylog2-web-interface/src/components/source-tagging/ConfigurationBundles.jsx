@@ -46,7 +46,7 @@ const ConfigurationBundles = React.createClass({
     }, this);
 
     return (
-      <Panel key={category} header={category} eventKey={idx}>
+      <Panel key={category} header={category} eventKey={`${category}-${idx}`}>
         <ul>
           {bundlesJsx}
         </ul>
@@ -88,6 +88,9 @@ const ConfigurationBundles = React.createClass({
   handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
     this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
   },
+  _resetSelection() {
+    this.setState(this.getInitialState());
+  },
   render() {
     return (
       <Row className="configuration-bundles">
@@ -96,9 +99,11 @@ const ConfigurationBundles = React.createClass({
           <Accordion>
             {this._getCategoriesHtml()}
             <Panel header="Import content pack" eventKey={-1}>
-              <form onSubmit={this.onSubmit} className="form-inline upload" encType="multipart/form-data">
-                <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
-                <input ref="uploadedFile" type="file" name="bundle"/>
+              <form onSubmit={this.onSubmit} className="upload" encType="multipart/form-data">
+                <span className="help-block">Remember to apply the content pack after uploading it, to make the changes effective.</span>
+                <div className="form-group">
+                  <input ref="uploadedFile" type="file" name="bundle"/>
+                </div>
                 <button type="submit" className="btn btn-success">Upload</button>
               </form>
             </Panel>
@@ -108,7 +113,9 @@ const ConfigurationBundles = React.createClass({
             }
         </Col>
         <Col md={6}>
-          <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>
+          <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId}
+                                      sourceTypeDescription={this.state.sourceTypeDescription}
+                                      onDelete={this._resetSelection} />
         </Col>
       </Row>
     );
