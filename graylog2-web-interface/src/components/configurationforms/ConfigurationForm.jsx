@@ -31,7 +31,7 @@ const ConfigurationForm = React.createClass({
     data.configuration = {};
 
     $.map(this.state.configFields, function(field, name) {
-      data.configuration[name] = (values[name] === undefined  || values === null || String(values[name]).trim() === "" ? field.default_value : values[name]);
+      data.configuration[name] = values[name] || '';
     });
 
     return data;

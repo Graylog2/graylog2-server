@@ -41,7 +41,7 @@ public class ConfigurationMapConverter {
             final String type = (String) fieldDescription.get("type");
 
             // Decide what to cast to. (string, bool, number)
-            final Object value;
+            Object value;
             switch (type) {
                 case "text":
                 case "dropdown":
@@ -51,7 +51,12 @@ public class ConfigurationMapConverter {
                     try {
                         value = Integer.parseInt(String.valueOf(entry.getValue()));
                     } catch (NumberFormatException e) {
-                        throw new ValidationException(field, e.getMessage());
+                        // If a numeric field is optional and not provided, use null as value
+                        if ("true".equals(String.valueOf(fieldDescription.get("is_optional")))) {
+                            value = null;
+                        } else {
+                            throw new ValidationException(field, e.getMessage());
+                        }
                     }
                     break;
                 case "boolean":
