@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.google.common.annotations.VisibleForTesting;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -126,6 +127,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_enable")
     private boolean webEnable = true;
 
+    @Parameter(value = "web_endpoint_uri")
+    private URI webEndpointUri;
+
     @Parameter(value = "web_enable_cors")
     private boolean webEnableCors = false;
 
@@ -166,14 +170,20 @@ public abstract class BaseConfiguration {
     }
 
     public URI getRestTransportUri() {
-        return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
+        if (restTransportUri == null) {
+            LOG.debug("No rest_transport_uri set. Using default [{}].", getDefaultRestTransportUri());
+            return getDefaultRestTransportUri();
+        } else {
+            return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
+        }
     }
 
     public void setRestTransportUri(final URI restTransportUri) {
         this.restTransportUri = restTransportUri;
     }
 
-    public URI getDefaultRestTransportUri() {
+    @VisibleForTesting
+    protected URI getDefaultRestTransportUri() {
         final URI transportUri;
         final URI listenUri = getRestListenUri();
 
@@ -372,5 +382,9 @@ public abstract class BaseConfiguration {
 
     public String getWebTlsKeyPassword() {
         return webTlsKeyPassword;
+    }
+
+    public URI getWebEndpointUri() {
+        return webEndpointUri == null ? getRestTransportUri() : webEndpointUri;
     }
 }
