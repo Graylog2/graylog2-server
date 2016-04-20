@@ -30,7 +30,7 @@ const IndexSummary = React.createClass({
       labels.push(<Label key={`${this.props.name}-reopened-label`} bsStyle="success">reopened</Label>);
     }
 
-    return <span>{labels}</span>;
+    return <span className="index-label">{labels}</span>;
   },
 
   _formatIndexRange() {
@@ -59,9 +59,9 @@ const IndexSummary = React.createClass({
   },
   _formatShowDetailsLink() {
     if (this.state.showDetails) {
-      return <span><i className="fa fa-caret-down"/> Hide Details / Actions</span>;
+      return <span className="index-more-actions"><i className="fa fa-caret-down"/> Hide Details / Actions</span>;
     }
-    return <span><i className="fa fa-caret-right"/> Show Details / Actions</span>;
+    return <span className="index-more-actions"><i className="fa fa-caret-right"/> Show Details / Actions</span>;
   },
   _toggleShowDetails(event) {
     event.preventDefault();
