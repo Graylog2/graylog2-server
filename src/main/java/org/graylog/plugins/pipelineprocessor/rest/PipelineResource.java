@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -55,6 +56,7 @@ import java.util.Collection;
 @Path("/system/pipelines/pipeline")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class PipelineResource extends RestResource implements PluginRestResource {
 
     private static final Logger log = LoggerFactory.getLogger(PipelineResource.class);

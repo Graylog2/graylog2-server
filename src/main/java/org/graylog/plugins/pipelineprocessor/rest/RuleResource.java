@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 @Path("/system/pipelines/rule")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class RuleResource extends RestResource implements PluginRestResource {
 
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
