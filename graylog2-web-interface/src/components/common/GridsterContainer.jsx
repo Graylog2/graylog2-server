@@ -89,7 +89,7 @@ const GridsterContainer = React.createClass({
 
   render() {
     const children = (this.state.grid && React.Children.map(this.props.children, (child) => {
-      const position = this.props.positions[child.props.id];
+      const position = this.props.positions[child.props.id] || {row: 0, col: 0, width: 1, height: 1};
 
       return (
         <GridsterWidget grid={this.state.grid} position={position}>
