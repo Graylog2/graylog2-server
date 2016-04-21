@@ -12,6 +12,13 @@ Please see https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking-
 
 The blog article https://www.elastic.co/blog/key-point-to-be-aware-of-when-upgrading-from-elasticsearch-1-to-2[Key points to be aware of when upgrading from Elasticsearch 1.x to 2.x] also contains interesting information about the upgrade path from Elasticsearch 1.x to 2.x.
 
+#### Multicast Discovery
+
+Multicast discovery has been removed from Elasticsearch 2.x (although it is still provided as an Elasticsearch plugin for now).
+
+To reflect this change, the `elasticsearch_discovery_zen_ping_unicast_hosts` now has to contain the address of at least one Elasticsearch node in the cluster which Graylog can connect to.
+
+
 #### Graylog Index Template
 
 Graylog applies a custom https://www.elastic.co/guide/en/elasticsearch/reference/2.0/indices-templates.html[index template] to ensure that the indexed messages adhere to a specific schema.
@@ -79,12 +86,14 @@ For better consistency, the defaults of some configuration settings have been ch
 
 .Configuration defaults
 |===
-| Setting name                 | Old default                    | New default
+| Setting name                                         | Old default                    | New default
 
-| `elasticsearch_cluster_name` | `graylog2`                     | `graylog`
-| `elasticsearch_node_name`    | `graylog2-server`              | `graylog-server`
-| `elasticsearch_index_prefix` | `graylog2`                     | `graylog`
-| `mongodb_uri`                | `mongodb://127.0.0.1/graylog2` | `mongodb://localhost/graylog`
+| `elasticsearch_cluster_name`                         | `graylog2`                     | `graylog`
+| `elasticsearch_node_name`                            | `graylog2-server`              | `graylog-server`
+| `elasticsearch_index_prefix`                         | `graylog2`                     | `graylog`
+| `elasticsearch_discovery_zen_ping_unicast_hosts`     | empty                          | `127.0.0.1:9300`
+| `elasticsearch_discovery_zen_ping_multicast_enabled` | `true`                         | `false`
+| `mongodb_uri`                                        | `mongodb://127.0.0.1/graylog2` | `mongodb://localhost/graylog`
 |===
 
 
