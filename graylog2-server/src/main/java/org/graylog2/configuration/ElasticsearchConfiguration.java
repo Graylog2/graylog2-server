@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.joda.time.Period;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,10 +57,10 @@ public class ElasticsearchConfiguration {
     private boolean httpEnabled = false;
 
     @Parameter(value = "elasticsearch_discovery_zen_ping_multicast_enabled")
-    private boolean multicastDiscovery = true;
+    private boolean multicastDiscovery = false;
 
     @Parameter(value = "elasticsearch_discovery_zen_ping_unicast_hosts", converter = StringListConverter.class)
-    private List<String> unicastHosts;
+    private List<String> unicastHosts = Collections.singletonList("127.0.0.1:9300");
 
     @Parameter(value = "elasticsearch_discovery_initial_state_timeout")
     private String initialStateTimeout = "3s";
@@ -80,7 +81,7 @@ public class ElasticsearchConfiguration {
     private boolean disableVersionCheck = false;
 
     @Parameter(value = "elasticsearch_config_file", validator = FilePathReadableValidator.class)
-    private Path configFile; // = "/etc/graylog/server/elasticsearch.yml";
+    private Path configFile;
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String indexPrefix = "graylog";
