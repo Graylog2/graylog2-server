@@ -64,7 +64,8 @@ const PipelineConnectionsPage = React.createClass({
         <PageHeader title="Pipeline connections">
           <span>
             Pipelines let you process messages sent to Graylog. Here you can select which streams will be used{' '}
-            as input for the different pipelines you configure.
+            as input for the different pipelines you configure.<br/><br/>
+            <i className="fa fa-lg fa-warning"/> This feature of Graylog is new and should be considered experimental. There may be missing functionality or incompatible changes in the future.
           </span>
           <span>
             Read more about Graylog pipelines in the <DocumentationLink page={DocsHelper.PAGES.PIPELINES} text="documentation" />.
