@@ -1,0 +1,236 @@
+/**
+ * This file is part of Graylog Beats Plugin.
+ *
+ * Graylog Beats Plugin is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog Beats Plugin is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog Beats Plugin.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog.plugins.beats;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.assistedinject.Assisted;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
+import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
+import static org.graylog.plugins.beats.MapUtils.flatten;
+
+@Codec(name = "beats", displayName = "Beats")
+public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
+    private static final Logger LOG = LoggerFactory.getLogger(BeatsCodec.class);
+    private static final String MAP_KEY_SEPARATOR = "_";
+
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public BeatsCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+        super(configuration);
+        this.objectMapper = requireNonNull(objectMapper);
+    }
+
+    @Nullable
+    @Override
+    public Message decode(@Nonnull RawMessage rawMessage) {
+        throw new UnsupportedOperationException("MultiMessageCodec " + getClass() + " does not support decode()");
+    }
+
+    @Nullable
+    @Override
+    public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
+        final byte[] payload = rawMessage.getPayload();
+        final List<Map<String, Object>> events;
+        try {
+            events = objectMapper.readValue(payload, new TypeReference<List<Map<String, Object>>>() {
+            });
+        } catch (IOException e) {
+            return null;
+        }
+
+        final List<Message> messages = new ArrayList<>(events.size());
+        for (Map<String, Object> event : events) {
+            final Message message = parseEvent(event);
+            if (message != null) {
+                messages.add(message);
+            }
+        }
+
+        return messages;
+    }
+
+    @Nullable
+    private Message parseEvent(Map<String, Object> event) {
+        @SuppressWarnings("unchecked")
+        final Map<String, String> metadata = (HashMap<String, String>) event.remove("@metadata");
+        final String type;
+        if (metadata == null) {
+            LOG.warn("Couldn't recognize Beats type");
+            type = "unknown";
+        } else {
+            type = metadata.get("beat");
+        }
+        final Message gelfMessage;
+        switch (type) {
+            case "filebeat":
+                gelfMessage = parseFilebeat(event);
+                break;
+            case "topbeat":
+                gelfMessage = parseTopbeat(event);
+                break;
+            case "packetbeat":
+                gelfMessage = parsePacketbeat(event);
+                break;
+            case "winlogbeat":
+                gelfMessage = parseWinlogbeat(event);
+                break;
+            default:
+                LOG.debug("Unknown beats type {}. Using generic handler.", type);
+                gelfMessage = parseGenericBeat(event);
+                break;
+        }
+
+        return gelfMessage;
+    }
+
+    private Message createMessage(String message, Map<String, Object> event) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> beat = (Map<String, Object>) event.remove("beat");
+        final String hostname;
+        final String name;
+        if (beat == null) {
+            hostname = "unknown";
+            name = "unknown";
+        } else {
+            hostname = String.valueOf(beat.get("hostname"));
+            name = String.valueOf(beat.get("name"));
+        }
+        final String timestampField = String.valueOf(event.remove("@timestamp"));
+        final DateTime timestamp = Tools.dateTimeFromString(timestampField);
+
+        final Message result = new Message(message, hostname, timestamp);
+        result.addField("name", name);
+
+        return result;
+    }
+
+    /**
+     * @see <a href="https://www.elastic.co/guide/en/beats/filebeat/1.2/exported-fields.html">Filebeat Exported Fields</a>
+     */
+    private Message parseFilebeat(Map<String, Object> event) {
+        final String message = String.valueOf(event.get("message"));
+        final Message gelfMessage = createMessage(message, event);
+        gelfMessage.addField("facility", "filebeat");
+        gelfMessage.addField("file", event.get("source"));
+        gelfMessage.addField("type", event.get("type"));
+        gelfMessage.addField("input_type", event.get("input_type"));
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> fields = (Map<String, Object>) event.get("fields");
+        if (fields != null) {
+            gelfMessage.addFields(fields);
+        }
+        return gelfMessage;
+    }
+
+    /**
+     * @see <a href="https://www.elastic.co/guide/en/beats/topbeat/1.2/exported-fields.html">Topbeat Exported Fields</a>
+     */
+    private Message parseTopbeat(Map<String, Object> event) {
+        final Message gelfMessage = createMessage("-", event);
+        gelfMessage.addField("type", event.remove("type"));
+        gelfMessage.addField("facility", "topbeat");
+        final Map<String, Object> flattened = flatten(event, "topbeat", MAP_KEY_SEPARATOR);
+
+        // Fix field names containing dots, like "cpu.name"
+        final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
+        gelfMessage.addFields(withoutDots);
+        return gelfMessage;
+    }
+
+    /**
+     * @see <a href="https://www.elastic.co/guide/en/beats/packetbeat/1.2/exported-fields.html">Packetbeat Exported Fields</a>
+     */
+    private Message parsePacketbeat(Map<String, Object> event) {
+        final Message gelfMessage = createMessage("-", event);
+        gelfMessage.addField("type", event.remove("type"));
+        gelfMessage.addField("facility", "packetbeat");
+        final Map<String, Object> flattened = flatten(event, "packetbeat", MAP_KEY_SEPARATOR);
+
+        // Fix field names containing dots, like "icmp.version"
+        final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
+        gelfMessage.addFields(withoutDots);
+
+        return gelfMessage;
+    }
+
+    /**
+     * @see <a href="https://www.elastic.co/guide/en/beats/winlogbeat/1.2/exported-fields.html">Winlogbeat Exported Fields</a>
+     */
+    private Message parseWinlogbeat(Map<String, Object> event) {
+        final String message = String.valueOf(event.remove("message"));
+        final Message gelfMessage = createMessage(message, event);
+        gelfMessage.addField("type", event.remove("type"));
+        gelfMessage.addField("facility", "winlogbeat");
+        final Map<String, Object> flattened = flatten(event, "winlogbeat", MAP_KEY_SEPARATOR);
+
+        // Fix field names containing dots, like "user.name"
+        final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
+        gelfMessage.addFields(withoutDots);
+        return gelfMessage;
+    }
+
+    private Message parseGenericBeat(Map<String, Object> event) {
+        final String message = String.valueOf(event.remove("message"));
+        final Message gelfMessage = createMessage(message, event);
+        gelfMessage.addField("type", event.remove("type"));
+        gelfMessage.addField("facility", "genericbeat");
+        final Map<String, Object> flattened = flatten(event, "beat", MAP_KEY_SEPARATOR);
+
+        // Fix field names containing dots
+        final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
+        gelfMessage.addFields(withoutDots);
+        return gelfMessage;
+    }
+
+
+    @FactoryClass
+    public interface Factory extends AbstractCodec.Factory<BeatsCodec> {
+        @Override
+        BeatsCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends AbstractCodec.Config {
+    }
+}

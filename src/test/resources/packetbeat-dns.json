@@ -1,0 +1,57 @@
+{
+  "@metadata": {
+    "beat": "packetbeat"
+  },
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local"
+  },
+  "bytes_in": 35,
+  "bytes_out": 51,
+  "client_ip": "192.168.0.10",
+  "client_port": 57935,
+  "client_proc": "",
+  "client_server": "",
+  "count": 1,
+  "direction": "out",
+  "dns": {
+    "additionals_count": 0,
+    "answers": [
+      {
+        "class": "IN",
+        "data": "216.58.211.46",
+        "name": "www3.l.google.com",
+        "ttl": 845,
+        "type": "A"
+      }
+    ],
+    "answers_count": 1,
+    "authorities_count": 0,
+    "flags": {
+      "authoritative": false,
+      "recursion_allowed": true,
+      "recursion_desired": true,
+      "truncated_response": false
+    },
+    "id": 9819,
+    "op_code": "QUERY",
+    "question": {
+      "class": "IN",
+      "name": "www3.l.google.com",
+      "type": "A"
+    },
+    "response_code": "NOERROR"
+  },
+  "ip": "192.168.0.1",
+  "method": "QUERY",
+  "port": 53,
+  "proc": "",
+  "query": "class IN, type A, www3.l.google.com",
+  "resource": "www3.l.google.com",
+  "responsetime": 15,
+  "server": "",
+  "status": "OK",
+  "transport": "udp",
+  "type": "dns"
+}

@@ -1,0 +1,32 @@
+{
+  "@metadata": {
+    "beat": "topbeat"
+  },
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local"
+  },
+  "count": 1,
+  "proc": {
+    "cmdline": "./topbeat -v -e topbeat.yml",
+    "cpu": {
+      "user": 35,
+      "user_p": 0,
+      "system": 24,
+      "total": 59,
+      "start_time": "17:13"
+    },
+    "mem": {
+      "size": 587173474304,
+      "rss": 12603392,
+      "rss_p": 0,
+      "share": 0
+    },
+    "name": "topbeat",
+    "pid": 76689,
+    "ppid": 76494,
+    "state": "running"
+  },
+  "type": "process"
+}

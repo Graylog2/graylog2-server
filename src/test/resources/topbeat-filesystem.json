@@ -1,0 +1,23 @@
+{
+  "@metadata": {
+    "beat": "topbeat"
+  },
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local"
+  },
+  "count": 1,
+  "fs": {
+    "device_name": "/dev/disk1",
+    "total": 499055067136,
+    "used": 379920072704,
+    "used_p": 0.76,
+    "free": 119134994432,
+    "avail": 118872850432,
+    "files": 121839614,
+    "free_files": 29021692,
+    "mount_point": "/"
+  },
+  "type": "filesystem"
+}
