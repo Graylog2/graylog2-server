@@ -9,7 +9,7 @@ const PipelinesOverviewPage = React.createClass({
   render() {
     return (
       <div>
-        <PageHeader title="Pipelines overview">
+        <PageHeader title="Pipelines overview" experimental>
           <span>
             Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where{' '}
             rules are evaluated and applied. Messages can go through one or more stages.

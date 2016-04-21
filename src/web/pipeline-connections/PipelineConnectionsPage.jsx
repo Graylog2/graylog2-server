@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import Reflux from 'reflux';
 import { Button, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -61,7 +61,7 @@ const PipelineConnectionsPage = React.createClass({
     }
     return (
       <span>
-        <PageHeader title="Pipeline connections">
+        <PageHeader title="Pipeline connections" experimental>
           <span>
             Pipelines let you process messages sent to Graylog. Here you can select which streams will be used{' '}
             as input for the different pipelines you configure.<br/><br/>
