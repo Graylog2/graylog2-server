@@ -343,11 +343,6 @@ public abstract class CmdLineTool implements CliCommand {
         LOG.debug("Loading configuration from config file: {}", configFile);
         processConfiguration(jadConfig);
 
-        if (configuration.getRestTransportUri() == null) {
-            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri());
-            LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
-        }
-
         return new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
     }
 

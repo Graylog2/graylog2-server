@@ -46,8 +46,10 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManager;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -56,6 +58,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractTcpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTcpTransport.class);
@@ -66,6 +70,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
     private static final String CK_TLS_CLIENT_AUTH = "tls_client_auth";
     private static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
+    private static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
 
     private static final String TLS_CLIENT_AUTH_DISABLED = "disabled";
     private static final String TLS_CLIENT_AUTH_OPTIONAL = "optional";
@@ -86,6 +91,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private File tlsKeyFile;
     private final File tlsClientAuthCertFile;
     private final String tlsClientAuth;
+    private final boolean tcpKeepalive;
 
     public AbstractTcpTransport(
             Configuration configuration,
@@ -107,6 +113,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.tlsClientAuth = configuration.getString(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_DISABLED);
         this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
 
+        this.tcpKeepalive = configuration.getBoolean(CK_TCP_KEEPALIVE);
 
         this.localRegistry.register("open_connections", connectionCounter.gaugeCurrent());
         this.localRegistry.register("total_connections", connectionCounter.gaugeTotal());
@@ -124,6 +131,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
         bootstrap.setOption("receiveBufferSize", getRecvBufferSize());
         bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
+        bootstrap.setOption("child.keepAlive", tcpKeepalive);
 
         return bootstrap;
     }
@@ -141,6 +149,13 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
         if (!tlsCertFile.exists() || !tlsKeyFile.exists()) {
             LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input [{}/{}].", input.getName(), input.getId());
+
+            final String tmpDir = System.getProperty("java.io.tmpdir");
+            checkState(tmpDir != null, "The temporary directory must not be null!");
+            final Path tmpPath = Paths.get(tmpDir);
+            if(!Files.isDirectory(tmpPath) || !Files.isWritable(tmpPath)) {
+                throw new IllegalStateException("Couldn't write to temporary directory: " + tmpPath.toAbsolutePath());
+            }
 
             try {
                 final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getString(CK_BIND_ADDRESS) + ":" + configuration.getString(CK_PORT));
@@ -272,6 +287,14 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             "",
                             "TLS Client Auth Trusted Certs  (File or Directory)",
                             ConfigurationField.Optional.OPTIONAL)
+            );
+            x.addField(
+                    new BooleanField(
+                            CK_TCP_KEEPALIVE,
+                            "TCP keepalive",
+                            false,
+                            "Enable TCP keepalive packets"
+                )
             );
 
             return x;

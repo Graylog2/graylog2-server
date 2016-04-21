@@ -45,8 +45,9 @@ const DataTable = React.createClass({
   getFormattedHeaders() {
     let i = 0;
     const formattedHeaders = this.state.headers.map((header) => {
+      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
       i++;
-      return <DataTableElement key={`header-${i}`} element={header} formatter={this.props.headerCellFormatter} />;
+      return el;
     });
 
     return <tr>{formattedHeaders}</tr>;
@@ -60,8 +61,9 @@ const DataTable = React.createClass({
       });
     }
     const formattedDataRows = sortedDataRows.map((row) => {
+      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={this.props.dataRowFormatter} />;
       i++;
-      return <DataTableElement key={`row-${i}`} element={row} formatter={this.props.dataRowFormatter} />;
+      return el;
     });
 
     return formattedDataRows;
