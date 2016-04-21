@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Label } from 'react-bootstrap';
 
 import SupportLink from 'components/support/SupportLink';
 
@@ -7,9 +7,20 @@ const PageHeader = React.createClass({
   propTypes: {
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
+    experimental: PropTypes.boolean,
   },
   render() {
     const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
+
+    let experimentalLabel;
+    if (this.props.experimental) {
+      experimentalLabel = (
+        <span style={{ marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
+          <Label bsStyle="primary">Experimental</Label>
+        </span>
+      );
+    }
+
     return (
       <div>
         <Row className="content content-head">
@@ -23,7 +34,7 @@ const PageHeader = React.createClass({
             }
 
             <h1>
-              {this.props.title}
+              {this.props.title} <small>{experimentalLabel}</small>
             </h1>
             {children[0] &&
             <p className="description">
