@@ -1,6 +1,8 @@
 import React from 'react';
 import FieldHelpers from './FieldHelpers';
 
+import FormsUtils from 'util/FormsUtils';
+
 const BooleanField = React.createClass({
   propTypes: {
     autoFocus: React.PropTypes.bool,
@@ -14,14 +16,13 @@ const BooleanField = React.createClass({
     const field = this.props.field;
     const typeName = this.props.typeName;
     const title = this.props.title;
-    const value = this._getEffectiveValue();
     return (
       <div className="form-group">
         <div className="checkbox">
           <label>
             <input id={typeName + '-' + title}
                    type="checkbox"
-                   checked={value}
+                   checked={this.props.value}
                    name={`configuration[${title}]`}
                    onChange={this.handleChange}/>
 
@@ -34,12 +35,8 @@ const BooleanField = React.createClass({
       </div>
     );
   },
-  _getEffectiveValue() {
-    return (this.props.value === undefined ? this.props.field.default_value : this.props.value);
-  },
-  handleChange() {
-    const newValue = !this._getEffectiveValue();
-    this.setState({value: newValue});
+  handleChange(event) {
+    const newValue = FormsUtils.getValueFromInput(event.target);
     this.props.onChange(this.props.title, newValue);
   },
 });

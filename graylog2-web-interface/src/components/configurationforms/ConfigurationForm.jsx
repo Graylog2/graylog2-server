@@ -5,21 +5,18 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 
 const ConfigurationForm = React.createClass({
-  getInitialState() {
-    return this._copyStateFromProps(this.props);
-  },
-  componentWillMount() {
-    this.setState({values: $.extend({}, this.props.values)});
-  },
-  componentWillReceiveProps(props) {
-    this.setState(this._copyStateFromProps(props));
-  },
   getDefaultProps() {
     return {
       values: {},
       includeTitleField: true,
       titleValue: '',
     };
+  },
+  getInitialState() {
+    return this._copyStateFromProps(this.props);
+  },
+  componentWillReceiveProps(props) {
+    this.setState(this._copyStateFromProps(props));
   },
   getValue() {
     const data = {};
@@ -31,16 +28,23 @@ const ConfigurationForm = React.createClass({
     data.configuration = {};
 
     $.map(this.state.configFields, function(field, name) {
-      data.configuration[name] = values[name] || '';
+      // Replace undefined with null, as JSON.stringify will leave out undefined fields from the DTO sent to the server
+      data.configuration[name] = (values[name] === undefined ? null : values[name]);
     });
 
     return data;
   },
   _copyStateFromProps(props) {
     const effectiveTitleValue = (this.state && this.state.titleValue !== undefined ? this.state.titleValue : props.titleValue);
+    const defaultValues = {};
+
+    Object.keys(props.configFields).forEach(field => {
+      defaultValues[field] = props.configFields[field].default_value;
+    });
+
     return {
       configFields: $.extend({}, props.configFields),
-      values: $.extend({}, props.values),
+      values: $.extend({}, defaultValues, props.values),
       titleValue: effectiveTitleValue,
     };
   },
