@@ -25,30 +25,26 @@ const TextField = React.createClass({
     this.props.onChange(this.state.title, evt.target.value);
     this.setState({value: evt.target.value});
   },
-  _fieldValue(field) {
-    return field.default_value;
-  },
   render() {
     const field = this.state.field;
     const title = this.state.title;
     const typeName = this.state.typeName;
 
     let inputField;
-    const value = this._fieldValue(field);
     const isRequired = !field.is_optional;
     const fieldType = (!FieldHelpers.hasAttribute(field.attributes, 'textarea') && FieldHelpers.hasAttribute(field.attributes, 'is_password') ? 'password' : 'text');
 
     if (FieldHelpers.hasAttribute(field.attributes, 'textarea')) {
       inputField = (
         <textarea id={title} className="form-control" rows={10}
-                  name={'configuration[' + title + ']'} required={isRequired} defaultValue={value} value={this.state.value}
+                  name={'configuration[' + title + ']'} required={isRequired} value={this.state.value}
                   onChange={this.handleChange} autoFocus={this.props.autoFocus}>
                     </textarea>
       );
     } else {
       inputField = (
         <input id={title} type={fieldType} className="form-control" name={'configuration[' + title + ']'} value={this.state.value}
-               onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)} autoFocus={this.props.autoFocus} />
+               onChange={this.handleChange} required={isRequired} autoFocus={this.props.autoFocus} />
       );
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import FieldHelpers from './FieldHelpers';
 
-import NumberUtils from 'util/NumberUtils';
+import FormsUtils from 'util/FormsUtils';
 
 const NumberField = React.createClass({
   propTypes: {
@@ -36,7 +36,7 @@ const NumberField = React.createClass({
     return this._getDefaultValidationSpecs();
   },
   handleChange(evt) {
-    const numericValue = NumberUtils.isNumber(evt.target.value) ? Number(evt.target.value) : undefined;
+    const numericValue = FormsUtils.getValueFromInput(evt.target);
     this.props.onChange(this.props.title, numericValue);
   },
   render() {
@@ -44,7 +44,6 @@ const NumberField = React.createClass({
     const field = this.props.field;
     const isRequired = !field.is_optional;
     const validationSpecs = this.validationSpec(field);
-    const fieldValue = this.props.value !== undefined ? this.props.value : field.default_value;
 
     // TODO: replace with bootstrap input component
     return (
@@ -55,7 +54,7 @@ const NumberField = React.createClass({
         </label>
 
         <input id={field.title} type="number" required={isRequired} onChange={this.handleChange}
-               defaultValue={fieldValue} className="input-xlarge validatable form-control"
+               value={this.props.value} className="input-xlarge validatable form-control"
           {...validationSpecs} autoFocus={this.props.autoFocus} />
 
         <p className="help-block">{field.description}</p>
