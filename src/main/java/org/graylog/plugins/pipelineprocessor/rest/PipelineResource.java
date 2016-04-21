@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -76,6 +77,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Create a processing pipeline from source", notes = "")
     @POST
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_CREATE)
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -121,7 +123,9 @@ public class PipelineResource extends RestResource implements PluginRestResource
         final Collection<PipelineDao> daos = pipelineService.loadAll();
         final ArrayList<PipelineSource> results = Lists.newArrayList();
         for (PipelineDao dao : daos) {
-            results.add(PipelineSource.fromDao(pipelineRuleParser, dao));
+            if (isPermitted(PipelineRestPermissions.PIPELINE_READ, dao.id())) {
+                results.add(PipelineSource.fromDao(pipelineRuleParser, dao));
+            }
         }
 
         return results;
@@ -131,6 +135,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/{id}")
     @GET
     public PipelineSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_READ, id);
         final PipelineDao dao = pipelineService.load(id);
         return PipelineSource.fromDao(pipelineRuleParser, dao);
     }
@@ -140,6 +145,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @PUT
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
+
         final PipelineDao dao = pipelineService.load(id);
         final Pipeline pipeline;
         try {
@@ -163,6 +170,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
+
         pipelineService.load(id);
         pipelineService.delete(id);
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));

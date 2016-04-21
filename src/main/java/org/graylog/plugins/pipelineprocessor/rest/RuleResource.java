@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -76,6 +77,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     @ApiOperation(value = "Create a processing rule from source", notes = "")
     @POST
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule;
         try {
@@ -119,6 +121,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     @ApiOperation(value = "Get all processing rules")
     @GET
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
     public Collection<RuleSource> getAll() {
         final Collection<RuleDao> ruleDaos = ruleService.loadAll();
         return ruleDaos.stream()
@@ -130,6 +133,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/{id}")
     @GET
     public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
         return RuleSource.fromDao(pipelineRuleParser, ruleService.load(id));
     }
 
@@ -141,6 +145,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         return ruleDaos.stream()
                 .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
+                .filter(rule -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, rule.id()))
                 .collect(Collectors.toList());
     }
 
@@ -149,6 +154,8 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @PUT
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
+
         final RuleDao ruleDao = ruleService.load(id);
         final Rule rule;
         try {
@@ -174,6 +181,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/{id}")
     @DELETE
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_DELETE, id);
         ruleService.load(id);
         ruleService.delete(id);
 
