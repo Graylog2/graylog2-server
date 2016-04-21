@@ -1039,9 +1039,10 @@ td.limited {
 
 .dashboard {
   color: #333333;
-  margin-left: -10px;
   height: 100%;
-  overflow: hidden;
+  margin: 0;
+  overflow: auto;
+  width: 100%;
 }
 
 .dashboard .gridster .gs-w {
@@ -1065,7 +1066,9 @@ td.limited {
 }
 
 .dashboard .widget {
-  margin: 15px;
+  height: inherit;
+  margin: 0;
+  padding: 15px;
 }
 
 .dashboard .widget .widget-top {
@@ -1144,8 +1147,6 @@ td.limited {
   display: none;
 }
 
-/* New widgets */
-
 .datatable-badge {
   border-radius: 2px;
   display: inline-block;
@@ -1165,8 +1166,8 @@ td.limited {
   color: #E3E5E5;
 }
 
-.dashboard .gridster ul {
-  margin: 0;
+.dashboard .gridster {
+  margin-left: -10px;
   transition: none;
 }
 
@@ -1176,12 +1177,6 @@ td.limited {
 
 .dashboard .gridster.gs-resize-disabled .widget {
   cursor: default;
-}
-
-.dashboard .widget {
-  height: inherit;
-  margin: 0;
-  padding: 15px;
 }
 
 .dashboard .widget .dc-chart {
@@ -1298,8 +1293,6 @@ td.limited {
 .dashboard .widget .not-available .spinner {
   vertical-align: middle;
 }
-
-/* End new widgets */
 
 .configuration-field-optional {
   margin-left: 5px;
