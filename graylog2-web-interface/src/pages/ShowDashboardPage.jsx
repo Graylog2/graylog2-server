@@ -214,6 +214,7 @@ const ShowDashboardPage = React.createClass({
         </PageHeader>
 
         {this.formatDashboard(dashboard)}
+        <div className="clearfix"/>
       </span>
     );
   },
