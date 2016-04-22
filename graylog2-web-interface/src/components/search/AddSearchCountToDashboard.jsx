@@ -5,6 +5,7 @@ const AddSearchCountToDashboard = React.createClass({
   propTypes: {
     searchInStream: PropTypes.object,
     permissions: PropTypes.array.isRequired,
+    pullRight: PropTypes.bool,
   },
 
   SEARCH_COUNT_WIDGET_TYPE: 'SEARCH_RESULT_COUNT',
@@ -13,7 +14,7 @@ const AddSearchCountToDashboard = React.createClass({
   render() {
     return (
       <AddToDashboardMenu title="Add count to dashboard"
-                          pullRight
+                          pullRight={this.props.pullRight}
                           widgetType={this.props.searchInStream ? this.STREAM_SEARCH_COUNT_WIDGET_TYPE : this.SEARCH_COUNT_WIDGET_TYPE}
                           permissions={this.props.permissions}/>
     );
