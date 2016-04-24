@@ -20,15 +20,16 @@ import org.graylog2.Configuration;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 
-import com.atlassian.ip.IPMatcher;
-
 import org.glassfish.grizzly.http.server.Request;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.SecurityContext;
+import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.Set;
 
 public class RestTools {
 
@@ -65,15 +66,19 @@ public class RestTools {
      */
     public String getRemoteAddrFromRequest(Request request) {
         final String XForwardedFor = request.getHeader("X-Forwarded-For");
-        IPMatcher ipmatcher = this.configuration.getTrustedProxies();
+        Set<IpSubnet> trustedSubnets = this.configuration.getTrustedProxies();
 
-        if (XForwardedFor instanceof String && ipmatcher instanceof IPMatcher) {
-
-            if (ipmatcher.matches(request.getRemoteAddr())) {
-                // Request came from a trusted source, use X-Forwarded-For
-                return XForwardedFor;
+        if (XForwardedFor instanceof String && trustedSubnets.size()>0) {
+            for (IpSubnet s: trustedSubnets) {
+                try {
+                    if (s.contains(request.getRemoteAddr())) {
+                        // Request came from trusted source, trust X-forwarded-For and return it
+                        return XForwardedFor;
+                    }
+                } catch (UnknownHostException e) {
+                    // ignore silently, probably not worth logging
+                }
             }
-
         }
 
         // Request did not come from a trusted source, or the X-Forwarded-For header was not set
