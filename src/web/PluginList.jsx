@@ -24,8 +24,8 @@ const PluginList = React.createClass({
     return (
       <Row className="content">
         <Col md={12}>
-          <p>This is the status of enterprise plugins in your system:</p>
-          <ul>
+          <p>The following Graylog Enterprise modules are active in this cluster:</p>
+          <ul className="enterprise-plugins">
             {enterprisePluginList}
           </ul>
         </Col>

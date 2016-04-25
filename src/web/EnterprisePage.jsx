@@ -7,7 +7,12 @@ const EnterprisePage = React.createClass({
     return (
       <div>
         <PageHeader title="Graylog Enterprise">
-          <span>Graylog Enterprise plugins.</span>
+          <a className="pull-right btn btn-lg btn-success" href="https://www.graylog.org/enterprise" target="_blank">Order a license</a>
+          
+          <span>
+            Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
+            about Graylog Enterprise and order a license on the <a href="https://www.graylog.org/enterprise" target="_blank">product page</a>.
+          </span>
         </PageHeader>
 
         <PluginList/>
