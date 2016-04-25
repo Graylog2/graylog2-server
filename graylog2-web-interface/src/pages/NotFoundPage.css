@@ -1,0 +1,21 @@
+body {
+    background: url('~images/not-found-bg.jpg') no-repeat center center fixed;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.jumbotron-container {
+    height: 82vh;
+}
+
+.jumbotron {
+    background-color: rgba(255,255,255,0.8);
+    text-align: center;
+}
+
+.jumbotron h1 {
+    font-size: 52px;
+    margin-bottom: 15px;
+}
