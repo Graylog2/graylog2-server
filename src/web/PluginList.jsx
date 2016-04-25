@@ -15,13 +15,13 @@ const PluginList = React.createClass({
   style: require('!style/useable!css!./PluginList.css'),
 
   ENTERPRISE_PLUGINS: {
-    'ArchivePlugin': 'Archive plugin',
+    ArchivePlugin: 'Archive plugin',
   },
 
   _formatPlugin(pluginName) {
     const plugin = PluginStore.get().filter(plugin => plugin.metadata.name === pluginName)[0];
     return (
-      <li className={plugin ? 'text-success' : 'text-danger'}>
+      <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <i className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`}/>&nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
