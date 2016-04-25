@@ -41,7 +41,7 @@ public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
             String[] subnets = value.split(",");
             for (String subnet: subnets) {
                 try {
-                    converted.add(new IpSubnet(subnet));
+                    converted.add(new IpSubnet(subnet.trim()));
                 } catch (UnknownHostException e) {
                     LOG.error("Invalid subnet {}", subnet);
                 }
