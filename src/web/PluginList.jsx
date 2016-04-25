@@ -4,6 +4,16 @@ import { Row, Col } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 const PluginList = React.createClass({
+  componentDidMount() {
+    this.style.use();
+  },
+
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!./PluginList.css'),
+
   ENTERPRISE_PLUGINS: {
     'ArchivePlugin': 'Archive plugin',
   },
