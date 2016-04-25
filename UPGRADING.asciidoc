@@ -54,6 +54,13 @@ Graylog switched its logging backend from https://logging.apache.org/log4j/1.2/[
 Please refer to the https://logging.apache.org/log4j/2.x/manual/migration.html[Log4j Migration Guide] for information on how to update your existing logging configuration.
 
 
+### Dead Letters feature removed
+
+The Dead Letters feature, which stored messages that couldn't be indexed into Elasticsearch for various reasons, has been removed.
+
+This feature has been disabled by default. If you have enabled the feature the configuration file, please check the `dead_letters_enabled` collection in MongoDB and remove it afterwards.
+
+
 ### Removed configuration settings
 
 Some settings, which have been deprecated in previous versions, have finally been removed from the Graylog configuration file.
@@ -77,6 +84,7 @@ Some settings, which have been deprecated in previous versions, have finally bee
 | `elasticsearch_max_size_per_index`    | UI in web interface (System/Indices)
 | `elasticsearch_max_time_per_index`    | UI in web interface (System/Indices)
 | `elasticsearch_max_number_of_indices` | UI in web interface (System/Indices)
+| `dead_letters_enabled`                | None
 |===
 
 
