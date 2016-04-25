@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import URI from 'urijs';
 
 import { IfPermitted } from 'components/common';
 
@@ -38,6 +39,7 @@ const NodesActions = React.createClass({
     }
   },
   render() {
+    const apiBrowserURI = new URI(this.props.node.transport_address).directory('api-browser');
     return (
       <div className="item-actions">
         <LinkContainer to={Routes.SYSTEM.NODES.SHOW(this.props.node.node_id)}>
@@ -48,7 +50,7 @@ const NodesActions = React.createClass({
           <Button bsStyle="info">Metrics</Button>
         </LinkContainer>
 
-        <Button bsStyle="info" href={`${this.props.node.transport_address}api-browser`} target="_blank">
+        <Button bsStyle="info" href={apiBrowserURI} target="_blank">
           <i className="fa fa-external-link"/>&nbsp; API browser
         </Button>
 
