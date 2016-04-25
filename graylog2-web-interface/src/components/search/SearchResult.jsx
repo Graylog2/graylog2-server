@@ -152,7 +152,7 @@ const SearchResult = React.createClass({
             <Col md={12}>
               <h1>
                 <span className="pull-right">
-                  <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
+                  <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions} pullRight/>
                 </span>
                 <span>Nothing found {streamDescription}</span>
               </h1>
