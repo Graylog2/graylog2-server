@@ -18,6 +18,50 @@ Multicast discovery has been removed from Elasticsearch 2.x (although it is stil
 
 To reflect this change, the `elasticsearch_discovery_zen_ping_unicast_hosts` now has to contain the address of at least one Elasticsearch node in the cluster which Graylog can connect to.
 
+#### Index range types
+
+*This step needs to be performed before the update to Elasticsearch 2.x!*
+
+Some Graylog versions stored meta information about indices in elasticsearch, alongside the messages themselves. Since Elasticsearch 2.0 having multiple types with conflicting mappings is no longer possible, which means that the `index_range` type must be removed before upgrading to Elasticsearch 2.3.1.
+
+Find out if your setup is affected by running (replace `$elasticsearch` with the address of one of your Elasticsearch nodes)
+`curl -XGET $elasticsearch:9200/_all/_mapping/index_range; echo`
+
+If the output is `{}` you are not affected and can skip this step.
+
+Otherwise, you need to delete the `index_range` type, Graylog does not use it anymore.
+
+As Graylog sets older indices to read-only, first we need to remove the write block on those indices.
+Since we'll be working with Elasticsearch's JSON output, we recommend installing the `jq` utility which should be available on all popular package managers or directly at https://stedolan.github.io/jq/[Github].
+
+[source, bash]
+----
+for i in `curl -s -XGET $elasticsearch:9200/_all/_mapping/index_range | jq -r "keys[]"`
+do
+    echo -n "Updating index $i: "
+    echo -n "curl -XPUT $elasticsearch:9200/$i/_settings -d '{\"index.blocks.read_only\":false, \"index.blocks.write\":false}' : "
+    curl -XPUT $elasticsearch:9200/$i/_settings -d '{"index.blocks.read_only":false, "index.blocks.write":false}'
+    echo
+done
+----
+
+The output for each of the curl commands should be `{"acknowledged":true}`.
+Next we have to delete the `index_range` mapping. We can perform this via the next command.
+
+*We strongly recommend to perform this on a single index before running this bulk command.* This operation can be expensive to perform if you have a lot of affected indices.
+
+[source, bash]
+----
+for i in `curl -s -XGET $elasticsearch:9200/_all/_mapping/index_range | jq -r "keys[]"`
+do
+    echo -n "Updating index $i: "
+    curl -XDELETE $elasticsearch:9200/$i/index_range
+    echo
+done
+----
+
+It is not strictly necessary to set the indices back to read only, but if you prefer to do that, note the index names and commands during the first step and change the `false` into `true`.
+
 
 #### Graylog Index Template
 
