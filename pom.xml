@@ -9,7 +9,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-enterprise-integration</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
