@@ -29,12 +29,8 @@ DEB and RPM packages can be build with `mvn jdeb:jdeb` and `mvn rpm:rpm` respect
 In order to release a new version of the plugin, run the following commands:
 
 ```
-$ mvn versions:set -DnewVersion=1.2.3
-$ git commit -m 'Bump to version 1.2.3' pom.xml
-$ mvn scm:tag
-$ mvn versions:set -DnewVersion=1.2.4-SNAPSHOT
-$ git commit -m 'Prepare next development iteration' pom.xml
-$ git push
+$ mvn release:prepare
+$ mvn release:perform
 ```
 
 This sets the version numbers, creates a tag and pushes to GitHub.

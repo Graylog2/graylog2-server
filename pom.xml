@@ -179,10 +179,15 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.9.4</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.2</version>
                 <configuration>
-                    <tag>${project.version}</tag>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <mavenExecutorId>forked-path</mavenExecutorId>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <preparationGoals>clean test</preparationGoals>
+                    <goals>package</goals>
                 </configuration>
             </plugin>
         </plugins>
