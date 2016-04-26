@@ -5,6 +5,7 @@ class DocsHelper {
     ALERTS: 'streams.html#alerts',
     CLUSTER_STATUS_EXPLAINED: 'configuring_es.html#cluster-status-explained',
     COLLECTOR: 'collector.html',
+    COLLECTOR_SIDECAR: 'collector_sidecar.html',
     CONFIGURING_ES: 'configuring_es.html',
     DASHBOARDS: 'dashboards.html',
     ES_CLUSTER_STATUS_RED: 'configuring_es.html#cluster-status-explained',
