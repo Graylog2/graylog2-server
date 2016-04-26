@@ -24,9 +24,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:https://github.com/Graylog2/graylog-plugin-enterprise-integration.git</connection>
-        <developerConnection>scm:git:git@github.com:https://github.com/Graylog2/graylog-plugin-enterprise-integration.git</developerConnection>
-        <url>https://github.com/https://github.com/Graylog2/graylog-plugin-enterprise-integration</url>
+        <connection>scm:git:git@github.com:Graylog2/graylog-plugin-enterprise-integration.git</connection>
+        <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-enterprise-integration.git</developerConnection>
+        <url>https://github.com/Graylog2/graylog-plugin-enterprise-integration</url>
         <tag>HEAD</tag>
     </scm>
 
