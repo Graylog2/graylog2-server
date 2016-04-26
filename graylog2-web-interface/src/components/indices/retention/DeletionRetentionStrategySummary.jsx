@@ -9,7 +9,7 @@ const DeletionRetentionStrategySummary = React.createClass({
     return (
       <div>
         <dl className="deflist">
-          <dt>Index rotation strategy:</dt>
+          <dt>Index retention strategy:</dt>
           <dd>Delete</dd>
           <dt>Max number of indices:</dt>
           <dd>{this.props.config.max_number_of_indices}</dd>
