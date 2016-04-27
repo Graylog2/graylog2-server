@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Alert, Table } from 'react-bootstrap';
 
 import { IndexerFailure } from 'components/indexers';
 
@@ -8,6 +8,12 @@ const IndexerFailuresList = React.createClass({
     failures: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
   },
   render() {
+    if (this.props.failures.length === 0) {
+      return (
+        <Alert bsStyle="success"><i className="fa fa-check-circle"/> Hurray! There are not any indexer failures.</Alert>
+      );
+    }
+
     return (
       <div className="scrollable-table">
         <Table className="indexer-failures" striped hover condensed>

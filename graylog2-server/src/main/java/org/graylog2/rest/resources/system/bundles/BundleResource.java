@@ -19,16 +19,16 @@ package org.graylog2.rest.resources.system.bundles;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.bundles.BundleService;
-import org.graylog2.bundles.ConfigurationBundle;
-import org.graylog2.bundles.ExportBundle;
-import org.graylog2.database.NotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.bundles.BundleService;
+import org.graylog2.bundles.ConfigurationBundle;
+import org.graylog2.bundles.ExportBundle;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -40,6 +40,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -136,7 +137,10 @@ public class BundleResource extends RestResource {
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_UPDATE, bundleId);
-        bundleService.update(bundleId, configurationBundle);
+        final boolean result = bundleService.update(bundleId, configurationBundle);
+        if (!result) {
+            throw new InternalServerErrorException("Couldn't update content pack \"" + bundleId + "\"");
+        }
     }
 
     @DELETE

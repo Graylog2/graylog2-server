@@ -35,6 +35,7 @@ public class ScrollResult extends IndexQueryResult {
     private final List<String> fields;
     private final String queryHash; // used in log output only
     private final long totalHits;
+    private SearchResponse firstResponse;
 
     private String scrollId;
     private int chunkId = 0;
@@ -48,6 +49,7 @@ public class ScrollResult extends IndexQueryResult {
         this.fields = fields;
         totalHits = response.getHits().totalHits();
         scrollId = response.getScrollId();
+        firstResponse = response;
 
         final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
         queryHash = md5Hash.toHex();
@@ -56,10 +58,18 @@ public class ScrollResult extends IndexQueryResult {
     }
 
     public ScrollChunk nextChunk() {
-        final SearchResponse search = client.prepareSearchScroll(scrollId)
-                .setScroll(TimeValue.timeValueMinutes(1))
-                .execute()
-                .actionGet();
+
+        final SearchResponse search;
+        // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
+        if (firstResponse == null) {
+            search = client.prepareSearchScroll(scrollId)
+                    .setScroll(TimeValue.timeValueMinutes(1))
+                    .execute()
+                    .actionGet();
+        } else {
+            search = firstResponse;
+            firstResponse = null;
+        }
 
         final SearchHits hits = search.getHits();
         if (hits.getHits().length == 0) {

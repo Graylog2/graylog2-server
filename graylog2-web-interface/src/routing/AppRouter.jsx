@@ -46,6 +46,7 @@ import ThreadDumpPage from 'pages/ThreadDumpPage';
 import LdapPage from 'pages/LdapPage';
 import LdapGroupsPage from 'pages/LdapGroupsPage';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
+import NotFoundPage from 'pages/NotFoundPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -99,6 +100,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.LDAP.SETTINGS} component={LdapPage}/>
             <Route path={Routes.SYSTEM.LDAP.GROUPS} component={LdapGroupsPage}/>
             {pluginRoutes}
+            <Route path="*" component={NotFoundPage}/>
           </Route>
         </Route>
       </Router>

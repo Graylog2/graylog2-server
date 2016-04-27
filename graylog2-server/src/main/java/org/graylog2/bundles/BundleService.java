@@ -87,9 +87,9 @@ public class BundleService {
         return bundles;
     }
 
-    public ConfigurationBundle update(final String bundleId, final ConfigurationBundle bundle) {
-        final WriteResult<ConfigurationBundle, ObjectId> writeResult = dbCollection.updateById(new ObjectId(bundleId), bundle);
-        return writeResult.getSavedObject();
+    public boolean update(final String bundleId, final ConfigurationBundle bundle) {
+        final WriteResult<ConfigurationBundle, ObjectId> result = dbCollection.updateById(new ObjectId(bundleId), bundle);
+        return result.getN() == 1;
     }
 
     public ConfigurationBundle insert(final ConfigurationBundle bundle) {
