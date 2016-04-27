@@ -19,7 +19,7 @@ package org.graylog2.plugin;
 public enum DocsHelper {
     PAGE_SENDING_JSONPATH("sending_data.html#json-path-from-http-api-input"),
     PAGE_ES_CONFIGURATION("configuring_es.html"),
-    PAGE_LDAP_TROUBLESHOOTING("users_roles.html#troubleshooting");
+    PAGE_LDAP_TROUBLESHOOTING("users_and_roles.html#troubleshooting");
 
     private static final String DOCS_URL = "http://docs.graylog.org/en/";
 
