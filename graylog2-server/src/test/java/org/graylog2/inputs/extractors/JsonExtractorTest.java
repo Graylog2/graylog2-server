@@ -35,13 +35,13 @@ public class JsonExtractorTest {
     public void setUp() throws Extractor.ReservedFieldException, ConfigurationException {
         jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", Collections.<String, Object>emptyMap(), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "");
+                "",1);
     }
 
     @Test(expected = ConfigurationException.class)
     public void constructorFailsOnMissingConfiguration() throws Extractor.ReservedFieldException, ConfigurationException {
         new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "");
+                "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "",1);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class JsonExtractorTest {
     public void testRunWithArrayAndDifferentListSeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", ImmutableMap.<String, Object>of("list_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "");
+                "",1);
         final String value = "{\"array\": [\"foobar\", \"foobaz\"]}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
@@ -105,7 +105,7 @@ public class JsonExtractorTest {
     public void testRunWithFlattenedObject() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", ImmutableMap.<String, Object>of("flatten", true), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "");
+                "",1);
         final String value = "{"
                 + "\"object\": {"
                 + "\"text\": \"foobar\", "
@@ -126,7 +126,7 @@ public class JsonExtractorTest {
     public void testRunWithObjectAndDifferentKeySeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", ImmutableMap.<String, Object>of("key_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "");
+                "",1);
         final String value = "{\"object\": {\"text\": \"foobar\", \"number\": 1234.5678, \"bool\": true, \"nested\": {\"text\": \"foobar\"}}}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
@@ -142,7 +142,7 @@ public class JsonExtractorTest {
     public void testRunWithFlattenedObjectAndDifferentKVSeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", ImmutableMap.<String, Object>of("flatten", true, "kv_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "");
+                "",1);
         final String value = "{\"object\": {\"text\": \"foobar\", \"number\": 1234.5678, \"bool\": true, \"nested\": {\"text\": \"foobar\"}}}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 

@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -104,12 +104,12 @@ public class ExtractorsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add an extractor to an input",
-            response = ExtractorCreated.class)
+        response = ExtractorCreated.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 400, message = "No such extractor type."),
-            @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+        @ApiResponse(code = 404, message = "No such input on this node."),
+        @ApiResponse(code = 400, message = "No such extractor type."),
+        @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
+        @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
     public Response create(@ApiParam(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
@@ -125,7 +125,7 @@ public class ExtractorsResource extends RestResource {
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final String id = new com.eaio.uuid.UUID().toString();
-        final Extractor extractor = buildExtractorFromRequest(cer, id);
+        final Extractor extractor = buildExtractorFromRequest(cer, id, 1);
 
         try {
             inputService.addExtractor(mongoInput, extractor);
@@ -140,8 +140,8 @@ public class ExtractorsResource extends RestResource {
 
         final ExtractorCreated result = ExtractorCreated.create(id);
         final URI extractorUri = getUriBuilderToSelf().path(ExtractorsResource.class)
-                .path("{inputId}")
-                .build(input.getId());
+            .path("{inputId}")
+            .build(input.getId());
 
         return Response.created(extractorUri).entity(result).build();
     }
@@ -153,18 +153,18 @@ public class ExtractorsResource extends RestResource {
     @ApiOperation(value = "Update an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 404, message = "No such extractor on this input."),
-            @ApiResponse(code = 400, message = "No such extractor type."),
-            @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+        @ApiResponse(code = 404, message = "No such input on this node."),
+        @ApiResponse(code = 404, message = "No such extractor on this input."),
+        @ApiResponse(code = 400, message = "No such extractor type."),
+        @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
+        @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
     public ExtractorSummary update(@ApiParam(name = "inputId", required = true)
-                                      @PathParam("inputId") String inputId,
-                                      @ApiParam(name = "extractorId", required = true)
-                                      @PathParam("extractorId") String extractorId,
-                                      @ApiParam(name = "JSON body", required = true)
-                                      @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
+                                   @PathParam("inputId") String inputId,
+                                   @ApiParam(name = "extractorId", required = true)
+                                   @PathParam("extractorId") String extractorId,
+                                   @ApiParam(name = "JSON body", required = true)
+                                   @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
@@ -175,7 +175,55 @@ public class ExtractorsResource extends RestResource {
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
-        final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
+        final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId(), 1);
+
+        inputService.removeExtractor(mongoInput, originalExtractor.getId());
+        try {
+            inputService.addExtractor(mongoInput, extractor);
+        } catch (ValidationException e) {
+            LOG.error("Extractor persist validation failed.", e);
+            throw new BadRequestException(e);
+        }
+
+        final String msg = "Updated extractor <" + originalExtractor.getId() + "> of type [" + cer.extractorType() + "] in input <" + inputId + ">.";
+        LOG.info(msg);
+        activityWriter.write(new Activity(msg, ExtractorsResource.class));
+
+        return toSummary(extractor);
+    }
+
+    @PUT
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Disable/Enable an extractor")
+    @Path("/{extractorId}/${status}")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "No such input on this node."),
+        @ApiResponse(code = 404, message = "No such extractor on this input."),
+        @ApiResponse(code = 400, message = "No such extractor type."),
+        @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
+        @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+    })
+    public ExtractorSummary toggleStatus(@ApiParam(name = "inputId", required = true)
+                                         @PathParam("inputId") String inputId,
+                                         @ApiParam(name = "extractorId", required = true)
+                                         @PathParam("extractorId") String extractorId,
+                                         @ApiParam(name = "status", required = true)
+                                         @PathParam("status") Integer status,
+                                         @ApiParam(name = "JSON body", required = false)
+                                         @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
+        checkPermission(RestPermissions.INPUTS_EDIT, inputId);
+
+        final MessageInput input = persistedInputs.get(inputId);
+        if (input == null) {
+            LOG.error("Input <{}> not found.", inputId);
+            throw new javax.ws.rs.NotFoundException("Couldn't find input " + inputId);
+        }
+
+        final Input mongoInput = inputService.find(input.getPersistId());
+        final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
+        final Extractor extractor = buildExtractorFromOriginal(originalExtractor, status);
 
         inputService.removeExtractor(mongoInput, originalExtractor.getId());
         try {
@@ -196,11 +244,11 @@ public class ExtractorsResource extends RestResource {
     @Timed
     @ApiOperation(value = "List all extractors of an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+        @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public ExtractorSummaryList list(@ApiParam(name = "inputId", required = true)
-                                    @PathParam("inputId") String inputId) throws NotFoundException {
+                                     @PathParam("inputId") String inputId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
@@ -222,15 +270,15 @@ public class ExtractorsResource extends RestResource {
     @ApiOperation(value = "Get information of a single extractor of an input")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 404, message = "No such extractor on this input.")
+        @ApiResponse(code = 404, message = "No such input on this node."),
+        @ApiResponse(code = 404, message = "No such extractor on this input.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public ExtractorSummary single(
-            @ApiParam(name = "inputId", required = true)
-            @PathParam("inputId") String inputId,
-            @ApiParam(name = "extractorId", required = true)
-            @PathParam("extractorId") final String extractorId) throws NotFoundException {
+        @ApiParam(name = "inputId", required = true)
+        @PathParam("inputId") String inputId,
+        @ApiParam(name = "extractorId", required = true)
+        @PathParam("extractorId") final String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
@@ -250,16 +298,16 @@ public class ExtractorsResource extends RestResource {
     @ApiOperation(value = "Delete an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid request."),
-            @ApiResponse(code = 404, message = "Input not found."),
-            @ApiResponse(code = 404, message = "Extractor not found.")
+        @ApiResponse(code = 400, message = "Invalid request."),
+        @ApiResponse(code = 404, message = "Input not found."),
+        @ApiResponse(code = 404, message = "Extractor not found.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public void terminate(
-            @ApiParam(name = "inputId", required = true)
-            @PathParam("inputId") String inputId,
-            @ApiParam(name = "extractorId", required = true)
-            @PathParam("extractorId") String extractorId) throws NotFoundException {
+        @ApiParam(name = "inputId", required = true)
+        @PathParam("inputId") String inputId,
+        @ApiParam(name = "extractorId", required = true)
+        @PathParam("extractorId") String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
@@ -274,7 +322,7 @@ public class ExtractorsResource extends RestResource {
         inputService.removeExtractor(mongoInput, extractor.getId());
 
         final String msg = "Deleted extractor <" + extractorId + "> of type [" + extractor.getType() + "] " +
-                "from input <" + inputId + ">.";
+            "from input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
     }
@@ -284,7 +332,7 @@ public class ExtractorsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update extractor order of an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+        @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Path("order")
     public void order(@ApiParam(name = "inputId", value = "Persist ID (!) of input.", required = true)
@@ -313,12 +361,12 @@ public class ExtractorsResource extends RestResource {
 
     private ExtractorSummary toSummary(Extractor extractor) {
         final ExtractorMetrics metrics = ExtractorMetrics.create(MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())),
-                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
+            MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
 
         return ExtractorSummary.create(extractor.getId(), extractor.getTitle(), extractor.getType().toString().toLowerCase(Locale.ENGLISH), extractor.getCursorStrategy().toString().toLowerCase(Locale.ENGLISH),
-                extractor.getSourceField(), extractor.getTargetField(), extractor.getExtractorConfig(), extractor.getCreatorUserId(), extractor.converterConfigMap(),
-                extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
-                extractor.getConverterExceptionCount(), metrics);
+            extractor.getSourceField(), extractor.getTargetField(), extractor.getExtractorConfig(), extractor.getCreatorUserId(), extractor.converterConfigMap(),
+            extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
+            extractor.getConverterExceptionCount(), metrics);
     }
 
     private List<Converter> loadConverters(Map<String, Map<String, Object>> requestConverters) {
@@ -337,22 +385,51 @@ public class ExtractorsResource extends RestResource {
         return converters;
     }
 
-    private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id) {
+    private Extractor buildExtractorFromOriginal(Extractor originalExtractor, int status) {
+        Extractor extractor = originalExtractor;
+        try {
+            extractor = extractorFactory.factory(
+                originalExtractor.getId(),
+                originalExtractor.getTitle(),
+                originalExtractor.getOrder(),
+                originalExtractor.getCursorStrategy(),
+                originalExtractor.getType(),
+                originalExtractor.getSourceField(),
+                originalExtractor.getTargetField(),
+                originalExtractor.getExtractorConfig(),
+                originalExtractor.getCreatorUserId(),
+                originalExtractor.getConverters(),
+                originalExtractor.getConditionType(),
+                originalExtractor.getConditionValue(),
+                status
+            );
+        } catch (ExtractorFactory.NoSuchExtractorException e) {
+            e.printStackTrace();
+        } catch (Extractor.ReservedFieldException e) {
+            e.printStackTrace();
+        } catch (ConfigurationException e) {
+            e.printStackTrace();
+        }
+        return extractor;
+    }
+
+    private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id, int status) {
         Extractor extractor;
         try {
             extractor = extractorFactory.factory(
-                    id,
-                    cer.title(),
-                    cer.order(),
-                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase(Locale.ENGLISH)),
-                    Extractor.Type.valueOf(cer.extractorType().toUpperCase(Locale.ENGLISH)),
-                    cer.sourceField(),
-                    cer.targetField(),
-                    cer.extractorConfig(),
-                    getCurrentUser().getName(),
-                    loadConverters(cer.converters()),
-                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase(Locale.ENGLISH)),
-                    cer.conditionValue()
+                id,
+                cer.title(),
+                cer.order(),
+                Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase(Locale.ENGLISH)),
+                Extractor.Type.valueOf(cer.extractorType().toUpperCase(Locale.ENGLISH)),
+                cer.sourceField(),
+                cer.targetField(),
+                cer.extractorConfig(),
+                getCurrentUser().getName(),
+                loadConverters(cer.converters()),
+                Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase(Locale.ENGLISH)),
+                cer.conditionValue(),
+                status
             );
         } catch (ExtractorFactory.NoSuchExtractorException e) {
             LOG.error("No such extractor type.", e);

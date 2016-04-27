@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -88,8 +88,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public List<Input> allOfThisNode(final String nodeId) {
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+            new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+            new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
         final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject("$or", query));
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
@@ -152,12 +152,12 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException {
         final List<BasicDBObject> forThisNodeOrGlobal = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+            new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+            new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
 
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject("_id", new ObjectId(id)),
-                new BasicDBObject("$or", forThisNodeOrGlobal));
+            new BasicDBObject("_id", new ObjectId(id)),
+            new BasicDBObject("$or", forThisNodeOrGlobal));
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         return new InputImpl((ObjectId) o.get("_id"), o.toMap());
@@ -166,12 +166,12 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public Input findForThisNode(String nodeId, String id) throws NotFoundException, IllegalArgumentException {
         final List<BasicDBObject> forThisNode = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+            new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+            new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
 
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject("_id", new ObjectId(id)),
-                new BasicDBObject("$and", forThisNode));
+            new BasicDBObject("_id", new ObjectId(id)),
+            new BasicDBObject("$and", forThisNode));
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         if (o == null) {
@@ -192,8 +192,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             @Override
             public Map<String, Object> getPersistedFields() {
                 return ImmutableMap.<String, Object>of(
-                        InputImpl.FIELD_STATIC_FIELD_KEY, key,
-                        InputImpl.FIELD_STATIC_FIELD_VALUE, value);
+                    InputImpl.FIELD_STATIC_FIELD_KEY, key,
+                    InputImpl.FIELD_STATIC_FIELD_VALUE, value);
             }
         };
 
@@ -212,8 +212,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             final DBObject ex = (BasicDBObject) element;
             try {
                 final Map.Entry<String, String> staticField =
-                        Maps.immutableEntry((String) ex.get(InputImpl.FIELD_STATIC_FIELD_KEY),
-                                (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
+                    Maps.immutableEntry((String) ex.get(InputImpl.FIELD_STATIC_FIELD_KEY),
+                        (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
                 listBuilder.add(staticField);
             } catch (Exception e) {
                 LOG.error("Cannot build static field from persisted data. Skipping.", e);
@@ -243,18 +243,18 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
             try {
                 final Extractor extractor = extractorFactory.factory(
-                        (String) ex.get(Extractor.FIELD_ID),
-                        (String) ex.get(Extractor.FIELD_TITLE),
-                        order.intValue(),
-                        Extractor.CursorStrategy.valueOf(((String) ex.get(Extractor.FIELD_CURSOR_STRATEGY)).toUpperCase(Locale.ENGLISH)),
-                        Extractor.Type.valueOf(((String) ex.get(Extractor.FIELD_TYPE)).toUpperCase(Locale.ENGLISH)),
-                        (String) ex.get(Extractor.FIELD_SOURCE_FIELD),
-                        (String) ex.get(Extractor.FIELD_TARGET_FIELD),
-                        (Map<String, Object>) ex.get(Extractor.FIELD_EXTRACTOR_CONFIG),
-                        (String) ex.get(Extractor.FIELD_CREATOR_USER_ID),
-                        getConvertersOfExtractor(ex),
-                        Extractor.ConditionType.valueOf(((String) ex.get(Extractor.FIELD_CONDITION_TYPE)).toUpperCase(Locale.ENGLISH)),
-                        (String) ex.get(Extractor.FIELD_CONDITION_VALUE)
+                    (String) ex.get(Extractor.FIELD_ID),
+                    (String) ex.get(Extractor.FIELD_TITLE),
+                    order.intValue(),
+                    Extractor.CursorStrategy.valueOf(((String) ex.get(Extractor.FIELD_CURSOR_STRATEGY)).toUpperCase(Locale.ENGLISH)),
+                    Extractor.Type.valueOf(((String) ex.get(Extractor.FIELD_TYPE)).toUpperCase(Locale.ENGLISH)),
+                    (String) ex.get(Extractor.FIELD_SOURCE_FIELD),
+                    (String) ex.get(Extractor.FIELD_TARGET_FIELD),
+                    (Map<String, Object>) ex.get(Extractor.FIELD_EXTRACTOR_CONFIG),
+                    (String) ex.get(Extractor.FIELD_CREATOR_USER_ID),
+                    getConvertersOfExtractor(ex),
+                    Extractor.ConditionType.valueOf(((String) ex.get(Extractor.FIELD_CONDITION_TYPE)).toUpperCase(Locale.ENGLISH)),
+                    (String) ex.get(Extractor.FIELD_CONDITION_VALUE), 1
                 );
 
                 listBuilder.add(extractor);
@@ -293,8 +293,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
             try {
                 listBuilder.add(ConverterFactory.factory(
-                        Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase(Locale.ENGLISH)),
-                        (Map<String, Object>) c.get(Extractor.FIELD_CONVERTER_CONFIG)
+                    Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase(Locale.ENGLISH)),
+                    (Map<String, Object>) c.get(Extractor.FIELD_CONVERTER_CONFIG)
                 ));
             } catch (ConverterFactory.NoSuchConverterException e1) {
                 LOG.error("Cannot build converter from persisted data. No such converter.", e1);
@@ -376,8 +376,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         final List<BasicDBObject> forThisNode = ImmutableList.of(new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
 
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
-                new BasicDBObject("$or", forThisNode));
+            new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
+            new BasicDBObject("$or", forThisNode));
 
         return count(InputImpl.class, new BasicDBObject("$and", query));
     }
@@ -385,8 +385,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public long totalCountForNode(String nodeId) {
         final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
+            new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
+            new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
 
         return count(InputImpl.class, new BasicDBObject("$or", query));
     }

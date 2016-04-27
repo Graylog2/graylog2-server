@@ -75,7 +75,7 @@ public class RegexReplaceTesterResource extends RestResource {
         try {
             extractor = new RegexReplaceExtractor(
                     new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
-                    config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, ""
+                    config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "",1
             );
         } catch (Extractor.ReservedFieldException e) {
             throw new BadRequestException("Trying to overwrite a reserved message field", e);

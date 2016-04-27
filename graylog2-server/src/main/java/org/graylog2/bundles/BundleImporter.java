@@ -326,7 +326,7 @@ public class BundleImporter {
                 userName,
                 createConverters(extractorDescription.getConverters()),
                 extractorDescription.getConditionType(),
-                extractorDescription.getConditionValue()
+                extractorDescription.getConditionValue(),1
         );
 
         org.graylog2.inputs.Input mongoInput = inputService.find(messageInput.getPersistId());

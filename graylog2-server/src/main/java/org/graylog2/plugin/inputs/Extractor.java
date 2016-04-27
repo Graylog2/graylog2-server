@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,6 +59,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     public static final String FIELD_CONVERTER_TYPE = "type";
     public static final String FIELD_CONVERTER_CONFIG = "config";
     public static final ResultPredicate VALUE_NULL_PREDICATE = new ResultPredicate();
+    public static final String FIELD_STATUS = "status";
 
     public enum Type {
         SUBSTRING,
@@ -109,6 +110,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     protected final List<Converter> converters;
     protected final ConditionType conditionType;
     protected final String conditionValue;
+    protected final int status;
 
     protected long order;
 
@@ -133,7 +135,8 @@ public abstract class Extractor implements EmbeddedPersistable {
                      String creatorUserId,
                      List<Converter> converters,
                      ConditionType conditionType,
-                     String conditionValue) throws ReservedFieldException {
+                     String conditionValue,
+                     int status) throws ReservedFieldException {
         this.metricRegistry = metricRegistry;
         if (Message.RESERVED_FIELDS.contains(targetField) && !Message.RESERVED_SETTABLE_FIELDS.contains(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
@@ -154,7 +157,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         this.converters = converters;
         this.conditionType = conditionType;
         this.conditionValue = conditionValue;
-
+        this.status = status;
         if (conditionType.equals(ConditionType.REGEX)) {
             this.regexConditionPattern = Pattern.compile(conditionValue, Pattern.DOTALL);
         }
@@ -252,8 +255,8 @@ public abstract class Extractor implements EmbeddedPersistable {
                         if (additionalFields.containsKey(reservedField)) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug(
-                                        "Not setting reserved field {} from converter {} on message {}, rest of the message is being processed",
-                                        reservedField, converter.getType(), msg.getId());
+                                    "Not setting reserved field {} from converter {} on message {}, rest of the message is being processed",
+                                    reservedField, converter.getType(), msg.getId());
                             }
                             converterExceptions.incrementAndGet();
                             additionalFields.remove(reservedField);
@@ -275,6 +278,10 @@ public abstract class Extractor implements EmbeddedPersistable {
         public ReservedFieldException(String msg) {
             super(msg);
         }
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public String getId() {
@@ -327,19 +334,20 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
-                .put(FIELD_ID, id)
-                .put(FIELD_TITLE, title)
-                .put(FIELD_ORDER, order)
-                .put(FIELD_TYPE, superType.toString().toLowerCase(Locale.ENGLISH))
-                .put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase(Locale.ENGLISH))
-                .put(FIELD_TARGET_FIELD, targetField)
-                .put(FIELD_SOURCE_FIELD, sourceField)
-                .put(FIELD_CREATOR_USER_ID, creatorUserId)
-                .put(FIELD_EXTRACTOR_CONFIG, extractorConfig)
-                .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase(Locale.ENGLISH))
-                .put(FIELD_CONDITION_VALUE, conditionValue)
-                .put(FIELD_CONVERTERS, converterConfigMap())
-                .build();
+            .put(FIELD_ID, id)
+            .put(FIELD_TITLE, title)
+            .put(FIELD_ORDER, order)
+            .put(FIELD_TYPE, superType.toString().toLowerCase(Locale.ENGLISH))
+            .put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase(Locale.ENGLISH))
+            .put(FIELD_TARGET_FIELD, targetField)
+            .put(FIELD_SOURCE_FIELD, sourceField)
+            .put(FIELD_CREATOR_USER_ID, creatorUserId)
+            .put(FIELD_EXTRACTOR_CONFIG, extractorConfig)
+            .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase(Locale.ENGLISH))
+            .put(FIELD_CONDITION_VALUE, conditionValue)
+            .put(FIELD_CONVERTERS, converterConfigMap())
+            .put(FIELD_STATUS, status)
+            .build();
     }
 
     public List<Converter> getConverters() {
@@ -351,8 +359,8 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         for (Converter converter : converters) {
             final Map<String, Object> config = ImmutableMap.of(
-                    FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(Locale.ENGLISH),
-                    FIELD_CONVERTER_CONFIG, converter.getConfig()
+                FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(Locale.ENGLISH),
+                FIELD_CONVERTER_CONFIG, converter.getConfig()
             );
             listBuilder.add(config);
         }
@@ -420,9 +428,9 @@ public abstract class Extractor implements EmbeddedPersistable {
             if (o == null || getClass() != o.getClass()) return false;
             Result result = (Result) o;
             return Objects.equals(beginIndex, result.beginIndex) &&
-                    Objects.equals(endIndex, result.endIndex) &&
-                    Objects.equals(value, result.value) &&
-                    Objects.equals(target, result.target);
+                Objects.equals(endIndex, result.endIndex) &&
+                Objects.equals(value, result.value) &&
+                Objects.equals(target, result.target);
         }
 
         @Override
@@ -433,11 +441,11 @@ public abstract class Extractor implements EmbeddedPersistable {
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
-                    .add("value", value)
-                    .add("target", target)
-                    .add("beginIndex", beginIndex)
-                    .add("endIndex", endIndex)
-                    .toString();
+                .add("value", value)
+                .add("target", target)
+                .add("beginIndex", beginIndex)
+                .add("endIndex", endIndex)
+                .toString();
         }
     }
 

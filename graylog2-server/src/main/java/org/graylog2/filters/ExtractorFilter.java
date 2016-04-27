@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,8 +41,8 @@ public class ExtractorFilter implements MessageFilter {
     private static final String NAME = "Extractor";
 
     private Cache<String, List<Extractor>> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .build();
+        .expireAfterWrite(1, TimeUnit.SECONDS)
+        .build();
 
     private final InputService inputService;
 
@@ -59,11 +59,13 @@ public class ExtractorFilter implements MessageFilter {
 
         for (final Extractor extractor : loadExtractors(msg.getSourceInputId())) {
             try {
-                extractor.runExtractor(msg);
+                if (extractor.getStatus() == 1) {
+                    extractor.runExtractor(msg);
+                }
             } catch (Exception e) {
                 extractor.incrementExceptions();
                 LOG.error("Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
-                        + "to message " + msg.getId(), e);
+                    + "to message " + msg.getId(), e);
             }
         }
 
