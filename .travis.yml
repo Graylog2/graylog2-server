@@ -1,7 +1,6 @@
 sudo: false
 language: java
 jdk:
-  - oraclejdk7
   - oraclejdk8
 addons:
   apt:
@@ -24,4 +23,4 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    jdk: oraclejdk7
+    jdk: oraclejdk8

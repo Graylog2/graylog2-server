@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-netflow</artifactId>
@@ -21,41 +24,26 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <graylog2.version>1.2.0</graylog2.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.site.skip>true</maven.site.skip>
+        <graylog2.version>2.0.0</graylog2.version>
         <graylog2.plugin-dir>/usr/share/graylog-server/plugin</graylog2.plugin-dir>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
+            <artifactId>graylog2-server</artifactId>
             <version>${graylog2.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-inputs</artifactId>
-            <version>${graylog2.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-buffer</artifactId>
-            <version>4.0.29.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -187,10 +175,6 @@
                 <version>2.18.1</version>
                 <configuration>
                     <systemProperties>
-                        <property>
-                            <name>log4j.configuration</name>
-                            <value>test-log4j.xml</value>
-                        </property>
                         <property>
                             <name>io.netty.leakDetectionLevel</name>
                             <value>PARANOID</value>

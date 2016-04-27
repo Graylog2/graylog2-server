@@ -24,9 +24,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
-/**
- * Implement the PluginMetaData interface here.
- */
 public class NetFlowPluginMetaData implements PluginMetaData {
     @Override
     public String getUniqueId() {
@@ -35,7 +32,7 @@ public class NetFlowPluginMetaData implements PluginMetaData {
 
     @Override
     public String getName() {
-        return "NetFlowPlugin";
+        return "NetFlow Plugin";
     }
 
     @Override
@@ -60,7 +57,7 @@ public class NetFlowPluginMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(1, 2, 0);
+        return new Version(2, 0, 0);
     }
 
     @Override
