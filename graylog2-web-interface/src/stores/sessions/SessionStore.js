@@ -17,10 +17,12 @@ const SessionStore = Reflux.createStore({
   init() {
     const sessionId = Store.get('sessionId');
     const username = Store.get('username');
-    this._validateSession(sessionId).then(() => {
-      this.sessionId = sessionId;
-      this.username = username;
-      this._propagateState();
+    this._validateSession(sessionId).then((response) => {
+      if (response.is_valid) {
+        this.sessionId = sessionId;
+        this.username = username;
+        this._propagateState();
+      }
     });
   },
   getInitialState() {
@@ -53,6 +55,7 @@ const SessionStore = Reflux.createStore({
   _validateSession(sessionId) {
     return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
       .session(sessionId)
+      .json()
       .build();
   },
 
