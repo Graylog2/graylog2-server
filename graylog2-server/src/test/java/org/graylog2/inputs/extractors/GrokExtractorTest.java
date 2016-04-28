@@ -107,7 +107,7 @@ public class GrokExtractorTest {
                                      "admin",
                                      Lists.<Converter>newArrayList(),
                                      Extractor.ConditionType.NONE,
-                                     null,1);
+                                     null,true);
         } catch (Extractor.ReservedFieldException | ConfigurationException e) {
             fail("Test setup is wrong: " + e.getMessage());
             throw new RuntimeException(e);

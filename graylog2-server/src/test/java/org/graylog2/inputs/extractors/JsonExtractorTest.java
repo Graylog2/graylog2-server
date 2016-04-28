@@ -34,14 +34,14 @@ public class JsonExtractorTest {
     @Before
     public void setUp() throws Extractor.ReservedFieldException, ConfigurationException {
         jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", Collections.<String, Object>emptyMap(), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "",1);
+            "source", "target", Collections.<String, Object>emptyMap(), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
+            "", true);
     }
 
     @Test(expected = ConfigurationException.class)
     public void constructorFailsOnMissingConfiguration() throws Extractor.ReservedFieldException, ConfigurationException {
         new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "",1);
+            "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "", true);
     }
 
     @Test
@@ -60,9 +60,9 @@ public class JsonExtractorTest {
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("foobar", "text", -1, -1),
-                new Extractor.Result(1234.5678, "number", -1, -1),
-                new Extractor.Result(true, "bool", -1, -1)
+            new Extractor.Result("foobar", "text", -1, -1),
+            new Extractor.Result(1234.5678, "number", -1, -1),
+            new Extractor.Result(true, "bool", -1, -1)
         );
 
         // Null values should be ignored!
@@ -80,8 +80,8 @@ public class JsonExtractorTest {
     @Test
     public void testRunWithArrayAndDifferentListSeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", ImmutableMap.<String, Object>of("list_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "",1);
+            "source", "target", ImmutableMap.<String, Object>of("list_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
+            "", true);
         final String value = "{\"array\": [\"foobar\", \"foobaz\"]}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
@@ -94,60 +94,60 @@ public class JsonExtractorTest {
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("foobar", "object_text", -1, -1),
-                new Extractor.Result(1234.5678, "object_number", -1, -1),
-                new Extractor.Result(true, "object_bool", -1, -1),
-                new Extractor.Result("foobar", "object_nested_text", -1, -1)
+            new Extractor.Result("foobar", "object_text", -1, -1),
+            new Extractor.Result(1234.5678, "object_number", -1, -1),
+            new Extractor.Result(true, "object_bool", -1, -1),
+            new Extractor.Result("foobar", "object_nested_text", -1, -1)
         );
     }
 
     @Test
     public void testRunWithFlattenedObject() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", ImmutableMap.<String, Object>of("flatten", true), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "",1);
+            "source", "target", ImmutableMap.<String, Object>of("flatten", true), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
+            "", true);
         final String value = "{"
-                + "\"object\": {"
-                + "\"text\": \"foobar\", "
-                + "\"number\": 1234.5678, "
-                + "\"bool\": true, "
-                + "\"null\": null, "
-                + "\"nested\": {\"text\": \"foobar\"}"
-                + "}"
-                + "}";
+            + "\"object\": {"
+            + "\"text\": \"foobar\", "
+            + "\"number\": 1234.5678, "
+            + "\"bool\": true, "
+            + "\"null\": null, "
+            + "\"nested\": {\"text\": \"foobar\"}"
+            + "}"
+            + "}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("text=foobar, number=1234.5678, bool=true, nested={text=foobar}", "object", -1, -1)
+            new Extractor.Result("text=foobar, number=1234.5678, bool=true, nested={text=foobar}", "object", -1, -1)
         );
     }
 
     @Test
     public void testRunWithObjectAndDifferentKeySeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", ImmutableMap.<String, Object>of("key_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "",1);
+            "source", "target", ImmutableMap.<String, Object>of("key_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
+            "", true);
         final String value = "{\"object\": {\"text\": \"foobar\", \"number\": 1234.5678, \"bool\": true, \"nested\": {\"text\": \"foobar\"}}}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("foobar", "object:text", -1, -1),
-                new Extractor.Result(1234.5678, "object:number", -1, -1),
-                new Extractor.Result(true, "object:bool", -1, -1),
-                new Extractor.Result("foobar", "object:nested:text", -1, -1)
+            new Extractor.Result("foobar", "object:text", -1, -1),
+            new Extractor.Result(1234.5678, "object:number", -1, -1),
+            new Extractor.Result(true, "object:bool", -1, -1),
+            new Extractor.Result("foobar", "object:nested:text", -1, -1)
         );
     }
 
     @Test
     public void testRunWithFlattenedObjectAndDifferentKVSeparator() throws Exception {
         final JsonExtractor jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", ImmutableMap.<String, Object>of("flatten", true, "kv_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
-                "",1);
+            "source", "target", ImmutableMap.<String, Object>of("flatten", true, "kv_separator", ":"), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
+            "", true);
         final String value = "{\"object\": {\"text\": \"foobar\", \"number\": 1234.5678, \"bool\": true, \"nested\": {\"text\": \"foobar\"}}}";
         final Extractor.Result[] results = jsonExtractor.run(value);
 
         assertThat(results).contains(
-                new Extractor.Result("text:foobar, number:1234.5678, bool:true, nested:{text=foobar}", "object", -1, -1)
+            new Extractor.Result("text:foobar, number:1234.5678, bool:true, nested:{text=foobar}", "object", -1, -1)
         );
     }
 }

@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- * <p>
+ *
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -125,7 +125,7 @@ public class ExtractorsResource extends RestResource {
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final String id = new com.eaio.uuid.UUID().toString();
-        final Extractor extractor = buildExtractorFromRequest(cer, id, 1);
+        final Extractor extractor = buildExtractorFromRequest(cer, id, true);
 
         try {
             inputService.addExtractor(mongoInput, extractor);
@@ -175,7 +175,7 @@ public class ExtractorsResource extends RestResource {
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
-        final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId(), 1);
+        final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId(), true);
 
         inputService.removeExtractor(mongoInput, originalExtractor.getId());
         try {
@@ -194,10 +194,8 @@ public class ExtractorsResource extends RestResource {
 
     @PUT
     @Timed
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Disable/Enable an extractor")
-    @Path("/{extractorId}/${status}")
+    @Path("/{extractorId}/{status}")
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "No such input on this node."),
         @ApiResponse(code = 404, message = "No such extractor on this input."),
@@ -210,9 +208,8 @@ public class ExtractorsResource extends RestResource {
                                          @ApiParam(name = "extractorId", required = true)
                                          @PathParam("extractorId") String extractorId,
                                          @ApiParam(name = "status", required = true)
-                                         @PathParam("status") Integer status,
-                                         @ApiParam(name = "JSON body", required = false)
-                                         @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
+                                         @PathParam("status") boolean status
+    ) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
@@ -233,7 +230,7 @@ public class ExtractorsResource extends RestResource {
             throw new BadRequestException(e);
         }
 
-        final String msg = "Updated extractor <" + originalExtractor.getId() + "> of type [" + cer.extractorType() + "] in input <" + inputId + ">.";
+        final String msg = status ? "Disabled" : "Enabled" + " extractor <" + originalExtractor.getId() + "> of type [" + originalExtractor.getType() + "] in input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
@@ -366,7 +363,7 @@ public class ExtractorsResource extends RestResource {
         return ExtractorSummary.create(extractor.getId(), extractor.getTitle(), extractor.getType().toString().toLowerCase(Locale.ENGLISH), extractor.getCursorStrategy().toString().toLowerCase(Locale.ENGLISH),
             extractor.getSourceField(), extractor.getTargetField(), extractor.getExtractorConfig(), extractor.getCreatorUserId(), extractor.converterConfigMap(),
             extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
-            extractor.getConverterExceptionCount(), metrics);
+            extractor.getConverterExceptionCount(), metrics, extractor.getExaractorEnabled());
     }
 
     private List<Converter> loadConverters(Map<String, Map<String, Object>> requestConverters) {
@@ -385,7 +382,7 @@ public class ExtractorsResource extends RestResource {
         return converters;
     }
 
-    private Extractor buildExtractorFromOriginal(Extractor originalExtractor, int status) {
+    private Extractor buildExtractorFromOriginal(Extractor originalExtractor, boolean status) {
         Extractor extractor = originalExtractor;
         try {
             extractor = extractorFactory.factory(
@@ -413,7 +410,7 @@ public class ExtractorsResource extends RestResource {
         return extractor;
     }
 
-    private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id, int status) {
+    private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id, boolean status) {
         Extractor extractor;
         try {
             extractor = extractorFactory.factory(

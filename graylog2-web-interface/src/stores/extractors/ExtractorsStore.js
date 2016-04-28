@@ -137,6 +137,25 @@ const ExtractorsStore = Reflux.createStore({
     return promise;
   },
 
+  toggle(inputId, extractor, status) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.toggle(inputId, extractor.id, !status).url);
+
+    const promise = fetch('PUT', url);
+    promise
+      .then(() => {
+        UserNotification.success(`Extractor "${extractor.title}" ${status ? "Disable" : "Enabled"} successfully`);
+        if (this.extractors) {
+          ExtractorsActions.list.triggerPromise(inputId);
+        }
+      })
+      .catch(error => {
+        UserNotification.error(status ? "Disable" : "Enabled" + ' extractor failed: ' + error,
+          `Could not ${status ? "disable" : "enable"} extractor ${extractor.title}`);
+      });
+
+    ExtractorsActions.toggle.promise(promise);
+  },
+
   delete(inputId, extractor) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
 

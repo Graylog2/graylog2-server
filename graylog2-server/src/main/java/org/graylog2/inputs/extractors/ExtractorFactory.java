@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- * <p>
+ *
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * 
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,25 +47,25 @@ public class ExtractorFactory {
                              String creatorUserId, List<Converter> converters,
                              Extractor.ConditionType conditionType,
                              String conditionValue,
-                             int status)
+                             boolean status)
         throws NoSuchExtractorException, Extractor.ReservedFieldException, ConfigurationException {
 
         // TODO convert to guice factory
         switch (type) {
             case REGEX:
-                return new RegexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new RegexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case SUBSTRING:
-                return new SubstringExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new SubstringExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case SPLIT_AND_INDEX:
-                return new SplitAndIndexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new SplitAndIndexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case COPY_INPUT:
-                return new CopyInputExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new CopyInputExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case REGEX_REPLACE:
-                return new RegexReplaceExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new RegexReplaceExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case GROK:
-                return new GrokExtractor(metricRegistry, grokPatternService.loadAll(), id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new GrokExtractor(metricRegistry, grokPatternService.loadAll(), id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             case JSON:
-                return new JsonExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue,status);
+                return new JsonExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
             default:
                 throw new NoSuchExtractorException();
         }

@@ -59,7 +59,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     public static final String FIELD_CONVERTER_TYPE = "type";
     public static final String FIELD_CONVERTER_CONFIG = "config";
     public static final ResultPredicate VALUE_NULL_PREDICATE = new ResultPredicate();
-    public static final String FIELD_STATUS = "status";
+    public static final String FIELD_Extractor_Enabled = "extractor_enabled";
 
     public enum Type {
         SUBSTRING,
@@ -110,7 +110,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     protected final List<Converter> converters;
     protected final ConditionType conditionType;
     protected final String conditionValue;
-    protected final int status;
+    protected final boolean exctractorEnabled;
 
     protected long order;
 
@@ -136,7 +136,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                      List<Converter> converters,
                      ConditionType conditionType,
                      String conditionValue,
-                     int status) throws ReservedFieldException {
+                     boolean exctractorEnabled) throws ReservedFieldException {
         this.metricRegistry = metricRegistry;
         if (Message.RESERVED_FIELDS.contains(targetField) && !Message.RESERVED_SETTABLE_FIELDS.contains(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
@@ -157,7 +157,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         this.converters = converters;
         this.conditionType = conditionType;
         this.conditionValue = conditionValue;
-        this.status = status;
+        this.exctractorEnabled = exctractorEnabled;
         if (conditionType.equals(ConditionType.REGEX)) {
             this.regexConditionPattern = Pattern.compile(conditionValue, Pattern.DOTALL);
         }
@@ -280,8 +280,8 @@ public abstract class Extractor implements EmbeddedPersistable {
         }
     }
 
-    public int getStatus() {
-        return status;
+    public boolean getExaractorEnabled() {
+        return exctractorEnabled;
     }
 
     public String getId() {
@@ -346,7 +346,7 @@ public abstract class Extractor implements EmbeddedPersistable {
             .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase(Locale.ENGLISH))
             .put(FIELD_CONDITION_VALUE, conditionValue)
             .put(FIELD_CONVERTERS, converterConfigMap())
-            .put(FIELD_STATUS, status)
+            .put(FIELD_Extractor_Enabled, String.valueOf(exctractorEnabled))
             .build();
     }
 

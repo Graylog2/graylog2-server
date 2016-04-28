@@ -37,7 +37,7 @@ public class CopyInputExtractorTest extends AbstractExtractorTest {
 
         msg.addField("somefield", "foo");
 
-        CopyInputExtractor x = new CopyInputExtractor(metricRegistry, "bar", "bar", 0, Extractor.CursorStrategy.COPY, "somefield", "our_result", noConfig(), "foo", noConverters(), Extractor.ConditionType.NONE, null,1);
+        CopyInputExtractor x = new CopyInputExtractor(metricRegistry, "bar", "bar", 0, Extractor.CursorStrategy.COPY, "somefield", "our_result", noConfig(), "foo", noConverters(), Extractor.ConditionType.NONE, null, true);
         x.runExtractor(msg);
 
         assertEquals("foo", msg.getField("our_result"));

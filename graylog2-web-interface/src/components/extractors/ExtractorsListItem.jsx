@@ -25,6 +25,11 @@ const ExtractorsListItem = React.createClass({
   _toggleDetails() {
     this.setState({showDetails: !this.state.showDetails});
   },
+  _toggleExtractor() {
+    if (window.confirm(`Really ${this.props.extractor.extractor_enabled ? "disable" : "enabled"} extractor "${this.props.extractor.title}?"`)) {
+      ExtractorsActions.toggle.triggerPromise(this.props.inputId, this.props.extractor, this.props.extractor.extractor_enabled);
+    }
+  },
   _deleteExtractor() {
     if (window.confirm(`Really remove extractor "${this.props.extractor.title}?"`)) {
       ExtractorsActions.delete.triggerPromise(this.props.inputId, this.props.extractor);
@@ -72,6 +77,15 @@ const ExtractorsListItem = React.createClass({
         <Button bsStyle="info">Edit</Button>
       </LinkContainer>
     );
+
+    if (this.props.extractor.extractor_enabled) {
+      actions.push(<Button key={`disable-extractor-`} bsStyle="danger"
+                           onClick={this._toggleExtractor}>Disabled</Button>);
+    } else {
+      actions.push(<Button key={`disable-extractor-`} bsStyle="info"
+                           onClick={this._toggleExtractor}>Enabled</Button>);
+    }
+
     actions.push(<Button key={`delete-extractor-`} bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
 
     return actions;
@@ -218,7 +232,7 @@ const ExtractorsListItem = React.createClass({
                       titleSuffix={ExtractorUtils.getReadableExtractorTypeName(this.props.extractor.type)}
                       description={this._formatExtractorSubtitle()}
                       actions={this._formatActions()}
-                      contentRow={this.state.showDetails ? this._formatDetails() : null} />
+                      contentRow={this.state.showDetails ? this._formatDetails() : null}/>
     );
   },
 });
