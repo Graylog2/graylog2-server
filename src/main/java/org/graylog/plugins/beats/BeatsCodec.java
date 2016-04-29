@@ -135,9 +135,13 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
         }
         final String timestampField = String.valueOf(event.remove("@timestamp"));
         final DateTime timestamp = Tools.dateTimeFromString(timestampField);
+        final String type = String.valueOf(event.get("type"));
+        final Object tags = event.get("tags");
 
         final Message result = new Message(message, hostname, timestamp);
         result.addField("name", name);
+        result.addField("type", type);
+        result.addField("tags", tags);
 
         return result;
     }
@@ -150,7 +154,6 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
         final Message gelfMessage = createMessage(message, event);
         gelfMessage.addField("facility", "filebeat");
         gelfMessage.addField("file", event.get("source"));
-        gelfMessage.addField("type", event.get("type"));
         gelfMessage.addField("input_type", event.get("input_type"));
         @SuppressWarnings("unchecked")
         final Map<String, Object> fields = (Map<String, Object>) event.get("fields");
@@ -165,7 +168,6 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
      */
     private Message parseTopbeat(Map<String, Object> event) {
         final Message gelfMessage = createMessage("-", event);
-        gelfMessage.addField("type", event.remove("type"));
         gelfMessage.addField("facility", "topbeat");
         final Map<String, Object> flattened = flatten(event, "topbeat", MAP_KEY_SEPARATOR);
 
@@ -180,7 +182,6 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
      */
     private Message parsePacketbeat(Map<String, Object> event) {
         final Message gelfMessage = createMessage("-", event);
-        gelfMessage.addField("type", event.remove("type"));
         gelfMessage.addField("facility", "packetbeat");
         final Map<String, Object> flattened = flatten(event, "packetbeat", MAP_KEY_SEPARATOR);
 
@@ -197,7 +198,6 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
     private Message parseWinlogbeat(Map<String, Object> event) {
         final String message = String.valueOf(event.remove("message"));
         final Message gelfMessage = createMessage(message, event);
-        gelfMessage.addField("type", event.remove("type"));
         gelfMessage.addField("facility", "winlogbeat");
         final Map<String, Object> flattened = flatten(event, "winlogbeat", MAP_KEY_SEPARATOR);
 
@@ -210,7 +210,6 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
     private Message parseGenericBeat(Map<String, Object> event) {
         final String message = String.valueOf(event.remove("message"));
         final Message gelfMessage = createMessage(message, event);
-        gelfMessage.addField("type", event.remove("type"));
         gelfMessage.addField("facility", "genericbeat");
         final Map<String, Object> flattened = flatten(event, "beat", MAP_KEY_SEPARATOR);
 

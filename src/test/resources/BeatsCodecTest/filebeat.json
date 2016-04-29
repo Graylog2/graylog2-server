@@ -14,6 +14,10 @@
     "message": "TEST",
     "offset": 0,
     "source": "/tmp/test.log",
+    "tags": [
+      "foobar",
+      "test"
+    ],
     "type": "log"
   }
 ]

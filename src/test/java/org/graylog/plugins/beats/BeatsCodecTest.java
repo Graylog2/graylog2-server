@@ -33,6 +33,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,6 +72,9 @@ public class BeatsCodecTest {
         assertThat(message.getField("facility")).isEqualTo("filebeat");
         assertThat(message.getField("file")).isEqualTo("/tmp/test.log");
         assertThat(message.getField("type")).isEqualTo("log");
+        @SuppressWarnings("unchecked")
+        final List<String> tags = (List<String>) message.getField("tags");
+        assertThat(tags).containsOnly("foobar", "test");
     }
 
     @Test
