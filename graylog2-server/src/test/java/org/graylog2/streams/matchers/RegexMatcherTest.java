@@ -78,6 +78,60 @@ public class RegexMatcherTest extends MatcherTest {
     }
 
     @Test
+    public void testMissingFieldShouldNotMatch() throws Exception {
+        final StreamRule rule = getSampleRule();
+        rule.setField("nonexistingfield");
+        rule.setValue("^foo");
+
+        final Message msg = getSampleMessage();
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
+        assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testInvertedMissingFieldShouldMatch() throws Exception {
+        final StreamRule rule = getSampleRule();
+        rule.setField("nonexistingfield");
+        rule.setValue("^foo");
+        rule.setInverted(true);
+
+        final Message msg = getSampleMessage();
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
+        assertTrue(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testNullFieldShouldNotMatch() throws Exception {
+        final String fieldName = "nullfield";
+        final StreamRule rule = getSampleRule();
+        rule.setField(fieldName);
+        rule.setValue("^foo");
+
+        final Message msg = getSampleMessage();
+        msg.addField(fieldName, null);
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
+        assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testInvertedNullFieldShouldMatch() throws Exception {
+        final String fieldName = "nullfield";
+        final StreamRule rule = getSampleRule();
+        rule.setField(fieldName);
+        rule.setValue("^foo");
+        rule.setInverted(true);
+
+        final Message msg = getSampleMessage();
+        msg.addField(fieldName, null);
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
+        assertTrue(matcher.match(msg, rule));
+    }
+
+    @Test
     public void testSuccessfulComplexRegexMatch() {
         StreamRule rule = getSampleRule();
         rule.setField("some_field");

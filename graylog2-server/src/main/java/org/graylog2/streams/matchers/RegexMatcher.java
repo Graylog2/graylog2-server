@@ -45,11 +45,11 @@ public class RegexMatcher implements StreamRuleMatcher {
     @Override
     public boolean match(Message msg, StreamRule rule) {
         if (msg.getField(rule.getField()) == null)
-            return false;
+            return rule.getInverted();
 
         try {
-            Pattern pattern = patternCache.get(rule.getValue());
-            CharSequence charSequence = new InterruptibleCharSequence(msg.getField(rule.getField()).toString());
+            final Pattern pattern = patternCache.get(rule.getValue());
+            final CharSequence charSequence = new InterruptibleCharSequence(msg.getField(rule.getField()).toString());
             return rule.getInverted() ^ pattern.matcher(charSequence).find();
         } catch (ExecutionException e) {
             LOG.error("Unable to get pattern from regex cache: ", e);
