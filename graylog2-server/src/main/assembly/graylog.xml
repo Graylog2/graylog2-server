@@ -14,6 +14,7 @@
             <includes>
                 <include>README.markdown</include>
                 <include>COPYING</include>
+                <include>UPGRADING.rst</include>
             </includes>
         </fileSet>
         <fileSet>
