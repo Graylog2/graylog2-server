@@ -44,8 +44,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -157,7 +159,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 throw new Exception("Could not determine PID.");
             }
 
-            Files.write(pidFilePath, pid.getBytes(StandardCharsets.UTF_8));
+            Files.write(pidFilePath, pid.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS);
         } catch (Exception e) {
             LOG.error("Could not write PID file: " + e.getMessage(), e);
             System.exit(1);
