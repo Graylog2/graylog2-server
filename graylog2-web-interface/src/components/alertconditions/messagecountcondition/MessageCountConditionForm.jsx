@@ -69,7 +69,7 @@ const MessageCountConditionForm = React.createClass({
           <input ref="time" name="time" type="number" min="1" className="form-control"
                  defaultValue={alertCondition.time} onChange={this._onTimeChange} required/>
           {' '}
-          <Pluralize singular="minute" plural="messages" value={this.state.time}/>
+          <Pluralize singular="minute" plural="minutes" value={this.state.time}/>
           {' '}
           <GracePeriodInput ref="gracePeriod" {...this.props}/>
         </span>
