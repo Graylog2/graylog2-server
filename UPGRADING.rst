@@ -129,6 +129,22 @@ collection in MongoDB and remove it afterwards.
 Removed configuration settings
 ------------------------------
 
+Index Retention and Rotation Settings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In 2.0.0 the index rotation and retention settings have been moved from the Graylog server config file to the database and are
+now configurable via the web interface.
+
+The old settings from the ``graylog.conf`` or ``/etc/graylog/server/server.conf`` will be migrated to the database.
+
+.. warning:: When you upgrade from a 1.x version and you modified any rotation/retention settings,
+             please make sure you **KEEP** your old settings in the config file so the migration process
+             will add your old settings to the database!
+             Otherwise the retention process will use the default settings and might remove a lot of indices.
+
+Overview
+^^^^^^^^
+
 Some settings, which have been deprecated in previous versions, have finally been removed from the Graylog configuration file.
 
 .. list-table:: Removed configuration settings
