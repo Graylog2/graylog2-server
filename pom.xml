@@ -9,7 +9,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-pipeline-processor</artifactId>
-    <version>1.0.0-beta.3-SNAPSHOT</version>
+    <version>1.1.0-beta.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -39,7 +39,7 @@
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
-        <graylog2.version>2.0.1-SNAPSHOT</graylog2.version>
+        <graylog2.version>2.1.0-SNAPSHOT</graylog2.version>
         <graylog2.plugin-dir>/usr/share/graylog-server/plugin</graylog2.plugin-dir>
         <antlr.version>4.5.1</antlr.version>
         <slf4j.version>1.7.13</slf4j.version>
