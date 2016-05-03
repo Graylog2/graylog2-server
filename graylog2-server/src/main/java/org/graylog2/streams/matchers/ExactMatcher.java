@@ -26,17 +26,13 @@ public class ExactMatcher implements StreamRuleMatcher {
 
 	@Override
 	public boolean match(Message msg, StreamRule rule) {
-        if (!msg.hasField(rule.getField())) {
-            return false;
+        if (msg.getField(rule.getField()) == null) {
+            return rule.getInverted();
         }
 
-		Object value = msg.getField(rule.getField());
-		
-		if (value == null) {
-			return false;
-		}
-		
-		return rule.getInverted() ^ value.toString().trim().equals(rule.getValue());
+		final String value = msg.getField(rule.getField()).toString();
+
+		return rule.getInverted() ^ value.trim().equals(rule.getValue());
 	}
 
 }
