@@ -81,7 +81,34 @@ public class ExactMatcherTest extends MatcherTest {
         msg.addField("someother", "foo");
 
         StreamRuleMatcher matcher = getMatcher(rule);
+        assertTrue(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testNullFieldShouldNotMatch() {
+        final String fieldName = "nullfield";
+        final StreamRule rule = getSampleRule();
+        rule.setField(fieldName);
+
+        final Message msg = getSampleMessage();
+        msg.addField(fieldName, null);
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
         assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testInvertedNullFieldShouldMatch() {
+        final String fieldName = "nullfield";
+        final StreamRule rule = getSampleRule();
+        rule.setField(fieldName);
+        rule.setInverted(true);
+
+        final Message msg = getSampleMessage();
+        msg.addField(fieldName, null);
+
+        final StreamRuleMatcher matcher = getMatcher(rule);
+        assertTrue(matcher.match(msg, rule));
     }
 
     protected StreamRule getSampleRule() {
