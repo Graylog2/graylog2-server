@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.junit.Before;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -60,6 +62,18 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
         alertLastTriggered(Integer.MAX_VALUE);
         assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
+    }
+
+    @Test
+    public void testDifferingTypesForNumericalParameters() throws Exception {
+        final AlertCondition alertConditionWithDouble = getDummyAlertCondition(ImmutableMap.of("grace", 3.0));
+        assertEquals(alertConditionWithDouble.getGrace(), 3);
+        final AlertCondition alertConditionWithInteger = getDummyAlertCondition(ImmutableMap.of("grace", 3));
+        assertEquals(alertConditionWithInteger.getGrace(), 3);
+        final AlertCondition alertConditionWithStringDouble = getDummyAlertCondition(ImmutableMap.of("grace", "3.0"));
+        assertEquals(alertConditionWithStringDouble.getGrace(), 3);
+        final AlertCondition alertConditionWithStringInteger = getDummyAlertCondition(ImmutableMap.of("grace", "3"));
+        assertEquals(alertConditionWithStringInteger.getGrace(), 3);
     }
 
     protected AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
