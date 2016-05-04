@@ -7,6 +7,7 @@
 ### Environment
 
 * Graylog Version:
+* Pipeline Processor plugin version:
 * Elasticsearch Version:
 * MongoDB Version:
 * Operating System:
