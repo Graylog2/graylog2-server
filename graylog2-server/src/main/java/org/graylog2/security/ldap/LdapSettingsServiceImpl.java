@@ -25,6 +25,7 @@ import org.graylog2.shared.security.ldap.LdapSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 
@@ -39,9 +40,9 @@ public class LdapSettingsServiceImpl extends PersistedServiceImpl implements Lda
     }
 
     @Override
+    @Nullable
     public LdapSettings load() {
-        DBObject query = new BasicDBObject();
-        final List<DBObject> results = query(LdapSettingsImpl.class, query);
+        final List<DBObject> results = query(LdapSettingsImpl.class, new BasicDBObject());
         if (results.size() == 0) {
             return null;
         }
@@ -51,13 +52,16 @@ public class LdapSettingsServiceImpl extends PersistedServiceImpl implements Lda
                     results.size());
             return null;
         }
-        final DBObject settingsObject = results.get(0);
-        return ldapSettingsFactory.create((ObjectId) settingsObject.get("_id"), settingsObject.toMap());
+        final DBObject settings = results.get(0);
+        final LdapSettingsImpl ldapSettings = ldapSettingsFactory.create((ObjectId) settings.get("_id"), settings.toMap());
+        if (null == ldapSettings.getSystemPassword()) {
+            return null;
+        }
+        return ldapSettings;
     }
 
     @Override
     public void delete() {
-        DBObject query = new BasicDBObject();
-        destroyAll(LdapSettingsImpl.class, query);
+        destroyAll(LdapSettingsImpl.class);
     }
 }
