@@ -17,6 +17,7 @@
 package org.graylog2.alerts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
@@ -186,6 +187,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         }
     }
 
+    @VisibleForTesting
     protected Optional<Number> getNumber(Object o) {
         if (o instanceof Number) {
             return Optional.of((Number)o);
