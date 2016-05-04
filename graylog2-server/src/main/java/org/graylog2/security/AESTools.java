@@ -20,6 +20,7 @@ import org.apache.shiro.codec.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,6 +28,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESTools {
     private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
 
+    @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
@@ -36,9 +38,10 @@ public class AESTools {
         } catch (Exception e) {
             LOG.error("Could not encrypt value.", e);
         }
-            return null;
+        return null;
     }
 
+    @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
@@ -50,5 +53,4 @@ public class AESTools {
         }
         return null;
     }
-
 }
