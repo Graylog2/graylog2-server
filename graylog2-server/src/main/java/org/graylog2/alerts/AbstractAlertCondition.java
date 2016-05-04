@@ -187,7 +187,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         }
     }
 
-    @VisibleForTesting
     protected Optional<Number> getNumber(Object o) {
         if (o instanceof Number) {
             return Optional.of((Number)o);
