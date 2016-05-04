@@ -17,6 +17,7 @@
 package org.graylog2.web.resources;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.base.Strings;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.rest.MoreMediaTypes;
@@ -28,7 +29,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -72,15 +74,20 @@ public class AppConfigResource {
         if (headers != null && !headers.isEmpty()) {
             endpointUri = headers.stream().filter(s -> {
                 try {
-                    final URL url = new URL(s);
-                    switch (url.getProtocol()) {
+                    if (Strings.isNullOrEmpty(s)) {
+                        return false;
+                    }
+                    final URI uri = new URI(s);
+                    if (!uri.isAbsolute()) {
+                        return true;
+                    }
+                    switch (uri.getScheme()) {
                         case "http":
                         case "https":
                             return true;
-                        default:
-                            return false;
                     }
-                } catch (MalformedURLException e) {
+                    return false;
+                } catch (URISyntaxException e) {
                     return false;
                 }
             }).findFirst();
