@@ -26,11 +26,11 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
@@ -64,7 +64,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.creatorUserId = creatorUserId;
         this.parameters = parameters;
 
-        this.grace = getInt(this.parameters.get("grace"), 0);
+        this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
     }
 
     protected abstract AlertCondition.CheckResult runCheck();
@@ -105,7 +105,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     @Override
     public Integer getBacklog() {
-        return getInt(getParameters().get("backlog"), 0);
+        return getNumber(getParameters().get("backlog")).orElse(0).intValue();
     }
 
     @Override
@@ -186,21 +186,15 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         }
     }
 
-    @Nullable
-    protected int getInt(Object o, Integer defaultValue) {
-        if (o == null) {
-            return defaultValue;
-        }
-
+    protected Optional<Number> getNumber(Object o) {
         if (o instanceof Number) {
-            return ((Number)o).intValue();
+            return Optional.of((Number)o);
         }
 
-        return Double.valueOf(String.valueOf(o)).intValue();
-    }
-
-    @Nullable
-    protected Integer getInt(Object o) {
-        return getInt(o, null);
+        try {
+            return Optional.of(Double.valueOf(String.valueOf(o)));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 }
