@@ -24,7 +24,6 @@ import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -39,6 +38,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Format of actual indexes behind the Deflector:
@@ -282,7 +283,6 @@ public class Deflector { // extends Ablenkblech
     }
 
     public boolean isGraylog2Index(final String indexName) {
-        return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
+        return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
     }
-
 }

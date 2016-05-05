@@ -20,11 +20,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
@@ -35,14 +38,17 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -57,16 +63,19 @@ public class IndexRangesResource extends RestResource {
 
     private final IndexRangeService indexRangeService;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     private final Deflector deflector;
     private final SystemJobManager systemJobManager;
 
     @Inject
     public IndexRangesResource(IndexRangeService indexRangeService,
                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                Deflector deflector,
                                SystemJobManager systemJobManager) {
         this.indexRangeService = indexRangeService;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.deflector = deflector;
         this.systemJobManager = systemJobManager;
     }
@@ -95,6 +104,29 @@ public class IndexRangesResource extends RestResource {
         return IndexRangesResponse.create(ranges.size(), ranges);
     }
 
+    @GET
+    @Path("/{index: [a-z_0-9]+}/rebuild")
+    @Timed
+    @ApiOperation(value = "Show single index range")
+    @Produces(MediaType.APPLICATION_JSON)
+    public IndexRangeSummary show(
+            @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
+            @PathParam("index") @NotEmpty String index) throws NotFoundException {
+        if (!deflector.isGraylog2Index(index)) {
+            throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
+        }
+        checkPermission(RestPermissions.INDEXRANGES_READ, index);
+
+        final IndexRange indexRange = indexRangeService.get(index);
+        return IndexRangeSummary.create(
+                indexRange.indexName(),
+                indexRange.begin(),
+                indexRange.end(),
+                indexRange.calculatedAt(),
+                indexRange.calculationDuration()
+        );
+    }
+
     @POST
     @Timed
     @Path("/rebuild")
@@ -109,6 +141,36 @@ public class IndexRangesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response rebuild() {
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(this.deflector);
+        try {
+            this.systemJobManager.submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new ForbiddenException();
+        }
+
+        return Response.accepted().build();
+    }
+
+    @POST
+    @Timed
+    @Path("/{index: [a-z_0-9]+}/rebuild")
+    @ApiOperation(value = "Rebuild/sync index range information.",
+            notes = "This triggers a system job that scans an index and stores meta information " +
+                    "about what indices contain messages in what time ranges. It atomically overwrites " +
+                    "already existing meta information.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Rebuild/sync system job triggered.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response rebuildIndex(
+            @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
+            @PathParam("index") @NotEmpty String index) {
+        if (!deflector.isGraylog2Index(index)) {
+            throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
+        }
+        checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
+
+        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(deflector, index);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
