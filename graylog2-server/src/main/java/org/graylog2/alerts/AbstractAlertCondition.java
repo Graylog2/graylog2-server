@@ -17,6 +17,7 @@
 package org.graylog2.alerts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
@@ -63,12 +65,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.creatorUserId = creatorUserId;
         this.parameters = parameters;
 
-        if (this.parameters.containsKey("grace")) {
-            this.grace = (Integer) this.parameters.get("grace");
-        } else {
-            this.grace = 0;
-        }
-
+        this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
     }
 
     protected abstract AlertCondition.CheckResult runCheck();
@@ -109,12 +106,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     @Override
     public Integer getBacklog() {
-        final Object rawParameter = getParameters().get("backlog");
-        if (rawParameter != null && rawParameter instanceof Number) {
-            return (Integer) rawParameter;
-        } else {
-            return 0;
-        }
+        return getNumber(getParameters().get("backlog")).orElse(0).intValue();
     }
 
     @Override
@@ -195,4 +187,15 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         }
     }
 
+    protected Optional<Number> getNumber(Object o) {
+        if (o instanceof Number) {
+            return Optional.of((Number)o);
+        }
+
+        try {
+            return Optional.of(Double.valueOf(String.valueOf(o)));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 }
