@@ -13,6 +13,7 @@ export { default as LinkToNode } from './LinkToNode';
 export { default as KeyValueTable } from './KeyValueTable';
 export { default as MultiSelect } from './MultiSelect';
 export { default as Page } from './Page';
+export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pluralize } from './Pluralize';
