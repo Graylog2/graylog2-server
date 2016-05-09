@@ -173,6 +173,9 @@ public abstract class BaseConfiguration {
         if (restTransportUri == null) {
             LOG.debug("No rest_transport_uri set. Using default [{}].", getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
+        } else if ("0.0.0.0".equals(restTransportUri.getHost())) {
+            LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
+            return getDefaultRestTransportUri();
         } else {
             return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
         }
