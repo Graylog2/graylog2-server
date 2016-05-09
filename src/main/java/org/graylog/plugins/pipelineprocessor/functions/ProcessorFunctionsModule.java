@@ -50,6 +50,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
+import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
@@ -83,6 +84,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // generic functions
         addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
+        addMessageProcessorFunction(GrokMatch.NAME, GrokMatch.class);
 
         // string functions
         addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);
