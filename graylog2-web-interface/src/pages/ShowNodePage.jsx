@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -36,8 +36,8 @@ const ShowNodePage = React.createClass({
   },
   componentWillMount() {
     ClusterOverviewStore.jvm(this.props.params.nodeId)
-      .then(jvmInformation => this.setState({jvmInformation: jvmInformation}));
-    PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({plugins: plugins}));
+      .then(jvmInformation => this.setState({ jvmInformation: jvmInformation }));
+    PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({ plugins: plugins }));
     InputStatesStore.list().then(inputStates => {
       // We only want the input states for the current node
       const inputIds = Object.keys(inputStates);
@@ -49,7 +49,7 @@ const ShowNodePage = React.createClass({
         }
       });
 
-      this.setState({inputStates: filteredInputStates});
+      this.setState({ inputStates: filteredInputStates });
     });
   },
   _isLoading() {
