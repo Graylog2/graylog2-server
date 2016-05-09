@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem, Col, Well } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
+import { ConfigurationWell } from 'components/configurationforms';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -105,7 +106,7 @@ const InputListItem = React.createClass({
                       title="More actions"
                       id={`more-actions-dropdown-${this.props.input.id}`}
                       pullRight>
-        <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
+        <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
           <MenuItem key={`edit-input-${this.props.input.id}`}
                     onSelect={this._editInput}
                     disabled={definition === undefined}>
@@ -115,7 +116,7 @@ const InputListItem = React.createClass({
 
         {showMetricsMenuItem}
 
-        <IfPermitted permissions={'inputs:edit:' + this.props.input.id}>
+        <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
           <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static field</MenuItem>
         </IfPermitted>
 
@@ -139,10 +140,10 @@ const InputListItem = React.createClass({
     }
 
     const inputForm = definition ?
-        <InputForm ref="configurationForm" key={'edit-form-input-' + input.id}
+        <InputForm ref="configurationForm" key={`edit-form-input-${input.id}`}
                    globalValue={input.global} nodeValue={input.node}
                    configFields={definition.requested_configuration}
-                   title={'Editing Input ' + input.title}
+                   title={`Editing Input ${input.title}`}
                    titleValue={input.title}
                    typeName={input.type} includeTitleField
                    submitAction={this._updateInput} values={input.attributes} /> : null;
@@ -150,11 +151,10 @@ const InputListItem = React.createClass({
     const additionalContent = (
       <div>
         <Col md={8}>
-          <Well bsSize="small" className="configuration-well">
-            <ul>
-              {this._getConfigurationOptions(this.props.input.attributes)}
-            </ul>
-          </Well>
+          <ConfigurationWell className="configuration-well"
+                             id={input.id}
+                             configuration={input.attributes}
+                             typeDefinition={definition || {}}/>
           <StaticFieldForm ref="staticFieldForm" input={this.props.input}/>
           <InputStaticFields input={this.props.input}/>
         </Col>

@@ -9,10 +9,10 @@ const ConfigurationWell = React.createClass({
   PASSWORD_PLACEHOLDER: '********',
   _formatRegularField(value, key) {
     const finalValue = (value === null || value === undefined || value === '' ? <i>{'<empty>'}</i> : String(value));
-    return (<li key={this.props.id + '-' + key}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
+    return (<li key={`${this.props.id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
   },
   _formatPasswordField(value, key) {
-    return (<li key={this.props.id + '-' + key}><div className="key">{key}:</div> <div className="value">{this.PASSWORD_PLACEHOLDER}</div></li>);
+    return (<li key={`${this.props.id}-${key}`}><div className="key">{key}:</div> <div className="value">{this.PASSWORD_PLACEHOLDER}</div></li>);
   },
   _formatConfiguration(id, config, typeDefinition) {
     if (!config) {
@@ -20,7 +20,7 @@ const ConfigurationWell = React.createClass({
     }
     const formattedItems = Object.keys(config).sort().map((key) => {
       const value = config[key];
-      const requestedConfiguration = typeDefinition.requested_configuration[key];
+      const requestedConfiguration = (typeDefinition && typeDefinition.requested_configuration ? typeDefinition.requested_configuration[key] : undefined);
       if (requestedConfiguration && requestedConfiguration.attributes.indexOf('is_password') > -1) {
         return this._formatPasswordField(value, key);
       }
