@@ -94,7 +94,7 @@ public class BaseConfigurationTest {
     }
 
     @Test
-    public void testRestTransportUriWildcard() throws RepositoryException, ValidationException {
+    public void testRestListenUriWildcard() throws RepositoryException, ValidationException {
         validProperties.put("rest_listen_uri", "http://0.0.0.0:12900");
 
         Configuration configuration = new Configuration();
@@ -102,6 +102,17 @@ public class BaseConfigurationTest {
 
         Assert.assertNotEquals("http://0.0.0.0:12900", configuration.getDefaultRestTransportUri().toString());
         Assert.assertNotNull(configuration.getDefaultRestTransportUri());
+    }
+
+    @Test
+    public void testRestTransportUriWildcard() throws RepositoryException, ValidationException {
+        validProperties.put("rest_listen_uri", "http://0.0.0.0:12900");
+        validProperties.put("rest_transport_uri", "http://0.0.0.0:12900");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertNotEquals(URI.create("http://0.0.0.0:12900"), configuration.getRestTransportUri());
     }
 
     @Test
