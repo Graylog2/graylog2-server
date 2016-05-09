@@ -13,10 +13,11 @@ const LoggerOverview = React.createClass({
     if (!this.state.loggers || !this.state.subsystems) {
       return <Spinner />;
     }
+    const subsystems = this.state.subsystems;
     const nodeLoggers = Object.keys(this.state.loggers)
-      .map((nodeId) => <NodeLoggers key={'node-loggers-' + nodeId}
+      .map((nodeId) => <NodeLoggers key={`node-loggers-${nodeId}`}
                                     nodeId={nodeId}
-                                    subsystems={this.state.subsystems[nodeId].subsystems}/>);
+                                    subsystems={subsystems[nodeId] ? subsystems[nodeId].subsystems : {}}/>);
     return (
       <span>
         {nodeLoggers}
