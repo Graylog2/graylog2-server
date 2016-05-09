@@ -22,6 +22,9 @@ const InputStatesStore = Reflux.createStore({
       .then((response) => {
         const result = {};
         Object.keys(response).forEach((node) => {
+          if (!response[node]) {
+            return;
+          }
           response[node].forEach((input) => {
             if (!result[input.id]) {
               result[input.id] = {};
@@ -38,15 +41,12 @@ const InputStatesStore = Reflux.createStore({
 
   _checkInputStateChangeResponse(input, response, action) {
     const nodes = Object.keys(response).filter(node => input.global ? true : node === input.node);
-    let failedNodes = 0;
-    nodes.forEach(node => {
-      failedNodes = (response[node] === null ? failedNodes + 1 : failedNodes);
-    });
+    const failedNodes = nodes.filter((nodeId) => response[nodeId] === null);
 
-    if (failedNodes === 0) {
+    if (failedNodes.length === 0) {
       UserNotification.success(`Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,
         `Input '${input.title}' will be ${action === 'START' ? 'started' : 'stopped'} shortly`);
-    } else if (failedNodes === nodes.length) {
+    } else if (failedNodes.length === nodes.length) {
       UserNotification.error(`Request to ${action.toLowerCase()} input '${input.title}' failed. Check your Graylog logs for more information.`,
         `Input '${input.title}' could not be ${action === 'START' ? 'started' : 'stopped'}`);
     } else {

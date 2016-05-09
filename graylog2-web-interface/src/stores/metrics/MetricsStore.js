@@ -70,6 +70,9 @@ const MetricsStore = Reflux.createStore({
         .forEach((nodeId) => {
           const nodeMetrics = {};
 
+          if (!response[nodeId]) {
+            return;
+          }
           response[nodeId].metrics.forEach((metric) => {
             nodeMetrics[metric.full_name] = metric;
           });
