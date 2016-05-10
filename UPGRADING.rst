@@ -289,6 +289,6 @@ The output ID key for the list of outputs in the ``/streams/*`` endpoints has be
 Web Interface Config Changes
 ----------------------------
 
-The web interface is now integrated into the server and was rewritten in React. Therefore configuring it has changed fundamentally since the last version(s). Please see our `Online Documentation <http://docs.graylog.org/en/2.0/pages/configuring_webif.html>` for details.
+The web interface has been integrated into the Graylog server and was rewritten in React. Therefore configuring it has changed fundamentally since the last version(s). Please consult the `Graylog documentation <http://docs.graylog.org/en/2.0/pages/configuring_webif.html>`__ for details.
 
-Please take note that the ``application.context`` configuration parameter present in 1.x is not existing anymore. The web interface must be served without a path prefix currently.
+Please take note that the ``application.context`` configuration parameter present in Graylog 1.x (and earlier) is not existing anymore. The web interface can currently only be served without a path prefix.
