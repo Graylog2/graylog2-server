@@ -18,6 +18,12 @@ Multicast discovery has been removed from Elasticsearch 2.x (although it is stil
 
 To reflect this change, the `elasticsearch_discovery_zen_ping_unicast_hosts` now has to contain the address of at least one Elasticsearch node in the cluster which Graylog can connect to.
 
+#### Default network host
+
+The network interface which Elasticsearch binds to (`elasticsearch_network_host`) has been changed to localhost (i. e. `127.0.0.1` or `::1`); see https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking_20_network_changes.html#_bind_to_localhost[Network changes/Bind to localhost].
+
+If Elasticsearch is not running on the same machine, `elasticsearch_network_host` must be set to a host name or an IP address which can be accessed by the other Elasticsearch nodes in the cluster.
+
 #### Index range types
 
 *This step needs to be performed before the update to Elasticsearch 2.x!*
