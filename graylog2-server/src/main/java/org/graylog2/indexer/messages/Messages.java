@@ -23,12 +23,9 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.action.WriteConsistencyLevel;
-import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -49,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -60,26 +58,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
-    private static final Predicate<Throwable> ES_TIMEOUT_EXCEPTION_PREDICATE = new Predicate<Throwable>() {
-        @Override
-        public boolean apply(Throwable t) {
-            return t instanceof ElasticsearchTimeoutException;
-        }
-    };
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
     private static final Retryer<BulkResponse> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResponse>newBuilder()
-            .retryIfException(ES_TIMEOUT_EXCEPTION_PREDICATE)
+            .retryIfException(t -> t instanceof ElasticsearchTimeoutException)
             .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
             .build();
 
     private final Client c;
     private final String deflectorName;
+    private final String analyzer;
     private final Meter invalidTimestampMeter;
 
     @Inject
     public Messages(Client client, ElasticsearchConfiguration configuration, MetricRegistry metricRegistry) {
         this.c = client;
         this.deflectorName = Deflector.buildName(configuration.getIndexPrefix());
+        this.analyzer = configuration.getAnalyzer();
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
     }
 
@@ -95,11 +89,12 @@ public class Messages {
     }
 
     public List<String> analyze(String string, String index) {
-        final AnalyzeRequestBuilder builder = c.admin().indices().prepareAnalyze(index, string);
-        final AnalyzeResponse response = c.admin().indices().analyze(builder.request()).actionGet();
+        final AnalyzeResponse response = c.admin().indices().prepareAnalyze(index, string)
+            .setAnalyzer(analyzer)
+            .get();
 
         final List<AnalyzeToken> tokens = response.getTokens();
-        final List<String> terms = Lists.newArrayListWithCapacity(tokens.size());
+        final List<String> terms = new ArrayList<>(tokens.size());
         for (AnalyzeToken token : tokens) {
             terms.add(token.getTerm());
         }
