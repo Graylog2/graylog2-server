@@ -34,13 +34,6 @@ const InputListItem = React.createClass({
   _openStaticFieldForm() {
     this.refs.staticFieldForm.open();
   },
-
-  _getConfigurationOptions(inputAttributes) {
-    const attributes = Object.keys(inputAttributes);
-    return attributes.map(attribute => {
-      return <li key={`${attribute}-${this.props.input.id}`}>{attribute}: {inputAttributes[attribute]}</li>;
-    });
-  },
   _editInput() {
     this.refs.configurationForm.open();
   },
