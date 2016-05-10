@@ -126,7 +126,7 @@ public class MessageResource extends RestResource {
         try {
             return MessageTokens.create(messages.analyze(string, index));
         } catch (IndexNotFoundException e) {
-            final String message = "Index " + index + "does not exist.";
+            final String message = "Index " + index + " does not exist.";
             LOG.error(message, e);
             throw new NotFoundException(message);
         }
