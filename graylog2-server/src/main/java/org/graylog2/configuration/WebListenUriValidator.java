@@ -18,13 +18,14 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
+import com.google.common.base.Strings;
 
 import java.net.URI;
 
 public class WebListenUriValidator implements Validator<URI> {
     @Override
     public void validate(String name, URI value) throws ValidationException {
-        if (value != null && !value.getPath().equals("/")) {
+        if (value != null && !Strings.isNullOrEmpty(value.getPath()) && !value.getPath().equals("/")) {
             throw new ValidationException("Parameter " + name + " must not contain a path prefix (found " + value + ")");
         }
     }
