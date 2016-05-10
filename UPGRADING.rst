@@ -284,3 +284,11 @@ The output ID key for the list of outputs in the ``/streams/*`` endpoints has be
       "title": "ALL",
       "content_pack": null
     }
+
+
+Web Interface Config Changes
+----------------------------
+
+The web interface is now integrated into the server and was rewritten in React. Therefore configuring it has changed fundamentally since the last version(s). Please see our `Online Documentation <http://docs.graylog.org/en/2.0/pages/configuring_webif.html>` for details.
+
+Please take note that the ``application.context`` configuration parameter present in 1.x is not existing anymore. The web interface must be served without a path prefix currently.
