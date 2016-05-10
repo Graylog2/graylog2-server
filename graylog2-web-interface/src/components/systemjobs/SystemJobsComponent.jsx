@@ -25,7 +25,9 @@ const SystemJobsComponent = React.createClass({
     if (!this.state.jobs) {
       return <Spinner />;
     }
-    const jobs = Object.keys(this.state.jobs).map((nodeId) => this.state.jobs[nodeId].jobs).reduce((a, b) => a.concat(b));
+    const jobs = Object.keys(this.state.jobs)
+      .map((nodeId) => this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : [])
+      .reduce((a, b) => a.concat(b));
     return (
       <Row className="content">
         <Col md={12}>
