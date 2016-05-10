@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -9,7 +9,7 @@ const InputStatesStore = StoreProvider.getStore('InputStates');
 const InputTypesStore = StoreProvider.getStore('InputTypes');
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
-import { PageHeader, Spinner } from 'components/common';
+import { PageErrorOverview, PageHeader, Spinner } from 'components/common';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
@@ -35,27 +35,32 @@ const ShowNodePage = React.createClass({
     };
   },
   componentWillMount() {
-    ClusterOverviewStore.jvm(this.props.params.nodeId)
-      .then(jvmInformation => this.setState({jvmInformation: jvmInformation}));
-    PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({plugins: plugins}));
-    InputStatesStore.list().then(inputStates => {
-      // We only want the input states for the current node
-      const inputIds = Object.keys(inputStates);
-      const filteredInputStates = [];
-      inputIds.forEach(inputId => {
-        const inputObject = inputStates[inputId][this.props.params.nodeId];
-        if (inputObject) {
-          filteredInputStates.push(inputObject);
-        }
-      });
+    Promise.all([
+      ClusterOverviewStore.jvm(this.props.params.nodeId)
+        .then(jvmInformation => this.setState({ jvmInformation: jvmInformation })),
+      PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({ plugins: plugins })),
+      InputStatesStore.list().then(inputStates => {
+        // We only want the input states for the current node
+        const inputIds = Object.keys(inputStates);
+        const filteredInputStates = [];
+        inputIds.forEach(inputId => {
+          const inputObject = inputStates[inputId][this.props.params.nodeId];
+          if (inputObject) {
+            filteredInputStates.push(inputObject);
+          }
+        });
 
-      this.setState({inputStates: filteredInputStates});
-    });
+        this.setState({ inputStates: filteredInputStates });
+      }),
+    ]).then(() => {}, (errors) => this.setState({ errors: errors }));
   },
   _isLoading() {
     return !(this.state.node && this.state.systemOverview);
   },
   render() {
+    if (this.state.errors) {
+      return <PageErrorOverview errors={[this.state.errors]} />;
+    }
     if (this._isLoading()) {
       return <Spinner/>;
     }
