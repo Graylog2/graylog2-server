@@ -20,6 +20,7 @@ const PageErrorOverview = React.createClass({
     return (
       <ul>
         {formattedErrors}
+        <li>Check your Graylog logs for more information.</li>
       </ul>
     );
   },
@@ -28,8 +29,8 @@ const PageErrorOverview = React.createClass({
       <Row className="jumbotron-container">
         <Col mdOffset={2} md={8}>
           <Jumbotron>
-            <h1>Error fetching data</h1>
-            <p>We had trouble fetching some data required to build this page.</p>
+            <h1>Error getting data</h1>
+            <p>We had trouble fetching some data required to build this page, so here is a picture instead.</p>
             {this._formatErrors(this.props.errors)}
           </Jumbotron>
         </Col>
