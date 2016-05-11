@@ -115,7 +115,7 @@ public class SessionsResource extends RestResource {
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         } catch (AuthenticationException e) {
-            LOG.warn("Unable to log in user " + createRequest.username(), e);
+            LOG.info("Invalid username or password for user \"{}\"", createRequest.username());
         } catch (UnknownSessionException e) {
             subject.logout();
         }
