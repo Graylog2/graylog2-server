@@ -18,7 +18,6 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Optional;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
@@ -50,7 +50,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain() {
-        final Map<String, IndexStats> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
+        final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
         final int indexCount = deflectorIndices.size();
         final Optional<Integer> maxIndices = getMaxNumberOfIndices();
 
@@ -80,10 +80,10 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         }
     }
 
-    private void runRetention(Map<String, IndexStats> deflectorIndices, int removeCount) throws NoTargetIndexException {
+    private void runRetention(Map<String, Set<String>> deflectorIndices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (indexName.equals(deflector.getCurrentActualTargetIndex())) {
+            if (deflectorIndices.get(indexName).contains(deflector.getName())) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }

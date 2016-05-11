@@ -20,7 +20,7 @@
  */
 package org.graylog2.indexer;
 
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import com.google.common.collect.Maps;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -31,12 +31,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
@@ -90,7 +96,7 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrow() {
-        final Map<String, IndexStats> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
+        final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
         assertNotNull(deflectorIndices);
         assertEquals(0, deflectorIndices.size());
     }
@@ -149,4 +155,77 @@ public class DeflectorTest {
         assertFalse(deflector.isGraylogDeflectorIndex("HAHA"));
         assertFalse(deflector.isGraylogIndex("HAHA"));
     }
+
+    @Test
+    public void getNewestTargetNumber() throws NoTargetIndexException {
+        final Indices indices = mock(Indices.class);
+        Map<String, Set<String>> indexNameAliases = Maps.newHashMap();
+        indexNameAliases.put("graylog_1", Collections.emptySet());
+        indexNameAliases.put("graylog_2", Collections.emptySet());
+        indexNameAliases.put("graylog_3", Collections.singleton("graylog_deflector"));
+        indexNameAliases.put("graylog_4_restored_archive", Collections.emptySet());
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final Deflector deflector = new Deflector(systemJobManager,
+                                                "graylog",
+                                                activityWriter,
+                                                indexReadOnlyJobFactory,
+                                                singleIndexRangeJobFactory,
+                                                indices);
+
+        final int number = deflector.getNewestTargetNumber();
+        assertEquals(3, number);
+    }
+
+    @Test
+    public void getAllGraylogIndexNames() {
+        final Indices indices = mock(Indices.class);
+        Map<String, Set<String>> indexNameAliases = Maps.newHashMap();
+        indexNameAliases.put("graylog_1", Collections.emptySet());
+        indexNameAliases.put("graylog_2", Collections.emptySet());
+        indexNameAliases.put("graylog_3", Collections.emptySet());
+        indexNameAliases.put("graylog_4_restored_archive", Collections.emptySet());
+        indexNameAliases.put("graylog_5", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final Deflector deflector = new Deflector(systemJobManager,
+                                                  "graylog",
+                                                  activityWriter,
+                                                  indexReadOnlyJobFactory,
+                                                  singleIndexRangeJobFactory,
+                                                  indices);
+
+        final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
+        assertThat(allGraylogIndexNames)
+                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
+    }
+
+    @Test
+    public void getAllGraylogDeflectorIndices() {
+        final Indices indices = mock(Indices.class);
+        Map<String, Set<String>> indexNameAliases = Maps.newHashMap();
+        indexNameAliases.put("graylog_1", Collections.emptySet());
+        indexNameAliases.put("graylog_2", Collections.emptySet());
+        indexNameAliases.put("graylog_3", Collections.emptySet());
+        indexNameAliases.put("graylog_4_restored_archive", Collections.emptySet());
+        indexNameAliases.put("graylog_5", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final Deflector deflector = new Deflector(systemJobManager,
+                                                  "graylog",
+                                                  activityWriter,
+                                                  indexReadOnlyJobFactory,
+                                                  singleIndexRangeJobFactory,
+                                                  indices);
+
+        final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
+
+        assertThat(deflectorIndices).isNotNull();
+        assertThat(deflectorIndices).isNotEmpty();
+        assertThat(deflectorIndices.keySet())
+                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+    }
+
+
+
 }
