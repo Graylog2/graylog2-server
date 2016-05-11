@@ -19,6 +19,7 @@ package org.graylog2.indexer.indices;
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
 import org.elasticsearch.ElasticsearchException;
@@ -38,6 +39,7 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRespon
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -55,6 +57,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.cluster.metadata.AliasMetaData;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
@@ -84,13 +87,16 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 @Singleton
@@ -177,6 +183,9 @@ public class Indices {
         final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
+        if (response.getFailedShards() > 0) {
+            LOG.warn("IndexStats response contains failed shards, response is incomplete: {}", (Object) response.getShardFailures());
+        }
         return response.getIndices();
     }
 
@@ -206,6 +215,35 @@ public class Indices {
 
     public boolean aliasExists(String alias) {
         return c.admin().indices().aliasesExist(new GetAliasesRequest(alias)).actionGet().exists();
+    }
+
+    @NotNull
+    public Map<String, Set<String>> getIndexNamesAndAliases(String indexPattern) {
+
+        // only request indices matching the name or pattern in `indexPattern` and only get the alias names for each index,
+        // not the settings or mappings
+        final GetIndexRequestBuilder getIndexRequestBuilder = c.admin().indices().prepareGetIndex();
+        getIndexRequestBuilder.addFeatures(GetIndexRequest.Feature.ALIASES);
+        getIndexRequestBuilder.setIndices(indexPattern);
+
+        final GetIndexResponse getIndexResponse = c.admin().indices().getIndex(getIndexRequestBuilder.request()).actionGet();
+
+        final String[] indices = getIndexResponse.indices();
+        final ImmutableOpenMap<String, List<AliasMetaData>> aliases = getIndexResponse.aliases();
+        final Map<String, Set<String>> indexAliases = Maps.newHashMap();
+        for (String index : indices) {
+            final List<AliasMetaData> aliasMetaData = aliases.get(index);
+            if (aliasMetaData == null) {
+                indexAliases.put(index, Collections.emptySet());
+            } else {
+                indexAliases.put(index,
+                                 aliasMetaData.stream()
+                                         .map(AliasMetaData::alias)
+                                         .collect(toSet()));
+            }
+        }
+
+        return indexAliases;
     }
 
     @Nullable
