@@ -1,5 +1,5 @@
 body {
-    background: url('~images/not-found-bg.jpg') no-repeat center center fixed;
+    background: url('../../public/images/not-found-bg.jpg') no-repeat center center fixed;
     -moz-background-size: cover;
     -webkit-background-size: cover;
     -o-background-size: cover;
