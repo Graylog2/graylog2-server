@@ -1,9 +1,10 @@
 import Qs from 'qs';
+import URI from 'urijs';
 import AppConfig from 'util/AppConfig';
 
 const URLUtils = {
   qualifyUrl(url) {
-    return AppConfig.gl2ServerUrl() + this.appPrefixed(url);
+    return new URI(AppConfig.gl2ServerUrl() + this.appPrefixed(url)).normalizePathname().toString();
   },
   appPrefixed(url) {
     return this.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
