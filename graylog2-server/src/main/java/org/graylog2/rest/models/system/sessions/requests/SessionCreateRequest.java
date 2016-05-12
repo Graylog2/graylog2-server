@@ -20,22 +20,25 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class SessionCreateRequest {
     @JsonProperty
+    @NotEmpty
     public abstract String username();
 
     @JsonProperty
+    @NotEmpty
     public abstract String password();
 
     @JsonProperty
     public abstract String host();
 
     @JsonCreator
-    public static SessionCreateRequest create(@JsonProperty("username") String username,
-                                              @JsonProperty("password") String password,
+    public static SessionCreateRequest create(@JsonProperty("username") @NotEmpty String username,
+                                              @JsonProperty("password") @NotEmpty String password,
                                               @JsonProperty("host") String host) {
         return new AutoValue_SessionCreateRequest(username, password, host);
     }
