@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
@@ -63,6 +64,8 @@ import java.util.concurrent.TimeUnit;
 
 @Path("/system/sessions")
 @Api(value = "System/Sessions", description = "Login for interactive user sessions")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class SessionsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SessionsResource.class);
 
@@ -134,7 +137,6 @@ public class SessionsResource extends RestResource {
         notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
         code = 204
     )
-    @Produces(MediaType.APPLICATION_JSON)
     public SessionValidationResponse validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);
