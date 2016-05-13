@@ -22,8 +22,8 @@ public class MessageProcessorModule extends PluginModule {
     @Override
     protected void configure() {
         addMessageProcessor(MessageFilterChainProcessor.class, MessageFilterChainProcessor.Descriptor.class);
-
-        bind(OrderedMessageProcessors.class).asEagerSingleton();
+        // must not be a singleton, because each thread should get an isolated copy of the processors
+        bind(OrderedMessageProcessors.class);
     }
 
 }
