@@ -43,7 +43,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
     }
 
     @Test(expected = ConfigurationException.class)
@@ -60,7 +60,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
     }
 
     @Test(expected = ConfigurationException.class)
@@ -77,7 +77,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
 
         assertThat(message.getMessage()).isEqualTo("Test");
@@ -116,7 +116,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
 
         assertThat(message.getMessage()).isEqualTo("Foobar");
@@ -137,7 +137,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
     }
 
@@ -156,7 +156,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
 
         assertThat(message.getMessage()).isEqualTo("123/Foobar");
@@ -177,7 +177,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
 
         assertThat(message.getMessage()).isEqualTo("123/Foobar 456/Foobaz");
@@ -198,7 +198,7 @@ public class RegexReplaceExtractorTest extends AbstractExtractorTest {
                 "user",
                 Collections.<Converter>emptyList(),
                 Extractor.ConditionType.NONE,
-                null);
+                null,true);
         extractor.runExtractor(message);
 
         assertThat(message.getMessage()).isEqualTo("123/Foobar Foobaz 456");

@@ -66,8 +66,10 @@ public class JsonExtractor extends Extractor {
                          final String creatorUserId,
                          final List<Converter> converters,
                          final ConditionType conditionType,
-                         final String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(metricRegistry, id, title, order, Type.JSON, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                         final String conditionValue,
+                         final boolean status) throws ReservedFieldException, ConfigurationException {
+        super(metricRegistry, id, title, order, Type.JSON, cursorStrategy,
+            sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
 
         if (extractorConfig == null) {
             throw new ConfigurationException("Missing extractor configuration");

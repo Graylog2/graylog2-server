@@ -70,16 +70,16 @@ public class JsonTesterResource extends RestResource {
                                                  String keySeparator,
                                                  String kvSeparator) {
         final Map<String, Object> config = ImmutableMap.<String, Object>of(
-                "flatten", flatten,
-                "list_separator", listSeparator,
-                "key_separator", keySeparator,
-                "kv_separator", kvSeparator
+            "flatten", flatten,
+            "list_separator", listSeparator,
+            "key_separator", keySeparator,
+            "kv_separator", kvSeparator
         );
         final JsonExtractor extractor;
         try {
             extractor = new JsonExtractor(
-                    new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
-                    config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, ""
+                new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
+                config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "", true
             );
         } catch (Extractor.ReservedFieldException e) {
             throw new BadRequestException("Trying to overwrite a reserved message field", e);

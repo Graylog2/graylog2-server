@@ -7,6 +7,7 @@ const ExtractorsActions = Reflux.createActions({
   'save': {asyncResult: true},
   'update': {asyncResult: true},
   'delete': {asyncResult: true},
+  'toggle': {asyncResult: true},
   'order': {asyncResult: true},
   'import': {},
 });

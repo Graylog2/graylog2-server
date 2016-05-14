@@ -67,15 +67,15 @@ public class RegexReplaceTesterResource extends RestResource {
 
     private RegexReplaceTesterResponse testRegexReplaceExtractor(String example, String regex, String replacement, boolean replaceAll) {
         final Map<String, Object> config = ImmutableMap.<String, Object>of(
-                "regex", regex,
-                "replacement", replacement,
-                "replace_all", replaceAll
+            "regex", regex,
+            "replacement", replacement,
+            "replace_all", replaceAll
         );
         final RegexReplaceExtractor extractor;
         try {
             extractor = new RegexReplaceExtractor(
-                    new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
-                    config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, ""
+                new MetricRegistry(), "test", "Test", 0L, Extractor.CursorStrategy.COPY, "test", "test",
+                config, getCurrentUser().getName(), Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "", true
             );
         } catch (Extractor.ReservedFieldException e) {
             throw new BadRequestException("Trying to overwrite a reserved message field", e);
@@ -85,7 +85,7 @@ public class RegexReplaceTesterResource extends RestResource {
 
         final Extractor.Result result = extractor.runExtractor(example);
         final RegexReplaceTesterResponse.Match match = result == null ? null :
-                RegexReplaceTesterResponse.Match.create(String.valueOf(result.getValue()), result.getBeginIndex(), result.getEndIndex());
+            RegexReplaceTesterResponse.Match.create(String.valueOf(result.getValue()), result.getBeginIndex(), result.getEndIndex());
         return RegexReplaceTesterResponse.create(result != null, match, regex, replacement, replaceAll, example);
     }
 }

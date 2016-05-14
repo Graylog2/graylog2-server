@@ -43,8 +43,9 @@ public class SplitAndIndexExtractor extends Extractor {
                                   String creatorUserId,
                                   List<Converter> converters,
                                   ConditionType conditionType,
-                                  String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(metricRegistry, id, title, order, Type.SPLIT_AND_INDEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                                  String conditionValue,
+                                  boolean status) throws ReservedFieldException, ConfigurationException {
+        super(metricRegistry, id, title, order, Type.SPLIT_AND_INDEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
 
         if (extractorConfig == null || extractorConfig.get("index") == null || extractorConfig.get("split_by") == null) {
             throw new ConfigurationException("Missing configuration fields. Required: index, split_by");

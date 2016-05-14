@@ -42,8 +42,9 @@ public class RegexExtractor extends Extractor {
                           final String creatorUserId,
                           final List<Converter> converters,
                           final ConditionType conditionType,
-                          final String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(metricRegistry, id, title, order, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                          final String conditionValue,
+                          boolean status) throws ReservedFieldException, ConfigurationException {
+        super(metricRegistry, id, title, order, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
 
         if (extractorConfig == null || extractorConfig.get(CONFIG_REGEX_VALUE) == null || ((String) extractorConfig.get(CONFIG_REGEX_VALUE)).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");
@@ -60,7 +61,7 @@ public class RegexExtractor extends Extractor {
             return null;
         }
 
-        return new Result[] { new Result(value.substring(matcher.start(1), matcher.end(1)), matcher.start(1), matcher.end(1)) };
+        return new Result[]{new Result(value.substring(matcher.start(1), matcher.end(1)), matcher.start(1), matcher.end(1))};
     }
 
 }

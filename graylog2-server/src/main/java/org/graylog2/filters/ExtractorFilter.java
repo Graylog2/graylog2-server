@@ -41,8 +41,8 @@ public class ExtractorFilter implements MessageFilter {
     private static final String NAME = "Extractor";
 
     private Cache<String, List<Extractor>> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .build();
+        .expireAfterWrite(1, TimeUnit.SECONDS)
+        .build();
 
     private final InputService inputService;
 
@@ -59,11 +59,13 @@ public class ExtractorFilter implements MessageFilter {
 
         for (final Extractor extractor : loadExtractors(msg.getSourceInputId())) {
             try {
-                extractor.runExtractor(msg);
+                if (extractor.getExaractorEnabled() == true) {
+                    extractor.runExtractor(msg);
+                }
             } catch (Exception e) {
                 extractor.incrementExceptions();
                 LOG.error("Could not apply extractor \"" + extractor.getTitle() + "\" (id=" + extractor.getId() + ") "
-                        + "to message " + msg.getId(), e);
+                    + "to message " + msg.getId(), e);
             }
         }
 

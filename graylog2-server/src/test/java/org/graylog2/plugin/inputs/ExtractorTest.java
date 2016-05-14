@@ -915,7 +915,7 @@ public class ExtractorTest {
                              ConditionType conditionType,
                              String conditionValue) throws ReservedFieldException {
             super(metricRegistry, id, title, order, type, cursorStrategy, sourceField, targetField, extractorConfig,
-                    creatorUserId, converters, conditionType, conditionValue);
+                    creatorUserId, converters, conditionType, conditionValue,true);
 
             this.callback = callback;
         }

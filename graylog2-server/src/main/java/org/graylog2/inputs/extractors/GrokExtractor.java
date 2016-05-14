@@ -50,20 +50,22 @@ public class GrokExtractor extends Extractor {
                          String creatorUserId,
                          List<Converter> converters,
                          ConditionType conditionType,
-                         String conditionValue) throws ReservedFieldException, ConfigurationException {
+                         String conditionValue,
+                         boolean status) throws ReservedFieldException, ConfigurationException {
         super(metricRegistry,
-              id,
-              title,
-              order,
-              Type.GROK,
-              cursorStrategy,
-              sourceField,
-              targetField,
-              extractorConfig,
-              creatorUserId,
-              converters,
-              conditionType,
-              conditionValue);
+            id,
+            title,
+            order,
+            Type.GROK,
+            cursorStrategy,
+            sourceField,
+            targetField,
+            extractorConfig,
+            creatorUserId,
+            converters,
+            conditionType,
+            conditionValue,
+            status);
         if (extractorConfig == null || Strings.isNullOrEmpty((String) extractorConfig.get("grok_pattern"))) {
             throw new ConfigurationException("grok_pattern not set");
         }

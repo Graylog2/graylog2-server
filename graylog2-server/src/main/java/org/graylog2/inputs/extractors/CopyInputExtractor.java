@@ -24,24 +24,30 @@ import java.util.List;
 import java.util.Map;
 
 public class CopyInputExtractor extends Extractor {
-    public CopyInputExtractor(MetricRegistry metricRegistry, String id, String title, long order, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters, ConditionType conditionType, String conditionValue) throws ReservedFieldException {
+    public CopyInputExtractor(MetricRegistry metricRegistry, String id, String title,
+                              long order, CursorStrategy cursorStrategy, String sourceField,
+                              String targetField, Map<String, Object> extractorConfig,
+                              String creatorUserId, List<Converter> converters,
+                              ConditionType conditionType, String conditionValue,
+                              boolean status) throws ReservedFieldException {
         super(metricRegistry,
-              id,
-              title,
-              order,
-              Type.COPY_INPUT,
-              cursorStrategy,
-              sourceField,
-              targetField,
-              extractorConfig,
-              creatorUserId,
-              converters,
-              conditionType,
-              conditionValue);
+            id,
+            title,
+            order,
+            Type.COPY_INPUT,
+            cursorStrategy,
+            sourceField,
+            targetField,
+            extractorConfig,
+            creatorUserId,
+            converters,
+            conditionType,
+            conditionValue,
+            status);
     }
 
     @Override
     protected Result[] run(String value) {
-        return new Result[] { new Result(value, 0, value.length())};
+        return new Result[]{new Result(value, 0, value.length())};
     }
 }

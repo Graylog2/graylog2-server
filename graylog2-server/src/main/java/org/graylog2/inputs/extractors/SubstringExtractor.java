@@ -44,8 +44,9 @@ public class SubstringExtractor extends Extractor {
                               String creatorUserId,
                               List<Converter> converters,
                               ConditionType conditionType,
-                              String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(metricRegistry, id, title, order, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                              String conditionValue,
+                              boolean status) throws ReservedFieldException, ConfigurationException {
+        super(metricRegistry, id, title, order, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue, status);
 
         if (extractorConfig == null || extractorConfig.get("begin_index") == null || extractorConfig.get("end_index") == null) {
             throw new ConfigurationException("Missing configuration fields. Required: begin_index, end_index");
