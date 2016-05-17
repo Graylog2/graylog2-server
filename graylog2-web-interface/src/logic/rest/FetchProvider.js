@@ -28,7 +28,7 @@ export class FetchError extends Error {
 
 export class Builder {
   constructor(method, url) {
-    this.request = request(method, url.replace(/([^:])\/\//, '$1/'));
+    this.request = request(method, url.replace(/([^:])\/\//, '$1/')).set('X-Requested-With', 'XMLHttpRequest');
   }
 
   authenticated() {
