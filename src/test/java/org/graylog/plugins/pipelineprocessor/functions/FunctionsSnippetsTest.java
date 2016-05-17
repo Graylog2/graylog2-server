@@ -54,6 +54,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
@@ -137,6 +138,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         // string functions
         functions.put(Abbreviate.NAME, new Abbreviate());
         functions.put(Capitalize.NAME, new Capitalize());
+        functions.put(Concat.NAME, new Concat());
         functions.put(Contains.NAME, new Contains());
         functions.put(Lowercase.NAME, new Lowercase());
         functions.put(Substring.NAME, new Substring());

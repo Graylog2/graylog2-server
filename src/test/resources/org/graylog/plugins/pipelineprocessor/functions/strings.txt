@@ -13,7 +13,8 @@ when
     abbreviate("abcdefg", 6) == "abc..." &&
     abbreviate("abcdefg", 7) == "abcdefg" &&
     abbreviate("abcdefg", 8) == "abcdefg" &&
-    abbreviate("abcdefg", 4) == "a..."
+    abbreviate("abcdefg", 4) == "a..." &&
+    concat("foo", "bar") == "foobar"
 then
     set_field("has_xyz", contains("abcdef", "xyz"));
     trigger_test();
