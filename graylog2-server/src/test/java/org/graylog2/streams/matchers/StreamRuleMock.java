@@ -33,6 +33,7 @@ public class StreamRuleMock implements StreamRule {
     private String field;
     private Boolean inverted;
     private String contentPack;
+    private String description;
 
     public StreamRuleMock(Map<String, Object> rule) {
         this.id = rule.get("_id").toString();
@@ -88,6 +89,16 @@ public class StreamRuleMock implements StreamRule {
 
     public void setStreamId(String streamId) {
         this.streamId = streamId;
+    }
+
+    @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
