@@ -1,0 +1,50 @@
+rule "syslog tests"
+when
+    true
+then
+    set_field("level0", syslog_level(0));
+    set_field("level1", syslog_level(1));
+    set_field("level2", syslog_level(2));
+    set_field("level3", syslog_level(3));
+    set_field("level4", syslog_level(4));
+    set_field("level5", syslog_level(5));
+    set_field("level6", syslog_level(6));
+    set_field("level7", syslog_level(7));
+    
+    set_field("facility0", syslog_facility(0));
+    set_field("facility1", syslog_facility(1));
+    set_field("facility2", syslog_facility(2));
+    set_field("facility3", syslog_facility(3));
+    set_field("facility4", syslog_facility(4));
+    set_field("facility5", syslog_facility(5));
+    set_field("facility6", syslog_facility(6));
+    set_field("facility7", syslog_facility(7));
+    set_field("facility8", syslog_facility(8));
+    set_field("facility9", syslog_facility(9));
+    set_field("facility10", syslog_facility(10));
+    set_field("facility11", syslog_facility(11));
+    set_field("facility12", syslog_facility(12));
+    set_field("facility13", syslog_facility(13));
+    set_field("facility14", syslog_facility(14));
+    set_field("facility15", syslog_facility(15));
+    set_field("facility16", syslog_facility(16));
+    set_field("facility17", syslog_facility(17));
+    set_field("facility18", syslog_facility(18));
+    set_field("facility19", syslog_facility(19));
+    set_field("facility20", syslog_facility(20));
+    set_field("facility21", syslog_facility(21));
+    set_field("facility22", syslog_facility(22));
+    set_field("facility23", syslog_facility(23));
+
+    let priority1 = expand_syslog_priority(0);
+    set_fields({prio1_facility: priority1.facility, prio1_level: priority1.level });
+    let priority2 = expand_syslog_priority(165);
+    set_fields({prio2_facility: priority2.facility, prio2_level: priority2.level });
+
+    let priority3 = expand_syslog_priority_as_string(0);
+    set_fields({prio3_facility: priority3.facility, prio3_level: priority3.level });
+    let priority4 = expand_syslog_priority_as_string(165);
+    set_fields({prio4_facility: priority4.facility, prio4_level: priority4.level });
+
+    trigger_test();
+end

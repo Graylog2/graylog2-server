@@ -62,6 +62,10 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uppercase;
+import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogFacilityConversion;
+import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConversion;
+import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
+import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -163,6 +167,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(IsNull.NAME, new IsNull());
         functions.put(IsNotNull.NAME, new IsNotNull());
+
+        functions.put(SyslogPriorityConversion.NAME, new SyslogPriorityConversion());
+        functions.put(SyslogPriorityToStringConversion.NAME, new SyslogPriorityToStringConversion());
+        functions.put(SyslogFacilityConversion.NAME, new SyslogFacilityConversion());
+        functions.put(SyslogLevelConversion.NAME, new SyslogLevelConversion());
 
         functions.put(UrlConversion.NAME, new UrlConversion());
 
@@ -377,5 +386,57 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
         assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
+    }
+
+    @Test
+    public void syslog() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+
+        assertThat(message.getField("level0")).isEqualTo("Emergency");
+        assertThat(message.getField("level1")).isEqualTo("Alert");
+        assertThat(message.getField("level2")).isEqualTo("Critical");
+        assertThat(message.getField("level3")).isEqualTo("Error");
+        assertThat(message.getField("level4")).isEqualTo("Warning");
+        assertThat(message.getField("level5")).isEqualTo("Notice");
+        assertThat(message.getField("level6")).isEqualTo("Informational");
+        assertThat(message.getField("level7")).isEqualTo("Debug");
+
+        assertThat(message.getField("facility0")).isEqualTo("kern");
+        assertThat(message.getField("facility1")).isEqualTo("user");
+        assertThat(message.getField("facility2")).isEqualTo("mail");
+        assertThat(message.getField("facility3")).isEqualTo("daemon");
+        assertThat(message.getField("facility4")).isEqualTo("auth");
+        assertThat(message.getField("facility5")).isEqualTo("syslog");
+        assertThat(message.getField("facility6")).isEqualTo("lpr");
+        assertThat(message.getField("facility7")).isEqualTo("news");
+        assertThat(message.getField("facility8")).isEqualTo("uucp");
+        assertThat(message.getField("facility9")).isEqualTo("clock");
+        assertThat(message.getField("facility10")).isEqualTo("authpriv");
+        assertThat(message.getField("facility11")).isEqualTo("ftp");
+        assertThat(message.getField("facility12")).isEqualTo("ntp");
+        assertThat(message.getField("facility13")).isEqualTo("log audit");
+        assertThat(message.getField("facility14")).isEqualTo("log alert");
+        assertThat(message.getField("facility15")).isEqualTo("cron");
+        assertThat(message.getField("facility16")).isEqualTo("local0");
+        assertThat(message.getField("facility17")).isEqualTo("local1");
+        assertThat(message.getField("facility18")).isEqualTo("local2");
+        assertThat(message.getField("facility19")).isEqualTo("local3");
+        assertThat(message.getField("facility20")).isEqualTo("local4");
+        assertThat(message.getField("facility21")).isEqualTo("local5");
+        assertThat(message.getField("facility22")).isEqualTo("local6");
+        assertThat(message.getField("facility23")).isEqualTo("local7");
+
+        assertThat(message.getField("prio1_facility")).isEqualTo(0);
+        assertThat(message.getField("prio1_level")).isEqualTo(0);
+        assertThat(message.getField("prio2_facility")).isEqualTo(20);
+        assertThat(message.getField("prio2_level")).isEqualTo(5);
+        assertThat(message.getField("prio3_facility")).isEqualTo("kern");
+        assertThat(message.getField("prio3_level")).isEqualTo("Emergency");
+        assertThat(message.getField("prio4_facility")).isEqualTo("local4");
+        assertThat(message.getField("prio4_level")).isEqualTo("Notice");
     }
 }
