@@ -23,29 +23,33 @@ import java.util.Map;
 
 @JsonAutoDetect
 public interface StreamRule extends Persisted {
-    public String getId();
+    String getId();
 
-    public StreamRuleType getType();
+    StreamRuleType getType();
 
-    public String getField();
+    String getField();
 
-    public String getValue();
+    String getValue();
 
-    public Boolean getInverted();
+    Boolean getInverted();
 
-    public String getStreamId();
+    String getStreamId();
 
-    public String getContentPack();
+    String getContentPack();
 
-    public void setType(StreamRuleType type);
+    String getDescription();
 
-    public void setField(String field);
+    void setType(StreamRuleType type);
 
-    public void setValue(String value);
+    void setField(String field);
 
-    public void setInverted(Boolean inverted);
+    void setValue(String value);
 
-    public void setContentPack(String contentPack);
+    void setInverted(Boolean inverted);
 
-    public Map<String, Object> asMap();
+    void setContentPack(String contentPack);
+
+    void setDescription(String description);
+
+    Map<String, Object> asMap();
 }

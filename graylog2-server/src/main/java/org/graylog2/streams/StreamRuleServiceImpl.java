@@ -69,6 +69,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
         streamRuleData.put(StreamRuleImpl.FIELD_FIELD, cr.field());
         streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, cr.inverted());
         streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamid));
+        streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, cr.description());
 
         return new StreamRuleImpl(streamRuleData);
     }
