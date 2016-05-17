@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -42,10 +41,10 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
     @Inject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
-                                        Provider<OrderedMessageProcessors> orderedMessageProcessorsProvider,
+                                        OrderedMessageProcessors orderedMessageProcessors,
                                         OutputBuffer outputBuffer) {
         super(metricRegistry);
-        this.orderedMessageProcessors = orderedMessageProcessorsProvider.get();
+        this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
     }
 

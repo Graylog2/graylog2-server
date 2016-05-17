@@ -16,6 +16,7 @@
  */
 package org.graylog2.messageprocessors;
 
+import com.google.inject.Scopes;
 import org.graylog2.plugin.PluginModule;
 
 public class MessageProcessorModule extends PluginModule {
@@ -23,7 +24,7 @@ public class MessageProcessorModule extends PluginModule {
     protected void configure() {
         addMessageProcessor(MessageFilterChainProcessor.class, MessageFilterChainProcessor.Descriptor.class);
         // must not be a singleton, because each thread should get an isolated copy of the processors
-        bind(OrderedMessageProcessors.class);
+        bind(OrderedMessageProcessors.class).in(Scopes.NO_SCOPE);
     }
 
 }
