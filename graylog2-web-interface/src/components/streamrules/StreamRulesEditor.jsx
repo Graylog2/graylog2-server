@@ -1,5 +1,3 @@
-/* global ApiRoutes */
-
 import React, { PropTypes } from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -8,8 +6,8 @@ import Routes from 'routing/Routes';
 
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
-import StreamRuleList from './StreamRuleList';
-import StreamRuleForm from './StreamRuleForm';
+import StreamRuleList from 'components/streamrules/StreamRuleList';
+import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
 
 import StoreProvider from 'injection/StoreProvider';
