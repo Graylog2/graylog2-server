@@ -47,7 +47,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
         try {
             final InetAddress inetAddress = InetAddresses.forString(ipString);
             return new IpAddress(inetAddress);
-        } catch (IllegalFormatException e) {
+        } catch (IllegalArgumentException e) {
             final Optional<String> defaultValue = defaultParam.optional(args, context);
             if (!defaultValue.isPresent()) {
                 return null;

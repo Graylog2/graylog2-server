@@ -443,4 +443,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("prio4_facility")).isEqualTo("local4");
         assertThat(message.getField("prio4_level")).isEqualTo("Notice");
     }
+
+    @Test
+    public void ipMatchingIssue28() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        evaluateRule(rule, in);
+
+        assertThat(actionsTriggered.get()).isFalse();
+    }
 }
