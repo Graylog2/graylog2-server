@@ -37,6 +37,7 @@ import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RestAccessLogFilter;
+import org.graylog2.shared.rest.XHRFilter;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
@@ -116,7 +117,8 @@ public abstract class AbstractJerseyService extends AbstractIdleService {
                 .registerFinder(new PackageNamesScanner(controllerPackages, true))
                 .registerResources(additionalResources)
                 .register(RestAccessLogFilter.class)
-                .register(NodeIdResponseFilter.class);
+                .register(NodeIdResponseFilter.class)
+                .register(XHRFilter.class);
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);
