@@ -75,7 +75,7 @@ const StreamRule = React.createClass({
         {description}
       </li>
     );
-  }
+  },
 });
 
 export default StreamRule;

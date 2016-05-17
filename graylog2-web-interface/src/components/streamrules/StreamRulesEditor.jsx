@@ -25,22 +25,62 @@ const StreamRulesEditor = React.createClass({
       index: PropTypes.string,
     };
   },
+  getInitialState() {
+    return {};
+  },
   componentDidMount() {
     this.loadData();
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
   },
-  getInitialState() {
-    return {};
-  },
   onMessageLoaded(message) {
-    this.setState({message: message});
+    this.setState({ message: message });
     if (message !== undefined) {
-      StreamsStore.testMatch(this.props.streamId, {message: message.fields}, (resultData) => {
-        this.setState({matchData: resultData});
+      StreamsStore.testMatch(this.props.streamId, { message: message.fields }, (resultData) => {
+        this.setState({ matchData: resultData });
       });
     } else {
-      this.setState({matchData: undefined});
+      this.setState({ matchData: undefined });
+    }
+  },
+  loadData() {
+    StreamRulesStore.types().then((types) => {
+      this.setState({ streamRuleTypes: types });
+    });
+
+    StreamsStore.get(this.props.streamId, (stream) => {
+      this.setState({ stream: stream });
+    });
+
+    if (this.state.message) {
+      this.onMessageLoaded(this.state.message);
+    }
+  },
+  _onStreamRuleFormSubmit(streamRuleId, data) {
+    StreamRulesStore.create(this.props.streamId, data, () => {});
+  },
+  _onAddStreamRule(event) {
+    event.preventDefault();
+    this.refs.newStreamRuleForm.open();
+  },
+  _getListClassName(matchData) {
+    return (matchData.matches ? 'success' : 'danger');
+  },
+  _explainMatchResult() {
+    if (this.state.matchData) {
+      if (this.state.matchData.matches) {
+        return (
+          <span>
+            <i className="fa fa-check" style={{ color: 'green' }}/> This message would be routed to this stream.
+          </span>);
+      } else {
+        return (
+          <span>
+            <i className="fa fa-remove" style={{ color: 'red' }}/> This message would not be routed to this stream.
+          </span>);
+      }
+    } else {
+      return ('Please load a message to check if it would match against these rules and therefore be routed into this stream.');
     }
   },
   render() {
@@ -57,10 +97,10 @@ const StreamRulesEditor = React.createClass({
               <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded}/>
             </div>
 
-            <div className="spinner" style={{display: 'none'}}><h2><i
-              className="fa fa-spinner fa-spin"></i> &nbsp;Loading message</h2></div>
+            <div className="spinner" style={{ display: 'none' }}><h2><i
+              className="fa fa-spinner fa-spin"/> &nbsp;Loading message</h2></div>
 
-            <div className="sample-message-display" style={{display: 'none', marginTop: '5px'}}>
+            <div className="sample-message-display" style={{ display: 'none', marginTop: '5px' }}>
               <strong>Next step:</strong>
               Add/delete/modify stream rules in step 2 and see if the example message would have been
               routed into the stream or not. Use the button on the right to add a stream rule.
@@ -88,7 +128,7 @@ const StreamRulesEditor = React.createClass({
                               permissions={this.props.currentUser.permissions} matchData={this.state.matchData}/>
             </Alert>
 
-            <p style={{marginTop: '10px'}}>
+            <p style={{ marginTop: '10px' }}>
               <LinkContainer to={Routes.STREAMS}>
                 <Button bsStyle="success">I'm done!</Button>
               </LinkContainer>
@@ -97,49 +137,9 @@ const StreamRulesEditor = React.createClass({
         </div>
       );
     } else {
-      return (<div className="row content"><div style={{marginLeft: 10}}><Spinner/></div></div>);
-    }
-  },
-  loadData() {
-    StreamRulesStore.types().then((types) => {
-      this.setState({streamRuleTypes: types});
-    });
-
-    StreamsStore.get(this.props.streamId, (stream) => {
-      this.setState({stream: stream});
-    });
-
-    if (this.state.message) {
-      this.onMessageLoaded(this.state.message);
-    }
-  },
-  _onStreamRuleFormSubmit(streamRuleId, data) {
-    StreamRulesStore.create(this.props.streamId, data, () => {});
-  },
-  _onAddStreamRule(event) {
-    event.preventDefault();
-    this.refs.newStreamRuleForm.open();
-  },
-  _getListClassName(matchData) {
-    return (matchData.matches ? 'success' : 'danger');
-  },
-  _explainMatchResult() {
-    if (this.state.matchData) {
-      if (this.state.matchData.matches) {
-        return (
-          <span>
-            <i className="fa fa-check" style={{'color': 'green'}}/> This message would be routed to this stream.
-          </span>);
-      } else {
-        return (
-          <span>
-            <i className="fa fa-remove" style={{'color': 'red'}}/> This message would not be routed to this stream.
-          </span>);
-      }
-    } else {
-      return ('Please load a message to check if it would match against these rules and therefore be routed into this stream.');
+      return (<div className="row content"><div style={{ marginLeft: 10 }}><Spinner/></div></div>);
     }
   },
 });
 
-module.exports = StreamRulesEditor;
+export default StreamRulesEditor;
