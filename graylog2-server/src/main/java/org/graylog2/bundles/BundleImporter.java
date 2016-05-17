@@ -468,6 +468,7 @@ public class BundleImporter {
                 streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.isInverted());
                 streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
                 streamRuleData.put(StreamRuleImpl.FIELD_CONTENT_PACK, bundleId);
+                streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
 
                 streamRuleService.save(new StreamRuleImpl(streamRuleData.build()));
             }
