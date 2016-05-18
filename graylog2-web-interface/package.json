@@ -51,7 +51,7 @@
     "react-select": "^0.8.2",
     "reflux": "0.2.13",
     "rickshaw": "^1.5.1",
-    "sockjs-client": "1.0.x",
+    "sockjs-client": "1.1.x",
     "string": "^3.3.1",
     "superagent": "^1.4.0",
     "superagent-bluebird-promise": "^2.1.0",
