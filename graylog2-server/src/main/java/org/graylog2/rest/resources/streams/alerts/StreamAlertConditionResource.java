@@ -77,8 +77,8 @@ public class StreamAlertConditionResource extends RestResource {
     @Timed
     @ApiOperation(value = "Create an alert condition")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+        @ApiResponse(code = 404, message = "Stream not found."),
+        @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public Response create(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                            @PathParam("streamId") String streamid,
@@ -99,8 +99,8 @@ public class StreamAlertConditionResource extends RestResource {
 
         final Map<String, String> result = ImmutableMap.of("alert_condition_id", alertCondition.getId());
         final URI alertConditionUri = getUriBuilderToSelf().path(StreamAlertConditionResource.class)
-                .path("{conditionId}")
-                .build(stream.getId(), alertCondition.getId());
+            .path("{conditionId}")
+            .build(stream.getId(), alertCondition.getId());
 
         return Response.created(alertConditionUri).entity(result).build();
     }
@@ -110,8 +110,8 @@ public class StreamAlertConditionResource extends RestResource {
     @Path("{conditionId}")
     @ApiOperation(value = "Modify an alert condition")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+        @ApiResponse(code = 404, message = "Stream not found."),
+        @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public void update(@ApiParam(name = "streamId", value = "The stream id the alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
@@ -139,10 +139,11 @@ public class StreamAlertConditionResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get all alert conditions of this stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+        @ApiResponse(code = 404, message = "Stream not found."),
+        @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Map<String, Object> list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) throws NotFoundException {
+    public Map<String, Object> list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
+                                    @PathParam("streamId") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final Stream stream = streamService.load(streamid);
@@ -153,8 +154,8 @@ public class StreamAlertConditionResource extends RestResource {
         }
 
         return ImmutableMap.of(
-                "conditions", conditions,
-                "total", conditions.size());
+            "conditions", conditions,
+            "total", conditions.size());
     }
 
     @DELETE
@@ -162,8 +163,8 @@ public class StreamAlertConditionResource extends RestResource {
     @Path("{conditionId}")
     @ApiOperation(value = "Delete an alert condition")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+        @ApiResponse(code = 404, message = "Stream not found."),
+        @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public void delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
