@@ -58,6 +58,8 @@ import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "AlertConditions", description = "Manage stream alert conditions")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 @Path("/streams/{streamId}/alerts/conditions")
 public class StreamAlertConditionResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertConditionResource.class);
@@ -74,8 +76,6 @@ public class StreamAlertConditionResource extends RestResource {
     @POST
     @Timed
     @ApiOperation(value = "Create an alert condition")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
@@ -109,8 +109,6 @@ public class StreamAlertConditionResource extends RestResource {
     @Timed
     @Path("{conditionId}")
     @ApiOperation(value = "Modify an alert condition")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
@@ -140,7 +138,6 @@ public class StreamAlertConditionResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get all alert conditions of this stream")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
@@ -164,7 +161,6 @@ public class StreamAlertConditionResource extends RestResource {
     @Timed
     @Path("{conditionId}")
     @ApiOperation(value = "Delete an alert condition")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
