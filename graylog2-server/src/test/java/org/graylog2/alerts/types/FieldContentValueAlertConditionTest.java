@@ -60,7 +60,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
     public void testConstructor() throws Exception {
         final Map<String, Object> parameters = getParametersMap(0, "field", "value");
 
-        final FieldContentValueAlertCondition condition = getCondition(parameters);
+        final FieldContentValueAlertCondition condition = getCondition(parameters, alertConditionTitle);
 
         assertNotNull(condition);
         assertNotNull(condition.getDescription());
@@ -83,20 +83,20 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
         final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(searchHits,
-                                                           indexRanges,
-                                                           "message:something",
-                                                           null,
-                                                           new TimeValue(100, TimeUnit.MILLISECONDS)));
+            indexRanges,
+            "message:something",
+            null,
+            new TimeValue(100, TimeUnit.MILLISECONDS)));
         when(searchResult.getTotalResults()).thenReturn(1L);
         when(searches.search(
-                anyString(),
-                anyString(),
-                any(RelativeRange.class),
-                anyInt(),
-                anyInt(),
-                any(Sorting.class)))
+            anyString(),
+            anyString(),
+            any(RelativeRange.class),
+            anyInt(),
+            anyInt(),
+            any(Sorting.class)))
             .thenReturn(searchResult);
-        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
+        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"), "Alert Condition for testing");
 
         alertLastTriggered(-1);
 
@@ -115,19 +115,19 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
         final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(searchHits,
-                                                               indexRanges,
-                                                               "message:something",
-                                                               null,
-                                                               new TimeValue(100, TimeUnit.MILLISECONDS)));
+            indexRanges,
+            "message:something",
+            null,
+            new TimeValue(100, TimeUnit.MILLISECONDS)));
         when(searches.search(
-                anyString(),
-                anyString(),
-                any(RelativeRange.class),
-                anyInt(),
-                anyInt(),
-                any(Sorting.class)))
-                .thenReturn(searchResult);
-        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"));
+            anyString(),
+            anyString(),
+            any(RelativeRange.class),
+            anyInt(),
+            anyInt(),
+            any(Sorting.class)))
+            .thenReturn(searchResult);
+        final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"), alertConditionTitle);
 
         alertLastTriggered(-1);
 
@@ -148,27 +148,28 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         when(configuration.getAlertCheckInterval()).thenReturn(alertCheckInterval);
 
         when(searches.search(anyString(),
-                anyString(),
-                eq(relativeRange),
-                anyInt(),
-                anyInt(),
-                any(Sorting.class))).thenReturn(searchResult);
+            anyString(),
+            eq(relativeRange),
+            anyInt(),
+            anyInt(),
+            any(Sorting.class))).thenReturn(searchResult);
 
         final FieldContentValueAlertCondition alertCondition = new FieldContentValueAlertCondition(searches, configuration, stream,
-                null, DateTime.now(DateTimeZone.UTC), "mockuser", ImmutableMap.<String,Object>of("field", "test", "value", "test"));
+            null, DateTime.now(DateTimeZone.UTC), "mockuser", ImmutableMap.<String,Object>of("field", "test", "value", "test"), "Field Content Value Test COndition");
 
         final AbstractAlertCondition.CheckResult result = alertCondition.runCheck();
     }
 
-    protected FieldContentValueAlertCondition getCondition(Map<String, Object> parameters) {
+    protected FieldContentValueAlertCondition getCondition(Map<String, Object> parameters, String title) {
         return new FieldContentValueAlertCondition(
-                searches,
-                mock(Configuration.class),
-                stream,
-                CONDITION_ID,
-                Tools.nowUTC(),
-                STREAM_CREATOR,
-                parameters);
+            searches,
+            mock(Configuration.class),
+            stream,
+            CONDITION_ID,
+            Tools.nowUTC(),
+            STREAM_CREATOR,
+            parameters,
+            title);
     }
 
     protected Map<String, Object> getParametersMap(Integer grace, String field, String value) {

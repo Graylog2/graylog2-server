@@ -49,10 +49,12 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final DateTime createdAt;
     protected final String creatorUserId;
     protected final int grace;
+    protected final String title;
 
     private final Map<String, Object> parameters;
 
-    protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+    protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
+        this.title = title;
         if (id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
@@ -82,6 +84,11 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     @Override
     public String getTypeString() {
         return type.toString();
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
     }
 
     @Override

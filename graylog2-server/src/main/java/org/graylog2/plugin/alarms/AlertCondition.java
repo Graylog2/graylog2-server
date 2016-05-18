@@ -42,6 +42,8 @@ public interface AlertCondition {
 
     String getTypeString();
 
+    String getTitle();
+
     interface CheckResult {
         boolean isTriggered();
         String getResultDescription();

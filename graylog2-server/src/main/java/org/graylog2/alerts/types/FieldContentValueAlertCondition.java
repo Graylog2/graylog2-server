@@ -54,12 +54,24 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private final String value;
 
     public interface Factory {
-        FieldContentValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
+        FieldContentValueAlertCondition createAlertCondition(Stream stream,
+                                                             @Assisted("id") String id,
+                                                             DateTime createdAt,
+                                                             @Assisted("userid") String creatorUserId,
+                                                             Map<String, Object> parameters,
+                                                             @Assisted("title") String title);
     }
 
     @AssistedInject
-    public FieldContentValueAlertCondition(Searches searches, Configuration configuration, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
-        super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters);
+    public FieldContentValueAlertCondition(Searches searches,
+                                           Configuration configuration,
+                                           @Assisted Stream stream,
+                                           @Nullable @Assisted("id") String id,
+                                           @Assisted DateTime createdAt,
+                                           @Assisted("userid") String creatorUserId,
+                                           @Assisted Map<String, Object> parameters,
+                                           @Assisted("title") String title) {
+        super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters, title);
         this.searches = searches;
         this.configuration = configuration;
         this.field = (String) parameters.get("field");

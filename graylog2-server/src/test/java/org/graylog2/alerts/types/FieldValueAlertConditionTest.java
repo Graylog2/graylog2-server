@@ -39,11 +39,11 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
     @Test
     public void testConstructor() throws Exception {
         Map<String, Object> parameters = getParametersMap(0,
-                0,
-                FieldValueAlertCondition.ThresholdType.HIGHER,
-                FieldValueAlertCondition.CheckType.MAX,
-                0,
-                "response_time");
+            0,
+            FieldValueAlertCondition.ThresholdType.HIGHER,
+            FieldValueAlertCondition.CheckType.MAX,
+            0,
+            "response_time");
 
         final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class, parameters);
 
@@ -57,7 +57,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             final double threshold = 50.0;
             final double higherThanThreshold = threshold + 10;
             final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class,
-                    getParametersMap(0, 0, FieldValueAlertCondition.ThresholdType.HIGHER, checkType, threshold, "response_time"));
+                getParametersMap(0, 0, FieldValueAlertCondition.ThresholdType.HIGHER, checkType, threshold, "response_time"));
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
@@ -74,8 +74,9 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             final double threshold = 50.0;
             final double lowerThanThreshold = threshold - 10;
             FieldValueAlertCondition fieldValueAlertCondition = getFieldValueAlertCondition(getParametersMap(0, 0,
-                    FieldValueAlertCondition.ThresholdType.HIGHER,
-                    checkType, threshold, "response_time"));
+                FieldValueAlertCondition.ThresholdType.HIGHER,
+                checkType, threshold, "response_time"),
+                alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
@@ -92,8 +93,9 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             final double threshold = 50.0;
             final double lowerThanThreshold = threshold - 10;
             FieldValueAlertCondition fieldValueAlertCondition = getFieldValueAlertCondition(getParametersMap(0, 0,
-                    FieldValueAlertCondition.ThresholdType.LOWER,
-                    checkType, threshold, "response_time"));
+                FieldValueAlertCondition.ThresholdType.LOWER,
+                checkType, threshold, "response_time"),
+                alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
@@ -110,8 +112,9 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             final double threshold = 50.0;
             final double higherThanThreshold = threshold + 10;
             FieldValueAlertCondition fieldValueAlertCondition = getFieldValueAlertCondition(getParametersMap(0, 0,
-                    FieldValueAlertCondition.ThresholdType.LOWER,
-                    checkType, threshold, "response_time"));
+                FieldValueAlertCondition.ThresholdType.LOWER,
+                checkType, threshold, "response_time"),
+                alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
@@ -136,25 +139,26 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         return parameters;
     }
 
-    protected FieldValueAlertCondition getFieldValueAlertCondition(Map<String, Object> parameters) {
+    protected FieldValueAlertCondition getFieldValueAlertCondition(Map<String, Object> parameters, String title) {
         return new FieldValueAlertCondition(
-                searches,
-                stream,
-                CONDITION_ID,
-                Tools.nowUTC(),
-                STREAM_CREATOR,
-                parameters);
+            searches,
+            stream,
+            CONDITION_ID,
+            Tools.nowUTC(),
+            STREAM_CREATOR,
+            parameters,
+            title);
     }
 
     protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
             when(searches.fieldStats(anyString(),
-                                     Matchers.eq("*"),
-                                     anyString(),
-                                     any(RelativeRange.class),
-                                     anyBoolean(),
-                                     anyBoolean(),
-                                     anyBoolean())).thenReturn(fieldStatsResult);
+                Matchers.eq("*"),
+                anyString(),
+                any(RelativeRange.class),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean())).thenReturn(fieldStatsResult);
         } catch (InvalidRangeFormatException | Searches.FieldTypeException e) {
             assertNotNull("This should not return an exception!", e);
         }

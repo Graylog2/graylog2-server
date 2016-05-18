@@ -27,16 +27,20 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateConditionRequest {
-    @JsonProperty
+    @JsonProperty("type")
     @Nullable
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("title")
+    public abstract String title();
+
+    @JsonProperty("parameters")
     public abstract Map<String, Object> parameters();
 
     @JsonCreator
     public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
+                                                @JsonProperty("title") String title,
                                                 @JsonProperty("parameters") Map<String, Object> parameters) {
-        return new AutoValue_CreateConditionRequest(type, parameters);
+        return new AutoValue_CreateConditionRequest(type, title, parameters);
     }
 }

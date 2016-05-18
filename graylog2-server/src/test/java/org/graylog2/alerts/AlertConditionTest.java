@@ -46,6 +46,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
+    protected static final String alertConditionTitle = "Alert Condition for Testing";
+
     protected Stream stream;
     protected Searches searches;
     protected MongoConnection mongoConnection;
@@ -64,36 +66,39 @@ public abstract class AlertConditionTest {
         mongoConnection = mock(MongoConnection.class);
         // TODO use injection please. this sucks so bad
         alertService = spy(new AlertServiceImpl(mongoConnection,
-                new FieldValueAlertCondition.Factory() {
-                    @Override
-                    public FieldValueAlertCondition createAlertCondition(Stream stream,
-                                                                         String id,
-                                                                         DateTime createdAt,
-                                                                         @Assisted("userid") String creatorUserId,
-                                                                         Map<String, Object> parameters) {
-                        return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
-                    }
-                },
-                new MessageCountAlertCondition.Factory() {
-                    @Override
-                    public MessageCountAlertCondition createAlertCondition(Stream stream,
-                                                                           String id,
-                                                                           DateTime createdAt,
-                                                                           @Assisted("userid") String creatorUserId,
-                                                                           Map<String, Object> parameters) {
-                        return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
-                    }
-                },
-                new FieldContentValueAlertCondition.Factory() {
-                    @Override
-                    public FieldContentValueAlertCondition createAlertCondition(Stream stream,
-                                                                           String id,
-                                                                           DateTime createdAt,
-                                                                           @Assisted("userid") String creatorUserId,
-                                                                           Map<String, Object> parameters) {
-                        return new FieldContentValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters);
-                    }
-                }));
+            new FieldValueAlertCondition.Factory() {
+                @Override
+                public FieldValueAlertCondition createAlertCondition(Stream stream,
+                                                                     String id,
+                                                                     DateTime createdAt,
+                                                                     @Assisted("userid") String creatorUserId,
+                                                                     Map<String, Object> parameters,
+                                                                     String title) {
+                    return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
+                }
+            },
+            new MessageCountAlertCondition.Factory() {
+                @Override
+                public MessageCountAlertCondition createAlertCondition(Stream stream,
+                                                                       String id,
+                                                                       DateTime createdAt,
+                                                                       @Assisted("userid") String creatorUserId,
+                                                                       Map<String, Object> parameters,
+                                                                       String title) {
+                    return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
+                }
+            },
+            new FieldContentValueAlertCondition.Factory() {
+                @Override
+                public FieldContentValueAlertCondition createAlertCondition(Stream stream,
+                                                                            String id,
+                                                                            DateTime createdAt,
+                                                                            @Assisted("userid") String creatorUserId,
+                                                                            Map<String, Object> parameters,
+                                                                            String title) {
+                    return new FieldContentValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters, title);
+                }
+            }));
 
     }
 
@@ -139,7 +144,7 @@ public abstract class AlertConditionTest {
     protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
         try {
             return klazz.getConstructor(Searches.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
-                    .newInstance(searches, stream, CONDITION_ID, Tools.nowUTC(), STREAM_CREATOR, parameters);
+                .newInstance(searches, stream, CONDITION_ID, Tools.nowUTC(), STREAM_CREATOR, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
