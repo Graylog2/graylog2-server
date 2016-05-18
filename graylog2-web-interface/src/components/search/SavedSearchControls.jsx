@@ -13,6 +13,7 @@ const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 const SavedSearchControls = React.createClass({
   propTypes: {
     currentSavedSearch: React.PropTypes.string,
+    pullRight: React.PropTypes.bool,
   },
   mixins: [Reflux.listenTo(SavedSearchesStore, '_updateTitle')],
   getInitialState() {
@@ -70,7 +71,7 @@ const SavedSearchControls = React.createClass({
   },
   _getEditSavedSearchControls() {
     return (
-      <DropdownButton bsSize="small" title="Saved search" id="saved-search-actions-dropdown">
+      <DropdownButton bsSize="small" title="Saved search" id="saved-search-actions-dropdown" pullRight={this.props.pullRight}>
         <MenuItem onSelect={this._openModal}>Update search criteria</MenuItem>
         <MenuItem divider/>
         <MenuItem onSelect={this._deleteSavedSearch}>Delete saved search</MenuItem>
