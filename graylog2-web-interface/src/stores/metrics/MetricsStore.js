@@ -87,6 +87,11 @@ const MetricsStore = Reflux.createStore({
     MetricsActions.list.promise(promise);
   },
   names() {
+    if (!this.nodes) {
+      console.warn('Node list not yet available, not fetching metrics.');
+      return;
+    }
+
     const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
       return fetch('GET', url).then((response) => {
