@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.beats;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -41,8 +40,7 @@ public class BeatsTransportTest {
                 new ThroughputCounter(new HashedWheelTimer()),
                 new LocalMetricRegistry(),
                 Executors.newSingleThreadExecutor(),
-                new ConnectionCounter(),
-                new ObjectMapper()
+                new ConnectionCounter()
         );
 
         final MessageInput input = mock(MessageInput.class);

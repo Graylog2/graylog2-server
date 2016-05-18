@@ -34,7 +34,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.Deflater;
 
@@ -56,7 +55,7 @@ public class BeatsFrameDecoderTest {
 
     @Before
     public void setUp() throws Exception {
-        decoder = new BeatsFrameDecoder(objectMapper);
+        decoder = new BeatsFrameDecoder();
     }
 
     @Test
@@ -89,13 +88,15 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer resultBuffer = (ChannelBuffer) decoder.decode(channelHandlerContext, channel, buffer);
+        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
-        final byte[] resultBytes = resultBuffer.array();
-        final List<Map<String, Object>> result = objectMapper.readValue(resultBytes, new TypeReference<List<Map<String, Object>>>() {
+        assertThat(resultBuffers).hasSize(1);
+        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
+        resultBuffer.readBytes(resultBytes);
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
         });
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0))
+        assertThat(result)
                 .hasSize(1)
                 .containsEntry("answer", 42);
 
@@ -132,13 +133,15 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer resultBuffer = (ChannelBuffer) decoder.decode(channelHandlerContext, channel, buffer);
+        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
-        final byte[] resultBytes = resultBuffer.array();
-        final List<Map<String, Object>> result = objectMapper.readValue(resultBytes, new TypeReference<List<Map<String, Object>>>() {
+        assertThat(resultBuffers).hasSize(1);
+        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
+        resultBuffer.readBytes(resultBytes);
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
         });
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0))
+        assertThat(result)
                 .hasSize(2)
                 .containsEntry("foo", "bar")
                 .containsEntry("quux", "baz");
@@ -184,13 +187,15 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer resultBuffer = (ChannelBuffer) decoder.decode(channelHandlerContext, channel, buffer);
+        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
-        final byte[] resultBytes = resultBuffer.array();
-        final List<Map<String, Object>> result = objectMapper.readValue(resultBytes, new TypeReference<List<Map<String, Object>>>() {
+        assertThat(resultBuffers).hasSize(1);
+        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
+        resultBuffer.readBytes(resultBytes);
+        final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
         });
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0))
+        assertThat(result)
                 .hasSize(1)
                 .containsEntry("answer", 42);
 

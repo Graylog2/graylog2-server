@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.beats;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -30,17 +30,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.InflaterInputStream;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * FrameDecoder for the Beats/Lumberjack protocol.
@@ -57,27 +54,25 @@ public class BeatsFrameDecoder extends FrameDecoder {
     private static final byte FRAME_JSON = 'J';
     private static final byte FRAME_WINDOW_SIZE = 'W';
 
-    private final ObjectMapper objectMapper;
     private long windowSize;
     private long sequenceNum;
 
-    public BeatsFrameDecoder(ObjectMapper objectMapper) {
-        this.objectMapper = requireNonNull(objectMapper);
+    public BeatsFrameDecoder() {
+        super(true);
     }
 
     @Override
     protected Object decode(ChannelHandlerContext channelHandlerContext, Channel channel, ChannelBuffer channelBuffer) throws Exception {
-        final List<Map<String, Object>> events = processBuffer(channel, channelBuffer);
-
+        final ChannelBuffer[] events = processBuffer(channel, channelBuffer);
         if (events == null) {
             return null;
         } else {
-            return ChannelBuffers.copiedBuffer(objectMapper.writeValueAsBytes(events));
+            return events;
         }
     }
 
     @Nullable
-    private List<Map<String, Object>> processBuffer(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private ChannelBuffer[] processBuffer(Channel channel, ChannelBuffer channelBuffer) throws IOException {
         channelBuffer.markReaderIndex();
         @SuppressWarnings("unused")
         byte version = channelBuffer.readByte();
@@ -86,20 +81,20 @@ public class BeatsFrameDecoder extends FrameDecoder {
         }
         byte frameType = channelBuffer.readByte();
 
-        List<Map<String, Object>> events = null;
+        ChannelBuffer[] events = null;
         switch (frameType) {
             case FRAME_WINDOW_SIZE:
                 processWindowSizeFrame(channelBuffer);
                 break;
             case FRAME_DATA:
-                events = Collections.singletonList(parseDataFrame(channelBuffer));
+                events = new ChannelBuffer[]{parseDataFrame(channelBuffer)};
                 sendACK(channel);
                 break;
             case FRAME_COMPRESSED:
                 events = processCompressedFrame(channel, channelBuffer);
                 break;
             case FRAME_JSON:
-                events = Collections.singletonList(parseJsonFrame(channelBuffer));
+                events = new ChannelBuffer[]{parseJsonFrame(channelBuffer)};
                 sendACK(channel);
                 break;
             default:
@@ -108,6 +103,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
                 }
                 break;
         }
+
         return events;
     }
 
@@ -129,21 +125,18 @@ public class BeatsFrameDecoder extends FrameDecoder {
     /**
      * <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#json-frame-type">'json' frame type</a>
      */
-    private Map<String, Object> parseJsonFrame(ChannelBuffer channelBuffer) throws IOException {
+    private ChannelBuffer parseJsonFrame(ChannelBuffer channelBuffer) throws IOException {
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
         final int jsonLength = Ints.saturatedCast(channelBuffer.readUnsignedInt());
-        final byte[] data = new byte[jsonLength];
-        channelBuffer.readBytes(data);
-        return objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {
-        });
+        return channelBuffer.readSlice(jsonLength);
     }
 
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#compressed-frame-type">'compressed' frame type</a>
      */
-    private List<Map<String, Object>> processCompressedFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private ChannelBuffer[] processCompressedFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
         if (channelBuffer.readableBytes() >= 4) {
             final long payloadLength = channelBuffer.readUnsignedInt();
             if (channelBuffer.readableBytes() < payloadLength) {
@@ -163,15 +156,15 @@ public class BeatsFrameDecoder extends FrameDecoder {
         return null;
     }
 
-    private List<Map<String, Object>> processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws IOException {
-        final List<Map<String, Object>> events = new ArrayList<>();
+    private ChannelBuffer[] processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+        final List<ChannelBuffer> events = new ArrayList<>();
         while (channelBuffer.readable()) {
-            final List<Map<String, Object>> buffer = processBuffer(channel, channelBuffer);
-            if (buffer != null) {
-                events.addAll(buffer);
+            final ChannelBuffer[] buffers = processBuffer(channel, channelBuffer);
+            if (buffers != null) {
+                Collections.addAll(events, buffers);
             }
         }
-        return events;
+        return events.toArray(new ChannelBuffer[events.size()]);
     }
 
     /**
@@ -189,19 +182,23 @@ public class BeatsFrameDecoder extends FrameDecoder {
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#data-frame-type">'data' frame type</a>
      */
-    private Map<String, Object> parseDataFrame(ChannelBuffer channelBuffer) {
+    private ChannelBuffer parseDataFrame(ChannelBuffer channelBuffer) throws IOException {
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
-        int pairs = Ints.saturatedCast(channelBuffer.readUnsignedInt());
-        final Map<String, Object> data = new HashMap<>(pairs);
-        for (int i = 0; i < pairs; i++) {
-            final String key = parseDataItem(channelBuffer);
-            final String value = parseDataItem(channelBuffer);
-            data.put(key, value);
+        final int pairs = Ints.saturatedCast(channelBuffer.readUnsignedInt());
+        final JsonFactory jsonFactory = new JsonFactory();
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (final JsonGenerator jg = jsonFactory.createGenerator(outputStream)) {
+            jg.writeStartObject();
+            for (int i = 0; i < pairs; i++) {
+                final String key = parseDataItem(channelBuffer);
+                final String value = parseDataItem(channelBuffer);
+                jg.writeStringField(key, value);
+            }
+            jg.writeEndObject();
         }
-
-        return data;
+        return ChannelBuffers.wrappedBuffer(outputStream.toByteArray());
     }
 
     private String parseDataItem(ChannelBuffer channelBuffer) {

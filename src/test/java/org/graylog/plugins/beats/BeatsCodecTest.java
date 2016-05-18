@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,20 +51,17 @@ public class BeatsCodecTest {
         codec = new BeatsCodec(configuration, objectMapper);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void decodeThrowsUnsupportedOperationException() throws Exception {
-        codec.decode(new RawMessage(new byte[0]));
+    @Test
+    public void decodeReturnsNullIfPayloadCouldNotBeDecoded() throws Exception {
+        assertThat(codec.decode(new RawMessage(new byte[0]))).isNull();
     }
 
     @Test
     public void decodeMessagesHandlesFilebeatMessages() throws Exception {
-        final byte[] json = Resources.toByteArray(Resources.getResource("BeatsCodecTest/filebeat.json"));
+        final byte[] json = Resources.toByteArray(Resources.getResource("filebeat.json"));
         final RawMessage rawMessage = new RawMessage(json);
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages)
-                .isNotNull()
-                .hasSize(1);
-        final Message message = messages.iterator().next();
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
         assertThat(message.getMessage()).isEqualTo("TEST");
         assertThat(message.getSource()).isEqualTo("example.local");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
@@ -79,13 +75,10 @@ public class BeatsCodecTest {
 
     @Test
     public void decodeMessagesHandlesPacketbeatMessages() throws Exception {
-        final byte[] json = Resources.toByteArray(Resources.getResource("BeatsCodecTest/packetbeat-dns.json"));
+        final byte[] json = Resources.toByteArray(Resources.getResource("packetbeat-dns.json"));
         final RawMessage rawMessage = new RawMessage(json);
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages)
-                .isNotNull()
-                .hasSize(1);
-        final Message message = messages.iterator().next();
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
         assertThat(message.getSource()).isEqualTo("example.local");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
         assertThat(message.getField("facility")).isEqualTo("packetbeat");
@@ -94,13 +87,10 @@ public class BeatsCodecTest {
 
     @Test
     public void decodeMessagesHandlesTopbeatMessages() throws Exception {
-        final byte[] json = Resources.toByteArray(Resources.getResource("BeatsCodecTest/topbeat-system.json"));
+        final byte[] json = Resources.toByteArray(Resources.getResource("topbeat-system.json"));
         final RawMessage rawMessage = new RawMessage(json);
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages)
-                .isNotNull()
-                .hasSize(1);
-        final Message message = messages.iterator().next();
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
         assertThat(message.getSource()).isEqualTo("example.local");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
         assertThat(message.getField("facility")).isEqualTo("topbeat");
@@ -110,23 +100,18 @@ public class BeatsCodecTest {
     @Test
     @Ignore("Ignored until JSON payload is added to test assets")
     public void decodeMessagesHandlesWinlogbeatMessages() throws Exception {
-        final byte[] json = Resources.toByteArray(Resources.getResource("BeatsCodecTest/winlogbeat.json"));
+        final byte[] json = Resources.toByteArray(Resources.getResource("winlogbeat.json"));
         final RawMessage rawMessage = new RawMessage(json);
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages)
-                .isNotNull()
-                .hasSize(1);
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
     }
 
     @Test
     public void decodeMessagesHandleGenericBeatMessages() throws Exception {
-        final byte[] json = Resources.toByteArray(Resources.getResource("BeatsCodecTest/generic.json"));
+        final byte[] json = Resources.toByteArray(Resources.getResource("generic.json"));
         final RawMessage rawMessage = new RawMessage(json);
-        final Collection<Message> messages = codec.decodeMessages(rawMessage);
-        assertThat(messages)
-                .isNotNull()
-                .hasSize(1);
-        final Message message = messages.iterator().next();
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
         assertThat(message.getSource()).isEqualTo("unknown");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
         assertThat(message.getField("facility")).isEqualTo("genericbeat");

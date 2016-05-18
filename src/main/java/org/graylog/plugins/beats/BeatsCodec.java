@@ -26,7 +26,6 @@ import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
-import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -36,17 +35,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog.plugins.beats.MapUtils.flatten;
 
 @Codec(name = "beats", displayName = "Beats")
-public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
+public class BeatsCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(BeatsCodec.class);
     private static final String MAP_KEY_SEPARATOR = "_";
 
@@ -61,30 +57,17 @@ public class BeatsCodec extends AbstractCodec implements MultiMessageCodec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        throw new UnsupportedOperationException("MultiMessageCodec " + getClass() + " does not support decode()");
-    }
-
-    @Nullable
-    @Override
-    public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
         final byte[] payload = rawMessage.getPayload();
-        final List<Map<String, Object>> events;
+        final Map<String, Object> event;
         try {
-            events = objectMapper.readValue(payload, new TypeReference<List<Map<String, Object>>>() {
+            event = objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {
             });
         } catch (IOException e) {
+            LOG.error("Couldn't decode raw message {}", rawMessage);
             return null;
         }
 
-        final List<Message> messages = new ArrayList<>(events.size());
-        for (Map<String, Object> event : events) {
-            final Message message = parseEvent(event);
-            if (message != null) {
-                messages.add(message);
-            }
-        }
-
-        return messages;
+        return parseEvent(event);
     }
 
     @Nullable

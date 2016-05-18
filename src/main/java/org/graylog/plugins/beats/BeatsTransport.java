@@ -18,7 +18,6 @@ package org.graylog.plugins.beats;
 
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -43,30 +42,24 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static java.util.Objects.requireNonNull;
 
 public class BeatsTransport extends AbstractTcpTransport {
-    private final ObjectMapper objectMapper;
-
     @Inject
     public BeatsTransport(@Assisted Configuration configuration,
                           ThroughputCounter throughputCounter,
                           LocalMetricRegistry localRegistry,
                           @Named("bossPool") Executor bossPool,
-                          ConnectionCounter connectionCounter,
-                          ObjectMapper objectMapper) {
-        this(configuration, throughputCounter, localRegistry, bossPool, executorService("beats-worker", "beats-transport-worker-%d", localRegistry), connectionCounter, objectMapper);
+                          ConnectionCounter connectionCounter) {
+        this(configuration, throughputCounter, localRegistry, bossPool, executorService("beats-worker", "beats-transport-worker-%d", localRegistry), connectionCounter);
     }
 
     private BeatsTransport(Configuration configuration,
-                             ThroughputCounter throughputCounter,
-                             LocalMetricRegistry localRegistry,
-                             Executor bossPool,
-                             Executor workerPool,
-                             ConnectionCounter connectionCounter,
-                             ObjectMapper objectMapper) {
+                           ThroughputCounter throughputCounter,
+                           LocalMetricRegistry localRegistry,
+                           Executor bossPool,
+                           Executor workerPool,
+                           ConnectionCounter connectionCounter) {
         super(configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter);
-        this.objectMapper = requireNonNull(objectMapper);
     }
 
     private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
@@ -81,7 +74,7 @@ public class BeatsTransport extends AbstractTcpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = super.getFinalChannelHandlers(input);
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
-        handlers.put("beats", () -> new BeatsFrameDecoder(objectMapper));
+        handlers.put("beats", BeatsFrameDecoder::new);
         handlers.putAll(finalChannelHandlers);
 
         return handlers;
