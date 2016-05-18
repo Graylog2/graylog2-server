@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import Reflux from 'reflux';
-import {Button, DropdownButton, MenuItem, Input} from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem, Input } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
@@ -12,7 +12,7 @@ const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SavedSearchControls = React.createClass({
   propTypes: {
-    currentSavedSearch: PropTypes.string,
+    currentSavedSearch: React.PropTypes.string,
   },
   mixins: [Reflux.listenTo(SavedSearchesStore, '_updateTitle')],
   getInitialState() {
@@ -34,7 +34,7 @@ const SavedSearchControls = React.createClass({
 
     const currentSavedSearch = SavedSearchesStore.getSavedSearch(this.props.currentSavedSearch);
     if (currentSavedSearch !== undefined) {
-      this.setState({title: currentSavedSearch.title});
+      this.setState({ title: currentSavedSearch.title });
     }
   },
   _openModal() {
@@ -63,7 +63,7 @@ const SavedSearchControls = React.createClass({
     }
   },
   _titleChanged() {
-    this.setState({error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.refs.title.getValue())});
+    this.setState({ error: !SavedSearchesStore.isValidTitle(this.props.currentSavedSearch, this.refs.title.getValue()) });
   },
   _getNewSavedSearchButtons() {
     return <Button bsStyle="success" bsSize="small" onClick={this._openModal}>Save search criteria</Button>;
@@ -79,7 +79,7 @@ const SavedSearchControls = React.createClass({
   },
   render() {
     return (
-      <div style={{display: 'inline-block'}}>
+      <div style={{ display: 'inline-block' }}>
         {this._isSearchSaved() ? this._getEditSavedSearchControls() : this._getNewSavedSearchButtons()}
         <BootstrapModalForm ref="saveSearchModal"
                             title={this._isSearchSaved() ? 'Update saved search' : 'Save search criteria'}
