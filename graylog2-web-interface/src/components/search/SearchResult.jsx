@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
-import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar, ShowQueryModal } from 'components/search';
+import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';
 
 import StoreProvider from 'injection/StoreProvider';
 const SearchStore = StoreProvider.getStore('Search');
@@ -12,17 +12,17 @@ import {} from 'components/field-analyzers'; // Make sure to load all field anal
 
 const SearchResult = React.createClass({
   propTypes: {
-    query: PropTypes.string,
-    builtQuery: PropTypes.string,
-    result: PropTypes.object.isRequired,
-    histogram: PropTypes.object.isRequired,
-    formattedHistogram: PropTypes.array,
-    searchInStream: PropTypes.object,
-    streams: PropTypes.instanceOf(Immutable.Map),
-    inputs: PropTypes.instanceOf(Immutable.Map),
-    nodes: PropTypes.instanceOf(Immutable.Map),
-    permissions: PropTypes.array.isRequired,
-    searchConfig: PropTypes.object.isRequired,
+    query: React.PropTypes.string,
+    builtQuery: React.PropTypes.string,
+    result: React.PropTypes.object.isRequired,
+    histogram: React.PropTypes.object.isRequired,
+    formattedHistogram: React.PropTypes.array,
+    searchInStream: React.PropTypes.object,
+    streams: React.PropTypes.instanceOf(Immutable.Map),
+    inputs: React.PropTypes.instanceOf(Immutable.Map),
+    nodes: React.PropTypes.instanceOf(Immutable.Map),
+    permissions: React.PropTypes.array.isRequired,
+    searchConfig: React.PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -60,7 +60,7 @@ const SearchResult = React.createClass({
   },
 
   togglePageFields() {
-    this.setState({showAllFields: !this.state.showAllFields});
+    this.setState({ showAllFields: !this.state.showAllFields });
   },
 
   predefinedFieldSelection(setName) {
@@ -76,7 +76,7 @@ const SearchResult = React.createClass({
   updateSelectedFields(fieldSelection) {
     const selectedFields = this.sortFields(fieldSelection);
     SearchStore.fields = selectedFields;
-    this.setState({selectedFields: selectedFields});
+    this.setState({ selectedFields: selectedFields });
   },
   _fields() {
     return this.props.result[this.state.showAllFields ? 'all_fields' : 'fields'];
@@ -125,8 +125,13 @@ const SearchResult = React.createClass({
   _shouldRenderAboveHistogram(analyzer) {
     return analyzer.displayPriority > 0;
   },
+
   _shouldRenderBelowHistogram(analyzer) {
     return analyzer.displayPriority <= 0;
+  },
+
+  _toggleShouldHighlight() {
+    this.setState({ shouldHighlight: !this.state.shouldHighlight });
   },
 
   render() {
@@ -154,7 +159,7 @@ const SearchResult = React.createClass({
                          predefinedFieldSelection={this.predefinedFieldSelection}
                          showHighlightToggle={anyHighlightRanges}
                          shouldHighlight={this.state.shouldHighlight}
-                         toggleShouldHighlight={() => this.setState({shouldHighlight: !this.state.shouldHighlight})}
+                         toggleShouldHighlight={this._toggleShouldHighlight}
                          currentSavedSearch={SearchStore.savedSearch}
                          searchInStream={this.props.searchInStream}
                          permissions={this.props.permissions}
