@@ -260,7 +260,11 @@ const QuickValuesVisualization = React.createClass({
 
     let dataTableClassName;
 
-    if (this.props.config.show_data_table) {
+    /*
+     * Ensure we always render the data table when quickvalues config was created before introducing pie charts,
+     * or when neither the data table or the pie chart are selected for rendering.
+     */
+    if (this.props.config.show_data_table || !this.props.config.show_pie_chart) {
       dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
     } else {
       dataTableClassName = 'hidden';
