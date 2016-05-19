@@ -36,6 +36,8 @@ public class StreamRule {
     private String value = "";
     @JsonProperty
     private boolean inverted = false;
+    @JsonProperty
+    private String description = "";
 
     public StreamRuleType getType() {
         return type;
@@ -67,5 +69,13 @@ public class StreamRule {
 
     public void setInverted(boolean inverted) {
         this.inverted = inverted;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

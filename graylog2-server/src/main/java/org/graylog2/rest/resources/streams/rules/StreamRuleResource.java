@@ -128,6 +128,7 @@ public class StreamRuleResource extends RestResource {
         streamRule.setType(streamRuleType);
         streamRule.setInverted(cr.inverted());
         streamRule.setValue(cr.value());
+        streamRule.setDescription(cr.description());
 
         streamRuleService.save(streamRule);
 

@@ -235,6 +235,7 @@ public class BundleExporter {
             streamRuleDescription.setField(streamRule.getField());
             streamRuleDescription.setValue(streamRule.getValue());
             streamRuleDescription.setInverted(streamRule.getInverted());
+            streamRuleDescription.setDescription(streamRule.getDescription());
 
             streamRuleBuilder.add(streamRuleDescription);
         }

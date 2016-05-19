@@ -36,11 +36,15 @@ public abstract class CreateStreamRuleRequest {
     @JsonProperty
     public abstract boolean inverted();
 
+    @JsonProperty
+    public abstract String description();
+
     @JsonCreator
     public static CreateStreamRuleRequest create(@JsonProperty("type") int type,
                                                  @JsonProperty("value") String value,
                                                  @JsonProperty("field") String field,
-                                                 @JsonProperty("inverted") boolean inverted) {
-        return new AutoValue_CreateStreamRuleRequest(type, value, field, inverted);
+                                                 @JsonProperty("inverted") boolean inverted,
+                                                 @JsonProperty("description") String description) {
+        return new AutoValue_CreateStreamRuleRequest(type, value, field, inverted, description);
     }
 }
