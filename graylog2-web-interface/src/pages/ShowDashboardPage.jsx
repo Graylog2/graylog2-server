@@ -95,7 +95,14 @@ const ShowDashboardPage = React.createClass({
 
     const positions = {};
     dashboard.widgets.forEach(widget => {
-      positions[widget.id] = dashboard.positions[widget.id] || this._defaultWidgetDimensions(widget);
+      const persistedDimensions = dashboard.positions[widget.id] || {};
+      const defaultDimensions = this._defaultWidgetDimensions(widget);
+      positions[widget.id] = {
+        col: (persistedDimensions.col === undefined ? defaultDimensions.col : persistedDimensions.col),
+        row: (persistedDimensions.row === undefined ? defaultDimensions.row : persistedDimensions.row),
+        height: (persistedDimensions.height === undefined ? defaultDimensions.height : persistedDimensions.height),
+        width: (persistedDimensions.width === undefined ? defaultDimensions.width : persistedDimensions.width),
+      };
     });
 
     const widgets = dashboard.widgets.sort((widget1, widget2) => {
