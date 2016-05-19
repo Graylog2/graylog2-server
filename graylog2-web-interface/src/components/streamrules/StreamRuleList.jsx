@@ -1,6 +1,7 @@
 import React from 'react';
 
 import StreamRule from 'components/streamrules/StreamRule';
+import { Spinner } from 'components/common';
 
 const StreamRuleList = React.createClass({
   propTypes: {
@@ -35,7 +36,7 @@ const StreamRuleList = React.createClass({
       );
     }
     return (
-      <div><i className="fa fa-spin fa-spinner"/> Loading</div>
+      <Spinner/>
     );
   },
 });
