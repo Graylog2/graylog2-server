@@ -141,10 +141,10 @@ public abstract class AlertConditionTest {
         }).when(alertService).triggered(Matchers.<AlertCondition>anyObject());
     }
 
-    protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
+    protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters, String title) {
         try {
-            return klazz.getConstructor(Searches.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
-                .newInstance(searches, stream, CONDITION_ID, Tools.nowUTC(), STREAM_CREATOR, parameters);
+            return klazz.getConstructor(Searches.class, Stream.class, String.class, DateTime.class, String.class, Map.class, String.class)
+                .newInstance(searches, stream, CONDITION_ID, Tools.nowUTC(), STREAM_CREATOR, parameters, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

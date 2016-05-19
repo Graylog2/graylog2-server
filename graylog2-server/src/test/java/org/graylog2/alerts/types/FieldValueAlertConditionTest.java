@@ -36,6 +36,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FieldValueAlertConditionTest extends AlertConditionTest {
+    private static final String alertConditionTitle = "Test Alert Condition";
+
     @Test
     public void testConstructor() throws Exception {
         Map<String, Object> parameters = getParametersMap(0,
@@ -45,7 +47,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             0,
             "response_time");
 
-        final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class, parameters);
+        final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class, parameters, alertConditionTitle);
 
         assertNotNull(fieldValueAlertCondition);
         assertNotNull(fieldValueAlertCondition.getDescription());
@@ -57,7 +59,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             final double threshold = 50.0;
             final double higherThanThreshold = threshold + 10;
             final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class,
-                getParametersMap(0, 0, FieldValueAlertCondition.ThresholdType.HIGHER, checkType, threshold, "response_time"));
+                getParametersMap(0, 0, FieldValueAlertCondition.ThresholdType.HIGHER, checkType, threshold, "response_time"),
+                alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
