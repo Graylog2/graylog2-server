@@ -84,7 +84,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -388,6 +387,7 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
         final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
+        final Collection<AlertCondition> alertConditions = streamService.getAlertConditions(stream);
         return StreamResponse.create(
             stream.getId(),
             (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
@@ -397,7 +397,7 @@ public class StreamResource extends RestResource {
             stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
             stream.getDisabled(),
             stream.getStreamRules(),
-            stream.getAlertConditions(),
+            alertConditions,
             AlertReceivers.create(
                 emailAlertReceivers == null ? Collections.emptyList() : emailAlertReceivers,
                 usersAlertReceivers == null ? Collections.emptyList() : usersAlertReceivers

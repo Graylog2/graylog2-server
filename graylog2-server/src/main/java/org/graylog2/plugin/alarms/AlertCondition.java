@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.alarms;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface AlertCondition {
+    @JsonIgnore
     String getDescription();
 
     String getId();
@@ -36,10 +38,13 @@ public interface AlertCondition {
 
     Map<String, Object> getParameters();
 
+    @JsonIgnore
     Integer getBacklog();
 
+    @JsonIgnore
     int getGrace();
 
+    @JsonIgnore
     String getTypeString();
 
     String getTitle();
