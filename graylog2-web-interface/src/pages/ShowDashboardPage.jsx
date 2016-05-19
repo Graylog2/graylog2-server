@@ -79,7 +79,7 @@ const ShowDashboardPage = React.createClass({
       dimensions.height = widgetPlugin.defaultHeight;
       dimensions.width = widgetPlugin.defaultWidth;
     } else {
-      dimensions.heigh = this.DEFAULT_HEIGHT;
+      dimensions.height = this.DEFAULT_HEIGHT;
       dimensions.width = this.DEFAULT_WIDTH;
     }
 
