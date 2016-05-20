@@ -119,7 +119,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
             buffer.writeInt((int) sequenceNum);
 
             LOG.trace("Sending ACK for sequence number {} on channel {}", sequenceNum, channel);
-            channel.write(buffer).awaitUninterruptibly();
+            channel.write(buffer);
         }
     }
 
