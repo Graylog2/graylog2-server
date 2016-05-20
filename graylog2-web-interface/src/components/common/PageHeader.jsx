@@ -16,7 +16,7 @@ const PageHeader = React.createClass({
     if (this.props.experimental) {
       experimentalLabel = (
         <span style={{ cursor: 'help', marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
-          <OverlayTrigger placement="bottom" overlay={<Tooltip>This feature of Graylog is new and should be considered experimental.</Tooltip>}>
+          <OverlayTrigger placement="bottom" overlay={<Tooltip id="experimental">This feature of Graylog is new and should be considered experimental.</Tooltip>}>
             <Label bsStyle="primary">Experimental</Label>
           </OverlayTrigger>
         </span>
