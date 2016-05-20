@@ -7,7 +7,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-beats</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -18,7 +18,7 @@
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-beats.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-beats.git</developerConnection>
         <url>https://github.com/Graylog2/graylog-plugin-beats</url>
-        <tag>HEAD</tag>
+        <tag>1.0.3</tag>
     </scm>
 
     <properties>
