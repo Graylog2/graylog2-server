@@ -18,6 +18,7 @@ package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -63,7 +64,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext channelHandlerContext, Channel channel, ChannelBuffer channelBuffer) throws Exception {
-        final ChannelBuffer[] events = processBuffer(channel, channelBuffer);
+        final Iterable<ChannelBuffer> events = processBuffer(channel, channelBuffer);
         if (events == null) {
             return null;
         } else {
@@ -72,7 +73,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
     }
 
     @Nullable
-    private ChannelBuffer[] processBuffer(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private Iterable<ChannelBuffer> processBuffer(Channel channel, ChannelBuffer channelBuffer) throws IOException {
         channelBuffer.markReaderIndex();
         @SuppressWarnings("unused")
         byte version = channelBuffer.readByte();
@@ -81,20 +82,20 @@ public class BeatsFrameDecoder extends FrameDecoder {
         }
         byte frameType = channelBuffer.readByte();
 
-        ChannelBuffer[] events = null;
+        Iterable<ChannelBuffer> events = null;
         switch (frameType) {
             case FRAME_WINDOW_SIZE:
                 processWindowSizeFrame(channelBuffer);
                 break;
             case FRAME_DATA:
-                events = new ChannelBuffer[]{parseDataFrame(channelBuffer)};
+                events = Collections.singleton(parseDataFrame(channelBuffer));
                 sendACK(channel);
                 break;
             case FRAME_COMPRESSED:
                 events = processCompressedFrame(channel, channelBuffer);
                 break;
             case FRAME_JSON:
-                events = new ChannelBuffer[]{parseJsonFrame(channelBuffer)};
+                events = Collections.singleton(parseJsonFrame(channelBuffer));
                 sendACK(channel);
                 break;
             default:
@@ -136,7 +137,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#compressed-frame-type">'compressed' frame type</a>
      */
-    private ChannelBuffer[] processCompressedFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private Iterable<ChannelBuffer> processCompressedFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
         if (channelBuffer.readableBytes() >= 4) {
             final long payloadLength = channelBuffer.readUnsignedInt();
             if (channelBuffer.readableBytes() < payloadLength) {
@@ -146,7 +147,7 @@ public class BeatsFrameDecoder extends FrameDecoder {
                 channelBuffer.readBytes(data);
                 try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(data);
                      final InputStream in = new InflaterInputStream(dataStream)) {
-                    final ChannelBuffer buffer = ChannelBuffers.copiedBuffer(ByteStreams.toByteArray(in));
+                    final ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(ByteStreams.toByteArray(in));
                     return processCompressedDataFrames(channel, buffer);
                 }
             }
@@ -156,15 +157,15 @@ public class BeatsFrameDecoder extends FrameDecoder {
         return null;
     }
 
-    private ChannelBuffer[] processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private Iterable<ChannelBuffer> processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws IOException {
         final List<ChannelBuffer> events = new ArrayList<>();
         while (channelBuffer.readable()) {
-            final ChannelBuffer[] buffers = processBuffer(channel, channelBuffer);
+            final Iterable<ChannelBuffer> buffers = processBuffer(channel, channelBuffer);
             if (buffers != null) {
-                Collections.addAll(events, buffers);
+                Iterables.addAll(events, buffers);
             }
         }
-        return events.toArray(new ChannelBuffer[events.size()]);
+        return events;
     }
 
     /**

@@ -19,6 +19,7 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -88,10 +89,11 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
+        @SuppressWarnings("unchecked")
+        final Iterable<ChannelBuffer> resultBuffers = (Iterable<ChannelBuffer>) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
         assertThat(resultBuffers).hasSize(1);
-        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final ChannelBuffer resultBuffer = Iterables.getOnlyElement(resultBuffers);
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -133,10 +135,11 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
+        @SuppressWarnings("unchecked")
+        final Iterable<ChannelBuffer> resultBuffers = (Iterable<ChannelBuffer>) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
         assertThat(resultBuffers).hasSize(1);
-        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final ChannelBuffer resultBuffer = Iterables.getOnlyElement(resultBuffers);
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -187,10 +190,11 @@ public class BeatsFrameDecoderTest {
 
         when(channel.write(anyObject())).thenReturn(new SucceededChannelFuture(channel));
         final ArgumentCaptor<ChannelBuffer> argument = ArgumentCaptor.forClass(ChannelBuffer.class);
-        final ChannelBuffer[] resultBuffers = (ChannelBuffer[]) decoder.decode(channelHandlerContext, channel, buffer);
+        @SuppressWarnings("unchecked")
+        final Iterable<ChannelBuffer> resultBuffers = (Iterable<ChannelBuffer>) decoder.decode(channelHandlerContext, channel, buffer);
         assertThat(buffer.readableBytes()).isEqualTo(0);
         assertThat(resultBuffers).hasSize(1);
-        final ChannelBuffer resultBuffer = resultBuffers[0];
+        final ChannelBuffer resultBuffer = Iterables.getOnlyElement(resultBuffers);
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
