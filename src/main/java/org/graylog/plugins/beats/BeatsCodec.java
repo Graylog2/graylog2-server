@@ -138,6 +138,8 @@ public class BeatsCodec extends AbstractCodec {
         gelfMessage.addField("facility", "filebeat");
         gelfMessage.addField("file", event.get("source"));
         gelfMessage.addField("input_type", event.get("input_type"));
+        gelfMessage.addField("count", event.get("count"));
+        gelfMessage.addField("offset", event.get("offset"));
         @SuppressWarnings("unchecked")
         final Map<String, Object> fields = (Map<String, Object>) event.get("fields");
         if (fields != null) {

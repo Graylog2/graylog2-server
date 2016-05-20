@@ -68,6 +68,8 @@ public class BeatsCodecTest {
         assertThat(message.getField("facility")).isEqualTo("filebeat");
         assertThat(message.getField("file")).isEqualTo("/tmp/test.log");
         assertThat(message.getField("type")).isEqualTo("log");
+        assertThat(message.getField("count")).isEqualTo(1);
+        assertThat(message.getField("offset")).isEqualTo(0);
         @SuppressWarnings("unchecked")
         final List<String> tags = (List<String>) message.getField("tags");
         assertThat(tags).containsOnly("foobar", "test");
