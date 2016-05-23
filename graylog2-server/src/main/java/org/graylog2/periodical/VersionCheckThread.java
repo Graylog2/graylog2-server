@@ -26,7 +26,6 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.ServerVersion;
@@ -127,10 +126,10 @@ public class VersionCheckThread extends Periodical {
             }
 
             final VersionResponse version = versionCheckResponse.version;
-            Version reportedVersion = new Version(version.major, version.minor, version.patch);
+            final com.github.zafarkhaja.semver.Version reportedVersion = com.github.zafarkhaja.semver.Version.forIntegers(version.major, version.minor, version.patch);
 
             LOG.debug("Version check reports current version: " + versionCheckResponse);
-            if (reportedVersion.greaterMinor(ServerVersion.VERSION)) {
+            if (reportedVersion.greaterThan(ServerVersion.VERSION.getVersion())) {
                 LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
 
                 Notification notification = notificationService.buildNow()

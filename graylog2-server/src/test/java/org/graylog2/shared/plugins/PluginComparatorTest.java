@@ -39,17 +39,17 @@ public class PluginComparatorTest {
     @Parameterized.Parameters
     public static Object[][] provideData() {
         return new Object[][]{
-                {new TestPlugin("u", "n", new Version(1, 0, 0)), new TestPlugin("u", "n", new Version(1, 0, 0)), 0},
-                {new TestPlugin("u1", "n", new Version(1, 0, 0)), new TestPlugin("u2", "n", new Version(1, 0, 0)), -1},
-                {new TestPlugin("u", "n1", new Version(1, 0, 0)), new TestPlugin("u", "n2", new Version(1, 0, 0)), -1},
-                {new TestPlugin("u2", "n1", new Version(1, 0, 0)), new TestPlugin("u1", "n2", new Version(1, 0, 0)), 1},
-                {new TestPlugin("u", "n", new Version(1, 0, 0, "beta.1")), new TestPlugin("u", "n", new Version(1, 0, 0)), -1},
-                {new TestPlugin("u", "n", new Version(1, 0, 0, "beta.1")), new TestPlugin("u", "n", new Version(1, 0, 0, "alpha.5")), 1},
-                {new TestPlugin("u", "n", new Version(1, 0, 1)), new TestPlugin("u", "n", new Version(1, 0, 0)), 1},
-                {new TestPlugin("u", "n", new Version(1, 0, 0)), new TestPlugin("u", "n", new Version(1, 0, 1)), -1},
-                {new TestPlugin("u", "n", new Version(2, 0, 0)), new TestPlugin("u", "n", new Version(1, 0, 0)), 1},
-                {new TestPlugin("u", "n", new Version(1, 1, 0)), new TestPlugin("u", "n", new Version(1, 0, 0)), 1},
-                {new TestPlugin("u", "n", new Version(1, 0, 1)), new TestPlugin("u", "n", new Version(1, 0, 0)), 1}
+                {new TestPlugin("u", "n", Version.from(1, 0, 0)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 0},
+                {new TestPlugin("u1", "n", Version.from(1, 0, 0)), new TestPlugin("u2", "n", Version.from(1, 0, 0)), -1},
+                {new TestPlugin("u", "n1", Version.from(1, 0, 0)), new TestPlugin("u", "n2", Version.from(1, 0, 0)), -1},
+                {new TestPlugin("u2", "n1", Version.from(1, 0, 0)), new TestPlugin("u1", "n2", Version.from(1, 0, 0)), 1},
+                {new TestPlugin("u", "n", Version.from(1, 0, 0, "beta.1")), new TestPlugin("u", "n", Version.from(1, 0, 0)), -1},
+                {new TestPlugin("u", "n", Version.from(1, 0, 0, "beta.1")), new TestPlugin("u", "n", Version.from(1, 0, 0, "alpha.5")), 1},
+                {new TestPlugin("u", "n", Version.from(1, 0, 1)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 1},
+                {new TestPlugin("u", "n", Version.from(1, 0, 0)), new TestPlugin("u", "n", Version.from(1, 0, 1)), -1},
+                {new TestPlugin("u", "n", Version.from(2, 0, 0)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 1},
+                {new TestPlugin("u", "n", Version.from(1, 1, 0)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 1},
+                {new TestPlugin("u", "n", Version.from(1, 0, 1)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 1}
         };
     }
 

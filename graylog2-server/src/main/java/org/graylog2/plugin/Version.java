@@ -16,62 +16,192 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.collect.ComparisonChain;
 import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.StringReader;
+import javax.annotation.Nonnull;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Properties;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Strings.nullToEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
- * Following semantic versioning.
- * <p/>
- * http://semver.org/
+ * Following the <a href="http://semver.org/">Semantic Versioning specification</a>.
  */
 public class Version implements Comparable<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
+    /**
+     * @deprecated Use {@link #getVersion()}
+     */
+    @Deprecated
     public final int major;
+    /**
+     * @deprecated Use {@link #getVersion()}
+     */
+    @Deprecated
     public final int minor;
+    /**
+     * @deprecated Use {@link #getVersion()}
+     */
+    @Deprecated
     public final int patch;
+    /**
+     * @deprecated Use {@link #getVersion()}
+     */
+    @Deprecated
     public final String additional;
+    /**
+     * @deprecated Use {@link #getVersion()}
+     */
+    @Deprecated
     public final String abbrevCommitSha;
+
+    private final com.github.zafarkhaja.semver.Version version;
 
     /**
      * Reads the current version from the classpath, using version.properties and git.properties.
      */
-    public static final Version CURRENT_CLASSPATH;
+    public static final Version CURRENT_CLASSPATH = fromClasspathProperties(Version.from(0, 0, 0, "unknown"));
 
-    static {
-        Version tmpVersion;
+    /**
+     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)} or {@link #from(int, int, int)}
+     */
+    @Deprecated
+    public Version(int major, int minor, int patch) {
+        this(buildSemVer(major, minor, patch, null, null));
+    }
+
+    /**
+     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)} or {@link #from(int, int, int, String)}
+     */
+    @Deprecated
+    public Version(int major, int minor, int patch, String additional) {
+        this(buildSemVer(major, minor, patch, additional, null));
+    }
+
+    /**
+     * @deprecated Use {@link #Version(com.github.zafarkhaja.semver.Version)}
+     */
+    @Deprecated
+    public Version(int major, int minor, int patch, String additional, String abbrevCommitSha) {
+        this(buildSemVer(major, minor, patch, additional, abbrevCommitSha));
+    }
+
+    public Version(com.github.zafarkhaja.semver.Version version) {
+        this.version = requireNonNull(version);
+
+        // Deprecated
+        this.major = version.getMajorVersion();
+        this.minor = version.getMinorVersion();
+        this.patch = version.getPatchVersion();
+        this.additional = version.getPreReleaseVersion();
+        this.abbrevCommitSha = version.getBuildMetadata();
+
+    }
+
+    /**
+     * Build valid {@link Version} from major, minor, and patch version ("X.Y.Z").
+     *
+     * @param major The major version component.
+     * @param minor The minor version component.
+     * @param patch The patch version component.
+     * @return The {@link Version} instance built from the given parameters.
+     */
+    public static Version from(int major, int minor, int patch) {
+        return new Version(com.github.zafarkhaja.semver.Version.forIntegers(major, minor, patch));
+    }
+
+    /**
+     * Build valid {@link Version} from major, minor, and patch version ("X.Y.Z").
+     *
+     * @param major      The major version component.
+     * @param minor      The minor version component.
+     * @param patch      The patch version component.
+     * @param preRelease The pre-release version component.
+     * @return The {@link Version} instance built from the given parameters.
+     */
+    public static Version from(int major, int minor, int patch, String preRelease) {
+        return new Version(buildSemVer(major, minor, patch, preRelease, null));
+    }
+
+    /**
+     * Build valid {@link Version} from major, minor, and patch version ("X.Y.Z").
+     *
+     * @param major         The major version component.
+     * @param minor         The minor version component.
+     * @param patch         The patch version component.
+     * @param preRelease    The pre-release version component.
+     * @param buildMetadata Additional build metadata (e. g. the Git commit SHA).
+     * @return The {@link Version} instance built from the given parameters.
+     */
+    public static Version from(int major, int minor, int patch, String preRelease, String buildMetadata) {
+        return new Version(buildSemVer(major, minor, patch, preRelease, buildMetadata));
+    }
+
+    private static com.github.zafarkhaja.semver.Version buildSemVer(int major, int minor, int patch, String preRelease, String buildMetadata) {
+        com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.forIntegers(major, minor, patch);
+        if (!isNullOrEmpty(preRelease)) {
+            version = version.setPreReleaseVersion(preRelease);
+        }
+        if (!isNullOrEmpty(buildMetadata)) {
+            version = version.setBuildMetadata(buildMetadata);
+        }
+        return version;
+    }
+
+    /**
+     * Try to read the version from {@literal version.properties} ({@code project.version} property)
+     * and {@literal git.properties} ({@code git.commit.id} property) from the classpath.
+     *
+     * @param defaultVersion The {@link Version} to return if reading the information from the properties files failed.
+     */
+    public static Version fromClasspathProperties(Version defaultVersion) {
+        return fromClasspathProperties("version.properties", "project.version", "git.properties", "git.commit.id", defaultVersion);
+    }
+
+    /**
+     * Try to read the version from {@code path} ({@code project.version} property)
+     * and {@code gitPath} ({@code git.commit.id} property) from the classpath.
+     *
+     * @param path           Path of the properties file on the classpath which contains the version information.
+     * @param gitPath        Path of the properties file on the classpath which contains the SCM information.
+     * @param defaultVersion The {@link Version} to return if reading the information from the properties files failed.
+     */
+    public static Version fromClasspathProperties(String path, String gitPath, Version defaultVersion) {
+        return fromClasspathProperties(path, "project.version", gitPath, "git.commit.id", defaultVersion);
+    }
+
+    /**
+     * Try to read the version from {@code path} ({@code propertyName} property)
+     * and {@code gitPath} ({@code gitPropertyName} property) from the classpath.
+     *
+     * @param path            Path of the properties file on the classpath which contains the version information.
+     * @param propertyName    The name of the property to read as project version ("major.minor.patch-preReleaseVersion").
+     * @param gitPath         Path of the properties file on the classpath which contains the SCM information.
+     * @param gitPropertyName The name of the property to read as git commit SHA.
+     * @param defaultVersion  The {@link Version} to return if reading the information from the properties files failed.
+     */
+    public static Version fromClasspathProperties(String path, String propertyName, String gitPath, String gitPropertyName, Version defaultVersion) {
         try {
-            final URL resource = Resources.getResource("version.properties");
-            final String versionPropertiesString = Resources.toString(resource, UTF_8);
+            final URL resource = Resources.getResource(path);
             final Properties versionProperties = new Properties();
-            versionProperties.load(new StringReader(versionPropertiesString));
+            versionProperties.load(resource.openStream());
 
-            com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionProperties.getProperty("project.version", "0.0.0"));
-
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionProperties.getProperty(propertyName));
             final int major = version.getMajorVersion();
             final int minor = version.getMinorVersion();
-            final int incremental = version.getPatchVersion();
+            final int patch = version.getPatchVersion();
             final String qualifier = version.getPreReleaseVersion();
 
             String commitSha = null;
             try {
                 final Properties git = new Properties();
-                final URL gitResource = Resources.getResource("git.properties");
-                final String gitProperties = Resources.toString(gitResource, UTF_8);
-                git.load(new StringReader(gitProperties));
-                commitSha = git.getProperty("git.commit.id");
+                final URL gitResource = Resources.getResource(gitPath);
+                git.load(gitResource.openStream());
+                commitSha = git.getProperty(gitPropertyName);
                 // abbreviate if present and looks like a long sha
                 if (commitSha != null && commitSha.length() > 7) {
                     commitSha = commitSha.substring(0, 7);
@@ -80,94 +210,71 @@ public class Version implements Comparable<Version> {
                 LOG.debug("Git commit details are not available, skipping.", e);
             }
 
-            tmpVersion = new Version(major, minor, incremental, qualifier, commitSha);
+            return from(major, minor, patch, qualifier, commitSha);
         } catch (Exception e) {
-            tmpVersion = new Version(0, 0, 0, "unknown");
-            LOG.error("Unable to read version.properties file, this build has no version number.", e);
+            LOG.error("Unable to read " + path + ", this build has no version number.", e);
         }
-        CURRENT_CLASSPATH = tmpVersion;
-    }
-
-    public Version(int major, int minor, int patch) {
-        this(major, minor, patch, null, null);
-    }
-
-    public Version(int major, int minor, int patch, String additional) {
-        this(major, minor, patch, additional, null);
-    }
-
-    public Version(int major, int minor, int patch, String additional, String abbrevCommitSha) {
-        this.major = major;
-        this.minor = minor;
-        this.patch = patch;
-        this.additional = additional;
-        this.abbrevCommitSha = abbrevCommitSha;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(major).append(".").append(minor).append(".").append(patch);
-
-        if (!isNullOrEmpty(additional)) {
-            sb.append("-").append(additional);
-        }
-
-        if (!isNullOrEmpty(abbrevCommitSha)) {
-            sb.append(" (").append(abbrevCommitSha).append(')');
-        }
-
-        return sb.toString();
+        return defaultVersion;
     }
 
     /**
-     * Check if this version is higher than the passed other version. Only taking major and minor version number in account.
-     *
-     * @param other version to compare
-     * @return
+     * @return the underlying {@link com.github.zafarkhaja.semver.Version} instance.
      */
-    public boolean greaterMinor(Version other) {
-        return (other.major < this.major) || (other.major == this.major && other.minor < this.minor);
-    }
-
-    public boolean sameOrHigher(Version other) {
-        return (this.major > other.major) ||
-                (this.major == other.major && (this.minor > other.minor || (this.minor == other.minor && this.patch >= other.patch)));
-    }
-
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Version that = (Version) o;
-
-        return Objects.equals(this.major, that.major)
-                && Objects.equals(this.minor, that.minor)
-                && Objects.equals(this.patch, that.patch)
-                && Objects.equals(this.additional, that.additional)
-                && Objects.equals(this.abbrevCommitSha, that.abbrevCommitSha);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(major, minor, patch, additional, abbrevCommitSha);
+    public com.github.zafarkhaja.semver.Version getVersion() {
+        return version;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int compareTo(Version that) {
-        checkNotNull(that);
-        return ComparisonChain.start()
-                .compare(this.major, that.major)
-                .compare(this.minor, that.minor)
-                .compare(this.patch, that.patch)
-                .compareFalseFirst(isNullOrEmpty(this.additional), isNullOrEmpty(that.additional))
-                .compare(nullToEmpty(this.additional), nullToEmpty(that.additional))
-                .result();
+    public String toString() {
+        return version.toString();
+    }
+
+    /**
+     * Check if this version is higher than the passed other version. Only taking major and minor version number in account.
+     *
+     * @param other {@link Version} to compare
+     */
+    @Deprecated
+    public boolean greaterMinor(Version other) {
+        return (other.major < this.major) || (other.major == this.major && other.minor < this.minor);
+    }
+
+    /**
+     * @see com.github.zafarkhaja.semver.Version#greaterThanOrEqualTo(com.github.zafarkhaja.semver.Version)
+     */
+    public boolean sameOrHigher(Version other) {
+        return version.greaterThanOrEqualTo(other.getVersion());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final Version that = (Version) o;
+        return version.equals(that.getVersion());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return version.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(@Nonnull Version that) {
+        requireNonNull(that);
+        return version.compareTo(that.getVersion());
     }
 }
