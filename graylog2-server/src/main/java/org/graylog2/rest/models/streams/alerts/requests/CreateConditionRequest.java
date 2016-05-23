@@ -32,6 +32,7 @@ public abstract class CreateConditionRequest {
     public abstract String type();
 
     @JsonProperty("title")
+    @Nullable
     public abstract String title();
 
     @JsonProperty("parameters")
@@ -39,7 +40,7 @@ public abstract class CreateConditionRequest {
 
     @JsonCreator
     public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
-                                                @JsonProperty("title") String title,
+                                                @JsonProperty("title") @Nullable String title,
                                                 @JsonProperty("parameters") Map<String, Object> parameters) {
         return new AutoValue_CreateConditionRequest(type, title, parameters);
     }

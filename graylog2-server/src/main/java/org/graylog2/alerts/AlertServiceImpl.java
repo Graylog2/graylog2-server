@@ -245,6 +245,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
             .put("parameters", alertCondition.getParameters())
             .put("in_grace", inGracePeriod(alertCondition))
+            .put("title", alertCondition.getTitle())
             .build();
     }
 

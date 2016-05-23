@@ -28,14 +28,24 @@ const AlertCondition = React.createClass({
   },
   _onUpdate(event) {
     event.preventDefault();
-    const request = {
-      type: this.props.alertCondition.type,
-      parameters: this.refs.updateForm.getValue(),
-    };
+    const request = this.refs.updateForm.getValue();
+    request.type = this.props.alertCondition.type;
     AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request)
     .then(() => {
       this.setState({edit: false});
     });
+  },
+  _formatTitle() {
+    const alertCondition = this.props.alertCondition;
+    const alertConditionType = new AlertConditionsFactory().get(alertCondition.type);
+    const title = alertCondition.title ? alertCondition.title : `Untitled ${alertConditionType.title} condition`;
+    const subtitle = alertCondition.title ? `(${alertConditionType.title} condition)` : null;
+    const badge = alertCondition.in_grace && <Badge className="badge-info">in grace period</Badge>;
+    return (
+      <span>
+        {title} <small>{subtitle}</small> {badge}
+      </span>
+    );
   },
   render() {
     const alertCondition = this.props.alertCondition;
@@ -47,12 +57,12 @@ const AlertCondition = React.createClass({
       <span>
         <Row className="alert-condition" data-condition-id={alertCondition.id}>
           <Col md={9}>
-            <h3>{alertConditionType.title} condition {alertCondition.in_grace && <Badge className="badge-info">in grace period</Badge>}</h3>
+            <h3>{this._formatTitle()}</h3>
             <alertConditionType.summary alertCondition={alertCondition} />
             {' '}
             {this.state.edit &&
             <form onSubmit={this._onUpdate}>
-              <AlertConditionForm ref="updateForm" type={alertCondition.type} alertCondition={alertCondition.parameters} />
+              <AlertConditionForm ref="updateForm" type={alertCondition.type} alertCondition={alertCondition} />
               {' '}
               <Button bsStyle="info" type="submit">Save</Button>
             </form>}

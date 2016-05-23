@@ -23,13 +23,14 @@ const CreateAlertConditionInput = React.createClass({
   _onChange(evt) {
     this.setState({type: evt.target.value});
   },
+  _resetForm() {
+    this.setState(this.getInitialState());
+  },
   _onSubmit(evt) {
     evt.preventDefault();
-    const request = {
-      type: this.state.type,
-      parameters: this.refs.conditionForm.getValue(),
-    };
-    AlertConditionsActions.save(this.props.streamId, request);
+    const request = this.refs.conditionForm.getValue();
+    request.type = this.state.type;
+    AlertConditionsActions.save.triggerPromise(this.props.streamId, request).then(() => { this._resetForm(); });
   },
   _formatConditionForm(type) {
     return <AlertConditionForm ref="conditionForm" type={type}/>;

@@ -130,6 +130,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
                 .put("creator_user_id", creatorUserId)
                 .put("created_at", Tools.getISO8601String(createdAt))
                 .put("parameters", parameters)
+                .put("title", title)
                 .build();
     }
 
