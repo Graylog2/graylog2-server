@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
+    private static final Duration deflectorIndexRangeCalculationTimeout = Duration.ofHours(1L);
+
     @Mock
     private SystemJobManager systemJobManager;
     @Mock
@@ -60,7 +63,7 @@ public class DeflectorTest {
 
     @Before
     public void setUp() {
-        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory, indices);
+        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory, indices, deflectorIndexRangeCalculationTimeout);
     }
 
     @Test
@@ -167,11 +170,12 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                "graylog",
-                                                activityWriter,
-                                                indexReadOnlyJobFactory,
-                                                singleIndexRangeJobFactory,
-                                                indices);
+            "graylog",
+            activityWriter,
+            indexReadOnlyJobFactory,
+            singleIndexRangeJobFactory,
+            indices,
+            deflectorIndexRangeCalculationTimeout);
 
         final int number = deflector.getNewestTargetNumber();
         assertEquals(3, number);
@@ -189,15 +193,16 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                  "graylog",
-                                                  activityWriter,
-                                                  indexReadOnlyJobFactory,
-                                                  singleIndexRangeJobFactory,
-                                                  indices);
+            "graylog",
+            activityWriter,
+            indexReadOnlyJobFactory,
+            singleIndexRangeJobFactory,
+            indices,
+            deflectorIndexRangeCalculationTimeout);
 
         final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
         assertThat(allGraylogIndexNames)
-                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
+            .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
     }
 
     @Test
@@ -212,20 +217,18 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                  "graylog",
-                                                  activityWriter,
-                                                  indexReadOnlyJobFactory,
-                                                  singleIndexRangeJobFactory,
-                                                  indices);
+            "graylog",
+            activityWriter,
+            indexReadOnlyJobFactory,
+            singleIndexRangeJobFactory,
+            indices,
+            deflectorIndexRangeCalculationTimeout);
 
         final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
 
         assertThat(deflectorIndices).isNotNull();
         assertThat(deflectorIndices).isNotEmpty();
         assertThat(deflectorIndices.keySet())
-                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+            .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
     }
-
-
-
 }

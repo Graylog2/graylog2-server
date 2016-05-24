@@ -44,6 +44,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
+import java.time.Duration;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -84,7 +85,7 @@ public class EsIndexRangeServiceTest {
     public void setUp() throws Exception {
         final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages);
-        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(), null, null, indices);
+        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(), null, null, indices, Duration.ofHours(1L));
         indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, new MetricRegistry());
     }
 
