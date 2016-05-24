@@ -16,8 +16,6 @@
  */
 package org.graylog2;
 
-import org.graylog2.utilities.IPSubnetConverter;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
@@ -28,13 +26,14 @@ import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.graylog2.configuration.WebListenUriValidator;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.utilities.IPSubnetConverter;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.graylog2.plugin.Tools.getUriWithDefaultPath;
@@ -158,7 +157,7 @@ public class Configuration extends BaseConfiguration {
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
-    private Set<IpSubnet> trustedProxies = new HashSet<IpSubnet>();
+    private Set<IpSubnet> trustedProxies = Collections.emptySet();
 
     public boolean isMaster() {
         return isMaster;

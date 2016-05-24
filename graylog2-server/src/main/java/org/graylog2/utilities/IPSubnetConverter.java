@@ -16,34 +16,29 @@
  */
 package org.graylog2.utilities;
 
-import com.google.common.base.Joiner;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
 import com.github.joschi.jadconfig.Converter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.joschi.jadconfig.ParameterException;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Converts a comma separated list of IP addresses / subnets to IpSubnet set.
+ * Converts a comma separated list of IP addresses / sub nets to set of {@link IpSubnet}.
  */
 public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
-    private static final Logger LOG = LoggerFactory.getLogger(IPSubnetConverter.class);
-
-    public IPSubnetConverter() {
-    }
-
     public Set<IpSubnet> convertFrom(String value) {
-        Set<IpSubnet> converted = new HashSet<IpSubnet>();
-        if (value instanceof String) {
-            String[] subnets = value.split(",");
-            for (String subnet: subnets) {
+        final Set<IpSubnet> converted = new HashSet<>();
+        if (value != null) {
+            Iterable<String> subnets = Splitter.on(',').trimResults().split(value);
+            for (String subnet : subnets) {
                 try {
-                    converted.add(new IpSubnet(subnet.trim()));
+                    converted.add(new IpSubnet(subnet));
                 } catch (UnknownHostException e) {
-                    LOG.error("Invalid subnet {}", subnet);
+                    throw new ParameterException("Invalid subnet: " + subnet);
                 }
             }
         }
@@ -51,7 +46,9 @@ public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
     }
 
     public String convertTo(Set<IpSubnet> value) {
-        Joiner joiner = Joiner.on(",").skipNulls();
-        return joiner.join(value);
+        if (value == null) {
+            throw new ParameterException("Couldn't convert IP subnets <null> to string.");
+        }
+        return Joiner.on(",").skipNulls().join(value);
     }
 }

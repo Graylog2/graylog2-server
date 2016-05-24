@@ -16,15 +16,13 @@
  */
 package org.graylog2.rest;
 
-import org.graylog2.Configuration;
+import com.google.common.net.HttpHeaders;
+import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
-
-import org.glassfish.grizzly.http.server.Request;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.SecurityContext;
 import java.net.UnknownHostException;
@@ -32,14 +30,6 @@ import java.security.Principal;
 import java.util.Set;
 
 public class RestTools {
-
-    private Configuration configuration;
-
-    @Inject
-    public RestTools(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
     @Nullable
     public static String getUserNameFromRequest(ContainerRequestContext requestContext) {
         final SecurityContext securityContext = requestContext.getSecurityContext();
@@ -62,16 +52,15 @@ public class RestTools {
 
     /**
      * If X-Forwarded-For request header is set, and the request came from a trusted source,
-     * return the value of X-Forwarded-For. Otherwise return request.GetRemoteAddr();
+     * return the value of X-Forwarded-For. Otherwise return {@link Request#getRemoteAddr()}.
      */
-    public String getRemoteAddrFromRequest(Request request) {
-        final String XForwardedFor = request.getHeader("X-Forwarded-For");
-        Set<IpSubnet> trustedSubnets = this.configuration.getTrustedProxies();
-
-        if (XForwardedFor instanceof String && trustedSubnets.size()>0) {
-            for (IpSubnet s: trustedSubnets) {
+    public static String getRemoteAddrFromRequest(Request request, Set<IpSubnet> trustedSubnets) {
+        final String remoteAddr = request.getRemoteAddr();
+        final String XForwardedFor = request.getHeader(HttpHeaders.X_FORWARDED_FOR);
+        if (XForwardedFor != null) {
+            for (IpSubnet s : trustedSubnets) {
                 try {
-                    if (s.contains(request.getRemoteAddr())) {
+                    if (s.contains(remoteAddr)) {
                         // Request came from trusted source, trust X-forwarded-For and return it
                         return XForwardedFor;
                     }
@@ -82,6 +71,6 @@ public class RestTools {
         }
 
         // Request did not come from a trusted source, or the X-Forwarded-For header was not set
-        return request.getRemoteAddr();
+        return remoteAddr;
     }
 }

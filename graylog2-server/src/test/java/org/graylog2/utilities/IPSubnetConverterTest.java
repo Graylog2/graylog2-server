@@ -16,43 +16,59 @@
  */
 package org.graylog2.utilities;
 
+import com.github.joschi.jadconfig.ParameterException;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IPSubnetConverterTest {
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
-    IPSubnetConverter converter = new IPSubnetConverter();
+    private final IPSubnetConverter converter = new IPSubnetConverter();
 
     @Test
     public void testDefault() throws Exception {
         final String defaultList = "127.0.0.1/32,0:0:0:0:0:0:0:1/128";
-        Set<IpSubnet> results = converter.convertFrom(defaultList);
-        assertEquals(results.size(), 2);
-        assertEquals(defaultList, converter.convertTo(results));
-        IpSubnet subnets[] = new IpSubnet[results.size()];
-        results.toArray(subnets);
-        assertEquals("127.0.0.1/32", subnets[0].toString());
-        assertEquals("0:0:0:0:0:0:0:1/128", subnets[1].toString());
+        final Set<IpSubnet> results = converter.convertFrom(defaultList);
+        assertThat(results)
+            .hasSize(2)
+            .contains(new IpSubnet(Inet4Address.getByName("127.0.0.1"), 32))
+            .contains(new IpSubnet(Inet6Address.getByName("0:0:0:0:0:0:0:1"), 128));
+        assertThat(converter.convertTo(results)).isEqualTo(defaultList);
     }
 
     @Test
     public void testNormalize() throws Exception {
         final String defaultList = "127.0.0.1/32, ::1/128";
         final String normalized = "127.0.0.1/32,0:0:0:0:0:0:0:1/128";
-        Set<IpSubnet> results = converter.convertFrom(defaultList);
-        assertEquals(normalized, converter.convertTo(results));
+        final Set<IpSubnet> results = converter.convertFrom(defaultList);
+        assertThat(converter.convertTo(results)).isEqualTo(normalized);
     }
 
     @Test
     public void testNull() throws Exception {
-        Set<IpSubnet> results = converter.convertFrom(null);
-        assertNotNull(results);
-        assertEquals(results.size(), 0);
+        assertThat(converter.convertFrom(null)).isEmpty();
     }
 
+    @Test
+    public void convertFromThrowsParameterExceptionWithInvalidSubnet() {
+        expectedException.expect(ParameterException.class);
+        expectedException.expectMessage("Invalid subnet: HODOR");
+        converter.convertFrom("127.0.0.1/32, ::1/128, HODOR");
+    }
+
+    @Test
+    public void convertToThrowsParameterExceptionWithNull() {
+        expectedException.expect(ParameterException.class);
+        expectedException.expectMessage("Couldn't convert IP subnets <null> to string.");
+        converter.convertTo(null);
+    }
 }
