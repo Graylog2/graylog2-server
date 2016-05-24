@@ -21,6 +21,7 @@ import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -35,21 +36,26 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
     private static final Logger LOG = LoggerFactory.getLogger("org.graylog2.rest.accesslog");
 
     private final Response response;
+    private final RestTools resttools;
 
-    public RestAccessLogFilter(@Context Response response) {
+    @Inject
+    public RestAccessLogFilter(@Context Response response, RestTools resttools) {
         this.response = requireNonNull(response);
+        this.resttools = resttools;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+
         if (LOG.isDebugEnabled()) {
             try {
                 final String rawQuery = requestContext.getUriInfo().getRequestUri().getRawQuery();
                 final Date requestDate = requestContext.getDate();
                 final String userName = RestTools.getUserNameFromRequest(requestContext);
+                final String remoteAddress = resttools.getRemoteAddrFromRequest(response.getRequest());
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
-                        response.getRequest().getRemoteAddr(),
+                        remoteAddress,
                         userName == null ? "-" : userName,
                         (requestDate == null ? "-" : requestDate),
                         requestContext.getMethod(),

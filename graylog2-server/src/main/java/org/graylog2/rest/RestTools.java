@@ -16,15 +16,30 @@
  */
 package org.graylog2.rest;
 
+import org.graylog2.Configuration;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 
+import org.glassfish.grizzly.http.server.Request;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
+
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.SecurityContext;
+import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.Set;
 
 public class RestTools {
+
+    private Configuration configuration;
+
+    @Inject
+    public RestTools(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Nullable
     public static String getUserNameFromRequest(ContainerRequestContext requestContext) {
         final SecurityContext securityContext = requestContext.getSecurityContext();
@@ -43,5 +58,30 @@ public class RestTools {
         final ShiroPrincipal shiroPrincipal = (ShiroPrincipal) userPrincipal;
 
         return shiroPrincipal.getName();
+    }
+
+    /**
+     * If X-Forwarded-For request header is set, and the request came from a trusted source,
+     * return the value of X-Forwarded-For. Otherwise return request.GetRemoteAddr();
+     */
+    public String getRemoteAddrFromRequest(Request request) {
+        final String XForwardedFor = request.getHeader("X-Forwarded-For");
+        Set<IpSubnet> trustedSubnets = this.configuration.getTrustedProxies();
+
+        if (XForwardedFor instanceof String && trustedSubnets.size()>0) {
+            for (IpSubnet s: trustedSubnets) {
+                try {
+                    if (s.contains(request.getRemoteAddr())) {
+                        // Request came from trusted source, trust X-forwarded-For and return it
+                        return XForwardedFor;
+                    }
+                } catch (UnknownHostException e) {
+                    // ignore silently, probably not worth logging
+                }
+            }
+        }
+
+        // Request did not come from a trusted source, or the X-Forwarded-For header was not set
+        return request.getRemoteAddr();
     }
 }
