@@ -21,7 +21,6 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
@@ -32,6 +31,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -85,7 +85,7 @@ public class PluginLoader {
         }
 
         LOG.debug("Loading [{}] plugins", files.length);
-        final List<URL> urls = Lists.newArrayList(files).stream()
+        final List<URL> urls = Arrays.stream(files)
                 .filter(File::isFile)
                 .map(jar -> {
                     try {
@@ -105,7 +105,7 @@ public class PluginLoader {
 
         final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
 
-        return ImmutableSet.<Plugin>builder().addAll(pluginServiceLoader).build();
+        return ImmutableSet.copyOf(pluginServiceLoader);
     }
 
     public static class PluginComparator implements Comparator<Plugin> {
