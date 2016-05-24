@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.logs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
@@ -97,7 +98,8 @@ public class LoggersResource extends RestResource {
         return LoggersSummary.create(loggers);
     }
 
-    private Collection<LoggerConfig> getLoggerConfigs() {
+    @VisibleForTesting
+    protected Collection<LoggerConfig> getLoggerConfigs() {
         final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
         final Configuration configuration = loggerContext.getConfiguration();
         return configuration.getLoggers().values();
@@ -134,7 +136,8 @@ public class LoggersResource extends RestResource {
         return SubsystemSummary.create(subsystems);
     }
 
-    private Level getLoggerLevel(final String loggerName) {
+    @VisibleForTesting
+    protected Level getLoggerLevel(final String loggerName) {
         final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
         final Configuration configuration = loggerContext.getConfiguration();
         final LoggerConfig loggerConfig = configuration.getLoggerConfig(loggerName);
@@ -142,12 +145,19 @@ public class LoggersResource extends RestResource {
         return loggerConfig.getLevel();
     }
 
-    private void setLoggerLevel(final String loggerName, final Level level) {
+    @VisibleForTesting
+    protected void setLoggerLevel(final String loggerName, final Level level) {
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final Configuration config = context.getConfiguration();
-
-        config.getLoggerConfig(loggerName).setLevel(level);
-        context.updateLoggers(config);
+        final LoggerConfig loggerConfig = config.getLoggerConfig(loggerName);
+        if(loggerName.equals(loggerConfig.getName())) {
+            loggerConfig.setLevel(level);
+        } else {
+            final LoggerConfig newLoggerConfig = new LoggerConfig(loggerName, level, loggerConfig.isAdditive());
+            newLoggerConfig.setLevel(level);
+            config.addLogger(loggerName, newLoggerConfig);
+        }
+        context.updateLoggers();
     }
 
     @PUT
