@@ -31,10 +31,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -58,6 +61,7 @@ public class Deflector { // extends Ablenkblech
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
+    private final Duration deflectorIndexRangeCalculationTimeout;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
@@ -71,13 +75,15 @@ public class Deflector { // extends Ablenkblech
                      final ActivityWriter activityWriter,
                      final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
-                     final Indices indices) {
+                     final Indices indices,
+                     @Named("deflector_index_range_calculation_timeout") final Duration deflectorIndexRangeCalculationTimeout) {
         this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
+        this.deflectorIndexRangeCalculationTimeout = deflectorIndexRangeCalculationTimeout;
 
         this.deflectorName = buildName(indexPrefix);
         this.indices = indices;
@@ -155,9 +161,22 @@ public class Deflector { // extends Ablenkblech
             pointTo(newTarget);
             activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
+            final SystemJobManager.ScheduleResult scheduleResult = addSingleIndexRanges(oldTarget);
+            if (scheduleResult != null) {
+                try {
+                    LOG.debug("Waiting for index calculation to complete");
+                    scheduleResult.getFuture().get(deflectorIndexRangeCalculationTimeout.toMillis(), TimeUnit.MILLISECONDS);
+                    LOG.debug("Completed!");
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    LOG.warn("Unable to calculate index range of index which is to be cycled: ", e);
+                }
+            } else {
+                LOG.warn("Unable to schedule job calculating index range of index which is to be cycled.");
+            }
+
             // Re-pointing from existing old index to the new one.
+            LOG.debug("Now switching over deflector alias.");
             pointTo(newTarget, oldTarget);
-            addSingleIndexRanges(oldTarget);
 
             // perform these steps after a delay, so we don't race with indexing into the alias
             // it can happen that an index request still writes to the old deflector target, while we cycled it above.
@@ -267,14 +286,16 @@ public class Deflector { // extends Ablenkblech
         indices.cycleAlias(getName(), newIndex);
     }
 
-    private void addSingleIndexRanges(String indexName) {
+    @Nullable
+    private SystemJobManager.ScheduleResult addSingleIndexRanges(String indexName) {
         try {
-            systemJobManager.submit(createNewSingleIndexRangeJobFactory.create(this, indexName));
+            return systemJobManager.submit(createNewSingleIndexRangeJobFactory.create(this, indexName));
         } catch (SystemJobConcurrencyException e) {
             final String msg = "Could not calculate index ranges for index " + indexName + " after cycling deflector: Maximum concurrency of job is reached.";
             activityWriter.write(new Activity(msg, Deflector.class));
             LOG.error(msg, e);
         }
+        return null;
     }
 
     @Nullable
