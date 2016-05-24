@@ -17,6 +17,7 @@
 package org.graylog2.indexer.ranges;
 
 import com.codahale.metrics.MetricRegistry;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.github.joschi.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +45,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
-import java.time.Duration;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -85,7 +85,7 @@ public class EsIndexRangeServiceTest {
     public void setUp() throws Exception {
         final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
         indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages);
-        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(), null, null, indices, Duration.ofHours(1L));
+        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(), null, null, indices, Duration.hours(1L));
         indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, new MetricRegistry());
     }
 

@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -165,7 +165,7 @@ public class Deflector { // extends Ablenkblech
             if (scheduleResult != null) {
                 try {
                     LOG.debug("Waiting for index calculation to complete");
-                    scheduleResult.getFuture().get(deflectorIndexRangeCalculationTimeout.toMillis(), TimeUnit.MILLISECONDS);
+                    scheduleResult.getFuture().get(deflectorIndexRangeCalculationTimeout.toMilliseconds(), TimeUnit.MILLISECONDS);
                     LOG.debug("Completed!");
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     LOG.warn("Unable to calculate index range of index which is to be cycled: ", e);

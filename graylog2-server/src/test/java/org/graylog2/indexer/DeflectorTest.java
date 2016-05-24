@@ -20,6 +20,7 @@
  */
 package org.graylog2.indexer;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
@@ -31,7 +32,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
-    private static final Duration deflectorIndexRangeCalculationTimeout = Duration.ofHours(1L);
+    private static final Duration deflectorIndexRangeCalculationTimeout = Duration.hours(1L);
 
     @Mock
     private SystemJobManager systemJobManager;
