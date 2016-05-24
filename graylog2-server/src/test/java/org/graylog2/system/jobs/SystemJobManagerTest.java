@@ -41,8 +41,8 @@ public class SystemJobManagerTest {
         LongRunningJob job1 = new LongRunningJob(1);
         LongRunningJob job2 = new LongRunningJob(1);
 
-        String jobID1 = manager.submit(job1);
-        String jobID2 = manager.submit(job2);
+        String jobID1 = manager.submit(job1).getJobId();
+        String jobID2 = manager.submit(job2).getJobId();
 
         assertEquals(2, manager.getRunningJobs().size());
         assertTrue(manager.getRunningJobs().containsValue(job1));

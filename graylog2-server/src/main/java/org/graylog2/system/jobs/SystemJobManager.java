@@ -31,12 +31,32 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class SystemJobManager {
+
+    public class ScheduleResult {
+        private final String jobId;
+        private final ScheduledFuture<?> future;
+
+        ScheduleResult(final String jobId, final ScheduledFuture<?> future) {
+            this.jobId = jobId;
+            this.future = future;
+        }
+
+        public String getJobId() {
+            return jobId;
+        }
+
+        public ScheduledFuture<?> getFuture() {
+            return future;
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobManager.class);
     private static final int THREAD_POOL_SIZE = 15;
 
@@ -59,11 +79,11 @@ public class SystemJobManager {
                 name(this.getClass(), "executor-service"));
     }
 
-    public String submit(final SystemJob job) throws SystemJobConcurrencyException {
+    public ScheduleResult submit(final SystemJob job) throws SystemJobConcurrencyException {
         return submitWithDelay(job, 0, TimeUnit.SECONDS);
     }
 
-    public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+    public ScheduleResult submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);
@@ -74,7 +94,7 @@ public class SystemJobManager {
         job.setId(new UUID().toString());
         jobs.put(job.getId(), job);
 
-        executor.schedule(new Runnable() {
+        final ScheduledFuture<?> future = executor.schedule(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -89,7 +109,7 @@ public class SystemJobManager {
                     x.stop();
 
                     final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
-                            TimeUnit.MILLISECONDS) + "ms.";
+                        TimeUnit.MILLISECONDS) + "ms.";
                     LOG.info(msg);
                     activityWriter.write(new Activity(msg, SystemJobManager.class));
                 } catch (SystemJobConcurrencyException ignored) {
@@ -102,7 +122,7 @@ public class SystemJobManager {
         }, delay, timeUnit);
 
         LOG.info("Submitted SystemJob <{}> [{}]", job.getId(), jobClass);
-        return job.getId();
+        return new ScheduleResult(job.getId(), future);
     }
 
     protected void checkAllowedConcurrency(SystemJob job) throws SystemJobConcurrencyException {
