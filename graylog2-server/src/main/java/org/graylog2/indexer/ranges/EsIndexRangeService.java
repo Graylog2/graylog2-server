@@ -179,6 +179,11 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public IndexRange createForDeflector(String index) {
+        return null;
+    }
+
+    @Override
     public void save(IndexRange indexRange) {
         throw new UnsupportedOperationException();
     }

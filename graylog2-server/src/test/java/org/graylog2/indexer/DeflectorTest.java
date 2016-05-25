@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
@@ -61,9 +62,13 @@ public class DeflectorTest {
     private Indices indices;
     private Deflector deflector;
 
+    @Mock
+    private IndexRangeService indexRangeService;
+
     @Before
     public void setUp() {
-        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory, indices, deflectorIndexRangeCalculationTimeout);
+        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory,
+            indices, indexRangeService, deflectorIndexRangeCalculationTimeout);
     }
 
     @Test
@@ -175,6 +180,7 @@ public class DeflectorTest {
             indexReadOnlyJobFactory,
             singleIndexRangeJobFactory,
             indices,
+            indexRangeService,
             deflectorIndexRangeCalculationTimeout);
 
         final int number = deflector.getNewestTargetNumber();
@@ -198,6 +204,7 @@ public class DeflectorTest {
             indexReadOnlyJobFactory,
             singleIndexRangeJobFactory,
             indices,
+            indexRangeService,
             deflectorIndexRangeCalculationTimeout);
 
         final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
@@ -222,6 +229,7 @@ public class DeflectorTest {
             indexReadOnlyJobFactory,
             singleIndexRangeJobFactory,
             indices,
+            indexRangeService,
             deflectorIndexRangeCalculationTimeout);
 
         final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();

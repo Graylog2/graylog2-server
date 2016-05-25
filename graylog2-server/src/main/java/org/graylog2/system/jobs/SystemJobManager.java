@@ -26,7 +26,9 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.validation.constraints.Null;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -79,11 +81,19 @@ public class SystemJobManager {
                 name(this.getClass(), "executor-service"));
     }
 
-    public ScheduleResult submit(final SystemJob job) throws SystemJobConcurrencyException {
-        return submitWithDelay(job, 0, TimeUnit.SECONDS);
+    public String submit(final SystemJob job) throws SystemJobConcurrencyException {
+        return submitForResult(job).getJobId();
     }
 
-    public ScheduleResult submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+    public ScheduleResult submitForResult(final SystemJob job) throws SystemJobConcurrencyException {
+        return submitWithDelayForResult(job, 0, TimeUnit.SECONDS);
+    }
+
+    public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+        return submitWithDelayForResult(job, delay, timeUnit).getJobId();
+    }
+
+    public ScheduleResult submitWithDelayForResult(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);

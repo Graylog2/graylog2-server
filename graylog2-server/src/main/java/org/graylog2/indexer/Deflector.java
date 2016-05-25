@@ -21,6 +21,8 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -61,7 +63,8 @@ public class Deflector { // extends Ablenkblech
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
-    private final Duration deflectorIndexRangeCalculationTimeout;
+    private final IndexRangeService indexRangeService;
+    private final Duration deflectorIndexReadOnlyTimeout;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
@@ -76,14 +79,16 @@ public class Deflector { // extends Ablenkblech
                      final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices,
-                     @Named("deflector_index_range_calculation_timeout") final Duration deflectorIndexRangeCalculationTimeout) {
+                     final IndexRangeService indexRangeService,
+                     @Named("deflector_index_read_only_timeout")final Duration deflectorIndexReadOnlyTimeout) {
         this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
-        this.deflectorIndexRangeCalculationTimeout = deflectorIndexRangeCalculationTimeout;
+        this.indexRangeService = indexRangeService;
+        this.deflectorIndexReadOnlyTimeout = deflectorIndexReadOnlyTimeout;
 
         this.deflectorName = buildName(indexPrefix);
         this.indices = indices;
@@ -150,6 +155,7 @@ public class Deflector { // extends Ablenkblech
         ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
+        addDeflectorIndexRange(newTarget);
         LOG.info("Done!");
 
         // Point deflector to new index.
@@ -161,19 +167,6 @@ public class Deflector { // extends Ablenkblech
             pointTo(newTarget);
             activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
-            final SystemJobManager.ScheduleResult scheduleResult = addSingleIndexRanges(oldTarget);
-            if (scheduleResult != null) {
-                try {
-                    LOG.debug("Waiting for index calculation to complete");
-                    scheduleResult.getFuture().get(deflectorIndexRangeCalculationTimeout.toMilliseconds(), TimeUnit.MILLISECONDS);
-                    LOG.debug("Completed!");
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    LOG.warn("Unable to calculate index range of index which is to be cycled: ", e);
-                }
-            } else {
-                LOG.warn("Unable to schedule job calculating index range of index which is to be cycled.");
-            }
-
             // Re-pointing from existing old index to the new one.
             LOG.debug("Now switching over deflector alias.");
             pointTo(newTarget, oldTarget);
@@ -184,18 +177,27 @@ public class Deflector { // extends Ablenkblech
             // waiting 30 seconds to perform the background task should completely get rid of these errors.
             final SystemJob makeReadOnlyJob = indexReadOnlyJobFactory.create(oldTarget);
             try {
-                systemJobManager.submitWithDelay(makeReadOnlyJob, 30, TimeUnit.SECONDS);
+                final SystemJobManager.ScheduleResult scheduleResult = systemJobManager.submitWithDelayForResult(makeReadOnlyJob, 30, TimeUnit.SECONDS);
+                if (scheduleResult != null) {
+                    scheduleResult.getFuture().get(deflectorIndexReadOnlyTimeout.toMilliseconds(), TimeUnit.MILLISECONDS);
+                }
             } catch (SystemJobConcurrencyException e) {
                 LOG.error("Cannot set index <" + oldTarget + "> to read only. It won't be optimized.", e);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                e.printStackTrace();
             }
+            addSingleIndexRanges(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
-
-        addSingleIndexRanges(newTarget);
 
         LOG.info("Done!");
 
         activityWriter.write(activity);
+    }
+
+    private void addDeflectorIndexRange(String newTarget) {
+        final IndexRange deflectorRange = indexRangeService.createForDeflector(newTarget);
+        indexRangeService.save(deflectorRange);
     }
 
     public int getNewestTargetNumber() throws NoTargetIndexException {
@@ -289,7 +291,7 @@ public class Deflector { // extends Ablenkblech
     @Nullable
     private SystemJobManager.ScheduleResult addSingleIndexRanges(String indexName) {
         try {
-            return systemJobManager.submit(createNewSingleIndexRangeJobFactory.create(this, indexName));
+            return systemJobManager.submitForResult(createNewSingleIndexRangeJobFactory.create(this, indexName));
         } catch (SystemJobConcurrencyException e) {
             final String msg = "Could not calculate index ranges for index " + indexName + " after cycling deflector: Maximum concurrency of job is reached.";
             activityWriter.write(new Activity(msg, Deflector.class));
