@@ -62,7 +62,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                                                       DateTime createdAt,
                                                       @Assisted("userid") String creatorUserId,
                                                       Map<String, Object> parameters,
-                                                      @Assisted("title") String title);
+                                                      @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -80,7 +80,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                                     @Assisted DateTime createdAt,
                                     @Assisted("userid") String creatorUserId,
                                     @Assisted Map<String, Object> parameters,
-                                    @Assisted("title") String title) {
+                                    @Assisted("title") @Nullable String title) {
         super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters, title);
         this.searches = searches;
 

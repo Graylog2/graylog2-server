@@ -54,7 +54,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                                                         DateTime createdAt,
                                                         @Assisted("userid") String creatorUserId,
                                                         Map<String, Object> parameters,
-                                                        @Assisted("title") String title);
+                                                        @Assisted("title") @Nullable String title);
     }
 
     private final int time;

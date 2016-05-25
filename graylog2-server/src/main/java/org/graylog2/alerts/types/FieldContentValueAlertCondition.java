@@ -59,7 +59,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                                                              DateTime createdAt,
                                                              @Assisted("userid") String creatorUserId,
                                                              Map<String, Object> parameters,
-                                                             @Assisted("title") String title);
+                                                             @Assisted("title") @Nullable String title);
     }
 
     @AssistedInject
@@ -70,7 +70,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                                            @Assisted DateTime createdAt,
                                            @Assisted("userid") String creatorUserId,
                                            @Assisted Map<String, Object> parameters,
-                                           @Assisted("title") String title) {
+                                           @Assisted("title") @Nullable String title) {
         super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters, title);
         this.searches = searches;
         this.configuration = configuration;
