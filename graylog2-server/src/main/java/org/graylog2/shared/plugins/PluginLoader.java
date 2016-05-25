@@ -31,12 +31,15 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
@@ -82,25 +85,27 @@ public class PluginLoader {
         }
 
         LOG.debug("Loading [{}] plugins", files.length);
-        final ImmutableSet.Builder<Plugin> plugins = ImmutableSet.builder();
-        for (File jar : files) {
-            if (!jar.isFile()) {
-                LOG.debug("{} is not a file, skipping.", jar);
-            } else {
-                try {
-                    LOG.debug("Loading <" + jar.getAbsolutePath() + ">");
-                    final ClassLoader pluginClassLoader = URLClassLoader.newInstance(new URL[]{jar.toURI().toURL()});
-                    classLoader.addClassLoader(pluginClassLoader);
-                    final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
+        final List<URL> urls = Arrays.stream(files)
+                .filter(File::isFile)
+                .map(jar -> {
+                    try {
+                        LOG.debug("Loading <" + jar.getAbsolutePath() + ">");
+                        return jar.toURI().toURL();
+                    } catch (MalformedURLException e) {
+                        LOG.error("Cannot open JAR file for discovering plugins", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-                    plugins.addAll(pluginServiceLoader);
-                } catch (MalformedURLException e) {
-                    LOG.error("Cannot open JAR file for discovering plugins", e);
-                }
-            }
-        }
+        // Create one URL class loader for all plugins so they can see each other.
+        // This makes plugin inter-dependencies work.
+        classLoader.addClassLoader(URLClassLoader.newInstance(urls.toArray(new URL[urls.size()])));
 
-        return plugins.build();
+        final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
+
+        return ImmutableSet.copyOf(pluginServiceLoader);
     }
 
     public static class PluginComparator implements Comparator<Plugin> {
