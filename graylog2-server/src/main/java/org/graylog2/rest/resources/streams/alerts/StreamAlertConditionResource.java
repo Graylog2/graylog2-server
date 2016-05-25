@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.streams.alerts;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,11 +27,13 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.models.streams.alerts.AlertConditionListSummary;
+import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiresAuthentication
 @Api(value = "AlertConditions", description = "Manage stream alert conditions")
@@ -142,20 +144,25 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Map<String, Object> list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
+    public AlertConditionListSummary list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                                     @PathParam("streamId") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final Stream stream = streamService.load(streamid);
 
-        final List<Map<String, Object>> conditions = Lists.newArrayList();
-        for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
-            conditions.add(alertService.asMap(alertCondition));
-        }
+        final List<AlertCondition> alertConditions = streamService.getAlertConditions(stream);
+        final List<AlertConditionSummary> conditionSummaries = alertConditions
+            .stream()
+            .map((condition) -> AlertConditionSummary.create(condition.getId(),
+                condition.getTypeString().toLowerCase(),
+                condition.getCreatorUserId(),
+                condition.getCreatedAt().toDate(),
+                condition.getParameters(),
+                alertService.inGracePeriod(condition),
+                condition.getTitle()))
+            .collect(Collectors.toList());
 
-        return ImmutableMap.of(
-            "conditions", conditions,
-            "total", conditions.size());
+        return AlertConditionListSummary.create(conditionSummaries);
     }
 
     @DELETE
