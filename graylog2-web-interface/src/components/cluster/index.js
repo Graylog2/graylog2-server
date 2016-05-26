@@ -1,1 +1,1 @@
-export GraylogClusterOverview from './GraylogClusterOverview';
+export { default as GraylogClusterOverview } from './GraylogClusterOverview';
