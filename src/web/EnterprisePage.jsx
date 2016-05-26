@@ -1,46 +1,25 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
-import { PageHeader, Spinner } from 'components/common';
+
+import { PageHeader } from 'components/common';
+import { GraylogClusterOverview } from 'components/cluster';
 import PluginList from './PluginList';
 
 import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-
 const NodesStore = StoreProvider.getStore('Nodes');
-const NodesActions = ActionsProvider.getActions('Nodes');
 
 const EnterprisePage = React.createClass({
   mixins: [Reflux.connect(NodesStore)],
 
-  componentDidMount() {
-    NodesActions.list();
-  },
-
-  _clusterId() {
-    if (this.state.nodes) {
-      return Object.keys(this.state.nodes).map(id => this.state.nodes[id]).map(node => node.cluster_id)[0].toUpperCase();
-    }
-    return null;
-  },
-
-  _numberOfNodes() {
-    if (this.state.nodes) {
-      return Object.keys(this.state.nodes).length;
-    }
-
-    return null;
+  _isLoading() {
+    return !this.state.nodes;
   },
 
   render() {
     let orderLink = 'https://www.graylog.org/enterprise';
-    let numberOfNodes = <Spinner />;
-    let clusterId = <Spinner />;
 
-    if (this.state.nodes) {
-      orderLink = `https://www.graylog.org/enterprise?cid=${this._clusterId()}&nodes=${this._numberOfNodes()}`;
-      numberOfNodes = this._numberOfNodes();
-      clusterId = this._clusterId();
+    if (this.state.clusterId) {
+      orderLink = `https://www.graylog.org/enterprise?cid=${this.state.clusterId}&nodes=${this.state.nodeCount}`;
     }
 
     return (
@@ -58,18 +37,7 @@ const EnterprisePage = React.createClass({
           </span>
         </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <h2 style={{ marginBottom: 10 }}>Cluster Details</h2>
-            <dl style={{ marginBottom: 0 }}>
-              <dt>Cluster ID</dt>
-              <dd>{clusterId}</dd>
-              <dt>Number of nodes</dt>
-              <dd>{numberOfNodes}</dd>
-            </dl>
-          </Col>
-        </Row>
-
+        <GraylogClusterOverview />
         <PluginList/>
       </div>
     );
