@@ -26,6 +26,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,6 +85,7 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
+                mock(NodeId.class),
                 clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
@@ -125,6 +127,7 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
+                mock(NodeId.class),
                 clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
@@ -167,6 +170,7 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
+                mock(NodeId.class),
                 clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
@@ -191,6 +195,7 @@ public class IndexRotationThreadTest {
                 deflector,
                 cluster,
                 new NullActivityWriter(),
+                mock(NodeId.class),
                 clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );

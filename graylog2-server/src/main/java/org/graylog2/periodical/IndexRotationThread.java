@@ -27,6 +27,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ public class IndexRotationThread extends Periodical {
     private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final Indices indices;
+    private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
 
@@ -53,6 +55,7 @@ public class IndexRotationThread extends Periodical {
                                Deflector deflector,
                                Cluster cluster,
                                ActivityWriter activityWriter,
+                               NodeId nodeId,
                                ClusterConfigService clusterConfigService,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap) {
         this.notificationService = notificationService;
@@ -60,6 +63,7 @@ public class IndexRotationThread extends Periodical {
         this.cluster = cluster;
         this.activityWriter = activityWriter;
         this.indices = indices;
+        this.nodeId = nodeId;
         this.clusterConfigService = clusterConfigService;
         this.rotationStrategyMap = rotationStrategyMap;
     }
@@ -89,6 +93,8 @@ public class IndexRotationThread extends Periodical {
 
         if (config == null) {
             LOG.warn("No index management configuration found, not running index rotation!");
+            rotationProblemNotification("Index Rotation Problem!",
+                    "No index management configuration found, not running index rotation! Please fix your index rotation configuration!");
             return;
         }
 
@@ -96,6 +102,8 @@ public class IndexRotationThread extends Periodical {
 
         if (rotationStrategyProvider == null) {
             LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategy());
+            rotationProblemNotification("Index Rotation Problem!",
+                    "Index rotation strategy " + config.rotationStrategy() + " not found! Please fix your index rotation configuration!");
             return;
         }
 
@@ -107,6 +115,16 @@ public class IndexRotationThread extends Periodical {
         }
 
         rotationStrategy.rotate();
+    }
+
+    private void rotationProblemNotification(String title, String description) {
+        final Notification notification = notificationService.buildNow()
+                .addNode(nodeId.toString())
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.URGENT)
+                .addDetail("title", title)
+                .addDetail("description", description);
+        notificationService.publishIfFirst(notification);
     }
 
     protected void checkAndRepair() {

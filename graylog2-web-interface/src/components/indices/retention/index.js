@@ -3,6 +3,8 @@ import DeletionRetentionStrategyConfiguration from './DeletionRetentionStrategyC
 import DeletionRetentionStrategySummary from './DeletionRetentionStrategySummary';
 import ClosingRetentionStrategyConfiguration from './ClosingRetentionStrategyConfiguration';
 import ClosingRetentionStrategySummary from './ClosingRetentionStrategySummary';
+import NoopRetentionStrategyConfiguration from './NoopRetentionStrategyConfiguration';
+import NoopRetentionStrategySummary from './NoopRetentionStrategySummary';
 
 PluginStore.register(new PluginManifest({}, {
   indexRetentionConfig: [
@@ -17,6 +19,12 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Close Index',
       configComponent: ClosingRetentionStrategyConfiguration,
       summaryComponent: ClosingRetentionStrategySummary,
+    },
+    {
+      type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+      displayName: 'Do nothing',
+      configComponent: NoopRetentionStrategyConfiguration,
+      summaryComponent: NoopRetentionStrategySummary,
     },
   ],
 }));
