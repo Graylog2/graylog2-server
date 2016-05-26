@@ -32,7 +32,7 @@ const TimesList = React.createClass({
     return (
       <Row className="content">
         <Col md={12}>
-          <h2><i className="fa fa-clock-o"/> Time configuration</h2>
+          <h2>Time configuration</h2>
 
           <p className="description">
             Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system.

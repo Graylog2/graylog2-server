@@ -62,7 +62,7 @@ const UsageStatsOptIn = React.createClass({
       content = (
         <Row className="content">
           <Col md={12}>
-            <h2><i className="fa fa-bar-chart"></i> Anonymous Usage Statistics</h2>
+            <h2>Anonymous usage statistics</h2>
             <Alert bsStyle="info">
               {form}
             </Alert>
