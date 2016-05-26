@@ -16,6 +16,7 @@ const PluginList = React.createClass({
 
   ENTERPRISE_PLUGINS: {
     ArchivePlugin: 'Archive plugin',
+    LicensePlugin: 'License plugin',
   },
 
   _formatPlugin(pluginName) {
