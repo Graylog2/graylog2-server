@@ -13,10 +13,15 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 const IndexerClusterHealth = React.createClass({
   mixins: [Reflux.connect(IndexerClusterStore)],
   render() {
-    if (!this.state.health) {
-      return <Spinner />;
-    }
     const health = this.state.health;
+
+    let content;
+    if (health) {
+      content = <IndexerClusterHealthSummary health={health} />;
+    } else {
+      content = <Spinner />;
+    }
+
     return (
       <Row className="content">
         <Col md={12}>
@@ -27,7 +32,7 @@ const IndexerClusterHealth = React.createClass({
             <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Graylog documentation"/>.
           </SmallSupportLink>
 
-          <IndexerClusterHealthSummary health={health} />
+          {content}
         </Col>
       </Row>
     );

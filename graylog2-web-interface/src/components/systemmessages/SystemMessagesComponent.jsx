@@ -31,12 +31,27 @@ const SystemMessagesComponent = React.createClass({
     this.loadMessages(page);
   },
   render() {
-    if (!this.state.total) {
-      return <Spinner />;
-    }
+    let content;
+    if (this.state.total && this.state.messages) {
+      const numberPages = Math.ceil(this.state.total / this.PER_PAGE);
+      const paginatorSize = 10;
 
-    const numberPages = Math.ceil(this.state.total / this.PER_PAGE);
-    const paginatorSize = 10;
+      content = (
+        <div>
+          <SystemMessagesList messages={this.state.messages}/>
+
+          <nav style={{textAlign: 'center'}}>
+            <Pagination bsSize="small" items={numberPages}
+                        activePage={this.state.currentPage}
+                        onSelect={this._onSelected}
+                        prev next first last
+                        maxButtons={Math.min(paginatorSize, numberPages)}/>
+          </nav>
+        </div>
+      );
+    } else {
+      content = <Spinner />;
+    }
 
     return (
       <Row className="content">
@@ -49,16 +64,7 @@ const SystemMessagesComponent = React.createClass({
             will be raised for any events that required action.
           </p>
 
-          <SystemMessagesList messages={this.state.messages}/>
-
-
-          <nav style={{textAlign: 'center'}}>
-            <Pagination bsSize="small" items={numberPages}
-                        activePage={this.state.currentPage}
-                        onSelect={this._onSelected}
-                        prev next first last
-                        maxButtons={Math.min(paginatorSize, numberPages)}/>
-          </nav>
+          {content}
         </Col>
       </Row>
     );

@@ -50,9 +50,13 @@ const IndexerFailuresComponent = React.createClass({
     return 'ambulance';
   },
   render() {
+    let content;
     if (this.state.total === undefined) {
-      return <Spinner />;
+      content = <Spinner />;
+    } else {
+      content = this._formatFailuresSummary();
     }
+
     return (
       <Row className="content">
         <Col md={12}>
@@ -63,8 +67,7 @@ const IndexerFailuresComponent = React.createClass({
             <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Graylog documentation"/>.
           </SmallSupportLink>
 
-          {this._formatFailuresSummary()}
-
+          {content}
         </Col>
       </Row>
     );
