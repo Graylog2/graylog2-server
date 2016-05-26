@@ -80,7 +80,7 @@ public class Deflector { // extends Ablenkblech
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices,
                      final IndexRangeService indexRangeService,
-                     @Named("deflector_index_read_only_timeout")final Duration deflectorIndexReadOnlyTimeout) {
+                     @Named("deflector_index_read_only_timeout") final Duration deflectorIndexReadOnlyTimeout) {
         this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
@@ -181,10 +181,8 @@ public class Deflector { // extends Ablenkblech
                 if (scheduleResult != null) {
                     scheduleResult.getFuture().get(deflectorIndexReadOnlyTimeout.toMilliseconds(), TimeUnit.MILLISECONDS);
                 }
-            } catch (SystemJobConcurrencyException e) {
+            } catch (SystemJobConcurrencyException | InterruptedException | ExecutionException | TimeoutException e) {
                 LOG.error("Cannot set index <" + oldTarget + "> to read only. It won't be optimized.", e);
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                e.printStackTrace();
             }
             addSingleIndexRanges(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
