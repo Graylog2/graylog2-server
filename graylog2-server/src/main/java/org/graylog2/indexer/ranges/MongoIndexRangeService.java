@@ -105,9 +105,9 @@ public class MongoIndexRangeService implements IndexRangeService {
                     DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
                 ),
                 DBQuery.and(
-                    DBQuery.notExists("start"),
-                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
-                    DBQuery.is(IndexRange.FIELD_END, 0L)
+                    DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, 0),
+                    DBQuery.greaterThanEquals(IndexRange.FIELD_END, 0)
                 )
             )
         );
@@ -134,7 +134,7 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange createForDeflector(String index) {
-        return MongoIndexRange.create(index, DateTime.now(), new DateTime(0L), DateTime.now(), 0);
+        return MongoIndexRange.create(index, new DateTime(0), new DateTime(0), DateTime.now(), 0);
     }
 
     @Override
