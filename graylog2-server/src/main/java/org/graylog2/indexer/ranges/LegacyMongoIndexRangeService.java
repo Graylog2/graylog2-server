@@ -110,7 +110,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
 
     @Override
     public IndexRange createForDeflector(String index) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public int delete(String index) {

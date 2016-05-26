@@ -180,7 +180,7 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange createForDeflector(String index) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
