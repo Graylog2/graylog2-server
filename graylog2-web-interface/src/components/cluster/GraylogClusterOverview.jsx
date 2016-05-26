@@ -8,21 +8,10 @@ import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
 
 const GraylogClusterOverview = React.createClass({
-  mixins: [Reflux.listenTo(NodesStore, '_onNodesChange', '_onNodesChange')],
-
-  getInitialState() {
-    return {
-      clusterId: undefined,
-      nodeCount: 0,
-    };
-  },
-
-  _onNodesChange() {
-    this.setState({ clusterId: NodesStore.getClusterId(), nodeCount: NodesStore.getNodeCount() });
-  },
+  mixins: [Reflux.connect(NodesStore)],
 
   _isLoading() {
-    return !this.state.clusterId;
+    return !this.state.nodes;
   },
 
   render() {
@@ -32,7 +21,7 @@ const GraylogClusterOverview = React.createClass({
       content = (
         <dl className="system-dl" style={{ marginBottom: 0 }}>
           <dt>Cluster ID:</dt>
-          <dd>{this.state.clusterId}</dd>
+          <dd>{this.state.clusterId || 'Not available'}</dd>
           <dt>Number of nodes:</dt>
           <dd>{this.state.nodeCount}</dd>
         </dl>

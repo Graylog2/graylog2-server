@@ -9,6 +9,8 @@ const NodesStore = Reflux.createStore({
   listenables: [NodesActions],
   sourceUrl: '/system/cluster',
   nodes: undefined,
+  clusterId: undefined,
+  nodeCount: 0,
   INTERVAL: 5000, // 5 seconds
 
   init() {
@@ -23,7 +25,7 @@ const NodesStore = Reflux.createStore({
   },
 
   getNodesInfo() {
-    return {nodes: this.nodes};
+    return { nodes: this.nodes, clusterId: this.clusterId, nodeCount: this.nodeCount };
   },
 
   list() {
@@ -33,6 +35,8 @@ const NodesStore = Reflux.createStore({
         response.nodes.forEach((node) => {
           this.nodes[node.node_id] = node;
         });
+        this.clusterId = this._clusterId();
+        this.nodeCount = this._nodeCount();
         this._propagateState();
       });
 
@@ -43,12 +47,12 @@ const NodesStore = Reflux.createStore({
     return this.nodes[nodeId];
   },
 
-  getClusterId() {
+  _clusterId() {
     const nodeInCluster = Object.keys(this.nodes).map(id => this.nodes[id]).find(node => node.cluster_id);
     return (nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined);
   },
 
-  getNodeCount() {
+  _nodeCount() {
     return Object.keys(this.nodes).length;
   },
 
