@@ -295,6 +295,7 @@ public abstract class CmdLineTool implements CliCommand {
             final PluginMetaData metadata = plugin.metadata();
             if (capabilities().containsAll(metadata.getRequiredCapabilities())) {
                 if (version.sameOrHigher(metadata.getRequiredVersion())) {
+                    LOG.info("Loaded plugin: {}", plugin);
                     plugins.add(plugin);
                 } else {
                     LOG.error("Plugin \"" + metadata.getName() + "\" requires version " + metadata.getRequiredVersion() + " - not loading!");
@@ -306,7 +307,6 @@ public abstract class CmdLineTool implements CliCommand {
             }
         }
 
-        LOG.info("Loaded plugins: " + plugins);
         return plugins;
     }
 
