@@ -43,6 +43,14 @@ const NodesStore = Reflux.createStore({
     return this.nodes[nodeId];
   },
 
+  getClusterId() {
+    return Object.keys(this.nodes).map(id => this.nodes[id]).map(node => node.cluster_id)[0].toUpperCase();
+  },
+
+  getNodeCount() {
+    return Object.keys(this.nodes).length;
+  },
+
   _propagateState() {
     this.trigger(this.getNodesInfo());
   },

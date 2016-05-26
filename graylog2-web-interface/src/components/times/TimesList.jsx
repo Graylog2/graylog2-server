@@ -39,7 +39,7 @@ const TimesList = React.createClass({
             You can check timezone settings of specific graylog-server nodes on their respective detail page.
           </p>
 
-          <dl className="system-time">
+          <dl className="system-dl">
             <dt>User <em>{currentUser.username}</em>:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat}/></dd>
             <dt>Your web browser:</dt>
