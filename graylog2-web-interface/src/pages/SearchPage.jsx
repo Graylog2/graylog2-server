@@ -92,16 +92,31 @@ const SearchPage = React.createClass({
     const inputs = InputsStore.inputsAsMap(state.inputs);
     this.setState({ inputs: Immutable.Map(inputs) });
   },
-  _determineHistogramResolution(response) {
-    let queryRangeInMinutes;
+  _determineSearchDuration(response) {
+    const searchTo = response.to;
+    let searchFrom;
     if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
-      const oldestIndex = response.used_indices.sort((i1, i2) => moment(i2.end) - moment(i1.end))[0];
-      queryRangeInMinutes = moment(response.to).diff(oldestIndex.begin, 'minutes');
+      const sortedIndices = response.used_indices.sort((i1, i2) => moment(i1.end) - moment(i2.end));
+      // If we didn't calculate index ranges for the oldest index, pick the next one.
+      // This usually happens to the deflector, when index ranges weren't calculated for it yet.
+      const oldestIndex = moment(sortedIndices[0].end).valueOf() === 0 ? sortedIndices[1] : sortedIndices[0];
+
+      if (oldestIndex !== undefined) {
+        searchFrom = oldestIndex.begin;
+      } else {
+        // We don't know when we received the first message, assume the search duration is 0.
+        searchFrom = searchTo;
+      }
     } else {
-      queryRangeInMinutes = moment(response.to).diff(response.from, 'minutes');
+      searchFrom = response.from;
     }
 
-    const duration = moment.duration(queryRangeInMinutes, 'minutes');
+    const queryRangeInMinutes = moment(searchTo).diff(searchFrom, 'minutes');
+
+    return moment.duration(queryRangeInMinutes, 'minutes');
+  },
+  _determineHistogramResolution(response) {
+    const duration = this._determineSearchDuration(response);
 
     if (duration.asHours() < 12) {
       return 'minute';
