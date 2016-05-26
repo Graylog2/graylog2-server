@@ -106,13 +106,6 @@ public class IndexHelper {
             indices.add(indexRange);
         }
 
-        try {
-            final IndexRange deflectorIndexRange = indexRangeService.get(deflector.getName());
-            indices.add(deflectorIndexRange);
-        } catch (NotFoundException e) {
-            LOG.warn("Unable to add deflector index range to search indices: ", e);
-        }
-
         // Always include the deflector target
         return indices.build();
     }
