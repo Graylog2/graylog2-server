@@ -16,10 +16,12 @@ const ShowMetricsPage = React.createClass({
     location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(MetricsStore), Reflux.connect(NodesStore)],
-  componentDidMount() {
+  mixins: [Reflux.connect(NodesStore), Reflux.connect(MetricsStore), Reflux.listenTo(NodesStore, '_getMetrics')],
+
+  _getMetrics() {
     MetricsActions.names();
   },
+
   render() {
     if (!this.state.nodes || !this.state.metricsNames) {
       return <Spinner />;
