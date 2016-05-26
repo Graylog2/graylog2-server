@@ -32,14 +32,14 @@ const TimesList = React.createClass({
     return (
       <Row className="content">
         <Col md={12}>
-          <h2><i className="fa fa-clock-o"/> Time configuration</h2>
+          <h2>Time configuration</h2>
 
           <p className="description">
             Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system.
             You can check timezone settings of specific graylog-server nodes on their respective detail page.
           </p>
 
-          <dl className="system-time">
+          <dl className="system-dl">
             <dt>User <em>{currentUser.username}</em>:</dt>
             <dd><Timestamp dateTime={time} format={timeFormat}/></dd>
             <dt>Your web browser:</dt>

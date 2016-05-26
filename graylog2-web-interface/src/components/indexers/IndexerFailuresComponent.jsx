@@ -50,21 +50,24 @@ const IndexerFailuresComponent = React.createClass({
     return 'ambulance';
   },
   render() {
+    let content;
     if (this.state.total === undefined) {
-      return <Spinner />;
+      content = <Spinner />;
+    } else {
+      content = this._formatFailuresSummary();
     }
+
     return (
       <Row className="content">
         <Col md={12}>
-          <h2><i className="fa fa-truck" /> Indexer Failures</h2>
+          <h2>Indexer failures</h2>
 
           <SmallSupportLink>
             Every message that was not successfully indexed will be logged as an indexer failure. You can learn more about this feature in the{' '}
             <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Graylog documentation"/>.
           </SmallSupportLink>
 
-          {this._formatFailuresSummary()}
-
+          {content}
         </Col>
       </Row>
     );

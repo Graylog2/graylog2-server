@@ -7,6 +7,7 @@ import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
 import UsageStatsOptIn from 'components/usagestats/UsageStatsOptIn';
+import { GraylogClusterOverview } from 'components/cluster';
 
 const SystemOverviewPage = React.createClass({
   render() {
@@ -19,6 +20,8 @@ const SystemOverviewPage = React.createClass({
         <IfPermitted permissions="systemjobs:read">
           <SystemJobsComponent />
         </IfPermitted>
+
+        <GraylogClusterOverview />
 
         <IfPermitted permissions="indexercluster:read">
           <IndexerClusterHealth />
