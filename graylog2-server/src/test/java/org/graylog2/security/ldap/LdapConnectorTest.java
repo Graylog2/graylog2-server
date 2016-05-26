@@ -17,6 +17,7 @@
 
 package org.graylog2.security.ldap;
 
+import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.server.annotations.CreateLdapServer;
@@ -34,7 +35,9 @@ import org.apache.directory.server.ldap.LdapServer;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
 import java.util.Set;
@@ -75,6 +78,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LdapConnectorTest extends AbstractLdapTestUnit {
     private static final String ADMIN_DN = "uid=admin,ou=system";
     private static final String ADMIN_PASSWORD = "secret";
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     private LdapConnector connector;
     private LdapNetworkConnection connection;
@@ -209,5 +215,33 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         assertThat(groups)
                 .hasSize(3)
                 .contains("Developers", "QA", "Engineers");
+    }
+
+    @Test
+    public void authenticateThrowsIllegalArgumentExceptionIfPrincipalIsNull() throws LdapException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Binding with empty principal is forbidden.");
+        connector.authenticate(connection, null, "secret");
+    }
+
+    @Test
+    public void authenticateThrowsIllegalArgumentExceptionIfPrincipalIsEmpty() throws LdapException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Binding with empty principal is forbidden.");
+        connector.authenticate(connection, "", "secret");
+    }
+
+    @Test
+    public void authenticateThrowsIllegalArgumentExceptionIfCredentialsAreNull() throws LdapException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Binding with empty credentials is forbidden.");
+        connector.authenticate(connection, "principal", null);
+    }
+
+    @Test
+    public void authenticateThrowsIllegalArgumentExceptionIfCredentialsAreEmpty() throws LdapException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Binding with empty credentials is forbidden.");
+        connector.authenticate(connection, "principal", "");
     }
 }

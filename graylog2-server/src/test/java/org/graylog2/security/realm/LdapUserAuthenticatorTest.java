@@ -141,4 +141,14 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
         assertThat(authenticator.doGetAuthenticationInfo(VALID_TOKEN)).isNotNull();
         assertThat(authenticator.doGetAuthenticationInfo(INVALID_TOKEN)).isNull();
     }
+
+    @Test
+    public void testDoGetAuthenticationInfoDeniesEmptyPassword() throws Exception {
+        final LdapUserAuthenticator authenticator = new LdapUserAuthenticator(ldapConnector, ldapSettingsService, userService);
+
+        when(ldapSettingsService.load()).thenReturn(ldapSettings);
+
+        assertThat(authenticator.doGetAuthenticationInfo(new UsernamePasswordToken("john", (char[]) null))).isNull();
+        assertThat(authenticator.doGetAuthenticationInfo(new UsernamePasswordToken("john", new char[0]))).isNull();
+    }
 }

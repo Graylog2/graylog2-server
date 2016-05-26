@@ -46,13 +46,14 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class LdapConnector {
@@ -355,6 +356,9 @@ public class LdapConnector {
     }
 
     public boolean authenticate(LdapNetworkConnection connection, String principal, String credentials) throws LdapException {
+        checkArgument(!isNullOrEmpty(principal), "Binding with empty principal is forbidden.");
+        checkArgument(!isNullOrEmpty(credentials), "Binding with empty credentials is forbidden.");
+
         final BindRequestImpl bindRequest = new BindRequestImpl();
         bindRequest.setName(principal);
         bindRequest.setCredentials(credentials);
