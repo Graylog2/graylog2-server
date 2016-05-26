@@ -106,7 +106,6 @@ public class IndexHelper {
             indices.add(indexRange);
         }
 
-        // Always include the deflector target
         return indices.build();
     }
 }
