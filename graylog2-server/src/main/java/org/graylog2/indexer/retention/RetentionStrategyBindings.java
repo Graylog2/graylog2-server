@@ -19,6 +19,7 @@ package org.graylog2.indexer.retention;
 
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.plugin.PluginModule;
 
 public class RetentionStrategyBindings extends PluginModule {
@@ -26,5 +27,6 @@ public class RetentionStrategyBindings extends PluginModule {
     protected void configure() {
         addRetentionStrategy(DeletionRetentionStrategy.class);
         addRetentionStrategy(ClosingRetentionStrategy.class);
+        addRetentionStrategy(NoopRetentionStrategy.class);
     }
 }
