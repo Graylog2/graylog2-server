@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Spinner } from 'components/common';
 import { Metric } from 'components/metrics';
 
 const MetricsList = React.createClass({
@@ -17,10 +16,13 @@ const MetricsList = React.createClass({
     );
   },
   render() {
+    const metrics = this.props.names
+      .sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
+      .map((metric) => this._formatMetric(metric));
+
     return (
       <ul className="metric-list">
-        {this.props.names.sort((m1, m2) => m1.full_name.localeCompare(m2.full_name))
-          .map((metric) => this._formatMetric(metric))}
+        {metrics.length > 0 ? metrics : <li>No metrics match the given filter. Please ensure you use a valid regular expression</li>}
       </ul>
     );
   },
