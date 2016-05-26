@@ -24,6 +24,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -32,6 +34,8 @@ import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
 import org.graylog2.rest.models.system.indices.RetentionStrategySummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -57,6 +61,8 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class RetentionStrategyResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategyResource.class);
+
     private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
     private final ClusterConfigService clusterConfigService;
 
@@ -81,7 +87,9 @@ public class RetentionStrategyResource extends RestResource {
         final String strategyName = indexManagementConfig.retentionStrategy();
         final Provider<RetentionStrategy> provider = retentionStrategies.get(strategyName);
         if (provider == null) {
-            throw new InternalServerErrorException("Couldn't retrieve retention strategy provider");
+            LOG.error("Couldn't retrieve retention strategy provider for {}. Returning no-op strategy config.", strategyName);
+            return RetentionStrategySummary.create(NoopRetentionStrategy.class.getCanonicalName(),
+                    NoopRetentionStrategyConfig.createDefault());
         }
 
         final RetentionStrategy retentionStrategy = provider.get();
