@@ -26,6 +26,7 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class RebuildIndexRangesJob extends SystemJob {
@@ -85,7 +86,11 @@ public class RebuildIndexRangesJob extends SystemJob {
         indicesToCalculate = indices.length;
 
         Stopwatch sw = Stopwatch.createStarted();
+        final String deflectorIndexName = deflector.getName();
         for (String index : indices) {
+            if (deflectorIndexName.equals(index)) {
+                continue;
+            }
             if (cancelRequested) {
                 info("Stop requested. Not calculating next index range, not updating ranges.");
                 sw.stop();
