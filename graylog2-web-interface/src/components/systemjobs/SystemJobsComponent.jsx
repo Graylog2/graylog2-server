@@ -16,7 +16,7 @@ const SystemJobsComponent = React.createClass({
   componentDidMount() {
     SystemJobsActions.list();
 
-    this.interval = setInterval(2000, SystemJobsActions.list);
+    this.interval = setInterval(SystemJobsActions.list, 2000);
   },
   componentWillUnmount() {
     clearInterval(this.interval);
