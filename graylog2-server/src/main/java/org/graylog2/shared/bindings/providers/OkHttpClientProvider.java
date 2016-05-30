@@ -17,16 +17,24 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.collect.ImmutableList;
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.SocketAddress;
 import java.net.URI;
+import java.util.List;
+import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,6 +48,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Singleton
 public class OkHttpClientProvider implements Provider<OkHttpClient> {
+    private static final Logger LOG = LoggerFactory.getLogger(OkHttpClientProvider.class);
     protected final Duration connectTimeout;
     protected final Duration readTimeout;
     protected final Duration writeTimeout;
@@ -66,7 +75,26 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
 
         if (httpProxyUri != null) {
             final Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort()));
-            clientBuilder.proxy(proxy);
+            final ProxySelector proxySelector = new ProxySelector() {
+                @Override
+                public List<Proxy> select(URI uri) {
+                    switch (uri.getHost().toLowerCase(Locale.ENGLISH)) {
+                        case "localhost":
+                        case "127.0.1":
+                        case "::1":
+                            return ImmutableList.of(Proxy.NO_PROXY);
+                        default:
+                            return ImmutableList.of(proxy);
+                    }
+                }
+
+                @Override
+                public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
+                    LOG.warn("Unable to connect to proxy: ", ioe);
+                }
+            };
+
+            clientBuilder.proxySelector(proxySelector);
         }
 
         return clientBuilder.build();
