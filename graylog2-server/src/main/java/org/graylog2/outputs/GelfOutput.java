@@ -63,6 +63,8 @@ public class GelfOutput implements MessageOutput {
     private static final String CK_TCP_KEEP_ALIVE = "tcp_keep_alive";
     private static final String CK_TLS_VERIFICATION_ENABLED = "tls_verification_enabled";
     private static final String CK_TLS_TRUST_CERT_CHAIN = "tls_trust_cert_chain";
+    private static final String CK_QUEUE_SIZE = "queue_size";
+    private static final String CK_MAX_INFLIGHT_SENDS = "max_inflight_sends";
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
@@ -105,6 +107,8 @@ public class GelfOutput implements MessageOutput {
         final boolean tcpNoDelay = configuration.getBoolean(CK_TCP_NO_DELAY, false);
         final boolean tlsVerificationEnabled = configuration.getBoolean(CK_TLS_VERIFICATION_ENABLED, false);
         final String tlsTrustCertChain = configuration.getString(CK_TLS_TRUST_CERT_CHAIN);
+        final int queueSize = configuration.getInt(CK_QUEUE_SIZE, 512);
+        final int maxInflightSends = configuration.getInt(CK_MAX_INFLIGHT_SENDS, 512);
 
         if (isNullOrEmpty(protocol) || isNullOrEmpty(hostname) || !configuration.intIsSet(CK_PORT)) {
             throw new MessageOutputConfigurationException("Protocol and/or hostname missing!");
@@ -145,7 +149,9 @@ public class GelfOutput implements MessageOutput {
                 .connectTimeout(connectTimeout)
                 .reconnectDelay(reconnectDelay)
                 .tcpKeepAlive(tcpKeepAlive)
-                .tcpNoDelay(tcpNoDelay);
+                .tcpNoDelay(tcpNoDelay)
+                .queueSize(queueSize)
+                .maxInflightSends(maxInflightSends);
 
         if (tlsEnabled) {
             gelfConfiguration.enableTls();
@@ -286,6 +292,8 @@ public class GelfOutput implements MessageOutput {
             configurationRequest.addField(new BooleanField(CK_TCP_KEEP_ALIVE, "TCP Keep Alive", false, "Whether to send TCP keep alive packets"));
             configurationRequest.addField(new BooleanField(CK_TLS_VERIFICATION_ENABLED, "TLS verification", false, "Whether to verify peers when using TLS"));
             configurationRequest.addField(new TextField(CK_TLS_TRUST_CERT_CHAIN, "TLS Trust Certificate Chain", "", "Local file which contains the trust certificate chain", ConfigurationField.Optional.OPTIONAL));
+            configurationRequest.addField(new NumberField(CK_QUEUE_SIZE, "Internal buffer size", 512, "Buffer size to support asynchronous writes", ConfigurationField.Optional.OPTIONAL, NumberField.Attribute.ONLY_POSITIVE));
+            configurationRequest.addField(new NumberField(CK_MAX_INFLIGHT_SENDS, "Concurrent network requests", 512, "Maximum number of concurrent network operations until spinning", ConfigurationField.Optional.OPTIONAL, NumberField.Attribute.ONLY_POSITIVE));
 
             return configurationRequest;
         }
