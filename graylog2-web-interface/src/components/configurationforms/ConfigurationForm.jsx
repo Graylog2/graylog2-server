@@ -38,9 +38,11 @@ const ConfigurationForm = React.createClass({
     const effectiveTitleValue = (this.state && this.state.titleValue !== undefined ? this.state.titleValue : props.titleValue);
     const defaultValues = {};
 
-    Object.keys(props.configFields).forEach(field => {
-      defaultValues[field] = props.configFields[field].default_value;
-    });
+    if (props.configFields) {
+      Object.keys(props.configFields).forEach(field => {
+        defaultValues[field] = props.configFields[field].default_value;
+      });
+    }
 
     return {
       configFields: $.extend({}, props.configFields),
