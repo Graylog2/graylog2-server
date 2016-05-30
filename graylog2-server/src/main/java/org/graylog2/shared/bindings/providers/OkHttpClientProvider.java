@@ -80,7 +80,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
                 public List<Proxy> select(URI uri) {
                     switch (uri.getHost().toLowerCase(Locale.ENGLISH)) {
                         case "localhost":
-                        case "127.0.1":
+                        case "127.0.0.1":
                         case "::1":
                             return ImmutableList.of(Proxy.NO_PROXY);
                         default:
