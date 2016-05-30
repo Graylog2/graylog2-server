@@ -984,7 +984,7 @@
                 <plugin>
                     <groupId>com.versioneye</groupId>
                     <artifactId>versioneye-maven-plugin</artifactId>
-                    <version>3.9.1</version>
+                    <version>3.9.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
