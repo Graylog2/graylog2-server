@@ -28,13 +28,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
 
@@ -78,14 +79,15 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
             final ProxySelector proxySelector = new ProxySelector() {
                 @Override
                 public List<Proxy> select(URI uri) {
-                    switch (uri.getHost().toLowerCase(Locale.ENGLISH)) {
-                        case "localhost":
-                        case "127.0.0.1":
-                        case "::1":
+                    try {
+                        final InetAddress targetAddress = InetAddress.getByName(uri.getHost());
+                        if (targetAddress.isLoopbackAddress()) {
                             return ImmutableList.of(Proxy.NO_PROXY);
-                        default:
-                            return ImmutableList.of(proxy);
+                        }
+                    } catch (UnknownHostException e) {
+                        LOG.debug("Unable to resolve host name for proxy selection: ", e);
                     }
+                    return ImmutableList.of(proxy);
                 }
 
                 @Override
