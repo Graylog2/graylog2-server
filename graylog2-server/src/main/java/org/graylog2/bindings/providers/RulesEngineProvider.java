@@ -16,7 +16,6 @@
  */
 package org.graylog2.bindings.providers;
 
-import org.graylog2.Configuration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.rules.DroolsEngine;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class RulesEngineProvider implements Provider<RulesEngine> {
     private final RulesEngine rulesEngine;
 
     @Inject
-    public RulesEngineProvider(Configuration configuration, DroolsEngine droolsEngine,
+    public RulesEngineProvider(DroolsEngine droolsEngine,
                                @Named("rules_file") @Nullable String rulesFilePath) {
         this.rulesEngine = checkNotNull(droolsEngine);
 
