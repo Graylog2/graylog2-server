@@ -252,7 +252,7 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.1</version>
             </dependency>
 
             <dependency>
