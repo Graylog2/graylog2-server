@@ -8,26 +8,43 @@ const AlertConditionForm = React.createClass({
     type: React.PropTypes.string.isRequired,
     alertCondition: React.PropTypes.object,
   },
-  alertConditionsFactory: new AlertConditionsFactory(),
-  getValue() {
-    return this.refs.conditionForm.getValue();
+  getDefaultProps() {
+    return {
+      alertCondition: {
+      },
+    };
   },
+  getValue() {
+    return {
+      title: this.refs.title.value,
+      parameters: this.refs.conditionForm.getValue(),
+    };
+  },
+  alertConditionsFactory: new AlertConditionsFactory(),
+
   _formatConditionFormFields(type) {
     const typeDefinition = this.alertConditionsFactory.get(type);
 
     if (typeDefinition !== undefined) {
-      return <typeDefinition.configuration_form ref="conditionForm" alertCondition={this.props.alertCondition}/>;
+      return <typeDefinition.configuration_form ref="conditionForm" alertCondition={this.props.alertCondition.parameters}/>;
     }
 
     return undefined;
   },
   render() {
+    const alertCondition = this.props.alertCondition;
     return (
       <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
+        Title: <input ref="title" type="text" className="form-control" autoComplete="off" defaultValue={alertCondition.title}/>
+        <span className="help-text">
+          This title can be included in alert notifications.
+        </span>
+
+        <p />
         {this._formatConditionFormFields(this.props.type)}
       </Well>
     );
-  }
+  },
 });
 
 export default AlertConditionForm;

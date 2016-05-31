@@ -49,7 +49,12 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     }
 
     public interface Factory {
-        MessageCountAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
+        MessageCountAlertCondition createAlertCondition(Stream stream,
+                                                        @Assisted("id") String id,
+                                                        DateTime createdAt,
+                                                        @Assisted("userid") String creatorUserId,
+                                                        Map<String, Object> parameters,
+                                                        @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -58,8 +63,14 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final Searches searches;
 
     @AssistedInject
-    public MessageCountAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
-        super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
+    public MessageCountAlertCondition(Searches searches,
+                                      @Assisted Stream stream,
+                                      @Nullable @Assisted("id") String id,
+                                      @Assisted DateTime createdAt,
+                                      @Assisted("userid") String creatorUserId,
+                                      @Assisted Map<String, Object> parameters,
+                                      @Nullable @Assisted("title") String title) {
+        super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters, title);
 
         this.searches = searches;
         this.time = getNumber(parameters.get("time")).orElse(0).intValue();

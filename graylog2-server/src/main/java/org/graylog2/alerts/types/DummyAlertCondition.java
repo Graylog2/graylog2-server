@@ -26,8 +26,8 @@ import java.util.Map;
 public class DummyAlertCondition extends AbstractAlertCondition {
     final String description = "Dummy alert to test notifications";
 
-    public DummyAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        super(stream, id, Type.DUMMY, createdAt, creatorUserId, parameters);
+    public DummyAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
+        super(stream, id, Type.DUMMY, createdAt, creatorUserId, parameters, title);
     }
 
     @Override

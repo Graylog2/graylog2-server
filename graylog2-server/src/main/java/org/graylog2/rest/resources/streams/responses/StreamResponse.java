@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
+import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
@@ -57,7 +58,7 @@ public abstract class StreamResponse {
     public abstract Collection<StreamRule> rules();
 
     @JsonProperty("alert_conditions")
-    public abstract Collection<AlertCondition> alertConditions();
+    public abstract Collection<AlertConditionSummary> alertConditions();
 
     @JsonProperty("alert_receivers")
     public abstract AlertReceivers alertReceivers();
@@ -78,7 +79,7 @@ public abstract class StreamResponse {
                                         @JsonProperty("created_at") String createdAt,
                                         @JsonProperty("disabled") boolean disabled,
                                         @JsonProperty("rules") Collection<StreamRule> rules,
-                                        @JsonProperty("alert_conditions") Collection<AlertCondition> alertConditions,
+                                        @JsonProperty("alert_conditions") Collection<AlertConditionSummary> alertConditions,
                                         @JsonProperty("alert_receivers") AlertReceivers alertReceivers,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack) {

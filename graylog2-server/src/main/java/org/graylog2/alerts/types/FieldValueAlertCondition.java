@@ -57,7 +57,12 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     }
 
     public interface Factory {
-        FieldValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
+        FieldValueAlertCondition createAlertCondition(Stream stream,
+                                                      @Assisted("id") String id,
+                                                      DateTime createdAt,
+                                                      @Assisted("userid") String creatorUserId,
+                                                      Map<String, Object> parameters,
+                                                      @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -69,8 +74,14 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private final Searches searches;
 
     @AssistedInject
-    public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
-        super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
+    public FieldValueAlertCondition(Searches searches,
+                                    @Assisted Stream stream,
+                                    @Nullable @Assisted("id") String id,
+                                    @Assisted DateTime createdAt,
+                                    @Assisted("userid") String creatorUserId,
+                                    @Assisted Map<String, Object> parameters,
+                                    @Assisted("title") @Nullable String title) {
+        super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters, title);
         this.searches = searches;
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));

@@ -42,6 +42,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "Stream ID: ${stream.id}\n" +
             "Stream title: ${stream.title}\n" +
             "Stream description: ${stream.description}\n" +
+            "Alert Condition Title: ${alertCondition.title}\n" +
             "${if stream_url}Stream URL: ${stream_url}${end}\n" +
             "\n" +
             "Triggered condition: ${check_result.triggeredCondition}\n" +
@@ -107,6 +108,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
         model.put("stream", stream);
         model.put("check_result", checkResult);
         model.put("stream_url", buildStreamDetailsURL(configuration.getWebInterfaceUri(), checkResult, stream));
+        model.put("alertCondition", checkResult.getTriggeredCondition());
 
         final List<Message> messages = firstNonNull(backlog, Collections.<Message>emptyList());
         model.put("backlog", messages);

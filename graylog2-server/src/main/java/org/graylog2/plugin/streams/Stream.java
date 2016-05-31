@@ -50,8 +50,6 @@ public interface Stream extends Persisted {
 
     String getContentPack();
 
-    Collection<AlertCondition> getAlertConditions();
-
     void setTitle(String title);
 
     void setDescription(String description);

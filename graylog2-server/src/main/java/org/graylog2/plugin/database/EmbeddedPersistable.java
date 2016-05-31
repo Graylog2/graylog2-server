@@ -23,6 +23,6 @@ import java.util.Map;
  */
 public interface EmbeddedPersistable {
 
-    public Map<String, Object> getPersistedFields();
+    Map<String, Object> getPersistedFields();
 
 }

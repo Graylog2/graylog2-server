@@ -14,34 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.streams.alerts.requests;
+package org.graylog2.rest.models.streams.alerts;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.List;
 
-@JsonAutoDetect
 @AutoValue
-public abstract class CreateConditionRequest {
-    @JsonProperty("type")
-    @Nullable
-    public abstract String type();
+@JsonAutoDetect
+public abstract class AlertConditionListSummary {
+    @JsonProperty("total")
+    public abstract long total();
 
-    @JsonProperty("title")
-    @Nullable
-    public abstract String title();
-
-    @JsonProperty("parameters")
-    public abstract Map<String, Object> parameters();
+    @JsonProperty("conditions")
+    public abstract List<AlertConditionSummary> conditions();
 
     @JsonCreator
-    public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
-                                                @JsonProperty("title") @Nullable String title,
-                                                @JsonProperty("parameters") Map<String, Object> parameters) {
-        return new AutoValue_CreateConditionRequest(type, title, parameters);
+    public static AlertConditionListSummary create(@JsonProperty("total") long total,
+                                                   @JsonProperty("conditions") List<AlertConditionSummary> conditions) {
+        return new AutoValue_AlertConditionListSummary(total, conditions);
+    }
+
+    public static AlertConditionListSummary create(@JsonProperty("conditions") List<AlertConditionSummary> conditions) {
+        return new AutoValue_AlertConditionListSummary(conditions.size(), conditions);
     }
 }

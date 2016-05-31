@@ -134,11 +134,6 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public Collection<AlertCondition> getAlertConditions() {
-        return Collections.emptyList();
-    }
-
-    @Override
     public Map<String, Object> asMap(List<StreamRule> streamRules) {
         return Maps.newHashMap();
     }

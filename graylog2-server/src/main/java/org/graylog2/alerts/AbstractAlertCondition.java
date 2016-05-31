@@ -17,7 +17,7 @@
 package org.graylog2.alerts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
@@ -40,7 +40,12 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         MESSAGE_COUNT,
         FIELD_VALUE,
         FIELD_CONTENT_VALUE,
-        DUMMY
+        DUMMY;
+
+        @JsonValue
+        public String toString() {
+            return super.toString().toLowerCase(Locale.ENGLISH);
+        }
     }
 
     protected final String id;
@@ -49,10 +54,12 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final DateTime createdAt;
     protected final String creatorUserId;
     protected final int grace;
+    protected final String title;
 
     private final Map<String, Object> parameters;
 
-    protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+    protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
+        this.title = title;
         if (id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
@@ -82,6 +89,11 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     @Override
     public String getTypeString() {
         return type.toString();
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
     }
 
     @Override
@@ -123,6 +135,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
                 .put("creator_user_id", creatorUserId)
                 .put("created_at", Tools.getISO8601String(createdAt))
                 .put("parameters", parameters)
+                .put("title", title)
                 .build();
     }
 

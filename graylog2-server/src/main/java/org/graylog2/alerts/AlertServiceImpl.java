@@ -89,10 +89,10 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         BasicDBObject sort = new BasicDBObject("triggered_at", -1);
 
         final List<DBObject> alertObjects = query(AlertImpl.class,
-                qb.get(),
-                sort,
-                AlertImpl.MAX_LIST_COUNT,
-                0
+            qb.get(),
+            sort,
+            AlertImpl.MAX_LIST_COUNT,
+            0
         );
 
         List<Alert> alerts = Lists.newArrayList();
@@ -107,7 +107,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     @Override
     public int triggeredSecondsAgo(String streamId, String conditionId) {
         DBObject query = QueryBuilder.start("stream_id").is(streamId)
-                .and("condition_id").is(conditionId).get();
+            .and("condition_id").is(conditionId).get();
         BasicDBObject sort = new BasicDBObject("triggered_at", -1);
 
         DBObject alert = findOne(AlertImpl.class, query, sort);
@@ -142,21 +142,28 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         }
 
         return createAlertCondition(type,
-                stream,
-                (String) fields.get("id"),
-                DateTime.parse((String) fields.get("created_at")),
-                (String) fields.get("creator_user_id"),
-                (Map<String, Object>) fields.get("parameters"));
+            stream,
+            (String) fields.get("id"),
+            DateTime.parse((String) fields.get("created_at")),
+            (String) fields.get("creator_user_id"),
+            (Map<String, Object>) fields.get("parameters"),
+            (String) fields.get("title"));
     }
 
-    private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type, Stream stream, String id, DateTime createdAt, String creatorId, Map<String, Object> parameters) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type,
+                                                        Stream stream,
+                                                        String id,
+                                                        DateTime createdAt,
+                                                        String creatorId,
+                                                        Map<String, Object> parameters,
+                                                        String title) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         switch (type) {
             case MESSAGE_COUNT:
-                return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
+                return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
             case FIELD_VALUE:
-                return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
+                return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
             case FIELD_CONTENT_VALUE:
-                return fieldContentValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
+                return fieldContentValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
         }
 
         throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
@@ -176,14 +183,14 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
         }
 
-        return createAlertCondition(alertConditionType, stream, null, Tools.nowUTC(), userId, ccr.parameters());
+        return createAlertCondition(alertConditionType, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
 
     @Override
     public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type = ((AbstractAlertCondition) alertCondition).getType();
+        final AbstractAlertCondition.Type type = ((AbstractAlertCondition) alertCondition).getType();
 
-        Map<String, Object> parameters = ccr.parameters();
+        final Map<String, Object> parameters = ccr.parameters();
         for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {
             if (!parameters.containsKey(stringObjectEntry.getKey())) {
                 parameters.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());
@@ -191,11 +198,12 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         }
 
         return createAlertCondition(type,
-                alertCondition.getStream(),
-                alertCondition.getId(),
-                alertCondition.getCreatedAt(),
-                alertCondition.getCreatorUserId(),
-                parameters
+            alertCondition.getStream(),
+            alertCondition.getId(),
+            alertCondition.getCreatedAt(),
+            alertCondition.getCreatorUserId(),
+            parameters,
+            ccr.title()
         );
     }
 
@@ -230,14 +238,19 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
-        return ImmutableMap.<String, Object>builder()
-                .put("id", alertCondition.getId())
-                .put("type", alertCondition.getTypeString().toLowerCase(Locale.ENGLISH))
-                .put("creator_user_id", alertCondition.getCreatorUserId())
-                .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
-                .put("parameters", alertCondition.getParameters())
-                .put("in_grace", inGracePeriod(alertCondition))
-                .build();
+        ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
+            .put("id", alertCondition.getId())
+            .put("type", alertCondition.getTypeString().toLowerCase(Locale.ENGLISH))
+            .put("creator_user_id", alertCondition.getCreatorUserId())
+            .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
+            .put("parameters", alertCondition.getParameters())
+            .put("in_grace", inGracePeriod(alertCondition));
+
+        if (alertCondition.getTitle() != null) {
+            builder = builder.put("title", alertCondition.getTitle());
+        }
+
+        return builder.build();
     }
 
     @Override
@@ -247,10 +260,10 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         BasicDBObject sort = new BasicDBObject("triggered_at", -1);
 
         final List<DBObject> alertObjects = query(AlertImpl.class,
-                qb.get(),
-                sort,
-                limit,
-                skip
+            qb.get(),
+            sort,
+            limit,
+            skip
         );
 
         final List<Alert> alerts = Lists.newArrayListWithCapacity(alertObjects.size());

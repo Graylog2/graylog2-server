@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -36,6 +37,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -90,15 +92,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
     @Override
     public List<StreamRule> getStreamRules() {
         return this.streamRules;
-    }
-
-    @Override
-    public Collection<AlertCondition> getAlertConditions() {
-        if (!this.fields.containsKey(EMBEDDED_ALERT_CONDITIONS)) {
-            return Collections.emptyList();
-        } else {
-            return (Collection<AlertCondition>)this.fields.get(EMBEDDED_ALERT_CONDITIONS);
-        }
     }
 
     @Override

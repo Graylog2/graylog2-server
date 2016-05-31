@@ -44,7 +44,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
     public void testConstructor() throws Exception {
         final Map<String, Object> parameters = getParametersMap(0, 0, MessageCountAlertCondition.ThresholdType.MORE, 0);
 
-        final MessageCountAlertCondition messageCountAlertCondition = getMessageCountAlertCondition(parameters);
+        final MessageCountAlertCondition messageCountAlertCondition = getMessageCountAlertCondition(parameters, alertConditionTitle);
 
         assertNotNull(messageCountAlertCondition);
         assertNotNull(messageCountAlertCondition.getDescription());
@@ -114,7 +114,8 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         final int time = 10;
 
         final MessageCountAlertCondition messageCountAlertCondition = getMessageCountAlertCondition(
-                getParametersMap(grace, time, MessageCountAlertCondition.ThresholdType.MORE, threshold)
+            getParametersMap(grace, time, MessageCountAlertCondition.ThresholdType.MORE, threshold),
+            alertConditionTitle
         );
 
 
@@ -126,20 +127,20 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
         alertLastTriggered(0);
         assertTrue("Alert condition should be in grace period because grace is greater than zero and alert has just been triggered!",
-                alertService.inGracePeriod(messageCountAlertCondition));
+            alertService.inGracePeriod(messageCountAlertCondition));
         final AlertCondition.CheckResult resultJustTriggered = alertService.triggered(messageCountAlertCondition);
         assertNotTriggered(resultJustTriggered);
 
         alertLastTriggered(grace * 60 - 1);
         assertTrue("Alert condition should be in grace period because grace is greater than zero and alert has been triggered during grace period!",
-                alertService.inGracePeriod(messageCountAlertCondition));
+            alertService.inGracePeriod(messageCountAlertCondition));
         final AlertCondition.CheckResult resultTriggeredAgo = alertService.triggered(messageCountAlertCondition);
         assertNotTriggered(resultTriggeredAgo);
     }
 
     protected MessageCountAlertCondition getConditionWithParameters(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
         Map<String, Object> parameters = simplestParameterMap(type, threshold);
-        return getMessageCountAlertCondition(parameters);
+        return getMessageCountAlertCondition(parameters, alertConditionTitle);
     }
 
     protected Map<String, Object> simplestParameterMap(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
@@ -157,14 +158,15 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    protected MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters) {
+    protected MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters, String title) {
         return new MessageCountAlertCondition(
-                searches,
-                stream,
-                CONDITION_ID,
-                Tools.nowUTC(),
-                STREAM_CREATOR,
-                parameters);
+            searches,
+            stream,
+            CONDITION_ID,
+            Tools.nowUTC(),
+            STREAM_CREATOR,
+            parameters,
+            title);
     }
 
     protected Map<String, Object> getParametersMap(Integer grace, Integer time, MessageCountAlertCondition.ThresholdType type, Number threshold) {
