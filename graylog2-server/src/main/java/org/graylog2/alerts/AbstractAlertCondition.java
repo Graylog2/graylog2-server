@@ -17,7 +17,7 @@
 package org.graylog2.alerts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
@@ -40,7 +40,12 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         MESSAGE_COUNT,
         FIELD_VALUE,
         FIELD_CONTENT_VALUE,
-        DUMMY
+        DUMMY;
+
+        @JsonValue
+        public String toString() {
+            return super.toString().toLowerCase(Locale.ENGLISH);
+        }
     }
 
     protected final String id;
