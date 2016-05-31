@@ -24,8 +24,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -33,6 +31,8 @@ import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -96,6 +96,9 @@ public class JournalReader extends AbstractExecutionThreadService {
             case RUNNING:
                 shouldBeReading = true;
                 break;
+            case THROTTLED:
+                shouldBeReading = true;
+                break;
             case PAUSED:
                 shouldBeReading = false;
                 break;
@@ -106,9 +109,9 @@ public class JournalReader extends AbstractExecutionThreadService {
                 triggerShutdown();
                 break;
             case OVERRIDE_LB_DEAD:
-                // don't care, keep processing journal
-                break;
             case OVERRIDE_LB_ALIVE:
+            case OVERRIDE_LB_THROTTLED:
+            default:
                 // don't care, keep processing journal
                 break;
         }

@@ -16,9 +16,6 @@
  */
 package org.graylog2.plugin.lifecycles;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public enum Lifecycle {
 
     UNINITIALIZED("Uninitialized", LoadBalancerStatus.DEAD),
@@ -27,10 +24,12 @@ public enum Lifecycle {
     PAUSED("Paused", LoadBalancerStatus.ALIVE),
     HALTING("Halting", LoadBalancerStatus.DEAD),
     FAILED("Failed", LoadBalancerStatus.DEAD),
+    THROTTLED("Throttled", LoadBalancerStatus.THROTTLED),
 
     // Manual lifecycle override, usually set by REST calls.
     OVERRIDE_LB_DEAD("Override lb:DEAD", LoadBalancerStatus.DEAD),
-    OVERRIDE_LB_ALIVE("Override lb:ALIVE", LoadBalancerStatus.ALIVE);
+    OVERRIDE_LB_ALIVE("Override lb:ALIVE", LoadBalancerStatus.ALIVE),
+    OVERRIDE_LB_THROTTLED("Override lb:THROTTLED", LoadBalancerStatus.THROTTLED);
 
     private final String description;
     private final LoadBalancerStatus loadBalancerStatus;
