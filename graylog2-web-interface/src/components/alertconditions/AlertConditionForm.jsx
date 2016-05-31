@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Well } from 'react-bootstrap';
+import { Well } from 'react-bootstrap';
 
 import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory';
 
@@ -8,20 +8,20 @@ const AlertConditionForm = React.createClass({
     type: React.PropTypes.string.isRequired,
     alertCondition: React.PropTypes.object,
   },
-  alertConditionsFactory: new AlertConditionsFactory(),
+  getDefaultProps() {
+    return {
+      alertCondition: {
+        parameters: {},
+      },
+    };
+  },
   getValue() {
     return {
       title: this.refs.title.value,
       parameters: this.refs.conditionForm.getValue(),
     };
   },
-  getDefaultProps() {
-    return {
-      alertCondition: {
-        parameters: {},
-      }
-    };
-  },
+  alertConditionsFactory: new AlertConditionsFactory(),
 
   _formatConditionFormFields(type) {
     const typeDefinition = this.alertConditionsFactory.get(type);
@@ -33,7 +33,7 @@ const AlertConditionForm = React.createClass({
     return undefined;
   },
   render() {
-    const alertCondition = this.props.alertCondition || {parameters: {}};
+    const alertCondition = this.props.alertCondition || { parameters: {} };
     return (
       <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
         Title: <input ref="title" type="text" className="form-control" autoComplete="off" defaultValue={alertCondition.title}/>
@@ -45,7 +45,7 @@ const AlertConditionForm = React.createClass({
         {this._formatConditionFormFields(this.props.type)}
       </Well>
     );
-  }
+  },
 });
 
 export default AlertConditionForm;

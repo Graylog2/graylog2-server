@@ -19,7 +19,7 @@ const AlertCondition = React.createClass({
     };
   },
   _onEdit() {
-    this.setState({edit: !this.state.edit});
+    this.setState({ edit: !this.state.edit });
   },
   _onDelete() {
     if (window.confirm('Really delete alarm condition?')) {
@@ -32,7 +32,7 @@ const AlertCondition = React.createClass({
     request.type = this.props.alertCondition.type;
     AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request)
     .then(() => {
-      this.setState({edit: false});
+      this.setState({ edit: false });
     });
   },
   _formatTitle() {
@@ -68,7 +68,7 @@ const AlertCondition = React.createClass({
             </form>}
           </Col>
 
-          <Col md={3} style={{textAlign: 'right'}}>
+          <Col md={3} style={{ textAlign: 'right' }}>
             <Button bsStyle="success" onClick={this._onEdit}>Edit condition</Button>
             {' '}
             <Button bsStyle="danger" onClick={this._onDelete}>Delete condition</Button>
