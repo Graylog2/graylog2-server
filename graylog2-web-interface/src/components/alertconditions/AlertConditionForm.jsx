@@ -11,7 +11,6 @@ const AlertConditionForm = React.createClass({
   getDefaultProps() {
     return {
       alertCondition: {
-        parameters: {},
       },
     };
   },
@@ -33,7 +32,7 @@ const AlertConditionForm = React.createClass({
     return undefined;
   },
   render() {
-    const alertCondition = this.props.alertCondition || { parameters: {} };
+    const alertCondition = this.props.alertCondition;
     return (
       <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
         Title: <input ref="title" type="text" className="form-control" autoComplete="off" defaultValue={alertCondition.title}/>
