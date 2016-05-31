@@ -1,10 +1,9 @@
 import Reflux from 'reflux';
 import jQuery from 'jquery';
-import moment from 'moment';
 import md5 from 'md5';
 
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+import MessageFormatter from 'logic/message/MessageFormatter';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -32,23 +31,7 @@ const UniversalSearchStore = Reflux.createStore({
         };
       });
 
-      result.messages = result.messages.map((messageSummary) => {
-        const message = messageSummary.message;
-        const filteredFields = MessageFieldsFilter.filterFields(message);
-        const newMessage = {
-          id: message._id,
-          timestamp: moment(message.timestamp).unix(),
-          filtered_fields: filteredFields,
-          formatted_fields: filteredFields,
-          fields: message,
-          index: messageSummary.index,
-          source_node_id: message.gl2_source_node,
-          source_input_id: message.gl2_source_input,
-          stream_ids: message.streams,
-          highlight_ranges: messageSummary.highlight_ranges,
-        };
-        return newMessage;
-      });
+      result.messages = result.messages.map(MessageFormatter.formatMessageSummary);
 
       return result;
     });
