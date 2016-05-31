@@ -30,6 +30,7 @@ const MessageDetail = React.createClass({
     streams: PropTypes.object,
     customFieldActions: PropTypes.node,
     searchConfig: PropTypes.object,
+    isSimulation: PropTypes.bool,
   },
 
   getInitialState() {
@@ -98,7 +99,7 @@ const MessageDetail = React.createClass({
       );
     }
 
-    const messageUrl = ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
+    const messageUrl = this.props.isSimulation ? '#' : ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
 
     let streamList = null;
     this._getAllStreams().forEach((stream) => {
@@ -178,23 +179,39 @@ const MessageDetail = React.createClass({
       );
     }
 
+    let messageActions;
+    if (!this.props.isSimulation) {
+      messageActions = (
+        <ButtonGroup className="pull-right" bsSize="small">
+          <Button href={messageUrl}>Permalink</Button>
+
+          <ClipboardButton title="Copy ID" text={this.props.message.id} />
+          {surroundingSearchButton}
+          {testAgainstStream}
+        </ButtonGroup>
+      );
+    }
+
+    let messageTitle;
+    if (this.props.isSimulation) {
+      messageTitle = `Simulation of processing ${this.props.message.id}`;
+    } else {
+      messageTitle = (
+        <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
+          <a href="#" style={{ color: '#000' }}>{this.props.message.id}</a>
+        </LinkContainer>
+      );
+    }
+
     return (<div>
 
       <Row className="row-sm">
         <Col md={12}>
-          <ButtonGroup className="pull-right" bsSize="small">
-            <Button href={messageUrl}>Permalink</Button>
-
-            <ClipboardButton title="Copy ID" text={this.props.message.id} />
-            {surroundingSearchButton}
-            {testAgainstStream}
-          </ButtonGroup>
+          {messageActions}
           <h3>
             <i className="fa fa-envelope" />
             &nbsp;
-            <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-              <a href="#" style={{ color: '#000' }}>{this.props.message.id}</a>
-            </LinkContainer>
+            {messageTitle}
           </h3>
         </Col>
       </Row>
@@ -205,7 +222,7 @@ const MessageDetail = React.createClass({
             {receivedBy}
 
             <dt>Stored in index</dt>
-            <dd>{this.props.message.index}</dd>
+            <dd>{this.props.isSimulation ? 'Simulations are not stored' : this.props.message.index}</dd>
 
             { streamIds.size > 0 && <dt>Routed into streams</dt> }
             { streamIds.size > 0 &&
