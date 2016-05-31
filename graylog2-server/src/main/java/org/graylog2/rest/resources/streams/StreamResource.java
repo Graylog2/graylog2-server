@@ -31,6 +31,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -41,6 +42,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
+import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
@@ -99,16 +101,19 @@ public class StreamResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    private final AlertService alertService;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
+                          AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                          AlertService alertService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
+        this.alertService = alertService;
     }
 
     @POST
@@ -387,7 +392,17 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
         final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
-        final Collection<AlertCondition> alertConditions = streamService.getAlertConditions(stream);
+        final Collection<AlertConditionSummary> alertConditions = streamService.getAlertConditions(stream)
+            .stream()
+            .map((alertCondition) -> AlertConditionSummary.create(
+                alertCondition.getId(),
+                alertCondition.getTypeString(),
+                alertCondition.getCreatorUserId(),
+                alertCondition.getCreatedAt().toDate(),
+                alertCondition.getParameters(),
+                alertService.inGracePeriod(alertCondition),
+                alertCondition.getTitle()))
+            .collect(Collectors.toList());
         return StreamResponse.create(
             stream.getId(),
             (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
