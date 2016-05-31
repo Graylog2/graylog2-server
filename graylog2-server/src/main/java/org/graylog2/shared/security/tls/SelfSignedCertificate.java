@@ -16,23 +16,33 @@
  */
 package org.graylog2.shared.security.tls;
 
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.bc.BcX509ExtensionUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jce.X509KeyUsage;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.x509.AlgorithmId;
-import sun.security.x509.CertificateAlgorithmId;
-import sun.security.x509.CertificateIssuerName;
-import sun.security.x509.CertificateSerialNumber;
-import sun.security.x509.CertificateSubjectName;
-import sun.security.x509.CertificateValidity;
-import sun.security.x509.CertificateVersion;
-import sun.security.x509.CertificateX509Key;
-import sun.security.x509.X500Name;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -142,7 +152,7 @@ public final class SelfSignedCertificate {
         try {
             certificate = generateCertificate(fqdn, keypair, random);
         } catch (Throwable t) {
-            LOG.debug("Failed to generate a self-signed X.509 certificate using sun.security.x509:", t);
+            LOG.debug("Failed to generate a self-signed X.509 certificate using X509v3CertificateBuilder:", t);
 
             throw new CertificateException("No provider succeeded to generate a self-signed certificate. See debug log for the root cause.");
         }
@@ -165,38 +175,46 @@ public final class SelfSignedCertificate {
         return keypair;
     }
 
+    private static SubjectKeyIdentifier createSubjectKeyIdentifier(Key publicKey) throws IOException {
+        try (ASN1InputStream is = new ASN1InputStream(new ByteArrayInputStream(publicKey.getEncoded()))) {
+            ASN1Sequence seq = (ASN1Sequence) is.readObject();
+            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(seq);
+            return new BcX509ExtensionUtils().createSubjectKeyIdentifier(info);
+        }
+    }
+
     private static X509Certificate generateCertificate(String fqdn, KeyPair keypair, SecureRandom random) throws Exception {
-        final PrivateKey key = keypair.getPrivate();
+        final X500Name subject = new X500Name("CN=" + fqdn);
+        final SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(keypair.getPublic().getEncoded());
+        final AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1withRSA");
+        final AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
+        final AsymmetricKeyParameter keyParam = PrivateKeyFactory.createKey(keypair.getPrivate().getEncoded());
+        final ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId).build(keyParam);
 
-        // Prepare the information required for generating an X.509 certificate.
-        final X509CertInfo info = new X509CertInfo();
-        final X500Name owner = new X500Name("CN=" + fqdn);
+        X509v3CertificateBuilder v3CertBuilder = new X509v3CertificateBuilder(subject,
+            new BigInteger(64, random),
+            NOT_BEFORE,
+            NOT_AFTER,
+            subject,
+            subPubKeyInfo);
 
-        info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
-        info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(new BigInteger(64, random)));
-        try {
-            info.set(X509CertInfo.SUBJECT, new CertificateSubjectName(owner));
-        } catch (CertificateException ignore) {
-            info.set(X509CertInfo.SUBJECT, owner);
-        }
-        try {
-            info.set(X509CertInfo.ISSUER, new CertificateIssuerName(owner));
-        } catch (CertificateException ignore) {
-            info.set(X509CertInfo.ISSUER, owner);
-        }
-        info.set(X509CertInfo.VALIDITY, new CertificateValidity(NOT_BEFORE, NOT_AFTER));
-        info.set(X509CertInfo.KEY, new CertificateX509Key(keypair.getPublic()));
-        info.set(X509CertInfo.ALGORITHM_ID,
-                new CertificateAlgorithmId(new AlgorithmId(AlgorithmId.sha1WithRSAEncryption_oid)));
+        v3CertBuilder.addExtension(Extension.basicConstraints,
+            true,
+            new BasicConstraints(true));
+        v3CertBuilder.addExtension(Extension.keyUsage,
+            true,
+            new X509KeyUsage(X509KeyUsage.digitalSignature |
+                X509KeyUsage.nonRepudiation |
+                X509KeyUsage.keyEncipherment |
+                X509KeyUsage.dataEncipherment));
+        v3CertBuilder.addExtension(Extension.subjectKeyIdentifier,
+            false,
+            createSubjectKeyIdentifier(keypair.getPublic()));
 
-        // Sign the cert to identify the algorithm that's used.
-        X509CertImpl cert = new X509CertImpl(info);
-        cert.sign(key, "SHA1withRSA");
+        JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
+        X509Certificate cert = converter.getCertificate(v3CertBuilder.build(sigGen));
 
-        // Update the algorithm and sign again.
-        info.set(CertificateAlgorithmId.NAME + '.' + CertificateAlgorithmId.ALGORITHM, cert.get(X509CertImpl.SIG_ALG));
-        cert = new X509CertImpl(info);
-        cert.sign(key, "SHA1withRSA");
+        cert.checkValidity();
         cert.verify(keypair.getPublic());
 
         return cert;
