@@ -38,8 +38,8 @@ const AlertCondition = React.createClass({
   _formatTitle() {
     const alertCondition = this.props.alertCondition;
     const alertConditionType = new AlertConditionsFactory().get(alertCondition.type);
-    const title = alertCondition.title ? alertCondition.title : `Untitled ${alertConditionType.title} condition`;
-    const subtitle = alertCondition.title ? `(${alertConditionType.title} condition)` : null;
+    const title = alertCondition.title ? alertCondition.title : 'Untitled';
+    const subtitle = `(${alertConditionType.title} condition)`;
     const badge = alertCondition.in_grace && <Badge className="badge-info">in grace period</Badge>;
     return (
       <span>
