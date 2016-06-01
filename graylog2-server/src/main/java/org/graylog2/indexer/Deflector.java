@@ -194,7 +194,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     private void addDeflectorIndexRange(String newTarget) {
-        final IndexRange deflectorRange = indexRangeService.createForDeflector(newTarget);
+        final IndexRange deflectorRange = indexRangeService.createEmptyRange(newTarget);
         indexRangeService.save(deflectorRange);
     }
 
