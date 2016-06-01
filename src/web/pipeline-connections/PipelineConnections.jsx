@@ -27,10 +27,14 @@ const PipelineConnections = React.createClass({
     this.props.onConnectionsChange(newConnection, callback);
   },
 
+  _isConnectionWithPipelines(connection) {
+    return connection.pipeline_ids.length > 0;
+  },
+
   render() {
     // TODO: Sort this list by stream title
     const formattedConnections = this.props.connections
-      .filter(c => this.state.filteredStreams.some(s => s.id === c.stream_id))
+      .filter(c => this.state.filteredStreams.some(s => s.id === c.stream_id && this._isConnectionWithPipelines(c)))
       .map(c => {
         return (
           <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
@@ -39,7 +43,7 @@ const PipelineConnections = React.createClass({
         );
       });
 
-    const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id));
+    const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id && this._isConnectionWithPipelines(c)));
 
     return (
       <div>
