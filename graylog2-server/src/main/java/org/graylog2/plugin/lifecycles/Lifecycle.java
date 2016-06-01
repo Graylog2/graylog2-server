@@ -30,7 +30,8 @@ public enum Lifecycle {
 
     // Manual lifecycle override, usually set by REST calls.
     OVERRIDE_LB_DEAD("Override lb:DEAD", LoadBalancerStatus.DEAD),
-    OVERRIDE_LB_ALIVE("Override lb:ALIVE", LoadBalancerStatus.ALIVE);
+    OVERRIDE_LB_ALIVE("Override lb:ALIVE", LoadBalancerStatus.ALIVE),
+    OVERRIDE_LB_THROTTLED("Override lb:THROTTLED", LoadBalancerStatus.THROTTLED);
 
     private final String description;
     private final LoadBalancerStatus loadBalancerStatus;

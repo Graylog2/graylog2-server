@@ -26,6 +26,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.rest.TooManyRequestsStatus;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -59,12 +60,21 @@ public class LoadBalancerStatusResource extends RestResource {
     @Timed
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get status of this Graylog server node for load balancers. " +
-            "Returns either ALIVE with HTTP 200 or DEAD with HTTP 503.")
+            "Returns ALIVE with HTTP 200, DEAD with HTTP 503, or THROTTLED with HTTP 429.")
     public Response status() {
         final LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 
-        Response.Status status = lbStatus == LoadBalancerStatus.ALIVE
-                ? Response.Status.OK : Response.Status.SERVICE_UNAVAILABLE;
+        Response.StatusType status;
+        switch (lbStatus) {
+            case ALIVE:
+                status = Response.Status.OK;
+                break;
+            case THROTTLED:
+                status = new TooManyRequestsStatus();
+                break;
+            default:
+                status = Response.Status.SERVICE_UNAVAILABLE;
+        }
 
         return Response.status(status)
                 .entity(lbStatus.toString().toUpperCase(Locale.ENGLISH))
@@ -77,7 +87,7 @@ public class LoadBalancerStatusResource extends RestResource {
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Override load balancer status of this Graylog server node. Next lifecycle " +
-            "change will override it again to its default. Set to ALIVE or DEAD.")
+            "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
     public void override(@ApiParam(name = "status") @PathParam("status") String status) {
         final LoadBalancerStatus lbStatus;
@@ -94,6 +104,8 @@ public class LoadBalancerStatusResource extends RestResource {
             case ALIVE:
                 serverStatus.overrideLoadBalancerAlive();
                 break;
+            case THROTTLED:
+                serverStatus.overrideLoadBalancerThrottled();
         }
     }
 }
