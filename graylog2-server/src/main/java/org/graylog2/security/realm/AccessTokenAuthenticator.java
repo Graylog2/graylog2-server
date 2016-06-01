@@ -32,6 +32,7 @@ import javax.inject.Inject;
 
 public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenAuthenticator.class);
+    public static final String NAME = "access-token";
 
     private final AccessTokenService accessTokenService;
     private final UserService userService;

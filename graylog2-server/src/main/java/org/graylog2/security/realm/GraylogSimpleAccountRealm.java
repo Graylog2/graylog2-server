@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class GraylogSimpleAccountRealm extends SimpleAccountRealm {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogSimpleAccountRealm.class);
+    public static final String NAME = "root-user";
 
     public GraylogSimpleAccountRealm() {
         super("graylog2-in-memory-realm");

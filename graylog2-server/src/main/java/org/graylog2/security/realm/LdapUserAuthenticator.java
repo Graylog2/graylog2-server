@@ -44,6 +44,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(LdapUserAuthenticator.class);
+    public static final String NAME = "legacy-ldap";
 
     private final LdapConnector ldapConnector;
 

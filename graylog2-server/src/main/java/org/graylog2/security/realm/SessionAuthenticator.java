@@ -33,6 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
+    public static final String NAME = "mongodb-session";
 
     private final UserService userService;
     private final LdapUserAuthenticator ldapAuthenticator;

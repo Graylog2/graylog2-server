@@ -32,6 +32,7 @@ import javax.inject.Inject;
  */
 public class PasswordAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordAuthenticator.class);
+    public static final String NAME = "mongodb-password";
     private final UserService userService;
     private final Configuration configuration;
 

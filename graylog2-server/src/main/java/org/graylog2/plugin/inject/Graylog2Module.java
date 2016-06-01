@@ -24,6 +24,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -305,6 +306,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, PasswordAlgorithm> passwordAlgorithmBinder() {
         return MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
+    }
+
+    protected MapBinder<String, AuthenticatingRealm> authenticationRealmBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, AuthenticatingRealm.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

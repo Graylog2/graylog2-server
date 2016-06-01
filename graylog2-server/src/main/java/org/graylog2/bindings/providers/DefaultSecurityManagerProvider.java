@@ -34,6 +34,7 @@ import org.graylog2.Configuration;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.security.MongoDbSessionDAO;
+import org.graylog2.security.OrderedAuthenticatingRealms;
 import org.graylog2.security.realm.AccessTokenAuthenticator;
 import org.graylog2.security.realm.GraylogSimpleAccountRealm;
 import org.graylog2.security.realm.LdapUserAuthenticator;
@@ -60,7 +61,8 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
                                           Configuration configuration,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                           MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager,
-                                          PasswordAlgorithmCredentialsMatcher passwordAlgorithmCredentialsMatcher) {
+                                          PasswordAlgorithmCredentialsMatcher passwordAlgorithmCredentialsMatcher,
+                                          OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
         final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
         inMemoryRealm.setCachingEnabled(false);
         inMemoryRealm.addRootAccount(
