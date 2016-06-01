@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
 
 import { EntityList, TypeAheadDataFilter } from 'components/common';
 import Connection from './Connection';
@@ -32,9 +33,14 @@ const PipelineConnections = React.createClass({
   },
 
   render() {
-    // TODO: Sort this list by stream title
+    const filteredStreamsMap = {};
+    this.state.filteredStreams.forEach(s => {
+      filteredStreamsMap[s.id] = s;
+    });
+
     const formattedConnections = this.props.connections
       .filter(c => this.state.filteredStreams.some(s => s.id === c.stream_id && this._isConnectionWithPipelines(c)))
+      .sort((c1, c2) => naturalSort(filteredStreamsMap[c1.stream_id].title, filteredStreamsMap[c2.stream_id].title))
       .map(c => {
         return (
           <Connection key={c.stream_id} stream={this.props.streams.filter(s => s.id === c.stream_id)[0]}
