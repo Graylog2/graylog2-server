@@ -61,7 +61,10 @@ public class OrderedAuthenticatingRealms extends AbstractCollection<Realm> {
         final LenientExplicitOrdering<String> ordering = new LenientExplicitOrdering<>(config.realmOrder());
 
         final ImmutableList<String> newRealmOrder = ordering.immutableSortedCopy(availableRealms.keySet());
-        orderedRealms.set(newRealmOrder.stream().map(availableRealms::get).collect(Collectors.toList()));
+        orderedRealms.set(newRealmOrder.stream()
+                                  .filter(name -> !config.disabledRealms().contains(name))
+                                  .map(availableRealms::get)
+                                  .collect(Collectors.toList()));
     }
 
     @Nonnull
