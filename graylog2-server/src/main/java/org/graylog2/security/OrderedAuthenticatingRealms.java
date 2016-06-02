@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.Realm;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.utilities.LenientExplicitOrdering;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.AbstractCollection;
 import java.util.Iterator;
@@ -17,12 +19,18 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class OrderedAuthenticatingRealms extends AbstractCollection<AuthenticatingRealm> {
+/**
+ * Runtime (re-)orderable collection of Shiro AuthenticatingRealms.
+ *
+ * The generic type is Realm, even though it really only contains AuthenticatingRealms. This is simply to avoid having to
+ * cast the generic collection when passing it to the SecurityManager.
+ */
+public class OrderedAuthenticatingRealms extends AbstractCollection<Realm> {
 
     private final Map<String, AuthenticatingRealm> availableRealms;
     private final ClusterConfigService clusterConfigService;
 
-    private final AtomicReference<List<AuthenticatingRealm>> orderedRealms = new AtomicReference<>();
+    private final AtomicReference<List<Realm>> orderedRealms = new AtomicReference<>();
 
     @Inject
     public OrderedAuthenticatingRealms(Map<String, AuthenticatingRealm> realms,
@@ -56,8 +64,9 @@ public class OrderedAuthenticatingRealms extends AbstractCollection<Authenticati
         orderedRealms.set(newRealmOrder.stream().map(availableRealms::get).collect(Collectors.toList()));
     }
 
+    @Nonnull
     @Override
-    public Iterator<AuthenticatingRealm> iterator() {
+    public Iterator<Realm> iterator() {
         return orderedRealms.get().iterator();
     }
 

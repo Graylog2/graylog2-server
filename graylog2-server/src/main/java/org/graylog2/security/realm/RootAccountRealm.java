@@ -17,6 +17,7 @@
 package org.graylog2.security.realm;
 
 import org.apache.shiro.authc.SimpleAccount;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.realm.SimpleAccountRealm;
@@ -24,15 +25,24 @@ import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraylogSimpleAccountRealm extends SimpleAccountRealm {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogSimpleAccountRealm.class);
+import javax.inject.Inject;
+import javax.inject.Named;
+
+public class RootAccountRealm extends SimpleAccountRealm {
+    private static final Logger LOG = LoggerFactory.getLogger(RootAccountRealm.class);
     public static final String NAME = "root-user";
 
-    public GraylogSimpleAccountRealm() {
-        super("graylog2-in-memory-realm");
+    @Inject
+    RootAccountRealm(@Named("root_username") String rootUsername,
+                     @Named("root_password_sha2") String rootPasswordSha2) {
+        setCachingEnabled(false);
+        setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
+        setName("root-account-realm");
+
+        addRootAccount(rootUsername, rootPasswordSha2);
     }
 
-    public void addRootAccount(String username, String password) {
+    private void addRootAccount(String username, String password) {
         LOG.debug("Adding root account named {}, having all permissions", username);
         add(new SimpleAccount(
                 username,

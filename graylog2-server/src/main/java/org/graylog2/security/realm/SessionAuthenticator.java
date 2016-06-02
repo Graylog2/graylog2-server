@@ -39,12 +39,13 @@ public class SessionAuthenticator extends AuthenticatingRealm {
     private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
-    public SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
+    SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
         this.userService = userService;
         this.ldapAuthenticator = ldapAuthenticator;
         // this realm either rejects a session, or allows the associated user implicitly
-        setAuthenticationTokenClass(SessionIdToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setAuthenticationTokenClass(SessionIdToken.class);
+        setCachingEnabled(false);
     }
 
     @Override

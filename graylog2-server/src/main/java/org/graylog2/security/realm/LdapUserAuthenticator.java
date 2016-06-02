@@ -52,12 +52,13 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     private final UserService userService;
 
     @Inject
-    public LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
+    LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
         this.ldapConnector = ldapConnector;
         this.userService = userService;
         this.ldapSettingsService = ldapSettingsService;
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCachingEnabled(false);
     }
 
     @Override

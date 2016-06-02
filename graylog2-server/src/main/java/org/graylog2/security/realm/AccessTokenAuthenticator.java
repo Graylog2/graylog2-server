@@ -39,13 +39,14 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
-    public AccessTokenAuthenticator(AccessTokenService accessTokenService,
-                                    UserService userService,
-                                    LdapUserAuthenticator ldapAuthenticator) {
+    AccessTokenAuthenticator(AccessTokenService accessTokenService,
+                             UserService userService,
+                             LdapUserAuthenticator ldapAuthenticator) {
         this.accessTokenService = accessTokenService;
         this.userService = userService;
         this.ldapAuthenticator = ldapAuthenticator;
         setAuthenticationTokenClass(AccessTokenAuthToken.class);
+        setCachingEnabled(false);
         // the presence of a valid access token is enough, we don't have any other credentials
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }

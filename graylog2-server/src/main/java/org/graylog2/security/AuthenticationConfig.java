@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.security.realm.AccessTokenAuthenticator;
-import org.graylog2.security.realm.GraylogSimpleAccountRealm;
+import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.security.realm.PasswordAuthenticator;
 import org.graylog2.security.realm.SessionAuthenticator;
@@ -36,7 +36,7 @@ public abstract class AuthenticationConfig {
                         AccessTokenAuthenticator.NAME,
                         LdapUserAuthenticator.NAME,
                         PasswordAuthenticator.NAME,
-                        GraylogSimpleAccountRealm.NAME))
+                        RootAccountRealm.NAME))
                 .build();
     }
 
@@ -45,7 +45,7 @@ public abstract class AuthenticationConfig {
     }
 
     @AutoValue.Builder
-    public abstract class Builder {
+    public static abstract class Builder {
 
         public abstract Builder realmOrder(List<String> order);
         public abstract AuthenticationConfig build();

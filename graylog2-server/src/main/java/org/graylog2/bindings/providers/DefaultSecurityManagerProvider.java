@@ -16,10 +16,8 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
@@ -27,25 +25,19 @@ import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
-import org.graylog2.Configuration;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.OrderedAuthenticatingRealms;
-import org.graylog2.security.realm.AccessTokenAuthenticator;
-import org.graylog2.security.realm.GraylogSimpleAccountRealm;
-import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.security.realm.MongoDbAuthorizationRealm;
-import org.graylog2.security.realm.PasswordAlgorithmCredentialsMatcher;
-import org.graylog2.security.realm.PasswordAuthenticator;
-import org.graylog2.security.realm.SessionAuthenticator;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import static com.google.common.collect.ImmutableList.of;
 
 @Singleton
 public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityManager> {
@@ -53,48 +45,17 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
 
     @Inject
     public DefaultSecurityManagerProvider(MongoDbSessionDAO mongoDbSessionDAO,
-                                          PasswordAuthenticator passwordAuthenticator,
                                           MongoDbAuthorizationRealm mongoDbAuthorizationRealm,
-                                          LdapUserAuthenticator ldapUserAuthenticator,
-                                          SessionAuthenticator sessionAuthenticator,
-                                          AccessTokenAuthenticator accessTokenAuthenticator,
-                                          Configuration configuration,
+                                          RootAccountRealm rootAccountRealm,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
-                                          MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager,
-                                          PasswordAlgorithmCredentialsMatcher passwordAlgorithmCredentialsMatcher,
                                           OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
-        final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
-        inMemoryRealm.setCachingEnabled(false);
-        inMemoryRealm.addRootAccount(
-                configuration.getRootUsername(),
-                configuration.getRootPasswordSha2()
-        );
-        inMemoryRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
-
-        passwordAuthenticator.setCachingEnabled(false);
-        passwordAuthenticator.setCredentialsMatcher(passwordAlgorithmCredentialsMatcher);
-        mongoDbAuthorizationRealm.setCachingEnabled(true);
-        mongoDbAuthorizationRealm.setCacheManager(mongoDbAuthorizationCacheManager);
-
-        ldapUserAuthenticator.setCachingEnabled(false);
-
-        sessionAuthenticator.setCachingEnabled(false);
-        accessTokenAuthenticator.setCachingEnabled(false);
-
-
-        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(
-                sessionAuthenticator,
-                accessTokenAuthenticator,
-                ldapUserAuthenticator,
-                passwordAuthenticator,
-                inMemoryRealm));
+        sm = new DefaultSecurityManager(orderedAuthenticatingRealms);
         final Authenticator authenticator = sm.getAuthenticator();
         if (authenticator instanceof ModularRealmAuthenticator) {
             ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
         }
-        final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(Lists.<Realm>newArrayList(
-                mongoDbAuthorizationRealm,
-                inMemoryRealm));
+        final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(of(mongoDbAuthorizationRealm,
+                                                                                rootAccountRealm));
         authorizer.setRolePermissionResolver(inMemoryRolePermissionResolver);
         sm.setAuthorizer(authorizer);
 
