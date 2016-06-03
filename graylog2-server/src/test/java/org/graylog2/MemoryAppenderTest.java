@@ -104,7 +104,10 @@ public class MemoryAppenderTest {
             final Runnable runner = () -> {
                 try {
                     latch.await();
-                    appender.append(logEvent);
+                    long start = System.currentTimeMillis();
+                    while (System.currentTimeMillis() - start < TimeUnit.SECONDS.toMillis(4L)) {
+                        appender.append(logEvent);
+                    }
                 } catch (InterruptedException ie) {
                     // Do nothing
                 }
