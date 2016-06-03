@@ -17,6 +17,8 @@
 
 package org.graylog2.log4j;
 
+import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.BufferUtils;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
@@ -40,13 +42,13 @@ import java.util.List;
 @Plugin(name = "Memory", category = "Core", elementType = "appender", printObject = true)
 public class MemoryAppender extends AbstractAppender {
 
-    private CircularFifoBuffer buffer;
+    private Buffer buffer;
     private int bufferSize;
 
     protected MemoryAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions, int bufferSize) {
         super(name, filter, layout, ignoreExceptions);
         this.bufferSize = bufferSize;
-        this.buffer = new CircularFifoBuffer(bufferSize);
+        this.buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(bufferSize));
     }
 
     @PluginFactory
