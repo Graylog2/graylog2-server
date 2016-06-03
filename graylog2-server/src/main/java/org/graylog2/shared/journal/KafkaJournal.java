@@ -315,13 +315,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         metricRegistry.register(name(KafkaJournal.class, "unflushedMessages"), (Gauge<Long>) kafkaLog::unflushedMessages);
         metricRegistry.register(name(KafkaJournal.class, "recoveryPoint"), (Gauge<Long>) kafkaLog::recoveryPoint);
         metricRegistry.register(name(KafkaJournal.class, "lastFlushTime"), (Gauge<Long>) kafkaLog::lastFlushTime);
-        metricRegistry.register(GlobalMetricNames.JOURNAL_OLDEST_SEGMENT, (Gauge<Date>) () -> {
-            long oldestSegment = Long.MAX_VALUE;
-            for (final LogSegment segment : getSegments()) {
-                oldestSegment = Math.min(oldestSegment, segment.created());
-            }
+        // must not be a lambda, because the serialization cannot determine the proper Metric type :(
+        metricRegistry.register(GlobalMetricNames.JOURNAL_OLDEST_SEGMENT, (Gauge<Date>) new Gauge<Date>() {
+            @Override
+            public Date getValue() {
+                long oldestSegment = Long.MAX_VALUE;
+                for (final LogSegment segment : KafkaJournal.this.getSegments()) {
+                    oldestSegment = Math.min(oldestSegment, segment.created());
+                }
 
-            return new Date(oldestSegment);
+                return new Date(oldestSegment);
+            }
         });
     }
 
