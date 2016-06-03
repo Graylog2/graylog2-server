@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import kafka.common.KafkaException;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -47,9 +48,11 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.directoryFileFilt
 import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 public class KafkaJournalTest {
@@ -91,7 +94,7 @@ public class KafkaJournalTest {
 
         final Journal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
 
-        assertEquals(new String(firstMessage.getPayload(), UTF_8), "message");
+        assertEquals("message", new String(firstMessage.getPayload(), UTF_8));
     }
 
     @Test
@@ -116,7 +119,7 @@ public class KafkaJournalTest {
 
         final Journal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
 
-        assertEquals(new String(firstMessage.getPayload(), UTF_8), "message1");
+        assertEquals("message1", new String(firstMessage.getPayload(), UTF_8));
     }
 
     private int createBulkChunks(KafkaJournal journal, Size segmentSize, int bulkCount) {
@@ -303,7 +306,7 @@ public class KafkaJournalTest {
         assertEquals(countSegmentsInDir(messageJournalDir), 1);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void lockedJournalDir() throws Exception {
         // Grab the lock before starting the KafkaJournal.
         final File file = new File(journalDirectory, ".lock");
@@ -311,7 +314,8 @@ public class KafkaJournalTest {
         final FileLock fileLock = new FileLock(file);
         assumeTrue(fileLock.tryLock());
 
-        new KafkaJournal(journalDirectory,
+        try {
+            new KafkaJournal(journalDirectory,
                 scheduler,
                 Size.megabytes(100L),
                 Duration.standardHours(1),
@@ -320,5 +324,12 @@ public class KafkaJournalTest {
                 1_000_000,
                 Duration.standardMinutes(1),
                 new MetricRegistry());
+            fail("Expected exception");
+        } catch (Exception e) {
+            assertThat(e)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessageStartingWith("kafka.common.KafkaException: Failed to acquire lock on file .lock in")
+                .hasCauseExactlyInstanceOf(KafkaException.class);
+        }
     }
 }
