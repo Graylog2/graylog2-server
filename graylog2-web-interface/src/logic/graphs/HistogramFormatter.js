@@ -1,16 +1,17 @@
 import moment from 'moment';
 import MomentUtils from 'util/MomentUtils';
 import NumberUtils from 'util/NumberUtils';
+import DateTime from 'logic/datetimes/DateTime';
 
 const DEFAULT_MAX_DATA_POINTS = 4000;
 
 const HistogramFormatter = {
   _firstDataPointTimestamp(dataPoints, queryFrom, isSearchAll) {
     if (isSearchAll) {
-      return moment.utc(Number(Object.keys(dataPoints).sort()[0]) * 1000);
+      return (new DateTime(Number(Object.keys(dataPoints).sort()[0]) * 1000)).toMoment();
     }
 
-    return moment.utc(queryFrom);
+    return (new DateTime(queryFrom)).toMoment();
   },
 
   /**
@@ -35,7 +36,7 @@ const HistogramFormatter = {
 
     if (typeof dataPoints === 'object' && !Array.isArray(dataPoints)) {
       const from = this._firstDataPointTimestamp(dataPoints, queryTimeRange.from, isSearchAll);
-      const to = moment.utc(queryTimeRange.to);
+      const to = (new DateTime(queryTimeRange.to)).toMoment();
 
       let tempTime = moment(from);
       const step = moment.duration(1, resolution);

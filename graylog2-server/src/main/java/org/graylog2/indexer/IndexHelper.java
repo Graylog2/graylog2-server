@@ -22,6 +22,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -57,14 +59,38 @@ public class IndexHelper {
         return r;
     }
 
+    public static RangeQueryBuilder decorateWithTimeZone(RangeQueryBuilder builder, TimeRange range) {
+        // If both timestamps are in the same zone, we add the time_zone parameter to the filter. This allows us to
+        // use non-UTC timestamps and Elasticsearch will convert them to UTC internally.
+        // See: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html#_time_zone_in_range_queries
+        if (range.getFrom().getZone().equals(range.getTo().getZone())) {
+            return builder.timeZone(range.getFrom().getZone().toString());
+        } else {
+            return builder;
+        }
+    }
+
+    public static DateHistogramBuilder decorateWithTimeZone(DateHistogramBuilder builder, TimeRange range) {
+        // If both timestamps are in the same zone, we add the time_zone parameter to the filter. This allows us to
+        // use non-UTC timestamps and Elasticsearch will convert them to UTC internally.
+        // See: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html#_time_zone_in_range_queries
+        if (range.getFrom().getZone().equals(range.getTo().getZone())) {
+            return builder.timeZone(range.getFrom().getZone().toString());
+        } else {
+            return builder;
+        }
+    }
+
     public static QueryBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
         if (range == null) {
             return null;
         }
 
-        return QueryBuilders.rangeQuery("timestamp")
-                .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
-                .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
+        final RangeQueryBuilder builder = QueryBuilders.rangeQuery("timestamp")
+                .gte(Tools.buildElasticSearchTimeFormatKeepZone(range.getFrom()))
+                .lte(Tools.buildElasticSearchTimeFormatKeepZone(range.getTo()));
+
+        return decorateWithTimeZone(builder, range);
     }
 
     private static String getPrefix(Set<String> names) {

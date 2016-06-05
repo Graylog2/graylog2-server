@@ -5,6 +5,7 @@ import md5 from 'md5';
 
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+import DateTime from 'logic/datetimes/DateTime';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -53,8 +54,16 @@ const UniversalSearchStore = Reflux.createStore({
       return result;
     });
   },
-  histogram(type, query, timerange, interval, streamId, maxDataPoints) {
+  histogram(type, query, timerange, interval, streamId, currentUser, maxDataPoints) {
     const timerangeParams = UniversalSearchStore.extractTimeRange(type, timerange);
+
+    // Convert absolute timerange params back to the user's timezone to make the histogram bucketing work properly.
+    // See https://github.com/Graylog2/graylog2-server/issues/1830 for details.
+    if (timerangeParams.from && timerangeParams.to) {
+      timerangeParams.from = (new DateTime(timerangeParams.from)).toString(DateTime.Formats.ISO_8601);
+      timerangeParams.to = (new DateTime(timerangeParams.to)).toString(DateTime.Formats.ISO_8601);
+    }
+
     const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.histogram(type, query, interval, timerangeParams, streamId).url);
 
     return fetch('GET', url).then((response) => {

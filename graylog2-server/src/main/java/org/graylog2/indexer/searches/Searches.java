@@ -441,9 +441,10 @@ public class Searches {
     public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
         FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
                 .subAggregation(
-                        AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                                .field("timestamp")
-                                .interval(interval.toESInterval()))
+                        IndexHelper.decorateWithTimeZone(
+                                AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
+                                        .field("timestamp")
+                                        .interval(interval.toESInterval()), range))
                 .filter(standardAggregationFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryStringQuery(query);
