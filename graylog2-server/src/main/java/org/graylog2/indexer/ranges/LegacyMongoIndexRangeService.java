@@ -109,7 +109,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
     }
 
     @Override
-    public IndexRange createEmptyRange(String index) {
+    public IndexRange createUnknownRange(String index) {
         throw new UnsupportedOperationException();
     }
 

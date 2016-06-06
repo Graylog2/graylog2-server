@@ -179,7 +179,7 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public IndexRange createEmptyRange(String index) {
+    public IndexRange createUnknownRange(String index) {
         throw new UnsupportedOperationException();
     }
 

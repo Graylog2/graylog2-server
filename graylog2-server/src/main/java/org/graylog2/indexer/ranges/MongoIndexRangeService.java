@@ -133,7 +133,7 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public IndexRange createEmptyRange(String index) {
+    public IndexRange createUnknownRange(String index) {
         return MongoIndexRange.create(index, new DateTime(0L), new DateTime(0L), DateTime.now(), 0);
     }
 
