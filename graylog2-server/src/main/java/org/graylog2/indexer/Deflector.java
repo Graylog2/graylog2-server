@@ -16,11 +16,10 @@
  */
 package org.graylog2.indexer;
 
-import com.github.joschi.jadconfig.util.Duration;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.shared.system.activities.Activity;
@@ -37,9 +36,7 @@ import javax.inject.Named;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -62,33 +59,27 @@ public class Deflector { // extends Ablenkblech
 
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
-    private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final IndexRangeService indexRangeService;
-    private final Duration deflectorIndexReadOnlyTimeout;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
-    private final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
     private final Pattern deflectorIndexPattern;
     private final Pattern indexPattern;
+    private final SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
                      @Named("elasticsearch_index_prefix") final String indexPrefix,
                      final ActivityWriter activityWriter,
-                     final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
-                     final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices,
                      final IndexRangeService indexRangeService,
-                     @Named("deflector_index_read_only_timeout") final Duration deflectorIndexReadOnlyTimeout) {
+                     final SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory) {
         this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
-        this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
-        this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
         this.indexRangeService = indexRangeService;
-        this.deflectorIndexReadOnlyTimeout = deflectorIndexReadOnlyTimeout;
+        this.setIndexReadOnlyAndCalculateRangeJobFactory = setIndexReadOnlyAndCalculateRangeJobFactory;
 
         this.deflectorName = buildName(indexPrefix);
         this.indices = indices;
@@ -175,16 +166,12 @@ public class Deflector { // extends Ablenkblech
             // it can happen that an index request still writes to the old deflector target, while we cycled it above.
             // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
             // waiting 30 seconds to perform the background task should completely get rid of these errors.
-            final SystemJob makeReadOnlyJob = indexReadOnlyJobFactory.create(oldTarget);
+            final SystemJob setIndexReadOnlyAndCalculateRangeJob = setIndexReadOnlyAndCalculateRangeJobFactory.create(oldTarget);
             try {
-                final SystemJobManager.ScheduleResult scheduleResult = systemJobManager.submitWithDelayForResult(makeReadOnlyJob, 30, TimeUnit.SECONDS);
-                if (scheduleResult != null) {
-                    scheduleResult.getFuture().get(deflectorIndexReadOnlyTimeout.toMilliseconds(), TimeUnit.MILLISECONDS);
-                }
-            } catch (SystemJobConcurrencyException | InterruptedException | ExecutionException | TimeoutException e) {
-                LOG.error("Cannot set index <" + oldTarget + "> to read only. It won't be optimized.", e);
+                systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
+            } catch (SystemJobConcurrencyException e) {
+                LOG.error("Cannot set index <" + oldTarget + "> to read only and calculate its range. It won't be optimized.", e);
             }
-            addSingleIndexRanges(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
@@ -284,18 +271,6 @@ public class Deflector { // extends Ablenkblech
 
     public void pointTo(final String newIndex) {
         indices.cycleAlias(getName(), newIndex);
-    }
-
-    @Nullable
-    private SystemJobManager.ScheduleResult addSingleIndexRanges(String indexName) {
-        try {
-            return systemJobManager.submitForResult(createNewSingleIndexRangeJobFactory.create(this, indexName));
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Could not calculate index ranges for index " + indexName + " after cycling deflector: Maximum concurrency of job is reached.";
-            activityWriter.write(new Activity(msg, Deflector.class));
-            LOG.error(msg, e);
-        }
-        return null;
     }
 
     @Nullable

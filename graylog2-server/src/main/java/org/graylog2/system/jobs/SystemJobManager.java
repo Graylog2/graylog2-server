@@ -26,38 +26,17 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.validation.constraints.Null;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class SystemJobManager {
-
-    public class ScheduleResult {
-        private final String jobId;
-        private final ScheduledFuture<?> future;
-
-        ScheduleResult(final String jobId, final ScheduledFuture<?> future) {
-            this.jobId = jobId;
-            this.future = future;
-        }
-
-        public String getJobId() {
-            return jobId;
-        }
-
-        public ScheduledFuture<?> getFuture() {
-            return future;
-        }
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobManager.class);
     private static final int THREAD_POOL_SIZE = 15;
@@ -82,18 +61,10 @@ public class SystemJobManager {
     }
 
     public String submit(final SystemJob job) throws SystemJobConcurrencyException {
-        return submitForResult(job).getJobId();
-    }
-
-    public ScheduleResult submitForResult(final SystemJob job) throws SystemJobConcurrencyException {
-        return submitWithDelayForResult(job, 0, TimeUnit.SECONDS);
+        return submitWithDelay(job, 0, TimeUnit.SECONDS);
     }
 
     public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
-        return submitWithDelayForResult(job, delay, timeUnit).getJobId();
-    }
-
-    public ScheduleResult submitWithDelayForResult(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);
@@ -104,7 +75,7 @@ public class SystemJobManager {
         job.setId(new UUID().toString());
         jobs.put(job.getId(), job);
 
-        final ScheduledFuture<?> future = executor.schedule(new Runnable() {
+        executor.schedule(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -132,7 +103,7 @@ public class SystemJobManager {
         }, delay, timeUnit);
 
         LOG.info("Submitted SystemJob <{}> [{}]", job.getId(), jobClass);
-        return new ScheduleResult(job.getId(), future);
+        return job.getId();
     }
 
     protected void checkAllowedConcurrency(SystemJob job) throws SystemJobConcurrencyException {

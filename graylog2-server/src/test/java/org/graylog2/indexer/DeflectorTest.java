@@ -23,6 +23,7 @@ package org.graylog2.indexer;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
@@ -59,6 +60,8 @@ public class DeflectorTest {
     @Mock
     private CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     @Mock
+    private SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory;
+    @Mock
     private Indices indices;
     private Deflector deflector;
 
@@ -67,8 +70,12 @@ public class DeflectorTest {
 
     @Before
     public void setUp() {
-        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory,
-            indices, indexRangeService, deflectorIndexRangeCalculationTimeout);
+        deflector = new Deflector(systemJobManager,
+            "graylog",
+            activityWriter,
+            indices,
+            indexRangeService,
+            setIndexReadOnlyAndCalculateRangeJobFactory);
     }
 
     @Test
@@ -177,11 +184,9 @@ public class DeflectorTest {
         final Deflector deflector = new Deflector(systemJobManager,
             "graylog",
             activityWriter,
-            indexReadOnlyJobFactory,
-            singleIndexRangeJobFactory,
             indices,
             indexRangeService,
-            deflectorIndexRangeCalculationTimeout);
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final int number = deflector.getNewestTargetNumber();
         assertEquals(3, number);
@@ -201,11 +206,9 @@ public class DeflectorTest {
         final Deflector deflector = new Deflector(systemJobManager,
             "graylog",
             activityWriter,
-            indexReadOnlyJobFactory,
-            singleIndexRangeJobFactory,
             indices,
             indexRangeService,
-            deflectorIndexRangeCalculationTimeout);
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
         assertThat(allGraylogIndexNames)
@@ -226,11 +229,9 @@ public class DeflectorTest {
         final Deflector deflector = new Deflector(systemJobManager,
             "graylog",
             activityWriter,
-            indexReadOnlyJobFactory,
-            singleIndexRangeJobFactory,
             indices,
             indexRangeService,
-            deflectorIndexRangeCalculationTimeout);
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
 

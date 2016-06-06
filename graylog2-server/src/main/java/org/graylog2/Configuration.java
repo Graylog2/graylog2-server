@@ -156,9 +156,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
 
-    @Parameter(value = "deflector_index_read_only_timeout", validator = PositiveDurationValidator.class)
-    private Duration deflectorIndexReadOnlyTimeout = Duration.hours(1L);
-
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
     private Set<IpSubnet> trustedProxies = Collections.emptySet();
 
