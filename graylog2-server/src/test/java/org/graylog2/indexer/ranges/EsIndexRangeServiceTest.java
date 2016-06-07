@@ -17,7 +17,6 @@
 package org.graylog2.indexer.ranges;
 
 import com.codahale.metrics.MetricRegistry;
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.github.joschi.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import com.google.common.collect.ImmutableSet;
