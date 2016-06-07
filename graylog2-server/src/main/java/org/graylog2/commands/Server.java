@@ -25,6 +25,7 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
+import org.graylog2.auditlog.AuditLogModule;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -108,7 +109,8 @@ public class Server extends ServerBootstrap {
             new RestApiBindings(),
             new PasswordAlgorithmBindings(),
             new WidgetStrategyBindings(),
-            new DashboardBindings()
+            new DashboardBindings(),
+            new AuditLogModule()
         );
 
         if (configuration.isWebEnable()) {
