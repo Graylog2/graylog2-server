@@ -29,6 +29,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
@@ -84,6 +85,7 @@ public class SessionsResource extends RestResource {
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @AuditLog(object = "session")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
                               @ApiParam(name = "Login request", value = "Username and credentials", required = true)
                               @Valid @NotNull SessionCreateRequest createRequest) {
@@ -155,6 +157,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
+    @AuditLog(object = "session")
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
