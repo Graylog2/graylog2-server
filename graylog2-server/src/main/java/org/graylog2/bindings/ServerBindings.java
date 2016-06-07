@@ -51,6 +51,7 @@ import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.InputEventListener;
@@ -116,12 +117,15 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindFactoryModules() {
+        // System Jobs
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
         install(new FactoryModuleBuilder().build(SetIndexReadOnlyJob.Factory.class));
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
+        install(new FactoryModuleBuilder().build(SetIndexReadOnlyAndCalculateRangeJob.Factory.class));
+
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
         install(new FactoryModuleBuilder().build(FieldValueAlertCondition.Factory.class));
         install(new FactoryModuleBuilder().build(MessageCountAlertCondition.Factory.class));
