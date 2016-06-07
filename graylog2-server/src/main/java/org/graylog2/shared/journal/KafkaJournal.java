@@ -47,7 +47,9 @@ import kafka.server.RunningAsBroker;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.Time;
 import org.graylog2.plugin.GlobalMetricNames;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.shared.metrics.HdrTimer;
 import org.graylog2.shared.utilities.ByteBufferUtils;
 import org.joda.time.DateTimeUtils;
@@ -75,6 +77,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -101,6 +104,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
     public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
+    private final ServerStatus serverStatus;
 
     // this exists so we can use JodaTime's millis provider in tests.
     // kafka really only cares about the milliseconds() method in here
@@ -147,6 +151,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final AtomicReference<ThrottleState> throttleState = new AtomicReference<>();
     private final AtomicInteger purgedSegmentsInLastRetention = new AtomicInteger();
 
+    private final int throttleThresholdPercentage;
+
     @Inject
     public KafkaJournal(@Named("message_journal_dir") File journalDirectory,
                         @Named("scheduler") ScheduledExecutorService scheduler,
@@ -156,8 +162,12 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         @Named("message_journal_max_age") Duration retentionAge,
                         @Named("message_journal_flush_interval") long flushInterval,
                         @Named("message_journal_flush_age") Duration flushAge,
-                        MetricRegistry metricRegistry) {
+                        @Named("lb_throttle_threshold_percentage") int throttleThresholdPercentage,
+                        MetricRegistry metricRegistry,
+                        ServerStatus serverStatus) {
         this.scheduler = scheduler;
+        this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
+        this.serverStatus = serverStatus;
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
@@ -282,6 +292,20 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+    }
+
+    /**
+     * Ensures that an integer is within a given range.
+     *
+     * @param i   The number to check.
+     * @param min The minimum value to return.
+     * @param max The maximum value to return.
+     * @return {@code i} if the number is between {@code min} and {@code max},
+     *         {@code min} if {@code i} is less than the minimum,
+     *         {@code max} if {@code i} is greater than the maximum.
+     */
+    private static int intRange(int i, int min, int max) {
+        return Integer.min(Integer.max(min, i), max);
     }
 
     private Timer registerHdrTimer(MetricRegistry metricRegistry, final String metricName) {
@@ -754,6 +778,29 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             return deletedSegments;
         }
 
+        /**
+         * Change the load balancer status from ALIVE to THROTTLE, or vice versa depending on the
+         * journal utilization percentage. As the utilization ratio is reliable only after cleanup,
+         * that's where this is called from.
+         */
+        private void updateLoadBalancerStatus(double utilizationPercentage) {
+            final LoadBalancerStatus currentStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
+
+            // Flip the status. The next lifecycle events may change status. This should be good enough, because
+            // throttling does not offer hard guarantees.
+            if (currentStatus == LoadBalancerStatus.THROTTLED && utilizationPercentage < throttleThresholdPercentage) {
+                serverStatus.running();
+                LOG.info(String.format(Locale.ENGLISH,
+                    "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from THROTTLED to ALIVE",
+                    utilizationPercentage, throttleThresholdPercentage));
+            } else if (currentStatus == LoadBalancerStatus.ALIVE && utilizationPercentage >= throttleThresholdPercentage) {
+                serverStatus.throttle();
+                LOG.info(String.format(Locale.ENGLISH,
+                    "Journal usage is %.2f%% (threshold %d%%), changing load balancer status from ALIVE to THROTTLED",
+                    utilizationPercentage, throttleThresholdPercentage));
+            }
+        }
+
         private int cleanupSegmentsToMaintainSize(Log kafkaLog) {
             final long retentionSize = kafkaLog.config().retentionSize();
             final long currentSize = kafkaLog.size();
@@ -762,6 +809,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
                         KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);
             }
+            updateLoadBalancerStatus(utilizationPercentage);
+
             if (retentionSize < 0 || currentSize < retentionSize) {
                 KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;

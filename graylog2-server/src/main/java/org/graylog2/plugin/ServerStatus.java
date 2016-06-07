@@ -121,12 +121,24 @@ public class ServerStatus {
         publishLifecycle(Lifecycle.FAILED);
     }
 
+    public void throttle() {
+        publishLifecycle(Lifecycle.THROTTLED);
+    }
+
+    public void running() {
+        publishLifecycle(Lifecycle.RUNNING);
+    }
+
     public void overrideLoadBalancerDead() {
         publishLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
     }
 
     public void overrideLoadBalancerAlive() {
         publishLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
+    }
+
+    public void overrideLoadBalancerThrottled() {
+        publishLifecycle(Lifecycle.OVERRIDE_LB_THROTTLED);
     }
 
     public void awaitRunning(final Runnable runnable) {

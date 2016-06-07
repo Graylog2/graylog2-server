@@ -14,15 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.lifecycles;
+package org.graylog2.rest;
+
+import javax.ws.rs.core.Response;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * A {@link Response.StatusType} for HTTP status 429 (Too many requests).
  */
-public enum LoadBalancerStatus {
+public class TooManyRequestsStatus implements Response.StatusType {
+    @Override
+    public int getStatusCode() {
+        return 429;
+    }
 
-    DEAD,
-    ALIVE,
-    THROTTLED
+    @Override
+    public Response.Status.Family getFamily() {
+        return Response.Status.Family.CLIENT_ERROR;
+    }
 
+    @Override
+    public String getReasonPhrase() {
+        return "Too many requests";
+    }
 }
