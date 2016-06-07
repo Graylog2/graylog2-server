@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Resources;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -24,6 +25,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -116,6 +121,14 @@ public class ToolsTest {
         assertEquals(testString, Tools.decompressZlib(buffer));
     }
 
+    @Test(expected = IOException.class)
+    public void testDecompressZlibBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/zlib64mb.raw");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        // Could also check the the exception message is "Got more than 2097152 bytes"
+        Tools.decompressZlib(testData);
+    }
+
     @Test
     public void testDecompressGzip() throws IOException {
 
@@ -129,6 +142,14 @@ public class ToolsTest {
         byte[] buffer = out.toByteArray();
 
         assertEquals(testString, Tools.decompressGzip(buffer));
+    }
+
+    @Test(expected = IOException.class)
+    public void testDecompressGzipBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/gzip64mb.gz");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        // Could also check the the exception message is "Got more than 2097152 bytes"
+        Tools.decompressGzip(testData);
     }
 
     @Test(expected = EOFException.class)
