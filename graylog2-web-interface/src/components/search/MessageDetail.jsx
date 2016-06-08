@@ -121,7 +121,7 @@ const MessageDetail = React.createClass({
       return <ButtonGroup className="pull-right" bsSize="small"/>;
     }
 
-    const messageUrl = this.props.message.index ? ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url : '#';
+    const messageUrl = this.props.message.index ? Routes.message_show(this.props.message.index, this.props.message.id) : '#';
 
     let surroundingSearchButton;
     if (!this.props.disableSurroundingSearch) {
