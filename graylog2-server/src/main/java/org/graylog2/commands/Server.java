@@ -26,6 +26,7 @@ import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.auditlog.AuditLogModule;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -64,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -173,12 +175,15 @@ public class Server extends ServerBootstrap {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
         private final GracefulShutdown gracefulShutdown;
+        private final AuditLogger auditLogger;
 
         @Inject
-        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, GracefulShutdown gracefulShutdown) {
+        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager,
+                            GracefulShutdown gracefulShutdown, AuditLogger auditLogger) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.gracefulShutdown = gracefulShutdown;
+            this.auditLogger = auditLogger;
         }
 
         @Override
@@ -186,6 +191,8 @@ public class Server extends ServerBootstrap {
             String msg = "SIGNAL received. Shutting down.";
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
+
+            auditLogger.success("<system>", "initiated", "shutdown");
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
