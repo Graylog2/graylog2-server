@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -30,7 +30,7 @@ const MessageDetail = React.createClass({
     streams: PropTypes.object,
     customFieldActions: PropTypes.node,
     searchConfig: PropTypes.object,
-    isSimulation: PropTypes.bool,
+    disableMessageActions: PropTypes.bool,
   },
 
   getInitialState() {
@@ -87,19 +87,10 @@ const MessageDetail = React.createClass({
     }
   },
 
-  render() {
-    // Short circuit when all messages are being expanded at the same time
-    if (this.props.expandAllRenderAsync) {
-      return (
-        <Row>
-          <Col md={12}>
-            <Spinner />
-          </Col>
-        </Row>
-      );
+  _getTestAgainstStreamButton() {
+    if (this.props.disableTestAgainstStream) {
+      return null;
     }
-
-    const messageUrl = this.props.isSimulation ? '#' : ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url;
 
     let streamList = null;
     this._getAllStreams().forEach((stream) => {
@@ -113,6 +104,57 @@ const MessageDetail = React.createClass({
         </LinkContainer>
       );
     });
+
+    return (
+      <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
+                      id="select-stream-dropdown">
+        { streamList }
+        { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
+          Loading streams</MenuItem> }
+        { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
+      </DropdownButton>
+    );
+  },
+
+  _formatMessageActions() {
+    if (this.props.disableMessageActions) {
+      return <ButtonGroup className="pull-right" bsSize="small"/>;
+    }
+
+    const messageUrl = this.props.message.index ? ApiRoutes.SearchController.showMessage(this.props.message.index, this.props.message.id).url : '#';
+
+    let surroundingSearchButton;
+    if (!this.props.disableSurroundingSearch) {
+      surroundingSearchButton = (
+        <SurroundingSearchButton id={this.props.message.id}
+                                 timestamp={this.props.message.timestamp}
+                                 searchConfig={this.props.searchConfig}
+                                 messageFields={this.props.message.fields} />
+      );
+    }
+
+    return (
+      <ButtonGroup className="pull-right" bsSize="small">
+        <Button href={messageUrl}>Permalink</Button>
+
+        <ClipboardButton title="Copy ID" text={this.props.message.id} />
+        {surroundingSearchButton}
+        {this._getTestAgainstStreamButton()}
+      </ButtonGroup>
+    );
+  },
+
+  render() {
+    // Short circuit when all messages are being expanded at the same time
+    if (this.props.expandAllRenderAsync) {
+      return (
+        <Row>
+          <Col md={12}>
+            <Spinner />
+          </Col>
+        </Row>
+      );
+    }
 
     const streamIds = Immutable.Set(this.props.message.stream_ids);
     const streams = streamIds.map((id) => {
@@ -160,55 +202,22 @@ const MessageDetail = React.createClass({
       receivedBy = null;
     }
 
-    const testAgainstStream = (this.props.disableTestAgainstStream ? null :
-      <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream"
-                      id="select-stream-dropdown">
-        { streamList }
-        { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
-          Loading streams</MenuItem> }
-        { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
-      </DropdownButton>);
-
-    let surroundingSearchButton;
-    if (!this.props.disableSurroundingSearch) {
-      surroundingSearchButton = (
-        <SurroundingSearchButton id={this.props.message.id}
-                                 timestamp={this.props.message.timestamp}
-                                 searchConfig={this.props.searchConfig}
-                                 messageFields={this.props.message.fields} />
-      );
-    }
-
-    let messageActions;
-    if (!this.props.isSimulation) {
-      messageActions = (
-        <ButtonGroup className="pull-right" bsSize="small">
-          <Button href={messageUrl}>Permalink</Button>
-
-          <ClipboardButton title="Copy ID" text={this.props.message.id} />
-          {surroundingSearchButton}
-          {testAgainstStream}
-        </ButtonGroup>
-      );
-    }
-
     let messageTitle;
-    if (this.props.isSimulation) {
-      messageTitle = `Simulation of processing ${this.props.message.id}`;
-    } else {
+    if (this.props.message.index) {
       messageTitle = (
         <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-          <a href="#" style={{ color: '#000' }}>{this.props.message.id}</a>
+          <a href="#">{this.props.message.id}</a>
         </LinkContainer>
       );
+    } else {
+      messageTitle = <span>{this.props.message.id} <Label bsStyle="warning">Not stored</Label></span>;
     }
 
     return (<div>
-
       <Row className="row-sm">
         <Col md={12}>
-          {messageActions}
-          <h3>
+          {this._formatMessageActions()}
+          <h3 className="message-details-title">
             <i className="fa fa-envelope" />
             &nbsp;
             {messageTitle}
@@ -222,7 +231,7 @@ const MessageDetail = React.createClass({
             {receivedBy}
 
             <dt>Stored in index</dt>
-            <dd>{this.props.isSimulation ? 'Simulations are not stored' : this.props.message.index}</dd>
+            <dd>{this.props.message.index ? this.props.message.index : 'Message is not stored'}</dd>
 
             { streamIds.size > 0 && <dt>Routed into streams</dt> }
             { streamIds.size > 0 &&
