@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
@@ -62,8 +63,10 @@ public class AbsoluteSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
 
     @Inject
-    public AbsoluteSearchResource(Searches searches, ClusterConfigService clusterConfigService) {
-        super(searches, clusterConfigService);
+    public AbsoluteSearchResource(Searches searches,
+                                  ClusterConfigService clusterConfigService,
+                                  DecoratorProcessor decoratorProcessor) {
+        super(searches, clusterConfigService, decoratorProcessor);
     }
 
     @GET

@@ -45,6 +45,10 @@ const ApiRoutes = {
     widgetValue: (dashboardId, widgetId) => { return { url: `/dashboards/${dashboardId}/widgets/${widgetId}/value` }; },
     updatePositions: (dashboardId) => { return { url: `/dashboards/${dashboardId}/positions` }; },
   },
+  DecoratorsResource: {
+    create: () => { return { url: '/search/decorators' }; },
+    get: () => { return { url: '/search/decorators' }; },
+  },
   DeflectorApiController: {
     cycle: () => { return { url: '/cluster/deflector/cycle' }; },
     list: () => { return { url: '/system/deflector' }; },

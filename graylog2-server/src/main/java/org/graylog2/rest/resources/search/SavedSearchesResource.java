@@ -27,10 +27,13 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchService;
@@ -52,6 +55,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "Search/Saved", description = "Saved searches")
@@ -62,8 +66,9 @@ public class SavedSearchesResource extends SearchResource {
     @Inject
     public SavedSearchesResource(Searches searches,
                                  SavedSearchService savedSearchService,
-                                 ClusterConfigService clusterConfigService) {
-        super(searches, clusterConfigService);
+                                 ClusterConfigService clusterConfigService,
+                                 DecoratorProcessor decoratorProcessor) {
+        super(searches, clusterConfigService, decoratorProcessor);
         this.savedSearchService = savedSearchService;
     }
 

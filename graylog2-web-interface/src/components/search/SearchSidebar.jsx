@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button, DropdownButton, Input, MenuItem, Modal } from 'react-bootstrap';
-import {AutoAffix} from 'react-overlays';
+import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
 
@@ -9,7 +9,7 @@ import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
 const SearchStore = StoreProvider.getStore('Search');
 
-import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
+import { AddSearchCountToDashboard, DecoratorSidebar, SavedSearchControls, ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SidebarMessageField from './SidebarMessageField';
 
@@ -84,7 +84,7 @@ const SearchSidebar = React.createClass({
       sidebarTop - sidebarPaddingTop - sidebarPaddingBottom -
       35; // for good measure™
 
-    this.setState({maxFieldsHeight: maxHeight});
+    this.setState({ maxFieldsHeight: maxHeight });
   },
 
   _updateFieldSelection(setName) {
@@ -111,7 +111,7 @@ const SearchSidebar = React.createClass({
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
     const query = searchParams.get('q') === '' ? '*' : searchParams.get('q');
     const fields = this.props.selectedFields;
-    const timeRange = SearchStore.rangeType === 'relative' ? {range: SearchStore.rangeParams.get('relative')} : SearchStore.rangeParams.toJS();
+    const timeRange = SearchStore.rangeType === 'relative' ? { range: SearchStore.rangeParams.get('relative') } : SearchStore.rangeParams.toJS();
 
     const url = new URI(URLUtils.qualifyUrl(
       ApiRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
@@ -138,7 +138,7 @@ const SearchSidebar = React.createClass({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => this.refs.indicesModal.close()}>Close</Button>
+          <Button onClick={this.refs.indicesModal.close}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -169,7 +169,7 @@ const SearchSidebar = React.createClass({
 
     // always add the debug query link as last elem
     moreActions.push(<MenuItem divider key="div2"/>);
-    moreActions.push(<MenuItem key="showQuery" onSelect={() => this.refs.showQueryModal.open()}>Show query</MenuItem>);
+    moreActions.push(<MenuItem key="showQuery" onSelect={this.refs.showQueryModal.open}>Show query</MenuItem>);
 
     return (
       <AutoAffix affixClassName="affix">
@@ -179,7 +179,7 @@ const SearchSidebar = React.createClass({
               {searchTitle}
             </h2>
 
-            <p style={{marginTop: 3}}>
+            <p style={{ marginTop: 3 }}>
               Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>&nbsp;
               in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
               <a href="#" onClick={this._showIndicesModal}>
@@ -193,7 +193,7 @@ const SearchSidebar = React.createClass({
 
               <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
 
-              <div style={{display: 'inline-block'}}>
+              <div style={{ display: 'inline-block' }}>
                 <DropdownButton bsSize="small" title="More actions" id="search-more-actions-dropdown">
                   {moreActions}
                 </DropdownButton>
@@ -205,7 +205,7 @@ const SearchSidebar = React.createClass({
 
             <h3>Fields</h3>
 
-            <div className="input-group input-group-sm" style={{marginTop: 5, marginBottom: 5}}>
+            <div className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
               <span className="input-group-btn">
                   <button type="button" className="btn btn-default"
                           onClick={() => this._updateFieldSelection('default')}>Default
@@ -218,21 +218,21 @@ const SearchSidebar = React.createClass({
                   </button>
               </span>
               <input type="text" className="form-control" placeholder="Filter fields"
-                     onChange={(event) => this.setState({fieldFilter: event.target.value})}
+                     onChange={(event) => this.setState({ fieldFilter: event.target.value })}
                      value={this.state.fieldFilter}/>
             </div>
           </div>
-          <div ref="fields" style={{maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll'}}>
+          <div ref="fields" style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
             <ul className="search-result-fields">
               {messageFields}
             </ul>
           </div>
           <div ref="footer">
-            <div style={{marginTop: 13, marginBottom: 0}}>
+            <div style={{ marginTop: 13, marginBottom: 0 }}>
               List <span className="message-result-fields-range"> fields of&nbsp;
-              <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
+              <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
                  onClick={this._showPageFields}>current page</a> or <a href="#"
-                                                                       style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
+                                                                       style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
                                                                        onClick={this._showAllFields}>all
                 fields</a>.
                     </span>
@@ -244,6 +244,8 @@ const SearchSidebar = React.createClass({
                 }
             </div>
           </div>
+          <hr />
+          <DecoratorSidebar />
         </div>
       </AutoAffix>
     );
