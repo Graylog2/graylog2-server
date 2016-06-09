@@ -1,4 +1,5 @@
 import React from 'react';
+import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
 import MessageDetail from './MessageDetail';
 
@@ -31,16 +32,16 @@ const MessageShow = React.createClass({
   },
   render() {
     return (
-      <div className="row content">
-        <div className="col-md-12">
+      <Row className="content">
+        <Col md={12}>
           <MessageDetail {...this.props} message={this.props.message}
                                          inputs={this.props.inputs}
                                          streams={this.state.streams}
                                          nodes={this.state.nodes}
                                          possiblyHighlight={this.possiblyHighlight}
                                          showTimestamp/>
-        </div>
-      </div>
+        </Col>
+      </Row>
     );
   },
 });
