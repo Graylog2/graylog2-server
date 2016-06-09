@@ -121,6 +121,24 @@ const SearchSidebar = React.createClass({
 
     return url.toString();
   },
+  _indicesModalClose() {
+    this.refs.indicesModal.close();
+  },
+  _showQueryModalOpen() {
+    this.refs.showQueryModal.open();
+  },
+  _filterFields(event) {
+    this.setState({ fieldFilter: event.target.value });
+  },
+  _updateFieldSelectionToDefault() {
+    this._updateFieldSelection('default');
+  },
+  _updateFieldSelectionToAll() {
+    this._updateFieldSelection('all');
+  },
+  _updateFieldSelectionToNone() {
+    this._updateFieldSelection('none');
+  },
   render() {
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
@@ -138,7 +156,7 @@ const SearchSidebar = React.createClass({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.refs.indicesModal.close}>Close</Button>
+          <Button onClick={this._indicesModalClose}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -169,7 +187,7 @@ const SearchSidebar = React.createClass({
 
     // always add the debug query link as last elem
     moreActions.push(<MenuItem divider key="div2"/>);
-    moreActions.push(<MenuItem key="showQuery" onSelect={this.refs.showQueryModal.open}>Show query</MenuItem>);
+    moreActions.push(<MenuItem key="showQuery" onSelect={this._showQueryModalOpen}>Show query</MenuItem>);
 
     return (
       <AutoAffix affixClassName="affix">
@@ -208,17 +226,17 @@ const SearchSidebar = React.createClass({
             <div className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
               <span className="input-group-btn">
                   <button type="button" className="btn btn-default"
-                          onClick={() => this._updateFieldSelection('default')}>Default
+                          onClick={this._updateFieldSelectionToDefault}>Default
                   </button>
                   <button type="button" className="btn btn-default"
-                          onClick={() => this._updateFieldSelection('all')}>All
+                          onClick={this._updateFieldSelectionToAll}>All
                   </button>
                   <button type="button" className="btn btn-default"
-                          onClick={() => this._updateFieldSelection('none')}>None
+                          onClick={this._updateFieldSelectionToNone}>None
                   </button>
               </span>
               <input type="text" className="form-control" placeholder="Filter fields"
-                     onChange={(event) => this.setState({ fieldFilter: event.target.value })}
+                     onChange={this._filterFields}
                      value={this.state.fieldFilter}/>
             </div>
           </div>
