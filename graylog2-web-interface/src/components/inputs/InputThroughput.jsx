@@ -8,6 +8,7 @@ const MetricsStore = StoreProvider.getStore('Metrics');
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
+import NumberUtils from 'util/NumberUtils';
 import { LinkToNode, Spinner } from 'components/common';
 
 const InputThroughput = React.createClass({
@@ -78,38 +79,30 @@ const InputThroughput = React.createClass({
   _formatCount(count) {
     return numeral(count).format('0,0');
   },
-  _formatBytes(bytes) {
-    return numeral(bytes).format('0.0b');
-  },
   _formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal) {
-    // ugh, is there a way of not doing it globally?
-    numeral.zeroFormat('0B');
-
     const network = (
       <span className="input-io">
         <span>Network IO: </span>
         <span className="persec">
           <i className="fa fa-caret-down channel-direction channel-direction-down"/>
-          <span className="rx value">{this._formatBytes(readBytes1Sec)} </span>
+          <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
           <i className="fa fa-caret-up channel-direction channel-direction-up"/>
-          <span className="tx value">{this._formatBytes(writtenBytes1Sec)}</span>
+          <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
         </span>
 
         <span className="total">
           <span> (total: </span>
           <i className="fa fa-caret-down channel-direction channel-direction-down"/>
-          <span className="rx value">{this._formatBytes(readBytesTotal)} </span>
+          <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
 
           <i className="fa fa-caret-up channel-direction channel-direction-up"/>
-          <span className="tx value">{this._formatBytes(writtenBytesTotal)}</span>
+          <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
           <span> )</span>
         </span>
         <br />
       </span>
     );
-    // wow this sucks
-    numeral.zeroFormat(null);
 
     return network;
   },

@@ -1,10 +1,10 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { ProgressBar } from 'react-bootstrap';
-import numeral from 'numeral';
 
 import { Spinner } from 'components/common';
 
+import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -62,13 +62,13 @@ const JvmHeapUsage = React.createClass({
           <p>
             The JVM is using{' '}
             <span className="blob used-memory"/>
-            <strong> {numeral(metrics.usedMemory).format('0.0 b')}</strong>
+            <strong> {NumberUtils.formatBytes(metrics.usedMemory)}</strong>
             {' '}of{' '}
             <span className="blob committed-memory"/>
-            <strong> {numeral(metrics.committedMemory).format('0.0 b')}</strong>
+            <strong> {NumberUtils.formatBytes(metrics.committedMemory)}</strong>
             {' '}heap space and will not attempt to use more than{' '}
             <span className="blob max-memory" style={{border: '1px solid #ccc'}}/>
-            <strong> {numeral(metrics.maxMemory).format('0.0 b')}</strong>
+            <strong> {NumberUtils.formatBytes(metrics.maxMemory)}</strong>
           </p>
         );
       }

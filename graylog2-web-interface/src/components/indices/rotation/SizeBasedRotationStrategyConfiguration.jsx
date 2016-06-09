@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
 
-import numeral from 'numeral';
+import NumberUtils from 'util/NumberUtils';
 
 const SizeBasedRotationStrategyConfiguration = React.createClass({
   propTypes: {
@@ -27,7 +27,7 @@ const SizeBasedRotationStrategyConfiguration = React.createClass({
   },
 
   _formatSize() {
-    return numeral(this.state.max_size).format('0.0b');
+    return NumberUtils.formatBytes(this.state.max_size);
   },
 
   render() {

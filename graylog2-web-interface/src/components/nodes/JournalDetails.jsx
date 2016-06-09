@@ -111,7 +111,7 @@ const JournalDetails = React.createClass({
             <dt>Earliest entry:</dt>
             <dd><Timestamp dateTime={oldestSegment} relative/></dd>
             <dt>Maximum size:</dt>
-            <dd>{numeral(journalInformation.journal_config.max_size).format('0,0 b')}</dd>
+            <dd>{NumberUtils.formatBytes(journalInformation.journal_config.max_size)}</dd>
             <dt>Maximum age:</dt>
             <dd>{moment.duration(journalInformation.journal_config.max_age).format('d [days] h [hours] m [minutes]')}</dd>
             <dt>Flush policy:</dt>

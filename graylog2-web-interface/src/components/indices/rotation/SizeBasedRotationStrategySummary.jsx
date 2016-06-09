@@ -1,5 +1,5 @@
 import React from 'react';
-import numeral from 'numeral';
+import NumberUtils from 'util/NumberUtils';
 
 const SizeBasedRotationStrategySummary = React.createClass({
   propTypes: {
@@ -13,7 +13,7 @@ const SizeBasedRotationStrategySummary = React.createClass({
           <dt>Index rotation strategy:</dt>
           <dd>Index Size</dd>
           <dt>Max index size:</dt>
-          <dd>{this.props.config.max_size} bytes ({numeral(this.props.config.max_size).format('0.0b')})</dd>
+          <dd>{this.props.config.max_size} bytes ({NumberUtils.formatBytes(this.props.config.max_size)})</dd>
         </dl>
       </div>
     );
