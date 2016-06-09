@@ -21,6 +21,7 @@ const LoaderTabs = React.createClass({
     onMessageLoaded: PropTypes.func,
     selectedInputId: PropTypes.string,
     customFieldActions: PropTypes.node,
+    disableMessagePreview: PropTypes.bool,
   },
   mixins: [Reflux.listenTo(InputsStore, '_formatInputs')],
   getInitialState() {
@@ -57,7 +58,7 @@ const LoaderTabs = React.createClass({
   },
   render() {
     let displayMessage;
-    if (this.state.message && this.state.inputs) {
+    if (this.state.message && this.state.inputs && !this.props.disableMessagePreview) {
       displayMessage = (
         <Col md={12}>
           <MessageShow message={this.state.message} inputs={this.state.inputs}
