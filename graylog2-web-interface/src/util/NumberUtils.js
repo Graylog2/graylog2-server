@@ -37,6 +37,20 @@ const NumberUtils = {
       return percentage;
     }
   },
+  formatBytes(number) {
+    numeral.zeroFormat('0B');
+
+    let formattedNumber;
+    try {
+      formattedNumber = numeral(this.normalizeNumber(number)).format('0.0b');
+    } catch (e) {
+      formattedNumber = number;
+    }
+
+    numeral.zeroFormat(null);
+
+    return formattedNumber;
+  },
   isNumber(possibleNumber) {
     return possibleNumber !== '' && !isNaN(possibleNumber);
   },
