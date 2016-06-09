@@ -66,10 +66,10 @@ public class MongoIndexRangeService implements IndexRangeService {
                                   EventBus eventBus) {
         this.indices = indices;
         this.collection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                MongoIndexRange.class,
-                ObjectId.class,
-                objectMapperProvider.get());
+            mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+            MongoIndexRange.class,
+            ObjectId.class,
+            objectMapperProvider.get());
 
         // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
         IndexChangeMonitor.setEventBus(eventBus);
@@ -77,16 +77,16 @@ public class MongoIndexRangeService implements IndexRangeService {
 
         collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
         collection.createIndex(BasicDBObjectBuilder.start()
-                .add(MongoIndexRange.FIELD_BEGIN, 1)
-                .add(MongoIndexRange.FIELD_END, 1)
-                .get());
+            .add(MongoIndexRange.FIELD_BEGIN, 1)
+            .add(MongoIndexRange.FIELD_END, 1)
+            .get());
     }
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.notExists("start"),
-                DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
+            DBQuery.notExists("start"),
+            DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
         final MongoIndexRange indexRange = collection.findOne(query);
         if (indexRange == null) {
             throw new NotFoundException("Index range for index <" + index + "> not found.");
@@ -98,11 +98,18 @@ public class MongoIndexRangeService implements IndexRangeService {
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
         final DBCursor<MongoIndexRange> indexRanges = collection.find(
+            DBQuery.or(
                 DBQuery.and(
-                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
-                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
-                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
+                    DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
+                    DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
+                ),
+                DBQuery.and(
+                    DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
+                    DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, 0L),
+                    DBQuery.greaterThanEquals(IndexRange.FIELD_END, 0L)
                 )
+            )
         );
 
         return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) indexRanges);
@@ -123,6 +130,11 @@ public class MongoIndexRangeService implements IndexRangeService {
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
         return MongoIndexRange.create(index, stats.min(), stats.max(), now, duration);
+    }
+
+    @Override
+    public IndexRange createUnknownRange(String index) {
+        return MongoIndexRange.create(index, new DateTime(0L), new DateTime(0L), DateTime.now(), 0);
     }
 
     @Override
@@ -158,10 +170,10 @@ public class MongoIndexRangeService implements IndexRangeService {
             indices.waitForRecovery(index);
 
             final Retryer<IndexRange> retryer = RetryerBuilder.<IndexRange>newBuilder()
-                    .retryIfException(input -> !(input instanceof IndexClosedException))
-                    .withWaitStrategy(WaitStrategies.exponentialWait())
-                    .withStopStrategy(StopStrategies.stopAfterDelay(5, TimeUnit.MINUTES))
-                    .build();
+                .retryIfException(input -> !(input instanceof IndexClosedException))
+                .withWaitStrategy(WaitStrategies.exponentialWait())
+                .withStopStrategy(StopStrategies.stopAfterDelay(5, TimeUnit.MINUTES))
+                .build();
 
             final IndexRange indexRange;
             try {

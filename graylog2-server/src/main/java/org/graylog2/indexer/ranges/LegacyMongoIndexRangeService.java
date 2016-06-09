@@ -108,6 +108,11 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public IndexRange createUnknownRange(String index) {
+        throw new UnsupportedOperationException();
+    }
+
     public int delete(String index) {
         return destroy(new BasicDBObject(FIELD_INDEX, index), COLLECTION_NAME);
     }

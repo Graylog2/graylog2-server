@@ -106,17 +106,6 @@ public class IndexHelper {
             indices.add(indexRange);
         }
 
-        // Always include the deflector target
-        final String targetIndex = deflector.getCurrentActualTargetIndex();
-        if (targetIndex != null) {
-            try {
-                final IndexRange deflectorIndexRange = indexRangeService.get(targetIndex);
-                indices.add(deflectorIndexRange);
-            } catch (NotFoundException e) {
-                LOG.warn("Couldn't find latest deflector target index", e);
-            }
-        }
-
         return indices.build();
     }
 }

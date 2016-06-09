@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class SystemJobManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobManager.class);
     private static final int THREAD_POOL_SIZE = 15;
 
@@ -89,7 +90,7 @@ public class SystemJobManager {
                     x.stop();
 
                     final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
-                            TimeUnit.MILLISECONDS) + "ms.";
+                        TimeUnit.MILLISECONDS) + "ms.";
                     LOG.info(msg);
                     activityWriter.write(new Activity(msg, SystemJobManager.class));
                 } catch (SystemJobConcurrencyException ignored) {

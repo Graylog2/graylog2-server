@@ -31,4 +31,5 @@ public interface IndexRangeService {
     void save(IndexRange indexRange);
 
     IndexRange calculateRange(String index);
+    IndexRange createUnknownRange(String index);
 }

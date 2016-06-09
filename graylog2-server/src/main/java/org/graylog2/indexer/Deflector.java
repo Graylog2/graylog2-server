@@ -19,7 +19,9 @@ package org.graylog2.indexer;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -57,27 +59,27 @@ public class Deflector { // extends Ablenkblech
 
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
-    private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
+    private final IndexRangeService indexRangeService;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
-    private final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
     private final Pattern deflectorIndexPattern;
     private final Pattern indexPattern;
+    private final SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
                      @Named("elasticsearch_index_prefix") final String indexPrefix,
                      final ActivityWriter activityWriter,
-                     final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
-                     final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
-                     final Indices indices) {
+                     final Indices indices,
+                     final IndexRangeService indexRangeService,
+                     final SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory) {
         this.indexPrefix = indexPrefix;
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
-        this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
-        this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
+        this.indexRangeService = indexRangeService;
+        this.setIndexReadOnlyAndCalculateRangeJobFactory = setIndexReadOnlyAndCalculateRangeJobFactory;
 
         this.deflectorName = buildName(indexPrefix);
         this.indices = indices;
@@ -144,6 +146,7 @@ public class Deflector { // extends Ablenkblech
         ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
+        addDeflectorIndexRange(newTarget);
         LOG.info("Done!");
 
         // Point deflector to new index.
@@ -156,27 +159,30 @@ public class Deflector { // extends Ablenkblech
             activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
             // Re-pointing from existing old index to the new one.
+            LOG.debug("Now switching over deflector alias.");
             pointTo(newTarget, oldTarget);
-            addSingleIndexRanges(oldTarget);
 
             // perform these steps after a delay, so we don't race with indexing into the alias
             // it can happen that an index request still writes to the old deflector target, while we cycled it above.
             // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
             // waiting 30 seconds to perform the background task should completely get rid of these errors.
-            final SystemJob makeReadOnlyJob = indexReadOnlyJobFactory.create(oldTarget);
+            final SystemJob setIndexReadOnlyAndCalculateRangeJob = setIndexReadOnlyAndCalculateRangeJobFactory.create(oldTarget);
             try {
-                systemJobManager.submitWithDelay(makeReadOnlyJob, 30, TimeUnit.SECONDS);
+                systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
             } catch (SystemJobConcurrencyException e) {
-                LOG.error("Cannot set index <" + oldTarget + "> to read only. It won't be optimized.", e);
+                LOG.error("Cannot set index <" + oldTarget + "> to read only and calculate its range. It won't be optimized.", e);
             }
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
-        addSingleIndexRanges(newTarget);
-
         LOG.info("Done!");
 
         activityWriter.write(activity);
+    }
+
+    private void addDeflectorIndexRange(String newTarget) {
+        final IndexRange deflectorRange = indexRangeService.createUnknownRange(newTarget);
+        indexRangeService.save(deflectorRange);
     }
 
     public int getNewestTargetNumber() throws NoTargetIndexException {
@@ -265,16 +271,6 @@ public class Deflector { // extends Ablenkblech
 
     public void pointTo(final String newIndex) {
         indices.cycleAlias(getName(), newIndex);
-    }
-
-    private void addSingleIndexRanges(String indexName) {
-        try {
-            systemJobManager.submit(createNewSingleIndexRangeJobFactory.create(this, indexName));
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Could not calculate index ranges for index " + indexName + " after cycling deflector: Maximum concurrency of job is reached.";
-            activityWriter.write(new Activity(msg, Deflector.class));
-            LOG.error(msg, e);
-        }
     }
 
     @Nullable

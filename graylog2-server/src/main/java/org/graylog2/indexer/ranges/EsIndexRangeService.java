@@ -179,6 +179,11 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public IndexRange createUnknownRange(String index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void save(IndexRange indexRange) {
         throw new UnsupportedOperationException();
     }

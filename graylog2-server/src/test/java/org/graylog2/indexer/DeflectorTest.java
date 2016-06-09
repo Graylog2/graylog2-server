@@ -22,7 +22,9 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
@@ -55,12 +57,22 @@ public class DeflectorTest {
     @Mock
     private CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     @Mock
+    private SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory;
+    @Mock
     private Indices indices;
     private Deflector deflector;
 
+    @Mock
+    private IndexRangeService indexRangeService;
+
     @Before
     public void setUp() {
-        deflector = new Deflector(systemJobManager, "graylog", activityWriter, indexReadOnlyJobFactory, singleIndexRangeJobFactory, indices);
+        deflector = new Deflector(systemJobManager,
+            "graylog",
+            activityWriter,
+            indices,
+            indexRangeService,
+            setIndexReadOnlyAndCalculateRangeJobFactory);
     }
 
     @Test
@@ -167,11 +179,11 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                "graylog",
-                                                activityWriter,
-                                                indexReadOnlyJobFactory,
-                                                singleIndexRangeJobFactory,
-                                                indices);
+            "graylog",
+            activityWriter,
+            indices,
+            indexRangeService,
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final int number = deflector.getNewestTargetNumber();
         assertEquals(3, number);
@@ -189,15 +201,15 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                  "graylog",
-                                                  activityWriter,
-                                                  indexReadOnlyJobFactory,
-                                                  singleIndexRangeJobFactory,
-                                                  indices);
+            "graylog",
+            activityWriter,
+            indices,
+            indexRangeService,
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
         assertThat(allGraylogIndexNames)
-                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
+            .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_4_restored_archive", "graylog_5");
     }
 
     @Test
@@ -212,20 +224,17 @@ public class DeflectorTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
-                                                  "graylog",
-                                                  activityWriter,
-                                                  indexReadOnlyJobFactory,
-                                                  singleIndexRangeJobFactory,
-                                                  indices);
+            "graylog",
+            activityWriter,
+            indices,
+            indexRangeService,
+            setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
 
         assertThat(deflectorIndices).isNotNull();
         assertThat(deflectorIndices).isNotEmpty();
         assertThat(deflectorIndices.keySet())
-                .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+            .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
     }
-
-
-
 }
