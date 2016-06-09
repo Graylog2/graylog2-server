@@ -17,6 +17,7 @@
 
 package org.graylog2.indexer.rotation.strategies;
 
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -51,6 +52,9 @@ public class TimeBasedRotationStrategyTest {
 
     @Mock
     private Indices indices;
+
+    @Mock
+    private AuditLogger auditLogger;
 
     @After
     public void resetTimeProvider() {
@@ -118,12 +122,12 @@ public class TimeBasedRotationStrategyTest {
         DateTimeUtils.setCurrentMillisProvider(clock);
 
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
+        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
 
         // Should not rotate the first index.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         hourlyRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
@@ -131,6 +135,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(seconds(2));
 
         // Crossed rotation period.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         hourlyRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
@@ -138,6 +143,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(seconds(2));
 
         // Did not cross rotation period.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         hourlyRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
@@ -152,13 +158,13 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService);
+        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
 
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
@@ -167,6 +173,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(seconds(1));
 
         // Did not cross rotation period.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         tenMinRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);
@@ -175,6 +182,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(minutes(4).withSeconds(59));
 
         // Crossed rotation period.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
@@ -184,6 +192,7 @@ public class TimeBasedRotationStrategyTest {
         clock.tick(minutes(51));
 
         // Crossed multiple rotation periods.
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         tenMinRotation.rotate();
         verify(deflector, times(1)).cycle();
         reset(deflector);
@@ -191,6 +200,7 @@ public class TimeBasedRotationStrategyTest {
         // move time to 2:52:00
         // this should not cycle again, because next valid rotation time is 3:00:00
         clock.tick(minutes(1));
+        when(deflector.getNewestTargetName()).thenReturn("ignored");
         tenMinRotation.rotate();
         verify(deflector, never()).cycle();
         reset(deflector);

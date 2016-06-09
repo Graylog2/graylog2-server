@@ -18,6 +18,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.base.MoreObjects;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
@@ -55,8 +56,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(Indices indices, Deflector deflector, ClusterConfigService clusterConfigService) {
-        super(deflector);
+    public TimeBasedRotationStrategy(Indices indices, Deflector deflector,
+                                     ClusterConfigService clusterConfigService, AuditLogger auditLogger) {
+        super(deflector, auditLogger);
         this.clusterConfigService = clusterConfigService;
         this.anchor = null;
         this.lastRotation = null;

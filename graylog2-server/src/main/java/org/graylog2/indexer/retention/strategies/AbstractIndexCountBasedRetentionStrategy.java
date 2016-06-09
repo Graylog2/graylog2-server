@@ -17,10 +17,10 @@
 
 package org.graylog2.indexer.retention.strategies;
 
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -30,7 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
@@ -38,11 +41,14 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     private final Deflector deflector;
     private final Indices indices;
     private final ActivityWriter activityWriter;
+    private final AuditLogger auditLogger;
 
-    public AbstractIndexCountBasedRetentionStrategy(Deflector deflector, Indices indices, ActivityWriter activityWriter) {
-        this.deflector = deflector;
-        this.indices = indices;
-        this.activityWriter = activityWriter;
+    public AbstractIndexCountBasedRetentionStrategy(Deflector deflector, Indices indices,
+                                                    ActivityWriter activityWriter, AuditLogger auditLogger) {
+        this.deflector = requireNonNull(deflector);
+        this.indices = requireNonNull(indices);
+        this.activityWriter = requireNonNull(activityWriter);
+        this.auditLogger = requireNonNull(auditLogger);
     }
 
     protected abstract Optional<Integer> getMaxNumberOfIndices();
@@ -73,14 +79,13 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-        try {
-            runRetention(deflectorIndices, removeCount);
-        } catch (NoTargetIndexException e) {
-            LOG.error("Could not run index retention. No target index.", e);
-        }
+        final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
+        auditLogger.success("<system>", "initiated", "index retention", auditLogContext);
+
+        runRetention(deflectorIndices, removeCount);
     }
 
-    private void runRetention(Map<String, Set<String>> deflectorIndices, int removeCount) throws NoTargetIndexException {
+    private void runRetention(Map<String, Set<String>> deflectorIndices, int removeCount) {
         for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
             // Never run against the current deflector target.
             if (deflectorIndices.get(indexName).contains(deflector.getName())) {
@@ -97,13 +102,18 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
                 continue;
             }
 
-            final String msg = "Running retention strategy [" + this.getClass().getCanonicalName() + "] " +
-                    "for index <" + indexName + ">";
+            final String strategyName = this.getClass().getCanonicalName();
+            final String msg = "Running retention strategy [" + strategyName + "] for index <" + indexName + ">";
             LOG.info(msg);
             activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
             // Sorry if this should ever go mad. Run retention strategy!
             retain(indexName);
+
+            final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of(
+                "index_name", indexName,
+                "retention_strategy", strategyName);
+            auditLogger.success("<system>", "completed", "index retention", auditLogContext);
         }
     }
 }
