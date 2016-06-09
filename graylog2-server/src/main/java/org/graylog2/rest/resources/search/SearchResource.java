@@ -162,18 +162,20 @@ public abstract class SearchResource extends RestResource {
         return TermsStatsResult.create(tr.took().millis(), tr.getResults(), tr.getBuiltQuery());
     }
 
-    protected SearchResponse buildSearchResponse(SearchResult sr, org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
-        SearchResponse result = SearchResponse.create(sr.getOriginalQuery(),
+    protected SearchResponse buildSearchResponse(SearchResult sr, org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange, boolean decorate) {
+        final List<ResultMessage> resultMessages = decorate ? decoratorProcessor.decorate(sr.getResults()) : sr.getResults();
+
+        final SearchResponse result = SearchResponse.create(sr.getOriginalQuery(),
             sr.getBuiltQuery(),
             indexRangeListToValueList(sr.getUsedIndices()),
-            resultMessageListtoValueList(sr.getResults()),
+            resultMessageListtoValueList(resultMessages),
             sr.getFields(),
             sr.took().millis(),
             sr.getTotalResults(),
             timeRange.getFrom(),
             timeRange.getTo());
 
-        return decoratorProcessor.decorate(result);
+        return decorate ? decoratorProcessor.decorate(result) : result;
     }
 
     protected Set<IndexRangeSummary> indexRangeListToValueList(Set<IndexRange> indexRanges) {
@@ -192,8 +194,7 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected List<ResultMessageSummary> resultMessageListtoValueList(List<ResultMessage> resultMessages) {
-        final Collection<ResultMessage> transformedMessages = decoratorProcessor.decorate(resultMessages);
-        return transformedMessages.stream()
+        return resultMessages.stream()
             // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
             .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
             .collect(Collectors.toList());

@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -87,7 +88,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
-            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort,
+            @ApiParam(name = "decorate", value = "Run decorators on search result", required = false) @QueryParam("decorate") @DefaultValue("true") boolean decorate) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         final List<String> fieldList = parseOptionalFields(fields);
@@ -104,7 +106,7 @@ public class KeywordSearchResource extends SearchResource {
                 .build();
 
         try {
-            return buildSearchResponse(searches.search(searchesConfig), timeRange);
+            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
