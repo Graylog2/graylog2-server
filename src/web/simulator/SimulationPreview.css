@@ -1,0 +1,9 @@
+.message-preview-wrapper {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.message-preview-wrapper dl {
+    margin-top: 5px;
+    margin-bottom: 0;
+}

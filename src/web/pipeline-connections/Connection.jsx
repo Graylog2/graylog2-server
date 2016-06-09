@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import { Button, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { DataTable, EntityListItem, Timestamp } from 'components/common';
@@ -46,10 +46,14 @@ const Connection = React.createClass({
   },
 
   render() {
-    const actions = (
-      <ConnectionForm connection={{ stream: this.props.stream, pipelines: this.props.pipelines }}
-                      save={this.props.onUpdate} />
-    );
+    const actions = [
+      <LinkContainer to={`/system/pipelines/simulate/${this.props.stream.id}`}>
+        <Button bsStyle="info" key={`simulate-${this.props.stream.id}`}>Simulate processing</Button>
+      </LinkContainer>,
+      <ConnectionForm key={`connection-${this.props.stream.id}`}
+                      connection={{ stream: this.props.stream, pipelines: this.props.pipelines }}
+                      save={this.props.onUpdate} />,
+    ];
 
     const content = (
       <Col md={12}>
