@@ -16,6 +16,9 @@
  */
 package org.graylog2.plugin;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
@@ -47,6 +50,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -62,6 +67,20 @@ public final class Tools {
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
+
+    private static final long RDNS_CACHE_SIZE = 10000;
+    private static final long RNDS_CACHE_EXPIRY = 30;
+    private static final LoadingCache<InetAddress, String> rdnsCache = CacheBuilder.newBuilder()
+        .expireAfterWrite(RNDS_CACHE_EXPIRY, TimeUnit.MINUTES)
+        .maximumSize(RDNS_CACHE_SIZE)
+        .build(
+            new CacheLoader<InetAddress, String>() {
+                @Override
+                public String load(InetAddress inetAddress) throws Exception {
+                    return inetAddress.getCanonicalHostName();
+                }
+            }
+        );
 
     private Tools() {
     }
@@ -264,8 +283,19 @@ public final class Tools {
         return new String(BaseEncoding.base64().decode(what), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Get the canonical hostname of InetAddress, using a cache.
+     *
+     * @param socketAddress ip address
+     * @return The fqdn matching ip address
+     * @throws UnknownHostException if querying failed
+     */
     public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
-        return socketAddress.getCanonicalHostName();
+        try {
+            return rdnsCache.get(socketAddress);
+        } catch (ExecutionException e) {
+            throw new UnknownHostException("Unable to rdns lookup:"  + e.getCause());
+        }
     }
 
     public static String generateServerId() {
