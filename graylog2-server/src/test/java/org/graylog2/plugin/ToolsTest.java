@@ -23,7 +23,9 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class ToolsTest {
 
@@ -154,6 +157,16 @@ public class ToolsTest {
     @Test
     public void testDecodeBase64() {
         assertEquals("lolwat.encoded", Tools.decodeBase64("bG9sd2F0LmVuY29kZWQ="));
+    }
+
+    @Test
+    public void testRdnsLookup () throws UnknownHostException {
+        final String localhost = Tools.getLocalCanonicalHostname();
+        // The rest of the test would not probably make much sense if the previous failed
+        assumeTrue(!"Unknown".equals(localhost));
+
+        InetAddress addr = InetAddress.getLocalHost();
+        assertEquals(localhost, Tools.rdnsLookup(addr));
     }
 
     @Test
