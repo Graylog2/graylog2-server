@@ -16,12 +16,12 @@
  */
 package integration;
 
-import com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule;
+import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.Rule;
 
-import static com.github.joschi.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-import static com.github.joschi.nosqlunit.elasticsearch2.RemoteElasticsearchConfigurationBuilder.remoteElasticsearch;
+import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
+import static com.lordofthejars.nosqlunit.elasticsearch2.RemoteElasticsearchConfigurationBuilder.remoteElasticsearch;
 
 
 public class RestTestIncludingElasticsearch extends BaseRestTest {

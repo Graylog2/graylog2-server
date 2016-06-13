@@ -118,7 +118,7 @@
 	        <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.joschi.nosqlunit</groupId>
+            <groupId>com.lordofthejars</groupId>
             <artifactId>nosqlunit-elasticsearch2</artifactId>
             <scope>test</scope>
         </dependency>

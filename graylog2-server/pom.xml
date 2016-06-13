@@ -327,7 +327,7 @@
             <artifactId>assertj-joda-time</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.joschi.nosqlunit</groupId>
+            <groupId>com.lordofthejars</groupId>
             <artifactId>nosqlunit-elasticsearch2</artifactId>
         </dependency>
         <dependency>
