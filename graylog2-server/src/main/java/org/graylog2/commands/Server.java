@@ -29,7 +29,7 @@ import org.graylog2.auditlog.AuditLogModule;
 import org.graylog2.auditlog.AuditLogStdOutConfiguration;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.bindings.AlarmCallbackBindings;
-import org.graylog2.bindings.DecoratorBindings;
+import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;

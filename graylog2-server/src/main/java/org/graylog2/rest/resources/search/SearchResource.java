@@ -34,6 +34,7 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -164,7 +165,6 @@ public abstract class SearchResource extends RestResource {
 
     protected SearchResponse buildSearchResponse(SearchResult sr, org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange, boolean decorate) {
         final List<ResultMessage> resultMessages = decorate ? decoratorProcessor.decorate(sr.getResults()) : sr.getResults();
-
         final SearchResponse result = SearchResponse.create(sr.getOriginalQuery(),
             sr.getBuiltQuery(),
             indexRangeListToValueList(sr.getUsedIndices()),

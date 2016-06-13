@@ -99,6 +99,10 @@ public class ResultMessage {
         this.message = new Message(tmp);
     }
 
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
     public void setHighlightRanges(Map<String, HighlightField> highlightFields) {
         if (!highlightFields.isEmpty()) {
             highlightRanges = ArrayListMultimap.create();
